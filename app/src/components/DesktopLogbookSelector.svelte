@@ -152,10 +152,10 @@
       cursor: pointer;
       max-width: 100%;
       min-width: 0;
-    }
-    .bc-logbook-selector--pill:focus-visible {
-      outline: 2px solid var(--bc-action);
-      outline-offset: 2px;
+      &:focus-visible {
+        outline: 2px solid var(--bc-action);
+        outline-offset: 2px;
+      }
     }
     .bc-logbook-selector--title {
       font-family: var(--bc-title-font);
@@ -172,9 +172,9 @@
       white-space: nowrap;
       font-size: 16px;
       color: var(--bc-text-2);
-    }
-    .bc-logbook-selector--name::before {
-      content: '· ';
+      &::before {
+        content: '· ';
+      }
     }
     .bc-logbook-selector--scrim {
       position: fixed;
@@ -269,9 +269,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-logbook-selector--pill {
         transition: box-shadow 120ms linear;
-      }
-      .bc-logbook-selector--pill:not(:disabled):hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:not(:disabled):hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {

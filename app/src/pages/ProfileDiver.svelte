@@ -115,10 +115,9 @@
       align-items: center;
       gap: 16px;
       text-decoration: none;
-    }
-
-    .bc-profile--emergency .bc-profile--chevron {
-      color: inherit;
+      & .bc-profile--chevron {
+        color: inherit;
+      }
     }
 
     .bc-profile--emergency-icon {
@@ -224,10 +223,9 @@
       gap: 16px;
       color: var(--bc-text);
       text-decoration: none;
-    }
-
-    .bc-profile--row + .bc-profile--row {
-      border-top: 1px solid var(--bc-separator);
+      & + .bc-profile--row {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     .bc-profile--tile {

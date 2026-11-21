@@ -222,18 +222,15 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-dive-gear--segment:first-child {
-      border-radius: 20px 8px 8px 20px;
-    }
-
-    .bc-dive-gear--segment:last-child {
-      border-radius: 8px 20px 20px 8px;
-    }
-
-    .bc-dive-gear--segment:disabled {
-      opacity: 0.38;
+      &:first-child {
+        border-radius: 20px 8px 8px 20px;
+      }
+      &:last-child {
+        border-radius: 8px 20px 20px 8px;
+      }
+      &:disabled {
+        opacity: 0.38;
+      }
     }
   }
 </style>

@@ -94,13 +94,13 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-    .bc-logbook-ready--way:hover {
-      background: var(--bc-surface-2);
-    }
-    .bc-logbook-ready--way:focus-visible {
-      outline: 2px solid var(--bc-action);
-      outline-offset: 2px;
+      &:hover {
+        background: var(--bc-surface-2);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--bc-action);
+        outline-offset: 2px;
+      }
     }
     .bc-logbook-ready--icon {
       flex: none;

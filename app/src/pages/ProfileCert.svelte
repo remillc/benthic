@@ -160,10 +160,9 @@
       border: none;
       background: none;
       color: inherit;
-    }
-
-    .bc-cert--bar:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-cert--photo {
@@ -175,12 +174,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .bc-cert--photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
     }
 
     .bc-cert--photo-empty {
@@ -216,10 +214,9 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-    }
-
-    .bc-cert--row + .bc-cert--row {
-      border-top: 1px solid var(--bc-separator);
+      & + .bc-cert--row {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     .bc-cert--label {

@@ -721,13 +721,13 @@
       color: var(--bc-text);
       cursor: pointer;
       white-space: nowrap;
-    }
-    .bc-desktop-planner--button:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
-    }
-    .bc-desktop-planner--button:disabled {
-      opacity: 0.4;
-      cursor: default;
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
+      &:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
     }
     .bc-desktop-planner--filled,
     .bc-desktop-planner--filled:hover:not(:disabled) {
@@ -745,9 +745,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-planner--more:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-planner--body {
       display: grid;
@@ -880,11 +880,11 @@
       list-style: none;
       font-size: 13px;
       color: var(--bc-text-2);
-    }
-    .bc-desktop-planner--legend li {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      & li {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
     }
     .bc-desktop-planner--swatch {
       width: 10px;
@@ -895,18 +895,18 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 15px;
-    }
-    .bc-desktop-planner--table th {
-      padding: 6px 12px 8px;
-      border-bottom: 1px solid var(--bc-separator);
-      font-size: 13px;
-      font-weight: 500;
-      text-align: left;
-      color: var(--bc-text-2);
-    }
-    .bc-desktop-planner--table td {
-      padding: 9px 12px;
-      color: var(--bc-text);
+      & th {
+        padding: 6px 12px 8px;
+        border-bottom: 1px solid var(--bc-separator);
+        font-size: 13px;
+        font-weight: 500;
+        text-align: left;
+        color: var(--bc-text-2);
+      }
+      & td {
+        padding: 9px 12px;
+        color: var(--bc-text);
+      }
     }
     .bc-desktop-planner--num {
       text-align: right !important;
@@ -937,9 +937,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-desktop-planner--filled {
         transition: box-shadow 120ms linear;
-      }
-      .bc-desktop-planner--filled:hover:not(:disabled) {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:hover:not(:disabled) {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
       .bc-desktop-planner--add:hover {
         text-decoration: underline;
@@ -951,9 +951,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-desktop-planner--remove {
         transition: box-shadow 120ms linear;
-      }
-      .bc-desktop-planner--remove:not(:disabled):hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:not(:disabled):hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {

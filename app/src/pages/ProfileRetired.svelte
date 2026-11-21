@@ -106,10 +106,9 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-
-    .bc-retired-page--row + .bc-retired-page--row {
-      border-top: 1px solid var(--bc-separator);
+      & + .bc-retired-page--row {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     .bc-retired-page--tile {

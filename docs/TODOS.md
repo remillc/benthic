@@ -48,7 +48,6 @@ Next number: 151
 - #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
-- #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.

@@ -105,10 +105,9 @@
       border-radius: 16px;
       overflow: hidden;
       background: var(--bc-surface);
-    }
-
-    .bc-recent-logbooks--list li + li {
-      border-top: 1px solid var(--bc-release-divider);
+      & li + li {
+        border-top: 1px solid var(--bc-release-divider);
+      }
     }
 
     .bc-recent-logbooks--row {

@@ -244,10 +244,9 @@
       border: none;
       background: none;
       color: inherit;
-    }
-
-    .bc-doc--bar:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-doc--head {
@@ -333,23 +332,21 @@
       flex-direction: column;
       align-items: center;
       gap: 8px;
-    }
-
-    .bc-doc--page figcaption {
-      align-self: flex-start;
-      padding: 0 4px;
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: 600;
-      color: var(--bc-text-2);
-    }
-
-    .bc-doc--page img {
-      width: 100%;
-      max-height: 420px;
-      border-radius: 16px;
-      object-fit: contain;
-      background: var(--bc-surface);
+      & figcaption {
+        align-self: flex-start;
+        padding: 0 4px;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600;
+        color: var(--bc-text-2);
+      }
+      & img {
+        width: 100%;
+        max-height: 420px;
+        border-radius: 16px;
+        object-fit: contain;
+        background: var(--bc-surface);
+      }
     }
 
     .bc-doc--full {
@@ -376,22 +373,20 @@
       gap: 12px;
       background: var(--bc-surface);
       font-size: 16px;
-    }
-
-    .bc-doc--pdf span {
-      flex: 1;
-    }
-
-    .bc-doc--pdf button {
-      height: 40px;
-      padding: 0 16px;
-      border: none;
-      border-radius: 20px;
-      background: var(--bc-tonal);
-      color: var(--bc-on-secondary-container);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
+      & span {
+        flex: 1;
+      }
+      & button {
+        height: 40px;
+        padding: 0 16px;
+        border: none;
+        border-radius: 20px;
+        background: var(--bc-tonal);
+        color: var(--bc-on-secondary-container);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+      }
     }
 
     .bc-doc--section {
@@ -414,10 +409,9 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-    }
-
-    .bc-doc--row + .bc-doc--row {
-      border-top: 1px solid var(--bc-separator);
+      & + .bc-doc--row {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     .bc-doc--label {

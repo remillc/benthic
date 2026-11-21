@@ -286,10 +286,9 @@
           stroke: var(--bc-water-top);
         }
       }
-    }
-
-    .bc-nav-menu--item .bc-nav-menu--label {
-      flex: 1;
+      & .bc-nav-menu--label {
+        flex: 1;
+      }
     }
 
     /* Count of waiting map updates: on the tertiary role (what waits for the diver), a number and a name, not the colour alone. */

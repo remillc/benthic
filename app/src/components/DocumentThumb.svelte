@@ -53,12 +53,11 @@
     .bc-doc-thumb--photo {
       background: var(--bc-surface-2);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
-    }
-
-    .bc-doc-thumb--photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
     }
 
     .bc-doc-thumb--drawn {
@@ -110,12 +109,11 @@
       overflow: hidden;
       background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
-    }
-
-    .bc-doc-thumb--page img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
     }
 
     .bc-doc-thumb--line {

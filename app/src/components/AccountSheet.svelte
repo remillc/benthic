@@ -887,18 +887,17 @@
       min-height: 64px;
       padding-top: 8px;
       padding-bottom: 8px;
-    }
+      & .bc-account-sheet--row-label {
+        gap: 2px;
+        font-size: 16px;
 
-    .bc-account-sheet--plus-row .bc-account-sheet--row-label {
-      gap: 2px;
-      font-size: 16px;
-
-      :global(.bc-plus-chip) {
-        align-self: flex-start;
-        height: 22px;
-        margin-bottom: 2px;
-        border-radius: 11px;
-        padding: 0 8px 0 6px;
+        :global(.bc-plus-chip) {
+          align-self: flex-start;
+          height: 22px;
+          margin-bottom: 2px;
+          border-radius: 11px;
+          padding: 0 8px 0 6px;
+      }
       }
     }
 

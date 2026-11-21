@@ -167,9 +167,9 @@
       text-align: start;
       font: inherit;
       cursor: pointer;
-    }
-    .bc-profile-nav--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-profile-nav--on,
     .bc-profile-nav--on:hover {

@@ -315,11 +315,10 @@
       grid-template-columns: minmax(0, 1fr);
       row-gap: 4px;
       margin-bottom: 0;
-    }
-
-    .bc-desktop-edit-field--stacked .bc-desktop-edit-field--label {
-      min-height: 0;
-      font-size: 13px;
+      & .bc-desktop-edit-field--label {
+        min-height: 0;
+        font-size: 13px;
+      }
     }
 
     .bc-desktop-edit-field--note,
@@ -385,10 +384,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-
-    .bc-desktop-edit-field--open:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
 
     .bc-desktop-edit-field--stars {
@@ -404,17 +402,15 @@
       border: 0;
       background: none;
       cursor: pointer;
-    }
-
-    .bc-desktop-edit-field--star path {
-      fill: none;
-      stroke: var(--bc-text);
-      stroke-width: 1.6;
-      stroke-linejoin: round;
-    }
-
-    .bc-desktop-edit-field--star path.bc-desktop-edit-field--star-on {
-      fill: var(--bc-text);
+      & path {
+        fill: none;
+        stroke: var(--bc-text);
+        stroke-width: 1.6;
+        stroke-linejoin: round;
+      }
+      & path.bc-desktop-edit-field--star-on {
+        fill: var(--bc-text);
+      }
     }
 
     .bc-desktop-edit-field--label {
@@ -520,10 +516,9 @@
       background: none;
       color: inherit;
       cursor: pointer;
-    }
-
-    .bc-desktop-edit-field--chip-x:hover {
-      background: color-mix(in srgb, currentColor 14%, transparent);
+      &:hover {
+        background: color-mix(in srgb, currentColor 14%, transparent);
+      }
     }
 
     .bc-desktop-edit-field--edit-wrap {

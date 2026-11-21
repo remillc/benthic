@@ -120,15 +120,15 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-account-avatar--circle {
         position: relative;
-      }
-      .bc-account-avatar--circle::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: currentColor;
-        opacity: 0;
-        transition: opacity 120ms linear;
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: currentColor;
+          opacity: 0;
+          transition: opacity 120ms linear;
+        }
       }
       .bc-account-avatar:hover .bc-account-avatar--circle::after {
         opacity: 0.08;

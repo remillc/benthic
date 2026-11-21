@@ -38,7 +38,7 @@ Every component carries a class that names it, prefixed `bc-`, in kebab case: `b
 
 **Layers.** Framework7's CSS sits in the `framework7` layer, imported by `app/src/theme.css`; ours in `od.tokens`, `od.base` and `od.components` (the styles of Svelte components). Overrides of the `--f7-*` variables stay outside any layer: Framework7 injects its colours at start-up without a layer, and a rule in a layer would always lose.
 
-**Nesting.** Nest only a real relation: a variant (`&.reduced`), a theme (`:global(.ios) &`), an element in its block (`.values strong`). Otherwise, flat rules.
+**Nesting.** Use CSS nesting in every stylesheet where it expresses a real relation: a state or variant (`&:hover`, `&.reduced`), a theme (`:global(.ios) &`), or an element in its block (`.values strong`). Preserve the original selectors, specificity, cascade order and browser support; leave rules flat when nesting would change them.
 
 ## 3. Colours
 

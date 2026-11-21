@@ -612,16 +612,14 @@
       background: none;
       color: var(--bc-text-2);
       cursor: pointer;
-    }
-
-    .bc-desktop-dive-fields--icon:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
-      color: var(--bc-text);
-    }
-
-    .bc-desktop-dive-fields--icon:disabled {
-      opacity: 0.38;
-      cursor: default;
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+        color: var(--bc-text);
+      }
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
     }
   }
 </style>

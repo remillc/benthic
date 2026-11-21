@@ -579,15 +579,13 @@
       text-decoration: none;
       white-space: nowrap;
       cursor: pointer;
-    }
-
-    .bc-desktop-statistics--outlined:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
-    }
-
-    .bc-desktop-statistics--outlined:disabled {
-      opacity: 0.38;
-      cursor: default;
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
     }
 
     .bc-desktop-statistics--icon-button {
@@ -600,15 +598,13 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-
-    .bc-desktop-statistics--icon-button:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
-    }
-
-    .bc-desktop-statistics--icon-button:disabled {
-      opacity: 0.38;
-      cursor: default;
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
     }
 
     .bc-desktop-statistics--state {
@@ -630,12 +626,11 @@
       overflow-x: hidden;
       overflow-y: auto;
       box-sizing: border-box;
-    }
-
-    .bc-desktop-statistics--list ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
+      & ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
     }
 
     /* A row: 72 dp, 12 dp corners, 8 dp side margins, 4 dp between rows. */
@@ -655,10 +650,9 @@
       align-items: center;
       gap: 14px;
       cursor: pointer;
-    }
-
-    .bc-desktop-statistics--item:hover:not(.bc-desktop-statistics--item-selected) {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover:not(.bc-desktop-statistics--item-selected) {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
 
     .bc-desktop-statistics--item-selected {

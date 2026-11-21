@@ -153,16 +153,16 @@
       border: 2px solid var(--bc-secondary);
       border-radius: 22px;
       color: var(--bc-text-2);
-    }
-    .bc-site-chooser--search input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      background: none;
-      font: inherit;
-      font-size: 15px;
-      color: var(--bc-text);
-      outline: none;
+      & input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        font-size: 15px;
+        color: var(--bc-text);
+        outline: none;
+      }
     }
     .bc-site-chooser--heading {
       margin: 8px 0 2px;

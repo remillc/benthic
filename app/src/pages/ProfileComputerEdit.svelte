@@ -293,10 +293,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-computer-edit--save:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-computer-edit--title {
@@ -402,10 +401,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .bc-computer-edit--delete-button:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     /* iPhone and iPad: grouped lists (10 pt corners, 44 pt rows, hairlines), footers in grey 13 pt. */
@@ -488,10 +486,9 @@
       font: inherit;
       font-size: 17px;
       font-weight: 600;
-    }
-
-    .bc-computer-edit--ios-ok:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-computer-edit--group-delete {

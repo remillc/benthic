@@ -178,17 +178,16 @@
       justify-content: flex-end;
       gap: 8px;
       padding: 12px 24px 0;
-    }
-
-    .bc-export-sheet--actions button {
-      width: auto;
-      min-height: 40px;
-      padding: 0 20px;
-      border-radius: 20px;
-      border: none;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
+      & button {
+        width: auto;
+        min-height: 40px;
+        padding: 0 20px;
+        border-radius: 20px;
+        border: none;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+      }
     }
 
     .bc-export-sheet--text-button {

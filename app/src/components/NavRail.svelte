@@ -96,10 +96,9 @@
       scrollbar-width: none;
       background: var(--bc-background);
       color: var(--bc-text);
-    }
-
-    .bc-nav-rail--rail > :not(.bc-nav-rail--spacer) {
-      flex-shrink: 0;
+      & > :not(.bc-nav-rail--spacer) {
+        flex-shrink: 0;
+      }
     }
 
     /* A low window (the desktop app's smallest is 560 dp, less its title bar): closer items keep the account button in view. */
@@ -163,15 +162,15 @@
 
         .bc-nav-rail--icon {
           position: relative;
-        }
-        .bc-nav-rail--icon::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: var(--bc-text);
-          opacity: 0;
-          transition: opacity 120ms linear;
+          &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: var(--bc-text);
+            opacity: 0;
+            transition: opacity 120ms linear;
+          }
         }
         &:hover .bc-nav-rail--icon::after {
           opacity: 0.08;

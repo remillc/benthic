@@ -675,16 +675,16 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-    .bc-desktop-account--entry + .bc-desktop-account--entry {
-      border-top: 1px solid var(--bc-separator);
-    }
-    .bc-desktop-account--entry:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
-    }
-    .bc-desktop-account--entry:focus-visible {
-      outline: 2px solid var(--bc-text);
-      outline-offset: -2px;
+      & + .bc-desktop-account--entry {
+        border-top: 1px solid var(--bc-separator);
+      }
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--bc-text);
+        outline-offset: -2px;
+      }
     }
     .bc-desktop-account--tile {
       flex: none;
@@ -713,10 +713,10 @@
       padding: 12px 12px 12px 16px;
       border-radius: 16px;
       background: var(--bc-release-tile);
-    }
-    .bc-desktop-account--upgrade .bc-desktop-account--row-texts {
-      flex: 1;
-      min-width: 0;
+      & .bc-desktop-account--row-texts {
+        flex: 1;
+        min-width: 0;
+      }
     }
     .bc-desktop-account--upgrade-action {
       flex: none;
@@ -731,13 +731,13 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-    }
-    .bc-desktop-account--upgrade-action:hover {
-      opacity: 0.88;
-    }
-    .bc-desktop-account--upgrade-action:focus-visible {
-      outline: 2px solid var(--bc-text);
-      outline-offset: 2px;
+      &:hover {
+        opacity: 0.88;
+      }
+      &:focus-visible {
+        outline: 2px solid var(--bc-text);
+        outline-offset: 2px;
+      }
     }
   }
 </style>

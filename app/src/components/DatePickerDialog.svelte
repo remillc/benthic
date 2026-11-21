@@ -453,11 +453,10 @@
       border: var(--bc-outline-width) solid var(--bc-outline);
       border-radius: 4px;
       padding: 8px 16px 6px;
-    }
-
-    .bc-date-picker--input-box:focus-within {
-      border: 2px solid var(--bc-primary);
-      padding: 7px 15px 5px;
+      &:focus-within {
+        border: 2px solid var(--bc-primary);
+        padding: 7px 15px 5px;
+      }
     }
 
     .bc-date-picker--input-label {

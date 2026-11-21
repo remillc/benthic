@@ -175,11 +175,10 @@
       fill: transparent;
       cursor: pointer;
       outline: none;
-    }
-
-    .bc-desktop-stat-chart--hit:focus-visible {
-      stroke: var(--bc-text);
-      stroke-width: 2;
+      &:focus-visible {
+        stroke: var(--bc-text);
+        stroke-width: 2;
+      }
     }
 
     /* The dark tooltip (as the dive profile's). */

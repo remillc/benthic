@@ -255,10 +255,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-cert-edit--save:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-cert-edit--slots {
@@ -295,13 +294,12 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 1px 4px rgb(0 0 0 / 0.15);
-    }
-
-    .bc-cert-edit--slot-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
     }
 
     .bc-cert-edit--slot-caption {

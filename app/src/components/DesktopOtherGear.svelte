@@ -106,11 +106,10 @@
       font: inherit;
       font-weight: 500;
       cursor: pointer;
-    }
-
-    .bc-desktop-other-gear--add:disabled {
-      opacity: 0.55;
-      cursor: default;
+      &:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
     }
 
     .bc-desktop-other-gear--plus {

@@ -374,10 +374,9 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-
-    .bc-gear-page--row + .bc-gear-page--row {
-      border-top: 1px solid var(--bc-separator);
+      & + .bc-gear-page--row {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     .bc-gear-page--tile {

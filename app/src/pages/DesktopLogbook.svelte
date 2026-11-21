@@ -1209,16 +1209,16 @@
       border-radius: 22px;
       background: var(--bc-surface-container);
       color: var(--bc-text-2);
-    }
-    .bc-desktop-logbook--search input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      background: none;
-      font: inherit;
-      font-size: 15px;
-      color: var(--bc-text);
-      outline: none;
+      & input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        font-size: 15px;
+        color: var(--bc-text);
+        outline: none;
+      }
     }
     .bc-desktop-logbook--hint {
       padding: 1px 6px;
@@ -1238,9 +1238,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-logbook--icon-button:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-logbook--columns-anchor {
       position: relative;
@@ -1272,9 +1272,9 @@
       font-size: 15px;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-logbook--column-choice:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-logbook--fixed {
       color: var(--bc-text-2);
@@ -1351,16 +1351,16 @@
       width: 8px;
       cursor: col-resize;
       outline: none;
-    }
-    .bc-desktop-logbook--edge::after {
-      content: '';
-      position: absolute;
-      top: 8px;
-      bottom: 8px;
-      left: 3px;
-      width: 2px;
-      border-radius: 1px;
-      background: transparent;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 8px;
+        bottom: 8px;
+        left: 3px;
+        width: 2px;
+        border-radius: 1px;
+        background: transparent;
+      }
     }
     .bc-desktop-logbook--edge:hover::after,
     .bc-desktop-logbook--edge:focus-visible::after {
@@ -1400,24 +1400,24 @@
     .bc-desktop-logbook--row {
       height: 48px;
       cursor: pointer;
-    }
-    .bc-desktop-logbook--row td {
-      padding: 0 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .bc-desktop-logbook--row td:first-child {
-      border-radius: 12px 0 0 12px;
-    }
-    .bc-desktop-logbook--row td:last-child {
-      border-radius: 0 12px 12px 0;
-    }
-    .bc-desktop-logbook--row td[data-col='number'] {
-      font-weight: 600;
-    }
-    .bc-desktop-logbook--row td[data-col='site'] {
-      font-weight: 500;
+      & td {
+        padding: 0 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      & td:first-child {
+        border-radius: 12px 0 0 12px;
+      }
+      & td:last-child {
+        border-radius: 0 12px 12px 0;
+      }
+      & td[data-col='number'] {
+        font-weight: 600;
+      }
+      & td[data-col='site'] {
+        font-weight: 500;
+      }
     }
     .bc-desktop-logbook--time {
       font-size: 12px;
@@ -1506,12 +1506,12 @@
     /* The windowing counts on these heights (ROW_HEIGHT and TRIP_HEIGHT in the script). */
     .bc-desktop-logbook--trip {
       height: 44px;
-    }
-    .bc-desktop-logbook--trip td {
-      padding: 0;
-      background: var(--bc-surface);
-      border-radius: 20px 20px 0 0;
-      box-shadow: 0 2px 0 var(--bc-surface);
+      & td {
+        padding: 0;
+        background: var(--bc-surface);
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 2px 0 var(--bc-surface);
+      }
     }
     .bc-desktop-logbook--trip-selected td {
       background: var(--bc-selected-container);
@@ -1582,12 +1582,12 @@
       width: 9px;
       cursor: col-resize;
       outline: none;
-    }
-    .bc-desktop-logbook--handle::before {
-      content: '';
-      position: absolute;
-      inset: 0 4px;
-      background: var(--bc-separator);
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0 4px;
+        background: var(--bc-separator);
+      }
     }
     .bc-desktop-logbook--grip {
       position: absolute;
@@ -1637,16 +1637,16 @@
       width: 3px;
       background: var(--bc-on-table-selected);
       pointer-events: none;
-    }
-    .bc-desktop-logbook--insert::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -3.5px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--bc-on-table-selected);
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -3.5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--bc-on-table-selected);
+      }
     }
     .bc-desktop-logbook--columns-divider {
       height: 1px;

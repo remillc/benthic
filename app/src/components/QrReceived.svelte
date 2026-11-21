@@ -124,10 +124,9 @@
       padding: 16px;
       border-radius: 16px;
       background: var(--bc-surface);
-    }
-
-    .bc-qr-received--card p {
-      margin: 0;
+      & p {
+        margin: 0;
+      }
     }
 
     .bc-qr-received--date,
@@ -191,10 +190,9 @@
       align-items: center;
       gap: 12px;
       font-size: 15px;
-    }
-
-    .bc-qr-received--row + .bc-qr-received--row {
-      border-top: 1px solid var(--bc-separator);
+      & + .bc-qr-received--row {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     .bc-qr-received--label {
@@ -245,10 +243,9 @@
       border: none;
       background: var(--bc-action);
       color: var(--bc-on-action);
-    }
-
-    .bc-qr-received--add:disabled {
-      opacity: 0.5;
+      &:disabled {
+        opacity: 0.5;
+      }
     }
   }
 

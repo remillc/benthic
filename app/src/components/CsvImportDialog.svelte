@@ -590,14 +590,13 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
-    }
-
-    .bc-csv-import--table th {
-      min-width: 168px;
-      padding: 12px 6px 10px 12px;
-      text-align: start;
-      font-weight: 400;
-      vertical-align: top;
+      & th {
+        min-width: 168px;
+        padding: 12px 6px 10px 12px;
+        text-align: start;
+        font-weight: 400;
+        vertical-align: top;
+      }
     }
 
     .bc-csv-import--column-name {
@@ -613,26 +612,25 @@
     .bc-csv-import--menu {
       position: relative;
       display: block;
-    }
+      & select {
+        appearance: none;
+        box-sizing: border-box;
+        width: 100%;
+        height: 36px;
+        padding: 0 30px 0 12px;
+        border: none;
+        border-radius: 10px;
+        background: var(--bc-release-hero);
+        color: var(--bc-release-chip-text);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
 
-    .bc-csv-import--menu select {
-      appearance: none;
-      box-sizing: border-box;
-      width: 100%;
-      height: 36px;
-      padding: 0 30px 0 12px;
-      border: none;
-      border-radius: 10px;
-      background: var(--bc-release-hero);
-      color: var(--bc-release-chip-text);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-
-      &:focus-visible {
-        outline: 2px solid var(--bc-release-row-main);
-        outline-offset: 1px;
+        &:focus-visible {
+          outline: 2px solid var(--bc-release-row-main);
+          outline-offset: 1px;
+      }
       }
     }
 
@@ -746,13 +744,12 @@
       border: 1px solid var(--bc-surface-container-highest);
       border-radius: 16px;
       background: var(--bc-surface);
-    }
-
-    .bc-csv-import--profile svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
+      & svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
     }
 
     .bc-csv-import--profile-area {

@@ -334,10 +334,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-profile-info--save:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-profile-info--fields {

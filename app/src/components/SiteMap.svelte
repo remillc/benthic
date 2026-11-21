@@ -754,11 +754,11 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-map-fullscreen-button {
         transition: box-shadow 120ms linear;
-      }
-      .bc-map-fullscreen-button:not(:disabled):hover {
-        box-shadow:
+        &:not(:disabled):hover {
+          box-shadow:
           inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent),
           0 1px 3px rgb(0 0 0 / 0.2);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {

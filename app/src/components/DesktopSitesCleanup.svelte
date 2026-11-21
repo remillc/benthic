@@ -235,9 +235,9 @@
       align-items: flex-start;
       gap: 12px;
       color: var(--bc-on-table-selected);
-    }
-    .bc-cleanup--merged > div > p {
-      margin: 0;
+      & > div > p {
+        margin: 0;
+      }
     }
     .bc-cleanup--name {
       margin: 0;
@@ -299,10 +299,10 @@
     }
     .bc-cleanup--danger {
       color: var(--bc-menu-danger);
-    }
-    .bc-cleanup--danger:disabled {
-      opacity: 0.38;
-      cursor: default;
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
     }
     .bc-cleanup--text:hover,
     .bc-cleanup--danger:not(:disabled):hover {
@@ -312,9 +312,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-cleanup--tonal {
         transition: box-shadow 120ms linear;
-      }
-      .bc-cleanup--tonal:hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
       .bc-cleanup--check:hover .bc-cleanup--box {
         box-shadow: 0 0 0 8px color-mix(in srgb, var(--bc-text) 8%, transparent);
@@ -326,10 +326,10 @@
       gap: 12px;
       padding: 6px 0;
       cursor: pointer;
-    }
-    .bc-cleanup--check input {
-      position: absolute;
-      opacity: 0;
+      & input {
+        position: absolute;
+        opacity: 0;
+      }
     }
     .bc-cleanup--box {
       display: grid;

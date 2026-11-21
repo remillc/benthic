@@ -338,10 +338,9 @@
       :global(.ios) & {
         border-radius: 10px;
       }
-    }
-
-    .bc-statistics--rows li + li {
-      border-top: 1px solid var(--bc-separator);
+      & li + li {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     .bc-statistics--row {
