@@ -54,7 +54,6 @@ Next number: 148
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
-- #135 [code] On /profile/info, in edit mode, reduce the width of the Blood group field.
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
 - #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.
 - #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
