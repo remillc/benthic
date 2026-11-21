@@ -1343,11 +1343,13 @@ async function profileInsetsFlows(expect) {
         (await import('/src/lib/navigation.svelte.js')).openOver(path);
       }, route);
       await sleep(1600);
-      const state = await tab.run(({ kind, portrait }) => {
+      const state = await tab.run(({ kind, portrait, path }) => {
         const page = [...document.querySelectorAll('.view.tab-active > .page-current')].find((item) => item.getBoundingClientRect().width > 0);
         const frame = page?.querySelector('.bc-pf')?.getBoundingClientRect();
         const nav = page?.querySelector('.bc-profile-nav')?.getBoundingClientRect();
-        const back = page?.querySelector('.bc-profile-nav--back')?.getBoundingClientRect();
+        const back = portrait
+          ? path === '/profile' && page?.querySelector(':scope > .navbar .left .back')
+          : page?.querySelector('.bc-profile-nav--back');
         const add = page?.querySelector('.bc-gear-list--add, .fab:not([style*="display: none"])')?.getBoundingClientRect();
         const navbar = page?.querySelector(':scope > .navbar')?.getBoundingClientRect();
         const inner = page?.querySelector(':scope > .navbar .navbar-inner')?.getBoundingClientRect();
@@ -1356,14 +1358,14 @@ async function profileInsetsFlows(expect) {
         const near = (a, b) => Math.abs(a - b) < 2;
         return {
           frame: portrait ? !frame : !!frame && near(frame.top, 24) && near(frame.bottom, bottom),
-          back: portrait || (!!back && back.top >= 24),
+          back: !back,
           add: !add || add.bottom <= bottom,
           main: (!portrait && kind !== 'main') || (!!navbar && !!inner && inner.top + parseFloat(getComputedStyle(page.querySelector(':scope > .navbar .navbar-inner')).paddingTop) >= 24),
           dialog: portrait || kind !== 'dialog' || (!!navbar && !!box && near(navbar.top, box.top) && box.top >= 24 && box.bottom <= bottom),
           navWidth: portrait || (!!nav && near(nav.width, innerWidth >= 1200 ? 350 : 320)),
           barAligned: portrait || kind !== 'main' || (!!nav && !!navbar && near(nav.right, navbar.left)),
         };
-      }, { kind: bar, portrait: label === 'portrait' });
+      }, { kind: bar, portrait: label === 'portrait', path: route });
       expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true, navWidth: true, barAligned: true }, state);
       if (label === 'landscape' && bar === 'dialog') {
         const changed = await tab.run(() => {

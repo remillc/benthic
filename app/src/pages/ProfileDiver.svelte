@@ -14,6 +14,7 @@
   import { documentsLine } from '../lib/documents-text.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
+  import { desktopApp, layout } from '../lib/layout.svelte.js';
 
   const name = $derived(diver.info.fullName || logbook.email || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
@@ -91,7 +92,7 @@
 <Page class="bc-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
   <Navbar title={t('gear.profile.title')}>
     {#snippet left()}
-      <BackLink label={t('account.title')} name={t('gear.piece.back')} />
+      {#if layout.phone && !desktopApp}<BackLink label={t('account.title')} name={t('gear.piece.back')} />{/if}
     {/snippet}
   </Navbar>
   {#if profileWide()}

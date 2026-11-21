@@ -6,7 +6,7 @@
   // window size only swaps the layout, the page and its state stay.
   //
   // `bar`: where the page's own top bar goes. `main`: over the right pane (its title and buttons; the Back arrow goes,
-  // the profile pane leads out); `none`: no bar (the panes draw their own titles); `dialog`: the dialog's header.
+  // the navigation rail leads out); `none`: no bar (the panes draw their own titles); `dialog`: the dialog's header.
   // `size`: the dialog's height, `s`, `m` or `l`.
   import ProfileNav from './ProfileNav.svelte';
   import ProfileGearList from './ProfileGearList.svelte';
