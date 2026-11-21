@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 152
+Next number: 153
 
 ## List
 
@@ -68,3 +68,4 @@ Next number: 152
 - #149 [code] remplacer les uuid par des id plus courts
 - #150 [code] dans desktop: sur le carnet, ajouter le même trait séparateur gris entre chaque plongée
 - #151 [code] compléter l'écriture en cascade css des fichiers
+- #152 [design] est-ce que la fonction signer est pertinente sur desktop?
