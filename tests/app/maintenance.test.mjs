@@ -100,9 +100,10 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
 test('suggestions per type, and the rule fields are validated', () => {
   assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12, dives: 100 });
   assert.deepEqual(suggestionsFor('bcd')[0], { task: 'service', months: 12 });
-  // Only a drysuit has seals to change.
-  assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'seals', months: 12 }]);
+  // Only a drysuit has seals and valves to maintain.
+  assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'seals', months: 12 }, { task: 'valves', months: 12 }]);
   assert.deepEqual(suggestionsFor('suit', { suitType: 'wet' }), []);
+  assert.deepEqual(suggestionsFor('suit', { suitType: 'semi' }), []);
   assert.deepEqual(suggestionsFor('suit', {}), []);
   // Task 2026-11-19-308: « Contrôle avant voyage » is gone (an inspection noted by hand), and a computer has no reminder.
   assert.equal(suggestionsFor('regulator').length, 1);
@@ -113,6 +114,17 @@ test('suggestions per type, and the rule fields are validated', () => {
   assert.deepEqual(ruleProblems({ months: 24, dives: null }), {});
   assert.deepEqual(ruleProblems({ months: 0, dives: 5000 }), { months: 'range' });
   assert.deepEqual(ruleProblems({ months: 2.5, dives: 0 }), { months: 'range', dives: 'range' });
+});
+
+test('a drysuit valve reminder and its service history stay separate from the seals', async () => {
+  const { inventory } = setup();
+  const suit = await inventory.saveGear({ type: 'suit', name: 'Dry suit', details: { suitType: 'dry' } });
+  const seals = await inventory.saveMaintenance({ gearId: suit.id, task: 'seals', intervalMonths: 12, intervalDives: null });
+  const valves = await inventory.saveMaintenance({ gearId: suit.id, task: 'valves', intervalMonths: 12, intervalDives: null });
+  await inventory.noteMaintenance({ id: valves.id, gearId: suit.id, task: 'valves' }, { kind: 'service', doneOn: '2026-11-17' });
+  const reminders = await inventory.listMaintenance();
+  assert.equal(reminders.find((item) => item.id === valves.id).history.length, 1);
+  assert.equal(reminders.find((item) => item.id === seals.id).history.length, 0);
 });
 
 test('months are added to the day, clamped at the end of the month', () => {

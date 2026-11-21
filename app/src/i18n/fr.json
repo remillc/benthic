@@ -2723,6 +2723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Équipement : un rappel annuel d’entretien des valves est proposé pour les combinaisons étanches.",
       "Équipement : l’intervalle de révision suggéré pour un détendeur est maintenant d’un an ou de 100 plongées.",
       "Carnet : le site et les autres détails modifiés d’une plongée apparaissent dans la liste après l’enregistrement.",
       "Détail d’une plongée sur ordinateur : l’indication de modification n’apparaît plus sous les compagnons et les guides.",
@@ -6262,6 +6263,7 @@
       "hydrostatic": "Requalification",
       "battery": "Pile",
       "seals": "Joints et fermeture",
+      "valves": "Entretien des valves",
       "travelCheck": "Contrôle avant voyage"
     },
     "kind": {
@@ -6330,7 +6332,7 @@
     "reminderCard": {
       "title": "Rappels d’entretien",
       "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
-      "suggestDrysuit": "Suggéré pour une combinaison étanche : les joints, chaque année",
+      "suggestDrysuit": "Suggéré pour une combinaison étanche : les joints et l’entretien des valves, chaque année",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",
         "regulator": "Suggéré pour un détendeur : {rule}",
