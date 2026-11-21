@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 158
+Next number: 159
 
 ## List
 
@@ -73,3 +73,4 @@ Next number: 158
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
 - #156 [code] bogue: vérifié sur téléphone, pas sur tablette et desktop, lorsqu'on télédécharge une nouvelle plongée, et qu'on renseigne le champs site, après sauvegarde et retour à /, le site affiche toujours Site à préciser
 - #157 [design] /tools/desaturation, "Les 16 compartiments...", rephraser
+- #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic
