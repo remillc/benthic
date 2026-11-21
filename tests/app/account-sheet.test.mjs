@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolveOdplusAccount, isSubscribed } from '../../app/src/lib/benthic-plus-state.js';
-import { sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
+import { accountEmail, sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
 import { forward, menuEntry, enterOffer, back, hasBack, leavesFirstLaunch, offerShowsSignIn } from '../../app/src/lib/first-launch-steps.js';
 import { evaluate, overdueCount, todayIso } from '../../app/src/lib/maintenance.js';
 import { createServerApi, overviewOf } from '../../app/src/lib/server-api.js';
@@ -23,6 +23,16 @@ const offer = read('components/FirstLaunchBenthicPlus.svelte');
 const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
 
 // --- Which sheet ---
+
+test('the account sheet uses the subscriber email instead of the server git username', () => {
+  const serverLog = { email: 'od123', odplus: true };
+  assert.equal(accountEmail({ signedIn: true, email: 'diver@example.test' }, serverLog), 'diver@example.test');
+  assert.equal(accountEmail({ signedIn: false, email: '' }, serverLog), '', 'do not expose the username while the session loads');
+  assert.equal(accountEmail({ signedIn: false, email: '' }, { email: 'diver@example.test', odplus: false }), 'diver@example.test');
+  assert.equal(accountEmail({ signedIn: true, email: 'diver@example.test' }, { email: 'git-user', odplus: false }), 'diver@example.test');
+  assert.match(sheet, /emailOfAccount\(odplusAccount, logbook\)/);
+  assert.match(avatar, /accountEmail\(odplusAccount, logbook\)/);
+});
 
 test('the release edition without an Benthic+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
   assert.equal(sheetVariant({ release: true, subscriber: false, email: '' }), 'free');

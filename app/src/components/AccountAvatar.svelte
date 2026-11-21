@@ -16,9 +16,10 @@
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
   import { isRelease } from '../lib/edition.js';
-  import { sheetVariant } from '../lib/account-sheet.js';
+  import { accountEmail, sheetVariant } from '../lib/account-sheet.js';
 
-  const initial = $derived((logbook.email || odplusAccount.email) ? (logbook.email || odplusAccount.email).trim().charAt(0).toLocaleUpperCase() : '');
+  const email = $derived(accountEmail(odplusAccount, logbook));
+  const initial = $derived(email.trim().charAt(0).toLocaleUpperCase());
   /** '' when nothing waits; else the badge's role. */
   const badge = $derived(
     logbook.syncFailure || (logbook.conflict && logbook.conflictLater) ? 'alarm' : logbook.pending > 0 || updatesCount() > 0 ? 'waiting' : '',
@@ -32,7 +33,7 @@
   // Free version (task 2026-11-18-281): the silhouette in the same disc, named by what the sheet holds.
   const free = $derived(sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email }) === 'free');
   const label = $derived(
-    free ? t('nav.accountLabelFree') + (waiting ? `. ${waiting}` : '') : t('nav.accountLabel', { name: logbook.email || odplusAccount.email || t('menu.noAccount') }) + (waiting ? `. ${waiting}` : ''),
+    free ? t('nav.accountLabelFree') + (waiting ? `. ${waiting}` : '') : t('nav.accountLabel', { name: email || t('menu.noAccount') }) + (waiting ? `. ${waiting}` : ''),
   );
 </script>
 

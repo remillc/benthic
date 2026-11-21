@@ -26,9 +26,9 @@
   import { openBackup } from '../lib/navigation.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
-  import { profileRow, sheetVariant } from '../lib/account-sheet.js';
+  import { accountEmail as emailOfAccount, profileRow, sheetVariant } from '../lib/account-sheet.js';
 
-  const email = $derived(logbook.email || odplusAccount.email);
+  const email = $derived(emailOfAccount(odplusAccount, logbook));
   // An OpenDives+ account shows the diver's full name first and the e-mail under it, in smaller grey text (task 2026-11-19-312).
   const fullName = $derived(odplusSubscriber() ? diver.info.fullName : '');
   const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');

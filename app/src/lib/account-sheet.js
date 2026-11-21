@@ -19,6 +19,17 @@ export function sheetVariant({ release, subscriber, email, git = false, reposito
 }
 
 /**
+ * The server session identifies the subscriber; a server logbook's git username is not their email.
+ * @param {{ signedIn: boolean, email: string }} account
+ * @param {{ email: string, odplus: boolean }} logbook
+ * @returns {string}
+ */
+export function accountEmail(account, logbook) {
+  if (account.signedIn) return account.email;
+  return logbook.odplus ? '' : logbook.email;
+}
+
+/**
  * The line under « Mon profil de plongeur » and the badge before its chevron: only the overdue pieces count (not the ones
  * due soon), the same count as the badge of the « Entretien » row of the profile (lib/maintenance.js, overdueCount).
  * @param {number} overdue
