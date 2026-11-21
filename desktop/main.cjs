@@ -55,6 +55,8 @@ const crashes = createCrashStore({
   osVersion: `${process.platform} ${process.getSystemVersion?.() ?? ''}`.trim(),
   device: `Electron ${process.versions.electron} ${process.arch}`,
 });
+const oldCrash = crashes.pending();
+if (oldCrash && isBrokenPipe(oldCrash)) crashes.clear();
 process.on('uncaughtException', (error) => {
   if (isBrokenPipe(error)) return;
   crashes.write('Main process', error);
