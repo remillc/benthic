@@ -1826,6 +1826,13 @@ async function profileInfoWidthsFlows(expect) {
       };
     });
     expect(`${label}: the three fields are narrower and fit`, { birthNarrower: true, relationNarrower: true, phoneNarrower: true, withinViewport: true }, result);
+    const bloodWidth = await tab.run(() => {
+      const page = document.querySelector('.page-current.bc-profile-info');
+      const blood = page.querySelector('.bc-profile-info--blood .bc-select-field--box').getBoundingClientRect();
+      const full = page.querySelector('.bc-profile-info--fields .bc-text-field--box').getBoundingClientRect();
+      return { narrower: blood.width < full.width && blood.width <= 192.5, withinViewport: blood.width > 0 && blood.left >= 0 && blood.right <= innerWidth };
+    });
+    expect(`${label}: the blood group field is narrower and fits`, { narrower: true, withinViewport: true }, bloodWidth);
     const bloodField = await tab.run(async () => {
       const { t } = await import('/src/lib/i18n.js');
       const page = document.querySelector('.page-current.bc-profile-info');
