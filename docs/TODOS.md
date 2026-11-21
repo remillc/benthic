@@ -16,7 +16,6 @@ Next number: 161
 ## List
 
 - #1 [code] ajouter de l'analytics dans l'app. Penser à corriger privacy (en pause : voir docs/analytics-decision.md)
-- #3 [code] urls U1 à U7 (non pour U8, U9 et U10) : U1 /plan/42 → /dives/42/plan ; U2 /plan/new → /plan ; U3 /plan/setup → /settings/planner ; U4 /statistics/year/2014 → /statistics/years/2014 ; U5 /filter/depth → /filter/criteria/depth ; U6 /download/failed → /download-failed ; U7 /add/download (iPhone) → /download ; et (ex-#7) Mettre /plan sous /tools
 - #27 [design] Se débarrasser de tout workflow lié à l'état invalide d'une plongée : menus contextuels, recherche, paramétrage. S'assurer au préalable que cette feature n'est pas utilisée.
 - #32 [code] tablette : sur une petite tablette en paysage, le dialogue de /welcome défile. On ne veut pas de défilement dans ce dialogue. Même bogue que l'ex-#31, que Claude VC a traité avec la tâche 2026-11-10-18 : à vérifier sur une petite tablette, puis supprimer.
 - #34 [site] un endroit qui explique ce qui reste toujours ouvert : le code source de toutes les apps OpenDives est public sur le dépôt GitHub du projet, et chaque version Android y est aussi publiée compilée, prête à installer (précisé par Christian le 16 novembre 2026, puis limité au code et à l’APK Android le même jour). Ne pas promettre d’autres versions compilées ni parler de prix. Décider où : page « Télécharger » ou « À propos » du site `site/`, README et versions GitHub, F-Droid plus tard ; la fiche du store seulement après avoir relu ses règles. Pas dans l’app.
