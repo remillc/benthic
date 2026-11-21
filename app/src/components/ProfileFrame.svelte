@@ -130,7 +130,7 @@
         --bc-pf-nav-width: 350px;
       }
     }
-    :global(.page:has(.bc-pf--bar-main) > .navbar .left) {
+    :global(.page:has(.bc-pf--bar-main) > .navbar .left:not(:has(.bc-profile-info--cancel-edit))) {
       display: none;
     }
     :global(.page:has(.bc-pf--bar-main) > .navbar .title) {

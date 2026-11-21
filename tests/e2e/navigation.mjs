@@ -1780,6 +1780,8 @@ async function profileInfoWidthsFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['narrow phone', 320, 740, true, false, 'md'],
     ['tablet', 1280, 800, false, false, 'md'],
+    ['tablet portrait', 800, 1280, false, false, 'md'],
+    ['desktop', 1400, 900, false, true, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     const state = () => tab.run(() => {
@@ -1864,6 +1866,23 @@ async function profileInfoWidthsFlows(expect) {
     const saved = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).bloodGroup);
     expect(`${label}: blood group is saved`, { blood: 'O+' }, { blood: saved });
     expect(`${label}: Save returns to the read view of the same page`, { route: '/profile/info', editing: false }, await state());
+    await tab.run(() => document.querySelector('.page-current .bc-profile-info--edit-button').click());
+    await sleep(200);
+    const cancelArrow = await tab.run(async () => {
+      const { services } = await import('/src/lib/profile.svelte.js');
+      const before = (await services().profile.readInfo()).fullName;
+      const page = document.querySelector('.page-current.bc-profile-info');
+      const input = page.querySelector('input[autocomplete="name"]');
+      input.value = 'Unsaved name';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const button = page.querySelector('.bc-profile-info--cancel-edit');
+      const visible = !!button?.querySelector('.icon-back') && button.getBoundingClientRect().width > 0;
+      button.click();
+      return { visible, before };
+    });
+    await sleep(400);
+    const afterCancel = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).fullName);
+    expect(`${label}: the arrow discards edits`, { visible: true, name: cancelArrow.before, route: '/profile/info', editing: false }, { visible: cancelArrow.visible, name: afterCancel, ...(await state()) });
     if (label === 'narrow phone') {
       const profile = await tab.run(() => {
         const page = document.querySelector('.page-current.bc-profile-info');
