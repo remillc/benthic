@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Tablet logbook: the dive list is slightly wider in landscape.",
       "Equipment: an annual service reminder, including valve service, is suggested for drysuits.",
       "Equipment: the suggested regulator service interval is now one year or 100 dives.",
       "Logbook: a dive's site and other edited details now appear in the list after saving.",

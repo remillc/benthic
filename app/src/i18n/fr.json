@@ -2723,6 +2723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet sur tablette : la liste des plongées est un peu plus large en paysage.",
       "Équipement : un rappel annuel d’entretien, y compris des valves, est proposé pour les combinaisons étanches.",
       "Équipement : l’intervalle de révision suggéré pour un détendeur est maintenant d’un an ou de 100 plongées.",
       "Carnet : le site et les autres détails modifiés d’une plongée apparaissent dans la liste après l’enregistrement.",

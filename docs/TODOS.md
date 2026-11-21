@@ -72,5 +72,4 @@ Next number: 162
 - #157 [design] /tools/desaturation, "Les 16 compartiments...", rephraser
 - #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
-- #160 [code] sur tablette, sur /, élargir un peu la colonne des plongées
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.

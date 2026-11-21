@@ -528,6 +528,12 @@
       width: calc(100% - var(--bc-nav-width) - var(--bc-safe-left));
     }
 
+    @media (orientation: landscape) {
+      :global(:where(html:not(.bc-desktop-app) .views.bc-tablet #view-logbook)) {
+        --f7-page-master-width: 360px;
+      }
+    }
+
     /* Logbook, list and dive side by side (Framework7 master-detail). */
     /* Adaptive pages: the desktop layout of a master route fills the view, with no list column's width or border. */
     :global(.view-master-detail .page-master:is(.bc-desktop-statistics, .bc-desktop-settings)) {
