@@ -18,7 +18,7 @@
   import { openOdPlus } from '../lib/open-offer.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
-  import { profileRow, sheetVariant } from '../lib/account-sheet.js';
+  import { accountEmail as emailOfAccount, profileRow, sheetVariant } from '../lib/account-sheet.js';
   import { isRelease } from '../lib/edition.js';
   import { logbooks } from '../lib/desktop-logbooks.svelte.js';
   import { syncNetwork, setUnmeteredOnly } from '../lib/sync-network.svelte.js';
@@ -26,7 +26,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
-  const email = $derived(logbook.email || odplusAccount.email);
+  const email = $derived(emailOfAccount(odplusAccount, logbook));
   // An OpenDives+ account shows the diver's full name first and the e-mail under it (task 2026-11-19-312).
   const fullName = $derived(odplusSubscriber() ? diver.info.fullName : '');
   const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');

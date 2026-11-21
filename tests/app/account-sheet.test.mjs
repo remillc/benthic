@@ -31,6 +31,7 @@ test('the account sheet uses the subscriber email instead of the server git user
   assert.equal(accountEmail({ signedIn: false, email: '' }, { email: 'diver@example.test', odplus: false }), 'diver@example.test');
   assert.equal(accountEmail({ signedIn: true, email: 'diver@example.test' }, { email: 'git-user', odplus: false }), 'diver@example.test');
   assert.match(sheet, /emailOfAccount\(odplusAccount, logbook\)/);
+  assert.match(desktopSheet, /emailOfAccount\(odplusAccount, logbook\)/);
   assert.match(avatar, /accountEmail\(odplusAccount, logbook\)/);
 });
 
