@@ -52,7 +52,6 @@ Next number: 148
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #127 [design] améliorer les icônes d'équipement.
 - #128 [code] Change the recommended maintenance interval to 1 year or every 100 dives.
-- #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
 - #135 [code] On /profile/info, in edit mode, reduce the width of the Blood group field.
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
