@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 155
+Next number: 156
 
 ## List
 
@@ -71,3 +71,4 @@ Next number: 155
 - #152 [design] est-ce que la fonction signer est pertinente sur desktop?
 - #153 [design] desktop, sur /dives/:id, afficher la carte en bg sur toute la largeur de l'en-tête
 - #154 [design] carte des sites de plongée créer à partir des sites de plongée des plongeurs: ajouter les sites de OpenStreetMap (ou freeMap...)
+- #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
