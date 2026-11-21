@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   // The logbook selector of Windows and Linux (task 2026-11-15-173; docs/mockups/bureau-carnets-selecteur.dc.html):
-  // the Carnet title becomes « Carnet · plongees.ssrf ▾ » on a pill. Its menu lists the recent logbooks (name,
+  // the Carnet title becomes « plongees.ssrf ▾ » on a pill. Its menu lists the recent logbooks (name,
   // source and when, a check on the open one), then Nouveau carnet…, Ouvrir un carnet…, Enregistrer une
   // copie… and Fermer le carnet with their shortcuts. The Mac has no selector: its menu bar does the same.
   import { onMount, tick } from 'svelte';
@@ -84,8 +84,7 @@
     title={t('desktopLogbooks.selector.change')}
     onclick={toggle}
   >
-    <span class="bc-logbook-selector--title">{t('desktopLogbooks.selector.label')}</span>
-    {#if current}<span class="bc-logbook-selector--name">{displayName(current, t)}</span>{/if}
+    <span class="bc-logbook-selector--title">{current ? displayName(current, t) : t('desktopLogbooks.selector.label')}</span>
     <Icon name="expand" size={20} />
   </button>
   {#if open}
@@ -161,23 +160,16 @@
       }
     }
     .bc-logbook-selector--title {
-      font-family: var(--bc-title-font);
-      font-size: 22px;
-      line-height: 28px;
-      font-weight: 500;
-    }
-    .bc-logbook-selector--name {
       flex: 0 1 auto;
       min-width: 0;
       max-width: 240px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-size: 16px;
-      color: var(--bc-text-2);
-      &::before {
-        content: '· ';
-      }
+      font-family: var(--bc-title-font);
+      font-size: 22px;
+      line-height: 28px;
+      font-weight: 500;
     }
     .bc-logbook-selector--scrim {
       position: fixed;
