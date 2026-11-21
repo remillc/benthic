@@ -42,7 +42,7 @@ export function readHero() {
 
 /**
  * Shows another screen of the profile in place of the current one: choosing in the panes does not pile up pages, so
- * the Back button of the pane leaves the profile in one step.
+ * leaving the profile takes one Back action.
  * @param {string} path
  */
 export function showProfilePath(path) {
