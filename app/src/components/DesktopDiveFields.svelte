@@ -361,7 +361,7 @@
       <div class="bc-desktop-dive-fields--columns">
         <DesktopEditField stacked name="buddies" kind="list" label={t('desktopDetail.label.buddies')} value={dive.buddies} invitation={t('desktopDetail.invitation.buddies')} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
         <DesktopEditField stacked name="guides" kind="list" label={t('desktopDetail.label.guides')} value={dive.guides} invitation={t('desktopDetail.invitation.guides')} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
-        <DesktopEditField stacked name="waterType" kind="choice" label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
+        <DesktopEditField stacked name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
         <DesktopEditField stacked name="visibility" kind="stars" label={t('desktopDetail.label.visibility')} value={dive.visibility} emptyText={t('desktopDetail.notRated')} invitation={t('desktopDetail.invitation.visibility')} onsave={(v) => save('visibility', v)} />
         <DesktopEditField stacked name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
         {#if manual}

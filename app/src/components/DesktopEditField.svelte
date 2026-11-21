@@ -43,11 +43,12 @@
    *   emptyText?: string,
    *   onopen?: () => void,
    *   openLabel?: string,
+   *   openChoiceOnClick?: boolean,
    *   leading?: import('svelte').Snippet,
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -81,7 +82,8 @@
       (kind === 'choice' ? (options.find((o) => o.value === value)?.label ?? '') : typeof value === 'string' ? value : ''),
   );
 
-  function startEdit() {
+  /** @param {boolean} [openChoice] */
+  function startEdit(openChoice = false) {
     if (readonly || editing || quiet) {
       quiet = false;
       return;
@@ -90,7 +92,18 @@
     typed = '';
     highlighted = -1;
     editing = true;
-    tick().then(() => /** @type {HTMLElement|null|undefined} */ (box?.querySelector('input, textarea, select, button'))?.focus());
+    tick().then(() => {
+      const input = box?.querySelector('input, textarea, select, button');
+      input?.focus();
+      if (openChoice && input instanceof HTMLSelectElement) input.showPicker();
+    });
+  }
+
+  /** @param {PointerEvent} event */
+  function pointerDown(event) {
+    if (!openChoiceOnClick || kind !== 'choice' || event.button !== 0) return;
+    event.preventDefault();
+    startEdit(true);
   }
 
   function backToRest() {
@@ -224,8 +237,9 @@
       tabindex="0"
       aria-label="{label}, {restText}"
       bind:this={rest}
-      onfocus={startEdit}
-      onclick={startEdit}
+      onfocus={() => startEdit()}
+      onclick={() => startEdit()}
+      onpointerdown={pointerDown}
       onmouseenter={() => (hovered = true)}
       onmouseleave={() => (hovered = false)}
     >

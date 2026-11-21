@@ -95,7 +95,10 @@ test('Informations: the water type menu and the stars write through the edit pat
   assert.deepEqual(fieldChanges(dive({ visibility: 4 }), 'visibility', 0, metric), { ok: true, changes: { visibility: 0 } });
   const fields = read('app/src/components/DesktopDiveFields.svelte');
   assert.match(fields, /WATER_TYPES\.map/);
-  assert.match(fields, /<DesktopEditField stacked name="waterType" kind="choice"[^>]*options=\{waterOptions\}[^>]*onsave=/);
+  assert.match(fields, /<DesktopEditField stacked name="waterType" kind="choice" openChoiceOnClick[^>]*options=\{waterOptions\}[^>]*onsave=/);
+  const editor = read('app/src/components/DesktopEditField.svelte');
+  assert.match(editor, /onpointerdown=\{pointerDown\}/);
+  assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) input\.showPicker\(\)/);
 });
 
 test('Gaz: one card per cylinder, with the levels of its pressures', () => {
