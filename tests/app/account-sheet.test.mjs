@@ -34,6 +34,27 @@ test('the account sheet uses the subscriber email instead of the server git user
   assert.match(avatar, /accountEmail\(odplusAccount, logbook\)/);
 });
 
+test('the account overview refreshes a renamed email and subscription in one request', async () => {
+  let requests = 0;
+  const api = createServerApi({
+    baseUrl: 'https://example.test',
+    transport: async ({ method, url }) => {
+      requests++;
+      assert.equal(method, 'GET');
+      assert.equal(url, 'https://example.test/v1/account');
+      return { status: 200, text: JSON.stringify({ email: 'new@example.test', subscription: { subscribed: true } }) };
+    },
+  });
+  const overview = await api.accountOverview('session');
+  assert.equal(overview.email, 'new@example.test');
+  assert.equal(overview.subscription.subscribed, true);
+  assert.equal(requests, 1);
+  assert.deepEqual(overviewOf({ subscription: { subscribed: 'true' } }).subscription, {});
+  const state = read('lib/benthic-plus-state.svelte.js');
+  assert.match(state, /accountOverview\(token\)/);
+  assert.match(state, /overview\.email\?\.trim\(\) \|\| info\.email/);
+});
+
 test('the release edition without an Benthic+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
   assert.equal(sheetVariant({ release: true, subscriber: false, email: '' }), 'free');
   assert.equal(sheetVariant({ release: true, subscriber: true, email: 'a@b.c' }), 'subscriber');

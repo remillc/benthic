@@ -64,7 +64,7 @@ function consentOf(r) {
  * @typedef {{
  *   email?: string,
  *   signInMethod?: 'google'|'apple'|'email',
- *   subscription?: { store?: 'google'|'apple', price?: string, renewsOn?: string },
+ *   subscription?: { subscribed?: boolean, store?: 'google'|'apple', price?: string, renewsOn?: string },
  *   storage?: { usedBytes?: number, limitBytes?: number },
  * }} AccountOverview
  */
@@ -82,6 +82,7 @@ export function overviewOf(r) {
   const sub = r?.subscription;
   if (sub && typeof sub === 'object') {
     out.subscription = {};
+    if (typeof sub.subscribed === 'boolean') out.subscription.subscribed = sub.subscribed;
     if (sub.store === 'google' || sub.store === 'apple') out.subscription.store = sub.store;
     if (typeof sub.price === 'string' && sub.price) out.subscription.price = sub.price;
     if (typeof sub.renewsOn === 'string' && /^\d{4}-\d{2}-\d{2}/.test(sub.renewsOn)) out.subscription.renewsOn = sub.renewsOn.slice(0, 10);
@@ -163,8 +164,8 @@ export function createServerApi({ baseUrl, transport }) {
 
     /**
      * What the account screen shows (task 2026-11-18-281): how the diver signs in, the subscription and the photo space.
-     * The server does not answer this route yet (UNREACHABLE): every field is optional and the screen shows a placeholder
-     * for what is missing. Expected shape: `{ email, signInMethod: 'google'|'apple'|'email', subscription: { store:
+     * Every field is optional and the screen shows a placeholder for what is missing. Expected shape:
+     * `{ email, signInMethod: 'google'|'apple'|'email', subscription: { subscribed: boolean, store:
      * 'google'|'apple', price: string, renewsOn: 'YYYY-MM-DD' }, storage: { usedBytes, limitBytes } }`.
      * @param {string} sessionToken
      * @returns {Promise<AccountOverview>}

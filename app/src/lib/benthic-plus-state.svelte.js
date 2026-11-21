@@ -38,9 +38,11 @@ export async function loadOdplusAccount() {
   if (!info?.signedIn) return;
   try {
     const token = (await OpenDivesCore.serverSessionAccess()).sessionToken;
-    const remote = await createServerApi({ baseUrl: serverUrl(), transport: serverTransport }).subscribed(token);
+    const overview = await createServerApi({ baseUrl: serverUrl(), transport: serverTransport }).accountOverview(token);
+    const remote = overview.subscription?.subscribed ?? null;
+    const email = overview.email?.trim() || info.email;
+    Object.assign(odplusAccount, resolveOdplusAccount({ info: { ...info, email }, cached, remote }));
     if (remote !== null) {
-      Object.assign(odplusAccount, resolveOdplusAccount({ info, cached, remote }));
       deviceStore.setItem(ODPLUS_SUBSCRIBED_KEY, remote ? '1' : '0');
     }
   } catch {
