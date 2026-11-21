@@ -2723,7 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Equipment: an annual valve service reminder is suggested for drysuits.",
+      "Equipment: an annual service reminder, including valve service, is suggested for drysuits.",
       "Equipment: the suggested regulator service interval is now one year or 100 dives.",
       "Logbook: a dive's site and other edited details now appear in the list after saving.",
       "Desktop dive details: the editing hint no longer appears under buddies and guides.",
@@ -6260,7 +6260,6 @@
       "hydrostatic": "Hydrostatic test",
       "battery": "Battery",
       "seals": "Seals and zipper",
-      "valves": "Valve service",
       "travelCheck": "Pre-trip check"
     },
     "kind": {
@@ -6329,7 +6328,7 @@
     "reminderCard": {
       "title": "Maintenance reminders",
       "suggestCylinder": "Suggested: inspection every year, hydrostatic test every 5 years",
-      "suggestDrysuit": "Suggested for a drysuit: the seals and valve service, every year",
+      "suggestDrysuit": "Suggested for a drysuit: annual service, including the valves",
       "suggest": {
         "computer": "Suggested for a computer: {rule}",
         "regulator": "Suggested for a regulator: {rule}",

@@ -28,7 +28,7 @@ Decided by Christian on 19 November 2026 (Benthic+, « Mon profil de plongeur �
 | Boussole | Brand, model |
 | Autre | Piece name, photo; type name (free text) on existing pieces only |
 
-Suggested maintenance reminders by type: Détendeur every year or 100 dives; Bouteille visual inspection every year and hydrostatic test every 5 years; Veste every year; Combinaison (Étanche only) the seals and valve service every year; Ordinateur none (a battery reminder waits for after the launch, `docs/POST-LAUNCH.md` #104); the other types none.
+Suggested maintenance reminders by type: Détendeur every year or 100 dives; Bouteille visual inspection every year and hydrostatic test every 5 years; Veste every year; Combinaison (Étanche only) service, including its valves, every year; Ordinateur none (a battery reminder waits for after the launch, `docs/POST-LAUNCH.md` #104); the other types none.
 
 The original `knife` type is displayed as « Coupe-ligne »; `diveKnife` is the distinct « Couteau » type. Existing pieces retain their original type and are therefore displayed as line cutters.
 

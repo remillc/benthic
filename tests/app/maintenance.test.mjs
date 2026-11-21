@@ -100,8 +100,8 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
 test('suggestions per type, and the rule fields are validated', () => {
   assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12, dives: 100 });
   assert.deepEqual(suggestionsFor('bcd')[0], { task: 'service', months: 12 });
-  // Only a drysuit has seals and valves to maintain.
-  assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'seals', months: 12 }, { task: 'valves', months: 12 }]);
+  // Only a drysuit has a suggested annual service.
+  assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'service', months: 12 }]);
   assert.deepEqual(suggestionsFor('suit', { suitType: 'wet' }), []);
   assert.deepEqual(suggestionsFor('suit', { suitType: 'semi' }), []);
   assert.deepEqual(suggestionsFor('suit', {}), []);
@@ -116,14 +116,14 @@ test('suggestions per type, and the rule fields are validated', () => {
   assert.deepEqual(ruleProblems({ months: 2.5, dives: 0 }), { months: 'range', dives: 'range' });
 });
 
-test('a drysuit valve reminder and its service history stay separate from the seals', async () => {
+test('a drysuit service reminder preserves an existing seals history', async () => {
   const { inventory } = setup();
   const suit = await inventory.saveGear({ type: 'suit', name: 'Dry suit', details: { suitType: 'dry' } });
   const seals = await inventory.saveMaintenance({ gearId: suit.id, task: 'seals', intervalMonths: 12, intervalDives: null });
-  const valves = await inventory.saveMaintenance({ gearId: suit.id, task: 'valves', intervalMonths: 12, intervalDives: null });
-  await inventory.noteMaintenance({ id: valves.id, gearId: suit.id, task: 'valves' }, { kind: 'service', doneOn: '2026-11-17' });
+  const service = await inventory.saveMaintenance({ gearId: suit.id, task: 'service', intervalMonths: 12, intervalDives: null });
+  await inventory.noteMaintenance({ id: service.id, gearId: suit.id, task: 'service' }, { kind: 'service', doneOn: '2026-11-17' });
   const reminders = await inventory.listMaintenance();
-  assert.equal(reminders.find((item) => item.id === valves.id).history.length, 1);
+  assert.equal(reminders.find((item) => item.id === service.id).history.length, 1);
   assert.equal(reminders.find((item) => item.id === seals.id).history.length, 0);
 });
 
