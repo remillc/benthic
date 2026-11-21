@@ -1,7 +1,7 @@
 // @ts-check
 // Pure logic of the desktop detail pane's tabs (task 2026-11-16-262; mock-ups bureau-carnet-colonnes,
 // -onglet-equipement, -onglet-gaz, -onglet-notes, -onglet-carte): the weight chips and their total, the
-// water type segments, the gas cards and the consumption figures, the typed gas mix and pressures.
+// gas cards and the consumption figures, the typed gas mix and pressures.
 // What is written to the core is decided in desktop-edit.js; this file only prepares what is shown.
 
 import { fillLevels } from './gas-summary.js';
@@ -9,9 +9,6 @@ import { gasName, pressureUsed, typeHelper } from './cylinder-card.js';
 import { formatCylinderSize, formatNumber, formatPressure, formatSac, formatWeight } from './format.js';
 import { t, tIfExists } from './i18n.js';
 import { cylinderTypeLabel } from './cylinder-types.js';
-
-/** The two segments of « Type d'eau »; any other water type (brackish, EN 13319) selects neither. */
-export const WATER_SEGMENTS = /** @type {const} */ (['fresh', 'salt']);
 
 /** The five stars of « Visibilité »: the words read out for a value (0: « Non notée »). @param {number} n */
 export const visibilityText = (n) => (n > 0 ? t('desktopDetail.starsLabel', { label: t('desktopDetail.label.visibility'), n }) : t('desktopDetail.notRated'));
