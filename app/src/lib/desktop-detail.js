@@ -10,9 +10,6 @@ import { formatCylinderSize, formatNumber, formatPressure, formatSac, formatWeig
 import { t, tIfExists } from './i18n.js';
 import { cylinderTypeLabel } from './cylinder-types.js';
 
-/** The two segments of « Type d'eau »; any other water type (brackish, EN 13319) selects neither. */
-export const WATER_SEGMENTS = /** @type {const} */ (['fresh', 'salt']);
-
 /** The five stars of « Visibilité »: the words read out for a value (0: « Non notée »). @param {number} n */
 export const visibilityText = (n) => (n > 0 ? t('desktopDetail.starsLabel', { label: t('desktopDetail.label.visibility'), n }) : t('desktopDetail.notRated'));
 

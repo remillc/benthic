@@ -12,7 +12,6 @@
   import DcTile from './DcTile.svelte';
   import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
   import ButtonGroup from './ButtonGroup.svelte';
-  import DesktopSegments from './DesktopSegments.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
@@ -30,12 +29,12 @@
   import { offerUndo } from '../lib/undo.js';
   import { cylinderChanges, fieldChanges, fieldValue, parseTyped, pressureMbarOf, siteChoice, weightChanges, weightText } from '../lib/desktop-edit.js';
   import { FEEDBACK_CHOICES, feedbackOf, withFeedback, withoutFeedbackTags } from '../lib/weight-feedback.js';
-  import { waterTypeName } from '../lib/tools.js';
+  import { WATER_TYPES, waterTypeName } from '../lib/tools.js';
   import { computerList } from '../lib/gas-summary.js';
   import { useKey } from '../lib/cylinder-use.js';
   import { formatCylinderSize, formatNumber, formatPressure, formatTemperature } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
-  import { WATER_SEGMENTS, computerRole, consumption, cylinderSpan, gasCards, gasText, parseGas, parsePressurePair } from '../lib/desktop-detail.js';
+  import { computerRole, consumption, cylinderSpan, gasCards, gasText, parseGas, parsePressurePair } from '../lib/desktop-detail.js';
   import { formatCoordinates } from '../lib/sites.svelte.js';
   import { focusSite } from '../lib/site-focus.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
@@ -217,7 +216,7 @@
     }
   }
 
-  const waterOptions = $derived(WATER_SEGMENTS.map((id) => ({ value: id, label: waterTypeName(id) })));
+  const waterOptions = $derived(WATER_TYPES.map((water) => ({ value: water.id, label: waterTypeName(water.id) })));
   const waterValue = $derived(/** @type {string} */ (fieldValue(dive, 'waterType', prefs)) || dive.waterType || '');
   const computers = $derived(computerList(dive.diveComputers));
   const manual = $derived(!!dive.manual);
@@ -362,10 +361,7 @@
       <div class="bc-desktop-dive-fields--columns">
         <DesktopEditField stacked name="buddies" kind="list" label={t('desktopDetail.label.buddies')} value={dive.buddies} invitation={t('desktopDetail.invitation.buddies')} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
         <DesktopEditField stacked name="guides" kind="list" label={t('desktopDetail.label.guides')} value={dive.guides} invitation={t('desktopDetail.invitation.guides')} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
-        <div class="bc-desktop-dive-fields--cell" data-field="waterType">
-          <span class="bc-desktop-dive-fields--cell-label" id="od-df-water">{t('desktopDetail.label.waterType')}</span>
-          <DesktopSegments block options={waterOptions} value={waterValue} ariaLabel={t('desktopDetail.label.waterType')} onchange={(v) => save('waterType', v)} />
-        </div>
+        <DesktopEditField stacked name="waterType" kind="choice" label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
         <DesktopEditField stacked name="visibility" kind="stars" label={t('desktopDetail.label.visibility')} value={dive.visibility} emptyText={t('desktopDetail.notRated')} invitation={t('desktopDetail.invitation.visibility')} onsave={(v) => save('visibility', v)} />
         <DesktopEditField stacked name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
         {#if manual}
