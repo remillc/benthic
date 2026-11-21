@@ -13,8 +13,8 @@
   /** @type {{ ondownload: () => void, onimport: () => void, onmanual: () => void }} */
   let { ondownload, onimport, onmanual } = $props();
 
-  const entry = windowLogbook();
-  const kept = entry ? keptIn(entry, t) : null;
+  const entry = $derived(windowLogbook());
+  const kept = $derived(entry ? keptIn(entry, t) : null);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
   const ways = [
     // « Télécharger mes plongées » with the dive computer icon, as the empty logbook (task 2026-11-15-220).

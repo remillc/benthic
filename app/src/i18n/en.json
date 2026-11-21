@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop logbook: rename the displayed logbook from the Logbook menu without changing its file.",
       "Tablet logbook: the dive list is slightly wider in landscape.",
       "Equipment: an annual service reminder, including valve service, is suggested for drysuits.",
       "Equipment: the suggested regulator service interval is now one year or 100 dives.",
@@ -4600,6 +4601,13 @@
   },
   "desktopLogbooks": {
     "mainName": "This computer's logbook",
+    "rename": {
+      "action": "Rename…",
+      "title": "Rename logbook",
+      "name": "Logbook name",
+      "save": "Rename",
+      "failed": "The logbook could not be renamed."
+    },
     "selector": {
       "label": "Logbook",
       "change": "Switch logbook",

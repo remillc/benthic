@@ -22,7 +22,7 @@
   /** « Exporter le carnet… » (task 2026-11-15-189): the Carnet opens its export dialog on the whole logbook. */
   let { onexport = undefined } = $props();
 
-  const current = windowLogbook();
+  const current = $derived(windowLogbook());
   const shortcuts = selectorShortcuts(false);
   let open = $state(false);
   let now = $state(Date.now());
@@ -111,6 +111,9 @@
         </button>
         <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(openLogbookDialog)}>
           <span class="bc-logbook-selector--label">{t('desktopLogbooks.selector.openLogbook')}</span><kbd>{shortcuts.openLogbook}</kbd>
+        </button>
+        <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(() => (logbooks.renameDialog = true))}>
+          <span class="bc-logbook-selector--label">{t('desktopLogbooks.rename.action')}</span>
         </button>
         <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(saveCopy)}>
           <span class="bc-logbook-selector--label">{t('desktopLogbooks.selector.saveCopy')}</span><kbd>{shortcuts.saveCopy}</kbd>

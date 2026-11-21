@@ -429,6 +429,14 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     return ctx ? ctx.descriptor : null;
   }
 
+  /** Update the display name without stopping the logbook's helper. */
+  function setDescriptorName(/** @type {number} */ key, /** @type {string} */ name) {
+    const ctx = contexts.get(key);
+    if (!ctx?.descriptor) throw new Error('NO_LOGBOOK');
+    ctx.descriptor = { ...ctx.descriptor, name };
+    return ctx.descriptor;
+  }
+
   // --- A file logbook: the core works on a git copy, the .ssrf file is kept up to date ---
 
   /** A logbook whose git copy is built from a .ssrf file: a file, or the working copy of a cloud logbook. */
@@ -1119,6 +1127,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     detach,
     setDescriptor,
     descriptorOf,
+    setDescriptorName,
     /** The core call of a window, as the renderer's, without the path checks (the main process asks). */
     callFor: (key, method, args) => coreCall(method, args ?? {}, contexts.get(key) || contextFor()),
     saveCopy: (key, target) => saveCopy(contexts.get(key) || contextFor(), target),
