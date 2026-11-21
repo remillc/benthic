@@ -190,8 +190,8 @@
   <Navbar title={t('diverProfile.info.title')}>
     {#snippet left()}
       {#if editing}
-        <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), cancelEdit())}>
-          <Icon name="close" /><span class="bc-sr-only">{t('diverProfile.info.close')}</span>
+        <a href="#close" class="link icon-only external bc-profile-info--cancel-edit" role="button" onclick={(e) => (e.preventDefault(), cancelEdit())}>
+          <i class="icon icon-back"></i><span class="bc-sr-only">{t('diverProfile.info.close')}</span>
         </a>
       {:else}
         <BackLink label={t('gear.profile.title')} name={t('diverProfile.info.back')} />

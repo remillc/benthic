@@ -2729,6 +2729,7 @@
       "Restauration : une plongée retrouve le numéro manquant à sa position ; si aucun numéro n’est disponible, les suivantes sont décalées.",
       "Informations : les champs de date de naissance, de lien, de téléphone et de groupe sanguin sont moins larges.",
       "Profil : la flèche de retour n’apparaît plus sur tablette et ordinateur.",
+      "Informations : une flèche permet de quitter la modification sans enregistrer.",
       "Profil et équipement : l’entrée Entretien apparaît lorsqu’une pièce active a un rappel d’entretien.",
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
       "Équipement : le champ « Type de pièce » n’apparaît plus à la création d’une pièce de type Autre.",
