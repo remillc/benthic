@@ -124,6 +124,12 @@ test('tablet and desktop: « Continuer sans compte » is centred across the 440 
 
 // --- The subscriber's sheet: chip, overdue badge, red line, cross on the right ---
 
+test('the desktop subscriber account initial has no plus badge', () => {
+  assert.match(desktopSheet, /<span class="bc-desktop-account--avatar" aria-hidden="true">\{initial\}<\/span>/);
+  assert.doesNotMatch(desktopSheet, /bc-desktop-account--avatar-plus/);
+  assert.match(desktopSheet, /bc-desktop-account--brand-name.*bc-desktop-account--dot/);
+});
+
 test('« Mon profil de plongeur »: the badge and the red line only for overdue pieces, with the count of the Entretien row', () => {
   assert.deepEqual(profileRow(0), { badge: 0, late: false });
   assert.deepEqual(profileRow(1), { badge: 1, late: true });
