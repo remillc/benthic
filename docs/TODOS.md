@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 162
+Next number: 163
 
 ## List
 
@@ -73,3 +73,4 @@ Next number: 162
 - #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.
+- #162 [code] créer un skeleton pour la page /dives/:id sur tablette et desktop
