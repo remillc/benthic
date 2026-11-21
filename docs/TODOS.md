@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 149
+Next number: 150
 
 ## List
 
@@ -65,3 +65,4 @@ Next number: 149
 - #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
 - #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes et les détendeurs
+- #149 [code] remplacer les uuid par des id plus courts
