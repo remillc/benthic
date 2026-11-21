@@ -101,6 +101,16 @@ test('Informations: the water type menu and the stars write through the edit pat
   assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) input\.showPicker\(\)/);
 });
 
+test('Informations: buddy and guide editors hide the editing hint, without hiding errors', () => {
+  const fields = read('app/src/components/DesktopDiveFields.svelte');
+  for (const name of ['buddies', 'guides']) {
+    assert.match(fields, new RegExp(`<DesktopEditField stacked name="${name}" kind="list" showHint=\\{false\\}`));
+  }
+  const editor = read('app/src/components/DesktopEditField.svelte');
+  assert.match(editor, /showHint = true/);
+  assert.match(editor, /\{#if invalid \|\| \(showHint && kind !== 'choice' && kind !== 'stars'\)\}/);
+});
+
 test('Gaz: one card per cylinder, with the levels of its pressures', () => {
   const cards = gasCards([cylinder(), cylinder({ o2Permille: 320, startMbar: 200000, endMbar: 0 })], metric);
   assert.equal(cards.length, 2);

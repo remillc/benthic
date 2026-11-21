@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop dive details: the editing hint no longer appears under buddies and guides.",
       "Desktop dive details: the water type menu opens with one click.",
       "Deleting dives automatically shifts the numbers of later dives.",
       "Fixed a dive detail error at startup when a cloud logbook is open.",

@@ -44,11 +44,12 @@
    *   onopen?: () => void,
    *   openLabel?: string,
    *   openChoiceOnClick?: boolean,
+   *   showHint?: boolean,
    *   leading?: import('svelte').Snippet,
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -293,7 +294,7 @@
           {#if unit}<span class="bc-desktop-edit-field--unit">{unit}</span>{/if}
         {/if}
       </div>
-      {#if kind !== 'choice' && kind !== 'stars'}<p class="bc-desktop-edit-field--hint" class:bc-desktop-edit-field--hint-invalid={invalid}>{invalid ? t('desktopDetail.invalid') : hint}</p>{/if}
+      {#if invalid || (showHint && kind !== 'choice' && kind !== 'stars')}<p class="bc-desktop-edit-field--hint" class:bc-desktop-edit-field--hint-invalid={invalid}>{invalid ? t('desktopDetail.invalid') : hint}</p>{/if}
       {#if (kind === 'list' || kind === 'site') && rows.length}
         <ul class="bc-desktop-edit-field--suggestions" role="listbox" aria-label={label} use:floatMenu>
           {#each rows as row, i (row.add ? `add-${row.key}` : row.key)}
