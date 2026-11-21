@@ -71,6 +71,5 @@ Next number: 159
 - #153 [design] desktop, sur /dives/:id, afficher la carte en bg sur toute la largeur de l'en-tête
 - #154 [design] carte des sites de plongée créer à partir des sites de plongée des plongeurs: ajouter les sites de OpenStreetMap (ou freeMap...)
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
-- #156 [code] bogue: vérifié sur téléphone, pas sur tablette et desktop, lorsqu'on télédécharge une nouvelle plongée, et qu'on renseigne le champs site, après sauvegarde et retour à /, le site affiche toujours Site à préciser
 - #157 [design] /tools/desaturation, "Les 16 compartiments...", rephraser
 - #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic

@@ -6,7 +6,6 @@
   // OpenDivesCore.editDive), one undoable step, so Ctrl/⌘+Z undoes it. What the dive computer
   // recorded is plain text, editable only on a dive logged by hand (lib/desktop-edit.js).
   import { untrack } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
   import { cachedCylinderTypes, cachedPlannerSetup, cachedSites, cachedValues } from '../lib/core-cache.js';
   import DesktopEditField from './DesktopEditField.svelte';
   import DcTile from './DcTile.svelte';
@@ -168,7 +167,6 @@
   async function write(changes) {
     try {
       await saveDiveChanges(dive.id, changes);
-      logbook.dives = await OpenDivesCore.listLoadedDives();
       return true;
     } catch (e) {
       failure(e);

@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: a dive's site and other edited details now appear in the list after saving.",
       "Desktop dive details: the editing hint no longer appears under buddies and guides.",
       "Desktop dive details: the water type menu opens with one click.",
       "Deleting dives automatically shifts the numbers of later dives.",

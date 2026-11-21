@@ -2723,6 +2723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet : le site et les autres détails modifiés d’une plongée apparaissent dans la liste après l’enregistrement.",
       "Détail d’une plongée sur ordinateur : l’indication de modification n’apparaît plus sous les compagnons et les guides.",
       "Détail d’une plongée sur ordinateur : le menu du type d’eau s’ouvre en un clic.",
       "La suppression de plongées décale automatiquement les numéros des plongées suivantes.",
