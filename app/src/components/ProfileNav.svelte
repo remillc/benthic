@@ -7,6 +7,7 @@
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { gear, loadInventory, visibleGear, overdueBadge, hasActiveMaintenance } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { onMount } from 'svelte';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
@@ -24,7 +25,7 @@
   });
 
   // The Mac's profile window does not load the logbook: the main window left the diver's line.
-  const hero = $derived(profileWindow ? readHero() : heroOf(logbook));
+  const hero = $derived(profileWindow ? readHero() : heroOf(logbook, odplusAccount));
   const name = $derived(diver.info.fullName || hero.name || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
   const total = $derived(hero.total);

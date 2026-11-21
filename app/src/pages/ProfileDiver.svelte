@@ -9,13 +9,15 @@
   import BenthicPlusChip from '../components/BenthicPlusChip.svelte';
   import { gear, loadInventory, visibleGear, overdueBadge, hasActiveMaintenance } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { accountEmail } from '../lib/account-sheet.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { t } from '../lib/i18n.js';
   import { documentsLine } from '../lib/documents-text.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
   import { profileWide } from '../lib/profile-frame.js';
 
-  const name = $derived(diver.info.fullName || logbook.email || t('gear.profile.defaultName'));
+  const name = $derived(diver.info.fullName || accountEmail(odplusAccount, logbook) || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
   const total = $derived(logbook.dives.length);
   const since = $derived(logbook.dives.reduce((year, d) => Math.min(year, Number(d.date.slice(0, 4)) || year), 9999));

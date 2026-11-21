@@ -35,6 +35,17 @@ test('the account sheet uses the subscriber email instead of the server git user
   assert.match(avatar, /accountEmail\(odplusAccount, logbook\)/);
 });
 
+test('the profile uses the account identity on narrow and wide layouts, including the separate profile window', () => {
+  const profile = read('pages/ProfileDiver.svelte');
+  const nav = read('components/ProfileNav.svelte');
+  const frame = read('lib/profile-frame.js');
+  const app = read('App.svelte');
+  assert.match(profile, /diver\.info\.fullName \|\| accountEmail\(odplusAccount, logbook\)/);
+  assert.match(frame, /name: accountEmail\(account, book\)/);
+  assert.match(nav, /profileWindow \? readHero\(\) : heroOf\(logbook, odplusAccount\)/);
+  assert.match(app, /rememberHero\(heroOf\(logbook, odplusAccount\)\)/);
+});
+
 test('the account overview refreshes a renamed email and subscription in one request', async () => {
   let requests = 0;
   const api = createServerApi({

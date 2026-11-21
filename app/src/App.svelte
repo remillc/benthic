@@ -405,7 +405,7 @@
     if (!desktopMac || sideWindow) return;
     const on = isSubscriber();
     /** @type {any} */ (window).odDesktop.setProfileAvailable?.(on);
-    if (on) rememberHero(heroOf(logbook));
+    if (on) rememberHero(heroOf(logbook, odplusAccount));
   });
 
   onMount(() => {

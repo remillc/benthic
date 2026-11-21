@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
       "Desktop: the account menu no longer shows a plus sign on the initial.",
       "Deleting dives automatically shifts the numbers of later dives.",
