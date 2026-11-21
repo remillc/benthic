@@ -2723,7 +2723,6 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
-      "Carnet sur ordinateur : un trait gris sépare les plongées.",
       "La suppression de plongées décale automatiquement les numéros des plongées suivantes.",
       "Corrigé une erreur du détail d’une plongée au démarrage avec un carnet synchronisé.",
       "Carnet sur tablette : quand des plongées sont cochées, les actions du détail passent dans le menu ⋮ en haut et permettent de supprimer la sélection.",

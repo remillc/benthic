@@ -66,4 +66,5 @@ Next number: 152
 - #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes et les détendeurs
 - #149 [code] remplacer les uuid par des id plus courts
+- #150 [code] dans desktop: sur le carnet, ajouter le même trait séparateur gris entre chaque plongée
 - #151 [code] compléter l'écriture en cascade css des fichiers

@@ -1287,7 +1287,7 @@
       overflow-anchor: none;
       padding-right: 9px;
     }
-    /* The table: 48 dp rows 2 dp apart, the selected row a pill. */
+    /* The table (task 2026-11-15-193): no lines, 48 dp rows 2 dp apart, the selected row a pill. */
     .bc-desktop-logbook--table {
       width: 100%;
       border-collapse: separate;
@@ -1418,9 +1418,6 @@
       & td[data-col='site'] {
         font-weight: 500;
       }
-    }
-    .bc-desktop-logbook--row:has(+ .bc-desktop-logbook--row) > td {
-      border-bottom: 1px solid var(--bc-separator);
     }
     .bc-desktop-logbook--time {
       font-size: 12px;
