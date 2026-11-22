@@ -6404,3 +6404,16 @@ Christian approved this on 22 November 2026. Work in `main`. Android phone first
 Dates follow the format chosen in Réglages; « Aujourd’hui » and « Hier » are used as day labels in the timeline only.
 
 **Test:** each of the three choices opens its screen and back returns to « Que voulez-vous récupérer ? »; restoring a deleted dive puts it back with its number; restoring a version keeps the current logbook as a version.
+
+## [ ] 2026-11-22-320 First-launch header: light rays from the sun (#98)
+
+Christian approved this on 22 November 2026. Work in `main`. Rules in `docs/system-design.md`, « Light rays in the first-launch header » (after « Lockup proportions »).
+
+- Replace the evenly spaced parallel stripes (`repeating-linear-gradient(105deg, …)` with the vertical fade mask) of the blue first-launch band with a few wide, barely diverging rays coming from a sun far beyond the top right corner: 3 rays per 390 px of band width, each with its own width and opacity (white 3 to 4 %), blurred 2 px, fading out from the top to about 65 % of the band's height.
+- Move the band's soft white glow from the top left to the top right (radial gradient at 85 % 0 % instead of 22 % 0 %).
+- Everywhere this band is used: first launch and every step, server sign-in, Benthic+ offer, sign-in, ready and health screens; phone, iPhone, tablet (portrait and landscape) and desktop. Draw the rays once as a component that adapts to the band's size (SVG or canvas), not as an image.
+- Respect « reduce motion »: the rays never move.
+
+**Mock-ups:** the design canvases are the reference (198 boards updated). Update the matching files in `docs/mockups/` the same way.
+
+**Test:** on the phone and on a wide desktop window the rays come from the top right, stay subtle (the text keeps its contrast), and disappear before the dive profile.
