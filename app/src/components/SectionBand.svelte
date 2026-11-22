@@ -58,12 +58,12 @@
 
       &.bc-section-band--tall {
         --bc-band-h: calc(var(--f7-safe-area-top) + 190px);
-      }
 
-      /* The logbook's search field sits 8 px higher; the band keeps its height (task 284). */
-      /* :global: the search field comes from the page (a slot); Svelte would drop the rule otherwise. */
-      &.bc-section-band--tall:has(:global(.bc-band-search)) {
-        padding-bottom: 40px;
+        /* The logbook's search field sits 8 px higher; the band keeps its height (task 284). */
+        /* :global: the search field comes from the page (a slot); Svelte would drop the rule otherwise. */
+        &:has(:global(.bc-band-search)) {
+          padding-bottom: 40px;
+        }
       }
 
       &.bc-section-band--pill {

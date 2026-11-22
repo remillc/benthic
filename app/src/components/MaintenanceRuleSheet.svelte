@@ -265,10 +265,10 @@
         font: inherit;
         font-size: 18px;
         text-align: center;
-      }
 
-      input[aria-invalid='true'] {
-        border-color: var(--bc-alarm);
+        &[aria-invalid='true'] {
+          border-color: var(--bc-alarm);
+        }
       }
     }
 

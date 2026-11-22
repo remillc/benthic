@@ -276,17 +276,13 @@
           opacity: 0.88;
         }
       }
-    }
 
-/* Phone (task 2026-11-16-227): the button takes the width of the column. */
-    @media (max-width: 767.98px) {
-      .bc-first-launch-git--action {
+      /* Phone (task 2026-11-16-227): the button takes the width of the column. */
+      @media (max-width: 767.98px) {
         align-self: stretch;
       }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      .bc-first-launch-git--action {
+      @media (prefers-reduced-motion: reduce) {
         transition: none;
       }
     }

@@ -425,11 +425,11 @@
       font-size: 15px;
       line-height: 21px;
       color: var(--bc-text);
-    }
 
-    .bc-server-create--note :global(svg) {
-      flex: none;
-      margin-top: 1px;
+      & :global(svg) {
+        flex: none;
+        margin-top: 1px;
+      }
     }
 
     .bc-server-create--buttons {

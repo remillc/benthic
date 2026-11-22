@@ -97,7 +97,7 @@ test('the connect screens: the hint under the button, in progress with « Annule
 
 test('the spinner stops under reduced motion', () => {
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /@media \(prefers-reduced-motion: reduce\) \{\s*\.bc-first-launch--spinner \{\s*animation: none;/);
+  assert.match(steps, /animation: od-first-launch-spin 0\.9s linear infinite;\s*@media \(prefers-reduced-motion: reduce\) \{\s*animation: none;/);
 });
 
 test('WebDAV: the codes tell the address or the password; the texts are the mock-ups’', () => {

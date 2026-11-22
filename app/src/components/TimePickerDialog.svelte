@@ -346,26 +346,26 @@
       cursor: pointer;
       outline: none;
       padding: 0;
-    }
 
-    .bc-time-picker--box.bc-time-picker--selected {
-      background: var(--bc-primary-container);
-      border-color: var(--bc-primary);
-    }
+      &.bc-time-picker--selected {
+        background: var(--bc-primary-container);
+        border-color: var(--bc-primary);
+      }
 
-    .bc-time-picker--box:focus-visible {
-      outline: 2px solid var(--bc-primary);
-      outline-offset: 2px;
+      &:focus-visible {
+        outline: 2px solid var(--bc-primary);
+        outline-offset: 2px;
+      }
     }
 
     .bc-time-picker--box-input {
       height: 72px;
       font-size: 48px;
       line-height: 68px;
-    }
 
-    .bc-time-picker--box-input.bc-time-picker--invalid {
-      border-color: var(--bc-error);
+      &.bc-time-picker--invalid {
+        border-color: var(--bc-error);
+      }
     }
 
     .bc-time-picker--box-label {
@@ -409,18 +409,18 @@
       & + .bc-time-picker--period-button {
         border-top: 1px solid var(--bc-outline);
       }
-    }
 
-    .bc-time-picker--period-button.bc-time-picker--on {
-      background: var(--bc-primary-container);
-      box-shadow: inset 0 0 0 2px var(--bc-primary);
-      color: var(--bc-text);
-      font-weight: 600;
-    }
+      &.bc-time-picker--on {
+        background: var(--bc-primary-container);
+        box-shadow: inset 0 0 0 2px var(--bc-primary);
+        color: var(--bc-text);
+        font-weight: 600;
+      }
 
-    .bc-time-picker--period-button:focus-visible {
-      outline: 2px solid var(--bc-primary);
-      outline-offset: -2px;
+      &:focus-visible {
+        outline: 2px solid var(--bc-primary);
+        outline-offset: -2px;
+      }
     }
 
     .bc-time-picker--error {

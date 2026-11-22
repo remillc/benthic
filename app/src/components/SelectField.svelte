@@ -330,10 +330,10 @@
   @layer od.components {
     .bc-select-field--field {
       margin: 18px var(--bc-field-margin, 16px) 0;
-    }
 
-    .bc-select-field--field.disabled {
-      opacity: 0.38;
+      &.disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-select-field--box {

@@ -323,12 +323,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-    }
 
-    /* Mouse: the 8 % layer of the content colour on a round state area. */
-    @media (hover: hover) and (pointer: fine) {
-      .bc-number-combo--chevron:hover {
-        background: radial-gradient(circle closest-side, color-mix(in srgb, var(--bc-text) 8%, transparent) 99%, transparent) center / 40px 40px no-repeat;
+      /* Mouse: the 8 % layer of the content colour on a round state area. */
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          background: radial-gradient(circle closest-side, color-mix(in srgb, var(--bc-text) 8%, transparent) 99%, transparent) center / 40px 40px no-repeat;
+        }
       }
     }
 
