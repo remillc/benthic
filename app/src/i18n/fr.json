@@ -2723,6 +2723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carte commune : un message indique quand les sites ne sont pas disponibles hors ligne.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",
@@ -6655,7 +6656,8 @@
     },
     "fewDives": "Moins de 5 plongées",
     "inYourSites": "Dans vos sites",
-    "offline": "Hors ligne : la carte commune revient avec le réseau.",
+    "offlineTitle": "Carte commune indisponible",
+    "offline": "Connectez-vous à Internet pour afficher les sites de la carte commune.",
     "failed": "La carte commune ne répond pas. Réessayez plus tard.",
     "retry": "Réessayer",
     "offerText": "La carte commune des sites fait partie de Benthic+.",

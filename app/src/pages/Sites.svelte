@@ -6,7 +6,7 @@
   // with a position and "centre on my position", then the list panel: the
   // count, the list items that apply (dives without a site, sites without
   // coordinates, possible duplicates), a divider and the sites.
-  import { tick } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
@@ -339,7 +339,6 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   function onview(v) {
     view = v;
     hintIfNotDownloaded();
-    if (common) loadBase(v);
   }
 
   // « Mes sites | Carte commune » (task 2026-11-19-315, docs/mockups/sites-commun-android.dc.html): a signed-in Benthic+
@@ -360,9 +359,9 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   /** Reads the base in the view once the map has stopped. @param {{ center: [number, number], bounds: [number, number, number, number], zoom: number }} v */
   function loadBase(v) {
     clearTimeout(baseTimer);
+    const ask = ++baseAsk;
     baseTimer = setTimeout(async () => {
       if (!connection.online) return;
-      const ask = ++baseAsk;
       if (baseState !== 'ready') baseState = 'loading';
       const [w, so, e, n] = v.bounds;
       const radiusM = Math.min(50000, Math.max(1, Math.round(distanceKm(v.center[0], v.center[1], e, n) * 1000)));
@@ -383,12 +382,17 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   }
 
   $effect(() => {
-    if (!common) {
+    if (!common || !connection.online) {
+      clearTimeout(baseTimer);
+      untrack(() => baseAsk++);
       baseSelectedId = null;
+      baseBox = null;
+      baseList = [];
       return;
     }
     if (!sharedSites.linksLoaded) loadLinks();
-    if (view) loadBase(view);
+    const currentView = view;
+    if (currentView) untrack(() => loadBase(currentView));
   });
 
   /** What the map draws of the base. */
@@ -512,7 +516,10 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   {#if common}
   <section class="bc-sites--panel" aria-label={t('sharedSites.listLabel')}>
     {#if !connection.online}
-      <p class="bc-sites--area-count" role="status">{t('sharedSites.offline')}</p>
+      <div class="bc-sites--common-offline" role="status">
+        <Icon name="offline" size={24} />
+        <div><h2>{t('sharedSites.offlineTitle')}</h2><p>{t('sharedSites.offline')}</p></div>
+      </div>
     {:else if baseState === 'offer'}
       <div class="bc-sites--common-offer">
         <p>{t('sharedSites.offerText')}</p>
@@ -1039,6 +1046,27 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       color: var(--bc-text-2);
       & p {
         margin: 0;
+      }
+    }
+
+    .bc-sites--common-offline {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 16px 24px;
+      color: var(--bc-text-2);
+
+      h2 {
+        margin: 0;
+        color: var(--bc-text);
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      p {
+        margin: 4px 0 0;
+        font-size: 14px;
+        line-height: 20px;
       }
     }
 
