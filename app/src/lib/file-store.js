@@ -31,7 +31,7 @@ export function sortedJson(value) {
     if (Array.isArray(v)) return v.map(sort);
     if (v && typeof v === 'object') {
       /** @type {Record<string, unknown>} */
-      const out = {};
+      const out = Object.create(null);
       for (const key of Object.keys(v).sort()) {
         const item = /** @type {Record<string, unknown>} */ (v)[key];
         if (item !== undefined) out[key] = sort(item);
