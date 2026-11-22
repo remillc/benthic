@@ -43,7 +43,7 @@ Next number: 175
 - #101 [site] création d'un site du produit : promotion, information, abonnement, aide. À décider ici : la carte partagée des sites (#76) est-elle réservée à OpenDives+, ouverte aux gratuits en lecture seule, ou publique sur le site ?
 - #103 [design] ré-évaluer la pertinence de la fonction de téléchargement de cartes et les réglages de cartes hors ligne.
 - #112 [beta] Liste des bêta-testeurs : Marc Bélaire, Martin Dupuis, Nicolas Pinsonneault, Julie Cardinal, Cyrill Jouzeau, Véronique Lizy, Benoît Turcotte.
-- #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format.
+- #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format. Décidé le 22 nov. 2026 : importer un .benthic crée le carnet (premier lancement) ou remplace le carnet actuel après confirmation, comme « Importer un carnet ».
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
@@ -53,7 +53,7 @@ Next number: 175
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
 - #139 [code] On `/`, when a synchronisation needs a progress bar, do not use the ME progress bar; use the wave on the bottom edge of the header instead.
-- #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
+- #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette. Décidé le 22 nov. 2026 : sur desktop, pas d’« Exporter le carnet » dans le menu 3-dots (l’export passe par le menu Fichier sur macOS et le sélecteur de carnets sur Windows et Linux). À traiter avec #163.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
 - #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
 - #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
@@ -69,7 +69,7 @@ Next number: 175
 - #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.
-- #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158).
+- #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158). Décidé le 22 nov. 2026 : on retire « Enregistrer une copie » du desktop ; le dialogue d’exportation offre un nouveau format, .benthic (un zip avec l’extension .benthic), seulement pour le carnet entier ; c’est le même fichier que « Télécharger mes données » (Compte), qu’on garde ; les données sensibles y sont incluses sans avertissement.
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
 - #172 [code] Bug: a dive without a site does not show its dive number. Does it have one?
 - #173 [code] Devices should synchronize as soon as data is updated.
