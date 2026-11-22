@@ -757,6 +757,7 @@
       !editingTogether &&
       !exporting &&
       !choosingTrip &&
+      !document.querySelector('.bc-renumber-from-dialog.modal-in') &&
       !document.querySelector('.dialog.modal-in, .sheet-modal.modal-in, .popup.modal-in') &&
       !!pageEl?.closest('.page-current, .page-master')
     );
