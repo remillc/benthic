@@ -1757,6 +1757,102 @@ async function gearTypeDialogFlows(expect) {
       }, other.id);
       expect('tablet: an existing Other piece keeps its type name when saved', { typeName: 'Repair kit' }, { typeName: savedType });
     }
+    {
+      // Task 2026-11-22-324: a Recycleur is added with its two dates and gets its two reminders.
+      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
+      await sleep(1000);
+      if (label === 'Android tablet') {
+        const grid = await tab.run(async () => {
+          const { t } = await import('/src/lib/i18n.js');
+          const page = document.querySelector('.page-current.bc-piece-edit');
+          const tiles = [...page.querySelectorAll('.bc-piece-edit--tile')];
+          const columns = getComputedStyle(page.querySelector('.bc-piece-edit--tiles')).gridTemplateColumns.split(' ').length;
+          return {
+            tiles: tiles.length,
+            columns,
+            title: page.querySelector('.bc-piece-edit--steps-title').textContent.trim(),
+            subtitle: page.querySelector('.bc-piece-edit--steps-subtitle')?.textContent.trim(),
+            expectedSubtitle: t('gear.pieceNew.step1'),
+            close: !!page.querySelector('.bc-piece-edit--close'),
+            footer: [...page.querySelectorAll('.bc-piece-edit--steps-footer button')].map((b) => b.textContent.trim()).join('|'),
+            expectedFooter: t('dialog.cancel'),
+          };
+        });
+        expect('tablet: step 1 is a grid of 19 types in 4 columns, with its subtitle, a close button and only Annuler', { tiles: 19, columns: 4, title: 'Nouvelle pièce', subtitle: grid.expectedSubtitle, close: true, footer: grid.expectedFooter }, { tiles: grid.tiles, columns: grid.columns, title: grid.title, subtitle: grid.subtitle, close: grid.close, footer: grid.footer });
+      }
+      await selectType('rebreather');
+      if (label === 'Android tablet') {
+        const step2 = await tab.run(async () => {
+          const { t } = await import('/src/lib/i18n.js');
+          const page = document.querySelector('.page-current.bc-piece-edit');
+          return {
+            footer: [...page.querySelectorAll('.bc-piece-edit--steps-footer button')].map((b) => b.textContent.trim()).join('|'),
+            expectedFooter: t('gear.pieceEdit.save'),
+            subtitle: !!page.querySelector('.bc-piece-edit--steps-subtitle'),
+            back: !!page.querySelector('.bc-piece-edit--back'),
+          };
+        });
+        expect('tablet: step 2 has the back arrow, no subtitle and only Enregistrer', { footer: step2.expectedFooter, subtitle: false, back: true }, { footer: step2.footer, subtitle: step2.subtitle, back: step2.back });
+        await tab.run(() => document.querySelector('.page-current .bc-piece-edit--back').click());
+        await sleep(600);
+        expect('tablet: the back arrow returns to the type grid', { step: 'choose' }, { step: await tab.run(() => document.querySelector('.page-current .bc-piece-edit--stage').dataset.step) });
+        await selectType('rebreather');
+      }
+      await tab.run(async (label) => {
+        const { t } = await import('/src/lib/i18n.js');
+        const page = document.querySelector('.page-current.bc-piece-edit');
+        const input = (key) => {
+          const l = [...page.querySelectorAll('label')].find((element) => element.textContent.trim() === t(key));
+          if (!l) throw new Error('Missing label ' + key);
+          return document.getElementById(l.htmlFor);
+        };
+        for (const [key, value] of [['gear.pieceEdit.brand', 'rEvo ' + label], ['gear.pieceEdit.model', 'III']]) {
+          const field = input(key);
+          field.value = value;
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, label);
+      // The two dates are date fields: each opens the date picker, typed in its keyboard mode.
+      for (const [key, value] of [['gear.field.o2CellsOn', '14/03/2026'], ['gear.field.lastService', '08/11/2025']]) {
+        await tab.run(async (key) => {
+          const { t } = await import('/src/lib/i18n.js');
+          const button = [...document.querySelectorAll('.page-current.bc-piece-edit button')].find((b) => b.textContent.includes(t(key)));
+          if (!button) throw new Error('Missing date field ' + key);
+          button.click();
+        }, key);
+        await sleep(500);
+        await tab.run((value) => {
+          if (!document.querySelector('.bc-date-picker--input')) document.querySelector('.bc-date-picker--mode').click();
+        }, value);
+        await sleep(300);
+        await tab.run((value) => {
+          const input = document.querySelector('.bc-date-picker--input');
+          input.value = value;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }, value);
+        await sleep(200);
+        await tab.run(async () => {
+          const { t } = await import('/src/lib/i18n.js');
+          [...document.querySelectorAll('.bc-date-picker button')].find((b) => b.textContent.trim() === t('dialog.ok')).click();
+        });
+        await sleep(500);
+      }
+      await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
+      await sleep(1200);
+      const reb = await tab.run(async (brand) => {
+        const { gear, loadInventory } = await import('/src/lib/inventory.svelte.js');
+        await loadInventory();
+        const piece = gear.pieces.find((item) => item.type === 'rebreather' && item.brand === brand);
+        return { found: !!piece, o2CellsOn: piece?.details?.o2CellsOn, lastService: piece?.details?.lastService, id: piece?.id };
+      }, 'rEvo ' + label);
+      expect(label + ': a Recycleur keeps its two dates', { found: true, o2CellsOn: '2026-03-14', lastService: '2025-11-08' }, { found: reb.found, o2CellsOn: reb.o2CellsOn, lastService: reb.lastService });
+      const reminders = await tab.run(async (id) => {
+        const { gear, loadInventory } = await import('/src/lib/inventory.svelte.js');
+        await loadInventory();
+        return gear.maintenance.filter((x) => x.gearId === id).map((x) => [x.task, x.intervalMonths, x.lastDoneOn]).sort();
+      }, reb.id);
+      expect(label + ': a Recycleur gets its two reminders, counted from its dates', { reminders: JSON.stringify([['o2Cells', 12, '2026-03-14'], ['service', 12, '2025-11-08']]) }, { reminders: JSON.stringify(reminders) });
+    }
     if (label === 'Android tablet') {
       // The fields of every type are in tests/app/gear-fields.test.mjs; one without the usual fields shows the form's wiring.
       for (const type of ['compass']) {
@@ -1768,14 +1864,18 @@ async function gearTypeDialogFlows(expect) {
           const dialog = document.querySelector('.page-current .bc-piece-edit--stage');
           const labels = [...dialog.querySelectorAll('label')].map((element) => element.textContent.trim());
           return {
-            title: dialog.querySelector('.bc-piece-edit--form-title').textContent.trim(),
-            expected: t(`gear.pieceNew.tile.${type}`),
+            // Task 2026-11-22-325: the type is in the dialog's title, « Nouvelle pièce · Boussole »; no type row, no « Changer » button.
+            title: document.querySelector('.page-current .bc-piece-edit--steps-title').textContent.trim(),
+            expected: t('gear.pieceNew.titleWithType', { type: t(`gear.pieceNew.tile.${type}`) }),
+            typeRow: labels.includes(t('gear.pieceNew.typeTitle')),
+            changeButton: !!dialog.querySelector('.bc-piece-edit--change-type'),
+            backArrow: !!document.querySelector('.page-current .bc-piece-edit--back'),
             brand: labels.includes(t('gear.pieceEdit.brand')),
             model: labels.includes(t('gear.pieceEdit.model')),
             photo: !!dialog.querySelector('[data-testid="piece-picture"]'),
           };
         }, type);
-        expect(`tablet: ${type} has its own title, brand and model`, { title: dialog.expected, brand: true, model: true, photo: false }, dialog);
+        expect(`tablet: ${type} has its own title, brand and model`, { title: dialog.expected, typeRow: false, changeButton: false, backArrow: true, brand: true, model: true, photo: false }, dialog);
         await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
         await sleep(600);
         const found = await tab.run(async (type) => {

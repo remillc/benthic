@@ -2791,6 +2791,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Équipement : nouveau type « Recycleur », après Bouteille, avec la date d’installation des cellules O₂ et la dernière révision. Il reçoit deux rappels, cellules O₂ aux 12 mois et révision chaque année, comptés à partir de ces dates.",
+      "Équipement, tablette et ordinateur : « Nouvelle pièce » se fait en deux étapes dans une fenêtre. La première choisit le type dans une grille de 19, la seconde affiche « Nouvelle pièce · type » avec une flèche de retour, la croix et le seul bouton Enregistrer. La ligne « Type de pièce » et le bouton « Changer de type » disparaissent de ces écrans.",
       "Tablette : le menu ⋮ du carnet affiche le nom du carnet et propose Renommer, Ouvrir un autre carnet, Nouveau carnet et Exporter le carnet, avec le nombre de plongées.",
       "Export : une fenêtre à lignes simples, une par format, avec l’extension et une phrase de description, sur téléphone, tablette et ordinateur. UDDF passe avant SSRF. « Fichier Benthic » a son interrupteur « Inclure les photos et vidéos », activé par défaut. « Envoyer vers divelogs.de » est ajouté.",
       "Ordinateur : « Enregistrer une copie » et « Télécharger mes plongées » quittent les menus, et « Exporter le carnet » le menu ⋮. Pour faire une copie, exportez le carnet.",
@@ -5824,6 +5826,8 @@
       "valve": "Robinet",
       "o2Clean": "Propre O₂",
       "lastInspection": "Dernière inspection visuelle",
+      "o2CellsOn": "Cellules O₂ installées le",
+      "lastService": "Dernière révision",
       "lastHydro": "Dernier test hydrostatique"
     },
     "fieldHint": {
@@ -5978,6 +5982,7 @@
         "suit": "Combinaisons",
         "undersuit": "Sous-vêtements",
         "cylinder": "Bouteilles",
+        "rebreather": "Recycleurs",
         "light": "Lampes",
         "other": "Autres",
         "bcd": "Vestes",
@@ -5998,6 +6003,7 @@
         "suit": "Combinaison",
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
+        "rebreather": "Recycleur",
         "light": "Lampe",
         "other": "Autre",
         "bcd": "Veste",
@@ -6194,6 +6200,10 @@
       "changeType": "Changer de type",
       "serialHint_suit": "Sur l’étiquette des combinaisons étanches",
       "serialHint_cylinder": "Numéro gravé sur la bouteille",
+      "serialHint_rebreather": "Sur la plaque du boîtier",
+      "step1": "Étape 1 sur 2 · Choisissez le type de pièce",
+      "titleWithType": "Nouvelle pièce · {type}",
+      "backToTypes": "Revenir au choix du type",
       "cylinderNameHint": "Par exemple, AL80 jaune",
       "typeTitle": "Type de pièce",
       "tile": {
@@ -6211,6 +6221,7 @@
         "suit": "Combinaison",
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
+        "rebreather": "Recycleur",
         "bcd": "Veste",
         "light": "Lampe",
         "weights": "Ceinture de lest",
@@ -6375,6 +6386,7 @@
       "service": "Révision",
       "inspection": "Inspection visuelle",
       "hydrostatic": "Requalification",
+      "o2Cells": "Cellules O₂",
       "battery": "Pile",
       "seals": "Joints et fermeture",
       "travelCheck": "Contrôle avant voyage"
@@ -6445,13 +6457,15 @@
     "reminderCard": {
       "title": "Rappels d’entretien",
       "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
+      "suggestRebreather": "Suggéré : cellules O₂ aux 12 mois, révision chaque année",
       "suggestDrysuit": "Suggéré pour une combinaison étanche : entretien annuel, y compris des valves",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",
         "regulator": "Suggéré pour un détendeur : {rule}",
         "suit": "Suggéré pour une combinaison : {rule}",
         "cylinder": "Suggéré pour une bouteille : {rule}",
-        "bcd": "Suggéré pour une veste : {rule}"
+        "bcd": "Suggéré pour une veste : {rule}",
+        "rebreather": "Suggéré pour un recycleur : {rule}"
       },
       "noSuggestion": "Aucun rappel suggéré pour ce type de pièce",
       "add": "Ajouter",

@@ -16,50 +16,45 @@
    */
   let { type, name = '', size = 24, piece, tile = 0, radius = ios ? 8 : 10 } = $props();
 
+  // The 19 drawings of the type board of « Nouvelle pièce » (docs/mockups/android-tablette-profil-piece-nouvelle-type-paysage.dc.html,
+  // task 2026-11-22-324): 24 grid, round caps and joins, no fill. The mock-up's rectangles and circles are written as paths.
   /** @type {Record<string, string>} */
   const paths = {
-    regulator: 'M9 4.5a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM9 10.5v3a4 4 0 0 0 4 4h1.5M16.5 14a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z',
-    suit: 'M8 3.5l-4.5 3 2 4 2-1V20.5h9V9.5l2 1 2-4-4.5-3c-.5 1.4-1.8 2.2-4 2.2S8.5 4.9 8 3.5z',
-    cylinder: 'M10 2.5h4v2c2 .5 3.5 2.2 3.5 4.5v10.5a2.5 2.5 0 0 1-2.5 2.5H9a2.5 2.5 0 0 1-2.5-2.5V9c0-2.3 1.5-4 3.5-4.5z',
-    // The vest: collar, centre opening, two straps (task 2026-11-18-283).
+    computer: 'M9.5 6h5a3.5 3.5 0 0 1 3.5 3.5v5a3.5 3.5 0 0 1 -3.5 3.5h-5a3.5 3.5 0 0 1 -3.5 -3.5v-5a3.5 3.5 0 0 1 3.5 -3.5zM9 6V3h6v3M9 18v3h6v-3M9 12h1.5l1-2 1.5 4 1-2H15',
+    regulator: 'M7 11a6 6 0 1 0 12 0a6 6 0 1 0 -12 0M10.6 11a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0M7 9.5H4.8a1.5 1.5 0 0 0 0 3H7M9.5 18.6c1 .9 2.2 1.4 3.5 1.4s2.5-.5 3.5-1.4M19 10.5h.5a2 2 0 0 0 2-2V3',
+    suit: 'M9 3h6l4.5 3.5-2 3-2.5-1.5V21H9V8L6.5 9.5l-2-3zM12 8v6',
+    undersuit: 'M8.5 4l-4.5 2.5 1.5 4.5 2-1V20h9V10l2 1 1.5-4.5L15.5 4c-.6 1.4-1.9 2.2-3.5 2.2S9.1 5.4 8.5 4zM8 13h8M8 16h8',
+    cylinder: 'M10 2.5h4M12 2.5V5M9 8a3 3 0 0 1 6 0v12a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 20zM9 11.5h6',
+    rebreather: 'M10.5 8h3a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-3a2 2 0 0 1 -2 -2v-7a2 2 0 0 1 2 -2zM4.75 5h0a2.25 2.25 0 0 1 2.25 2.25v11.5a2.25 2.25 0 0 1 -2.25 2.25h-0a2.25 2.25 0 0 1 -2.25 -2.25v-11.5a2.25 2.25 0 0 1 2.25 -2.25zM19.25 5h0a2.25 2.25 0 0 1 2.25 2.25v11.5a2.25 2.25 0 0 1 -2.25 2.25h-0a2.25 2.25 0 0 1 -2.25 -2.25v-11.5a2.25 2.25 0 0 1 2.25 -2.25zM4.75 5V3M19.25 5V3M10.5 8V6a1.5 1.5 0 0 1 3 0v2',
     bcd: 'M8.5 3L5 5.5V19a2 2 0 0 0 2 2h3.5V10l1.5 1.5 1.5-1.5v11H17a2 2 0 0 0 2-2V5.5L15.5 3M8.5 3c.6 1.6 1.9 2.5 3.5 2.5s2.9-.9 3.5-2.5M5 13h5.5M13.5 13H19M5 16.5h5.5M13.5 16.5H19',
-    // The surface marker buoy (« Saucisse »): a flat-top tube, two bands, two wave lines.
-    buoy: 'M9.5 17V3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5V17M9.5 7h5M9.5 10.5h5M2.5 18.5c1.6 0 1.6-1.2 3.2-1.2s1.6 1.2 3.2 1.2 1.6-1.2 3.1-1.2 1.6 1.2 3.2 1.2 1.6-1.2 3.2-1.2 1.6 1.2 3.1 1.2M5 21.5c1.4 0 1.4-1 2.8-1s1.4 1 2.8 1 1.4-1 2.8-1 1.4 1 2.8 1 1.4-1 2.8-1',
-    weights: 'M5 10H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2M9 10h6M9 14h6M19 10h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2M6 7.5h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zM16 7.5h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z',
-    light: 'M4 8.5h7a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-7a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5zM13.5 7h1.5a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zM5.5 14.5V20a1.5 1.5 0 0 0 3 0v-5.5M18.5 7.5l2.5-1.5M19 11.5h2.5M18.5 15.5l2.5 1.5',
-    // The 7 types added with the fields by type (task 2026-11-19-309): mask, fins, scooter, camera, buoy of a float, knife.
-    // Redrawn from the mock-ups (task 2026-11-19-310): weight belt, light, fins and knife.
-    mask: 'M3.5 9.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v2.5a4.5 4.5 0 0 1-4.5 4.5h-1.2l-1.3-2h-3l-1.3 2H8a4.5 4.5 0 0 1-4.5-4.5zM8 11.2h2.5M13.5 11.2H16',
-    fins: 'M5 3h3.5l.5 5.5 2 11a1.2 1.2 0 0 1-1.2 1.5H3.7a1.2 1.2 0 0 1-1.2-1.5l2-11zM15.5 3H19l.5 5.5 2 11a1.2 1.2 0 0 1-1.2 1.5h-6.1a1.2 1.2 0 0 1-1.2-1.5l2-11zM6.75 11v7M17.25 11v7',
-    camera: 'M4 8h3l1.5-2h7L17 8h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
-    floatBuoy: 'M12 3.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 13.5V17M2.5 19c1.6 0 1.6-1.2 3.2-1.2s1.6 1.2 3.2 1.2 1.6-1.2 3.1-1.2 1.6 1.2 3.2 1.2 1.6-1.2 3.2-1.2 1.6 1.2 3.1 1.2',
-    knife: 'M9.5 3.5a7 7 0 0 0-4.5 6.5v4a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-4a7 7 0 0 0-4.5-6.5L12 9zM10.5 8.6l1.5 2.4 1.5-2.4M10.4 16a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0z',
-    diveKnife: 'M5 19l5-5m-1-2 3 3m-1-2 5-7 4-2-2 4-6 6M4 20l2 2 4-4-2-2z',
-    compass: 'M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zM15.5 8.5l-2 5-5 2 2-5zM12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2',
+    light: 'M4 8.5h7a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1 -1.5 1.5h-7a1.5 1.5 0 0 1 -1.5 -1.5v-3a1.5 1.5 0 0 1 1.5 -1.5zM13.5 7h1.5a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-1.5a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1zM5.5 14.5V20a1.5 1.5 0 0 0 3 0v-5.5M18.5 7.5l2.5-1.5M19 11.5h2.5M18.5 15.5l2.5 1.5',
+    weights: 'M5 10H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2M9 10h6M9 14h6M19 10h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2M6 7.5h2a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1zM16 7.5h2a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1z',
+    mask: 'M3.5 9a2.5 2.5 0 0 1 2.5-2.5h12A2.5 2.5 0 0 1 20.5 9v3.5a3.5 3.5 0 0 1-3.5 3.5h-2.3l-1.2-2a1.75 1.75 0 0 0-3 0l-1.2 2H7a3.5 3.5 0 0 1-3.5-3.5zM12 6.5v4.5M3.5 10H2M20.5 10H22',
+    fins: 'M9 2.5h6l.6 5.5 2.7 11.6a1.6 1.6 0 0 1-1.6 1.9H7.3a1.6 1.6 0 0 1-1.6-1.9L8.4 8zM8.4 8h7.2M10.3 11.5l-.9 7.5M13.7 11.5l.9 7.5',
+    scooter: 'M16 8.5H6a3.5 3.5 0 0 0 0 7h10zM17.5 5.5h2a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1 -1.5 1.5h-2a1.5 1.5 0 0 1 -1.5 -1.5v-10a1.5 1.5 0 0 1 1.5 -1.5zM18.5 8v8M2.5 12h2',
+    camera: 'M3 8h4l2-2.5h6L17 8h4v11H3zM8.5 13a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0',
+    dsmb: 'M7 3h10l-2 14H9zM12 17v4',
+    floatBuoy: 'M10 3h4v13a2 2 0 0 1-4 0zM12 18v4',
+    knife: 'M9.5 3.5a7 7 0 0 0-4.5 6.5v4a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-4a7 7 0 0 0-4.5-6.5L12 9zM10.5 8.6l1.5 2.4 1.5-2.4M10.4 16a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0',
+    diveKnife: 'M4 20l9-9M13 11l6.5-6.5a1.4 1.4 0 0 1 2 2L15 13zM7 15l2 2',
+    compass: 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M15.5 8.5l-2 5-5 2 2-5z',
+    other: 'M10.7 5.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0M10.7 12a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0M10.7 18.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0',
   };
-  // An « Autre » piece named like a surface marker buoy shows the buoy.
-  const shown = $derived(type === 'dsmb' || (type === 'other' && isBuoyName(name)) ? 'buoy' : type === 'undersuit' ? 'suit' : type);
+  // An « Autre » piece named like a surface marker buoy shows the buoy of « Parachute de palier ».
+  const shown = $derived(type === 'buoy' || (type === 'other' && isBuoyName(name)) ? 'dsmb' : type);
   const path = $derived(paths[shown]);
 </script>
 
 {#snippet computerIcon()}
-  <Icon name="wristComputer" {size} weight={1.8} />
+  <svg class="bc-gear-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={paths.computer} /></svg>
 {/snippet}
 
 {#if type === 'computer' && piece && tile}
   <DcTile model={piece.computerModel || piece.name || name} size={tile} {radius} photo={ownPhoto(piece.photoId)} fallback={computerIcon} />
-{:else if type === 'computer'}
-  <Icon name="wristComputer" {size} weight={1.8} />
-{:else if type === 'scooter'}
-  <svg class="bc-gear-icon bc-gear-icon--scooter" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M5 7.8h1.8c1.8 0 3.2 1.9 3.2 4.2s-1.4 4.2-3.2 4.2H5M10 10c.5-.3 1-.4 1.6-.4h6.8c2.4 0 4 1 4 2.4s-1.6 2.4-4 2.4h-6.8c-.6 0-1.1-.1-1.6-.4M18.5 9.6c.5 1.5.5 3.3 0 4.8" />
-    <ellipse cx="5" cy="12" rx="3.3" ry="4.2" />
-    <path class="bc-gear-icon--propeller" fill-rule="evenodd" d="M4.62 11.5c-.36-.8-.3-1.7.25-1.8.55-.1.77.66.5 1.8.28.13.4.32.43.57.8.04 1.36.4 1.27.85-.1.45-.67.55-1.14.25l-.53-.36c-.2.11-.42.11-.62 0-.65.51-1.26.63-1.5.25-.27-.43.18-.88 1.12-.99.03-.25.1-.44.22-.57zM4.96 11.86a.28.28 0 1 0 0 .56.28.28 0 0 0 0-.56z" />
-  </svg>
-{:else if path}
-  <svg class="bc-gear-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={path} /></svg>
-{:else}
+{:else if type === 'kit'}
   <Icon name="briefcase" {size} weight={1.8} />
+{:else}
+  <svg class="bc-gear-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={path ?? paths.other} /></svg>
 {/if}
 
 <style>
@@ -71,15 +66,6 @@
       stroke-width: 1.8;
       stroke-linecap: round;
       stroke-linejoin: round;
-    }
-
-    .bc-gear-icon--scooter {
-      stroke-width: 1.2;
-    }
-
-    .bc-gear-icon--propeller {
-      fill: currentColor;
-      stroke: none;
     }
   }
 </style>

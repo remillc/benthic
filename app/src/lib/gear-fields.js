@@ -27,6 +27,7 @@
  * @property {string} [serialHint] a type's own hint for the serial number: `gear.pieceNew.serialHint.<serialHint>`
  * @property {DetailField[]} [before] fields between the name and the brand (the free type name of « Autre »)
  * @property {DetailField[]} [extras] fields after the serial number
+ * @property {DetailField[]} [late] fields after « Date d'achat » (a rebreather's two dates), before « Notes »
  */
 
 /** @type {Record<GearType, TypeSpec>} */
@@ -56,6 +57,17 @@ export const SPECS = {
     ],
   },
   undersuit: { brand: true, extras: [{ key: 'size', kind: 'text' }] },
+  // Task 2026-11-22-324: the date the O₂ cells were installed and the last service, after « Date d'achat »; each feeds a reminder.
+  rebreather: {
+    photo: true,
+    brand: true,
+    serial: true,
+    serialHint: 'rebreather',
+    late: [
+      { key: 'o2CellsOn', kind: 'date' },
+      { key: 'lastService', kind: 'date' },
+    ],
+  },
   cylinder: {
     named: true,
     serial: true,
@@ -126,14 +138,14 @@ export const CYLINDER_AFTER_SERIAL = [
 ];
 
 /**
- * The fields of a type, in two lists: those before the serial number and those after it.
+ * The fields of a type, in three lists: those before the serial number, those after it, and those after « Date d'achat ».
  * @param {GearType} type
- * @returns {{ before: DetailField[], after: DetailField[] }}
+ * @returns {{ before: DetailField[], after: DetailField[], late: DetailField[] }}
  */
 export function detailFields(type) {
   const spec = SPECS[type] ?? SPECS.other;
-  if (type === 'cylinder') return { before: CYLINDER_BEFORE_SERIAL, after: CYLINDER_AFTER_SERIAL };
-  return { before: spec.before ?? [], after: spec.extras ?? [] };
+  if (type === 'cylinder') return { before: CYLINDER_BEFORE_SERIAL, after: CYLINDER_AFTER_SERIAL, late: [] };
+  return { before: spec.before ?? [], after: spec.extras ?? [], late: spec.late ?? [] };
 }
 
 /** True when a type names its pieces by hand (cylinder, weight belt, other). @param {GearType} type */
@@ -181,8 +193,8 @@ export const stampText = (iso) => (iso ? `${iso.slice(5, 7)}/${iso.slice(2, 4)}`
 export function detailProblems(type, details, typed = {}) {
   /** @type {Record<string, 'number'|'date'|'stamp'>} */
   const out = {};
-  const { before, after } = detailFields(type);
-  for (const f of [...before, ...after]) {
+  const { before, after, late } = detailFields(type);
+  for (const f of [...before, ...after, ...late]) {
     const v = (details[f.key] ?? '').trim();
     if (f.kind === 'number' && v && !/^\d{1,6}$/.test(v)) out[f.key] = 'number';
     if (f.kind === 'date' && v && !realDate(v)) out[f.key] = 'date';
@@ -203,9 +215,9 @@ export function detailProblems(type, details, typed = {}) {
  * @returns {Record<string, string>}
  */
 export function detailsToKeep(type, details, stored = {}) {
-  const { before, after } = detailFields(type);
-  const own = new Set([...before, ...after].map((f) => f.key));
-  const allKnown = new Set(Object.values(SPECS).flatMap((s) => [...(s.before ?? []), ...(s.extras ?? [])].map((f) => f.key)));
+  const { before, after, late } = detailFields(type);
+  const own = new Set([...before, ...after, ...late].map((f) => f.key));
+  const allKnown = new Set(Object.values(SPECS).flatMap((s) => [...(s.before ?? []), ...(s.extras ?? []), ...(s.late ?? [])].map((f) => f.key)));
   for (const f of [...CYLINDER_BEFORE_SERIAL, ...CYLINDER_AFTER_SERIAL]) allKnown.add(f.key);
   /** @type {Record<string, string>} */
   const out = {};
@@ -225,10 +237,10 @@ export function detailsToKeep(type, details, stored = {}) {
  * @returns {{ label: string, value: string }[]}
  */
 export function detailRows(type, details, text) {
-  const { before, after } = detailFields(type);
+  const { before, after, late } = detailFields(type);
   /** @type {{ label: string, value: string }[]} */
   const rows = [];
-  for (const f of [...before, ...after]) {
+  for (const f of [...before, ...after, ...late]) {
     const v = (details?.[f.key] ?? '').trim();
     if (!v) continue;
     const value = f.kind === 'switch' ? (v === 'yes' ? text.yes : '') : f.kind === 'segments' || f.kind === 'select' ? text.option(f.key, v) : f.kind === 'date' ? text.date(v) : f.kind === 'stamp' ? stampText(v) : v;

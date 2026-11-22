@@ -6,7 +6,7 @@
   // window size only swaps the layout, the page and its state stay.
   //
   // `bar`: where the page's own top bar goes. `main`: over the right pane (its title and buttons; the Back arrow goes,
-  // the navigation rail leads out); `none`: no bar (the panes draw their own titles); `dialog`: the dialog's header.
+  // the navigation rail leads out); `none`: no bar (the panes draw their own titles); `dialog`: the dialog's header; `steps`: a dialog that draws its own header and footer (a new piece's two steps), no page bar.
   // `size`: the dialog's height, `s`, `m` or `l`.
   import ProfileNav from './ProfileNav.svelte';
   import ProfileGearList from './ProfileGearList.svelte';
@@ -16,7 +16,7 @@
   /**
    * @type {{
    *   section: 'gear'|'maintenance'|'certs'|'info', list?: 'gear'|'maintenance'|null, selected?: string|null,
-   *   bar?: 'main'|'none'|'dialog', size?: 's'|'m'|'l', children?: import('svelte').Snippet
+   *   bar?: 'main'|'none'|'dialog'|'steps', size?: 's'|'m'|'l', children?: import('svelte').Snippet
    * }}
    */
   let { section, list = null, selected = null, bar = 'main', size = 'm', children } = $props();
@@ -25,7 +25,11 @@
 <div class="bc-pf bc-pf--bar-{bar} bc-pf--size-{size}" class:bc-pf--three={!!list}>
   <ProfileNav {section} />
   {#if list === 'gear'}<ProfileGearList {selected} />{:else if list === 'maintenance'}<ProfileMaintenanceList {selected} />{/if}
-  {#if bar === 'dialog'}
+  {#if bar === 'steps'}
+    <div class="bc-pf--main"></div>
+    <div class="bc-pf--scrim"></div>
+    <div class="bc-pf--box bc-pf--box-steps" role="dialog" aria-modal="true">{@render children?.()}</div>
+  {:else if bar === 'dialog'}
     <div class="bc-pf--main"></div>
     <div class="bc-pf--scrim"></div>
     <div class="bc-pf--box" role="dialog" aria-modal="true">{@render children?.()}</div>
@@ -98,11 +102,25 @@
       box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
     }
 
+    /* A dialog with its own header and footer: sized by its content, centred, the body scrolls. */
+    .bc-pf--box-steps {
+      inset: 0;
+      margin: auto;
+      width: min(760px, 92%);
+      height: fit-content;
+      max-height: 90%;
+      padding-top: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
     /* The page's own bar (Framework7 puts it at the top of the page, over everything). */
     :global(.page-content:has(> .bc-pf)) {
       padding: 0 !important;
       overflow: hidden;
     }
+    :global(.page:has(.bc-pf--bar-steps) > .navbar),
     :global(.page:has(.bc-pf--bar-none) > .navbar) {
       display: none;
     }

@@ -57,8 +57,8 @@ test('every label, hint and option the forms show exists in French and English',
         if (type === 'computer' && root.endsWith('typePlural')) continue;
         assert.ok(at(catalog, `${root}.${type}`), `${lang} ${root}.${type}`);
       }
-      const { before, after } = detailFields(type);
-      for (const f of [...before, ...after]) {
+      const { before, after, late } = detailFields(type);
+      for (const f of [...before, ...after, ...late]) {
         assert.ok(at(catalog, `gear.field.${f.key}`), `${lang} gear.field.${f.key}`);
         if (f.hint) assert.ok(at(catalog, `gear.fieldHint.${f.key}`), `${lang} gear.fieldHint.${f.key}`);
         for (const o of f.options ?? []) assert.ok(at(catalog, `gear.fieldOption.${f.key}.${o}`), `${lang} gear.fieldOption.${f.key}.${o}`);
@@ -104,4 +104,15 @@ test('the rows of a piece\'s sheet: the type\'s own fields in the order of the f
     { label: 'L:lastHydro', value: '03/22' },
   ]);
   assert.deepEqual(detailRows('mask', undefined, text), []);
+});
+
+test('a rebreather (Recycleur, task 324): its two dates come after the purchase date and are kept', () => {
+  assert.equal(GEAR_TYPES[GEAR_TYPES.indexOf('cylinder') + 1], 'rebreather', 'right after the bottle');
+  const { before, after, late } = detailFields('rebreather');
+  assert.deepEqual([before, after], [[], []]);
+  assert.deepEqual(late.map((f) => [f.key, f.kind]), [['o2CellsOn', 'date'], ['lastService', 'date']]);
+  assert.deepEqual([SPECS.rebreather.brand, SPECS.rebreather.serial, SPECS.rebreather.photo, SPECS.rebreather.serialHint], [true, true, true, 'rebreather']);
+  assert.deepEqual(detailsToKeep('rebreather', { o2CellsOn: '2026-03-14', lastService: '2025-11-08', thickness: '5' }), { o2CellsOn: '2026-03-14', lastService: '2025-11-08' });
+  assert.deepEqual(detailProblems('rebreather', { o2CellsOn: '14/03', lastService: '2025-11-08' }), { o2CellsOn: 'date' });
+  assert.deepEqual(detailRows('rebreather', { o2CellsOn: '2026-03-14' }, { label: (k) => k, option: (k, o) => o, yes: 'yes', date: (d) => d }), [{ label: 'o2CellsOn', value: '2026-03-14' }]);
 });

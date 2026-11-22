@@ -2791,6 +2791,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Equipment: new type « Rebreather », after Cylinder, with the date the O₂ cells were installed and the last service. It gets two reminders, O₂ cells every 12 months and a service every year, counted from those dates.",
+      "Equipment, tablet and desktop: « New piece » is done in two steps in a dialog. The first chooses the type in a grid of 19; the second shows « New piece · type » with a back arrow, the cross and the Save button only. The « Type of piece » row and the « Change type » button are gone from these screens.",
       "Tablet: the logbook’s ⋮ menu shows the logbook’s name and offers Rename, Open another logbook, New logbook and Export the logbook, with the number of dives.",
       "Export: a dialog of plain rows, one per format, with the extension and a line of description, on phone, tablet and desktop. UDDF comes before SSRF. « Benthic file » has its « Include photos and videos » switch, on by default. « Send to divelogs.de » is added.",
       "Desktop: « Save a copy » and « Download my dives » leave the menus, and « Export the logbook » leaves the ⋮ menu. To make a copy, export the logbook.",
@@ -5821,6 +5823,8 @@
       "valve": "Valve",
       "o2Clean": "O₂ clean",
       "lastInspection": "Last visual inspection",
+      "o2CellsOn": "O₂ cells installed on",
+      "lastService": "Last service",
       "lastHydro": "Last hydrostatic test"
     },
     "fieldHint": {
@@ -5975,6 +5979,7 @@
         "suit": "Suits",
         "undersuit": "Undersuits",
         "cylinder": "Cylinders",
+        "rebreather": "Rebreathers",
         "light": "Lamps",
         "other": "Other",
         "bcd": "BCDs",
@@ -5995,6 +6000,7 @@
         "suit": "Suit",
         "undersuit": "Undersuit",
         "cylinder": "Cylinder",
+        "rebreather": "Rebreather",
         "light": "Lamp",
         "other": "Other",
         "bcd": "BCD",
@@ -6191,6 +6197,10 @@
       "changeType": "Change type",
       "serialHint_suit": "On the label of drysuits",
       "serialHint_cylinder": "The number stamped on the cylinder",
+      "serialHint_rebreather": "On the unit’s plate",
+      "step1": "Step 1 of 2 · Choose the type of piece",
+      "titleWithType": "New piece · {type}",
+      "backToTypes": "Back to the type choice",
       "cylinderNameHint": "For example, yellow AL80",
       "typeTitle": "Type of piece",
       "tile": {
@@ -6208,6 +6218,7 @@
         "suit": "Suit",
         "undersuit": "Undersuit",
         "cylinder": "Cylinder",
+        "rebreather": "Rebreather",
         "bcd": "BCD",
         "light": "Lamp",
         "weights": "Weight belt",
@@ -6372,6 +6383,7 @@
       "service": "Service",
       "inspection": "Visual inspection",
       "hydrostatic": "Hydrostatic test",
+      "o2Cells": "O₂ cells",
       "battery": "Battery",
       "seals": "Seals and zipper",
       "travelCheck": "Pre-trip check"
@@ -6442,13 +6454,15 @@
     "reminderCard": {
       "title": "Maintenance reminders",
       "suggestCylinder": "Suggested: inspection every year, hydrostatic test every 5 years",
+      "suggestRebreather": "Suggested: O₂ cells every 12 months, service every year",
       "suggestDrysuit": "Suggested for a drysuit: annual service, including the valves",
       "suggest": {
         "computer": "Suggested for a computer: {rule}",
         "regulator": "Suggested for a regulator: {rule}",
         "suit": "Suggested for a suit: {rule}",
         "cylinder": "Suggested for a cylinder: {rule}",
-        "bcd": "Suggested for a BCD: {rule}"
+        "bcd": "Suggested for a BCD: {rule}",
+        "rebreather": "Suggested for a rebreather: {rule}"
       },
       "noSuggestion": "No reminder suggested for this type of piece",
       "add": "Add",
