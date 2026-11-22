@@ -291,7 +291,7 @@ struct IosBluetoothTransport::Impl {
 		CBPeripheral *p = find_peripheral(uuid, timeout_ms);
 		if (!p)
 			return false;
-		// OpenDives: as on Android, one more attempt after a failed connection.
+		// Benthic: as on Android, one more attempt after a failed connection.
 		for (int attempt = 1; attempt <= 2; attempt++) {
 			bt_log("connect to %s (attempt %d)", address.c_str(), attempt);
 			begin(Connect, nil);

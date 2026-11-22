@@ -1,11 +1,11 @@
-// Browser harness of the REAL git layer (app/src/lib/odgit): repo.js + fs-adapter.js + http-adapter.js, over
+// Browser harness of the REAL git layer (app/src/lib/bgit): repo.js + fs-adapter.js + http-adapter.js, over
 // either LightningFS (IndexedDB) or a "bridge" backend that sends every file operation out of the page as JSON with
 // base64 data (what @capacitor/filesystem does between the web view and Kotlin/Swift), done here by puppeteer's
-// exposeFunction into Node's fs. Bundled by build-odgit.mjs, driven by odgit-run.mjs.
+// exposeFunction into Node's fs. Bundled by build-bgit.mjs, driven by bgit-run.mjs.
 import LightningFS from '@isomorphic-git/lightning-fs';
-import { base64ToBytes, bytesToBase64, createGitFs, fsError } from '../../app/src/lib/odgit/fs-adapter.js';
-import { createGitHttp } from '../../app/src/lib/odgit/http-adapter.js';
-import { openRepo } from '../../app/src/lib/odgit/repo.js';
+import { base64ToBytes, bytesToBase64, createGitFs, fsError } from '../../app/src/lib/bgit/fs-adapter.js';
+import { createGitHttp } from '../../app/src/lib/bgit/http-adapter.js';
+import { openRepo } from '../../app/src/lib/bgit/repo.js';
 import { editDive, editGear } from './gen.mjs';
 
 let peak = 0;

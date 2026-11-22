@@ -3,7 +3,7 @@
 
 #include "BluetoothTransport.h"
 #include "core/compat/bt_transport.h"
-#include "core/libbenthic/odgit.h"
+#include "core/libbenthic/bgit.h"
 #include "core/libbenthic/benthic.h"
 
 #include <cstdint>
@@ -394,7 +394,7 @@ static void send_sync_progress(const char *message)
 	return json_or_fail(ret, json, message, error);
 }
 
-+ (NSString *)odgit:(NSString *)operation
++ (NSString *)bgit:(NSString *)operation
 		args:(NSDictionary<NSString *, id> *)args
 	    progress:(void (^)(NSString *))progress
 	       error:(NSError **)error
@@ -408,42 +408,42 @@ static void send_sync_progress(const char *message)
 	if ([list isKindOfClass:[NSArray class]])
 		for (id item in (NSArray *)list)
 			paths.push_back([item isKindOfClass:[NSString class]] ? str((NSString *)item) : std::string());
-	benthic::OdgitAuthor author;
+	benthic::BgitAuthor author;
 	if (!text(@"authorName").empty() && !text(@"authorEmail").empty()) {
 		author.name = text(@"authorName");
 		author.email = text(@"authorEmail");
 	}
-	benthic::OdgitAuth auth{ text(@"username"), text(@"token") };
-	benthic::OdgitProgress report;
+	benthic::BgitAuth auth{ text(@"username"), text(@"token") };
+	benthic::BgitProgress report;
 	if (progress)
 		report = [progress](const char *phase, uint64_t done, uint64_t total) {
 			progress([NSString stringWithFormat:@"{\"phase\":\"%s\",\"done\":%llu,\"total\":%llu}", phase,
 				  (unsigned long long)done, (unsigned long long)total]);
 		};
-	benthic::odgit_allow_http([args[@"allowHttp"] boolValue]);
+	benthic::bgit_allow_http([args[@"allowHttp"] boolValue]);
 	std::string op = str(operation), json, message;
 	int ret = -1;
 	if (op == "cancel") {
-		benthic::odgit_cancel();
+		benthic::bgit_cancel();
 		return @"{}";
 	} else if (op == "clone")
-		ret = benthic::odgit_clone(text(@"url"), text(@"dir"), text(@"branch"), auth, report, json, message);
+		ret = benthic::bgit_clone(text(@"url"), text(@"dir"), text(@"branch"), auth, report, json, message);
 	else if (op == "pull")
-		ret = benthic::odgit_pull(text(@"dir"), text(@"branch"), auth, author, report, json, message);
+		ret = benthic::bgit_pull(text(@"dir"), text(@"branch"), auth, author, report, json, message);
 	else if (op == "commit")
-		ret = benthic::odgit_commit(text(@"dir"), paths, text(@"message"), author, text(@"mergeParent"), json, message);
+		ret = benthic::bgit_commit(text(@"dir"), paths, text(@"message"), author, text(@"mergeParent"), json, message);
 	else if (op == "push")
-		ret = benthic::odgit_push(text(@"dir"), text(@"branch"), auth, report, json, message);
+		ret = benthic::bgit_push(text(@"dir"), text(@"branch"), auth, report, json, message);
 	else if (op == "status")
-		ret = benthic::odgit_status(text(@"dir"), paths, json, message);
+		ret = benthic::bgit_status(text(@"dir"), paths, json, message);
 	else if (op == "unpushed")
-		ret = benthic::odgit_unpushed(text(@"dir"), text(@"branch"), json, message);
+		ret = benthic::bgit_unpushed(text(@"dir"), text(@"branch"), json, message);
 	else if (op == "head")
-		ret = benthic::odgit_head(text(@"dir"), text(@"branch"), json, message);
+		ret = benthic::bgit_head(text(@"dir"), text(@"branch"), json, message);
 	else if (op == "listFiles")
-		ret = benthic::odgit_list_files(text(@"dir"), text(@"prefix"), json, message);
+		ret = benthic::bgit_list_files(text(@"dir"), text(@"prefix"), json, message);
 	else if (op == "remove") {
-		ret = benthic::odgit_remove(text(@"dir"), message);
+		ret = benthic::bgit_remove(text(@"dir"), message);
 		json = "{}";
 	} else
 		message = "BAD_REQUEST";

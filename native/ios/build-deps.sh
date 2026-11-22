@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 # Builds the core dependencies as static libraries for iOS, with the options of
-# OpenDives' native/build-deps.sh (Android): Mbed TLS, libgit2 (HTTPS through
+# Benthic's native/build-deps.sh (Android): Mbed TLS, libgit2 (HTTPS through
 # Mbed TLS, no SSH), libxml2, libxslt, sqlite3, libzip, libdivecomputer.
 # zlib and iconv come from the iOS SDK. Output: build/ios/deps/<slice>/{include,lib}
 # usage: native/ios/build-deps.sh [slice...]
@@ -15,7 +15,7 @@ clone() { # name url tag
   [ -d "$SRC/$1/.git" ] || git clone -q --depth 1 --branch "$3" "$2" "$SRC/$1"
 }
 [ -d "$SRC/mbedtls/.git" ] || git clone -q --depth 1 --recurse-submodules --shallow-submodules --branch "$MBEDTLS_TAG" https://github.com/Mbed-TLS/mbedtls.git "$SRC/mbedtls"
-# Same configuration as Android: threading on, TLS up to 1.2 (see OpenDives'
+# Same configuration as Android: threading on, TLS up to 1.2 (see Benthic'
 # native/build-deps.sh). perl, because BSD sed has neither -i alone nor \b.
 perl -pi -e 's{^//(#define MBEDTLS_THREADING_(C|PTHREAD))\b}{$1}; s{^(#define MBEDTLS_SSL_(PROTO_TLS1_3|TLS1_3_[A-Z0-9_]+))\b}{//$1}' "$SRC/mbedtls/include/mbedtls/mbedtls_config.h"
 clone libgit2 https://github.com/libgit2/libgit2.git "$LIBGIT2_TAG"

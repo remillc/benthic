@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// OpenDives — portable replacements for the Qt-based helpers that the
+// Benthic — portable replacements for the Qt-based helpers that the
 // Subsurface core calls (qthelper.cpp, string-format.cpp, gettextfromc.cpp,
 // metadata.cpp, bluetoothaddress.cpp, checkcloudconnection.cpp, ...).
 //
@@ -133,7 +133,7 @@ std::string get_current_date()
 
 std::string subsurface_user_agent()
 {
-	return "OpenDives-POC/0.0.1 (Subsurface core " CANONICAL_VERSION_STRING ")";
+	return "Benthic/0.3.0 (Subsurface core " CANONICAL_VERSION_STRING ")";
 }
 
 timestamp_t dateTimeToTimestamp(const QDateTime &t)

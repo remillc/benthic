@@ -32,7 +32,7 @@ list(APPEND SOURCES
   "${ROOT}/core/libbenthic/account.cpp"
   "${ROOT}/core/libbenthic/stats.cpp"
   "${ROOT}/core/libbenthic/download.cpp"
-  "${ROOT}/core/libbenthic/odgit.cpp")
+  "${ROOT}/core/libbenthic/bgit.cpp")
 
 # Written once: a new time stamp at each configuration would rebuild the whole core.
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/build-defs.h")

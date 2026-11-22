@@ -1,5 +1,5 @@
 // Runs the Node measurements: node driver.mjs <nDives> [runs] [skipList]
-// Needs the proxy for the artificial latency (node proxy.mjs 3180 80) and OD_FORGEJO_USER / OD_FORGEJO_PASSWORD.
+// Needs the proxy for the artificial latency (node proxy.mjs 3180 80) and BC_FORGEJO_USER / BC_FORGEJO_PASSWORD.
 // Results are appended to build/spike-git/results-node.jsonl.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -59,7 +59,7 @@ for (const lat of LATENCIES) {
     for (const [label, batch, K] of cases) {
       // The repository is seeded (git push) with every dive but the first K; the contents API then sends those K, on a repository of full size.
       const first = new Set(diveIds.slice(0, K).map((id) => `dives/${id.slice(0, 2)}/${id}/`));
-      const subset = new Map([...files].filter(([p]) => p !== 'opendives.json' && ![...first].some((pre) => p.startsWith(pre))));
+      const subset = new Map([...files].filter(([p]) => p !== 'benthic.json' && ![...first].some((pre) => p.startsWith(pre))));
       await measure(label, lat, contentsRuns, async () => {
         const repo = await seedRepo(subset, path.join(dataDir, 'preseed'));
         rmrf(path.join(dataDir, 'preseed'));

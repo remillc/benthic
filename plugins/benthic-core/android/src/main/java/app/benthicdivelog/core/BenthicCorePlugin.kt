@@ -58,9 +58,9 @@ class BenthicCorePlugin : Plugin() {
     /** The user's own git repository, instead of the cloud account (see GitRemoteStore). */
     private val gitStore: GitRemoteStore by lazy { GitRemoteStore(context) }
 
-    /** The OpenDives server's session (release edition), see ServerSessionStore. */
+    /** The Benthic server's session (release edition), see ServerSessionStore. */
     private val serverStore: ServerSessionStore by lazy { ServerSessionStore(context) }
-    private val dataKeyFile: SealedFile by lazy { SealedFile(context, "opendives-data-key", "data-key.bin") }
+    private val dataKeyFile: SealedFile by lazy { SealedFile(context, "benthic-data-key", "data-key.bin", legacyAlias = "opendives-data-key") }
 
     /**
      * An account being created or signed in to whose logbook does not exist
@@ -482,20 +482,26 @@ class BenthicCorePlugin : Plugin() {
         }
     }
 
-    // --- Git on the device (odgit.h): the working copies of the OpenDives server's logbooks ---
+    // --- Git on the device (bgit.h): the working copies of the Benthic server's logbooks ---
 
     /** Git work runs on its own thread: it never waits for the core, and a long clone does not hold the others. */
     private val gitThread: ExecutorService = Executors.newSingleThreadExecutor()
 
-    /** The working copies: `<files>/odgit/<dir>`, the folder @capacitor/filesystem calls `Directory.Data` + `odgit/<dir>`. */
-    private val odgitRoot: File by lazy { File(context.filesDir, "odgit") }
+    /** The working copies: `<files>/bgit/<dir>`, the folder @capacitor/filesystem calls `Directory.Data` + `bgit/<dir>`. */
+    private val bgitRoot: File by lazy {
+        val root = File(context.filesDir, "bgit")
+        // The folder was `odgit` before the rename to Benthic (22 November 2026): renamed once, on first use.
+        val legacy = File(context.filesDir, "odgit")
+        if (legacy.exists() && !root.exists()) legacy.renameTo(root)
+        root
+    }
 
     /**
-     * Runs one git call (options: `dir`, the working copy's name under odgit/) off the main thread and resolves
+     * Runs one git call (options: `dir`, the working copy's name under bgit/) off the main thread and resolves
      * `json`; rejects with the error code (UNREACHABLE, REFUSED, REJECTED, CANCELLED, ...). The development server is
      * plain http: allowed in debuggable builds only. Progress goes out as "gitProgress" events ({dir, phase, done, total}).
      */
-    private fun odgit(call: PluginCall, work: (String, DownloadListener) -> String) {
+    private fun bgit(call: PluginCall, work: (String, DownloadListener) -> String) {
         val name = call.getString("dir").orEmpty()
         if (name.isEmpty() || name.startsWith("/") || name.contains("..") || name.contains("\\")) {
             call.reject("BAD_PATH", "BAD_PATH")
@@ -505,7 +511,7 @@ class BenthicCorePlugin : Plugin() {
             try {
                 setupDone.await()
                 val debuggable = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
-                NativeCore.odgitAllowHttp(debuggable)
+                NativeCore.bgitAllowHttp(debuggable)
                 val listener = DownloadListener { json ->
                     try {
                         notifyListeners("gitProgress", JSObject(json).put("dir", name))
@@ -513,7 +519,7 @@ class BenthicCorePlugin : Plugin() {
                         // A progress report is never worth a failure.
                     }
                 }
-                call.resolve(JSObject().put("json", work(File(odgitRoot, name).absolutePath, listener)))
+                call.resolve(JSObject().put("json", work(File(bgitRoot, name).absolutePath, listener)))
             } catch (e: IllegalStateException) {
                 call.reject(e.message, e.message.orEmpty().substringBefore(':'))
             } catch (e: Exception) {
@@ -527,83 +533,83 @@ class BenthicCorePlugin : Plugin() {
 
     /** Makes the working copy from a branch of the repository (options: url, dir, branch, username, token). */
     @PluginMethod
-    fun odgitClone(call: PluginCall) {
+    fun bgitClone(call: PluginCall) {
         val url = call.getString("url").orEmpty()
         val branch = call.getString("branch").orEmpty()
         val user = call.getString("username").orEmpty()
         val token = call.getString("token").orEmpty()
-        odgit(call) { dir, listener -> NativeCore.odgitClone(url, dir, branch, user, token, listener) }
+        bgit(call) { dir, listener -> NativeCore.bgitClone(url, dir, branch, user, token, listener) }
     }
 
     /** Fetches the branch and merges it (options: dir, branch, username, token). */
     @PluginMethod
-    fun odgitPull(call: PluginCall) {
+    fun bgitPull(call: PluginCall) {
         val branch = call.getString("branch").orEmpty()
         val user = call.getString("username").orEmpty()
         val token = call.getString("token").orEmpty()
-        odgit(call) { dir, listener -> NativeCore.odgitPull(dir, branch, user, token, call.getString("authorName"), call.getString("authorEmail"), listener) }
+        bgit(call) { dir, listener -> NativeCore.bgitPull(dir, branch, user, token, call.getString("authorName"), call.getString("authorEmail"), listener) }
     }
 
     /** Stages the files and commits (options: dir, paths, message, mergeParent). */
     @PluginMethod
-    fun odgitCommit(call: PluginCall) {
+    fun bgitCommit(call: PluginCall) {
         val paths = call.paths()
         val message = call.getString("message").orEmpty()
-        odgit(call) { dir, _ ->
-            NativeCore.odgitCommit(dir, paths, message, call.getString("authorName"), call.getString("authorEmail"), call.getString("mergeParent"))
+        bgit(call) { dir, _ ->
+            NativeCore.bgitCommit(dir, paths, message, call.getString("authorName"), call.getString("authorEmail"), call.getString("mergeParent"))
         }
     }
 
     /** Sends the branch (options: dir, branch, username, token). */
     @PluginMethod
-    fun odgitPush(call: PluginCall) {
+    fun bgitPush(call: PluginCall) {
         val branch = call.getString("branch").orEmpty()
         val user = call.getString("username").orEmpty()
         val token = call.getString("token").orEmpty()
-        odgit(call) { dir, listener -> NativeCore.odgitPush(dir, branch, user, token, listener) }
+        bgit(call) { dir, listener -> NativeCore.bgitPush(dir, branch, user, token, listener) }
     }
 
     @PluginMethod
-    fun odgitStatus(call: PluginCall) {
+    fun bgitStatus(call: PluginCall) {
         val paths = call.paths()
-        odgit(call) { dir, _ -> NativeCore.odgitStatus(dir, paths) }
+        bgit(call) { dir, _ -> NativeCore.bgitStatus(dir, paths) }
     }
 
     @PluginMethod
-    fun odgitUnpushed(call: PluginCall) {
+    fun bgitUnpushed(call: PluginCall) {
         val branch = call.getString("branch").orEmpty()
-        odgit(call) { dir, _ -> NativeCore.odgitUnpushed(dir, branch) }
+        bgit(call) { dir, _ -> NativeCore.bgitUnpushed(dir, branch) }
     }
 
     @PluginMethod
-    fun odgitHead(call: PluginCall) {
+    fun bgitHead(call: PluginCall) {
         val branch = call.getString("branch").orEmpty()
-        odgit(call) { dir, _ -> NativeCore.odgitHead(dir, branch) }
+        bgit(call) { dir, _ -> NativeCore.bgitHead(dir, branch) }
     }
 
     @PluginMethod
-    fun odgitListFiles(call: PluginCall) {
+    fun bgitListFiles(call: PluginCall) {
         val prefix = call.getString("prefix").orEmpty()
-        odgit(call) { dir, _ -> NativeCore.odgitListFiles(dir, prefix) }
+        bgit(call) { dir, _ -> NativeCore.bgitListFiles(dir, prefix) }
     }
 
     /** Removes the working copy's folder. */
     @PluginMethod
-    fun odgitRemove(call: PluginCall) {
-        odgit(call) { dir, _ ->
-            NativeCore.odgitRemove(dir)
+    fun bgitRemove(call: PluginCall) {
+        bgit(call) { dir, _ ->
+            NativeCore.bgitRemove(dir)
             "{}"
         }
     }
 
     /** Stops the running git call (it fails with CANCELLED). Runs at once, on the calling thread. */
     @PluginMethod
-    fun odgitCancel(call: PluginCall) {
-        NativeCore.odgitCancel()
+    fun bgitCancel(call: PluginCall) {
+        NativeCore.bgitCancel()
         call.resolve()
     }
 
-    /** Keeps the OpenDives server's session (the e-mail sign-in's answer) in the Keystore; nothing is returned. */
+    /** Keeps the Benthic server's session (the e-mail sign-in's answer) in the Keystore; nothing is returned. */
     @PluginMethod
     fun serverSessionSave(call: PluginCall) {
         try {
@@ -626,7 +632,7 @@ class BenthicCorePlugin : Plugin() {
         }
     }
 
-    /** Who is signed in to the OpenDives server, without any token. */
+    /** Who is signed in to the Benthic server, without any token. */
     @PluginMethod
     fun serverSessionInfo(call: PluginCall) {
         val stored = serverStore.read()
@@ -702,7 +708,7 @@ class BenthicCorePlugin : Plugin() {
         val files = context.filesDir
         files.listFiles()?.forEach { f ->
             val name = f.name
-            val device = name == "carnet" || name.startsWith("carnet.") || name == "odgit" || name == DEV_CREDENTIALS
+            val device = name == "carnet" || name.startsWith("carnet.") || name == "bgit" || name == DEV_CREDENTIALS
             val alpha = name == ".subsurface" && !keepAlpha
             if (device || alpha) f.deleteRecursively()
         }
@@ -713,7 +719,7 @@ class BenthicCorePlugin : Plugin() {
         call.resolve()
     }
 
-    /** Signs out of the OpenDives server: the tokens are erased from this device. */
+    /** Signs out of the Benthic server: the tokens are erased from this device. */
     @PluginMethod
     fun serverSessionClear(call: PluginCall) {
         serverStore.delete()
@@ -2095,9 +2101,9 @@ class BenthicCorePlugin : Plugin() {
         }
     }
 
-    // --- A file sent to the app (deep links, "Open with OpenDives") ------------
+    // --- A file sent to the app (deep links, "Open with Benthic") ------------
 
-    /** « Share to OpenDives » while the app runs (singleTask: the new intent arrives here). */
+    /** « Share to Benthic » while the app runs (singleTask: the new intent arrives here). */
     override fun handleOnNewIntent(intent: Intent) {
         super.handleOnNewIntent(intent)
         offerSharedFiles(intent)
@@ -2134,7 +2140,7 @@ class BenthicCorePlugin : Plugin() {
     }
 
     /**
-     * A file another app handed to OpenDives (a content:// address: "Share to", "Open with"): streamed, in
+     * A file another app handed to Benthic (a content:// address: "Share to", "Open with"): streamed, in
      * pieces of 64 KB, into a file of the app's cache; {name, size, path}. The name is the provider's display
      * name (OpenableColumns), "" when it gives none. Nothing but the path crosses the bridge: a logbook of 100 MB
      * as one base64 string ran the Java heap (256 MB) out of memory. The web layer looks at the beginning with

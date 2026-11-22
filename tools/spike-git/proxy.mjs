@@ -4,7 +4,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 const port = Number(process.argv[2] ?? 3100), rtt = Number(process.argv[3] ?? 0);
-const target = new URL(process.env.OD_FORGEJO ?? 'http://127.0.0.1:3000');
+const target = new URL(process.env.BC_FORGEJO ?? 'http://127.0.0.1:3000');
 const agent = new http.Agent({ keepAlive: true });
 const sleep = (ms) => (ms ? new Promise((r) => setTimeout(r, ms)) : null);
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization,content-type,git-protocol,accept', 'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS', 'Access-Control-Expose-Headers': '*' };

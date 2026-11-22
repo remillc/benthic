@@ -1,4 +1,4 @@
-// Synthetic OpenDives logbook (docs/architecture.md, section 11.3), written with the app's own writer.
+// Synthetic Benthic logbook (docs/architecture.md, section 11.3), written with the app's own writer.
 // Pure and deterministic: runs in Node and in the browser (bundled by esbuild).
 import { diveFile, profileFile, siteFile, tripFile, markerFile, stableJson, divePath, profilePath, sitePath, tripPath, MARKER_PATH } from '../../app/src/lib/server-logbook-format.js';
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives — HTTPS request provided by the platform (replaces QNetworkAccessManager).
+// Benthic — HTTPS request provided by the platform (replaces QNetworkAccessManager).
 // The server certificate MUST be validated (trust chain and host name).
 #ifndef BENTHIC_PLATFORM_HTTPS_H
 #define BENTHIC_PLATFORM_HTTPS_H

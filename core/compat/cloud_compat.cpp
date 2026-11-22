@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// OpenDives — port without Qt of the cloud helpers of Subsurface:
+// Benthic — port without Qt of the cloud helpers of Subsurface:
 //   checkcloudconnection.cpp : canReachCloudServer(), checkServer(), nextServer()
 //   qthelper.cpp             : getCloudURL(), sanitize_email()
 // Same requests, same server order, same side effects on prefs and git_local_only.

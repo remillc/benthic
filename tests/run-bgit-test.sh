@@ -1,13 +1,13 @@
 #!/bin/bash
-# The git calls of the facade (core/libbenthic/odgit.h) against a local git http server (tests/odgit_server.py):
+# The git calls of the facade (core/libbenthic/bgit.h) against a local git http server (tests/bgit_server.py):
 # clone of an empty repository, commit, push, a second device, fast-forward, a clean merge, a conflict and its
-# resolution, a wrong token, an http address refused. usage: tests/run-odgit-test.sh [build/poc/odgit-test]
+# resolution, a wrong token, an http address refused. usage: tests/run-bgit-test.sh [build/poc/bgit-test]
 set -u
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-BIN=${1:-$ROOT/build/poc/odgit-test}
+BIN=${1:-$ROOT/build/poc/bgit-test}
 W=$(mktemp -d); trap 'kill $SRV 2>/dev/null; rm -rf "$W"' EXIT
 mkdir -p "$W/srv/owner"; git init -q --bare -b main "$W/srv/owner/repo.git"
-python3 "$ROOT/tests/odgit_server.py" "$W/srv" tok > "$W/port" & SRV=$!
+python3 "$ROOT/tests/bgit_server.py" "$W/srv" tok > "$W/port" & SRV=$!
 for _ in $(seq 50); do grep -q PORT "$W/port" && break; sleep 0.1; done
 URL=http://127.0.0.1:$(awk '{print $2}' "$W/port")/owner/repo.git
 T() { "$BIN" --http "$@" 2>/dev/null; }
@@ -134,12 +134,22 @@ r=$(T hlog "$A" main 0 10 0); has "$r" '"summary":"account v1"' && has "$r" '"su
 has "$(T hadopt "$A" "$D" main)" '"result":"unchanged"'; ok $? "adopt: the same head twice does nothing"
 echo "duration 43:00 min" > "$D/2022/05/15-Sun-09=00=00/Dive-4"; git -C "$D" commit -q -a -m "device later" --date="2026-11-06T10:00:00"
 has "$(T hadopt "$A" "$D" main)" '"result":"adopted"'; ok $? "adopt: a later head is brought in too"
-git -C "$A" cat-file -e $DV2 2>/dev/null && [ "$(git -C "$A" for-each-ref refs/opendives/device | wc -l)" = 2 ]; ok $? "adopt: each head keeps its own reference"
+git -C "$A" cat-file -e $DV2 2>/dev/null && [ "$(git -C "$A" for-each-ref refs/benthic/device | wc -l)" = 2 ]; ok $? "adopt: each head keeps its own reference"
 r=$(T hrestore "$A" main $DV1 "Restore a device dive" 2022/05/01-Sun-09=00=00); has "$r" '"commit":"'; ok $? "adopt: a dive deleted before the account is restored from it"
 [ "$(git -C "$A" show main:2022/05/01-Sun-09=00=00/Dive-2)" = "duration 40:00 min" ]; ok $? "adopt: the restored dive has its content"
 has "$(T hadopt "$A" "$W/nothing-here" main)" '"result":"none"'; ok $? "adopt: no device logbook is not an error"
 has "$(T hadopt "$A" "$D" nobranch)" '"result":"none"'; ok $? "adopt: a branch the device logbook does not have is not an error"
 git clone -q --bare "$A" "$W/account-bare.git"
 has "$(T hadopt "$W/account-bare.git" "$D" main)" '"result":"adopted"'; ok $? "adopt: into a bare cache"
+
+# a working copy made before the rename to Benthic keeps the device history under refs/opendives/device/: opening it
+# renames the references, once, and the history is still listed
+for ref in $(git -C "$A" for-each-ref --format='%(refname)' refs/benthic/device); do
+  git -C "$A" update-ref "refs/opendives/device/${ref##*/}" "$ref"; git -C "$A" update-ref -d "$ref"
+done
+[ "$(git -C "$A" for-each-ref refs/opendives/device | wc -l)" = 2 ] && [ "$(git -C "$A" for-each-ref refs/benthic/device | wc -l)" = 0 ]; ok $? "legacy refs: the old names are in place"
+r=$(T hlog "$A" main 0 10 0); has "$r" '"summary":"device v1"'; ok $? "legacy refs: the log still lists the device history"
+[ "$(git -C "$A" for-each-ref refs/benthic/device | wc -l)" = 2 ] && [ "$(git -C "$A" for-each-ref refs/opendives/device | wc -l)" = 0 ]; ok $? "legacy refs: opening renamed them to refs/benthic/device/"
+git -C "$A" cat-file -e $DV2 2>/dev/null; ok $? "legacy refs: the commits are still there"
 
 echo "$pass passed, $fail failed"; [ "$fail" = 0 ]

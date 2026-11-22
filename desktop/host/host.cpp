@@ -22,10 +22,10 @@
 // reentrant). The calls the facade allows off the core thread run at once on
 // the reader thread (downloadCancel, the dive computer name lookups, setCaFile,
 // setXsltDir) or on a second, network thread (cloudProbe, gitCheck: they run
-// while the core thread loads the log). The odgit* calls (git on the device, odgit.h) run in order on a third,
-// git thread: a long clone blocks neither the core nor gitCheck; odgitCancel runs at once. stdout writes are serialised. When
+// while the core thread loads the log). The bgit* calls (git on the device, bgit.h) run in order on a third,
+// git thread: a long clone blocks neither the core nor gitCheck; bgitCancel runs at once. stdout writes are serialised. When
 // stdin closes, the requests already received finish, then the process exits.
-#include "core/libbenthic/odgit.h"
+#include "core/libbenthic/bgit.h"
 #include "core/libbenthic/benthic.h"
 #include "desktop/host/json_value.h"
 
@@ -351,74 +351,74 @@ void register_methods()
 		return S(json);
 	});
 
-	// --- Git on the device (odgit.h): the working copies of the OpenDives server's logbooks ---
+	// --- Git on the device (bgit.h): the working copies of the Benthic server's logbooks ---
 	// `dir` is the absolute folder (the bridge maps the page's name onto it); `allowHttp` is set by the bridge in
 	// development only. The token is only passed through. Progress goes out as "gitProgress" events.
-	auto git_progress = [](const Args &) -> benthic::OdgitProgress {
+	auto git_progress = [](const Args &) -> benthic::BgitProgress {
 		return [](const char *phase, uint64_t done, uint64_t total) {
 			emit(std::string("{\"event\":\"gitProgress\",\"data\":{\"phase\":") + json_string(phase) + ",\"done\":" +
 			     std::to_string(done) + ",\"total\":" + std::to_string(total) + "}}");
 		};
 	};
 	auto git_author = [](const Args &a) {
-		benthic::OdgitAuthor author;
+		benthic::BgitAuthor author;
 		if (!a.str("authorName").empty() && !a.str("authorEmail").empty()) {
 			author.name = a.str("authorName");
 			author.email = a.str("authorEmail");
 		}
 		return author;
 	};
-	add("odgitClone", Lane::Git, [git_progress](const Args &a) {
+	add("bgitClone", Lane::Git, [git_progress](const Args &a) {
 		std::string json, error;
-		benthic::odgit_allow_http(a.flag("allowHttp"));
-		return json_or_fail(benthic::odgit_clone(a.str("url"), a.str("dir"), a.str("branch"),
+		benthic::bgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(benthic::bgit_clone(a.str("url"), a.str("dir"), a.str("branch"),
 							   { a.str("username"), a.str("token") }, git_progress(a), json, error),
 				    json, error);
 	});
-	add("odgitPull", Lane::Git, [git_progress, git_author](const Args &a) {
+	add("bgitPull", Lane::Git, [git_progress, git_author](const Args &a) {
 		std::string json, error;
-		benthic::odgit_allow_http(a.flag("allowHttp"));
-		return json_or_fail(benthic::odgit_pull(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
+		benthic::bgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(benthic::bgit_pull(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
 							  git_author(a), git_progress(a), json, error),
 				    json, error);
 	});
-	add("odgitCommit", Lane::Git, [git_author](const Args &a) {
+	add("bgitCommit", Lane::Git, [git_author](const Args &a) {
 		std::string json, error;
-		return json_or_fail(benthic::odgit_commit(a.str("dir"), a.strs("paths"), a.str("message"), git_author(a),
+		return json_or_fail(benthic::bgit_commit(a.str("dir"), a.strs("paths"), a.str("message"), git_author(a),
 							    a.str("mergeParent"), json, error),
 				    json, error);
 	});
-	add("odgitPush", Lane::Git, [git_progress](const Args &a) {
+	add("bgitPush", Lane::Git, [git_progress](const Args &a) {
 		std::string json, error;
-		benthic::odgit_allow_http(a.flag("allowHttp"));
-		return json_or_fail(benthic::odgit_push(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
+		benthic::bgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(benthic::bgit_push(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
 							  git_progress(a), json, error),
 				    json, error);
 	});
-	add("odgitStatus", Lane::Git, [](const Args &a) {
+	add("bgitStatus", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(benthic::odgit_status(a.str("dir"), a.strs("paths"), json, error), json, error);
+		return json_or_fail(benthic::bgit_status(a.str("dir"), a.strs("paths"), json, error), json, error);
 	});
-	add("odgitUnpushed", Lane::Git, [](const Args &a) {
+	add("bgitUnpushed", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(benthic::odgit_unpushed(a.str("dir"), a.str("branch"), json, error), json, error);
+		return json_or_fail(benthic::bgit_unpushed(a.str("dir"), a.str("branch"), json, error), json, error);
 	});
-	add("odgitHead", Lane::Git, [](const Args &a) {
+	add("bgitHead", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(benthic::odgit_head(a.str("dir"), a.str("branch"), json, error), json, error);
+		return json_or_fail(benthic::bgit_head(a.str("dir"), a.str("branch"), json, error), json, error);
 	});
-	add("odgitListFiles", Lane::Git, [](const Args &a) {
+	add("bgitListFiles", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(benthic::odgit_list_files(a.str("dir"), a.str("prefix"), json, error), json, error);
+		return json_or_fail(benthic::bgit_list_files(a.str("dir"), a.str("prefix"), json, error), json, error);
 	});
-	add("odgitRemove", Lane::Git, [](const Args &a) {
+	add("bgitRemove", Lane::Git, [](const Args &a) {
 		std::string error;
-		if (benthic::odgit_remove(a.str("dir"), error))
+		if (benthic::bgit_remove(a.str("dir"), error))
 			fail(error);
 		return NOTHING;
 	});
-	add("odgitCancel", Lane::Immediate, [](const Args &) {
-		benthic::odgit_cancel();
+	add("bgitCancel", Lane::Immediate, [](const Args &) {
+		benthic::bgit_cancel();
 		return NOTHING;
 	});
 

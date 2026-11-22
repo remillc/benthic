@@ -1,12 +1,12 @@
 // Shared helpers of the spike: Forgejo dev stack access, timing, files on disk. Credentials come from the
-// environment (OD_FORGEJO_USER / OD_FORGEJO_PASSWORD), never from this repository.
+// environment (BC_FORGEJO_USER / BC_FORGEJO_PASSWORD), never from this repository.
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-export const DIRECT = process.env.OD_FORGEJO ?? 'http://127.0.0.1:3000';
-export const USER = process.env.OD_FORGEJO_USER;
-const PASSWORD = process.env.OD_FORGEJO_PASSWORD;
+export const DIRECT = process.env.BC_FORGEJO ?? 'http://127.0.0.1:3000';
+export const USER = process.env.BC_FORGEJO_USER;
+const PASSWORD = process.env.BC_FORGEJO_PASSWORD;
 export const WORK = path.resolve(import.meta.dirname, '../../build/spike-git');
 fs.mkdirSync(WORK, { recursive: true });
 
@@ -33,7 +33,7 @@ export async function createRepo(prefix = 'spike') {
   if (!r.ok) throw new Error(`createRepo ${r.status} ${await r.text()}`);
   // the git host's API sees the pushed branch a moment later (hooks): wait for it
   for (let i = 0; i < 100; i++) {
-    const r = await api(DIRECT, `/repos/${USER}/${name}/contents/opendives.json?ref=main`);
+    const r = await api(DIRECT, `/repos/${USER}/${name}/contents/benthic.json?ref=main`);
     if (r.ok && !Array.isArray(await r.json())) break;
     await new Promise((x) => setTimeout(x, 200));
   }
@@ -81,7 +81,7 @@ export function dirSize(dir) {
 export function gitCli(cwd, args, env = {}) {
   return execFileSync('git', args, { cwd, env: { ...process.env, GIT_TERMINAL_PROMPT: '0', GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'core.autocrlf', GIT_CONFIG_VALUE_0: 'false', ...env }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 1 << 28 });
 }
-export const AUTHOR = { name: 'OpenDives', email: 'noreply@benthicdivelog.app' };
+export const AUTHOR = { name: 'Benthic', email: 'noreply@benthicdivelog.app' };
 
 /** Prepares a repository on the server with a complete logbook (git CLI push, not measured). */
 export async function seedRepo(files, ownerDir) {

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives compat layer: minimal, Qt-free stand-ins for the Qt types that
+// Benthic compat layer: minimal, Qt-free stand-ins for the Qt types that
 // Subsurface's core code uses. Subsurface's own sources are compiled unchanged
 // against these headers; no Qt library is linked.
 //
 // QString stores UTF-32 code points, so indices behave like Qt's for text in
 // the Basic Multilingual Plane. Locale-aware formatting is reduced to the "C"
-// locale: OpenDives formats numbers and dates for display in its interface.
+// locale: Benthic formats numbers and dates for display in its interface.
 #pragma once
 
 #include <algorithm>

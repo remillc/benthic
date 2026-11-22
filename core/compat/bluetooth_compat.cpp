@@ -8,7 +8,7 @@
 //    signals become the synchronous calls of the platform's transport
 //    (bt_transport.h); the decisions, their order and the timeouts are
 //    Subsurface's. The comments in English quoted from Subsurface keep their
-//    wording. Departures, each marked "OpenDives:", are only where Qt's own
+//    wording. Departures, each marked "Benthic:", are only where Qt's own
 //    behaviour cannot be reproduced without Qt.
 #include "core/compat/bt_transport.h"
 
@@ -449,7 +449,7 @@ bool BLEObject::wait_for_packet(int ms)
 		Bytes value;
 		int r = transport.ble_receive(c, value, left);
 		if (r < 0) {
-			// OpenDives: Qt has no such answer; the wait would run to its
+			// Benthic: Qt has no such answer; the wait would run to its
 			// end. Stop at once instead.
 			disconnected = true;
 			bt_transport_error = true;
@@ -516,7 +516,7 @@ dc_status_t BLEObject::write(const void *data, size_t size, size_t *actual)
 
 		bool with_response = !(c.properties & BLE_PROP_WRITE_NO_RESPONSE);
 
-		// OpenDives: Qt queues the write and returns; Android allows one GATT
+		// Benthic: Qt queues the write and returns; Android allows one GATT
 		// operation at a time, so the platform waits until it is sent.
 		if (!transport.ble_write(preferredService()->uuid, c.uuid, bytes, with_response, BLE_TIMEOUT)) {
 			bt_log("%s write failed: %s", current_time().c_str(), transport.last_error().c_str());
@@ -746,7 +746,7 @@ dc_status_t BLEObject::setupHwTerminalIo(const std::vector<BleCharacteristic> &a
 	int credits_tx = allC.size() == 4 ? TELIT_CREDITS_TX : UBLOX_CREDITS_TX;
 	if (allC[credits_tx].descriptors.empty())
 		return DC_STATUS_IO;
-	// OpenDives: Qt does not wait for these two writes; a failure is only logged.
+	// Benthic: Qt does not wait for these two writes; a failure is only logged.
 	if (!transport.ble_write_descriptor(preferredService()->uuid, allC[credits_tx].uuid, allC[credits_tx].descriptors.front(),
 					    Bytes{ 0x02, 0x00 }, BLE_TIMEOUT))
 		bt_log("credits TX descriptor write not confirmed: %s", transport.last_error().c_str());
@@ -1032,7 +1032,7 @@ static dc_status_t qt_ble_ioctl(void *io, unsigned int request, void *data, size
 #ifdef __ANDROID__
 // --- core/serial_usb_android.cpp: USB serial cables, not supported -----------
 // Only reached when device_data_t.androidUsbDeviceDescriptor is set, which
-// OpenDives never does: downloads go over Bluetooth only.
+// Benthic never does: downloads go over Bluetooth only.
 dc_status_t serial_usb_android_open(dc_iostream_t **, dc_context_t *, void *)
 {
 	return DC_STATUS_UNSUPPORTED;
@@ -1144,7 +1144,7 @@ static dc_status_t qt_serial_poll(void *io, int timeout)
 	if (!device->socket)
 		return DC_STATUS_INVALIDARGS;
 
-	// Waits for readyRead. OpenDives: bytes already waiting count too.
+	// Waits for readyRead. Benthic: bytes already waiting count too.
 	auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout < 0 ? 0 : timeout);
 	for (;;) {
 		if (device->socket->rfcomm_available() > 0)

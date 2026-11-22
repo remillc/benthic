@@ -511,7 +511,7 @@ int download_dives(const std::string &request_json, download_progress progress_c
 	int default_salinity = 0;
 	for (const auto &[key, v]: fields) {
 		if (key == "defaultSalinity") {
-			// OpenDives addition (Settings, water type of downloaded dives):
+			// Benthic addition (Settings, water type of downloaded dives):
 			// 0 leaves the dives as the computer gave them.
 			int n = static_cast<int>(v.number);
 			if (v.kind != JsonValue::NUMBER || (n != 0 && n != 10000 && n != 10100 && n != 10200 && n != 10300)) {
@@ -574,7 +574,7 @@ int download_dives(const std::string &request_json, download_progress progress_c
 	unsigned int transports = dc_descriptor_get_transports(descriptor);
 	transports &= (DC_TRANSPORT_BLE | DC_TRANSPORT_BLUETOOTH);
 
-	// OpenDives: a device found over Bluetooth Low Energy and also paired as
+	// Benthic: a device found over Bluetooth Low Energy and also paired as
 	// Bluetooth Classic ("classicAddress") is tried over BLE first; when the
 	// BLE link itself fails (not the dive computer's protocol, not a
 	// cancellation), once more over Classic, without the diver doing anything.

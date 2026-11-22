@@ -44,7 +44,7 @@ enum LaunchCover {
     }
 
     /// Tests only: the launch screen is kept 8 s so that a screenshot can catch it.
-    private static let held = ProcessInfo.processInfo.environment["OD_HOLD_LAUNCH_SCREEN"] != nil
+    private static let held = ProcessInfo.processInfo.environment["BC_HOLD_LAUNCH_SCREEN"] != nil
 
     static func hide(force: Bool = false) {
         if held && !force { DispatchQueue.main.asyncAfter(deadline: .now() + 8) { hide(force: true) }; return }

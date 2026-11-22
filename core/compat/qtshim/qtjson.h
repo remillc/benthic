@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives compat layer: the small part of Qt's JSON classes (QJsonDocument, QJsonObject,
+// Benthic compat layer: the small part of Qt's JSON classes (QJsonDocument, QJsonObject,
 // QJsonArray, QJsonValue) and of QFile and QFileInfo that Subsurface's core/import-suunto-json.cpp
 // uses, so that file is compiled as it is, without Qt. The values behave as Qt 6's: a missing
 // key gives an undefined value, a value of another type gives the default passed to toDouble(),

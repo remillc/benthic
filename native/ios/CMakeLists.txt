@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 # Subsurface core (unmodified) + core/compat + facade, as a static library for
-# iOS. Same sources and flags as OpenDives' native/CMakeLists.txt, without the
+# iOS. Same sources and flags as Benthic's native/CMakeLists.txt, without the
 # JNI bridge. Run by native/ios/build-ios.sh.
 cmake_minimum_required(VERSION 3.22)
 project(benthic_ios LANGUAGES C CXX)
@@ -31,7 +31,7 @@ list(APPEND SOURCES
   "${ROOT}/core/libbenthic/account.cpp"
   "${ROOT}/core/libbenthic/stats.cpp"
   "${ROOT}/core/libbenthic/download.cpp"
-  "${ROOT}/core/libbenthic/odgit.cpp")
+  "${ROOT}/core/libbenthic/bgit.cpp")
 
 # Written once: a new time stamp at each configuration would rebuild the whole core.
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/build-defs.h")
@@ -58,7 +58,7 @@ benthic_setup(core_objs)
 
 add_library(benthic STATIC $<TARGET_OBJECTS:core_objs>)
 
-# The programs of OpenDives' tests, unchanged, to be run in the simulator.
+# The programs of Benthic's tests, unchanged, to be run in the simulator.
 if(BENTHIC_TESTS)
   foreach(test roundtrip plan_test plan_oracle)
     add_executable(${test} "${ROOT}/tests/${test}.cpp" $<TARGET_OBJECTS:core_objs>)

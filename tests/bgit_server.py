@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# A local git http server for tests/run-odgit-test.sh: git's http-backend over the bare repositories under ROOT, with
+# A local git http server for tests/run-bgit-test.sh: git's http-backend over the bare repositories under ROOT, with
 # Basic authentication (any user, the password is TOKEN). Prints "PORT <n>" when it listens.
 import base64, os, subprocess, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer

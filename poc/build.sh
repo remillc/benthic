@@ -1,5 +1,5 @@
 #!/bin/bash
-# OpenDives POC — builds Subsurface's core (unmodified, without Qt) and the
+# Benthic POC — builds Subsurface's core (unmodified, without Qt) and the
 # round-trip test program. Linux / WSL. Needs: g++ (C++20), autotools,
 # pkg-config, libgit2, libxml2, libxslt, libzip, sqlite3, zlib.
 #   Debian/Ubuntu: apt install build-essential autoconf automake libtool \
@@ -50,7 +50,7 @@ FLAGS="-std=c++20 -O1 -w
   echo "$ROOT/core/libbenthic/settings.cpp"; echo "$ROOT/core/libbenthic/plan.cpp"
   echo "$ROOT/core/libbenthic/filter.cpp"; echo "$ROOT/core/libbenthic/account.cpp"
   echo "$ROOT/core/libbenthic/stats.cpp"; echo "$ROOT/tests/stats_test.cpp"
-  echo "$ROOT/core/libbenthic/download.cpp"; echo "$ROOT/core/libbenthic/odgit.cpp"; echo "$ROOT/tests/odgit_test.cpp"; echo "$ROOT/tests/download_test.cpp"; echo "$ROOT/tests/cylinder_reorder_test.cpp"; echo "$ROOT/tests/cylinder_delete_test.cpp"; echo "$ROOT/tests/fit_import_test.cpp"; echo "$ROOT/tests/multi_dive_test.cpp"; echo "$ROOT/tests/import_formats_test.cpp"; echo "$ROOT/tests/import_csv_test.cpp"; echo "$ROOT/tests/save_logbook_test.cpp"; echo "$ROOT/tests/json_int64_test.cpp"; } > "$B/sources.txt"
+  echo "$ROOT/core/libbenthic/download.cpp"; echo "$ROOT/core/libbenthic/bgit.cpp"; echo "$ROOT/tests/bgit_test.cpp"; echo "$ROOT/tests/download_test.cpp"; echo "$ROOT/tests/cylinder_reorder_test.cpp"; echo "$ROOT/tests/cylinder_delete_test.cpp"; echo "$ROOT/tests/fit_import_test.cpp"; echo "$ROOT/tests/multi_dive_test.cpp"; echo "$ROOT/tests/import_formats_test.cpp"; echo "$ROOT/tests/import_csv_test.cpp"; echo "$ROOT/tests/save_logbook_test.cpp"; echo "$ROOT/tests/json_int64_test.cpp"; } > "$B/sources.txt"
 
 # Objects are only rebuilt when their source is newer: compiled again in full
 # when the flags change (BT_SUPPORT and BLE_SUPPORT enable Subsurface's
@@ -64,8 +64,8 @@ export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|cylinder_delete_test|fit_import_test|multi_dive_test|import_formats_test|import_csv_test|save_logbook_test|json_int64_test|benthic|edit|tools|settings|plan|filter|account|stats|download|odgit|odgit_test)[.]o$')
-FACADE="$B/obj/benthic.o $B/obj/edit.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o $B/obj/odgit.o"
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|cylinder_delete_test|fit_import_test|multi_dive_test|import_formats_test|import_csv_test|save_logbook_test|json_int64_test|benthic|edit|tools|settings|plan|filter|account|stats|download|bgit|bgit_test)[.]o$')
+FACADE="$B/obj/benthic.o $B/obj/edit.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o $B/obj/bgit.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
 g++ $OBJS $FACADE "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
 g++ $OBJS $FACADE "$B/obj/facade.o" -o "$B/facade" $LIBS
@@ -86,6 +86,6 @@ g++ $OBJS $FACADE "$B/obj/multi_dive_test.o" -o "$B/multi-dive" $LIBS
 g++ $OBJS $FACADE "$B/obj/import_formats_test.o" -o "$B/import-formats" $LIBS
 g++ $OBJS $FACADE "$B/obj/import_csv_test.o" -o "$B/import-csv" $LIBS
 g++ $OBJS $FACADE "$B/obj/save_logbook_test.o" -o "$B/save-logbook" $LIBS
-g++ $OBJS $FACADE "$B/obj/odgit_test.o" -o "$B/odgit-test" $LIBS
+g++ $OBJS $FACADE "$B/obj/bgit_test.o" -o "$B/bgit-test" $LIBS
 g++ $OBJS $FACADE "$B/obj/json_int64_test.o" -o "$B/json-int64" $LIBS
 echo "built $B/account $B/git-remote $B/stats $B/download $B/plan $B/tools $B/roundtrip $B/facade $B/cloud $B/edit-roundtrip $B/cloud-write $B/multi-dive $B/import-formats $B/import-csv $B/save-logbook"

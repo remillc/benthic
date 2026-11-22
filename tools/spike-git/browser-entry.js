@@ -4,7 +4,7 @@ import http from 'isomorphic-git/http/web';
 import LightningFS from '@isomorphic-git/lightning-fs';
 import { makeLogbook, editDive, editGear } from './gen.mjs';
 
-const AUTHOR = { name: 'OpenDives', email: 'noreply@benthicdivelog.app' };
+const AUTHOR = { name: 'Benthic', email: 'noreply@benthicdivelog.app' };
 let peak = 0;
 const heap = () => { const m = performance.memory; if (m) peak = Math.max(peak, m.usedJSHeapSize); };
 setInterval(heap, 50);

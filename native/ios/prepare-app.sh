@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# Gives the plugin what native/ios/build-ios.sh produced, builds OpenDives' web
+# Gives the plugin what native/ios/build-ios.sh produced, builds Benthic's web
 # layer and generates the Xcode workspace.
 # usage: native/ios/prepare-app.sh     (after native/ios/build-ios.sh)
 set -euo pipefail

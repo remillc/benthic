@@ -1,4 +1,4 @@
-# OpenDives offline regions: Natural Earth 1:10m (public domain), built by tools/build-regions.mjs
+# Benthic offline regions: Natural Earth 1:10m (public domain), built by tools/build-regions.mjs
 C	ID	Indonesia	Indonésie
 C	MY	Malaysia	Malaisie
 C	CL	Chile	Chili
