@@ -47,7 +47,7 @@ Next number: 179
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
-- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
+- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted. Décidé le 22 nov. 2026 : la date de naissance, le contact d’urgence et les informations de santé sont chiffrés de bout en bout.
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
 - #139 [code] On `/`, when a synchronisation needs a progress bar, do not use the ME progress bar; use the wave on the bottom edge of the header instead.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
