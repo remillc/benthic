@@ -74,13 +74,15 @@
   import { readTab, saveTab, stepTab, DETAIL_TABS } from '../lib/detail-tab.js';
   import { hasRecordedValues } from '../lib/desktop-edit.js';
   import { navigation } from '../lib/navigation.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import { t, tIfExists } from '../lib/i18n.js';
 
   /**
-   * `slide`: the dive was reached by a swipe from the next or previous one.
-   * @type {{ f7route: { params: { id: string, trip?: string }, url: string }, f7router: any, slide?: 'next'|'previous' }}
+   * `slide`: the dive was reached by a swipe from the next or previous one. `preview`: the detail kept at the last start
+   * (lib/detail-snapshot.js), drawn in the pane while the core reads the logbook: nothing here reads or acts on data then.
+   * @type {{ f7route: { params: { id: string, trip?: string }, url: string }, f7router: any, slide?: 'next'|'previous', preview?: import('opendives-core').DiveDetail }}
    */
-  let { f7route, f7router, slide = undefined } = $props();
+  let { f7route, f7router, slide = undefined, preview = undefined } = $props();
 
   // --- Swipe left or right: the next (older) or previous (more recent) dive,
   // in the order of the logbook list, its filter applied. Not from the
@@ -383,7 +385,7 @@
   // detail pane (from a trip): the list and its selected row do not change then.
   $effect(() => {
     const id = diveId;
-    if (f7route.params.trip) return;
+    if (preview || f7route.params.trip) return;
     navigation.dive = id;
     return () => {
       if (navigation.dive === id) navigation.dive = null;
@@ -393,7 +395,7 @@
   // Prepared before the swipe that led here (dive-preload.js): shown from the
   // first frame, then read again from the core in case it changed.
   // svelte-ignore state_referenced_locally
-  let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (readyDive(Number(f7route.params.id))));
+  let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (preview ?? readyDive(Number(f7route.params.id))));
   let failed = $state(false);
   const prefs = $derived(logbook.prefs);
   const diveNumber = $derived(logbook.dives.find((d) => d.id === dive?.id)?.number ?? dive?.number ?? 0);
@@ -401,7 +403,7 @@
   // After an edit or an undo of this dive, show the result at once.
   $effect(() => {
     const edited = logbook.edited;
-    if (edited && dive && edited.id === dive.id) {
+    if (!preview && edited && dive && edited.id === dive.id) {
       dive = edited.dive;
       keepDive(edited.id, edited.dive);
     }
@@ -411,6 +413,8 @@
     const id = Number(diveId);
     try {
       dive = await readDive(id);
+      // The first screen is up: what waited for it starts (lib/startup.svelte.js).
+      if (!preview && !f7route.params.trip) startup.detail = true;
     } catch (e) {
       console.error('Dive detail', e);
       failed = true;
@@ -431,6 +435,7 @@
   // Validations (task 2026-11-19-309, point 2): OpenDives+ only. The pending ones are asked about when the page opens.
   const validationItems = $derived(dive && odplusSubscriber() ? validationsOf(dive) : []);
   onMount(() => {
+    if (preview) return;
     if (odplusSubscriber()) (validations.ready ? Promise.resolve() : loadValidations()).then(refreshPending).catch((e) => console.error('Validations', e));
     if (isRelease) loadInventory();
     return loadDive();
@@ -772,7 +777,7 @@
     window.dispatchEvent(new CustomEvent('od-desktop-command', { detail: command }));
   }
   $effect(() => {
-    if (!desk) return;
+    if (!desk || preview) return;
     /** @param {KeyboardEvent} e */
     const key = (e) => {
       if (profileBig && e.key === 'Escape') profileBig = false;
@@ -1195,7 +1200,7 @@
 
     <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
     {#if desk}
-      <DesktopDiveFields {dive} {prefs} {tab} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
+      <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
     {#if !desk && dive.pictures > 0 && settings.showPhotos}

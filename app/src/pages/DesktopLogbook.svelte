@@ -35,6 +35,8 @@
   import { desktopMac, layout } from '../lib/layout.svelte.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { undoNameKey } from '../lib/undo-name.js';
+  import { orderOf, rememberFirstDetail, seedStartDetail } from '../lib/detail-snapshot.js';
+  import { keepDive, loadDive } from '../lib/dive-preload.js';
   import { desk, setSort, setColumns, setColumnWidths, setTableWidth, loadExtras, loadDesktopChoices } from '../lib/desktop-logbook.svelte.js';
   import {
     COLUMNS,
@@ -207,11 +209,33 @@
     const ids = desk.selection.ids;
     // Nothing selected yet: the first dive of the table, as the tablet does.
     if (!ids.length) {
-      if (order.length) untrack(() => (desk.selection = { ids: [order[0]], anchor: order[0], focus: order[0] }));
+      if (order.length) {
+        untrack(() => {
+          // The detail kept at the last start, if it is of this dive: the pane draws it from its first frame, then reads the dive.
+          const first = logbook.dives.find((d) => d.id === order[0]);
+          if (first) seedStartDetail(first, keepDive);
+          desk.selection = { ids: [order[0]], anchor: order[0], focus: order[0] };
+        });
+      }
       else showDetail('/pane/empty');
       return;
     }
     showDetail(ids.length === 1 ? `/dives/${ids[0]}` : '/pane/selection');
+  });
+
+  // The first dive of the table, once shown in the pane, is kept for the next start (lib/detail-snapshot.js).
+  $effect(() => {
+    if (!layout.desktop || logbook.loading || logbook.error || desk.trip !== null || !order.length) return;
+    const firstId = order[0];
+    const sort = desk.sort;
+    const timer = setTimeout(() => {
+      const first = logbook.dives.find((d) => d.id === firstId);
+      const ids = desk.selection.ids;
+      if (first && ids.length === 1 && ids[0] === firstId && navigation.dive === String(firstId)) {
+        rememberFirstDetail(first, orderOf(true, sort), loadDive).catch((e) => console.warn('Keeping the detail', e));
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
   });
 
   /** @param {string} url */
