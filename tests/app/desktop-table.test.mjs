@@ -161,10 +161,10 @@ test('↑ and ↓ move between dives, Shift grows the range', () => {
 });
 
 test('right-click menu for one dive and for several', () => {
-  const available = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'copy', 'export', 'share', 'delete']);
+  const available = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'renumberFrom', 'copy', 'export', 'share', 'delete']);
   const keys = (entries) => entries.map((e) => e.key);
   const one = contextMenuEntries(1, { mac: false, available });
-  assert.deepEqual(keys(one), ['addToTrip', 'edit', 'separator', 'copy', 'export', 'share', 'separator', 'delete']);
+  assert.deepEqual(keys(one), ['addToTrip', 'edit', 'renumberFrom', 'separator', 'copy', 'export', 'share', 'separator', 'delete']);
   const two = contextMenuEntries(2, { mac: false, available });
   assert.deepEqual(keys(two), ['merge', 'addToTrip', 'editTogether', 'separator', 'copy', 'export', 'share', 'separator', 'delete']);
   assert.deepEqual(

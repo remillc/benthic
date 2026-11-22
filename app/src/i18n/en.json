@@ -2323,6 +2323,13 @@
     "editSite": "Edit the site {name}",
     "editedNoDuplicate": "{name} edited, no longer a possible duplicate"
   },
+  "renumberFrom": {
+    "title": "Renumber from this dive",
+    "text": "This dive and all later dives receive consecutive numbers in date order, including hidden dives. You can undo this.",
+    "conflict": "Number {n} is already used by an earlier dive. Choose another starting number.",
+    "tooLarge": "The starting number is too large to number all later dives.",
+    "failed": "Renumbering could not be completed. Check the logbook before trying again."
+  },
   "renumber": {
     "titleChecked": "Renumber the checked dives?",
     "dialogTextChecked": {
@@ -2723,6 +2730,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: renumber a dive and all later dives starting with the number you choose.",
       "Desktop: the logbook selector shows the logbook name without a redundant label.",
       "Shared map: panning and scrolling are smoother when many sites are displayed.",
       "Shared map: the list follows the visible area, including sites grouped on the map.",

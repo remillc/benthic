@@ -31,6 +31,7 @@
   import FlightBanner from '../components/FlightBanner.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
+  import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { replaceEligibility, replacementFromFile } from '../lib/replace-logbook.js';
@@ -374,6 +375,7 @@
 
   /** "Renumber the dives" of the menu: Subsurface's Renumber dialog, all the dives. */
   let renumbering = $state(false);
+  let renumberFrom = $state(/** @type {number|null} */ (null));
 
   /**
    * Undo or Redo from the menu, one step each time: the history of this
@@ -1527,6 +1529,9 @@
         <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={!logbook.dives.length ? t('welcomeSteps.menuExportNone') : ''} disabled={logbook.loading || !!logbook.error || !logbook.dives.length} onclick={() => ((exportWhole = true), (exporting = true))} />
       {:else}
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
+        {#if checkedCount === 1}
+          <MenuItem icon="renumber" text={t('renumberFrom.title')} onclick={() => (renumberFrom = checkedIds[0])} />
+        {/if}
       {/if}
       {#if selecting}
         {#if theme.ios}<MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />{/if}
@@ -1621,6 +1626,9 @@
         endSelection();
       }}
     />
+  {/if}
+  {#if renumberFrom !== null}
+    <RenumberFromDialog id={renumberFrom} oncancel={() => (renumberFrom = null)} ondone={() => { renumberFrom = null; endSelection(); }} />
   {/if}
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->

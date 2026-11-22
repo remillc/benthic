@@ -756,8 +756,8 @@ export class OpenDivesCoreDesktop extends WebPlugin {
   }
 
   /** The dives of the log in memory, without loading anything. */
-  async listLoadedDives() {
-    return { json: await this.core('listLoadedDives') };
+  async listLoadedDives(options) {
+    return { json: await this.core('listLoadedDives', options ?? {}) };
   }
 
   /** Desktop only: the logbook table's extra columns (dive_columns, opendives.h). */

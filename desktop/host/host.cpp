@@ -667,9 +667,9 @@ void register_methods()
 			fail(error);
 		return S(json);
 	});
-	add("listLoadedDives", core, [](const Args &) {
+	add("listLoadedDives", core, [](const Args &a) {
 		std::string json;
-		opendives::list_loaded_dives(json);
+		opendives::list_loaded_dives(json, a.flag("includeInvalid"));
 		return S(json);
 	});
 	// Desktop only: the logbook table's extra columns (task 2026-11-15-169).

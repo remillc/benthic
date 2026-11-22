@@ -186,6 +186,14 @@ test('deleteDive takes one id or several; renumberDives needs a start', async ()
   assert.deepEqual(lastCall().args, { ids: [], start: 3, numbers: [] });
 });
 
+test('the loaded dive list can include hidden invalid dives', async () => {
+  install({ listLoadedDives: '[]' });
+  await plugin.listLoadedDives();
+  assert.deepEqual(lastCall().args, {});
+  await plugin.listLoadedDives({ includeInvalid: true });
+  assert.deepEqual(lastCall().args, { includeInvalid: true });
+});
+
 test('site identifiers above 2^31 reach the core as numbers', async () => {
   install({ siteQuery: '{}', siteAction: '{}' });
   await plugin.siteQuery({ kind: 'site', uuid: 4000000000 });

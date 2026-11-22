@@ -20,6 +20,7 @@
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
+  import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -75,7 +76,7 @@
   loadDesktopChoices();
 
   /** The actions the right-click menu can offer today (the others wait: see the task's notes). */
-  const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'copy', 'export', 'share', 'delete']);
+  const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'renumberFrom', 'copy', 'export', 'share', 'delete']);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
 
   // --- Search: the core's fulltext index, as on the phone (Logbook.svelte). ---------------
@@ -287,6 +288,7 @@
 
   /** @type {{x: number, y: number}|null} */
   let menuAt = $state(null);
+  let renumberFrom = $state(/** @type {number|null} */ (null));
 
   /** @param {MouseEvent} e @param {number} id */
   function rowMenu(e, id) {
@@ -460,6 +462,7 @@
     else if (key === 'delete') deleteSelected();
     else if (key === 'editTogether') editingTogether = true;
     else if (key === 'merge') mergeSelected();
+    else if (key === 'renumberFrom' && desk.selection.ids.length === 1) renumberFrom = desk.selection.ids[0];
     else if (key === 'copy') copySelected();
     else if (key === 'export' || key === 'share') exporting = true;
     else if (key === 'addToTrip') choosingTrip = true;
@@ -1137,6 +1140,9 @@
   {/if}
   {#if renumbering}
     <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
+  {/if}
+  {#if renumberFrom !== null}
+    <RenumberFromDialog id={renumberFrom} oncancel={() => (renumberFrom = null)} ondone={() => (renumberFrom = null)} />
   {/if}
   {#if menuAt}
     <DesktopContextMenu x={menuAt.x} y={menuAt.y} heading={menuHeading} entries={menuEntries} onchoose={act} onclose={() => (menuAt = null)} />

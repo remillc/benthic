@@ -1109,7 +1109,7 @@ class OpenDivesCorePlugin : Plugin() {
     /** The dives of the log in memory, without loading anything (after a sync that reloaded it). */
     @PluginMethod
     fun listLoadedDives(call: PluginCall) = onCoreThread(call) {
-        call.resolve(JSObject().put("json", NativeCore.listLoadedDives()))
+        call.resolve(JSObject().put("json", NativeCore.listLoadedDives(call.getBoolean("includeInvalid", false) == true)))
     }
 
     /** Local save only, without network (manual synchronisation). */
