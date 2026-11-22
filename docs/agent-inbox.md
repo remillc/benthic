@@ -6433,3 +6433,24 @@ Keep the non-breaking space before « % ». The gradient factors are those of th
 Christian approved this on 22 November 2026. Work in `main`.
 
 In the `serverOffline` step of `FirstLaunchServer.svelte` (phone, iPhone, tablet portrait and landscape, desktop): « Retour » stays at the top left; the icon tile, the title, the help text and the two buttons form one block, centred vertically in the space between « Retour » and the « Une question ? » link, with the title and text centred horizontally. On tablet and desktop the two buttons are centred under the text (they were aligned to the right); on the phone « Réessayer » keeps the full width. Mock-ups: `android-serveur-hors-ligne`, `android-tablette-serveur-hors-ligne-portrait`, `android-tablette-serveur-hors-ligne-paysage`, `bureau-serveur-hors-ligne`; update `docs/mockups/` the same way.
+
+## [ ] 2026-11-22-323 Desktop menus cleaned up, and the .benthic export format (#163)
+
+Christian approved this on 22 November 2026. Work in `main`.
+
+**1. Remove « Enregistrer une copie… » from the desktop** (macOS File menu with ⇧⌘S, the Windows and Linux logbook selector, its save dialog and the snackbar « Copie enregistrée · Ouvrir »). Saving is automatic; a copy of the logbook is now made with the export, in the .benthic format below. There is no « Enregistrer sous ».
+
+**2. Remove « Télécharger mes plongées… » (⌘D) from the macOS File menu** (`desktop.macMenu.download`): downloading from the dive computer stays in the « + » menu of the logbook, as on the other platforms.
+
+**3. No « Exporter le carnet » in the logbook's ⋮ menu on the desktop.** On the desktop the whole logbook is exported from « Exporter… » (⇧⌘E) in the macOS File menu and from « Exporter le carnet… » (Ctrl+Maj+E) in the Windows and Linux logbook selector. (The tablet's ⋮ is to-do #140, still to be drawn.)
+
+**4. New export format: .benthic.** It is the archive already written by « Télécharger mes données » (`app/src/lib/full-export.js`): the same ZIP, named `<logbook>.benthic` instead of `.zip`. Rules:
+- In the export dialog, « Fichier Benthic (.benthic) » is offered only when the whole logbook is exported (« Exporter le carnet » / « Exporter… » with nothing checked), first in the list, described « Tout le carnet et vos données Benthic : équipement, profil, brevets, réglages ». It is not offered for a selection of dives.
+- « Télécharger mes données » in Compte stays, and now writes the same `.benthic` file.
+- The sensitive items (blood group, emergency contact, certifications and their photos) are included as today, with no extra warning in the export dialog.
+- The choice of including the dives' photos and videos stays as in « Télécharger mes données ».
+- Register the `.benthic` extension (and its MIME type `application/vnd.benthic+zip`) with the desktop installers and Android/iOS, so that the file opens with Benthic. Opening or importing a .benthic is to-do #113 (decided: it creates the logbook on first launch, or replaces the current logbook after confirmation, like « Importer un carnet »); do not build the import in this task.
+
+**Mock-ups:** `bureau-carnets-menu-fichier-macos`, `bureau-carnets-selecteur` on the tablet and desktop canvas; update `docs/mockups/` the same way. The export dialog with the .benthic row will be drawn with #140.
+
+**Test:** the desktop File menu and logbook selector no longer show « Enregistrer une copie » nor « Télécharger mes plongées »; exporting the whole logbook offers .benthic and writes a file that unzips to the layout of `full-export.js`; « Télécharger mes données » writes the same kind of file.

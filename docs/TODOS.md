@@ -69,7 +69,6 @@ Next number: 175
 - #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.
-- #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158). Décidé le 22 nov. 2026 : on retire « Enregistrer une copie » du desktop ; le dialogue d’exportation offre un nouveau format, .benthic (un zip avec l’extension .benthic), seulement pour le carnet entier ; c’est le même fichier que « Télécharger mes données » (Compte), qu’on garde ; les données sensibles y sont incluses sans avertissement.
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
 - #172 [code] Bug: a dive without a site does not show its dive number. Does it have one?
 - #173 [code] Devices should synchronize as soon as data is updated.
