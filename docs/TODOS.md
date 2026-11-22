@@ -55,7 +55,6 @@ Next number: 177
 - #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes, les détendeurs, les recycleurs et les combinaisons étanches (drysuit)
 - #149 [code] remplacer les uuid par des id plus courts
-- #151 [code] compléter l'écriture en cascade css des fichiers
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.

@@ -1210,19 +1210,19 @@ html.ios {
     .item-link.no-chevron .item-title-row::before {
       display: none;
     }
+  }
 
-    /*
-     * Android section titles on the page background, as in Settings, Tools and
-     * the gas results: 18/24, bold, ink, 20 dp from the sides (About).
-     */
-    & .bc-section-title {
-      margin: 0;
-      padding: 22px calc(20px + var(--f7-safe-area-right)) 8px calc(20px + var(--f7-safe-area-left));
-      font-size: 18px;
-      line-height: 24px;
-      font-weight: 700;
-      color: var(--bc-text);
-    }
+  /*
+   * Android section titles on the page background, as in Settings, Tools and
+   * the gas results: 18/24, bold, ink, 20 dp from the sides (About).
+   */
+  .md .bc-section-title {
+    margin: 0;
+    padding: 22px calc(20px + var(--f7-safe-area-right)) 8px calc(20px + var(--f7-safe-area-left));
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--bc-text);
   }
 
   /* Intro paragraph at the top of a screen (Account, Dives without a site, Clean up the sites). */
