@@ -63,7 +63,7 @@ test('the Benthic+ chip is a small component with tokens only', () => {
 });
 
 test('the logo on the band has a 1 dp ring at 30 % white and no shadow', () => {
-  const page = read('pages/WelcomeStartRelease.svelte');
+  const page = read('components/BrandLockup.svelte');
   assert.match(page, /border: 1px solid var\(--bc-release-logo-ring\)/);
   assert.match(read('theme.css'), /--bc-release-logo-ring: rgb\(255 255 255 \/ 0\.3\)/);
   assert.doesNotMatch(page, /drop-shadow|box-shadow: 0 [1-9]/);

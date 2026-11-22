@@ -7,6 +7,7 @@
   // `step`: 140 dp under the status bar, only the brand, a straight bottom edge (no wave, no profile).
   // The status bar is part of the band: its height (at least 24 dp) comes first.
   import { t } from '../lib/i18n.js';
+  import FirstLaunchRays from './FirstLaunchRays.svelte';
   import { decorativeProfilePath } from '../lib/smooth-path.js';
 
   /** @type {{ variant?: 'welcome'|'step' }} */
@@ -27,7 +28,7 @@
 
 <header class="bc-first-launch-band" class:bc-first-launch-band--welcome={welcome}>
   {#if welcome}<div class="bc-first-launch-band--sheen" aria-hidden="true"></div>{/if}
-  <div class="bc-first-launch-band--hatch" aria-hidden="true"></div>
+  <div class="bc-first-launch-band--rays"><FirstLaunchRays /></div>
   {#if !welcome}
     <svg class="bc-first-launch-band--step-profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{STEP_PROFILE} V140 H0 Z" class="bc-first-launch-band--step-area" />
@@ -80,7 +81,7 @@
     }
 
     .bc-first-launch-band--sheen,
-    .bc-first-launch-band--hatch {
+    .bc-first-launch-band--rays {
       position: absolute;
       inset: 0;
       pointer-events: none;
@@ -90,11 +91,7 @@
       background: var(--bc-first-band-sheen);
     }
 
-    /* Faint diagonal hatching, fading out at 55 % of the height. */
-    .bc-first-launch-band--hatch {
-      background: var(--bc-first-band-hatch);
-      mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
-    }
+    /* The light rays from the top right (task 2026-11-22-320), gone at 65 % of the height. */
 
     /* Steps (task 2026-11-16-250): the section band's profile and 18 dp wave in the page colour. */
     .bc-first-launch-band--step-profile {

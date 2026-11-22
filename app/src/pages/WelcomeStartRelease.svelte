@@ -8,11 +8,15 @@
   // chosen for the edition is pages/WelcomeEntry.svelte.
   import { Page } from 'framework7-svelte';
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
+  import FirstLaunchRays from '../components/FirstLaunchRays.svelte';
+  import BrandLockup from '../components/BrandLockup.svelte';
   import FirstLaunchSteps from '../components/FirstLaunchSteps.svelte';
   import BenthicPlusChip from '../components/BenthicPlusChip.svelte';
   import BenthicPlusPanel from '../components/BenthicPlusPanel.svelte';
   import { flow, currentStep } from '../lib/first-launch.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { layout } from '../lib/layout.svelte.js';
+  import { lockupSize } from '../lib/first-launch-phone.js';
 
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
@@ -24,15 +28,15 @@
   const offerPanel = $derived(currentStep() === 'odplusOffer' || currentStep() === 'odplusAll');
   const plusPanel = $derived(currentStep() === 'odplusReady');
 
+  /** The lockup: large on a tablet, the phone's on the first step, the Benthic+ sign-in and offer, the name alone on the other steps. */
+  const lockup = $derived(lockupSize(layout, flow.stack.length <= 1, currentStep() === 'odplusConnect' || offerPanel));
+
   // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
 </script>
 
 {#snippet panelContent()}
-  <div class="bc-welcome-release--brand">
-    <span class="bc-welcome-release--logo"><img src="logo-light.svg" alt="" width="96" height="96" /></span>
-    <span>Benthic</span>
-  </div>
+  <div class="bc-welcome-release--brand"><BrandLockup size={lockup} ring /></div>
   {#if plusPanel}
     <BenthicPlusPanel />
   {:else if offerPanel}
@@ -50,7 +54,7 @@
   <div class="bc-welcome-release--page" class:bc-welcome-release--plus={plusHero}>
     <section class="bc-welcome-release--panel" class:bc-welcome-release--compact={flow.stack.length > 1}>
       <div class="bc-welcome-release--panel-light" aria-hidden="true"></div>
-      <div class="bc-welcome-release--panel-bands" aria-hidden="true"></div>
+      <div class="bc-welcome-release--panel-rays"><FirstLaunchRays /></div>
       <svg class="bc-welcome-release--panel-profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
         <path d="{BAND_PROFILE} V140 H0 Z" class="bc-welcome-release--panel-profile-area" />
         <path d={BAND_PROFILE} class="bc-welcome-release--panel-profile-line" vector-effect="non-scaling-stroke" />
@@ -105,14 +109,13 @@
     .bc-welcome-release--panel-light {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 70% 45% at 22% 0%, var(--bc-release-panel-light), transparent 70%);
+      background: radial-gradient(ellipse 70% 45% at 85% 0%, var(--bc-release-panel-light), transparent 70%);
     }
 
-    .bc-welcome-release--panel-bands {
+    .bc-welcome-release--panel-rays {
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(105deg, var(--bc-release-panel-band) 0 60px, transparent 60px 150px);
-      mask-image: linear-gradient(180deg, black 0%, transparent 55%);
+      pointer-events: none;
     }
 
     /* The phone steps band's faint profile and wave: only on a phone, only on the steps. */
@@ -123,39 +126,6 @@
 
     .bc-welcome-release--brand {
       position: relative;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      font-size: 48px;
-      line-height: 56px;
-      font-weight: 500;
-      letter-spacing: -0.5px;
-    }
-
-    /* The logo on the blue band (task 2026-11-17-263): no drop shadow; its disc has a thin light ring instead, 1 dp,
-       white at 30 %. The disc is 60/66 of the image, so the ring sits 4.5 % inside its edges. */
-    .bc-welcome-release--logo {
-      position: relative;
-      display: block;
-      width: 96px;
-      height: 96px;
-
-      img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        filter: none;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        inset: 4.545%;
-        box-sizing: border-box;
-        border: 1px solid var(--bc-release-logo-ring);
-        border-radius: 50%;
-        pointer-events: none;
-      }
     }
 
     .bc-welcome-release--headline {
@@ -262,10 +232,6 @@
         background: var(--bc-first-band-sheen);
       }
 
-      .bc-welcome-release--panel-bands {
-        background: var(--bc-first-band-hatch);
-      }
-
       /* Steps band (task 2026-11-16-251): the section band's radial gradient and rays, its faint profile and its 18 dp wave
          in the page colour; no sheen. */
       .bc-welcome-release--compact {
@@ -307,28 +273,6 @@
 
       .bc-welcome-release--panel-wave path {
         fill: var(--bc-background);
-      }
-
-      .bc-welcome-release--brand {
-        gap: 10px;
-        font-size: 24px;
-        line-height: 30px;
-        letter-spacing: 0;
-      }
-
-      .bc-welcome-release--logo {
-        width: 40px;
-        height: 40px;
-      }
-
-      .bc-welcome-release--compact .bc-welcome-release--brand {
-        font-size: 20px;
-        line-height: 26px;
-      }
-
-      .bc-welcome-release--compact .bc-welcome-release--logo {
-        width: 32px;
-        height: 32px;
       }
 
       .bc-welcome-release--compact .bc-welcome-release--headline,

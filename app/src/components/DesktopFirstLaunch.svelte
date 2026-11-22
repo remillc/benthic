@@ -14,6 +14,8 @@
   import { onMount } from 'svelte';
   import { f7, f7ready } from 'framework7-svelte';
   import ReleaseProfile from './ReleaseProfile.svelte';
+  import FirstLaunchRays from './FirstLaunchRays.svelte';
+  import BrandLockup from './BrandLockup.svelte';
   import BenthicPlusPanel from './BenthicPlusPanel.svelte';
   import { currentStep } from '../lib/first-launch.svelte.js';
   import FirstLaunchSteps from './FirstLaunchSteps.svelte';
@@ -63,11 +65,8 @@
 <main class="bc-desktop-first-launch" class:bc-desktop-first-launch--away={!visible} aria-label={t('welcomeSteps.startTitle')}>
   <section class="bc-desktop-first-launch--panel">
     <div class="bc-desktop-first-launch--panel-light" aria-hidden="true"></div>
-    <div class="bc-desktop-first-launch--panel-bands" aria-hidden="true"></div>
-    <div class="bc-desktop-first-launch--brand">
-      <img class="bc-desktop-first-launch--logo" src="logo-light.svg" alt="" width="96" height="96" />
-      <span>Benthic</span>
-    </div>
+    <div class="bc-desktop-first-launch--panel-rays"><FirstLaunchRays /></div>
+    <div class="bc-desktop-first-launch--brand"><BrandLockup size="large" /></div>
     {#if plusPanel}
       <BenthicPlusPanel />
     {:else}
@@ -124,31 +123,17 @@
     .bc-desktop-first-launch--panel-light {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 70% 45% at 22% 0%, var(--bc-release-panel-light), transparent 70%);
+      background: radial-gradient(ellipse 70% 45% at 85% 0%, var(--bc-release-panel-light), transparent 70%);
     }
 
-    .bc-desktop-first-launch--panel-bands {
+    .bc-desktop-first-launch--panel-rays {
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(105deg, var(--bc-release-panel-band) 0 60px, transparent 60px 150px);
-      mask-image: linear-gradient(180deg, black 0%, transparent 55%);
+      pointer-events: none;
     }
 
     .bc-desktop-first-launch--brand {
       position: relative;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      font-size: 48px;
-      line-height: 56px;
-      font-weight: 500;
-      letter-spacing: -0.5px;
-    }
-
-    .bc-desktop-first-launch--logo {
-      display: block;
-      width: 96px;
-      height: 96px;
     }
 
     .bc-desktop-first-launch--headline {
@@ -220,15 +205,17 @@
         padding: 40px 32px 0;
       }
 
-      .bc-desktop-first-launch--brand {
-        gap: 14px;
-        font-size: 32px;
-        line-height: 40px;
-      }
-
-      .bc-desktop-first-launch--logo {
-        width: 64px;
-        height: 64px;
+      /* The phone's lockup sizes (52 dp logo, 30 dp name). */
+      .bc-desktop-first-launch--brand :global(.bc-brand-lockup) {
+        --bc-lockup-logo: 52px;
+        --bc-lockup-gap: 10px;
+        --bc-lockup-name: 30px;
+        --bc-lockup-name-line: 32px;
+        --bc-lockup-name-spacing: 0.2px;
+        --bc-lockup-sub: 11px;
+        --bc-lockup-sub-line: 14px;
+        --bc-lockup-sub-spacing: 3px;
+        --bc-lockup-sub-gap: 2px;
       }
 
       .bc-desktop-first-launch--headline {
@@ -264,15 +251,15 @@
         padding: 32px 24px 0;
       }
 
-      .bc-desktop-first-launch--brand {
-        gap: 10px;
-        font-size: 26px;
-        line-height: 32px;
-      }
-
-      .bc-desktop-first-launch--logo {
-        width: 48px;
-        height: 48px;
+      /* The compact lockup (48 dp logo, 26 dp name). */
+      .bc-desktop-first-launch--brand :global(.bc-brand-lockup) {
+        --bc-lockup-logo: 48px;
+        --bc-lockup-gap: 8px;
+        --bc-lockup-name: 26px;
+        --bc-lockup-name-line: 28px;
+        --bc-lockup-sub: 10px;
+        --bc-lockup-sub-line: 13px;
+        --bc-lockup-sub-spacing: 2.6px;
       }
 
       .bc-desktop-first-launch--headline {

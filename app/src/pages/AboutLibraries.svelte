@@ -33,6 +33,7 @@
         ['qrcode-generator', 'MIT', 'https://github.com/kazuhikoarase/qrcode-generator'],
         ['Natural Earth (simplified world map)', 'Public domain', 'https://www.naturalearthdata.com'],
         ['Source Sans 3', 'SIL Open Font License 1.1', 'https://github.com/adobe-fonts/source-sans'],
+        ['Outfit (the name « Benthic »)', 'SIL Open Font License 1.1', 'https://github.com/Outfitio/Outfit-Fonts'],
       ],
     },
   ];

@@ -98,7 +98,7 @@ test('the panel: 700 dp on the left in landscape, 640 dp at the top in portrait,
   assert.match(style, /\.bc-first-launch-panel--intro \{[^}]*font-size: 16px;[^}]*color: var\(--bc-on-first-band-2\);/);
   assert.match(panel, /src="logo-light\.svg" alt="" width="96" height="96"/);
   assert.match(style, /background: var\(--bc-first-band\);/);
-  assert.match(style, /background: var\(--bc-first-band-hatch\);/);
+  assert.match(panel, /<FirstLaunchRays \/>/);
   assert.match(theme, /--bc-on-first-band-2: rgb\(255 255 255 \/ 0\.78\);/);
 });
 
