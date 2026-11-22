@@ -2348,6 +2348,7 @@
       "other": "{n} dives merged"
     },
     "mergeFailed": "The dives could not be merged. No dive was changed.",
+    "mergeNumberConflict": "Merging would duplicate a dive number. Check the numbering; no dive was changed.",
     "menuEdit": "Edit together…",
     "editTitle": "Edit {n} dives",
     "manyValues": "Several values",
@@ -2726,6 +2727,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Merging dives adjusts later dive numbers even when some dives are unnumbered.",
       "Desktop: the logbook selector shows the logbook name without a redundant label.",
       "Shared map: panning and scrolling are smoother when many sites are displayed.",
       "Shared map: the list follows the visible area, including sites grouped on the map.",

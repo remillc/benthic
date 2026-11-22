@@ -72,6 +72,103 @@ static dive *by_when(timestamp_t when)
 	return nullptr;
 }
 
+static void check_merge_numbers(const std::string &log, const std::vector<int> &before,
+				size_t selected, const std::vector<int> &after, const std::string &label)
+{
+	std::string json, error;
+	if (list_dives(log, json, error) || divelog.dives.size() < before.size()) {
+		check(false, label + ": cannot load enough dives");
+		return;
+	}
+	std::vector<timestamp_t> times;
+	std::vector<int> ids;
+	for (size_t i = 0; i < before.size(); ++i) {
+		dive *d = divelog.dives[i].get();
+		d->number = before[i];
+		times.push_back(d->when);
+		if (i < selected)
+			ids.push_back(d->id);
+	}
+	for (size_t i = before.size(); i < divelog.dives.size(); ++i)
+		divelog.dives[i]->number = 1000 + static_cast<int>(i);
+	auto matches = [&](const std::vector<int> &numbers, bool merged) {
+		for (size_t i = 0; i < numbers.size(); ++i) {
+			size_t original = merged && i > 0 ? i + selected - 1 : i;
+			dive *d = by_when(times[original]);
+			if (!d || d->number != numbers[i])
+				return false;
+		}
+		return true;
+	};
+	if (merge_dives(ids, json, error)) {
+		check(false, label + ": merge failed");
+		return;
+	}
+	check(matches(after, true), label + ": numbers after merge");
+	check(undo(json, error) == 0 && matches(before, false), label + ": undo restores all numbers");
+	check(redo(json, error) == 0 && matches(after, true), label + ": redo restores the merged numbers");
+}
+
+static void check_merge_number_collision(const std::string &log)
+{
+	std::string json, error;
+	if (list_dives(log, json, error) || divelog.dives.size() < 4) {
+		check(false, "collision check: cannot load enough dives");
+		return;
+	}
+	const std::vector<int> numbers { 10, 12, 14, 12 };
+	for (size_t i = 0; i < numbers.size(); ++i)
+		divelog.dives[i]->number = numbers[i];
+	const size_t count = divelog.dives.size();
+	check(merge_dives({ divelog.dives[0]->id, divelog.dives[1]->id }, json, error) != 0 &&
+		      error == "NUMBERING_CONFLICT" && divelog.dives.size() == count && !can_undo(),
+	      "merge refuses to create a duplicate number");
+	for (size_t i = 0; i < numbers.size(); ++i)
+		check(divelog.dives[i]->number == numbers[i], "a refused merge preserves the original number");
+}
+
+static void check_merge_number_persistence(const std::string &log, const std::string &folder)
+{
+	std::string json, error;
+	if (list_dives(log, json, error) || divelog.dives.size() < 6) {
+		check(false, "numbering round trip: cannot load enough dives");
+		return;
+	}
+	std::vector<int> ids, numbers { 0, 10, 12, 0, 13, 14 };
+	for (size_t i = 0; i < divelog.dives.size(); ++i) {
+		ids.push_back(divelog.dives[i]->id);
+		if (i >= numbers.size())
+			numbers.push_back(1000 + static_cast<int>(i));
+	}
+	if (renumber_dives(ids, 0, json, error, numbers) || save_local(error) || list_dives(log, json, error)) {
+		check(false, "numbering round trip: cannot save the starting numbers");
+		return;
+	}
+	std::vector<timestamp_t> times;
+	ids.clear();
+	for (size_t i = 0; i < 6; ++i) {
+		times.push_back(divelog.dives[i]->when);
+		if (i < 3)
+			ids.push_back(divelog.dives[i]->id);
+	}
+	const std::string before = tree_of(folder);
+	if (merge_dives(ids, json, error) || save_local(error)) {
+		check(false, "numbering round trip: cannot save the merge");
+		return;
+	}
+	const std::string merged = tree_of(folder);
+	check(merged != before, "the merge and adjusted numbers are saved");
+	check(undo(json, error) == 0 && save_local(error) == 0 && tree_of(folder) == before,
+	      "undo restores the saved numbering exactly");
+	check(redo(json, error) == 0 && save_local(error) == 0 && tree_of(folder) == merged,
+	      "redo saves the adjusted numbering exactly");
+	check(list_dives(log, json, error) == 0 && by_when(times[0]) && by_when(times[0])->number == 10 &&
+		      by_when(times[3]) && by_when(times[3])->number == 0 &&
+		      by_when(times[4]) && by_when(times[4])->number == 11 &&
+		      by_when(times[5]) && by_when(times[5])->number == 12,
+	      "the adjusted and unnumbered dives reload with their numbers");
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 3) {
@@ -103,6 +200,18 @@ int main(int argc, char **argv)
 	}
 	size_t count0 = divelog.dives.size();
 	const std::string tree0 = tree_of(folder);
+
+	check_merge_numbers(log, { 0, 10, 12, 0, 13, 14 }, 3, { 10, 0, 11, 12 },
+			    "merge with unnumbered selected and following dives");
+	check_merge_numbers(log, { 10, 12, 0, 13, 14 }, 2, { 10, 0, 11, 12 },
+			    "merge across a numbering gap");
+	check_merge_numbers(log, { 0, 10, 0, 11, 12 }, 2, { 10, 0, 11, 12 },
+			    "merge with only one numbered dive");
+	check_merge_number_collision(log);
+	if (list_dives(log, json, error)) {
+		printf("FAIL: reload after numbering checks: %s\n", error.c_str());
+		return 1;
+	}
 
 	// --- Merge ------------------------------------------------------------
 	dive *a = divelog.dives[1].get(), *b = divelog.dives[2].get();
@@ -274,6 +383,7 @@ int main(int argc, char **argv)
 		if (d->notes == "edited together")
 			reread = reread && d->suit == "7 mm";
 	check(reread, "the reloaded dives carry the edit");
+	check_merge_number_persistence(log, folder);
 	printf("%s: %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
 	return failures ? 1 : 0;
 }

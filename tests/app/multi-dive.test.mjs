@@ -2,12 +2,18 @@
 // « Modifier ensemble », and the changes it sends to the core.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { canMerge, chipsOf, multiEditChanges, multiEditState } from '../../app/src/lib/multi-dive.js';
+import { canMerge, chipsOf, mergeErrorKey, multiEditChanges, multiEditState } from '../../app/src/lib/multi-dive.js';
 
 /** A dive of the list: `start` as « HH:MM » on 5 November 2012, `minutes` long. */
 const dive = (id, start, minutes, date = '2012-11-05') => ({ id, number: id, date: `${date}T${start}:00`, durationSeconds: minutes * 60 });
 
 const day = [dive(1, '08:00', 40), dive(2, '09:00', 45), dive(3, '10:20', 30), dive(4, '14:00', 50)];
+
+test('merge numbering conflicts are explained without hiding other errors', () => {
+  assert.equal(mergeErrorKey('CORE_ERROR: NUMBERING_CONFLICT'), 'multiDive.mergeNumberConflict');
+  assert.equal(mergeErrorKey('WRITE_LOCKED'), 'edit.writeLocked');
+  assert.equal(mergeErrorKey('OTHER_ERROR'), 'multiDive.mergeFailed');
+});
 
 test('two dives following each other, 20 minutes apart, can be merged', () => {
   // Dive 1 ends at 08:40, dive 2 starts at 09:00.

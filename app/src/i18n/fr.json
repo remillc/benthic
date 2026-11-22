@@ -2348,6 +2348,7 @@
       "other": "{n} plongées fusionnées"
     },
     "mergeFailed": "Les plongées n'ont pas pu être fusionnées. Aucune plongée n'a été modifiée.",
+    "mergeNumberConflict": "La fusion créerait un numéro en double. Vérifiez la numérotation ; aucune plongée n’a été modifiée.",
     "menuEdit": "Modifier ensemble…",
     "editTitle": "Modifier {n} plongées",
     "manyValues": "Plusieurs valeurs",
@@ -2726,6 +2727,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "La fusion de plongées ajuste les numéros suivants même lorsque certaines plongées ne sont pas numérotées.",
       "Ordinateur : le sélecteur affiche le nom du carnet sans libellé superflu.",
       "Carte commune : le déplacement de la carte et le défilement restent plus fluides lorsque beaucoup de sites sont affichés.",
       "Carte commune : la liste suit la zone affichée, y compris les sites regroupés sur la carte.",

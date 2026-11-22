@@ -3377,9 +3377,8 @@ int merge_dives(const std::vector<int> &ids, std::string &result_json, std::stri
 			break;
 		}
 	}
-	// The following dives are renumbered only if the merged ones are
-	// consecutive in the table and numbered in increasing order; missing
-	// numbers stay missing (see the comment in MergeDives).
+	// Keep the merge and its numbering in the same undoable step. Unnumbered
+	// dives do not consume a number or interrupt an otherwise ordered sequence.
 	size_t idx = divelog.dives.get_idx(dives[0]);
 	size_t num = dives.size();
 	if (idx == std::string::npos) {
@@ -3389,15 +3388,41 @@ int merge_dives(const std::vector<int> &ids, std::string &result_json, std::stri
 	bool consecutive = idx + num <= divelog.dives.size();
 	for (size_t i = 0; consecutive && i < num; i++)
 		consecutive = divelog.dives[idx + i].get() == dives[i];
-	if (consecutive && dives[0]->number && dives.back()->number && dives[0]->number < dives.back()->number) {
-		int diff = dives.back()->number - dives[0]->number;
-		int previousnr = dives[0]->number;
+	int firstnr = 0, lastnr = 0;
+	bool ordered = true;
+	for (const dive *item: dives) {
+		if (item->number <= 0)
+			continue;
+		if (lastnr && item->number <= lastnr)
+			ordered = false;
+		if (!firstnr)
+			firstnr = item->number;
+		lastnr = item->number;
+	}
+	if (consecutive && ordered && firstnr && lastnr > firstnr) {
+		int diff = lastnr - firstnr;
+		int previousnr = firstnr;
 		for (size_t i = idx + num; i < divelog.dives.size(); ++i) {
+			if (divelog.dives[i]->number <= 0)
+				continue;
 			int newnr = divelog.dives[i]->number - diff;
 			if (newnr <= previousnr) // stop renumbering if stuff isn't in order
 				break;
 			step.renumbered.push_back({ divelog.dives[i].get(), newnr });
 			previousnr = newnr;
+		}
+		std::set<const dive *> changing(dives.begin(), dives.end());
+		for (const auto &item: step.renumbered)
+			changing.insert(item.first);
+		std::set<int> retained_numbers { firstnr };
+		for (const auto &item: divelog.dives)
+			if (!changing.count(item.get()) && item->number > 0)
+				retained_numbers.insert(item->number);
+		for (const auto &item: step.renumbered) {
+			if (!retained_numbers.insert(item.second).second) {
+				error = "NUMBERING_CONFLICT";
+				return -1;
+			}
 		}
 	}
 	DiveToAdd merged;

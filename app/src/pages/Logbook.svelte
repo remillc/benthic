@@ -40,7 +40,7 @@
   import { pickCsvFiles } from '../lib/csv-import.js';
   import { guardedAdd } from '../lib/demo.svelte.js';
   import { logbook, loadLogbook, importFiles, importCsvFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
-  import { canMerge } from '../lib/multi-dive.js';
+  import { canMerge, mergeErrorKey } from '../lib/multi-dive.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { shownTrip } from '../lib/trip-shown.js';
@@ -358,7 +358,7 @@
     } catch (e) {
       console.error('Merge dives', e);
       const code = String(/** @type {any} */ (e)?.message ?? '');
-      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('multiDive.mergeFailed'));
+      showSnackbar(t(mergeErrorKey(code)));
     }
   }
 
