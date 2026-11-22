@@ -2268,6 +2268,7 @@
     "mapFullscreen": "Carte des sites en plein écran",
     "mapWithSites": "{map} : {list}",
     "mapSite": "{name} {place}, {dives}",
+    "mapSiteWithoutDives": "{name} {place}",
     "mapPin": "{name}, {dives}",
     "openSiteSheet": "Ouvrir la fiche du site",
     "stackTitle": {
@@ -2323,6 +2324,13 @@
     "editSite": "Modifier le site {name}",
     "editedNoDuplicate": "{name} modifié, ce n’est plus un doublon possible"
   },
+  "renumberFrom": {
+    "title": "Renuméroter à partir de cette plongée",
+    "text": "Cette plongée et toutes les suivantes reçoivent des numéros consécutifs, dans l’ordre des dates, même si elles sont masquées. Vous pourrez annuler.",
+    "conflict": "Le numéro {n} est déjà utilisé par une plongée précédente. Choisissez un autre premier numéro.",
+    "tooLarge": "Le premier numéro est trop grand pour numéroter toutes les plongées suivantes.",
+    "failed": "La renumérotation n’a pas pu être terminée. Vérifiez le carnet avant de réessayer."
+  },
   "renumber": {
     "titleChecked": "Renuméroter les plongées cochées ?",
     "dialogTextChecked": {
@@ -2347,6 +2355,7 @@
       "other": "{n} plongées fusionnées"
     },
     "mergeFailed": "Les plongées n'ont pas pu être fusionnées. Aucune plongée n'a été modifiée.",
+    "mergeNumberConflict": "La fusion créerait un numéro en double. Vérifiez la numérotation ; aucune plongée n’a été modifiée.",
     "menuEdit": "Modifier ensemble…",
     "editTitle": "Modifier {n} plongées",
     "manyValues": "Plusieurs valeurs",
@@ -2709,6 +2718,8 @@
     "version": "Version {version}",
     "versionDated": "Version {version} · {date}",
     "author": "Par {name}",
+    "diveSites": "Données des sites de plongée",
+    "diveSitesText": "© contributeurs OpenDiving Commons et OpenStreetMap ; Wikidata ; NOAA Florida Keys et Thunder Bay ; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). Base sous licence ODbL 1.0.",
     "copyright": "© {year} {name}.",
     "tagline": "Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface.",
     "desktopText": "Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. Le code de l’app est sur GitHub : chacun peut le lire, le modifier et le partager. Exportable en tout temps, votre carnet vous appartient.",
@@ -2724,17 +2735,37 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Recherche : une croix permet d’effacer le texte sans quitter le champ.",
+      "La fusion de plongées ajuste les numéros suivants même lorsque certaines plongées ne sont pas numérotées.",
+      "Carnet : renumérotez une plongée et toutes les suivantes à partir du numéro choisi.",
+      "Ordinateur : le sélecteur affiche le nom du carnet sans libellé superflu.",
       "Carte commune : le déplacement de la carte et le défilement restent plus fluides lorsque beaucoup de sites sont affichés.",
       "Carte commune : la liste suit la zone affichée, y compris les sites regroupés sur la carte.",
+      "Carte commune : un message indique quand les sites ne sont pas disponibles hors ligne.",
+      "Carte commune : ajout de sites d’OpenDiving Commons.",
+      "Sites : les modifications reçues par synchronisation apparaissent sans rouvrir l’application.",
+      "Ordinateur : la carte commune se charge lorsque la vue mondiale traverse la ligne de changement de date.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
+      "Sites : les noms apparaissent en zoomant sur les deux cartes ; sur tablette, le déplacement et le zoom fonctionnent dans la page et la carte est dégagée de la zone de navigation système.",
+      "Carte commune : les boutons de sélection sont plus faciles à toucher.",
+      "Sites : les sites proches sont regroupés sur téléphone et tablette ; la carte commune est accessible sur ordinateur.",
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",
       "Desktop : le signe « + » n’apparaît plus sur l’initiale dans le menu Compte.",
+      "Tablette Android : l’icône Compte dans la barre latérale est plus grande.",
+      "Carnet sur ordinateur : le menu Carnet permet de renommer le carnet affiché, sans modifier son fichier.",
+      "Carnet sur tablette : la liste des plongées est un peu plus large en paysage.",
+      "Équipement : un rappel annuel d’entretien, y compris des valves, est proposé pour les combinaisons étanches.",
+      "Équipement : l’intervalle de révision suggéré pour un détendeur est maintenant d’un an ou de 100 plongées.",
+      "Carnet : le site et les autres détails modifiés d’une plongée apparaissent dans la liste après l’enregistrement.",
+      "Détail d’une plongée sur ordinateur : l’indication de modification n’apparaît plus sous les compagnons et les guides.",
+      "Détail d’une plongée sur ordinateur : le menu du type d’eau s’ouvre en un clic.",
       "La suppression de plongées décale automatiquement les numéros des plongées suivantes.",
       "Corrigé une erreur du détail d’une plongée au démarrage avec un carnet synchronisé.",
       "Carnet sur tablette : quand des plongées sont cochées, les actions du détail passent dans le menu ⋮ en haut et permettent de supprimer la sélection.",
       "Restauration : une plongée retrouve le numéro manquant à sa position ; si aucun numéro n’est disponible, les suivantes sont décalées.",
-      "Informations : les champs de date de naissance, de lien et de téléphone sont moins larges.",
+      "Informations : les champs de date de naissance, de lien, de téléphone et de groupe sanguin sont moins larges.",
+      "Profil : la flèche de retour n’apparaît plus sur tablette et ordinateur.",
+      "Informations : une flèche permet de quitter la modification sans enregistrer.",
       "Profil et équipement : l’entrée Entretien apparaît lorsqu’une pièce active a un rappel d’entretien.",
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
       "Équipement : le champ « Type de pièce » n’apparaît plus à la création d’une pièce de type Autre.",
@@ -4599,6 +4630,13 @@
   },
   "desktopLogbooks": {
     "mainName": "Carnet de cet ordinateur",
+    "rename": {
+      "action": "Renommer…",
+      "title": "Renommer le carnet",
+      "name": "Nom du carnet",
+      "save": "Renommer",
+      "failed": "Le carnet n’a pas pu être renommé."
+    },
     "selector": {
       "label": "Carnet",
       "change": "Changer de carnet",
@@ -6331,7 +6369,7 @@
     "reminderCard": {
       "title": "Rappels d’entretien",
       "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
-      "suggestDrysuit": "Suggéré pour une combinaison étanche : les joints, chaque année",
+      "suggestDrysuit": "Suggéré pour une combinaison étanche : entretien annuel, y compris des valves",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",
         "regulator": "Suggéré pour un détendeur : {rule}",
@@ -6643,6 +6681,7 @@
     }
   },
   "sharedSites": {
+    "mapCredits": "Sites : © OpenDiving Commons, Wikidata, NOAA, FWC",
     "commonMap": "carte commune",
     "show": "Afficher",
     "mine": "Mes sites",
@@ -6660,7 +6699,8 @@
     },
     "fewDives": "Moins de 5 plongées",
     "inYourSites": "Dans vos sites",
-    "offline": "Hors ligne : la carte commune revient avec le réseau.",
+    "offlineTitle": "Carte commune indisponible",
+    "offline": "Connectez-vous à Internet pour afficher les sites de la carte commune.",
     "failed": "La carte commune ne répond pas. Réessayez plus tard.",
     "retry": "Réessayer",
     "offerText": "La carte commune des sites fait partie de Benthic+.",
@@ -6676,7 +6716,7 @@
       "encryptedTitle": "Vos données sont chiffrées",
       "encryptedText": "Profil, santé et documents sont gardés chiffrés sur le serveur Benthic.",
       "sharedTitle": "La carte commune des sites",
-      "sharedText": "Les sites de votre carnet alimentent la base commune des sites de plongée de Benthic : nom, position, pays, type d’eau et profondeur. Jamais vos notes, jamais votre nom.",
+      "sharedText": "Les sites de votre carnet alimentent la base commune. Leur nom et leur position sont publiés en données ouvertes. Jamais vos notes, jamais votre nom.",
       "readAll": "Lire les conditions complètes",
       "fullTitle": "Conditions d’utilisation",
       "accept": "J’accepte les conditions",
@@ -6691,7 +6731,8 @@
       "usualDepth": "Profondeur la plus souvent notée",
       "depthRange": "{from} à {to}",
       "recentDives": "Plongées des 12 derniers mois",
-      "note": "Sites versés par les plongeurs de Benthic+. Aucun nom de plongeur n’est affiché.",
+      "note": "Sites versés par les plongeurs de Benthic+ et OpenDiving Commons. Aucun nom de plongeur n’est affiché.",
+      "commonsCredits": "Données : © contributeurs OpenDiving Commons et OpenStreetMap ; Wikidata ; NOAA Florida Keys et Thunder Bay ; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). Licence ODbL 1.0.",
       "add": "Ajouter à mes sites",
       "inYourSites": "Dans vos sites",
       "report": "Signaler",

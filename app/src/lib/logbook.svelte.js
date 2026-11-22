@@ -243,6 +243,7 @@ export async function saveDiveChanges(id, changes) {
   logbook.edited = { id, dive: result.dive };
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
   await persistChanges();
   return result;
 }
@@ -809,6 +810,7 @@ async function syncEdits() {
       // The cloud brought changes: the merged log was read again, its dives
       // are new objects and the undo history is gone (lib/undo.js).
       logbook.dives = await OpenDivesCore.listLoadedDives();
+      logbook.sitesVersion++;
       undoCleared();
     }
     const reached = status.status !== 'offline' && status.status !== 'stopped';

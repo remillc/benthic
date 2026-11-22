@@ -91,18 +91,16 @@
       height: auto;
       padding: 12px 12px 12px 16px;
       box-shadow: 0 4px 12px color-mix(in srgb, var(--bc-release-row-main) 25%, transparent);
-    }
-
-    .bc-demo-banner--bottom .bc-demo-banner--text {
-      font-size: 15px;
-      line-height: 20px;
-    }
-
-    .bc-demo-banner--bottom .bc-demo-banner--start {
-      height: 40px;
-      padding: 0 16px;
-      border-radius: 20px;
-      font-size: 14px;
+      & .bc-demo-banner--text {
+        font-size: 15px;
+        line-height: 20px;
+      }
+      & .bc-demo-banner--start {
+        height: 40px;
+        padding: 0 16px;
+        border-radius: 20px;
+        font-size: 14px;
+      }
     }
 
     .bc-demo-banner--icon {
@@ -115,10 +113,9 @@
       margin: 0;
       font-size: 16px;
       line-height: 22px;
-    }
-
-    .bc-demo-banner--text strong {
-      font-weight: 600;
+      & strong {
+        font-weight: 600;
+      }
     }
 
     .bc-demo-banner--start {

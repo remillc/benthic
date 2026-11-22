@@ -430,14 +430,13 @@
       .bc-delete-wizard--row {
         padding: 0;
       }
-    }
-
-    .bc-delete-wizard--summary > .bc-delete-wizard--row + .bc-delete-wizard--row {
-      border-top: none;
-      margin-left: 0;
-
-      > :global(.bc-icon) {
+      & > .bc-delete-wizard--row + .bc-delete-wizard--row {
+        border-top: none;
         margin-left: 0;
+
+        > :global(.bc-icon) {
+          margin-left: 0;
+      }
       }
     }
 

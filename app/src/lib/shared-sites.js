@@ -8,6 +8,8 @@
 // usual depth, number of dives and of dives in the last 12 months, and the base site it was added from. Never the
 // notes, the description, a buddy, a dive date or the diver's name: `contributionOf` builds each entry field by field.
 
+import { normalizeBbox, normalizeLongitude } from './maps-logic.js';
+
 /** The reasons of « Signaler », in the order of the dialog (the server's codes). */
 export const REPORT_REASONS = /** @type {const} */ (['wrong_position', 'duplicate', 'wrong_name_or_country', 'closed_or_forbidden', 'other']);
 /** @typedef {typeof REPORT_REASONS[number]} ReportReason */
@@ -23,7 +25,7 @@ export const CHOOSE_RADIUS_M = 50000;
  * A site of the base, as the server sends it (lists and card).
  * @typedef {{ id: string, name: string, lat: number, lon: number, country: string, region: string,
  *   waterType: ''|'fresh'|'salt'|'brackish', closed: boolean, dives: number|null, fewDives: boolean,
- *   distanceM?: number, redirectedFrom?: string,
+ *   distanceM?: number, redirectedFrom?: string, commonsSources?: string[],
  *   carnets?: { waterType: string, depthMm: number|null, depthRangeMm: [number, number]|null,
  *     divesLast12Months: number|null, fewDivesLast12Months: boolean } }} BaseSite
  */
@@ -71,6 +73,7 @@ export function baseSiteOf(r) {
   };
   if (num(r.distanceM) !== null) site.distanceM = /** @type {number} */ (num(r.distanceM));
   if (r.redirectedFrom !== undefined && r.redirectedFrom !== null) site.redirectedFrom = String(r.redirectedFrom);
+  if (Array.isArray(r.commonsSources)) site.commonsSources = r.commonsSources.filter((v) => typeof v === 'string');
   const c = r.carnets;
   if (c && typeof c === 'object') {
     const range = Array.isArray(c.depthRangeMm) && c.depthRangeMm.length === 2 && c.depthRangeMm.every((/** @type {unknown} */ x) => num(x) !== null) ? /** @type {[number, number]} */ ([c.depthRangeMm[0], c.depthRangeMm[1]]) : null;
@@ -161,7 +164,7 @@ export function createSharedSitesApi({ baseUrl, transport }) {
      */
     async inBox(token, { bbox, zoom, limit }) {
       const round = (/** @type {number} */ x) => Math.round(x * 1e5) / 1e5;
-      const r = await call(token, 'GET', `/v1/sites/base?${qs({ bbox: bbox.map(round).join(','), zoom: Math.max(0, Math.min(22, Math.round(zoom))), limit })}`);
+      const r = await call(token, 'GET', `/v1/sites/base?${qs({ bbox: normalizeBbox(bbox).map(round).join(','), zoom: Math.max(0, Math.min(22, Math.round(zoom))), limit })}`);
       return {
         mode: r.mode === 'clusters' ? 'clusters' : 'sites',
         total: num(r.total) ?? 0,
@@ -191,7 +194,7 @@ export function createSharedSitesApi({ baseUrl, transport }) {
      * @returns {Promise<BaseSite[]>}
      */
     async nearby(token, { lat, lon, radiusM, limit, q }) {
-      const r = await call(token, 'GET', `/v1/sites/base/nearby?${qs({ lat: lat.toFixed(6), lon: lon.toFixed(6), radiusM, limit, q: q?.trim() || undefined })}`);
+      const r = await call(token, 'GET', `/v1/sites/base/nearby?${qs({ lat: lat.toFixed(6), lon: normalizeLongitude(lon).toFixed(6), radiusM, limit, q: q?.trim() || undefined })}`);
       return /** @type {any[]} */ (Array.isArray(r.sites) ? r.sites : []).map(baseSiteOf).filter((s) => s !== null);
     },
     /** The card of a base site (a merged id answers the surviving site, with `redirectedFrom`). @param {string} token @param {string} id */

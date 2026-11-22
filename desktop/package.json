@@ -32,6 +32,7 @@
       "logbooks.cjs",
       "windows.cjs",
       "preload.cjs",
+      "process-errors.cjs",
       "package.json",
       "resources/icon-round.png"
     ],

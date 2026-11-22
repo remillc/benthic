@@ -13,8 +13,8 @@
   /** @type {{ ondownload: () => void, onimport: () => void, onmanual: () => void }} */
   let { ondownload, onimport, onmanual } = $props();
 
-  const entry = windowLogbook();
-  const kept = entry ? keptIn(entry, t) : null;
+  const entry = $derived(windowLogbook());
+  const kept = $derived(entry ? keptIn(entry, t) : null);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
   const ways = [
     // « Télécharger mes plongées » with the dive computer icon, as the empty logbook (task 2026-11-15-220).
@@ -94,13 +94,13 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-    .bc-logbook-ready--way:hover {
-      background: var(--bc-surface-2);
-    }
-    .bc-logbook-ready--way:focus-visible {
-      outline: 2px solid var(--bc-action);
-      outline-offset: 2px;
+      &:hover {
+        background: var(--bc-surface-2);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--bc-action);
+        outline-offset: 2px;
+      }
     }
     .bc-logbook-ready--icon {
       flex: none;

@@ -2268,6 +2268,7 @@
     "mapFullscreen": "Map of the sites, full screen",
     "mapWithSites": "{map}: {list}",
     "mapSite": "{name} {place}, {dives}",
+    "mapSiteWithoutDives": "{name} {place}",
     "mapPin": "{name}, {dives}",
     "openSiteSheet": "Open the site sheet",
     "stackTitle": {
@@ -2323,6 +2324,13 @@
     "editSite": "Edit the site {name}",
     "editedNoDuplicate": "{name} edited, no longer a possible duplicate"
   },
+  "renumberFrom": {
+    "title": "Renumber from this dive",
+    "text": "This dive and all later dives receive consecutive numbers in date order, including hidden dives. You can undo this.",
+    "conflict": "Number {n} is already used by an earlier dive. Choose another starting number.",
+    "tooLarge": "The starting number is too large to number all later dives.",
+    "failed": "Renumbering could not be completed. Check the logbook before trying again."
+  },
   "renumber": {
     "titleChecked": "Renumber the checked dives?",
     "dialogTextChecked": {
@@ -2347,6 +2355,7 @@
       "other": "{n} dives merged"
     },
     "mergeFailed": "The dives could not be merged. No dive was changed.",
+    "mergeNumberConflict": "Merging would duplicate a dive number. Check the numbering; no dive was changed.",
     "menuEdit": "Edit together…",
     "editTitle": "Edit {n} dives",
     "manyValues": "Several values",
@@ -2709,6 +2718,8 @@
     "version": "Version {version}",
     "versionDated": "Version {version} · {date}",
     "author": "By {name}",
+    "diveSites": "Dive site data",
+    "diveSitesText": "© OpenDiving Commons and OpenStreetMap contributors; Wikidata; NOAA Florida Keys and Thunder Bay; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). Database licensed under ODbL 1.0.",
     "copyright": "© {year} {name}.",
     "tagline": "Open-source dive logbook, built on the solid, proven foundations of Subsurface.",
     "desktopText": "Open-source dive logbook, built on the solid, proven foundations of Subsurface. The app’s code is on GitHub: anyone can read it, change it and share it. Exportable at any time, your logbook belongs to you.",
@@ -2724,17 +2735,37 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Search: a clear button removes the text without leaving the field.",
+      "Merging dives adjusts later dive numbers even when some dives are unnumbered.",
+      "Logbook: renumber a dive and all later dives starting with the number you choose.",
+      "Desktop: the logbook selector shows the logbook name without a redundant label.",
       "Shared map: panning and scrolling are smoother when many sites are displayed.",
       "Shared map: the list follows the visible area, including sites grouped on the map.",
+      "Shared map: a message explains when sites are unavailable offline.",
+      "Shared map: added sites from OpenDiving Commons.",
+      "Sites: changes received by sync appear without reopening the app.",
+      "Desktop: the shared map loads when the world view crosses the date line.",
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
+      "Sites: names appear when zooming in on either map; on tablets, the embedded map can be panned and zoomed and clears the system navigation area.",
+      "Shared map: the mode buttons are easier to tap.",
+      "Sites: nearby sites are grouped on phones and tablets; the shared map is available on desktop.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
       "Desktop: the account menu no longer shows a plus sign on the initial.",
+      "Android tablets: the Account icon in the navigation rail is larger.",
+      "Desktop logbook: rename the displayed logbook from the Logbook menu without changing its file.",
+      "Tablet logbook: the dive list is slightly wider in landscape.",
+      "Equipment: an annual service reminder, including valve service, is suggested for drysuits.",
+      "Equipment: the suggested regulator service interval is now one year or 100 dives.",
+      "Logbook: a dive's site and other edited details now appear in the list after saving.",
+      "Desktop dive details: the editing hint no longer appears under buddies and guides.",
+      "Desktop dive details: the water type menu opens with one click.",
       "Deleting dives automatically shifts the numbers of later dives.",
       "Fixed a dive detail error at startup when a cloud logbook is open.",
       "Logbook on tablets: when dives are checked, detail actions move to the top ⋮ menu, which can delete the selection.",
       "Restore: a dive takes the missing number at its position; if none is available, later dives are shifted.",
-      "Information: the date of birth, relationship and phone fields are narrower.",
+      "Information: the date of birth, relationship, phone and blood group fields are narrower.",
+      "Profile: the back arrow no longer appears on tablets and desktop.",
+      "Information: a back arrow closes editing without saving.",
       "Profile and equipment: the Maintenance entry appears when an active piece has a maintenance reminder.",
       "Equipment: a piece's menu offers permanent deletion after confirmation.",
       "Equipment: the type of piece field no longer appears when creating an Other piece.",
@@ -4599,6 +4630,13 @@
   },
   "desktopLogbooks": {
     "mainName": "This computer's logbook",
+    "rename": {
+      "action": "Rename…",
+      "title": "Rename logbook",
+      "name": "Logbook name",
+      "save": "Rename",
+      "failed": "The logbook could not be renamed."
+    },
     "selector": {
       "label": "Logbook",
       "change": "Switch logbook",
@@ -6328,7 +6366,7 @@
     "reminderCard": {
       "title": "Maintenance reminders",
       "suggestCylinder": "Suggested: inspection every year, hydrostatic test every 5 years",
-      "suggestDrysuit": "Suggested for a drysuit: the seals, every year",
+      "suggestDrysuit": "Suggested for a drysuit: annual service, including the valves",
       "suggest": {
         "computer": "Suggested for a computer: {rule}",
         "regulator": "Suggested for a regulator: {rule}",
@@ -6640,6 +6678,7 @@
     }
   },
   "sharedSites": {
+    "mapCredits": "Sites: © OpenDiving Commons, Wikidata, NOAA, FWC",
     "commonMap": "shared map",
     "show": "Show",
     "mine": "My sites",
@@ -6657,7 +6696,8 @@
     },
     "fewDives": "Fewer than 5 dives",
     "inYourSites": "In your sites",
-    "offline": "Offline: the shared map comes back with the network.",
+    "offlineTitle": "Shared map unavailable",
+    "offline": "Connect to the internet to see sites on the shared map.",
     "failed": "The shared map does not answer. Try again later.",
     "retry": "Try again",
     "offerText": "The shared map of dive sites is part of Benthic+.",
@@ -6673,7 +6713,7 @@
       "encryptedTitle": "Your data is encrypted",
       "encryptedText": "Profile, health and documents are kept encrypted on the Benthic server.",
       "sharedTitle": "The shared map of sites",
-      "sharedText": "The sites in your logbook feed Benthic’s shared base of dive sites: name, position, country, water type and depth. Never your notes, never your name.",
+      "sharedText": "The sites in your logbook feed the shared base. Their names and positions are published as open data. Never your notes, never your name.",
       "readAll": "Read the full terms",
       "fullTitle": "Terms of use",
       "accept": "I accept the terms",
@@ -6688,7 +6728,8 @@
       "usualDepth": "Depth most often logged",
       "depthRange": "{from} to {to}",
       "recentDives": "Dives in the last 12 months",
-      "note": "Sites contributed by Benthic+ divers. No diver’s name is shown.",
+      "note": "Sites contributed by Benthic+ divers and OpenDiving Commons. No diver’s name is shown.",
+      "commonsCredits": "Data: © OpenDiving Commons and OpenStreetMap contributors; Wikidata; NOAA Florida Keys and Thunder Bay; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). ODbL 1.0.",
       "add": "Add to my sites",
       "inYourSites": "In your sites",
       "report": "Report",

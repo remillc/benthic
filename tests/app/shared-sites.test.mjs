@@ -64,7 +64,7 @@ test('reading: box, nearby, card with « Ce que disent les carnets », redirect 
     }),
     'GET /v1/sites/base/nearby': ok({ sites: [{ id: '5', name: 'Goat Island', lat: -36.27, lon: 174.8, dives: null, fewDives: true, distanceM: 98000 }] }),
     'GET /v1/sites/base/41': ok({
-      id: '123', redirectedFrom: '41', name: 'Poor Knights', lat: -35.46, lon: 174.74, country: 'NZ', region: '', waterType: 'salt', closed: true, dives: 214, fewDives: false,
+      id: '123', redirectedFrom: '41', name: 'Poor Knights', lat: -35.46, lon: 174.74, country: 'NZ', region: '', waterType: 'salt', closed: true, dives: 214, fewDives: false, commonsSources: ['openstreetmap'],
       carnets: { waterType: 'salt', depthMm: 30000, depthRangeMm: [18000, 30000], divesLast12Months: null, fewDivesLast12Months: true },
     }),
   });
@@ -82,6 +82,7 @@ test('reading: box, nearby, card with « Ce que disent les carnets », redirect 
   const card = await api.card('t', '41');
   assert.equal(card.redirectedFrom, '41');
   assert.equal(card.closed, true);
+  assert.deepEqual(card.commonsSources, ['openstreetmap']);
   assert.deepEqual(card.carnets?.depthRangeMm, [18000, 30000]);
   assert.equal(card.carnets?.fewDivesLast12Months, true);
   assert.deepEqual(diveCountOf(card), { key: 'count', n: 214 });
@@ -110,6 +111,23 @@ test('area list stops when the map moves and rejects invalid pagination', async 
   const { transport } = fakeTransport({ 'GET /v1/sites/base/list': ok({ sites: [], next: '1' }) });
   const api = createSharedSitesApi({ baseUrl: 'https://api.test', transport });
   await assert.rejects(api.inBoxPage('t', { bbox: [0, 0, 1, 1] }), (e) => e.code === 'UNREACHABLE');
+});
+
+test('map requests wrap world and antimeridian views before reaching the server', async () => {
+  const { calls, transport } = fakeTransport({
+    'GET /v1/sites/base': ok({ mode: 'clusters', total: 0, sites: [], clusters: [] }),
+    'GET /v1/sites/base/nearby': ok({ sites: [] }),
+  });
+  const api = createSharedSitesApi({ baseUrl: 'https://api.test', transport });
+  await api.inBox('t', { bbox: [-220, -80, 220, 80], zoom: 2 });
+  await api.inBox('t', { bbox: [170, -10, 190, 10], zoom: 5 });
+  await api.nearby('t', { lat: 0, lon: 190, radiusM: 50000 });
+  await api.nearby('t', { lat: 0, lon: -190, radiusM: 50000 });
+  const queries = calls.map((call) => new URL(call.url).searchParams);
+  assert.equal(queries[0].get('bbox'), '-180,-80,180,80');
+  assert.equal(queries[1].get('bbox'), '170,-10,-170,10');
+  assert.equal(queries[2].get('lon'), '-170.000000');
+  assert.equal(queries[3].get('lon'), '170.000000');
 });
 
 test('link and report send what the contract says', async () => {

@@ -101,6 +101,16 @@ start_daemon
 run h2 back open "$URL/empty.git" someone "$TOKEN" main
 check "back online: the edit is sent" "[ \"\$(git -C '$W/srv/empty.git' rev-list --count main)\" = 3 ]"
 
+# Site-only edits must be written, sent, and read by another device.
+git init -q --bare -b main "$W/srv/sites.git"
+run hs1 screate create "$URL/sites.git" someone "$TOKEN" main
+run hs1 site-create hist "$URL/sites.git" someone "$TOKEN" main site-create
+run hs2 site-before hist "$URL/sites.git" someone "$TOKEN" main sites
+check "sites: the second device reads the original site" "grep -q '\"name\":\"Initial site\"' '$W/out/site-before'"
+run hs1 site-edit hist "$URL/sites.git" someone "$TOKEN" main site-edit
+run hs2 site-after hist "$URL/sites.git" someone "$TOKEN" main sites
+check "sites: name, coordinates and country reach the second device" "grep -q '\"name\":\"Updated site\"' '$W/out/site-after' && grep -q '\"latUdeg\":23965000' '$W/out/site-after' && grep -q '\"lonUdeg\":-74555000' '$W/out/site-after' && grep -q '\"country\":\"Bahamas\"' '$W/out/site-after'"
+
 # 8. History and restore (task 290): three syncs with changes, the middle version restored, the newest restored back,
 # a deleted dive restored, a version opened read only. Nothing is ever rewritten on the server.
 git init -q --bare -b main "$W/srv/hist.git"

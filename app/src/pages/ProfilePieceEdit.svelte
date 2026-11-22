@@ -166,7 +166,7 @@
           ? t(`maintenance.reminderCard.suggest.${type}`, { rule: ruleText(suggestedRule).replace(/^./, (c) => c.toLocaleLowerCase()) })
           : t('maintenance.reminderCard.noSuggestion'),
   );
-  const showReminderCard = $derived(!id && !!type && !computer);
+  const showReminderCard = $derived(!id && (type === 'regulator' || type === 'cylinder'));
   /** @param {string} key @param {string} value */
   const setDetail = (key, value) => {
     if (key === 'suitType' && details[key] !== value) reminder = null;
@@ -257,7 +257,7 @@
           details: kept,
           photoId: nextPhoto || undefined,
         });
-        if (!id && reminder && !computer) {
+        if (!id && reminder && (type === 'regulator' || type === 'cylinder')) {
           // The first reminder is the one the diver set; the type's other suggestions (a cylinder's hydrostatic test) follow with their usual rule.
           const [first, ...rest] = suggestions;
           await inv.saveMaintenance({ gearId: g.id, task: reminder.task, intervalMonths: reminder.months, intervalDives: reminder.dives, notifyDays: ownLeadDays(reminder.notifyDays, settings.maintenanceLeadDays), warnInDive: reminder.warnInDive });
@@ -279,7 +279,7 @@
       });
       showSnackbar(t('gear.pieceEdit.saved'));
       f7router.back();
-      if (!id && reminder && !computer && saved) afterReminderSaved();
+      if (!id && reminder && (type === 'regulator' || type === 'cylinder') && saved) afterReminderSaved();
     } catch (e) {
       showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
     } finally {
@@ -602,10 +602,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-piece-edit--save:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-piece-edit--title {
@@ -887,10 +886,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-piece-edit--reminder-button:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-piece-edit--retire {
@@ -909,10 +907,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .bc-piece-edit--retire:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-piece-edit--bottom {

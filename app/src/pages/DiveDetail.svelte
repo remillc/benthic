@@ -33,6 +33,7 @@
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
+  import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import QrShare from '../components/QrShare.svelte';
   import { qrSummary } from '../lib/qr-send.js';
@@ -462,6 +463,7 @@
 
   /** "Renuméroter la plongée" open. */
   let renumbering = $state(false);
+  let renumberingFrom = $state(false);
 
   /** "Partager" open: the sheet, then the system's share sheet. */
   // The map behind the header: the top bar is see-through over it,
@@ -540,6 +542,7 @@
       items: [
         odplusSubscriber() ? t('detail.moreItemValidate') : '',
         t('detail.moreItemRenumber'),
+        t('renumberFrom.title'),
         removableFromTrip ? t('detail.moreItemTrip') : '',
         t('detail.moreItemDelete'),
       ]
@@ -911,6 +914,14 @@
           renumbering = true;
         }}
       />
+      <MenuItem
+        icon="renumber"
+        text={t('renumberFrom.title')}
+        onclick={() => {
+          f7.popover.close(`#${menuId}`);
+          renumberingFrom = true;
+        }}
+      />
       {#if removableFromTrip}
         <MenuItem icon="tripRemove" text={t('detail.removeFromTrip')} onclick={removeFromTrip} />
       {/if}
@@ -1243,6 +1254,9 @@
     }}
   />
 {/if}
+{#if renumberingFrom && dive}
+  <RenumberFromDialog id={dive.id} oncancel={() => (renumberingFrom = false)} ondone={() => { renumberingFrom = false; loadDive(); }} />
+{/if}
 
 <style>
   @layer od.components {
@@ -1320,9 +1334,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-dive-detail--desk-action:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-dive-detail--desk-card {
       margin: 8px 24px 0;
@@ -1346,16 +1360,16 @@
       flex-wrap: wrap;
       gap: 12px 28px;
       margin: 16px 24px 0;
-    }
-    .bc-dive-detail--desk-figures dt {
-      font-size: 13px;
-      color: var(--bc-text-2);
-    }
-    .bc-dive-detail--desk-figures dd {
-      margin: 2px 0 0;
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--bc-text);
+      & dt {
+        font-size: 13px;
+        color: var(--bc-text-2);
+      }
+      & dd {
+        margin: 2px 0 0;
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--bc-text);
+      }
     }
     .bc-dive-detail--desk-tabs {
       display: flex;
@@ -1511,10 +1525,9 @@
       align-items: center;
       gap: 12px;
       border-top: 1px solid var(--bc-separator);
-    }
-
-    .bc-dive-validations--item:first-child {
-      border-top: none;
+      &:first-child {
+        border-top: none;
+      }
     }
 
     .bc-dive-validations--text {
@@ -1676,10 +1689,9 @@
           transform: rotate(180deg);
         }
       }
-    }
-
-    .bc-dive-detail--disclosure + .bc-dive-detail--row {
-      border-top: 1px solid var(--bc-separator);
+      & + .bc-dive-detail--row {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
 
     /* Tags and people: 32 px chips on the tint. */
@@ -1748,9 +1760,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-dive-detail--disclosure {
         transition: box-shadow 120ms linear;
-      }
-      .bc-dive-detail--disclosure:not(:disabled):hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:not(:disabled):hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {

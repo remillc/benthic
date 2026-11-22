@@ -97,14 +97,19 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
   assert.notEqual(copied.adhoc[0].id, 'x');
 });
 
+test('the new-piece reminder field appears only for regulators and cylinders', () => {
+  const source = readFileSync(new URL('../../app/src/pages/ProfilePieceEdit.svelte', import.meta.url), 'utf8');
+  assert.match(source, /const showReminderCard = \$derived\(!id && \(type === 'regulator' \|\| type === 'cylinder'\)\)/);
+  assert.match(source, /\(type === 'regulator' \|\| type === 'cylinder'\)/);
+});
+
 test('suggestions per type, and the rule fields are validated', () => {
-  // Decided 19 November 2026 (task 309, docs/equipment-fields.md): the suggested service of a regulator is every 2
-  // years or 100 dives (18 November had said yearly); a vest every year (it was every 2 years).
-  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 24, dives: 100 });
+  assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12, dives: 100 });
   assert.deepEqual(suggestionsFor('bcd')[0], { task: 'service', months: 12 });
-  // Only a drysuit has seals to change.
-  assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'seals', months: 12 }]);
+  // Only a drysuit has a suggested annual service.
+  assert.deepEqual(suggestionsFor('suit', { suitType: 'dry' }), [{ task: 'service', months: 12 }]);
   assert.deepEqual(suggestionsFor('suit', { suitType: 'wet' }), []);
+  assert.deepEqual(suggestionsFor('suit', { suitType: 'semi' }), []);
   assert.deepEqual(suggestionsFor('suit', {}), []);
   // Task 2026-11-19-308: « Contrôle avant voyage » is gone (an inspection noted by hand), and a computer has no reminder.
   assert.equal(suggestionsFor('regulator').length, 1);
@@ -115,6 +120,17 @@ test('suggestions per type, and the rule fields are validated', () => {
   assert.deepEqual(ruleProblems({ months: 24, dives: null }), {});
   assert.deepEqual(ruleProblems({ months: 0, dives: 5000 }), { months: 'range' });
   assert.deepEqual(ruleProblems({ months: 2.5, dives: 0 }), { months: 'range', dives: 'range' });
+});
+
+test('a drysuit service reminder preserves an existing seals history', async () => {
+  const { inventory } = setup();
+  const suit = await inventory.saveGear({ type: 'suit', name: 'Dry suit', details: { suitType: 'dry' } });
+  const seals = await inventory.saveMaintenance({ gearId: suit.id, task: 'seals', intervalMonths: 12, intervalDives: null });
+  const service = await inventory.saveMaintenance({ gearId: suit.id, task: 'service', intervalMonths: 12, intervalDives: null });
+  await inventory.noteMaintenance({ id: service.id, gearId: suit.id, task: 'service' }, { kind: 'service', doneOn: '2026-11-17' });
+  const reminders = await inventory.listMaintenance();
+  assert.equal(reminders.find((item) => item.id === service.id).history.length, 1);
+  assert.equal(reminders.find((item) => item.id === seals.id).history.length, 0);
 });
 
 test('months are added to the day, clamped at the end of the month', () => {

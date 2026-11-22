@@ -119,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)undo:(BOOL)redo error:(NSError **)error NS_SWIFT_NAME(undo(redo:));
 + (nullable NSString *)syncWithError:(NSError **)error NS_SWIFT_NAME(sync());
 + (BOOL)saveLocalWithError:(NSError **)error NS_SWIFT_NAME(saveLocal());
-+ (NSString *)listLoadedDives;
++ (NSString *)listLoadedDives:(BOOL)includeInvalid NS_SWIFT_NAME(listLoadedDives(includeInvalid:));
 + (NSString *)siteQuery:(NSString *)kind
 		   uuid:(int64_t)uuid
 		    lat:(NSInteger)lat

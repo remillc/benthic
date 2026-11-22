@@ -78,6 +78,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
 const { StringDecoder } = require('node:string_decoder');
+const { isBrokenPipe, safeWrite } = require('./process-errors.cjs');
 const logbooks = require('./logbooks.cjs');
 
 /** The NativeCore functions the renderer may call (host.cpp), without the ones the bridge runs itself. */
@@ -226,7 +227,7 @@ class HostProcess {
     child.on('error', (e) => gone(`Cannot run the core: ${e.message}`));
     child.on('exit', (code, signal) => gone(`The core stopped (${signal || code})`));
     child.stdin.on('error', () => {}); // a closed pipe is reported by 'exit'
-    forwardCoreStderr(child.stderr, (text) => process.stderr.write(text));
+    forwardCoreStderr(child.stderr, (text) => safeWrite(process.stderr, text));
     readline.createInterface({ input: child.stdout, crlfDelay: Infinity }).on('line', (line) => this.line(line));
     this.ready = Promise.resolve()
       .then(() => this.onStart?.((method, args) => this.send(method, args)))
@@ -266,8 +267,24 @@ class HostProcess {
         return;
       }
       const id = this.nextId++;
-      this.pending.set(id, { resolve, reject });
-      child.stdin.write(`${JSON.stringify({ id, method, args: args ?? {} })}\n`);
+      const waiting = {
+        resolve,
+        reject: (error) => {
+          if (!isBrokenPipe(error)) reject(error);
+          else reject(new Error('The core is not running'));
+        },
+      };
+      this.pending.set(id, waiting);
+      try {
+        child.stdin.write(`${JSON.stringify({ id, method, args: args ?? {} })}\n`, (error) => {
+          if (!error) return;
+          this.pending.delete(id);
+          waiting.reject(error);
+        });
+      } catch (error) {
+        this.pending.delete(id);
+        waiting.reject(error);
+      }
     });
   }
 
@@ -427,6 +444,14 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   function descriptorOf(/** @type {number} */ key) {
     const ctx = contexts.get(key);
     return ctx ? ctx.descriptor : null;
+  }
+
+  /** Update the display name without stopping the logbook's helper. */
+  function setDescriptorName(/** @type {number} */ key, /** @type {string} */ name) {
+    const ctx = contexts.get(key);
+    if (!ctx?.descriptor) throw new Error('NO_LOGBOOK');
+    ctx.descriptor = { ...ctx.descriptor, name };
+    return ctx.descriptor;
   }
 
   // --- A file logbook: the core works on a git copy, the .ssrf file is kept up to date ---
@@ -1119,6 +1144,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     detach,
     setDescriptor,
     descriptorOf,
+    setDescriptorName,
     /** The core call of a window, as the renderer's, without the path checks (the main process asks). */
     callFor: (key, method, args) => coreCall(method, args ?? {}, contexts.get(key) || contextFor()),
     saveCopy: (key, target) => saveCopy(contexts.get(key) || contextFor(), target),

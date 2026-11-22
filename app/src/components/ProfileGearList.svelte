@@ -265,9 +265,9 @@
       font: inherit;
       font-size: 14px;
       cursor: pointer;
-    }
-    .bc-gear-list--chip span {
-      color: var(--bc-text-2);
+      & span {
+        color: var(--bc-text-2);
+      }
     }
     .bc-gear-list--row {
       width: 100%;
@@ -283,9 +283,9 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-    .bc-gear-list--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-gear-list--on,
     .bc-gear-list--on:hover {

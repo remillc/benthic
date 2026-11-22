@@ -50,11 +50,11 @@
       display: flex;
       height: 40px;
       border-radius: 20px;
-    }
-    .bc-desktop-segments--block .bc-desktop-segments--segment {
-      flex: 1;
-      justify-content: center;
-      padding: 0 12px;
+      & .bc-desktop-segments--segment {
+        flex: 1;
+        justify-content: center;
+        padding: 0 12px;
+      }
     }
     .bc-desktop-segments--segment {
       display: flex;
@@ -68,12 +68,12 @@
       white-space: nowrap;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-segments--segment + .bc-desktop-segments--segment {
-      border-left: 1px solid var(--bc-text-2);
-    }
-    .bc-desktop-segments--segment:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      & + .bc-desktop-segments--segment {
+        border-left: 1px solid var(--bc-text-2);
+      }
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-segments--selected,
     .bc-desktop-segments--selected:hover {

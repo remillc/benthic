@@ -192,13 +192,13 @@
       color: var(--bc-text);
       cursor: pointer;
       white-space: nowrap;
-    }
-    .bc-desktop-best-mix--prepare:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
-    }
-    .bc-desktop-best-mix--prepare:disabled {
-      opacity: 0.4;
-      cursor: default;
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
+      &:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
     }
     .bc-desktop-best-mix--cards {
       display: grid;

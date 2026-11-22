@@ -272,19 +272,17 @@
         height: auto;
         min-height: calc(140px - 24px + var(--bc-welcome-band-top));
         background: var(--bc-first-step-band);
-      }
-
-      .bc-welcome-release--compact .bc-welcome-release--panel-light {
-        display: none;
-      }
-
-      .bc-welcome-release--compact .bc-welcome-release--panel-profile {
-        display: block;
-        position: absolute;
-        left: 0;
-        bottom: 2px;
-        width: 100%;
-        height: 34px;
+        & .bc-welcome-release--panel-light {
+          display: none;
+        }
+        & .bc-welcome-release--panel-profile {
+          display: block;
+          position: absolute;
+          left: 0;
+          bottom: 2px;
+          width: 100%;
+          height: 34px;
+        }
       }
 
       .bc-welcome-release--panel-profile-area {

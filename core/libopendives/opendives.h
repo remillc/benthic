@@ -806,8 +806,8 @@ int pending_changes(std::string &json);
 int history_call(const std::string &action, const std::vector<std::string> &args, std::string &json, std::string &error);
 
 // The dives of the log in memory, as list_dives() returns them, without
-// loading anything.
-int list_loaded_dives(std::string &json);
+// loading anything. include_invalid includes hidden invalid dives, but not plans.
+int list_loaded_dives(std::string &json, bool include_invalid = false);
 
 // Cloud write lock (plan, section 4). Writing to a cloud log is refused
 // unless the account email equals `email` (the test account), or writes

@@ -94,10 +94,9 @@
       gap: 8px;
       border: 2px dashed var(--bc-gas-card-add-outline);
       color: var(--bc-text-2);
-    }
-
-    .bc-desktop-gas-cards--add:hover {
-      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      }
     }
 
     .bc-desktop-gas-cards--add-title {

@@ -150,6 +150,16 @@ describe('benthic-host', { skip }, () => {
     firstId = dives[0].id;
   });
 
+  test('listLoadedDives can include an invalid dive hidden by preferences', async () => {
+    await host.call('setPrefs', { changes: JSON.stringify({ displayInvalidDives: false }) });
+    await host.call('editDive', { id: firstId, changes: JSON.stringify({ invalid: true }) });
+    const visible = JSON.parse(await host.call('listLoadedDives'));
+    const all = JSON.parse(await host.call('listLoadedDives', { includeInvalid: true }));
+    assert.equal(visible.some((d) => d.id === firstId), false);
+    assert.equal(all.some((d) => d.id === firstId), true);
+    await host.call('undo', { redo: false });
+  });
+
   test('getDive gives the detail, and an unknown dive is an error', async () => {
     const dive = JSON.parse(await host.call('getDive', { id: firstId }));
     assert.equal(dive.id, firstId);

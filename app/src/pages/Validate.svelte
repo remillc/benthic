@@ -303,10 +303,9 @@
       font: inherit;
       background: var(--bc-surface);
       color: var(--bc-text);
-    }
-
-    .bc-validate--choice:disabled {
-      opacity: 0.5;
+      &:disabled {
+        opacity: 0.5;
+      }
     }
 
     .bc-validate--choice-text {

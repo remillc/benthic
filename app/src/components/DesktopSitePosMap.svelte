@@ -268,20 +268,20 @@
       overflow: hidden;
       background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
-    }
-    .bc-desktop-pos-map--zoom button {
-      display: grid;
-      place-items: center;
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: var(--bc-on-table-selected);
-      cursor: pointer;
-    }
-    .bc-desktop-pos-map--zoom button + button {
-      border-top: 1px solid var(--bc-separator);
+      & button {
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--bc-on-table-selected);
+        cursor: pointer;
+      }
+      & button + button {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
     .bc-desktop-pos-map--credits {
       position: absolute;

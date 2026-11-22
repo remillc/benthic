@@ -57,7 +57,7 @@ internal object NativeCore {
     /** Receives the messages of the cloud log's git work (opendives.h, set_sync_progress); null stops them. */
     external fun setSyncListener(listener: DownloadListener?)
     external fun saveLocal()
-    external fun listLoadedDives(): String
+    external fun listLoadedDives(includeInvalid: Boolean): String
     external fun setCloudTestEmail(email: String)
     external fun cloudDeleteAccount(password: String, keepDivesIn: String): String
     external fun cloudCreateAccount(email: String, password: String): String

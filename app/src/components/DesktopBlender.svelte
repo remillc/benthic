@@ -371,17 +371,17 @@
       margin: 0;
       padding: 0;
       list-style: none;
-    }
-    .bc-desktop-blender--steps li {
-      display: grid;
-      grid-template-columns: 36px minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-top: 1px solid var(--bc-separator);
-    }
-    .bc-desktop-blender--steps li:first-child {
-      border-top: 0;
+      & li {
+        display: grid;
+        grid-template-columns: 36px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid var(--bc-separator);
+      }
+      & li:first-child {
+        border-top: 0;
+      }
     }
     .bc-desktop-blender--number {
       display: grid;

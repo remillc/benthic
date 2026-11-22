@@ -40,9 +40,9 @@
       font: inherit;
       text-align: left;
       cursor: pointer;
-    }
-    .bc-dev-tools-row:active {
-      background: var(--bc-dev-tint);
+      &:active {
+        background: var(--bc-dev-tint);
+      }
     }
     .bc-dev-tools-row--icon {
       display: inline-flex;

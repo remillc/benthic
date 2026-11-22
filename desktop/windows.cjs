@@ -129,6 +129,7 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
   }
 
   function create(/** @type {any} */ descriptor, /** @type {any} */ from) {
+    if (descriptor) descriptor = store.withSavedName(descriptor);
     const state = windowState ? windowState.load(userData) : { width: 1440, height: 900, maximized: false };
     const primary = firstWindow;
     firstWindow = false;
@@ -214,7 +215,7 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
    * @param {any} descriptor @param {any} [from] the window that asked
    */
   async function open(descriptor, from) {
-    const d = logbooks.cleanDescriptor(descriptor);
+    const d = store.withSavedName(descriptor);
     if (!d) throw new Error('BAD_ARGUMENT: not a logbook');
     const already = windowOf(d.id);
     if (already) {
@@ -469,6 +470,17 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
       case 'close':
         if (win) await closeLogbook(win);
         return true;
+      case 'rename': {
+        if (!win) throw new Error('NO_WINDOW');
+        const key = win.webContents.id;
+        const current = bridge.descriptorOf(key);
+        if (!current) throw new Error('NO_LOGBOOK');
+        const renamed = store.rename(current, options.name);
+        bridge.setDescriptorName(key, renamed.name);
+        win.setTitle(titleOf(renamed));
+        notify();
+        return renamed;
+      }
       case 'clearRecent':
         store.clear();
         notify();

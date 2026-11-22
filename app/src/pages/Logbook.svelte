@@ -31,6 +31,7 @@
   import FlightBanner from '../components/FlightBanner.svelte';
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
+  import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { replaceEligibility, replacementFromFile } from '../lib/replace-logbook.js';
@@ -40,7 +41,7 @@
   import { pickCsvFiles } from '../lib/csv-import.js';
   import { guardedAdd } from '../lib/demo.svelte.js';
   import { logbook, loadLogbook, importFiles, importCsvFile, undoLastChange, reopenConflict, deleteDives, mergeDives, tripChange } from '../lib/logbook.svelte.js';
-  import { canMerge } from '../lib/multi-dive.js';
+  import { canMerge, mergeErrorKey } from '../lib/multi-dive.js';
   import { conflictDiveCount } from '../lib/conflict-choices.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { shownTrip } from '../lib/trip-shown.js';
@@ -358,7 +359,7 @@
     } catch (e) {
       console.error('Merge dives', e);
       const code = String(/** @type {any} */ (e)?.message ?? '');
-      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('multiDive.mergeFailed'));
+      showSnackbar(t(mergeErrorKey(code)));
     }
   }
 
@@ -374,6 +375,7 @@
 
   /** "Renumber the dives" of the menu: Subsurface's Renumber dialog, all the dives. */
   let renumbering = $state(false);
+  let renumberFrom = $state(/** @type {number|null} */ (null));
 
   /**
    * Undo or Redo from the menu, one step each time: the history of this
@@ -1527,6 +1529,9 @@
         <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={!logbook.dives.length ? t('welcomeSteps.menuExportNone') : ''} disabled={logbook.loading || !!logbook.error || !logbook.dives.length} onclick={() => ((exportWhole = true), (exporting = true))} />
       {:else}
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
+        {#if checkedCount === 1}
+          <MenuItem icon="renumber" text={t('renumberFrom.title')} onclick={() => (renumberFrom = checkedIds[0])} />
+        {/if}
       {/if}
       {#if selecting}
         {#if theme.ios}<MenuItem icon="plus" text={t('logbook.menuCreateTrip')} onclick={createTrip} />{/if}
@@ -1622,6 +1627,9 @@
       }}
     />
   {/if}
+  {#if renumberFrom !== null}
+    <RenumberFromDialog id={renumberFrom} oncancel={() => (renumberFrom = null)} ondone={() => { renumberFrom = null; endSelection(); }} />
+  {/if}
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
   <input type="file" multiple class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
@@ -1690,10 +1698,9 @@
       font-size: 15px;
       line-height: 21px;
       color: var(--bc-text-2);
-    }
-
-    .bc-logbook--count .bc-logbook--separator {
-      margin: 0 0.4em;
+      & .bc-logbook--separator {
+        margin: 0 0.4em;
+      }
     }
 
     /* Selection mode: the number of dives checked, beside the total. */

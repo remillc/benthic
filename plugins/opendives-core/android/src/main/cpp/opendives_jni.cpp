@@ -937,10 +937,10 @@ Java_org_opendives_core_NativeCore_sync(JNIEnv *env, jobject)
 }
 
 JNIEXPORT jstring JNICALL
-Java_org_opendives_core_NativeCore_listLoadedDives(JNIEnv *env, jobject)
+Java_org_opendives_core_NativeCore_listLoadedDives(JNIEnv *env, jobject, jboolean includeInvalid)
 {
 	std::string json;
-	opendives::list_loaded_dives(json);
+	opendives::list_loaded_dives(json, includeInvalid);
 	return env->NewStringUTF(json.c_str());
 }
 

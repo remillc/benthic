@@ -565,10 +565,9 @@
         outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
-    }
-
-    .bc-plus--primary:disabled {
-      opacity: 0.6;
+      &:disabled {
+        opacity: 0.6;
+      }
     }
 
     .bc-plus--no-account {

@@ -218,12 +218,12 @@
       margin: 0;
       flex: 1;
       min-width: 0;
-    }
-    .bc-card-photo--figure figcaption {
-      margin-bottom: 4px;
-      color: var(--bc-text-2);
-      font-size: 13px;
-      font-weight: 600;
+      & figcaption {
+        margin-bottom: 4px;
+        color: var(--bc-text-2);
+        font-size: 13px;
+        font-weight: 600;
+      }
     }
     .bc-card-photo--frame {
       position: relative;
@@ -245,12 +245,12 @@
       width: 100%;
       height: 100%;
       touch-action: none;
-    }
-    .bc-card-photo--quad polygon {
-      fill: rgb(255 255 255 / 0.12);
-      stroke: var(--bc-secondary);
-      stroke-width: 3;
-      vector-effect: non-scaling-stroke;
+      & polygon {
+        fill: rgb(255 255 255 / 0.12);
+        stroke: var(--bc-secondary);
+        stroke-width: 3;
+        vector-effect: non-scaling-stroke;
+      }
     }
     .bc-card-photo--corner {
       fill: #FFFFFF;

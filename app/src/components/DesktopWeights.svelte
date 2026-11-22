@@ -167,10 +167,9 @@
       font: inherit;
       font-size: 14px;
       cursor: pointer;
-    }
-
-    .bc-desktop-weights--chip:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
 
     .bc-desktop-weights--amount {
@@ -187,10 +186,9 @@
       color: var(--bc-text-2);
       font: inherit;
       cursor: pointer;
-    }
-
-    .bc-desktop-weights--add:hover {
-      color: var(--bc-text);
+      &:hover {
+        color: var(--bc-text);
+      }
     }
 
     .bc-desktop-weights--spacer {
@@ -201,11 +199,10 @@
       font-size: 13px;
       color: var(--bc-text-2);
       font-variant-numeric: tabular-nums;
-    }
-
-    .bc-desktop-weights--total strong {
-      font-weight: 600;
-      color: var(--bc-text);
+      & strong {
+        font-weight: 600;
+        color: var(--bc-text);
+      }
     }
 
     .bc-desktop-weights--place,

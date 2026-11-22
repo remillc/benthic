@@ -311,9 +311,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-equipment-card--summary {
         transition: box-shadow 120ms linear;
-      }
-      .bc-equipment-card--summary:not(.bc-equipment-card--static):hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:not(.bc-equipment-card--static):hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {

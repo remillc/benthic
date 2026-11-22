@@ -278,16 +278,16 @@
       box-shadow:
         0 2px 6px 2px rgb(0 0 0 / 0.15),
         0 1px 2px rgb(0 0 0 / 0.3);
-    }
-    .bc-site-field--list li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 40px;
-      padding: 4px 12px;
-      font-size: 15px;
-      cursor: pointer;
+      & li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 40px;
+        padding: 4px 12px;
+        font-size: 15px;
+        cursor: pointer;
+      }
     }
     .bc-site-field--list li:hover,
     .bc-site-field--active {

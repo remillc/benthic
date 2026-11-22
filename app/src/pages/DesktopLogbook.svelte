@@ -21,12 +21,13 @@
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
+  import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, importData, undoLastChange, deleteDives, tripChange, mergeDives } from '../lib/logbook.svelte.js';
-  import { canMerge } from '../lib/multi-dive.js';
+  import { canMerge, mergeErrorKey } from '../lib/multi-dive.js';
   import { selectionText, copyDives, clipboardDives, textToBase64 } from '../lib/desktop-clipboard.js';
   import { filter } from '../lib/filter.svelte.js';
   import { navigation, openSettings, openAbout } from '../lib/navigation.svelte.js';
@@ -76,7 +77,7 @@
   loadDesktopChoices();
 
   /** The actions the right-click menu can offer today (the others wait: see the task's notes). */
-  const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'copy', 'export', 'share', 'delete']);
+  const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'renumberFrom', 'copy', 'export', 'share', 'delete']);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
 
   // --- Search: the core's fulltext index, as on the phone (Logbook.svelte). ---------------
@@ -288,6 +289,7 @@
 
   /** @type {{x: number, y: number}|null} */
   let menuAt = $state(null);
+  let renumberFrom = $state(/** @type {number|null} */ (null));
 
   /** @param {MouseEvent} e @param {number} id */
   function rowMenu(e, id) {
@@ -355,7 +357,7 @@
     } catch (e) {
       console.error('Merge dives', e);
       const code = String(/** @type {any} */ (e)?.message ?? '');
-      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('multiDive.mergeFailed'));
+      showSnackbar(t(mergeErrorKey(code)));
     }
   }
 
@@ -461,6 +463,7 @@
     else if (key === 'delete') deleteSelected();
     else if (key === 'editTogether') editingTogether = true;
     else if (key === 'merge') mergeSelected();
+    else if (key === 'renumberFrom' && desk.selection.ids.length === 1) renumberFrom = desk.selection.ids[0];
     else if (key === 'copy') copySelected();
     else if (key === 'export' || key === 'share') exporting = true;
     else if (key === 'addToTrip') choosingTrip = true;
@@ -755,6 +758,7 @@
       !editingTogether &&
       !exporting &&
       !choosingTrip &&
+      !document.querySelector('.bc-renumber-from-dialog.modal-in') &&
       !document.querySelector('.dialog.modal-in, .sheet-modal.modal-in, .popup.modal-in') &&
       !!pageEl?.closest('.page-current, .page-master')
     );
@@ -1139,6 +1143,9 @@
   {#if renumbering}
     <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
   {/if}
+  {#if renumberFrom !== null}
+    <RenumberFromDialog id={renumberFrom} oncancel={() => (renumberFrom = null)} ondone={() => (renumberFrom = null)} />
+  {/if}
   {#if menuAt}
     <DesktopContextMenu x={menuAt.x} y={menuAt.y} heading={menuHeading} entries={menuEntries} onchoose={act} onclose={() => (menuAt = null)} />
   {/if}
@@ -1210,16 +1217,16 @@
       border-radius: 22px;
       background: var(--bc-surface-container);
       color: var(--bc-text-2);
-    }
-    .bc-desktop-logbook--search input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      background: none;
-      font: inherit;
-      font-size: 15px;
-      color: var(--bc-text);
-      outline: none;
+      & input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        font-size: 15px;
+        color: var(--bc-text);
+        outline: none;
+      }
     }
     .bc-desktop-logbook--hint {
       padding: 1px 6px;
@@ -1239,9 +1246,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-logbook--icon-button:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-logbook--columns-anchor {
       position: relative;
@@ -1273,9 +1280,9 @@
       font-size: 15px;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-logbook--column-choice:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-logbook--fixed {
       color: var(--bc-text-2);
@@ -1352,16 +1359,16 @@
       width: 8px;
       cursor: col-resize;
       outline: none;
-    }
-    .bc-desktop-logbook--edge::after {
-      content: '';
-      position: absolute;
-      top: 8px;
-      bottom: 8px;
-      left: 3px;
-      width: 2px;
-      border-radius: 1px;
-      background: transparent;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 8px;
+        bottom: 8px;
+        left: 3px;
+        width: 2px;
+        border-radius: 1px;
+        background: transparent;
+      }
     }
     .bc-desktop-logbook--edge:hover::after,
     .bc-desktop-logbook--edge:focus-visible::after {
@@ -1401,24 +1408,24 @@
     .bc-desktop-logbook--row {
       height: 48px;
       cursor: pointer;
-    }
-    .bc-desktop-logbook--row td {
-      padding: 0 10px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .bc-desktop-logbook--row td:first-child {
-      border-radius: 12px 0 0 12px;
-    }
-    .bc-desktop-logbook--row td:last-child {
-      border-radius: 0 12px 12px 0;
-    }
-    .bc-desktop-logbook--row td[data-col='number'] {
-      font-weight: 600;
-    }
-    .bc-desktop-logbook--row td[data-col='site'] {
-      font-weight: 500;
+      & td {
+        padding: 0 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      & td:first-child {
+        border-radius: 12px 0 0 12px;
+      }
+      & td:last-child {
+        border-radius: 0 12px 12px 0;
+      }
+      & td[data-col='number'] {
+        font-weight: 600;
+      }
+      & td[data-col='site'] {
+        font-weight: 500;
+      }
     }
     .bc-desktop-logbook--time {
       font-size: 12px;
@@ -1507,12 +1514,12 @@
     /* The windowing counts on these heights (ROW_HEIGHT and TRIP_HEIGHT in the script). */
     .bc-desktop-logbook--trip {
       height: 44px;
-    }
-    .bc-desktop-logbook--trip td {
-      padding: 0;
-      background: var(--bc-surface);
-      border-radius: 20px 20px 0 0;
-      box-shadow: 0 2px 0 var(--bc-surface);
+      & td {
+        padding: 0;
+        background: var(--bc-surface);
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 2px 0 var(--bc-surface);
+      }
     }
     .bc-desktop-logbook--trip-selected td {
       background: var(--bc-selected-container);
@@ -1583,12 +1590,12 @@
       width: 9px;
       cursor: col-resize;
       outline: none;
-    }
-    .bc-desktop-logbook--handle::before {
-      content: '';
-      position: absolute;
-      inset: 0 4px;
-      background: var(--bc-separator);
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0 4px;
+        background: var(--bc-separator);
+      }
     }
     .bc-desktop-logbook--grip {
       position: absolute;
@@ -1638,16 +1645,16 @@
       width: 3px;
       background: var(--bc-on-table-selected);
       pointer-events: none;
-    }
-    .bc-desktop-logbook--insert::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -3.5px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--bc-on-table-selected);
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -3.5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--bc-on-table-selected);
+      }
     }
     .bc-desktop-logbook--columns-divider {
       height: 1px;

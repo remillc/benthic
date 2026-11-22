@@ -360,10 +360,9 @@
       padding: 0 20px;
       background: var(--bc-secondary);
       color: var(--bc-on-secondary);
-    }
-
-    .bc-rule-sheet--main:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
   }
 </style>

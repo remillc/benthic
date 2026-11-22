@@ -554,10 +554,10 @@ static void send_sync_progress(const char *message)
 	return ok_or_fail(opendives::save_local(message), message, error);
 }
 
-+ (NSString *)listLoadedDives
++ (NSString *)listLoadedDives:(BOOL)includeInvalid
 {
 	std::string json;
-	opendives::list_loaded_dives(json);
+	opendives::list_loaded_dives(json, includeInvalid);
 	return ns(json);
 }
 

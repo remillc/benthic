@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   // The logbook selector of Windows and Linux (task 2026-11-15-173; docs/mockups/bureau-carnets-selecteur.dc.html):
-  // the Carnet title becomes « Carnet · plongees.ssrf ▾ » on a pill. Its menu lists the recent logbooks (name,
+  // the Carnet title becomes « plongees.ssrf ▾ » on a pill. Its menu lists the recent logbooks (name,
   // source and when, a check on the open one), then Nouveau carnet…, Ouvrir un carnet…, Enregistrer une
   // copie… and Fermer le carnet with their shortcuts. The Mac has no selector: its menu bar does the same.
   import { onMount, tick } from 'svelte';
@@ -22,7 +22,7 @@
   /** « Exporter le carnet… » (task 2026-11-15-189): the Carnet opens its export dialog on the whole logbook. */
   let { onexport = undefined } = $props();
 
-  const current = windowLogbook();
+  const current = $derived(windowLogbook());
   const shortcuts = selectorShortcuts(false);
   let open = $state(false);
   let now = $state(Date.now());
@@ -84,8 +84,7 @@
     title={t('desktopLogbooks.selector.change')}
     onclick={toggle}
   >
-    <span class="bc-logbook-selector--title">{t('desktopLogbooks.selector.label')}</span>
-    {#if current}<span class="bc-logbook-selector--name">{displayName(current, t)}</span>{/if}
+    <span class="bc-logbook-selector--title">{current ? displayName(current, t) : t('desktopLogbooks.selector.label')}</span>
     <Icon name="expand" size={20} />
   </button>
   {#if open}
@@ -111,6 +110,9 @@
         </button>
         <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(openLogbookDialog)}>
           <span class="bc-logbook-selector--label">{t('desktopLogbooks.selector.openLogbook')}</span><kbd>{shortcuts.openLogbook}</kbd>
+        </button>
+        <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(() => (logbooks.renameDialog = true))}>
+          <span class="bc-logbook-selector--label">{t('desktopLogbooks.rename.action')}</span>
         </button>
         <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(saveCopy)}>
           <span class="bc-logbook-selector--label">{t('desktopLogbooks.selector.saveCopy')}</span><kbd>{shortcuts.saveCopy}</kbd>
@@ -152,29 +154,22 @@
       cursor: pointer;
       max-width: 100%;
       min-width: 0;
-    }
-    .bc-logbook-selector--pill:focus-visible {
-      outline: 2px solid var(--bc-action);
-      outline-offset: 2px;
+      &:focus-visible {
+        outline: 2px solid var(--bc-action);
+        outline-offset: 2px;
+      }
     }
     .bc-logbook-selector--title {
-      font-family: var(--bc-title-font);
-      font-size: 22px;
-      line-height: 28px;
-      font-weight: 500;
-    }
-    .bc-logbook-selector--name {
       flex: 0 1 auto;
       min-width: 0;
       max-width: 240px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-size: 16px;
-      color: var(--bc-text-2);
-    }
-    .bc-logbook-selector--name::before {
-      content: '· ';
+      font-family: var(--bc-title-font);
+      font-size: 22px;
+      line-height: 28px;
+      font-weight: 500;
     }
     .bc-logbook-selector--scrim {
       position: fixed;
@@ -269,9 +264,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-logbook-selector--pill {
         transition: box-shadow 120ms linear;
-      }
-      .bc-logbook-selector--pill:not(:disabled):hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:not(:disabled):hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {

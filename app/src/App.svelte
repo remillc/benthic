@@ -500,6 +500,7 @@
   <!-- Desktop: a window with no logbook shows its start screen. The release edition shows « Pour commencer » (task 2026-11-16-228); the new-logbook dialog opens from the selector and the menu bar (task 2026-11-15-173). -->
   {#if desktopApp && noLogbook}{#if isRelease}<DesktopFirstLaunch />{:else}<DesktopLogbookStart />{/if}{/if}
   {#if desktopApp && logbooks.dialog}{#await import('./components/DesktopNewLogbook.svelte') then { default: DesktopNewLogbook }}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/await}{/if}
+  {#if desktopApp && logbooks.renameDialog}{#await import('./components/DesktopRenameLogbook.svelte') then { default: DesktopRenameLogbook }}<DesktopRenameLogbook onclose={() => (logbooks.renameDialog = false)} />{/await}{/if}
   <Views tabs class="safe-areas {layout.rail ? 'bc-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --bc-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />
@@ -526,6 +527,12 @@
       --f7-safe-area-left: 0px;
       margin-left: calc(var(--bc-nav-width) + var(--bc-safe-left));
       width: calc(100% - var(--bc-nav-width) - var(--bc-safe-left));
+    }
+
+    @media (orientation: landscape) {
+      :global(:where(html:not(.bc-desktop-app) .views.bc-tablet #view-logbook)) {
+        --f7-page-master-width: 360px;
+      }
     }
 
     /* Logbook, list and dive side by side (Framework7 master-detail). */

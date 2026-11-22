@@ -61,6 +61,7 @@ function buildMenu(texts, send, logbooks = {}) {
         item(l.newLogbook, 'newLogbook', 'Shift+Cmd+N'),
         { label: l.openLogbook, accelerator: 'Cmd+O', click: () => actions.pickAndOpen?.() },
         { label: l.recentLogbooks, submenu: recentItems },
+        item(texts.desktopLogbooks.rename.action, 'renameLogbook'),
         { type: 'separator' },
         { label: l.closeLogbook, accelerator: 'Cmd+W', click: () => actions.closeLogbook?.() },
         item(l.saveCopy, 'saveCopy', 'Shift+Cmd+S'),

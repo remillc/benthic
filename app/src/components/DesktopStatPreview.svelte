@@ -53,10 +53,9 @@
       width: 56px;
       height: 24px;
       display: block;
-    }
-
-    .bc-desktop-stat-preview svg {
-      display: block;
+      & svg {
+        display: block;
+      }
     }
 
     .bc-desktop-stat-preview--bar {

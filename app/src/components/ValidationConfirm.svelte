@@ -88,10 +88,9 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-    }
-
-    .bc-validation-confirm--card p {
-      margin: 0;
+      & p {
+        margin: 0;
+      }
     }
 
     .bc-validation-confirm--date,
@@ -169,10 +168,9 @@
       border: none;
       background: var(--bc-action);
       color: var(--bc-on-action);
-    }
-
-    .bc-validation-confirm--ok:disabled {
-      opacity: 0.5;
+      &:disabled {
+        opacity: 0.5;
+      }
     }
   }
 

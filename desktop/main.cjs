@@ -21,6 +21,9 @@ const { createCloudService, loadClients } = require('./cloud.cjs');
 const { createNetworkMonitor } = require('./network.cjs');
 const { createNotifier } = require('./notifications.cjs');
 const { createCrashStore } = require('./crash-reports.cjs');
+const { isBrokenPipe, guardProcessPipes, safeWrite } = require('./process-errors.cjs');
+
+guardProcessPipes(process);
 
 const devUrl = process.env.OD_DEV_URL || '';
 const resources = app.isPackaged
@@ -52,13 +55,17 @@ const crashes = createCrashStore({
   osVersion: `${process.platform} ${process.getSystemVersion?.() ?? ''}`.trim(),
   device: `Electron ${process.versions.electron} ${process.arch}`,
 });
+const oldCrash = crashes.pending();
+if (oldCrash && isBrokenPipe(oldCrash)) crashes.clear();
 process.on('uncaughtException', (error) => {
+  if (isBrokenPipe(error)) return;
   crashes.write('Main process', error);
-  console.error('[desktop] Uncaught exception', error);
+  try { safeWrite(process.stderr, `[desktop] Uncaught exception ${error?.stack || error}\n`); } catch {}
 });
 process.on('unhandledRejection', (reason) => {
+  if (isBrokenPipe(reason)) return;
   crashes.write('Main process rejection', reason);
-  console.error('[desktop] Unhandled rejection', reason);
+  try { safeWrite(process.stderr, `[desktop] Unhandled rejection ${reason?.stack || reason}\n`); } catch {}
 });
 app.on('render-process-gone', (_event, _contents, details) => {
   if (details.reason !== 'clean-exit' && details.reason !== 'killed') crashes.write('Window process gone', `${details.reason} (${details.exitCode})`);

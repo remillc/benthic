@@ -106,10 +106,9 @@
     .bc-gear-sheet--main {
       background: var(--bc-secondary);
       color: var(--bc-on-secondary);
-    }
-
-    .bc-gear-sheet--main:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
   }
 </style>

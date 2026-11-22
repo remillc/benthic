@@ -41,6 +41,12 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { setDiveSite } from '../lib/dive-site.js';
   import { t } from '../lib/i18n.js';
+  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
+  import { inYourSites } from '../lib/shared-sites.js';
+  import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
+  import { distanceKm } from '../lib/maps-logic.js';
+  import { openOdPlus } from '../lib/open-offer.svelte.js';
 
   loadSitesChoices();
 
@@ -138,6 +144,49 @@
   });
 
   const selectedSite = $derived(sites.find((s) => s.uuid === sel.selected) ?? null);
+
+  const canCommon = $derived(odplusAccount.signedIn);
+  const common = $derived(canCommon && sharedSites.mode === 'common');
+  let mapView = $state.raw(/** @type {{ center: [number, number], bounds: [number, number, number, number], zoom: number }|null} */ (null));
+  let baseBox = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  let baseClusters = $state.raw(/** @type {{ lat: number, lon: number, count: number }[]} */ ([]));
+  let baseList = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  let baseSelectedId = $state(/** @type {string|null} */ (null));
+  let baseState = $state(/** @type {'idle'|'loading'|'ready'|'offer'|'failed'} */ ('idle'));
+  let baseAsk = 0;
+  const baseSelected = $derived(baseBox.find((s) => s.id === baseSelectedId) ?? null);
+  const baseLayer = $derived(common ? baseBox.map((s) => ({ id: s.id, name: s.name, lat: s.lat, lon: s.lon, mine: inYourSites(s.id, sharedSites.links) })) : []);
+
+  $effect(() => {
+    const view = mapView;
+    const q = query.trim();
+    const enabled = common && connection.online;
+    const ask = ++baseAsk;
+    if (!common) baseSelectedId = null;
+    if (!enabled || !view) return;
+    if (!sharedSites.linksLoaded) void loadLinks();
+    const timer = setTimeout(async () => {
+      baseState = 'loading';
+      const [w, s, e, n] = view.bounds;
+      const radiusM = Math.min(50000, Math.max(1, Math.round(distanceKm(view.center[0], view.center[1], e, n) * 1000)));
+      try {
+        const [box, nearby] = await withSession((api, token) => Promise.all([
+          api.inBox(token, { bbox: [w, s, e, n], zoom: view.zoom }),
+          api.nearby(token, { lat: view.center[1], lon: view.center[0], radiusM, limit: 30, q }),
+        ]));
+        if (ask !== baseAsk) return;
+        baseBox = box.sites;
+        baseClusters = box.clusters;
+        baseList = nearby;
+        baseState = 'ready';
+      } catch (error) {
+        if (ask !== baseAsk) return;
+        console.error('Shared site area', error);
+        baseState = /** @type {any} */ (error)?.code === 'SUBSCRIPTION_REQUIRED' ? 'offer' : 'failed';
+      }
+    }, 350);
+    return () => { clearTimeout(timer); baseAsk++; };
+  });
 
   /** @type {HTMLElement|undefined} */
   let scrollEl = $state();
@@ -258,7 +307,7 @@
         newSite();
         return true;
       case 'edit':
-        if (sel.selected !== null) {
+        if (!common && sel.selected !== null) {
           select({ type: 'edit' });
           tick().then(() => sheet?.focusFirst());
         }
@@ -295,10 +344,11 @@
           searchField?.blur();
         } else if (!typing) {
           if (pane !== 'sites') pane = 'sites';
+          else if (baseSelectedId !== null) baseSelectedId = null;
           else select({ type: 'escape' });
         }
         return;
-      } else if (!typing && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && pane === 'sites' && rows.length) {
+      } else if (!typing && !common && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && pane === 'sites' && rows.length) {
         e.preventDefault();
         const at = rows.findIndex((s) => s.uuid === sel.selected);
         const next = rows[Math.max(0, Math.min(rows.length - 1, at < 0 ? 0 : at + (e.key === 'ArrowDown' ? 1 : -1)))];
@@ -348,7 +398,7 @@
 
   /** « Nouvelle-Zélande · 1 plongée · 60,4 m au plus profond » @param {import('opendives-core').SiteSummary} s */
   function cardLine(s) {
-    return [s.country, t('sites.diveCount', { n: s.dives }), s.maxDepthMm ? t('desktopSites.deepestAt', { depth: formatDepth(s.maxDepthMm, logbook.prefs) }) : ''].filter(Boolean).join(' · ');
+    return [s.country, common ? '' : t('sites.diveCount', { n: s.dives }), s.maxDepthMm ? t('desktopSites.deepestAt', { depth: formatDepth(s.maxDepthMm, logbook.prefs) }) : ''].filter(Boolean).join(' · ');
   }
 </script>
 
@@ -357,7 +407,7 @@
     <header class="bc-desktop-sites--bar">
       <div class="bc-desktop-sites--titles">
         <h1 class="bc-desktop-sites--title">{t('sites.title')}</h1>
-        {#if summary}<p class="bc-desktop-sites--summary bc-value" title={summary} role="status">{summary}</p>{/if}
+        {#if !common && summary}<p class="bc-desktop-sites--summary bc-value" title={summary} role="status">{summary}</p>{/if}
       </div>
       <label class="bc-desktop-sites--search">
         <Icon name="search" size={20} />
@@ -375,23 +425,44 @@
     <div class="bc-desktop-sites--body" bind:this={bodyEl}>
       <div class="bc-desktop-sites--list" style:width="{deskSites.width}px">
         <!-- The bars never scroll: the list below is the only part that does (task 175). -->
-        {#if bars.without}
+        {#if !common && bars.without}
           <div class="bc-desktop-sites--todo" class:bc-desktop-sites--active={pane === 'without'} role="status">
             <svg class="bc-desktop-sites--todo-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10zM10 9l4 4M14 9l-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
             <span class="bc-desktop-sites--todo-text">{t('desktopSites.withoutBar', { n: bars.without.count })}</span>
             <button type="button" class="bc-desktop-sites--link" aria-pressed={pane === 'without'} onclick={showWithout}>{t('desktopSites.findThem')}</button>
           </div>
         {/if}
-        {#if bars.cleanup}
+        {#if !common && bars.cleanup}
           <div class="bc-desktop-sites--todo" class:bc-desktop-sites--active={pane === 'cleanup'} role="status">
             <Icon name="delete" size={18} />
             <span class="bc-desktop-sites--todo-text">{[bars.cleanup.duplicates ? t('sites.duplicatesCount', { n: bars.cleanup.duplicates }) : '', bars.cleanup.unused ? t('sites.unusedCount', { n: bars.cleanup.unused }) : ''].filter(Boolean).join(' · ')}</span>
             <button type="button" class="bc-desktop-sites--link" aria-pressed={pane === 'cleanup'} onclick={showCleanup}>{t('desktopSites.cleanUp')}</button>
           </div>
         {/if}
-        {#if typed}<p class="bc-desktop-sites--search-note">{t('desktopSites.searchNote')}</p>{/if}
+        {#if typed && !common}<p class="bc-desktop-sites--search-note">{t('desktopSites.searchNote')}</p>{/if}
 
-        {#if !loaded}
+        {#if common}
+          {#if !connection.online}
+            <p class="bc-desktop-sites--state" role="status">{t('sharedSites.offline')}</p>
+          {:else if baseState === 'offer'}
+            <div class="bc-desktop-sites--state"><p>{t('sharedSites.offerText')}</p><button type="button" class="bc-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button></div>
+          {:else if baseState === 'failed'}
+            <p class="bc-desktop-sites--state" role="status">{t('sharedSites.failed')}</p>
+          {:else if baseState !== 'ready'}
+            <p class="bc-desktop-sites--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
+          {:else}
+            <div class="bc-desktop-sites--scroll" aria-label={t('sharedSites.listLabel')}>
+              {#each baseList as site (site.id)}
+                <a class="bc-desktop-sites--shared-row" href="/sites/base/{encodeURIComponent(site.id)}">
+                  <span>{site.name}</span>
+                  <span class="bc-desktop-sites--muted">{baseRowText(site, sharedSites.links, logbook.prefs)}</span>
+                </a>
+              {:else}
+                <p class="bc-desktop-sites--state">{t('sites.noMatch')}</p>
+              {/each}
+            </div>
+          {/if}
+        {:else if !loaded}
           <p class="bc-desktop-sites--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
         {:else if !sites.length}
           <div class="bc-desktop-sites--state">
@@ -443,8 +514,14 @@
       <div class="bc-desktop-sites--right">
         <!-- The map stays mounted under the other panes, so that its view is kept. -->
         <div class="bc-desktop-sites--pane" hidden={pane !== 'sites' || sel.mode === 'sheet'}>
-          <DesktopSiteMap sites={sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} onselect={(uuid) => select({ type: 'pin' }, uuid)} onclear={() => select({ type: 'clear' })}>
+          <DesktopSiteMap sites={sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} base={baseLayer} clusters={common ? baseClusters : []} {common} onview={(view) => mapView = view} onbaseselect={(id) => { select({ type: 'clear' }); baseSelectedId = id; }} onselect={(uuid) => { baseSelectedId = null; select({ type: 'pin' }, uuid); }} onclear={() => { baseSelectedId = null; select({ type: 'clear' }); }}>
             {#snippet overlay()}
+              {#if canCommon}
+                <div class="bc-desktop-sites--mode" role="group" aria-label={t('sharedSites.show')}>
+                  <button type="button" aria-pressed={!common} onclick={() => setSitesMode('mine')}>{t('sharedSites.mine')}</button>
+                  <button type="button" aria-pressed={common} onclick={() => setSitesMode('common')}>{t('sharedSites.commonMapButton')}</button>
+                </div>
+              {/if}
               {#if selectedSite}
                 <div class="bc-desktop-sites--card">
                   <div class="bc-desktop-sites--card-text">
@@ -453,6 +530,14 @@
                   </div>
                   <button type="button" class="bc-desktop-sites--outlined" onclick={() => select({ type: 'edit' })}>{t('desktopSites.modify')}</button>
                   <button type="button" class="bc-desktop-sites--filled" onclick={() => showSiteDives(selectedSite?.name ?? '')}>{t('desktopSites.seeDives')}</button>
+                </div>
+              {:else if baseSelected}
+                <div class="bc-desktop-sites--card">
+                  <div class="bc-desktop-sites--card-text">
+                    <h2 class="bc-desktop-sites--card-title">{baseSelected.name}</h2>
+                    <p class="bc-desktop-sites--card-line">{baseCardLine(baseSelected, false)}</p>
+                  </div>
+                  <a class="bc-desktop-sites--filled" href="/sites/base/{encodeURIComponent(baseSelected.id)}">{t('sites.openSiteSheet')}</a>
                 </div>
               {/if}
             {/snippet}
@@ -538,20 +623,20 @@
       border-radius: 22px;
       background: var(--bc-surface-container);
       color: var(--bc-text-2);
-    }
-    .bc-desktop-sites--search:focus-within {
-      border-color: var(--bc-secondary);
-      background: var(--bc-surface);
-    }
-    .bc-desktop-sites--search input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      background: none;
-      font: inherit;
-      font-size: 15px;
-      color: var(--bc-text);
-      outline: none;
+      &:focus-within {
+        border-color: var(--bc-secondary);
+        background: var(--bc-surface);
+      }
+      & input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        font-size: 15px;
+        color: var(--bc-text);
+        outline: none;
+      }
     }
     .bc-desktop-sites--hint {
       padding: 1px 6px;
@@ -571,9 +656,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-sites--icon-button:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-sites--outlined,
     .bc-desktop-sites--filled {
@@ -593,9 +678,9 @@
       border: 1px solid var(--bc-outline);
       background: none;
       color: var(--bc-text);
-    }
-    .bc-desktop-sites--outlined:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-desktop-sites--filled {
       border: 0;
@@ -658,9 +743,9 @@
       font-weight: 600;
       color: var(--bc-on-table-selected);
       cursor: pointer;
-    }
-    .bc-desktop-sites--link:hover {
-      background: color-mix(in srgb, var(--bc-secondary) 10%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-secondary) 10%, transparent);
+      }
     }
     .bc-desktop-sites--search-note {
       flex: none;
@@ -673,6 +758,18 @@
       flex: 1;
       min-height: 0;
       overflow: auto;
+    }
+    .bc-desktop-sites--shared-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--bc-separator);
+      color: var(--bc-text);
+      text-decoration: none;
+    }
+    .bc-desktop-sites--shared-row:hover {
+      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
     }
     .bc-desktop-sites--table {
       width: 100%;
@@ -693,30 +790,30 @@
       font-weight: 500;
       text-align: start;
       color: var(--bc-text-2);
-    }
-    .bc-desktop-sites--head button {
-      width: 100%;
-      height: 100%;
-      padding: 0 12px;
-      border: 0;
-      background: none;
-      font: inherit;
-      color: inherit;
-      text-align: inherit;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .bc-desktop-sites--head button:hover {
-      color: var(--bc-text);
-    }
-    .bc-desktop-sites--head:nth-child(2) {
-      width: 27%;
-    }
-    .bc-desktop-sites--head:nth-child(3) {
-      width: 96px;
-    }
-    .bc-desktop-sites--head:nth-child(4) {
-      width: 124px;
+      & button {
+        width: 100%;
+        height: 100%;
+        padding: 0 12px;
+        border: 0;
+        background: none;
+        font: inherit;
+        color: inherit;
+        text-align: inherit;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      & button:hover {
+        color: var(--bc-text);
+      }
+      &:nth-child(2) {
+        width: 27%;
+      }
+      &:nth-child(3) {
+        width: 96px;
+      }
+      &:nth-child(4) {
+        width: 124px;
+      }
     }
     .bc-desktop-sites--arrow {
       margin-inline-start: 4px;
@@ -729,16 +826,16 @@
       height: 44px;
       border-bottom: 1px solid var(--bc-row-divider);
       cursor: pointer;
-    }
-    .bc-desktop-sites--row td {
-      padding: 0 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 240px;
-    }
-    .bc-desktop-sites--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      & td {
+        padding: 0 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+      }
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      }
     }
     .bc-desktop-sites--selected,
     .bc-desktop-sites--selected:hover {
@@ -769,12 +866,12 @@
       width: 9px;
       cursor: col-resize;
       outline: none;
-    }
-    .bc-desktop-sites--handle::before {
-      content: '';
-      position: absolute;
-      inset: 0 4px;
-      background: var(--bc-separator);
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0 4px;
+        background: var(--bc-separator);
+      }
     }
     .bc-desktop-sites--grip {
       position: absolute;
@@ -802,6 +899,33 @@
     }
     .bc-desktop-sites--pane[hidden] {
       display: none;
+    }
+    .bc-desktop-sites--mode {
+      position: absolute;
+      z-index: 4;
+      top: 16px;
+      left: 16px;
+      display: flex;
+      border-radius: 20px;
+      background: var(--bc-surface);
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+      overflow: hidden;
+    }
+    .bc-desktop-sites--mode button {
+      width: auto;
+      min-height: 40px;
+      padding: 0 16px;
+      border: 0;
+      background: transparent;
+      color: var(--bc-text);
+      font: inherit;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .bc-desktop-sites--mode button[aria-pressed='true'] {
+      background: var(--bc-secondary-container);
+      color: var(--bc-on-secondary-container);
+      font-weight: 600;
     }
     /* The selected site's card at the bottom of the map: white, 16 dp corners. */
     .bc-desktop-sites--card {
