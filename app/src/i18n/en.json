@@ -2791,6 +2791,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Equipment: retiring a piece offers a fourth reason, « Other », beside Sold, Lost and Worn out. It shows in « Retired pieces ».",
       "Equipment: new type « Rebreather », after Cylinder, with the date the O₂ cells were installed and the last service. It gets two reminders, O₂ cells every 12 months and a service every year, counted from those dates.",
       "Equipment, tablet and desktop: « New piece » is done in two steps in a dialog. The first chooses the type in a grid of 19; the second shows « New piece · type » with a back arrow, the cross and the Save button only. The « Type of piece » row and the « Change type » button are gone from these screens.",
       "Tablet: the logbook’s ⋮ menu shows the logbook’s name and offers Rename, Open another logbook, New logbook and Export the logbook, with the number of dives.",
@@ -5903,7 +5904,8 @@
       "reason": {
         "sold": "Sold",
         "lost": "Lost",
-        "worn": "Worn out"
+        "worn": "Worn out",
+        "other": "Other"
       },
       "sheet": "Retire · {reason}",
       "sheetNone": "Retire without a reason",

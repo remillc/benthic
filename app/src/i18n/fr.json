@@ -2791,6 +2791,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Équipement : retirer une pièce propose une quatrième raison, « Autre », à côté de Vendue, Perdue et Hors d’usage. Elle s’affiche dans « Pièces retirées ».",
       "Équipement : nouveau type « Recycleur », après Bouteille, avec la date d’installation des cellules O₂ et la dernière révision. Il reçoit deux rappels, cellules O₂ aux 12 mois et révision chaque année, comptés à partir de ces dates.",
       "Équipement, tablette et ordinateur : « Nouvelle pièce » se fait en deux étapes dans une fenêtre. La première choisit le type dans une grille de 19, la seconde affiche « Nouvelle pièce · type » avec une flèche de retour, la croix et le seul bouton Enregistrer. La ligne « Type de pièce » et le bouton « Changer de type » disparaissent de ces écrans.",
       "Tablette : le menu ⋮ du carnet affiche le nom du carnet et propose Renommer, Ouvrir un autre carnet, Nouveau carnet et Exporter le carnet, avec le nombre de plongées.",
@@ -5906,7 +5907,8 @@
       "reason": {
         "sold": "Vendue",
         "lost": "Perdue",
-        "worn": "Hors d’usage"
+        "worn": "Hors d’usage",
+        "other": "Autre"
       },
       "sheet": "Retirer · {reason}",
       "sheetNone": "Retirer sans raison",
