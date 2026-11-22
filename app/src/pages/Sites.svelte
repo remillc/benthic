@@ -19,6 +19,7 @@
   import MenuItem from '../components/MenuItem.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import { possibleDuplicates, siteChange } from '../lib/sites.svelte.js';
   import { defaultKeeper, sortSitesByName, sortSitesByRecent } from '../lib/site-merge.js';
   import { offerUndo } from '../lib/undo.js';
@@ -510,7 +511,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   $effect(() => {
     logbook.loading;
     logbook.sitesVersion;
-    if (!logbook.loading) load();
+    if (!logbook.loading && startup.ready) load();
   });
 
   /** @param {number} uuid */

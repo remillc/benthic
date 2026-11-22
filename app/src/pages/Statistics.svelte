@@ -20,6 +20,7 @@
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import { filter } from '../lib/filter.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import {
     chronological,
     computeStatistics,
@@ -48,7 +49,7 @@
     const dives = logbook.dives;
     const list = myStatistics.list;
     const ids = filter.ids;
-    if (logbook.loading) return;
+    if (logbook.loading || !startup.ready) return;
     void dives;
     void ids;
     computeStatistics([]).then((r) => (result = r));
@@ -59,7 +60,7 @@
   let sites = $state(/** @type {import('opendives-core').SiteSummary[]} */ ([]));
   $effect(() => {
     logbook.sitesVersion;
-    if (logbook.loading) return;
+    if (logbook.loading || !startup.ready) return;
     cachedSites().then(
       (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
       (/** @type {unknown} */ e) => console.error('Sites', e),
