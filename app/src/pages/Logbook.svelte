@@ -825,13 +825,18 @@
   $effect(() => {
     if (navigation.dive !== null) {
       autoOpening = false;
+      navigation.paneOpening = false;
       return;
     }
+    // A logbook that could not be read: no dive comes, the pane says so.
+    if (logbook.error) navigation.paneOpening = false;
     if (!layout.split || navigation.section !== 'logbook' || logbook.loading || logbook.error || selecting || !listEl) return;
     const first = entries[0];
     const dive = first?.type === 'trip' ? first.dives[0] : first?.dive;
     // The emptied pane (PaneEmpty) is not a screen to keep: the desktop layout leaves it when the window narrows.
     const pane = listEl.closest('.view')?.querySelector('.page-master-detail');
+    // Nothing to open (an empty logbook, a filter with no result): the skeleton of the start leaves the pane.
+    if (!dive) navigation.paneOpening = false;
     if (!dive || autoOpening || (pane && !pane.classList.contains('bc-pane-empty'))) return;
     autoOpening = true;
     f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });

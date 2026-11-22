@@ -69,6 +69,7 @@
     formatTimeOfDay,
   } from '../lib/format.js';
   import DesktopDiveFields from '../components/DesktopDiveFields.svelte';
+  import DiveDetailSkeleton from '../components/DiveDetailSkeleton.svelte';
   import { deviceStore } from '../lib/device-store.js';
   import { readTab, saveTab, stepTab, DETAIL_TABS } from '../lib/detail-tab.js';
   import { hasRecordedValues } from '../lib/desktop-edit.js';
@@ -964,13 +965,7 @@
       <Button fill class="bc-primary-action bc-dive-detail--error-retry" onClick={retry}>{t('detail.retry')}</Button>
     </div>
   {:else if !dive}
-    <div class="skeleton-text" aria-busy="true" aria-label={t('detail.loading')}>
-      <div class="bc-dive-detail--head" aria-hidden="true">
-        <p class="bc-dive-detail--day">––––––––––––––</p>
-        <h1 class="bc-dive-detail--site">––––––––</h1>
-      </div>
-      <div class="skeleton-block bc-dive-detail--skeleton-profile"></div>
-    </div>
+    <DiveDetailSkeleton {desk} />
   {:else}
     {#if desk}
     <!-- The site's map behind the header, 170 dp from the top of the pane (task 2026-11-15-193). -->
@@ -1448,12 +1443,6 @@
       &.bc-dive-detail--not-set {
         color: var(--bc-text-2);
       }
-    }
-
-    .bc-dive-detail--skeleton-profile {
-      height: 180px;
-      margin: 14px 16px 0;
-      border-radius: 16px;
     }
 
     .bc-dive-detail--facts {

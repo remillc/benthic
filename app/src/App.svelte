@@ -91,6 +91,7 @@
   import { settings } from './lib/settings.svelte.js';
   import MapsDialogs from './components/MapsDialogs.svelte';
   import ErrorReportHost from './components/ErrorReportHost.svelte';
+  import DiveDetailSkeleton from './components/DiveDetailSkeleton.svelte';
   import { noteLog } from './lib/error-report.js';
   import { startOfflineMaps } from './lib/offline-maps.svelte.js';
 
@@ -502,7 +503,12 @@
   {#if desktopApp && logbooks.dialog}{#await import('./components/DesktopNewLogbook.svelte') then { default: DesktopNewLogbook }}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/await}{/if}
   {#if desktopApp && logbooks.renameDialog}{#await import('./components/DesktopRenameLogbook.svelte') then { default: DesktopRenameLogbook }}<DesktopRenameLogbook onclose={() => (logbooks.renameDialog = false)} />{/await}{/if}
   <Views tabs class="safe-areas {layout.rail ? 'bc-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --bc-no-dive: '{t('tablet.noDive')}'">
-    <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
+    <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint}>
+      <!-- At start, the pane beside the list shows the skeleton of the detail until its first dive opens (navigation.paneOpening). -->
+      {#if layout.split && navigation.paneOpening && !logbook.welcome && !(desktopApp && noLogbook)}
+        <div class="bc-pane-opening" class:bc-pane-opening--desk={layout.desktop}><DiveDetailSkeleton desk={layout.desktop} /></div>
+      {/if}
+    </View>
     <View id="view-sites" tab url="/sites/" />
     <View
       id="view-statistics"
@@ -595,6 +601,25 @@
       :global(.view-master-detail:not(:has(.page-master-detail)):has(.bc-release-empty)) {
         --f7-page-master-width: 100%;
       }
+    }
+
+    /* At start, the first dive on its way: its skeleton instead of « nothing chosen » (gone once a page shows in the pane). */
+    .bc-pane-opening {
+      position: absolute;
+      inset: 0 0 0 var(--f7-page-master-width);
+      z-index: 1;
+      overflow: hidden;
+      padding-top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height));
+      background: var(--bc-surface);
+      pointer-events: none;
+    }
+    .bc-pane-opening--desk {
+      padding-top: 0;
+      background: var(--bc-background);
+    }
+    :global(.view-master-detail:has(.page-master-detail)) .bc-pane-opening,
+    :global(.view:not(.view-master-detail)) .bc-pane-opening {
+      display: none;
     }
 
     /* Nothing chosen yet. */

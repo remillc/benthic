@@ -3202,7 +3202,8 @@
       "Certifications: the agency menu now lists many more agencies (recreational, technical, freediving and national federations), and the level suggestions cover the whole ladder of the main agencies, from entry level to instructor. A photo or scan slot now shows a progress indicator while the picture is read, and the picture appears at once.",
       "Information (Benthic+): the page is edited in place. The pencil turns the sections into fields, “Save” is in the top bar and Back leaves without saving. An empty value no longer shows any text. On a tablet and the desktop, the sections have a horizontal margin.",
       "Tablet and desktop: the Account button, at the bottom of the sidebar, is larger.",
-      "Dive profile: no curve is on by default any more, the water temperature included; turn on the ones you want, the choice is kept."
+      "Dive profile: no curve is on by default any more, the water temperature included; turn on the ones you want, the choice is kept.",
+      "Tablet and desktop: at start, the right pane shows the shape of the dive while the logbook is read, instead of “Choose a dive to see it here”."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
