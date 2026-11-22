@@ -6528,3 +6528,14 @@ Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and 
 In the Compagnons column of the desktop logbook table, remove the round grey badge (22 px, #ECEAE4) with the buddy's initial in front of the name: the cell shows only the name(s), in the row's text style, cut with an ellipsis when too long. Nothing else changes.
 
 Mock-ups: `bureau-carnet-profil-droite` and the other desktop boards that show the logbook list (28 boards), updated in `docs/mockups/`.
+
+## [ ] 2026-11-22-330 « Faire valider la plongée » on the tablet and the desktop (#152)
+
+Christian approved this on 22 November 2026. Work in `main`. Validation (a signature by an instructor or a buddy) exists on the phone: « Faire valider la plongée » is the first item of the ⋮ menu of the detail's floating bar (`validation-menu-android`). Bring it to the tablet and the desktop, with the same flow behind it (the method choice of `validation-choix-android`, then QR code or signature on this device), shown as a dialog on these screens.
+
+- **Tablet** (portrait and landscape): « Faire valider la plongée » becomes the first item of the ⋮ menu of the detail's floating bar, before « Renuméroter la plongée », with the phone's icon (a seal with a check mark). Mock-ups: `android-tablette-detail-menu-paysage`, `android-tablette-detail-menu-portrait`.
+- **Desktop** (Windows, Linux, macOS): a 44 px icon button in the detail pane's header, between « Planifier depuis cette plongée » and « Partager… », same seal icon, tooltip « Faire valider la plongée… (signature d’un moniteur ou d’un compagnon) », accessible name « Faire valider la plongée ». Mock-ups: `bureau-carnet-profil-droite` and every desktop board showing the detail header (31 boards).
+
+Benthic+ only, as on the phone. Mock-ups updated in `docs/mockups/`.
+
+**Test:** on the tablet the ⋮ of the detail and on the desktop the header button open the validation flow; a validation added there shows in the detail's Validations group.
