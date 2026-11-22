@@ -76,4 +76,5 @@ Next number: 174
 - #162 [code] créer un skeleton pour la page /dives/:id sur tablette et desktop
 - #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158).
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
+- #169 [code] tous les champs de recherche doivent avoir un "x" quand il y a une valeur
 - #173 [code] Devices should synchronize as soon as data is updated.
