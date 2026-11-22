@@ -17,6 +17,7 @@
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { applyZoomCap } from '../lib/offline-tiles.js';
   import { offlineMaps } from '../lib/offline-maps.svelte.js';
+  import { stackPins } from '../lib/desktop-sites.js';
 
   // Loaded when a map is first shown: about 800 KB the start-up does not need.
   /** @type {typeof import('maplibre-gl')} */
@@ -38,9 +39,10 @@
    *   points?: { n: number, latUdeg: number, lonUdeg: number }[],
    *   muted?: boolean,
    *   label?: string,
-   *   names?: 'always'|'fewInFullScreen'|'never'|'atZoom',
+   *   names?: 'always'|'fewInFullScreen'|'never'|'atZoom'|'atZoomOrFewInFullScreen',
    *   namesFromZoom?: number,
    *   hideDiveCounts?: boolean,
+   *   groupSites?: boolean,
    *   selected?: number|null,
    *   onstack?: (uuids: number[], at: { latUdeg: number, lonUdeg: number }) => void,
    *   onmapclick?: () => void,
@@ -71,8 +73,10 @@
    * closerInFullScreen: full screen opens on the same area, slightly closer.
    * names: « fewInFullScreen » (Sites, task 2026-11-14-150): the names show only in full
    *   screen, with 8 pins or fewer in view and no two names overlapping.
-   *   « atZoom » shows site names from namesFromZoom, including shared sites.
+   *   « atZoom » shows site names from namesFromZoom, including shared sites;
+   *   « atZoomOrFewInFullScreen » also keeps the full-screen overlap rule.
    * hideDiveCounts: omit dive counts from pins and the map's accessible name.
+   * groupSites: group nearby personal sites into a marker that opens their list.
    * selected: the site whose pin is selected (1.3×, a halo in the secondary colour, in front).
    * onstack: a tap that touches several pins (within the 48 dp target) gives them all.
    * onmapclick: a tap on the map, not on a pin.
@@ -102,6 +106,7 @@
     names = 'always',
     namesFromZoom = 13,
     hideDiveCounts = false,
+    groupSites = false,
     selected = null,
     onstack,
     onmapclick,
@@ -243,7 +248,7 @@
   let container = $state();
   /** Reactive (not deeply): the pin's effect runs again once it exists. */
   let map = $state.raw(/** @type {import('maplibre-gl').Map|undefined} */ (undefined));
-  /** @type {{ uuid: number, marker: import('maplibre-gl').Marker }[]} */
+  /** @type {{ uuid: number, uuids: number[], marker: import('maplibre-gl').Marker }[]} */
   let markers = [];
   /** @type {import('maplibre-gl').Marker|undefined} */
   let pinMarker;
@@ -264,7 +269,25 @@
     for (const m of markers) m.marker.remove();
     // The most dived on top (drawn last), so that the busy sites stay visible.
     const ordered = [...sites].sort((a, b) => (a.dives ?? 0) - (b.dives ?? 0));
-    markers = ordered.map((site) => {
+    const m = map;
+    const groups = groupSites
+      ? stackPins(ordered.map((site) => ({ uuid: site.uuid, ...m.project(lngLat(site)) })), 16)
+      : ordered.map((site) => ({ uuids: [site.uuid] }));
+    markers = groups.map((group) => {
+      const site = /** @type {typeof sites[number]} */ (ordered.find((s) => s.uuid === group.uuids[0]));
+      if (group.uuids.length > 1) {
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'bc-site-map--personal-cluster';
+        el.textContent = numbers.format(group.uuids.length);
+        el.setAttribute('aria-label', t('sites.stackTitle', { n: group.uuids.length }));
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onstack?.(group.uuids, { latUdeg: site.latUdeg, lonUdeg: site.lonUdeg });
+        });
+        const marker = new maplibregl.Marker({ element: el }).setLngLat(lngLat(site)).addTo(m);
+        return { uuid: site.uuid, uuids: group.uuids, marker };
+      }
       // The pin with the number of dives in its head, and the site's name beside it.
       const name = site.name || t('sites.noName');
       // Muted: a grey pin with a white dot and the name on its left, for the eye only
@@ -309,7 +332,7 @@
       const marker = new maplibregl.Marker({ element: el, anchor: 'bottom', offset: [0, 2] })
         .setLngLat(lngLat(site))
         .addTo(/** @type {import('maplibre-gl').Map} */ (map));
-      return { uuid: site.uuid, marker };
+      return { uuid: site.uuid, uuids: group.uuids, marker };
     });
     dim();
     mark();
@@ -327,7 +350,7 @@
     const near = [];
     for (const m of markers) {
       const box = m.marker.getElement().getBoundingClientRect();
-      if (!box.width) continue;
+      if (!box.width || m.uuids.length > 1) continue;
       // The head's centre: 16 px from the left and the top of the 32 × 42 drawing.
       const dx = box.left + box.width / 2 - e.clientX;
       const dy = box.top + (16 * box.height) / 42 - e.clientY;
@@ -341,8 +364,8 @@
 
   /** The selected pin: larger, with a halo, in front. */
   function mark() {
-    for (const { uuid, marker } of markers) {
-      const on = uuid === selected;
+    for (const { uuids, marker } of markers) {
+      const on = selected !== null && uuids.includes(selected);
       const el = marker.getElement();
       el.classList.toggle('bc-site-map--selected', on);
       el.style.zIndex = on ? '2' : '';
@@ -376,11 +399,12 @@
   function updateNames() {
     if (names === 'always' || !map) return;
     let on = false;
-    if (names === 'atZoom') {
-      on = map.getZoom() >= namesFromZoom;
-    } else if (full && names !== 'never') {
+    if (names === 'atZoom' || names === 'atZoomOrFewInFullScreen') {
+      on = map.getZoom() >= Math.min(namesFromZoom, map.getMaxZoom());
+    }
+    if (!on && full && (names === 'fewInFullScreen' || names === 'atZoomOrFewInFullScreen')) {
       const b = map.getBounds();
-      const inView = markers.filter((m) => b.contains(m.marker.getLngLat()));
+      const inView = markers.filter((m) => m.uuids.length === 1 && b.contains(m.marker.getLngLat()));
       if (inView.length <= 8) {
         // Measured with the names shown.
         root?.classList.add('bc-site-map--names-on');
@@ -471,7 +495,7 @@
 
   /** During a search, the markers that do not match fade to 30 %. */
   function dim() {
-    for (const { uuid, marker } of markers) marker.getElement().classList.toggle('bc-site-map--dim', !!matching && !matching.has(uuid));
+    for (const { uuids, marker } of markers) marker.getElement().classList.toggle('bc-site-map--dim', !!matching && !uuids.some((uuid) => matching.has(uuid)));
   }
 
   $effect(() => {
@@ -549,7 +573,7 @@
     m.on('move', scheduleHeat);
     m.on('zoom', () => {
       zoomLayers();
-      if (names === 'atZoom') updateNames();
+      if (names === 'atZoom' || names === 'atZoomOrFewInFullScreen') updateNames();
     });
     m.on('resize', scheduleHeat);
     // Where the map looks, for the offline hint (Sites).
@@ -557,6 +581,7 @@
       // Offline over a region of less detail (zoom 12), the map does not zoom further.
       applyZoomCap(m);
       readBounds();
+      if (groupSites) drawSites();
       updateNames();
       const b = m.getBounds();
       const c = m.getCenter();
@@ -590,7 +615,10 @@
   $effect(() => {
     offlineMaps.online;
     offlineMaps.regions.map((r) => `${r.status}${r.maxZoom}`);
-    if (map) applyZoomCap(map);
+    if (map) {
+      applyZoomCap(map);
+      updateNames();
+    }
   });
 
   /**
@@ -637,6 +665,7 @@
   $effect(() => {
     sites;
     hideDiveCounts;
+    groupSites;
     if (map?.loaded()) {
       drawSites();
     }
@@ -901,11 +930,35 @@
     }
     :global(.bc-site-map--base-cluster) {
       min-width: 32px;
+      width: auto;
       height: 32px;
+      padding: 0 6px;
       font: inherit;
       font-size: 13px;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
+    }
+    :global(.bc-site-map--personal-cluster) {
+      display: grid;
+      place-items: center;
+      min-width: 32px;
+      width: auto;
+      height: 32px;
+      padding: 0 6px;
+      border: 2px solid var(--bc-surface);
+      border-radius: 16px;
+      background: var(--bc-text);
+      color: var(--bc-surface);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    :global(.bc-site-map--personal-cluster)::after,
+    :global(.bc-site-map--base-cluster)::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
     }
     :global(.bc-site-map--point) {
       box-sizing: border-box;
