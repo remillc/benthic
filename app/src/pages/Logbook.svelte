@@ -1690,10 +1690,9 @@
       font-size: 15px;
       line-height: 21px;
       color: var(--bc-text-2);
-    }
-
-    .bc-logbook--count .bc-logbook--separator {
-      margin: 0 0.4em;
+      & .bc-logbook--separator {
+        margin: 0 0.4em;
+      }
     }
 
     /* Selection mode: the number of dives checked, beside the total. */

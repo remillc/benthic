@@ -82,11 +82,11 @@
       padding: 0 20px;
       display: flex;
       align-items: center;
-    }
-    .bc-maintenance-list--head h1 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 500;
+      & h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 500;
+      }
     }
     .bc-maintenance-list--scroll {
       flex: 1;
@@ -135,9 +135,9 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-    .bc-maintenance-list--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-maintenance-list--on,
     .bc-maintenance-list--on:hover {

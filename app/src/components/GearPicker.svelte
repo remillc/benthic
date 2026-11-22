@@ -87,11 +87,10 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-
-    .bc-gear-picker--row:disabled {
-      opacity: 0.6;
-      cursor: default;
+      &:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
     }
 
     .bc-gear-picker--check {

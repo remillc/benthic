@@ -766,10 +766,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-
-    .bc-dive-profile--enlarge:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
 
     .bc-dive-profile--tick {

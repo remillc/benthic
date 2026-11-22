@@ -64,9 +64,9 @@
       border-radius: 8px;
       background: var(--bc-desktop-field);
       box-shadow: inset 0 -2px 0 transparent;
-    }
-    .bc-desktop-field--box:focus-within {
-      box-shadow: inset 0 -2px 0 var(--bc-text);
+      &:focus-within {
+        box-shadow: inset 0 -2px 0 var(--bc-text);
+      }
     }
     .bc-desktop-field--invalid,
     .bc-desktop-field--invalid:focus-within {

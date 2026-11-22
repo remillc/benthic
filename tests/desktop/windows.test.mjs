@@ -131,6 +131,26 @@ test('recent logbooks: newest first, once each, kept by a new store (a restart),
   assert.deepEqual(new logbooks.LogbookStore(userData).list(), []);
 });
 
+test('renamed display names survive restart and clearing recents without changing other logbooks', () => {
+  const dir = path.join(root, 'rename-store');
+  const store = new logbooks.LogbookStore(dir);
+  const a = logbooks.fileDescriptor(path.join(root, 'rename-a.ssrf'));
+  const b = logbooks.fileDescriptor(path.join(root, 'rename-b.ssrf'));
+  store.remember(a);
+  store.remember(b);
+  store.setLastOpen([a, b]);
+  assert.throws(() => store.rename(a, '  '), /BAD_ARGUMENT/);
+  assert.throws(() => store.rename(a, 'x'.repeat(101)), /BAD_ARGUMENT/);
+  assert.equal(store.rename(a, '  My dives  ').name, 'My dives');
+  const restarted = new logbooks.LogbookStore(dir);
+  assert.equal(restarted.find(a.id).name, 'My dives');
+  assert.equal(restarted.lastOpen().find((entry) => entry.id === a.id).name, 'My dives');
+  assert.equal(restarted.find(b.id).name, b.name);
+  restarted.clear();
+  assert.equal(new logbooks.LogbookStore(dir).withSavedName(logbooks.fileDescriptor(a.location)).name, 'My dives');
+  assert.equal(restarted.withSavedName(b).name, b.name);
+});
+
 /** A fake Electron: windows are objects that remember what was done to them. */
 let nextId = 100;
 function fakeElectron() {
@@ -196,6 +216,31 @@ test('windows: opening a logbook opens a window; the same logbook again only foc
   await wm.openPath(file, main);
   assert.equal(fake.created.length, 2);
   assert.equal(fake.created[1].focused, true);
+});
+
+test('renaming updates the window without changing the file, restarting the helper, or reloading', async () => {
+  const fake = fakeElectron();
+  const wm = manager(fake);
+  const main = wm.openMain();
+  const file = path.join(root, 'rename-window.ssrf');
+  writeFileSync(file, '<divelog>unchanged</divelog>');
+  await wm.openPath(file, main);
+  const win = fake.created[1];
+  const id = win.webContents.id;
+  const before = bridge.descriptorOf(id);
+  const pid = await bridge.callFor(id, 'ping');
+  const renamed = await wm.handle({ sender: win.webContents }, 'rename', { name: 'New name' });
+  assert.deepEqual(renamed, { ...before, name: 'New name' });
+  assert.equal(win.title, 'Benthic Log · New name');
+  assert.equal(win.reloads, undefined);
+  assert.equal(await bridge.callFor(id, 'ping'), pid);
+  assert.equal(readFileSync(file, 'utf8'), '<divelog>unchanged</divelog>');
+  await assert.rejects(wm.handle({ sender: win.webContents }, 'rename', { name: '' }), /BAD_ARGUMENT/);
+  assert.equal(bridge.descriptorOf(id).name, 'New name');
+  await wm.closeLogbook(win);
+  await wm.openPath(file, win);
+  assert.equal(bridge.descriptorOf(id).name, 'New name');
+  assert.equal(win.title, 'Benthic Log · New name');
 });
 
 test('windows: closing a logbook leaves the start screen; opening from it reuses the window', async () => {

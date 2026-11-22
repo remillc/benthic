@@ -181,10 +181,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-kit-page--save:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-kit-page--field {

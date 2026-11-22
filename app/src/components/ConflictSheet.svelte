@@ -652,15 +652,14 @@
       height: 64px;
       box-sizing: content-box;
       padding: var(--f7-safe-area-top, 0px) 4px 0;
-    }
-
-    .bc-conflict-sheet--bar h1 {
-      flex: 1;
-      min-width: 0;
-      margin: 0 0 0 4px;
-      font-size: 22px;
-      line-height: 28px;
-      font-weight: 500;
+      & h1 {
+        flex: 1;
+        min-width: 0;
+        margin: 0 0 0 4px;
+        font-size: 22px;
+        line-height: 28px;
+        font-weight: 500;
+      }
     }
 
     .bc-conflict-sheet--bar-close {

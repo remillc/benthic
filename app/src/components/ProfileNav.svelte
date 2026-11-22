@@ -1,8 +1,7 @@
 <script>
   // @ts-check
-  // The left pane of « Mon profil de plongeur » on a wide screen (tasks 2026-11-18-275 and 277): the way back, the diver
+  // The left pane of « Mon profil de plongeur » on a wide screen (tasks 2026-11-18-275 and 277): the diver
   // (avatar, name, OpenDives+ chip) and the four entries; the chosen one is lit.
-  import { f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { gear, loadInventory, visibleGear, overdueBadge, hasActiveMaintenance } from '../lib/inventory.svelte.js';
@@ -10,7 +9,6 @@
   import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { onMount } from 'svelte';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
-  import { goToSection } from '../lib/navigation.svelte.js';
   import { PROFILE_SECTIONS, showProfilePath, heroOf, readHero } from '../lib/profile-frame.js';
   import { profileWindow } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -45,19 +43,10 @@
     { id: 'certs', icon: 'idCard', tone: 'violet', label: 'gear.profile.certifications' },
     { id: 'info', icon: 'account', tone: 'red', label: 'gear.profile.information' },
   ]);
-
-  /** Leaves the profile: back to the section it was opened over. */
-  function leave() {
-    const router = f7.views.current?.router;
-    // The pages the panes replaced left one entry only, so one Back leaves.
-    if (router && router.history.length > 1) router.back({ force: true });
-    else goToSection('logbook');
-  }
 </script>
 
 <nav class="bc-profile-nav" aria-label={t('gear.profile.title')}>
   <div class="bc-profile-nav--head">
-    {#if !profileWindow}<button type="button" class="bc-profile-nav--back" aria-label={t('gear.piece.back')} onclick={leave}><i class="icon icon-back"></i></button>{/if}
     <h1 class="bc-profile-nav--title">{t('gear.profile.title')}</h1>
   </div>
   <div class="bc-profile-nav--hero">
@@ -107,17 +96,6 @@
       gap: 8px;
       height: 64px;
       padding: 0 12px;
-    }
-    .bc-profile-nav--back {
-      width: 40px;
-      height: 40px;
-      border: 0;
-      border-radius: 20px;
-      background: none;
-      color: var(--bc-text);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
     }
     .bc-profile-nav--title {
       margin: 0;
@@ -190,9 +168,9 @@
       text-align: start;
       font: inherit;
       cursor: pointer;
-    }
-    .bc-profile-nav--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-profile-nav--on,
     .bc-profile-nav--on:hover {

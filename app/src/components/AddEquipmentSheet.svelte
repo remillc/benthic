@@ -246,10 +246,9 @@
     .bc-add-equipment--main {
       background: var(--bc-secondary);
       color: var(--bc-on-secondary);
-    }
-
-    .bc-add-equipment--main:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
   }
 </style>

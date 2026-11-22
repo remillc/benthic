@@ -207,12 +207,11 @@
       overflow: hidden;
       background: #15181b;
       display: flex;
-    }
-
-    .bc-gauge-sheet--thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
     }
 
     .bc-gauge-sheet--fields {
@@ -241,17 +240,16 @@
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-    }
-
-    .bc-gauge-sheet--actions button {
-      height: 40px;
-      padding: 0 24px;
-      border-radius: 20px;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.1px;
-      cursor: pointer;
+      & button {
+        height: 40px;
+        padding: 0 24px;
+        border-radius: 20px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+        cursor: pointer;
+      }
     }
 
     .bc-gauge-sheet--again {

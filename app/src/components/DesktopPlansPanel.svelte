@@ -98,11 +98,11 @@
       align-items: center;
       justify-content: space-between;
       padding: 4px 4px 0 8px;
-    }
-    .bc-plans-panel--head h2 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
+      & h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 500;
+      }
     }
     .bc-plans-panel--close {
       width: 40px;
@@ -127,9 +127,9 @@
       border-radius: 20px;
       overflow: hidden;
       background: var(--bc-surface);
-    }
-    .bc-plans-panel--list li + li {
-      border-top: 1px solid var(--bc-separator);
+      & li + li {
+        border-top: 1px solid var(--bc-separator);
+      }
     }
     .bc-plans-panel--row {
       width: 100%;
@@ -144,9 +144,9 @@
       font: inherit;
       text-align: start;
       cursor: pointer;
-    }
-    .bc-plans-panel--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-plans-panel--open,
     .bc-plans-panel--open:hover {

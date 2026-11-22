@@ -537,20 +537,20 @@
       border-radius: 22px;
       background: var(--bc-surface-container);
       color: var(--bc-text-2);
-    }
-    .bc-desktop-sites--search:focus-within {
-      border-color: var(--bc-secondary);
-      background: var(--bc-surface);
-    }
-    .bc-desktop-sites--search input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      background: none;
-      font: inherit;
-      font-size: 15px;
-      color: var(--bc-text);
-      outline: none;
+      &:focus-within {
+        border-color: var(--bc-secondary);
+        background: var(--bc-surface);
+      }
+      & input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        font-size: 15px;
+        color: var(--bc-text);
+        outline: none;
+      }
     }
     .bc-desktop-sites--hint {
       padding: 1px 6px;
@@ -570,9 +570,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-sites--icon-button:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-desktop-sites--outlined,
     .bc-desktop-sites--filled {
@@ -592,9 +592,9 @@
       border: 1px solid var(--bc-outline);
       background: none;
       color: var(--bc-text);
-    }
-    .bc-desktop-sites--outlined:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-desktop-sites--filled {
       border: 0;
@@ -657,9 +657,9 @@
       font-weight: 600;
       color: var(--bc-on-table-selected);
       cursor: pointer;
-    }
-    .bc-desktop-sites--link:hover {
-      background: color-mix(in srgb, var(--bc-secondary) 10%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-secondary) 10%, transparent);
+      }
     }
     .bc-desktop-sites--search-note {
       flex: none;
@@ -692,30 +692,30 @@
       font-weight: 500;
       text-align: start;
       color: var(--bc-text-2);
-    }
-    .bc-desktop-sites--head button {
-      width: 100%;
-      height: 100%;
-      padding: 0 12px;
-      border: 0;
-      background: none;
-      font: inherit;
-      color: inherit;
-      text-align: inherit;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .bc-desktop-sites--head button:hover {
-      color: var(--bc-text);
-    }
-    .bc-desktop-sites--head:nth-child(2) {
-      width: 27%;
-    }
-    .bc-desktop-sites--head:nth-child(3) {
-      width: 96px;
-    }
-    .bc-desktop-sites--head:nth-child(4) {
-      width: 124px;
+      & button {
+        width: 100%;
+        height: 100%;
+        padding: 0 12px;
+        border: 0;
+        background: none;
+        font: inherit;
+        color: inherit;
+        text-align: inherit;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      & button:hover {
+        color: var(--bc-text);
+      }
+      &:nth-child(2) {
+        width: 27%;
+      }
+      &:nth-child(3) {
+        width: 96px;
+      }
+      &:nth-child(4) {
+        width: 124px;
+      }
     }
     .bc-desktop-sites--arrow {
       margin-inline-start: 4px;
@@ -728,16 +728,16 @@
       height: 44px;
       border-bottom: 1px solid var(--bc-row-divider);
       cursor: pointer;
-    }
-    .bc-desktop-sites--row td {
-      padding: 0 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 240px;
-    }
-    .bc-desktop-sites--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      & td {
+        padding: 0 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+      }
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      }
     }
     .bc-desktop-sites--selected,
     .bc-desktop-sites--selected:hover {
@@ -768,12 +768,12 @@
       width: 9px;
       cursor: col-resize;
       outline: none;
-    }
-    .bc-desktop-sites--handle::before {
-      content: '';
-      position: absolute;
-      inset: 0 4px;
-      background: var(--bc-separator);
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0 4px;
+        background: var(--bc-separator);
+      }
     }
     .bc-desktop-sites--grip {
       position: absolute;

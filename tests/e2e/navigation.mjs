@@ -1343,11 +1343,13 @@ async function profileInsetsFlows(expect) {
         (await import('/src/lib/navigation.svelte.js')).openOver(path);
       }, route);
       await sleep(1600);
-      const state = await tab.run(({ kind, portrait }) => {
+      const state = await tab.run(({ kind, portrait, path }) => {
         const page = [...document.querySelectorAll('.view.tab-active > .page-current')].find((item) => item.getBoundingClientRect().width > 0);
         const frame = page?.querySelector('.bc-pf')?.getBoundingClientRect();
         const nav = page?.querySelector('.bc-profile-nav')?.getBoundingClientRect();
-        const back = page?.querySelector('.bc-profile-nav--back')?.getBoundingClientRect();
+        const back = portrait
+          ? path === '/profile' && page?.querySelector(':scope > .navbar .left .back')
+          : page?.querySelector('.bc-profile-nav--back');
         const add = page?.querySelector('.bc-gear-list--add, .fab:not([style*="display: none"])')?.getBoundingClientRect();
         const navbar = page?.querySelector(':scope > .navbar')?.getBoundingClientRect();
         const inner = page?.querySelector(':scope > .navbar .navbar-inner')?.getBoundingClientRect();
@@ -1356,14 +1358,14 @@ async function profileInsetsFlows(expect) {
         const near = (a, b) => Math.abs(a - b) < 2;
         return {
           frame: portrait ? !frame : !!frame && near(frame.top, 24) && near(frame.bottom, bottom),
-          back: portrait || (!!back && back.top >= 24),
+          back: !back,
           add: !add || add.bottom <= bottom,
           main: (!portrait && kind !== 'main') || (!!navbar && !!inner && inner.top + parseFloat(getComputedStyle(page.querySelector(':scope > .navbar .navbar-inner')).paddingTop) >= 24),
           dialog: portrait || kind !== 'dialog' || (!!navbar && !!box && near(navbar.top, box.top) && box.top >= 24 && box.bottom <= bottom),
           navWidth: portrait || (!!nav && near(nav.width, innerWidth >= 1200 ? 350 : 320)),
           barAligned: portrait || kind !== 'main' || (!!nav && !!navbar && near(nav.right, navbar.left)),
         };
-      }, { kind: bar, portrait: label === 'portrait' });
+      }, { kind: bar, portrait: label === 'portrait', path: route });
       expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true, navWidth: true, barAligned: true }, state);
       if (label === 'landscape' && bar === 'dialog') {
         const changed = await tab.run(() => {
@@ -1778,6 +1780,8 @@ async function profileInfoWidthsFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['narrow phone', 320, 740, true, false, 'md'],
     ['tablet', 1280, 800, false, false, 'md'],
+    ['tablet portrait', 800, 1280, false, false, 'md'],
+    ['desktop', 1400, 900, false, true, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     const state = () => tab.run(() => {
@@ -1826,6 +1830,13 @@ async function profileInfoWidthsFlows(expect) {
       };
     });
     expect(`${label}: the three fields are narrower and fit`, { birthNarrower: true, relationNarrower: true, phoneNarrower: true, withinViewport: true }, result);
+    const bloodWidth = await tab.run(() => {
+      const page = document.querySelector('.page-current.bc-profile-info');
+      const blood = page.querySelector('.bc-profile-info--blood .bc-select-field--box').getBoundingClientRect();
+      const full = page.querySelector('.bc-profile-info--fields .bc-text-field--box').getBoundingClientRect();
+      return { narrower: blood.width < full.width && blood.width <= 192.5, withinViewport: blood.width > 0 && blood.left >= 0 && blood.right <= innerWidth };
+    });
+    expect(`${label}: the blood group field is narrower and fits`, { narrower: true, withinViewport: true }, bloodWidth);
     const bloodField = await tab.run(async () => {
       const { t } = await import('/src/lib/i18n.js');
       const page = document.querySelector('.page-current.bc-profile-info');
@@ -1855,6 +1866,23 @@ async function profileInfoWidthsFlows(expect) {
     const saved = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).bloodGroup);
     expect(`${label}: blood group is saved`, { blood: 'O+' }, { blood: saved });
     expect(`${label}: Save returns to the read view of the same page`, { route: '/profile/info', editing: false }, await state());
+    await tab.run(() => document.querySelector('.page-current .bc-profile-info--edit-button').click());
+    await sleep(200);
+    const cancelArrow = await tab.run(async () => {
+      const { services } = await import('/src/lib/profile.svelte.js');
+      const before = (await services().profile.readInfo()).fullName;
+      const page = document.querySelector('.page-current.bc-profile-info');
+      const input = page.querySelector('input[autocomplete="name"]');
+      input.value = 'Unsaved name';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const button = page.querySelector('.bc-profile-info--cancel-edit');
+      const visible = !!button?.querySelector('.icon-back') && button.getBoundingClientRect().width > 0;
+      button.click();
+      return { visible, before };
+    });
+    await sleep(400);
+    const afterCancel = await tab.run(async () => (await (await import('/src/lib/profile.svelte.js')).services().profile.readInfo()).fullName);
+    expect(`${label}: the arrow discards edits`, { visible: true, name: cancelArrow.before, route: '/profile/info', editing: false }, { visible: cancelArrow.visible, name: afterCancel, ...(await state()) });
     if (label === 'narrow phone') {
       const profile = await tab.run(() => {
         const page = document.querySelector('.page-current.bc-profile-info');

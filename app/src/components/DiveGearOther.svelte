@@ -142,10 +142,9 @@
       align-items: center;
       justify-content: center;
       color: var(--bc-text);
-    }
-
-    .bc-dive-gear--remove:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-dive-gear--add {

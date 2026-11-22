@@ -326,8 +326,8 @@ test('the empty logbook profile is 724 dp wide in landscape and 624 dp in portra
   assert.match(empty, /width: min\(724px, calc\(100vw - var\(--bc-nav-width, 96px\) - var\(--f7-page-master-width, 340px\) - 96px\)\)/);
   assert.match(empty, /width: min\(624px, calc\(100vw - var\(--bc-nav-width, 96px\) - 80px\)\)/);
   assert.match(empty, /@media \(orientation: portrait\)/);
-  // Landscape on 1 280 dp: 1 280 - 96 - 340 = 844 dp of pane, 60 dp on each side of 724. Portrait on 800 dp: 704, 40 each side.
-  assert.ok((1280 - 96 - 340 - 724) / 2 >= 48 && (800 - 96 - 624) / 2 >= 40);
+  // Landscape on 1 280 dp: 1 280 - 96 - 360 = 824 dp of pane, 50 dp on each side of 724. Portrait on 800 dp: 704, 40 each side.
+  assert.ok((1280 - 96 - 360 - 724) / 2 >= 48 && (800 - 96 - 624) / 2 >= 40);
   // The list pane takes the whole width in portrait while the column is alone.
   assert.match(read('App.svelte'), /:has\(\.bc-release-empty\)\) \{\s*--f7-page-master-width: 100%;/);
 });

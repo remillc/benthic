@@ -8,7 +8,7 @@
   import { odplusAccount, odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
-  import { bottomNav, layout, ios } from '../lib/layout.svelte.js';
+  import { bottomNav, layout, ios, desktopApp } from '../lib/layout.svelte.js';
 
   /** rail: at the bottom of the Android tablet rail (task 2026-11-14-126), a 64 dp circle. */
   let { rail = false } = $props();
@@ -38,9 +38,9 @@
 </script>
 
 {#if shown}
-  <button type="button" class="bc-account-avatar" class:bc-account-avatar--rail={rail} class:bc-account-avatar--ios={ios} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
+  <button type="button" class="bc-account-avatar" class:bc-account-avatar--rail={rail} class:bc-account-avatar--tablet={rail && !desktopApp} class:bc-account-avatar--ios={ios} aria-label={label} aria-haspopup="dialog" onclick={() => (navigation.accountOpen = true)}>
     <span class="bc-account-avatar--circle">
-      {#if initial}{initial}{:else}<Icon name="account" size={rail ? 38 : 20} weight={2} />{/if}
+      {#if initial}{initial}{:else}<Icon name="account" size={rail ? (desktopApp ? 38 : 44) : 20} weight={2} />{/if}
     </span>
     {#if badge}<span class="bc-account-avatar--badge bc-account-avatar--{badge}" aria-hidden="true"></span>{/if}
   </button>
@@ -99,6 +99,20 @@
       }
     }
 
+    .bc-account-avatar--tablet {
+      .bc-account-avatar--circle {
+        width: 72px;
+        height: 72px;
+        border-radius: 36px;
+        font-size: 32px;
+      }
+
+      .bc-account-avatar--badge {
+        top: 8px;
+        right: 8px;
+      }
+    }
+
     /* iPhone (task 2026-11-14-127): a 32 pt circle in the secondary colour, white initial. */
     .bc-account-avatar--ios {
       width: 44px;
@@ -121,15 +135,15 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-account-avatar--circle {
         position: relative;
-      }
-      .bc-account-avatar--circle::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        background: currentColor;
-        opacity: 0;
-        transition: opacity 120ms linear;
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: currentColor;
+          opacity: 0;
+          transition: opacity 120ms linear;
+        }
       }
       .bc-account-avatar:hover .bc-account-avatar--circle::after {
         opacity: 0.08;

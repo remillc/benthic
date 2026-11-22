@@ -349,10 +349,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-doc-edit--save:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-doc-edit--fields {
@@ -410,10 +409,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-doc-edit--button:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-doc-edit--file {
@@ -428,20 +426,18 @@
       gap: 12px;
       background: var(--bc-surface);
       font-size: 15px;
-    }
-
-    .bc-doc-edit--pdf span {
-      flex: 1;
-    }
-
-    .bc-doc-edit--pdf button {
-      height: 40px;
-      padding: 0 12px;
-      border: none;
-      background: none;
-      color: var(--bc-secondary);
-      font: inherit;
-      font-weight: 500;
+      & span {
+        flex: 1;
+      }
+      & button {
+        height: 40px;
+        padding: 0 12px;
+        border: none;
+        background: none;
+        color: var(--bc-secondary);
+        font: inherit;
+        font-weight: 500;
+      }
     }
 
     .bc-doc-edit--section {

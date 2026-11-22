@@ -406,10 +406,9 @@
       font: inherit;
       font-size: 16px;
       cursor: pointer;
-    }
-
-    .bc-time-picker--period-button + .bc-time-picker--period-button {
-      border-top: 1px solid var(--bc-outline);
+      & + .bc-time-picker--period-button {
+        border-top: 1px solid var(--bc-outline);
+      }
     }
 
     .bc-time-picker--period-button.bc-time-picker--on {

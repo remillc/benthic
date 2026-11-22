@@ -383,21 +383,21 @@
       border-radius: 8px;
       background: var(--bc-surface);
       box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
-    }
-    .bc-edit-together--suggestions button {
-      display: block;
-      width: 100%;
-      padding: 8px 12px;
-      border: 0;
-      background: none;
-      color: var(--bc-text);
-      font: inherit;
-      font-size: 14px;
-      text-align: start;
-      cursor: pointer;
-    }
-    .bc-edit-together--suggestions button:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      & button {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        border: 0;
+        background: none;
+        color: var(--bc-text);
+        font: inherit;
+        font-size: 14px;
+        text-align: start;
+        cursor: pointer;
+      }
+      & button:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
   }
 </style>

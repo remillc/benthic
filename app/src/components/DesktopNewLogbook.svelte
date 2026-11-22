@@ -551,13 +551,13 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-    }
-    .bc-new-logbook--close:hover {
-      background: var(--bc-surface-2);
-    }
-    .bc-new-logbook--close:focus-visible {
-      outline: 2px solid var(--bc-action);
-      outline-offset: 0;
+      &:hover {
+        background: var(--bc-surface-2);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--bc-action);
+        outline-offset: 0;
+      }
     }
     .bc-new-logbook--step {
       margin: 0 0 4px;
@@ -606,10 +606,10 @@
       color: var(--bc-text);
       font: inherit;
       font-size: 16px;
-    }
-    .bc-new-logbook--input:focus-visible {
-      outline: 2px solid var(--bc-action);
-      outline-offset: 0;
+      &:focus-visible {
+        outline: 2px solid var(--bc-action);
+        outline-offset: 0;
+      }
     }
     .bc-new-logbook--invalid {
       border-color: var(--bc-alarm);
@@ -619,9 +619,9 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--bc-text-2);
-    }
-    .bc-new-logbook--help a {
-      color: var(--bc-selected);
+      & a {
+        color: var(--bc-selected);
+      }
     }
     .bc-new-logbook--heading {
       margin: 16px 0 6px;
@@ -776,11 +776,11 @@
       color: var(--bc-selected);
       cursor: pointer;
       white-space: nowrap;
-    }
-    .bc-new-logbook--link-button:focus-visible {
-      outline: 2px solid var(--bc-action);
-      outline-offset: 2px;
-      border-radius: 4px;
+      &:focus-visible {
+        outline: 2px solid var(--bc-action);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
     }
     .bc-new-logbook--privacy {
       display: flex;

@@ -2730,11 +2730,21 @@
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",
       "Desktop : le signe « + » n’apparaît plus sur l’initiale dans le menu Compte.",
+      "Tablette Android : l’icône Compte dans la barre latérale est plus grande.",
+      "Carnet sur ordinateur : le menu Carnet permet de renommer le carnet affiché, sans modifier son fichier.",
+      "Carnet sur tablette : la liste des plongées est un peu plus large en paysage.",
+      "Équipement : un rappel annuel d’entretien, y compris des valves, est proposé pour les combinaisons étanches.",
+      "Équipement : l’intervalle de révision suggéré pour un détendeur est maintenant d’un an ou de 100 plongées.",
+      "Carnet : le site et les autres détails modifiés d’une plongée apparaissent dans la liste après l’enregistrement.",
+      "Détail d’une plongée sur ordinateur : l’indication de modification n’apparaît plus sous les compagnons et les guides.",
+      "Détail d’une plongée sur ordinateur : le menu du type d’eau s’ouvre en un clic.",
       "La suppression de plongées décale automatiquement les numéros des plongées suivantes.",
       "Corrigé une erreur du détail d’une plongée au démarrage avec un carnet synchronisé.",
       "Carnet sur tablette : quand des plongées sont cochées, les actions du détail passent dans le menu ⋮ en haut et permettent de supprimer la sélection.",
       "Restauration : une plongée retrouve le numéro manquant à sa position ; si aucun numéro n’est disponible, les suivantes sont décalées.",
-      "Informations : les champs de date de naissance, de lien et de téléphone sont moins larges.",
+      "Informations : les champs de date de naissance, de lien, de téléphone et de groupe sanguin sont moins larges.",
+      "Profil : la flèche de retour n’apparaît plus sur tablette et ordinateur.",
+      "Informations : une flèche permet de quitter la modification sans enregistrer.",
       "Profil et équipement : l’entrée Entretien apparaît lorsqu’une pièce active a un rappel d’entretien.",
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
       "Équipement : le champ « Type de pièce » n’apparaît plus à la création d’une pièce de type Autre.",
@@ -4599,6 +4609,13 @@
   },
   "desktopLogbooks": {
     "mainName": "Carnet de cet ordinateur",
+    "rename": {
+      "action": "Renommer…",
+      "title": "Renommer le carnet",
+      "name": "Nom du carnet",
+      "save": "Renommer",
+      "failed": "Le carnet n’a pas pu être renommé."
+    },
     "selector": {
       "label": "Carnet",
       "change": "Changer de carnet",
@@ -6331,7 +6348,7 @@
     "reminderCard": {
       "title": "Rappels d’entretien",
       "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
-      "suggestDrysuit": "Suggéré pour une combinaison étanche : les joints, chaque année",
+      "suggestDrysuit": "Suggéré pour une combinaison étanche : entretien annuel, y compris des valves",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",
         "regulator": "Suggéré pour un détendeur : {rule}",

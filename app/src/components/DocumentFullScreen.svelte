@@ -117,13 +117,12 @@
       align-items: center;
       justify-content: center;
       background: none;
-    }
-
-    .bc-doc-full--image img {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 12px;
-      object-fit: contain;
+      & img {
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 12px;
+        object-fit: contain;
+      }
     }
 
     .bc-doc-full--hint {

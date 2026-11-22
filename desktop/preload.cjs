@@ -118,6 +118,7 @@ contextBridge.exposeInMainWorld('odDesktop', {
     pickAndOpen: () => invoke('od:logbooks', 'pickAndOpen'),
     openPath: (options) => invoke('od:logbooks', 'openPath', options),
     close: () => invoke('od:logbooks', 'close'),
+    rename: (options) => invoke('od:logbooks', 'rename', options),
     clearRecent: () => invoke('od:logbooks', 'clearRecent'),
     forget: (options) => invoke('od:logbooks', 'forget', options),
     exists: () => invoke('od:logbooks', 'exists'),

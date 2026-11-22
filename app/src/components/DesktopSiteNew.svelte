@@ -223,11 +223,11 @@
       grid-template-columns: 110px minmax(0, 1fr);
       gap: 8px 12px;
       align-items: start;
-    }
-    .bc-site-form--fields > label {
-      padding-top: 10px;
-      font-size: 15px;
-      color: var(--bc-text-2);
+      & > label {
+        padding-top: 10px;
+        font-size: 15px;
+        color: var(--bc-text-2);
+      }
     }
     .bc-site-form--notice {
       display: flex;
@@ -238,11 +238,11 @@
       border-radius: 12px;
       background: var(--bc-tertiary-container);
       color: var(--bc-on-tertiary-container);
-    }
-    .bc-site-form--notice p {
-      flex: 1;
-      margin: 0;
-      font-size: 14px;
+      & p {
+        flex: 1;
+        margin: 0;
+        font-size: 14px;
+      }
     }
     .bc-site-form--actions {
       display: flex;
@@ -281,10 +281,10 @@
       font: inherit;
       font-size: 15px;
       cursor: pointer;
-    }
-    .bc-site-form--filled:disabled {
-      opacity: 0.38;
-      cursor: default;
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
     }
   }
 </style>

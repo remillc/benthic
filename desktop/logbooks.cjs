@@ -187,6 +187,7 @@ function windowTitle(descriptor, mainName = '') {
 /**
  * What this computer remembers about its logbooks: <userData>/logbooks.json.
  *   recent    the recent logbooks, newest first
+ *   names     user-chosen display names by logbook id, independent of recent entries
  *   startup   'last' (reopen the logbooks open at the last quit, the default) or 'ask' (the start screen)
  *   lastOpen  the descriptors open at the last quit, in window order
  */
@@ -259,6 +260,28 @@ class LogbookStore {
   /** @param {string} id */
   find(id) {
     return this.list().find((e) => e.id === id) ?? null;
+  }
+
+  /** @param {any} descriptor */
+  withSavedName(descriptor) {
+    const d = cleanDescriptor(descriptor);
+    if (!d) return null;
+    const names = this.read().names;
+    const name = names && typeof names === 'object' ? names[d.id] : undefined;
+    return typeof name === 'string' && name.trim() && name.length <= 100 ? { ...d, name } : d;
+  }
+
+  /** @param {any} descriptor @param {unknown} name */
+  rename(descriptor, name) {
+    const d = cleanDescriptor(descriptor);
+    if (!d || typeof name !== 'string' || !name.trim() || name.trim().length > 100) throw new Error('BAD_ARGUMENT: logbook name');
+    const renamed = { ...d, name: name.trim() };
+    const data = this.read();
+    const names = data.names && typeof data.names === 'object' && !Array.isArray(data.names) ? data.names : {};
+    const recent = this.list().map((entry) => (entry.id === d.id ? { ...entry, name: renamed.name } : entry));
+    const lastOpen = this.lastOpen().map((entry) => (entry.id === d.id ? { ...entry, name: renamed.name } : entry));
+    this.save({ names: { ...names, [d.id]: renamed.name }, recent, lastOpen });
+    return renamed;
   }
 
   /** « Ouvrir au démarrage » (Réglages › Carnet): 'last' unless the diver chose 'ask'. @returns {'last'|'ask'} */

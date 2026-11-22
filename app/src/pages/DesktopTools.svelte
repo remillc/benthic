@@ -197,11 +197,11 @@
       padding: 8px 8px 24px 12px;
       border-right: 1px solid var(--bc-separator);
       overflow-y: auto;
-    }
-    .bc-desktop-tools--list ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
+      & ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
     }
     .bc-desktop-tools--heading {
       margin: 12px 0 4px;
@@ -224,13 +224,13 @@
       text-align: left;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-tools--row:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
-    }
-    .bc-desktop-tools--row:focus-visible {
-      outline: 2px solid var(--bc-text);
-      outline-offset: -2px;
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--bc-text);
+        outline-offset: -2px;
+      }
     }
     .bc-desktop-tools--selected,
     .bc-desktop-tools--selected:hover {
@@ -317,9 +317,9 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-desktop-tools--row {
         transition: box-shadow 120ms linear;
-      }
-      .bc-desktop-tools--row:hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        &:hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
   }

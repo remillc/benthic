@@ -12,17 +12,22 @@ import { logbookShortcut, isLogbookFileName } from './desktop-logbooks.js';
 /** @returns {any} */
 const bridge = () => /** @type {any} */ (globalThis).odDesktop;
 
+/** @type {LogbookEntry|null|undefined} */
+const initialLogbook = bridge()?.logbook;
+
 /** What this window holds: undefined outside the desktop app, null on the start screen. @returns {LogbookEntry|null|undefined} */
 export function windowLogbook() {
-  return bridge()?.logbook;
+  return logbooks.current;
 }
 
 /** The window has no logbook open: the start screen shows. */
-export const noLogbook = desktopApp && windowLogbook() === null;
+export const noLogbook = desktopApp && initialLogbook === null;
 
 export const logbooks = $state({
   /** The new-logbook dialog is open. */
   dialog: false,
+  renameDialog: false,
+  current: initialLogbook,
   /** @type {LogbookEntry[]} */
   recent: [],
   /** The recent logbooks were read at least once (the window without a logbook waits for it to choose its screen). */
@@ -111,6 +116,12 @@ export async function openPath(path) {
   }
 }
 
+/** @param {string} name */
+export async function renameLogbook(name) {
+  logbooks.current = await bridge().logbooks.rename({ name });
+  await refreshRecent();
+}
+
 /** « Fermer le carnet »: the window goes back to its start screen. */
 export async function closeLogbook() {
   try {
@@ -145,9 +156,10 @@ export async function saveCopy() {
   }
 }
 
-/** @param {'newLogbook'|'openLogbook'|'saveCopy'|'closeLogbook'} command */
+/** @param {'newLogbook'|'openLogbook'|'saveCopy'|'closeLogbook'|'renameLogbook'} command */
 export function runCommand(command) {
   if (command === 'newLogbook') logbooks.dialog = true;
+  else if (command === 'renameLogbook' && windowLogbook()) logbooks.renameDialog = true;
   else if (command === 'openLogbook') openLogbookDialog();
   else if (command === 'saveCopy') saveCopy();
   else if (command === 'closeLogbook') closeLogbook();
@@ -159,7 +171,7 @@ export function runCommand(command) {
 export function enableLogbookCommands() {
   if (!desktopApp) return () => {};
   const offMenu = bridge().onMenu?.((/** @type {string} */ command) => {
-    if (command === 'newLogbook' || command === 'saveCopy') runCommand(command);
+    if (command === 'newLogbook' || command === 'saveCopy' || command === 'renameLogbook') runCommand(command);
   });
   /** @param {KeyboardEvent} e */
   const keydown = (e) => {

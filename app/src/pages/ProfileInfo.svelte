@@ -133,7 +133,7 @@
       </div>
 
       <h2 class="bc-profile-info--section">{t('diverProfile.info.health')}</h2>
-      <div class="bc-profile-info--fields">
+      <div class="bc-profile-info--fields bc-profile-info--blood">
         <SelectField label={t('diverProfile.info.blood')} bind:value={blood} options={bloodOptions} clearLabel={t('diverProfile.info.clearBlood')} supporting={t('diverProfile.info.bloodHint')} />
       </div>
       <div class="bc-profile-info--bottom"></div>
@@ -190,8 +190,8 @@
   <Navbar title={t('diverProfile.info.title')}>
     {#snippet left()}
       {#if editing}
-        <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), cancelEdit())}>
-          <Icon name="close" /><span class="bc-sr-only">{t('diverProfile.info.close')}</span>
+        <a href="#close" class="link icon-only external bc-profile-info--cancel-edit" role="button" onclick={(e) => (e.preventDefault(), cancelEdit())}>
+          <i class="icon icon-back"></i><span class="bc-sr-only">{t('diverProfile.info.close')}</span>
         </a>
       {:else}
         <BackLink label={t('gear.profile.title')} name={t('diverProfile.info.back')} />
@@ -334,10 +334,9 @@
       font: inherit;
       font-size: 14px;
       font-weight: 500;
-    }
-
-    .bc-profile-info--save:disabled {
-      opacity: 0.38;
+      &:disabled {
+        opacity: 0.38;
+      }
     }
 
     .bc-profile-info--fields {
@@ -353,6 +352,10 @@
 
     .bc-profile-info--relation {
       width: min(100%, 272px);
+    }
+
+    .bc-profile-info--blood :global(.bc-select-field--box) {
+      width: min(100%, 192px);
     }
 
     .bc-profile-info--phone {

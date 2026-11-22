@@ -2730,11 +2730,21 @@
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
       "Desktop: the account menu no longer shows a plus sign on the initial.",
+      "Android tablets: the Account icon in the navigation rail is larger.",
+      "Desktop logbook: rename the displayed logbook from the Logbook menu without changing its file.",
+      "Tablet logbook: the dive list is slightly wider in landscape.",
+      "Equipment: an annual service reminder, including valve service, is suggested for drysuits.",
+      "Equipment: the suggested regulator service interval is now one year or 100 dives.",
+      "Logbook: a dive's site and other edited details now appear in the list after saving.",
+      "Desktop dive details: the editing hint no longer appears under buddies and guides.",
+      "Desktop dive details: the water type menu opens with one click.",
       "Deleting dives automatically shifts the numbers of later dives.",
       "Fixed a dive detail error at startup when a cloud logbook is open.",
       "Logbook on tablets: when dives are checked, detail actions move to the top ⋮ menu, which can delete the selection.",
       "Restore: a dive takes the missing number at its position; if none is available, later dives are shifted.",
-      "Information: the date of birth, relationship and phone fields are narrower.",
+      "Information: the date of birth, relationship, phone and blood group fields are narrower.",
+      "Profile: the back arrow no longer appears on tablets and desktop.",
+      "Information: a back arrow closes editing without saving.",
       "Profile and equipment: the Maintenance entry appears when an active piece has a maintenance reminder.",
       "Equipment: a piece's menu offers permanent deletion after confirmation.",
       "Equipment: the type of piece field no longer appears when creating an Other piece.",
@@ -4599,6 +4609,13 @@
   },
   "desktopLogbooks": {
     "mainName": "This computer's logbook",
+    "rename": {
+      "action": "Rename…",
+      "title": "Rename logbook",
+      "name": "Logbook name",
+      "save": "Rename",
+      "failed": "The logbook could not be renamed."
+    },
     "selector": {
       "label": "Logbook",
       "change": "Switch logbook",
@@ -6328,7 +6345,7 @@
     "reminderCard": {
       "title": "Maintenance reminders",
       "suggestCylinder": "Suggested: inspection every year, hydrostatic test every 5 years",
-      "suggestDrysuit": "Suggested for a drysuit: the seals, every year",
+      "suggestDrysuit": "Suggested for a drysuit: annual service, including the valves",
       "suggest": {
         "computer": "Suggested for a computer: {rule}",
         "regulator": "Suggested for a regulator: {rule}",

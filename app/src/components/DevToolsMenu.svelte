@@ -603,15 +603,15 @@
       padding-top: 12px;
       border-top: 1px solid var(--bc-dev-tint);
       font-size: 14px;
-    }
-    .bc-dev-tools-menu--facts dt {
-      display: inline-flex;
-      color: var(--bc-dev);
-    }
-    .bc-dev-tools-menu--facts dd {
-      margin: 0;
-      min-width: 0;
-      overflow-wrap: anywhere;
+      & dt {
+        display: inline-flex;
+        color: var(--bc-dev);
+      }
+      & dd {
+        margin: 0;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
     }
     .bc-dev-tools-menu--heading {
       margin: 0 0 8px 8px;
@@ -710,13 +710,13 @@
       font: inherit;
       text-align: left;
       cursor: pointer;
-    }
-    .bc-dev-tools-menu--action:active:not(:disabled) {
-      background: var(--bc-surface-container-highest);
-    }
-    .bc-dev-tools-menu--action:disabled {
-      opacity: 0.5;
-      cursor: default;
+      &:active:not(:disabled) {
+        background: var(--bc-surface-container-highest);
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
     }
     .bc-dev-tools-menu--action[aria-busy='true'] {
       opacity: 1;
@@ -803,9 +803,9 @@
     .bc-dev-tools-menu--reset-buttons {
       display: flex;
       gap: 8px;
-    }
-    .bc-dev-tools-menu--reset-buttons button {
-      flex: 1;
+      & button {
+        flex: 1;
+      }
     }
     .bc-dev-tools-menu--confirm {
       display: flex;

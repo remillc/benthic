@@ -300,11 +300,11 @@
       margin-top: 8px;
       font-size: 13px;
       color: var(--bc-text-2);
-    }
-    .bc-desktop-desaturation--legend span {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      & span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
     }
     .bc-desktop-desaturation--swatch {
       width: 10px;
@@ -321,13 +321,13 @@
       margin: 0;
       padding: 0;
       list-style: none;
-    }
-    .bc-desktop-desaturation--dives li {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--bc-separator);
+      & li {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--bc-separator);
+      }
     }
     .bc-desktop-desaturation--dive-date {
       font-size: 15px;

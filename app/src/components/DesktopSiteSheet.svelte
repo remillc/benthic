@@ -326,9 +326,9 @@
       font-size: 15px;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-site-sheet-desk--outlined:hover {
-      background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
     }
     .bc-site-sheet-desk--icon {
       display: grid;
@@ -340,9 +340,9 @@
       background: none;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-site-sheet-desk--icon:hover {
-      background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+      }
     }
     .bc-site-sheet-desk--body {
       display: grid;
@@ -359,15 +359,15 @@
       display: flex;
       gap: 28px;
       margin: 12px 0 0;
-    }
-    .bc-site-sheet-desk--figures dt {
-      font-size: 13px;
-      color: var(--bc-text-2);
-    }
-    .bc-site-sheet-desk--figures dd {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 500;
+      & dt {
+        font-size: 13px;
+        color: var(--bc-text-2);
+      }
+      & dd {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 500;
+      }
     }
     .bc-site-sheet-desk--subtitle {
       margin: 16px 0 8px;
@@ -394,9 +394,9 @@
       color: var(--bc-text);
       text-align: start;
       cursor: pointer;
-    }
-    .bc-site-sheet-desk--dive:hover {
-      background: color-mix(in srgb, var(--bc-text) 5%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 5%, transparent);
+      }
     }
     .bc-site-sheet-desk--number {
       flex: none;
@@ -421,11 +421,11 @@
       grid-template-columns: 110px minmax(0, 1fr);
       gap: 8px 12px;
       align-items: start;
-    }
-    .bc-site-sheet-desk--fields > label {
-      padding-top: 10px;
-      font-size: 15px;
-      color: var(--bc-text-2);
+      & > label {
+        padding-top: 10px;
+        font-size: 15px;
+        color: var(--bc-text-2);
+      }
     }
     .bc-site-sheet-desk--saved {
       display: flex;

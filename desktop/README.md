@@ -31,6 +31,9 @@ setupBridge({ ipcMain, app, safeStorage, hostPath, resourcesDir });
 // webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true }
 ```
 
+The Logbook menu can rename the current logbook's display name. It is kept in `logbooks.json` by
+logbook ID, independently of the recent list; the logbook file, account and core process are unchanged.
+
 `resourcesDir` holds `xslt/` (Subsurface's stylesheets, as `native/build-android.sh` copies them to the
 Android assets) and `SampleDivesV2.ssrf`. By default: `<process.resourcesPath>/resources` when
 packaged, else `desktop/resources`.

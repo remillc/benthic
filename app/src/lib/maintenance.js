@@ -43,28 +43,28 @@
  */
 
 /** @type {Task[]} */
-export const TASKS = ['service', 'inspection', 'hydrostatic', 'seals', 'custom'];
+export const TASKS = ['service', 'inspection', 'hydrostatic', 'seals', 'custom']
 
 /** The lead times of « Me prévenir avant » and of the default: 2 weeks, 30 days, 60 days. @type {(14|30|60)[]} */
-export const NOTIFY_CHOICES = [14, 30, 60];
+export const NOTIFY_CHOICES = [14, 30, 60]
 
 /** The default lead time until the diver chooses another. */
-export const DEFAULT_NOTIFY_DAYS = 30;
+export const DEFAULT_NOTIFY_DAYS = 30
 
 /** What a reminder stores for the lead time the diver chose: nothing when it is the default (it follows the default). @param {number} chosen @param {number} fallback @returns {14|30|60|null} */
-export const ownLeadDays = (chosen, fallback) => (chosen === fallback ? null : leadDays({ notifyDays: chosen }, fallback));
+export const ownLeadDays = (chosen, fallback) => (chosen === fallback ? null : leadDays({ notifyDays: chosen }, fallback))
 
 /** The lead time of a reminder: its own, else the default; a stored 7 days reads as 2 weeks. @param {{ notifyDays?: number|null }} item @param {number} [fallback] */
 export function leadDays(item, fallback = DEFAULT_NOTIFY_DAYS) {
-  const own = item.notifyDays == null ? fallback : item.notifyDays;
-  return NOTIFY_CHOICES.includes(/** @type {any} */ (own)) ? /** @type {14|30|60} */ (own) : own < 14 ? 14 : DEFAULT_NOTIFY_DAYS;
+  const own = item.notifyDays == null ? fallback : item.notifyDays
+  return NOTIFY_CHOICES.includes(/** @type {any} */(own)) ? /** @type {14|30|60} */ (own) : own < 14 ? 14 : DEFAULT_NOTIFY_DAYS
 }
 
 /** A reminder counts as « Bientôt » from this many days before the due date. */
-export const SOON_DAYS = 60;
+export const SOON_DAYS = 60
 
 /** Without a dive rate to estimate from, a dive criterion is « Bientôt » at this many dives left. */
-export const SOON_DIVES = 10;
+export const SOON_DIVES = 10
 
 /** @typedef {{ task: Task, months?: number, dives?: number }} Suggestion */
 
@@ -76,24 +76,24 @@ export const SOON_DIVES = 10;
 export const SUGGESTIONS = {
   // A dive computer has no reminder (task 2026-11-19-308).
   computer: [],
-  regulator: [{ task: 'service', months: 24, dives: 100 }],
-  suit: [{ task: 'seals', months: 12 }],
+  regulator: [{ task: 'service', months: 12, dives: 100 }],
+  suit: [{ task: 'service', months: 12 }],
   cylinder: [
     { task: 'inspection', months: 12 },
     { task: 'hydrostatic', months: 60 },
   ],
   bcd: [{ task: 'service', months: 12 }],
-};
+}
 
 /**
  * @param {string} type
- * @param {Record<string, string>} [details] the piece's fields: only a drysuit has seals to change (docs/equipment-fields.md);
+ * @param {Record<string, string>} [details] the piece's fields: only a drysuit has these reminders (docs/equipment-fields.md);
  *   without them the suggestion of the type stands
  * @returns {Suggestion[]}
  */
 export function suggestionsFor(type, details) {
-  if (type === 'suit' && details && details.suitType !== 'dry') return [];
-  return SUGGESTIONS[type] ?? [];
+  if (type === 'suit' && details && details.suitType !== 'dry') return []
+  return SUGGESTIONS[type] ?? []
 }
 
 /**
@@ -101,22 +101,22 @@ export function suggestionsFor(type, details) {
  * @param {string} text @returns {string|null}
  */
 export function parseStamp(text) {
-  const m = /^\s*(0?[1-9]|1[0-2])\s*\/\s*(\d{2})\s*$/.exec(text);
-  return m ? `20${m[2]}-${m[1].padStart(2, '0')}-01` : null;
+  const m = /^\s*(0?[1-9]|1[0-2])\s*\/\s*(\d{2})\s*$/.exec(text)
+  return m ? `20${m[2]}-${m[1].padStart(2, '0')}-01` : null
 }
 
 /** The stamp of a date, « 03/22 ». @param {string} iso YYYY-MM-DD */
-export const stampOf = (iso) => `${iso.slice(5, 7)}/${iso.slice(2, 4)}`;
+export const stampOf = (iso) => `${iso.slice(5, 7)}/${iso.slice(2, 4)}`
 
 /** @param {string} iso YYYY-MM-DD @returns {number} UTC midnight in ms */
-const day = (iso) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
+const day = (iso) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10))
 
 /** Whole days from `a` to `b` (negative when `b` is before `a`). @param {string} a @param {string} b */
-export const daysBetween = (a, b) => Math.round((day(b) - day(a)) / 86400000);
+export const daysBetween = (a, b) => Math.round((day(b) - day(a)) / 86400000)
 
 /** @param {string} iso @param {number} n */
 export function addDays(iso, n) {
-  return new Date(day(iso) + n * 86400000).toISOString().slice(0, 10);
+  return new Date(day(iso) + n * 86400000).toISOString().slice(0, 10)
 }
 
 /**
@@ -126,18 +126,18 @@ export function addDays(iso, n) {
  * @param {number} months
  */
 export function addMonths(iso, months) {
-  const y = +iso.slice(0, 4);
-  const m = +iso.slice(5, 7) - 1 + months;
-  const d = +iso.slice(8, 10);
-  const first = new Date(Date.UTC(y, m, 1));
-  const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
-  return new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), Math.min(d, last))).toISOString().slice(0, 10);
+  const y = +iso.slice(0, 4)
+  const m = +iso.slice(5, 7) - 1 + months
+  const d = +iso.slice(8, 10)
+  const first = new Date(Date.UTC(y, m, 1))
+  const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate()
+  return new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), Math.min(d, last))).toISOString().slice(0, 10)
 }
 
 /** The local day, YYYY-MM-DD. @param {Date} [now] */
 export function todayIso(now = new Date()) {
-  const p = (/** @type {number} */ n) => String(n).padStart(2, '0');
-  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
+  const p = (/** @type {number} */ n) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
 }
 
 /**
@@ -147,15 +147,15 @@ export function todayIso(now = new Date()) {
  */
 export function ruleProblems({ months, dives }) {
   /** @type {{ criteria?: 'none', months?: 'range', dives?: 'range' }} */
-  const out = {};
-  if (months == null && dives == null) out.criteria = 'none';
-  if (months != null && !(Number.isInteger(months) && months >= 1 && months <= 600)) out.months = 'range';
-  if (dives != null && !(Number.isInteger(dives) && dives >= 1 && dives <= 10000)) out.dives = 'range';
-  return out;
+  const out = {}
+  if (months == null && dives == null) out.criteria = 'none'
+  if (months != null && !(Number.isInteger(months) && months >= 1 && months <= 600)) out.months = 'range'
+  if (dives != null && !(Number.isInteger(dives) && dives >= 1 && dives <= 10000)) out.dives = 'range'
+  return out
 }
 
 /** An item has a rule when one of its criteria is set. @param {Pick<MaintenanceItem, 'intervalMonths'|'intervalDives'>} item */
-export const hasRule = (item) => item.intervalMonths != null || item.intervalDives != null;
+export const hasRule = (item) => item.intervalMonths != null || item.intervalDives != null
 
 /**
  * @typedef {Object} Evaluation
@@ -187,45 +187,45 @@ export const hasRule = (item) => item.intervalMonths != null || item.intervalDiv
  * @returns {Evaluation}
  */
 export function evaluate(item, diveKeys, today) {
-  const base = item.lastDoneOn || item.startOn || today;
-  const serviced = !!item.lastDoneOn;
-  const days = diveKeys.map((k) => k.slice(0, 10));
-  const sinceDays = days.filter((d) => (serviced ? d > base : d >= base)).sort();
-  const divesSince = sinceDays.length;
+  const base = item.lastDoneOn || item.startOn || today
+  const serviced = !!item.lastDoneOn
+  const days = diveKeys.map((k) => k.slice(0, 10))
+  const sinceDays = days.filter((d) => (serviced ? d > base : d >= base)).sort()
+  const divesSince = sinceDays.length
 
-  const dueDate = item.intervalMonths != null ? addMonths(base, item.intervalMonths) : null;
-  const daysLeft = dueDate ? daysBetween(today, dueDate) : null;
-  const divesLeft = item.intervalDives != null ? item.intervalDives - divesSince : null;
+  const dueDate = item.intervalMonths != null ? addMonths(base, item.intervalMonths) : null
+  const daysLeft = dueDate ? daysBetween(today, dueDate) : null
+  const divesLeft = item.intervalDives != null ? item.intervalDives - divesSince : null
 
   // The pace of the last 365 days, to say when the dives will be reached.
-  const yearAgo = addDays(today, -365);
-  const lastYear = days.filter((d) => d > yearAgo && d <= today).length;
-  const estimatedDays = divesLeft != null && divesLeft > 0 && lastYear > 0 ? Math.ceil((divesLeft * 365) / lastYear) : null;
+  const yearAgo = addDays(today, -365)
+  const lastYear = days.filter((d) => d > yearAgo && d <= today).length
+  const estimatedDays = divesLeft != null && divesLeft > 0 && lastYear > 0 ? Math.ceil((divesLeft * 365) / lastYear) : null
 
-  const timeReached = daysLeft != null && daysLeft < 0;
-  const divesReached = divesLeft != null && divesLeft <= 0;
-  const overdue = timeReached || divesReached;
+  const timeReached = daysLeft != null && daysLeft < 0
+  const divesReached = divesLeft != null && divesLeft <= 0
+  const overdue = timeReached || divesReached
 
   /** @type {'time'|'dives'|null} */
-  let first = null;
-  if (timeReached && !divesReached) first = 'time';
-  else if (divesReached && !timeReached) first = 'dives';
-  else if (timeReached && divesReached) first = 'time';
-  else if (daysLeft != null && (estimatedDays == null || daysLeft <= estimatedDays)) first = 'time';
-  else if (divesLeft != null) first = 'dives';
+  let first = null
+  if (timeReached && !divesReached) first = 'time'
+  else if (divesReached && !timeReached) first = 'dives'
+  else if (timeReached && divesReached) first = 'time'
+  else if (daysLeft != null && (estimatedDays == null || daysLeft <= estimatedDays)) first = 'time'
+  else if (divesLeft != null) first = 'dives'
 
   const soon =
     !overdue &&
     ((daysLeft != null && daysLeft <= SOON_DAYS) ||
-      (divesLeft != null && (estimatedDays != null ? estimatedDays <= SOON_DAYS : divesLeft <= SOON_DIVES)));
+      (divesLeft != null && (estimatedDays != null ? estimatedDays <= SOON_DAYS : divesLeft <= SOON_DIVES)))
 
-  const triggers = [daysLeft, divesReached ? 0 : estimatedDays].filter((x) => x != null);
-  const sortDays = triggers.length ? Math.min(...triggers) : divesLeft != null ? 9999 : null;
+  const triggers = [daysLeft, divesReached ? 0 : estimatedDays].filter((x) => x != null)
+  const sortDays = triggers.length ? Math.min(...triggers) : divesLeft != null ? 9999 : null
 
-  const reachedOn = item.intervalDives != null && divesReached ? (sinceDays[item.intervalDives - 1] ?? today) : null;
-  const overdueSince = !overdue ? null : [timeReached ? dueDate : null, reachedOn].filter((d) => !!d).sort()[0] ?? today;
+  const reachedOn = item.intervalDives != null && divesReached ? (sinceDays[item.intervalDives - 1] ?? today) : null
+  const overdueSince = !overdue ? null : [timeReached ? dueDate : null, reachedOn].filter((d) => !!d).sort()[0] ?? today
 
-  const active = hasRule(item);
+  const active = hasRule(item)
   return {
     item,
     active,
@@ -241,7 +241,7 @@ export function evaluate(item, diveKeys, today) {
     status: !active ? 'none' : overdue ? 'overdue' : soon ? 'soon' : 'ok',
     sortDays: active ? sortDays : null,
     overdueSince: active ? overdueSince : null,
-  };
+  }
 }
 
 /**
@@ -251,8 +251,8 @@ export function evaluate(item, diveKeys, today) {
  * @returns {Evaluation[]}
  */
 export function evaluateAll({ items, pieces, diveKeysOf, today }) {
-  const live = new Set(pieces.filter((g) => !g.retired && g.type !== 'computer').map((g) => g.id));
-  return items.filter((m) => live.has(m.gearId)).map((m) => evaluate(m, diveKeysOf(m.gearId), today));
+  const live = new Set(pieces.filter((g) => !g.retired && g.type !== 'computer').map((g) => g.id))
+  return items.filter((m) => live.has(m.gearId)).map((m) => evaluate(m, diveKeysOf(m.gearId), today))
 }
 
 /**
@@ -261,16 +261,16 @@ export function evaluateAll({ items, pieces, diveKeysOf, today }) {
  * @returns {{ overdue: Evaluation[], soon: Evaluation[], ok: Evaluation[], counts: { overdue: number, soon: number, ok: number } }}
  */
 export function sections(evaluations) {
-  const byUrgency = (/** @type {Evaluation} */ a, /** @type {Evaluation} */ b) => (a.sortDays ?? 9999) - (b.sortDays ?? 9999);
-  const pick = (/** @type {string} */ s) => evaluations.filter((e) => e.status === s).sort(byUrgency);
-  const overdue = pick('overdue');
-  const soon = pick('soon');
-  const ok = pick('ok');
-  return { overdue, soon, ok, counts: { overdue: overdue.length, soon: soon.length, ok: ok.length } };
+  const byUrgency = (/** @type {Evaluation} */ a, /** @type {Evaluation} */ b) => (a.sortDays ?? 9999) - (b.sortDays ?? 9999)
+  const pick = (/** @type {string} */ s) => evaluations.filter((e) => e.status === s).sort(byUrgency)
+  const overdue = pick('overdue')
+  const soon = pick('soon')
+  const ok = pick('ok')
+  return { overdue, soon, ok, counts: { overdue: overdue.length, soon: soon.length, ok: ok.length } }
 }
 
 /** The number on the red badge of « Mon profil » and of the « Entretien » card. @param {Evaluation[]} evaluations */
-export const overdueCount = (evaluations) => evaluations.filter((e) => e.status === 'overdue').length;
+export const overdueCount = (evaluations) => evaluations.filter((e) => e.status === 'overdue').length
 
 /**
  * The reminders to warn about in the edit of a dive: overdue, with « Avertir dans une plongée » on, and the piece in
@@ -280,8 +280,8 @@ export const overdueCount = (evaluations) => evaluations.filter((e) => e.status 
  * @returns {Evaluation[]}
  */
 export function diveWarnings(equipment, evaluations) {
-  const used = new Set([equipment.suitGearId, equipment.undersuitGearId, ...equipment.gearIds].filter(Boolean));
-  return evaluations.filter((e) => e.status === 'overdue' && e.item.warnInDive && used.has(e.item.gearId));
+  const used = new Set([equipment.suitGearId, equipment.undersuitGearId, ...equipment.gearIds].filter(Boolean))
+  return evaluations.filter((e) => e.status === 'overdue' && e.item.warnInDive && used.has(e.item.gearId))
 }
 
 /**
@@ -289,7 +289,7 @@ export function diveWarnings(equipment, evaluations) {
  * @param {{ intervalMonths: number|null }} rule
  * @param {string} doneOn
  */
-export const nextDueAfter = (rule, doneOn) => (rule.intervalMonths != null ? addMonths(doneOn, rule.intervalMonths) : null);
+export const nextDueAfter = (rule, doneOn) => (rule.intervalMonths != null ? addMonths(doneOn, rule.intervalMonths) : null)
 
 /**
  * @typedef {Object} PlannedNotification
@@ -308,13 +308,13 @@ export const nextDueAfter = (rule, doneOn) => (rule.intervalMonths != null ? add
  */
 
 /** Hour of the day the maintenance notifications come, local time. The flight reminder is apart: it comes when the wait ends. */
-export const NOTIFICATION_HOUR = 9;
+export const NOTIFICATION_HOUR = 9
 
 /** The moment a planned day's notification comes: 9:00 local time. @param {string} day YYYY-MM-DD */
-export const notificationMoment = (day) => new Date(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), NOTIFICATION_HOUR, 0, 0);
+export const notificationMoment = (day) => new Date(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8, 10), NOTIFICATION_HOUR, 0, 0)
 
 /** How far ahead the weekly late reminders are planned; the plan is made again at every start of the app. */
-export const OVERDUE_HORIZON_WEEKS = 8;
+export const OVERDUE_HORIZON_WEEKS = 8
 
 /**
  * The notifications to schedule: one `leadDays` before each due date (the reminder's own, else the default) and one
@@ -328,32 +328,32 @@ export const OVERDUE_HORIZON_WEEKS = 8;
  * @returns {PlannedNotification[]}
  */
 export function notificationPlan(evaluations, today, options = {}) {
-  const { enabled = true, defaultDays = DEFAULT_NOTIFY_DAYS, remindOverdue = true, snoozed = {} } = options;
+  const { enabled = true, defaultDays = DEFAULT_NOTIFY_DAYS, remindOverdue = true, snoozed = {} } = options
   /** @type {PlannedNotification[]} */
-  const plan = [];
-  if (!enabled) return plan;
+  const plan = []
+  if (!enabled) return plan
   for (const e of evaluations) {
-    if (!e.active) continue;
+    if (!e.active) continue
     if (e.status === 'overdue') {
-      if (!remindOverdue) continue;
+      if (!remindOverdue) continue
       // Weekly from the day it fell due, never before tomorrow; a snooze moves the first one.
-      const from = e.overdueSince ?? today;
-      const snooze = snoozed[e.item.id];
-      let day = addDays(from, 7);
-      while (day <= today) day = addDays(day, 7);
+      const from = e.overdueSince ?? today
+      const snooze = snoozed[e.item.id]
+      let day = addDays(from, 7)
+      while (day <= today) day = addDays(day, 7)
       // A snooze asks for a precise day: the first reminder comes then, the next ones a week apart.
-      if (snooze && snooze > today) day = snooze;
-      for (let n = 0; n < OVERDUE_HORIZON_WEEKS; n++, day = addDays(day, 7)) plan.push({ id: `${e.item.id}:overdue:${day}`, itemId: e.item.id, kind: 'overdue', on: day });
-      continue;
+      if (snooze && snooze > today) day = snooze
+      for (let n = 0; n < OVERDUE_HORIZON_WEEKS; n++, day = addDays(day, 7)) plan.push({ id: `${e.item.id}:overdue:${day}`, itemId: e.item.id, kind: 'overdue', on: day })
+      continue
     }
-    const candidates = [e.dueDate, e.estimatedDays != null ? addDays(today, e.estimatedDays) : null].filter((d) => !!d);
-    if (!candidates.length) continue;
-    const due = /** @type {string} */ (candidates.sort()[0]);
-    const lead = addDays(due, -leadDays(e.item, defaultDays));
-    if (lead >= today && lead < due) plan.push({ id: `${e.item.id}:lead`, itemId: e.item.id, kind: 'lead', on: lead });
-    if (due >= today) plan.push({ id: `${e.item.id}:due`, itemId: e.item.id, kind: 'due', on: due });
+    const candidates = [e.dueDate, e.estimatedDays != null ? addDays(today, e.estimatedDays) : null].filter((d) => !!d)
+    if (!candidates.length) continue
+    const due = /** @type {string} */ (candidates.sort()[0])
+    const lead = addDays(due, -leadDays(e.item, defaultDays))
+    if (lead >= today && lead < due) plan.push({ id: `${e.item.id}:lead`, itemId: e.item.id, kind: 'lead', on: lead })
+    if (due >= today) plan.push({ id: `${e.item.id}:due`, itemId: e.item.id, kind: 'due', on: due })
   }
-  return plan.sort((a, b) => (a.on === b.on ? (a.id < b.id ? -1 : 1) : a.on < b.on ? -1 : 1));
+  return plan.sort((a, b) => (a.on === b.on ? (a.id < b.id ? -1 : 1) : a.on < b.on ? -1 : 1))
 }
 
 /**
@@ -364,12 +364,12 @@ export function notificationPlan(evaluations, today, options = {}) {
  */
 
 /** @type {NotificationDeliverer} */
-let deliverer = async () => {};
+let deliverer = async () => { }
 
 /** Installs the deliverer a plugin provides (and, in the tests, a spy). @param {NotificationDeliverer} fn */
 export function setNotificationDeliverer(fn) {
-  deliverer = fn;
+  deliverer = fn
 }
 
 /** Cancel everything scheduled and schedule `plan`. @param {PlannedNotification[]} plan */
-export const applyNotificationPlan = (plan) => deliverer(plan);
+export const applyNotificationPlan = (plan) => deliverer(plan)

@@ -1,5 +1,5 @@
 // The five tabs of the desktop dive detail (task 2026-11-16-262): the weight chips and their total, the water
-// type segments and the stars through the edit path, the gas cards and their colour tokens, the Consommation
+// type menu and the stars through the edit path, the gas cards and their colour tokens, the Consommation
 // figures, the typed mix and pressures, and the inert « Autre équipement » seam.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -7,7 +7,6 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
-  WATER_SEGMENTS,
   consumption,
   cylinderSpan,
   gasCards,
@@ -86,12 +85,30 @@ test('weights: adding a third through the edit path keeps the two others', () =>
   ]);
 });
 
-test('Informations: the segmented water type and the stars write through the edit path', () => {
-  assert.deepEqual([...WATER_SEGMENTS], ['fresh', 'salt']);
+test('Informations: the water type menu and the stars write through the edit path', () => {
   assert.deepEqual(fieldChanges(dive(), 'waterType', 'salt', metric), { ok: true, changes: { userSalinity: 10300 } });
   assert.deepEqual(fieldChanges(dive(), 'waterType', 'fresh', metric), { ok: true, changes: null });
+  assert.deepEqual(fieldChanges(dive(), 'waterType', 'brackish', metric), { ok: true, changes: { userSalinity: 10100 } });
+  assert.deepEqual(fieldChanges(dive(), 'waterType', 'en13319', metric), { ok: true, changes: { userSalinity: 10200 } });
+  assert.deepEqual(fieldChanges(dive(), 'waterType', '', metric), { ok: true, changes: { userSalinity: 0 } });
   for (const n of [1, 2, 3, 4, 5]) assert.deepEqual(fieldChanges(dive(), 'visibility', n, metric), { ok: true, changes: { visibility: n } });
   assert.deepEqual(fieldChanges(dive({ visibility: 4 }), 'visibility', 0, metric), { ok: true, changes: { visibility: 0 } });
+  const fields = read('app/src/components/DesktopDiveFields.svelte');
+  assert.match(fields, /WATER_TYPES\.map/);
+  assert.match(fields, /<DesktopEditField stacked name="waterType" kind="choice" openChoiceOnClick[^>]*options=\{waterOptions\}[^>]*onsave=/);
+  const editor = read('app/src/components/DesktopEditField.svelte');
+  assert.match(editor, /onpointerdown=\{pointerDown\}/);
+  assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) input\.showPicker\(\)/);
+});
+
+test('Informations: buddy and guide editors hide the editing hint, without hiding errors', () => {
+  const fields = read('app/src/components/DesktopDiveFields.svelte');
+  for (const name of ['buddies', 'guides']) {
+    assert.match(fields, new RegExp(`<DesktopEditField stacked name="${name}" kind="list" showHint=\\{false\\}`));
+  }
+  const editor = read('app/src/components/DesktopEditField.svelte');
+  assert.match(editor, /showHint = true/);
+  assert.match(editor, /\{#if invalid \|\| \(showHint && kind !== 'choice' && kind !== 'stars'\)\}/);
 });
 
 test('Gaz: one card per cylinder, with the levels of its pressures', () => {

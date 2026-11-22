@@ -243,6 +243,7 @@ export async function saveDiveChanges(id, changes) {
   logbook.edited = { id, dive: result.dive };
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
+  logbook.dives = await OpenDivesCore.listLoadedDives();
   await persistChanges();
   return result;
 }

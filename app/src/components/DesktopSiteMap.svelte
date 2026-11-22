@@ -394,9 +394,9 @@
       font-weight: 600;
       color: var(--bc-on-table-selected);
       cursor: pointer;
-    }
-    .bc-desktop-site-map--zoom-here:hover {
-      background: color-mix(in srgb, var(--bc-secondary) 8%, transparent);
+      &:hover {
+        background: color-mix(in srgb, var(--bc-secondary) 8%, transparent);
+      }
     }
 
 

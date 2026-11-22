@@ -121,10 +121,10 @@
       color: var(--bc-text);
       text-align: start;
       cursor: pointer;
-    }
-    .bc-context-menu--item:disabled {
-      opacity: 0.38;
-      cursor: default;
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
     }
     .bc-context-menu--item:not(:disabled):hover,
     .bc-context-menu--item:focus-visible {
