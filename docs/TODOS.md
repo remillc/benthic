@@ -50,7 +50,6 @@ Next number: 175
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
 - #127 [design] améliorer les icônes d'équipement.
-- #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
 - #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.

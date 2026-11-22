@@ -97,6 +97,12 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
   assert.notEqual(copied.adhoc[0].id, 'x');
 });
 
+test('the new-piece reminder field appears only for regulators and cylinders', () => {
+  const source = readFileSync(new URL('../../app/src/pages/ProfilePieceEdit.svelte', import.meta.url), 'utf8');
+  assert.match(source, /const showReminderCard = \$derived\(!id && \(type === 'regulator' \|\| type === 'cylinder'\)\)/);
+  assert.match(source, /\(type === 'regulator' \|\| type === 'cylinder'\)/);
+});
+
 test('suggestions per type, and the rule fields are validated', () => {
   assert.deepEqual(suggestionsFor('regulator')[0], { task: 'service', months: 12, dives: 100 });
   assert.deepEqual(suggestionsFor('bcd')[0], { task: 'service', months: 12 });
