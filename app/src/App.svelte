@@ -56,7 +56,8 @@
   import DemoHost from './components/DemoHost.svelte';
   import { accountGuard } from './lib/demo.svelte.js';
   import { layout, ios, listWidth, splitBreakpoint, bottomNav, desktopApp, desktopMac, settingsWindow, profileWindow, sideWindow } from './lib/layout.svelte.js';
-  import { logbooks, noLogbook, enableLogbookCommands } from './lib/desktop-logbooks.svelte.js';
+  import { logbooks, noLogbook, enableLogbookCommands, renameLogbook } from './lib/desktop-logbooks.svelte.js';
+  import { displayName } from './lib/desktop-logbooks.js';
   import DesktopAccountSheet from './components/DesktopAccountSheet.svelte';
   import { releaseModalListeners } from './lib/f7-modal-cleanup.js';
   import { startDesktopShell } from './lib/desktop-shell.js';
@@ -500,7 +501,7 @@
   <!-- Desktop: a window with no logbook shows its start screen. The release edition shows « Pour commencer » (task 2026-11-16-228); the new-logbook dialog opens from the selector and the menu bar (task 2026-11-15-173). -->
   {#if desktopApp && noLogbook}{#if isRelease}<DesktopFirstLaunch />{:else}<DesktopLogbookStart />{/if}{/if}
   {#if desktopApp && logbooks.dialog}{#await import('./components/DesktopNewLogbook.svelte') then { default: DesktopNewLogbook }}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/await}{/if}
-  {#if desktopApp && logbooks.renameDialog}{#await import('./components/DesktopRenameLogbook.svelte') then { default: DesktopRenameLogbook }}<DesktopRenameLogbook onclose={() => (logbooks.renameDialog = false)} />{/await}{/if}
+  {#if desktopApp && logbooks.renameDialog && logbooks.current}{#await import('./components/RenameLogbook.svelte') then { default: RenameLogbook }}<RenameLogbook initialName={displayName(logbooks.current, t)} onsave={renameLogbook} onclose={() => (logbooks.renameDialog = false)} />{/await}{/if}
   <Views tabs class="safe-areas {layout.rail ? 'bc-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --bc-no-dive: '{t('tablet.noDive')}'">
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint} />
     <View id="view-sites" tab url="/sites/" />

@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 164
+Next number: 173
 
 ## List
 
@@ -51,7 +51,7 @@ Next number: 164
 - #127 [design] améliorer les icônes d'équipement.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
-- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
+- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
 - #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.
 - #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
@@ -75,3 +75,7 @@ Next number: 164
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.
 - #162 [code] créer un skeleton pour la page /dives/:id sur tablette et desktop
 - #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158).
+- #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
+- #169 [code] tous les champs de recherche doivent avoir un "x" quand il y a une valeur
+- #171 [code] When dives are merged, renumber the affected dives.
+- #172 [code] Bug: a dive without a site does not show its dive number. Does it have one?

@@ -3,13 +3,12 @@
   import Md3Dialog from './Md3Dialog.svelte';
   import TextField from './TextField.svelte';
   import { t } from '../lib/i18n.js';
-  import { displayName, validLogbookName } from '../lib/desktop-logbooks.js';
-  import { renameLogbook, windowLogbook } from '../lib/desktop-logbooks.svelte.js';
+  import { validLogbookName } from '../lib/desktop-logbooks.js';
 
-  /** @type {{ onclose: () => void }} */
-  let { onclose } = $props();
-  const entry = windowLogbook();
-  let name = $state(entry ? displayName(entry, t) : '');
+  /** @type {{ initialName: string, onclose: () => void, onsave: (name: string) => void | Promise<void> }} */
+  let { initialName, onclose, onsave } = $props();
+  // svelte-ignore state_referenced_locally
+  let name = $state(initialName);
   let busy = $state(false);
   let error = $state('');
   /** @type {HTMLElement|undefined} */
@@ -34,7 +33,7 @@
     busy = true;
     error = '';
     try {
-      await renameLogbook(name.trim());
+      await onsave(name.trim());
       onclose();
     } catch (e) {
       console.error('Renaming the logbook', e);
@@ -53,13 +52,13 @@
   }
 </script>
 
-<Md3Dialog class="bc-desktop-rename-logbook" title={t('desktopLogbooks.rename.title')} oncancel={cancel}>
+<Md3Dialog class="bc-rename-logbook" title={t('desktopLogbooks.rename.title')} oncancel={cancel}>
   {#snippet children()}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="bc-desktop-rename-logbook--field" bind:this={field} onkeydown={keydown}>
+    <div class="bc-rename-logbook--field" bind:this={field} onkeydown={keydown}>
       <TextField label={t('desktopLogbooks.rename.name')} bind:value={name} disabled={busy} />
     </div>
-    {#if error}<p class="bc-desktop-rename-logbook--error" role="alert">{error}</p>{/if}
+    {#if error}<p class="bc-rename-logbook--error" role="alert">{error}</p>{/if}
   {/snippet}
   {#snippet actions()}
     <button type="button" disabled={busy} onclick={cancel}>{t('dialog.cancel')}</button>
@@ -69,10 +68,10 @@
 
 <style>
   @layer od.components {
-    .bc-desktop-rename-logbook--field {
+    .bc-rename-logbook--field {
       --bc-field-margin: 24px;
     }
-    .bc-desktop-rename-logbook--error {
+    .bc-rename-logbook--error {
       margin: 12px 24px 0;
       color: var(--bc-alarm);
     }

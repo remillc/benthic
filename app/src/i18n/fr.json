@@ -2723,7 +2723,9 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
-      "Ordinateur : le s?lecteur affiche le nom du carnet sans libell? superflu.",
+      "Carnet sur mobile et tablette : renommez le carnet depuis le menu ⋮.",
+      "Carnet sur ordinateur : l’attente avant l’avion s’affiche au-dessus des plongées.",
+      "Ordinateur : le sélecteur affiche le nom du carnet sans libellé superflu.",
       "Tablette Android : l’icône Compte dans la barre latérale est plus grande.",
       "Carnet sur ordinateur : le menu Carnet permet de renommer le carnet affiché, sans modifier son fichier.",
       "Carnet sur tablette : la liste des plongées est un peu plus large en paysage.",
