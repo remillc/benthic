@@ -23,6 +23,12 @@ export const navigation = $state({
   page: /** @type {''|'settings'|'about'} */ (''),
   /** Identifier of the dive shown beside the list (tablet), or null. */
   dive: /** @type {string|null} */ (null),
+  /**
+   * At start, the detail pane beside the list waits for its first dive (tablet and desktop): it shows the
+   * detail's skeleton (App.svelte) while the core reads the logbook, until a page opens there or the list
+   * finds no dive to open (Logbook.svelte).
+   */
+  paneOpening: true,
   /** Download pages open (Download, Download failed): the Logbook's floating + steps aside while one shows. */
   downloadPanes: 0,
   /**
