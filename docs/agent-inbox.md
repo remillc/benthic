@@ -6492,3 +6492,11 @@ Christian approved this on 22 November 2026. Work in `main`. Amends step 2 of ta
 - The back arrow left of the title (back to step 1) and the ✕ are unchanged.
 
 Mock-ups: `android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle` (updated in `docs/mockups/`).
+
+## [ ] 2026-11-22-326 Retiring a piece of gear: the reason « Autre »
+
+Christian approved this on 22 November 2026. Work in `main`.
+
+In the « Retirer … ? » dialog of a piece of gear (phone, tablet, desktop), the optional reason gets a fourth chip after « Hors d’usage »: « Autre » (en « Other »), next to the existing reasons « Vendue », « Perdue », « Hors d’usage » (i18n keys beside `worn`). Same filter chip, single choice, still optional. On the phone the chips wrap onto two lines. The retired piece shows « Autre » as its reason in « Pièces retirées ». No text field.
+
+Mock-ups: `android-tablette-profil-piece-retirer-paysage`, `bureau-profil-piece-retirer`, `profil-piece-supprimer-android` (updated in `docs/mockups/`).
