@@ -1,8 +1,9 @@
 <script>
   // @ts-check
-  // « Sauvegarde et restauration » of an OpenDives+ account (task 2026-11-19-290), opened from the account sheet. On a phone the
-  // list, a version, one dive's versions and the deleted dives are pages with a back arrow (AccountBackupVersion and the others);
-  // from the tablet layout the list and what a choice shows sit side by side in this page (the desktop opens the same panes in a
+  // « Sauvegarde et restauration » of an OpenDives+ account (tasks 2026-11-19-290 and 2026-11-22-319), opened from the account sheet.
+  // On a phone « Que voulez-vous récupérer ? » and each of its three choices (the deleted dives, a version of a dive, the whole
+  // logbook at a date, then one version) are pages with a back arrow (AccountBackupDeleted and the others); from the tablet layout
+  // the choices and what one shows sit side by side in this page (the desktop opens the same panes in a
   // dialog, components/BackupDialog.svelte). The layout follows the width, the route stays this one.
   import { Page, Navbar } from 'framework7-svelte';
   import BackLink from '../components/BackLink.svelte';
@@ -31,7 +32,7 @@
     </div>
   {:else}
     <BackupMain
-      onversion={(id) => f7router.navigate(`/account/backup/version/${id}`)}
+      oncarnet={() => f7router.navigate('/account/backup/carnet/')}
       ondive={() => f7router.navigate('/account/backup/dive/')}
       ondeleted={() => f7router.navigate('/account/backup/deleted/')}
     />

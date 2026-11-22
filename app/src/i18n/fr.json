@@ -1222,8 +1222,10 @@
     "title": "Sauvegarde et restauration",
     "media": "Les photos et vidéos supprimées sont gardées 90 jours, puis effacées.",
     "status": {
-      "saved": "Carnet sauvegardé",
-      "savedLine": "{when}, chiffré sur le serveur Benthic",
+      "saved": "Sauvegardé {when}",
+      "savedLine": "Chiffré sur le serveur Benthic",
+      "never": "Pas encore sauvegardé",
+      "syncNow": "Sauvegarder maintenant",
       "neverLine": "Pas encore envoyé au serveur Benthic",
       "pending": {
         "one": "{n} modification en attente d’envoi",
@@ -1236,10 +1238,8 @@
       "failedLine": "La dernière synchronisation a échoué"
     },
     "versions": {
-      "title": "Revenir à une version du carnet",
       "current": "Actuelle",
       "older": "Versions plus anciennes",
-      "note": "Une version est gardée à chaque synchronisation. Restaurer une version garde aussi le carnet actuel comme version.",
       "empty": "Aucune version pour l’instant",
       "loading": "Lecture de l’historique",
       "failed": "L’historique n’a pas pu être lu",
@@ -1266,21 +1266,46 @@
       },
       "sinceNone": "Identique au carnet actuel"
     },
-    "only": {
-      "title": "Restaurer seulement",
-      "dive": "Une plongée",
-      "diveLine": "Choisir une version de la plongée",
-      "deleted": "Plongées supprimées",
-      "deletedLine": {
-        "one": "{n} plongée, toujours récupérable",
-        "other": "{n} plongées, toujours récupérables"
+    "hub": {
+      "title": "Que voulez-vous récupérer ?",
+      "deleted": "Une plongée supprimée",
+      "deletedLine": "Remettre une plongée effacée dans le carnet",
+      "deletedCount": {
+        "one": "{n} plongée supprimée, toujours récupérable",
+        "other": "{n} plongées supprimées, toujours récupérables"
       },
-      "deletedNone": "Aucune plongée supprimée",
       "deletedFailed": "L’historique n’a pas pu être lu",
-      "deletedSearching": "Recherche dans l’historique"
+      "deletedSearching": "Recherche dans l’historique",
+      "dive": "Une version d’une plongée",
+      "diveLine": "Annuler des changements faits à une plongée",
+      "carnet": "Tout le carnet à une date",
+      "carnetLine": "Revenir à une version complète du carnet",
+      "note": "Une version est gardée à chaque synchronisation. Rien n’est perdu en restaurant : le carnet actuel est gardé lui aussi."
+    },
+    "timeline": {
+      "title": "Tout le carnet à une date",
+      "today": "Aujourd’hui",
+      "yesterday": "Hier",
+      "added": {
+        "one": "+{n} ajoutée",
+        "other": "+{n} ajoutées"
+      },
+      "modified": {
+        "one": "{n} modifiée",
+        "other": "{n} modifiées"
+      },
+      "removed": {
+        "one": "{n} supprimée",
+        "other": "{n} supprimées"
+      },
+      "sites": {
+        "one": "{n} site changé",
+        "other": "{n} sites changés"
+      },
+      "note": "Les pastilles montrent ce qui a changé depuis chaque version. Restaurer garde aussi le carnet actuel comme version."
     },
     "pane": {
-      "empty": "Choisissez une version pour voir ce qu’elle contient"
+      "empty": "Choisissez ce que vous voulez récupérer"
     },
     "version": {
       "title": "Version",
@@ -1296,7 +1321,12 @@
         "one": "{n} pièce",
         "other": "{n} pièces"
       },
-      "differences": "Différences avec le carnet actuel",
+      "navTitle": "Version du {date}",
+      "differences": "Ce qui changera si vous restaurez",
+      "addedNote": {
+        "one": "Elle sera retirée du carnet",
+        "other": "Elles seront retirées du carnet"
+      },
       "none": "Aucune différence : c’est le carnet actuel.",
       "addedDetail": {
         "one": "{numbers}. Elle sera retirée.",
@@ -1314,7 +1344,7 @@
       "sitesDetail": "Le carnet reprend les sites de cette version.",
       "restore": "Restaurer cette version",
       "browse": "Parcourir cette version",
-      "browseNote": "« Parcourir » ouvre cette version en lecture seule, sans rien changer.",
+      "browseNote": "« Parcourir » ouvre cette version en lecture seule, sans rien changer. En restaurant, le carnet actuel est gardé comme version : vous pourrez y revenir.",
       "number": "N° {n}",
       "numbers": "N° {list}"
     },
@@ -1347,6 +1377,17 @@
       "change": "Changer",
       "choose": "Choisir",
       "search": "Rechercher une plongée",
+      "pickTitle": "Une version d’une plongée",
+      "recent": "Modifiées récemment",
+      "recentNone": "Aucune plongée n’a encore plusieurs versions.",
+      "changedOn": "Modifiée le {date}",
+      "changedAt": "Modifiée {when}",
+      "versionCount": {
+        "one": "{n} version",
+        "other": "{n} versions"
+      },
+      "noMatch": "Aucune plongée trouvée",
+      "hint": "Choisissez une plongée pour voir ses versions. Seule cette plongée change, le reste du carnet ne bouge pas.",
       "versions": "Versions",
       "restore": "Restaurer",
       "note": "Restaurer change seulement cette plongée. Le reste du carnet ne bouge pas.",
@@ -1359,7 +1400,8 @@
       "deleted": "Plongée supprimée",
       "fromMenu": "Versions de cette plongée",
       "row": "{number} · {site} · {date}",
-      "rowNoSite": "{number} · {date}"
+      "rowNoSite": "{number} · {date}",
+      "rowShort": "{number} · {site}"
     },
     "change": {
       "site": "Site : {to}, auparavant « {from} »",
@@ -1417,15 +1459,17 @@
       "title": "Plongées supprimées",
       "empty": "Aucune plongée supprimée",
       "failed": "L’historique n’a pas pu être lu : les plongées supprimées ne peuvent pas être listées.",
-      "row": "Supprimée {when}",
-      "fields": {
-        "depth": "Profondeur max",
-        "duration": "Durée",
-        "mode": "Mode",
-        "computer": "Ordinateur de plongée"
+      "row": "Supprimée le {date}",
+      "intro": "Une plongée restaurée reprend sa place et son numéro dans le carnet.",
+      "restoreAll": {
+        "one": "Restaurer la plongée",
+        "other": "Restaurer les {n} plongées"
+      },
+      "restoredAll": {
+        "one": "Plongée rétablie",
+        "other": "{n} plongées rétablies"
       },
       "restore": "Restaurer",
-      "note": "Une plongée supprimée reste récupérable sans limite de temps. Ses photos et vidéos sont gardées 90 jours après la suppression, puis effacées.",
       "restored": "Plongée rétablie",
       "restoreFailed": "La plongée n’a pas pu être rétablie. Le carnet n’a pas changé.",
       "restoredWithNumber": "Plongée rétablie sous le N° {number}",
@@ -2749,6 +2793,7 @@
       "Outils, désaturation : la légende sous les graphiques des tissus est plus courte.",
       "Premier lancement : des rayons de lumière venus du coin supérieur droit remplacent les bandes du bandeau bleu.",
       "Premier lancement : le nom Benthic prend sa propre police, avec « DIVE LOG » en dessous, et un logo plus grand.",
+      "Sauvegarde et restauration : « Que voulez-vous récupérer ? » propose trois choix, une plongée supprimée, une version d’une plongée ou tout le carnet à une date, chacun sur son écran. Le carnet se parcourt sur une frise par jour avec ce qui a changé depuis chaque version, et une version montre ce qui changera si vous la restaurez. « Sauvegarder maintenant » envoie le carnet tout de suite. « Restaurer les N plongées » rétablit toutes les plongées supprimées, chacune avec son numéro.",
       "Sauvegarde et restauration : les plongées supprimées sont présentées dans des fiches lisibles, avec les caractéristiques alignées d’une plongée à l’autre. Les listes affichent des placeholders pendant leur chargement.",
       "Sauvegarde et restauration : les plongées supprimées avant la création du compte et les versions antérieures du carnet sont listées et peuvent être restaurées. Une recherche des plongées supprimées qui échoue le dit maintenant, avec un bouton Réessayer. Chaque plongée supprimée montre sa date et son heure, sa profondeur, sa durée, son mode, son ordinateur et son site. Les listes défilantes affichent leur barre de défilement.",
       "Carnet sur mobile et tablette : renommez le carnet depuis le menu ⋮.",

@@ -6390,7 +6390,7 @@ Christian approved this on 19 November 2026. Work in `main`. Apply together with
 
 **Test:** compare the first launch on phone and tablet with the canvases; the wave and the letters look the same thickness.
 
-## [ ] 2026-11-22-319 Backup and restore redesigned (#147): « Que voulez-vous récupérer ? »
+## [x] 2026-11-22-319 Backup and restore redesigned (#147): « Que voulez-vous récupérer ? »
 
 Christian approved this on 22 November 2026. Work in `main`. Android phone first; apply the same structure to iPhone, tablet and desktop (desktop keeps its two-pane layout: the list on the left, the chosen screen on the right).
 

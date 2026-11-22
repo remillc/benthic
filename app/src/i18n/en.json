@@ -1222,8 +1222,10 @@
     "title": "Backup and restore",
     "media": "Deleted photos and videos are kept for 90 days, then erased.",
     "status": {
-      "saved": "Logbook backed up",
-      "savedLine": "{when}, encrypted on the Benthic server",
+      "saved": "Backed up {when}",
+      "savedLine": "Encrypted on the Benthic server",
+      "never": "Not backed up yet",
+      "syncNow": "Back up now",
       "neverLine": "Not sent to the Benthic server yet",
       "pending": {
         "one": "{n} change waiting to be sent",
@@ -1236,10 +1238,8 @@
       "failedLine": "The last sync failed"
     },
     "versions": {
-      "title": "Go back to a version of the logbook",
       "current": "Current",
       "older": "Older versions",
-      "note": "A version is kept at every sync. Restoring a version also keeps the current logbook as a version.",
       "empty": "No version yet",
       "loading": "Reading the history",
       "failed": "The history could not be read",
@@ -1266,21 +1266,46 @@
       },
       "sinceNone": "Same as the current logbook"
     },
-    "only": {
-      "title": "Restore only",
-      "dive": "One dive",
-      "diveLine": "Pick a version of the dive",
-      "deleted": "Deleted dives",
-      "deletedLine": {
-        "one": "{n} dive, always recoverable",
-        "other": "{n} dives, always recoverable"
+    "hub": {
+      "title": "What do you want to recover?",
+      "deleted": "A deleted dive",
+      "deletedLine": "Put an erased dive back in the logbook",
+      "deletedCount": {
+        "one": "{n} deleted dive, always recoverable",
+        "other": "{n} deleted dives, always recoverable"
       },
-      "deletedNone": "No deleted dive",
       "deletedFailed": "The history could not be read",
-      "deletedSearching": "Searching the history"
+      "deletedSearching": "Searching the history",
+      "dive": "A version of a dive",
+      "diveLine": "Undo changes made to a dive",
+      "carnet": "The whole logbook at a date",
+      "carnetLine": "Go back to a complete version of the logbook",
+      "note": "A version is kept at every sync. Nothing is lost by restoring: the current logbook is kept too."
+    },
+    "timeline": {
+      "title": "The whole logbook at a date",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "added": {
+        "one": "+{n} added",
+        "other": "+{n} added"
+      },
+      "modified": {
+        "one": "{n} changed",
+        "other": "{n} changed"
+      },
+      "removed": {
+        "one": "{n} deleted",
+        "other": "{n} deleted"
+      },
+      "sites": {
+        "one": "{n} site changed",
+        "other": "{n} sites changed"
+      },
+      "note": "The chips show what changed since each version. Restoring also keeps the current logbook as a version."
     },
     "pane": {
-      "empty": "Pick a version to see what it holds"
+      "empty": "Pick what you want to recover"
     },
     "version": {
       "title": "Version",
@@ -1296,7 +1321,12 @@
         "one": "{n} piece",
         "other": "{n} pieces"
       },
-      "differences": "Differences with the current logbook",
+      "navTitle": "Version of {date}",
+      "differences": "What will change if you restore",
+      "addedNote": {
+        "one": "It will be removed from the logbook",
+        "other": "They will be removed from the logbook"
+      },
       "none": "No difference: this is the current logbook.",
       "addedDetail": {
         "one": "{numbers}. It will be removed.",
@@ -1314,7 +1344,7 @@
       "sitesDetail": "The logbook takes this version’s sites back.",
       "restore": "Restore this version",
       "browse": "Browse this version",
-      "browseNote": "“Browse” opens this version read-only, without changing anything.",
+      "browseNote": "“Browse” opens this version read-only, without changing anything. When you restore, the current logbook is kept as a version: you can go back to it.",
       "number": "No. {n}",
       "numbers": "No. {list}"
     },
@@ -1347,6 +1377,17 @@
       "change": "Change",
       "choose": "Choose",
       "search": "Search for a dive",
+      "pickTitle": "A version of a dive",
+      "recent": "Recently changed",
+      "recentNone": "No dive has several versions yet.",
+      "changedOn": "Changed on {date}",
+      "changedAt": "Changed {when}",
+      "versionCount": {
+        "one": "{n} version",
+        "other": "{n} versions"
+      },
+      "noMatch": "No dive found",
+      "hint": "Pick a dive to see its versions. Only that dive changes, the rest of the logbook does not move.",
       "versions": "Versions",
       "restore": "Restore",
       "note": "Restoring changes only this dive. The rest of the logbook does not move.",
@@ -1359,7 +1400,8 @@
       "deleted": "Dive deleted",
       "fromMenu": "Versions of this dive",
       "row": "{number} · {site} · {date}",
-      "rowNoSite": "{number} · {date}"
+      "rowNoSite": "{number} · {date}",
+      "rowShort": "{number} · {site}"
     },
     "change": {
       "site": "Site: {to}, previously “{from}”",
@@ -1417,15 +1459,17 @@
       "title": "Deleted dives",
       "empty": "No deleted dive",
       "failed": "The history could not be read, so the deleted dives cannot be listed.",
-      "row": "Deleted {when}",
-      "fields": {
-        "depth": "Max depth",
-        "duration": "Duration",
-        "mode": "Mode",
-        "computer": "Dive computer"
+      "row": "Deleted on {date}",
+      "intro": "A restored dive takes back its place and its number in the logbook.",
+      "restoreAll": {
+        "one": "Restore the dive",
+        "other": "Restore all {n} dives"
+      },
+      "restoredAll": {
+        "one": "Dive brought back",
+        "other": "{n} dives brought back"
       },
       "restore": "Restore",
-      "note": "A deleted dive stays recoverable with no time limit. Its photos and videos are kept for 90 days after the deletion, then erased.",
       "restored": "Dive brought back",
       "restoreFailed": "The dive could not be brought back. The logbook did not change.",
       "restoredWithNumber": "Dive restored as no. {number}",
@@ -2749,6 +2793,7 @@
       "Tools, decompression: the caption under the tissue charts is shorter.",
       "First launch: light rays from the top right corner replace the stripes of the blue band.",
       "First launch: the name Benthic has its own typeface, with « DIVE LOG » under it, and a larger logo.",
+      "Backup and restore: “What do you want to recover?” offers three choices, a deleted dive, a version of a dive or the whole logbook at a date, each on its own screen. The logbook is browsed on a timeline by day showing what changed since each version, and a version shows what will change if you restore it. “Back up now” sends the logbook right away. “Restore all N dives” brings every deleted dive back, each with its number.",
       "Backup and restore: deleted dives are shown in readable cards, with details aligned from one dive to the next. Lists show placeholders while they load.",
       "Backup and restore: the dives deleted before the account was created, and the earlier versions of the logbook, are listed and can be restored. A failed search for deleted dives now says so, with a Try again button. Each deleted dive shows its date and time, depth, duration, mode, computer and site. Scrollable lists show their scrollbars.",
       "Logbook on phones and tablets: rename the logbook from the ⋮ menu.",

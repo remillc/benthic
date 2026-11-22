@@ -403,6 +403,38 @@ export async function diveVersions(core, key, { limit = 30, pageSize = 100 } = {
 }
 
 /**
+ * @typedef {Object} RecentDive
+ * @property {string} key the start time
+ * @property {number|null} number the number written in the newest version
+ * @property {number} time when a sync last touched the dive, seconds since 1970
+ * @property {number} versions how many syncs touched it (its versions, the first one included)
+ */
+
+/**
+ * The dives the latest syncs touched, newest first, with how many versions each has: the list of « Une version d’une plongée ».
+ * Only the newest `pages` pages of the history are read, which is enough for « modified recently ».
+ * @param {HistoryCore} core
+ * @param {{ pageSize?: number, pages?: number }} [options]
+ * @returns {Promise<RecentDive[]>}
+ */
+export async function recentDives(core, { pageSize = 100, pages = 5 } = {}) {
+  /** @type {Map<string, RecentDive>} */
+  const found = new Map();
+  for (let page = 0; page < pages; page++) {
+    const log = await core.history('log', [String(page * pageSize), String(pageSize), '1']);
+    for (const c of /** @type {Commit[]} */ (log.commits)) {
+      for (const d of summarizeChanges(c.changes ?? []).dives) {
+        const entry = found.get(d.key);
+        if (entry) entry.versions++;
+        else found.set(d.key, { key: d.key, number: d.number, time: c.time, versions: 1 });
+      }
+    }
+    if (!log.more) break;
+  }
+  return [...found.values()].sort((a, b) => b.time - a.time);
+}
+
+/**
  * @typedef {Object} DeletedDive
  * @property {string} key the start time
  * @property {number|null} number
@@ -546,4 +578,32 @@ export function restoredDiveNumberPlan(key, dives) {
     }
   }
   return { ids, numbers, number, shifted: !gap };
+}
+
+/**
+ * A restored dive that kept its own number while another dive took that number since (deleting a dive renumbers the later ones):
+ * the later dives, in date order, move up by one until the numbers no longer collide, so that the restored dive keeps its number.
+ * @param {string} key the restored dive's start time
+ * @param {{ id: number, date: string, number: number }[]} dives
+ * @returns {{ ids: number[], numbers: number[], number: number }|null} null: no collision, nothing to move
+ */
+export function restoredNumberCollisionPlan(key, dives) {
+  const ordered = [...dives].sort((a, b) => keyOfDate(a.date).localeCompare(keyOfDate(b.date)));
+  const index = ordered.findIndex((d) => keyOfDate(d.date) === key);
+  if (index < 0) return null;
+  const dive = ordered[index];
+  if (!(dive.number > 0) || !ordered.some((d) => d.id !== dive.id && d.number === dive.number)) return null;
+  /** @type {number[]} */
+  const ids = [];
+  /** @type {number[]} */
+  const numbers = [];
+  let next = dive.number + 1;
+  for (const later of ordered.slice(index + 1)) {
+    if (!(later.number > 0)) continue;
+    if (later.number > next) break;
+    ids.push(later.id);
+    numbers.push(next);
+    next++;
+  }
+  return ids.length ? { ids, numbers, number: dive.number } : null;
 }

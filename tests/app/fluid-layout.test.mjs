@@ -27,8 +27,7 @@ test('scrollbars: thin in the desktop app, never on the page itself', () => {
 test('backup panes show a scrollbar in each scrollable section', () => {
   const css = read('app/src/components/backup.css');
   for (const selector of [
-    '.bc-backup-main--versions',
-    '.bc-backup-main--only',
+    '.bc-backup-panes--list',
     '.bc-backup-panes--detail',
   ]) {
     assert.ok(css.includes(`${selector}::-webkit-scrollbar`), selector);
@@ -37,18 +36,16 @@ test('backup panes show a scrollbar in each scrollable section', () => {
 });
 
 test('backup history shows loading skeletons and keeps restore beside the dive details', () => {
-  const main = read('app/src/components/BackupMain.svelte');
-  assert.match(main, /bc-backup-main--skeleton-list skeleton-effect-wave" role="status" aria-busy="true"/);
-  assert.match(main, /bc-backup-main--deleted-skeleton/);
+  const timeline = read('app/src/components/BackupTimeline.svelte');
+  assert.match(timeline, /bc-backup-main--skeleton-list skeleton-effect-wave" role="status" aria-busy="true"/);
+  assert.match(read('app/src/components/BackupMain.svelte'), /bc-backup-main--badge-skeleton/);
 
+  // Task 2026-11-22-319: a deleted dive is a row (name, « date · duration · depth », « Supprimée le … ») with a text button.
   const deleted = read('app/src/components/BackupDeleted.svelte');
   assert.match(deleted, /bc-backup-deleted--facts/);
+  assert.match(deleted, /bc-backup-deleted--removed/);
   const css = read('app/src/components/backup.css');
   assert.match(css, /\.bc-backup-deleted--restore,\s*\.bc-backup-deleted--state button \{\s*width: auto;/);
-  assert.match(css, /\.bc-backup-deleted--facts \{\s*display: grid;\s*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
-  for (const field of ['depth', 'duration', 'mode', 'computer']) {
-    assert.ok(deleted.includes(`bc-backup-deleted--fact-${field}`), field);
-  }
 });
 
 test('the tools, the site sheet and the clean-up lay out by their pane, not the window', () => {

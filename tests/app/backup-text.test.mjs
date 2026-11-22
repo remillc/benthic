@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { numbersText, changeText, revertText, changesLine, versionLine, differenceBlocks, confirmText, diveVersionLine, isoOfEpoch, versionWhen } from '../../app/src/lib/backup-text.js';
+import { numbersText, changeText, revertText, changesLine, versionLine, differenceBlocks, confirmText, diveVersionLine, isoOfEpoch, versionWhen, changedWhen } from '../../app/src/lib/backup-text.js';
 
 const fr = JSON.parse(readFileSync(new URL('../../app/src/i18n/fr.json', import.meta.url), 'utf8'));
 const en = JSON.parse(readFileSync(new URL('../../app/src/i18n/en.json', import.meta.url), 'utf8'));
@@ -81,15 +81,13 @@ test('French and English have the same texts for the backup screens, and the 90 
   assert.deepEqual(keys(fr.backup).sort(), keys(en.backup).sort());
   assert.match(fr.backup.media, /90 jours/);
   assert.match(en.backup.media, /90 days/);
-  assert.match(fr.backup.deleted.note, /90 jours/);
-  assert.match(en.backup.deleted.note, /90 days/);
   // The deletion of the account says it erases the history, the deleted dives included.
   assert.match(fr.account.manage.deleteText, /tout l’historique du carnet \(les plongées supprimées comprises\)/);
   assert.match(en.account.manage.deleteText, /whole history of the logbook \(deleted dives included\)/);
 });
 
 test('the screens, the dialog and the dive menu are wired', () => {
-  for (const f of ['BackupMain', 'BackupVersion', 'BackupDive', 'BackupDeleted', 'BackupBrowse', 'BackupPanes', 'BackupDialog']) assert.ok(existsSync(new URL(`../../app/src/components/${f}.svelte`, import.meta.url)), f);
+  for (const f of ['BackupMain', 'BackupTimeline', 'BackupVersion', 'BackupDivePick', 'BackupDive', 'BackupDeleted', 'BackupBrowse', 'BackupPanes', 'BackupDialog']) assert.ok(existsSync(new URL(`../../app/src/components/${f}.svelte`, import.meta.url)), f);
   assert.match(read('pages/DiveDetail.svelte'), /logbook\.odplus && dive[\s\S]*icon="history"[\s\S]*openDiveVersions\(dive\.date\)/);
   assert.match(read('lib/backup-nav.js'), /layout\.desktop[\s\S]*navigation\.backupOpen = true/);
   // Browsing holds the core: nothing is saved or synced meanwhile.
@@ -97,8 +95,28 @@ test('the screens, the dialog and the dive menu are wired', () => {
   assert.match(logbook, /logbook\.autoSync && syncAllowedOnThisNetwork\(\) && !logbook\.browsing/);
   assert.match(logbook, /if \(logbook\.browsing\) return \/\*\* @type \{SyncOutcome\} \*\/ \('failed'\)/);
   // Every css class of the screens is prefixed od- and names its component.
-  for (const f of ['BackupMain', 'BackupVersion', 'BackupDive', 'BackupDeleted', 'BackupBrowse', 'BackupPanes']) {
+  for (const f of ['BackupMain', 'BackupTimeline', 'BackupVersion', 'BackupDivePick', 'BackupDive', 'BackupDeleted', 'BackupBrowse', 'BackupPanes']) {
     const classes = [...read(`components/${f}.svelte`).matchAll(/class(?:name)?="([^"{]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('bc-backup'));
     assert.ok(classes.length, f);
   }
+});
+
+test('a dive changed today or yesterday says when, an older one says the day (task 2026-11-22-319)', () => {
+  const local = '2026-11-22T10:30:00';
+  const t0 = Date.parse('2026-11-22T10:12:00Z') / 1000;
+  assert.match(nbsp(changedWhen(t0, local)), /^Modifiée aujourd’hui, /);
+  assert.match(nbsp(changedWhen(t0 - 86400, local)), /^Modifiée hier, /);
+  assert.match(nbsp(changedWhen(t0 - 7 * 86400, local)), /^Modifiée le .*2026/);
+});
+
+test('the three choices, the timeline and the deleted dives have their texts in both languages (task 2026-11-22-319)', () => {
+  assert.equal(fr.backup.hub.title, 'Que voulez-vous récupérer ?');
+  assert.equal(fr.backup.hub.deleted, 'Une plongée supprimée');
+  assert.equal(fr.backup.hub.dive, 'Une version d’une plongée');
+  assert.equal(fr.backup.hub.carnet, 'Tout le carnet à une date');
+  assert.equal(fr.backup.status.syncNow, 'Sauvegarder maintenant');
+  assert.equal(fr.backup.deleted.intro, 'Une plongée restaurée reprend sa place et son numéro dans le carnet.');
+  assert.equal(fr.backup.deleted.restoreAll.other, 'Restaurer les {n} plongées');
+  assert.equal(fr.backup.version.differences, 'Ce qui changera si vous restaurez');
+  assert.equal(en.backup.hub.title, 'What do you want to recover?');
 });

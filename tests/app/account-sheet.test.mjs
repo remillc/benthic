@@ -367,13 +367,15 @@ test('the free sheet opens the offer for both Benthic+ rows; the subscriber shee
   assert.equal(langs.fr.account.sheet.backupText, 'Revenir à une version du carnet ou d’une plongée');
 });
 
-test('the backup and restore screens are routes of the account: the list, a version, a dive, the deleted dives and a read-only version', () => {
+test('the backup and restore screens are routes of the account: the choices, a version, a dive, the deleted dives, the timeline and a read-only version', () => {
   const app = read('App.svelte');
   assert.match(app, /path: '\/account\/backup', \.\.\.lazy\(\(\) => import\('\.\/pages\/AccountBackup\.svelte'\)\)/);
   assert.match(app, /path: '\/account\/backup\/version\/:id'/);
   assert.match(app, /path: '\/account\/backup\/dive\/:key'/);
   assert.match(app, /path: '\/account\/backup\/dive\/',/);
   assert.match(app, /path: '\/account\/backup\/deleted\/'/);
+  // Task 2026-11-22-319: « Que voulez-vous récupérer ? » opens three pages, the timeline of the logbook being the third.
+  assert.match(app, /path: '\/account\/backup\/carnet\/'/);
   assert.match(app, /path: '\/account\/backup\/browse\/:id'/);
   assert.match(app, /\{#if layout\.desktop\}<BackupDialog \/>\{\/if\}/);
   // The old provisional page (sync status, server, history line) is gone.

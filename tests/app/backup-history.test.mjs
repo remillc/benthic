@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   diveOfPath, siteOfPath, summarizeChanges, parseDiveFile, diveFieldChanges, computerModel,
   listVersions, versionDetail, diveVersions, deletedDives, restoreVersion, restoreDive, divesAt, keyOfDate,
-  restoredDiveNumberPlan,
+  restoredDiveNumberPlan, restoredNumberCollisionPlan, recentDives,
 } from '../../app/src/lib/backup-history.js';
 import { GitLogbook } from './git-history-core.mjs';
 
@@ -306,4 +306,42 @@ test('a dive deleted long ago stays recoverable, past the first page of the hist
   } finally {
     lb.dispose();
   }
+});
+
+test('the recent dives are the ones the latest syncs touched, with their number of versions (task 2026-11-22-319)', async () => {
+  const { lb, v1, v2, v4 } = makeLogbook();
+  try {
+    const recent = await recentDives(lb);
+    // Newest touch first; the dive of 2022-04-24 was created at v1 and changed at v2: two versions.
+    const byKey = new Map(recent.map((r) => [r.key, r]));
+    assert.equal(byKey.get('2022-04-24 10:30:00').versions, 2);
+    assert.equal(byKey.get('2022-04-24 10:30:00').number, 1);
+    assert.equal(byKey.get('2022-05-15 09:00:00').versions, 1);
+    assert.deepEqual(recent.map((r) => r.time), [...recent.map((r) => r.time)].sort((a, b) => b - a));
+    // Each dive is listed once, and the versions counted are the ones diveVersions lists.
+    assert.equal(new Set(recent.map((r) => r.key)).size, recent.length);
+    for (const r of recent) assert.equal((await diveVersions(lb, r.key)).length, r.versions, r.key);
+    // Only the newest pages are read.
+    const one = await recentDives(lb, { pageSize: 1, pages: 1 });
+    assert.equal(one.length >= 1, true);
+    assert.ok(v1 && v2 && v4);
+  } finally {
+    lb.dispose();
+  }
+});
+
+test('a restored dive keeps its number: the later dives that took it move up (task 2026-11-22-319)', () => {
+  const restored = { id: 3, date: '2023-06-11T09:45:00', number: 3 };
+  const a = { id: 1, date: '2023-01-01T09:00:00', number: 1 };
+  const b = { id: 2, date: '2023-02-01T09:00:00', number: 2 };
+  const l1 = { id: 4, date: '2023-07-01T09:00:00', number: 3 };
+  const l2 = { id: 5, date: '2023-08-01T09:00:00', number: 4 };
+  const l3 = { id: 6, date: '2023-09-01T09:00:00', number: 9 };
+  // The dives that came after it were renumbered when it was deleted: 3 and 4 collide, the gap before 9 stops the shift.
+  assert.deepEqual(restoredNumberCollisionPlan('2023-06-11 09:45:00', [l3, l2, l1, restored, b, a]), { ids: [4, 5], numbers: [4, 5], number: 3 });
+  // No other dive has its number: nothing moves.
+  assert.equal(restoredNumberCollisionPlan('2023-06-11 09:45:00', [restored, a, b, { ...l1, number: 4 }]), null);
+  // An unnumbered dive is the other plan's business.
+  assert.equal(restoredNumberCollisionPlan('2023-06-11 09:45:00', [{ ...restored, number: 0 }, a, b, l1]), null);
+  assert.equal(restoredNumberCollisionPlan('2000-01-01 00:00:00', [restored, a]), null);
 });
