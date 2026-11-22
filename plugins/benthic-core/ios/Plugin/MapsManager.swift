@@ -415,7 +415,7 @@ public final class MapsManager {
             try data.write(to: stateURL, options: .atomic)
             excludeFromBackup(stateURL)
         } catch {
-            NSLog("OpenDives: cannot save the maps state: \(error.localizedDescription)")
+            NSLog("Benthic: cannot save the maps state: \(error.localizedDescription)")
         }
     }
 
@@ -598,7 +598,7 @@ public final class MapsManager {
                 let data = try JSONSerialization.data(withJSONObject: entries[i].state)
                 try data.write(to: part.appendingPathComponent(Self.meta))
             } catch {
-                NSLog("OpenDives: cannot write the region's meta file: \(error.localizedDescription)")
+                NSLog("Benthic: cannot write the region's meta file: \(error.localizedDescription)")
                 return false
             }
             let ready = readyDir(id)
@@ -764,7 +764,7 @@ public final class MapsManager {
             try BGTaskScheduler.shared.submit(request)
         } catch {
             // The simulator, or background work turned off: the download resumes when the app comes back.
-            NSLog("OpenDives: no background task for the map download: \(error.localizedDescription)")
+            NSLog("Benthic: no background task for the map download: \(error.localizedDescription)")
         }
     }
 }

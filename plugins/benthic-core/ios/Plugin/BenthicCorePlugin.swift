@@ -197,7 +197,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             do {
                 try BenthicNative.initialize(withHome: home.path)
             } catch {
-                CAPLog.print("OpenDives: cannot start the core: \(error.localizedDescription)")
+                CAPLog.print("Benthic: cannot start the core: \(error.localizedDescription)")
             }
             // The messages of the cloud log's git work, while it syncs.
             BenthicNative.setSyncProgress { [weak self] message in
@@ -206,10 +206,10 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             // iOS cannot export its trust store: the Mozilla bundle ships with the plugin.
             if let certificates = resources.path(forResource: "cacert", ofType: "pem") {
                 if !BenthicNative.setCaFile(certificates) {
-                    CAPLog.print("OpenDives: certificate authorities rejected by libgit2")
+                    CAPLog.print("Benthic: certificate authorities rejected by libgit2")
                 }
             } else {
-                CAPLog.print("OpenDives: cacert.pem is missing from the plugin's resources")
+                CAPLog.print("Benthic: cacert.pem is missing from the plugin's resources")
             }
             if let root = resources.resourcePath {
                 BenthicNative.setXsltDir(root + "/xslt")
@@ -806,7 +806,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
                     ])
                     return
                 } catch {
-                    CAPLog.print("OpenDives: the stored repository cannot be used: \(error.localizedDescription)")
+                    CAPLog.print("Benthic: the stored repository cannot be used: \(error.localizedDescription)")
                 }
             }
             let stored = credentials.read()
