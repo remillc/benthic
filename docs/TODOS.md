@@ -55,7 +55,7 @@ Next number: 166
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
 - #135 [code] On /profile/info, in edit mode, reduce the width of the Blood group field.
-- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
+- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
 - #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.
 - #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
@@ -66,4 +66,3 @@ Next number: 166
 - #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
 - #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
-- #165 [code] On /profile/info, update the sentence to say that all information in this section is encrypted, once #136 is complete.
