@@ -179,10 +179,12 @@
       </div>
     </div>
 
-    <p class="bc-profile-info--note">
-      <Icon name="lock" size={18} />
-      <span>{t('diverProfile.info.lockNoteNoDate')}</span>
-    </p>
+    {#if diver.ready}
+      <p class="bc-profile-info--note">
+        <Icon name="lock" size={18} />
+        <span>{t(diver.legacyBirthDate ? 'diverProfile.info.lockNoteLegacyBirthDate' : 'diverProfile.info.lockNoteNoDate')}</span>
+      </p>
+    {/if}
   {/if}
 {/snippet}
 

@@ -13,6 +13,7 @@ import { createProfile, emptyInfo } from './profile.js';
 /** What the screens read. */
 export const diver = $state({
   ready: false,
+  legacyBirthDate: false,
   info: emptyInfo(),
   /** @type {Certification[]} */
   certs: [],
@@ -66,8 +67,10 @@ export const services = () => open();
 export async function loadProfile() {
   const { profile } = open();
   const [info, certs] = await Promise.all([profile.readInfo(), profile.listCertifications()]);
+  const legacyBirthDate = await profile.hasClearBirthDate();
   diver.info = info;
   diver.certs = certs;
+  diver.legacyBirthDate = legacyBirthDate;
   diver.ready = true;
 }
 

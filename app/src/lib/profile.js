@@ -2,7 +2,7 @@
 // « Mon profil de plongeur » (Benthic+, task 2026-11-18-272): the Informations (date of birth, emergency contact,
 // blood group) and the certification cards, in the same local store as the equipment (lib/file-store.js), in the
 // layout of the Benthic logbook (docs/architecture.md, section 11.3):
-//   profile/diver.json          plain: dateOfBirth; sealed block `enc`: emergencyContact, bloodGroup
+//   profile/diver.json          sealed block `enc`: fullName, dateOfBirth, emergencyContact, bloodGroup
 //   certifications/<uuid>.json  the whole payload sealed: agency, level, number, issuedOn, instructor, photos
 //   documents/<hash>.json       one sealed card photo, named by the hash of its ciphertext (section 11.6)
 //   meta/health-consent.json    legacy health-data consent, retained for export
@@ -216,9 +216,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     return { consent: c?.consent === true, at: typeof c?.at === 'string' ? c.at : '', synced: c?.synced !== false };
   }
 
-  /** @param {boolean} [strict] @returns {Promise<any>} */
-  async function readSealed(strict = false) {
-    const file = strict ? await store.readStrict(DIVER) : await store.read(DIVER);
+  /** @param {any} file @param {boolean} [strict] @returns {Promise<any>} */
+  async function readSealed(file, strict = false) {
     if (!file?.enc) return {};
     try {
       return await box.open(file.enc, { id: 'profile', format: 1 });
@@ -228,14 +227,43 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     }
   }
 
+  /** Moves an old clear-text birth date into the sealed block without overwriting a concurrent edit. */
+  async function migrateBirthDate() {
+    for (;;) {
+      const { text, value: file } = await store.readSnapshot(DIVER);
+      if (!file || !Object.hasOwn(file, 'dateOfBirth')) return file;
+      if (typeof file.dateOfBirth !== 'string') throw new Error('INVALID_BIRTH_DATE');
+      const state = await store.readSnapshot('meta/state.json');
+      if (state.value?.readOnlyFrom) throw new ReadOnlyError();
+      const sealed = await readSealed(file, true);
+      if (!sealed || typeof sealed !== 'object' || Array.isArray(sealed)) throw new Error('INVALID_PROFILE_DATA');
+      if (Object.hasOwn(sealed, 'dateOfBirth') && sealed.dateOfBirth !== file.dateOfBirth) {
+        throw new Error('CONFLICTING_BIRTH_DATE');
+      }
+      const next = { ...sealed };
+      if (file.dateOfBirth) next.dateOfBirth = file.dateOfBirth;
+      const updated = { ...file, enc: await box.seal(next, { id: 'profile', format: 1 }) };
+      delete updated.dateOfBirth;
+      if (await store.trackedBatchIfUnchanged([[DIVER, text], ['meta/state.json', state.text]], { writes: [[DIVER, updated]] })) return updated;
+    }
+  }
+
   const api = {
     readConsent,
+    migrateBirthDate,
+
+    /** Whether a legacy profile still has a clear-text birth date. */
+    async hasClearBirthDate() {
+      const file = await store.readStrict(DIVER);
+      return !!file && Object.hasOwn(file, 'dateOfBirth');
+    },
 
     /** Removes the blood group from the sealed block; the rest of the file stays. */
     async deleteBloodGroup() {
+      await migrateBirthDate();
       const file = await store.readStrict(DIVER);
       if (!file?.enc) return;
-      const sealed = await readSealed(true);
+      const sealed = await readSealed(file, true);
       if (!('bloodGroup' in sealed)) return;
       const rest = { ...sealed };
       delete rest.bloodGroup;
@@ -245,10 +273,13 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
 
     /** @returns {Promise<DiverInfo>} */
     async readInfo() {
-      const file = await store.read(DIVER);
-      const sealed = await readSealed();
+      let file = await store.readStrict(DIVER);
+      if (file && Object.hasOwn(file, 'dateOfBirth') && !(await store.readStrict('meta/state.json'))?.readOnlyFrom) {
+        file = await migrateBirthDate();
+      }
+      const sealed = await readSealed(file);
       const info = emptyInfo();
-      info.dateOfBirth = typeof file?.dateOfBirth === 'string' ? file.dateOfBirth : '';
+      info.dateOfBirth = typeof sealed.dateOfBirth === 'string' ? sealed.dateOfBirth : typeof file?.dateOfBirth === 'string' ? file.dateOfBirth : '';
       info.fullName = typeof sealed.fullName === 'string' ? sealed.fullName : '';
       const e = sealed.emergencyContact;
       if (e) info.emergency = { name: e.name ?? '', relation: e.relation ?? '', phone: { country: e.phone?.country ?? 'CA', number: e.phone?.number ?? '' } };
@@ -261,7 +292,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const problems = infoProblems(info, now().toISOString().slice(0, 10));
       if (Object.keys(problems).length) throw new Error(`INVALID_INFO:${Object.keys(problems).join(',')}`);
       const file = (await store.readStrict(DIVER)) ?? { format: 1 };
-      const sealed = await readSealed(true);
+      const sealed = await readSealed(file, true);
       const phone = { country: info.emergency.phone.country, number: nationalDigits(info.emergency.phone.number, info.emergency.phone.country) };
       const next = {
         ...sealed,
@@ -272,10 +303,12 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const fullName = cleanFullName(info.fullName ?? '');
       if (fullName) next.fullName = fullName;
       else delete next.fullName;
+      const dob = info.dateOfBirth.trim();
+      if (dob) next.dateOfBirth = dob;
+      else delete next.dateOfBirth;
       const restOfFile = { ...file };
       delete restOfFile.dateOfBirth;
-      const dob = info.dateOfBirth.trim();
-      await commit([[DIVER, { ...restOfFile, format: 1, ...(dob ? { dateOfBirth: dob } : {}), enc: await box.seal(next, { id: 'profile', format: 1 }), updatedAt: stamp() }]]);
+      await commit([[DIVER, { ...restOfFile, format: 1, enc: await box.seal(next, { id: 'profile', format: 1 }), updatedAt: stamp() }]]);
     },
 
     // ---- Certification cards ----

@@ -12,6 +12,7 @@
 //  - get(path) -> text|null; list(prefix) -> paths that start with prefix;
 //  - apply(writes, removes): all the changes or none (one transaction), so a crash never leaves half a change.
 //  - applyTracked(writes, removes): apply changes and add their paths to meta/pending.json in the same transaction.
+//  - applyTrackedIfUnchanged(expected, writes, removes): the same, only if all files still match expected.
 //  - snapshotPending() / acknowledgePending(snapshot): capture and acknowledge unchanged pending files atomically.
 
 /**
@@ -20,6 +21,7 @@
  * @property {(prefix: string) => Promise<string[]>} list
  * @property {(writes: [string, string][], removes: string[]) => Promise<void>} apply
  * @property {(writes: [string, string][], removes: string[]) => Promise<void>} applyTracked
+ * @property {(expected: [string, string|null][], writes: [string, string][], removes: string[]) => Promise<boolean>} applyTrackedIfUnchanged
  * @property {() => Promise<[string, string|null][]>} snapshotPending
  * @property {(snapshot: [string, string|null][]) => Promise<void>} acknowledgePending
  */
@@ -86,6 +88,14 @@ export function memoryBackend() {
       for (const [path, text] of writes) files.set(path, text);
       for (const path of removes) files.delete(path);
       files.set(PENDING, pending);
+    },
+    async applyTrackedIfUnchanged(expected, writes, removes) {
+      if (expected.some(([path, text]) => (files.get(path) ?? null) !== text)) return false;
+      const pending = addPending(files.get(PENDING), [...writes.map(([p]) => p), ...removes]);
+      for (const [p, text] of writes) files.set(p, text);
+      for (const p of removes) files.delete(p);
+      files.set(PENDING, pending);
+      return true;
     },
     async snapshotPending() {
       return parsePending(files.get(PENDING)).paths.map((/** @type {string} */ path) => [path, files.get(path) ?? null]);
@@ -232,6 +242,38 @@ export function indexedDbBackend(factory = globalThis.indexedDB) {
         tx.onabort = () => reject(failure ?? tx.error);
       });
     },
+    async applyTrackedIfUnchanged(expected, writes, removes) {
+      const db = await open();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        const store = tx.objectStore(STORE);
+        let changed = false;
+        /** @type {unknown} */
+        let failure;
+        let matches = true;
+        for (const [path, text] of expected) {
+          const current = store.get(path);
+          current.onsuccess = () => { if ((current.result ?? null) !== text) matches = false; };
+        }
+        const marker = store.get(PENDING);
+        marker.onsuccess = () => {
+          if (!matches) return;
+          try {
+            const pending = addPending(marker.result, [...writes.map(([p]) => p), ...removes]);
+            for (const [p, text] of writes) store.put(text, p);
+            for (const p of removes) store.delete(p);
+            store.put(pending, PENDING);
+            changed = true;
+          } catch (error) {
+            failure = error;
+            tx.abort();
+          }
+        };
+        tx.oncomplete = () => resolve(changed);
+        tx.onerror = () => reject(failure ?? tx.error);
+        tx.onabort = () => reject(failure ?? tx.error);
+      });
+    },
     async snapshotPending() {
       const db = await open();
       return new Promise((resolve, reject) => {
@@ -298,6 +340,11 @@ export function indexedDbBackend(factory = globalThis.indexedDB) {
  */
 export function createFileStore(backend) {
   return {
+    /** @param {string} path @returns {Promise<{ text: string|null, value: any|null }>} */
+    async readSnapshot(path) {
+      const text = await backend.get(path);
+      return { text, value: text == null ? null : JSON.parse(text) };
+    },
     /** @param {string} path @returns {Promise<any|null>} */
     async readStrict(path) {
       const text = await backend.get(path);
@@ -332,6 +379,9 @@ export function createFileStore(backend) {
     batch: ({ writes = [], removes = [] }) => backend.apply(writes.map(([p, v]) => [p, sortedJson(v)]), removes),
     /** Changes and their pending paths in one transaction. @param {{ writes?: [string, unknown][], removes?: string[] }} changes */
     trackedBatch: ({ writes = [], removes = [] }) => backend.applyTracked(writes.map(([p, v]) => [p, sortedJson(v)]), removes),
+    /** @param {[string, string|null][]} expected @param {{ writes?: [string, unknown][], removes?: string[] }} changes */
+    trackedBatchIfUnchanged: (expected, { writes = [], removes = [] }) =>
+      backend.applyTrackedIfUnchanged(expected, writes.map(([p, v]) => [p, sortedJson(v)]), removes),
     snapshotPending: () => backend.snapshotPending(),
     /** @param {[string, string|null][]} snapshot */
     acknowledgePending: (snapshot) => backend.acknowledgePending(snapshot),

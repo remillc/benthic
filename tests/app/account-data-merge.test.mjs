@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeAccountFile } from '../../app/src/lib/account-data-merge.js';
+import { mergeAccountFile, mergeEncryptedAccountFile } from '../../app/src/lib/account-data-merge.js';
+import { createSecretBox, toBase64 } from '../../app/src/lib/secret-box.js';
 
 test('merges independent fields and preserves unknown data', () => {
   const base = { name: 'A', tags: ['old'], future: { retained: true }, updatedAt: '2026-01-01T00:00:00Z' };
@@ -47,4 +48,76 @@ test('preserves unknown JSON keys that have special meaning to JavaScript object
   const theirs = JSON.parse('{"__proto__":{"future":2},"name":"A"}');
   const result = mergeAccountFile(base, ours, theirs);
   assert.deepEqual(result.value, JSON.parse('{"__proto__":{"future":2},"name":"B"}'));
+});
+
+function boxFor(byte) {
+  const key = toBase64(new Uint8Array(32).fill(byte));
+  return createSecretBox({ read: async () => key, write: async () => { throw new Error('unexpected key write'); } });
+}
+
+test('merges the encrypted profile fields without encrypting its ordinary fields', async () => {
+  const box = boxFor(1);
+  const item = { id: 'profile', format: 1 };
+  const make = async (data, updatedAt, homeAirport) => ({ format: 1, updatedAt, homeAirport, enc: await box.seal(data, item) });
+  const base = await make({ fullName: 'Name A', bloodGroup: 'A+', dateOfBirth: '1980-01-01', future: 'keep' }, '2026-01-01T00:00:00Z', 'AAA');
+  const ours = await make({ fullName: 'Name B', bloodGroup: 'A+', dateOfBirth: '1980-01-01', future: 'keep' }, '2026-01-02T00:00:00Z', 'BBB');
+  const theirs = await make({ fullName: 'Name A', bloodGroup: 'O+', dateOfBirth: '1980-01-01', future: 'keep' }, '2026-01-03T00:00:00Z', 'AAA');
+  const result = await mergeEncryptedAccountFile(base, ours, theirs, box, item);
+  assert.equal(result.value.homeAirport, 'BBB');
+  assert.deepEqual(await box.open(result.value.enc, item), { fullName: 'Name B', bloodGroup: 'O+', dateOfBirth: '1980-01-01', future: 'keep' });
+  assert.notEqual(result.value.enc.nonce, ours.enc.nonce);
+  assert.notEqual(result.value.enc.nonce, theirs.enc.nonce);
+  assert.deepEqual(result.conflicts, []);
+  assert.equal(result.sealedConflicts, null);
+});
+
+test('keeps sensitive certification conflicts encrypted, including both competing values', async () => {
+  const box = boxFor(2);
+  const item = { id: 'cert-1', format: 1 };
+  const make = async (payload, updatedAt) => ({ format: 1, id: item.id, updatedAt, enc: await box.seal(payload, item) });
+  const base = await make({ number: 'original', documents: ['old'] }, '2026-01-01T00:00:00Z');
+  const ours = await make({ number: 'private-one', documents: ['old'] }, '2026-01-02T00:00:00Z');
+  const theirs = await make({ number: 'private-two', documents: ['new'] }, '2026-01-03T00:00:00Z');
+  const result = await mergeEncryptedAccountFile(base, ours, theirs, box, item);
+  assert.deepEqual(await box.open(result.value.enc, item), { number: 'private-two', documents: ['new'] });
+  assert.ok(result.sealedConflicts);
+  assert.doesNotMatch(JSON.stringify(result), /private-one|private-two/);
+  assert.deepEqual(await box.open(result.sealedConflicts, { id: 'cert-1:conflicts', format: 1 }), [{
+    key: 'number', base: { present: true, value: 'original' }, ours: { present: true, value: 'private-one' }, theirs: { present: true, value: 'private-two' },
+  }]);
+  await assert.rejects(box.open(result.sealedConflicts, item));
+});
+
+test('does not merge encrypted content with a different key or file identity', async () => {
+  const box = boxFor(3);
+  const other = boxFor(4);
+  const item = { id: 'cert-1', format: 1 };
+  const base = { format: 1, id: item.id, updatedAt: '2026-01-01T00:00:00Z', enc: await box.seal({ level: 'A' }, item) };
+  const ours = { ...base, updatedAt: '2026-01-02T00:00:00Z', enc: await box.seal({ level: 'B' }, item) };
+  const theirs = { ...base, updatedAt: '2026-01-03T00:00:00Z', enc: await other.seal({ level: 'C' }, item) };
+  await assert.rejects(mergeEncryptedAccountFile(base, ours, theirs, box, item));
+  await assert.rejects(mergeEncryptedAccountFile(base, ours, { ...theirs, id: 'another' }, box, item), /INVALID_ACCOUNT_FILE/);
+  await assert.rejects(mergeEncryptedAccountFile(base, ours, { ...theirs, format: 2 }, box, item), /INVALID_ACCOUNT_FILE/);
+  await assert.rejects(mergeEncryptedAccountFile(null, null, theirs, box, item));
+});
+
+test('rejects a legacy clear-text birth date before returning a file for synchronization', async () => {
+  const box = boxFor(7);
+  const item = { id: 'profile', format: 1 };
+  const file = { format: 1, dateOfBirth: '1980-01-02' };
+  await assert.rejects(mergeEncryptedAccountFile(null, null, file, box, item), /LEGACY_BIRTH_DATE/);
+});
+
+test('resolves deletion of an encrypted block without exposing its conflict in clear text', async () => {
+  const box = boxFor(5);
+  const item = { id: 'profile', format: 1 };
+  const base = { format: 1, updatedAt: '2026-01-01T00:00:00Z', enc: await box.seal({ fullName: 'old' }, item) };
+  const ours = { format: 1, updatedAt: '2026-01-02T00:00:00Z' };
+  const theirs = { format: 1, updatedAt: '2026-01-03T00:00:00Z', enc: await box.seal({ fullName: 'private' }, item) };
+  const result = await mergeEncryptedAccountFile(base, ours, theirs, box, item);
+  assert.equal((await box.open(result.value.enc, item)).fullName, 'private');
+  assert.doesNotMatch(JSON.stringify(result), /private/);
+  const conflicts = await box.open(result.sealedConflicts, { id: 'profile:conflicts', format: 1 });
+  assert.equal(conflicts[0].ours.present, false);
+  assert.equal(conflicts[0].theirs.value.fullName, 'private');
 });

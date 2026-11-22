@@ -1,11 +1,20 @@
 // @ts-check
-// Three-way merge of plaintext JSON objects. Arrays are treated as single values.
+// Three-way merge of account JSON files. Arrays are treated as single values.
 import { sortedJson } from './file-store.js';
 
 /**
  * @typedef {{ present: boolean, value?: unknown }} FieldVersion
  * @typedef {{ key: string, base: FieldVersion, ours: FieldVersion, theirs: FieldVersion }} FieldConflict
  */
+
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
+const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+
+/** @param {unknown} value @returns {value is import('./secret-box.js').SealedBlock} */
+function isSealedBlock(value) {
+  return isObject(value) && value.v === 1 && value.alg === 'A256GCM'
+    && typeof value.kid === 'string' && typeof value.nonce === 'string' && typeof value.ct === 'string';
+}
 
 /** @param {Record<string, unknown>} object @param {string} key @returns {FieldVersion} */
 function field(object, key) {
@@ -36,6 +45,19 @@ export function mergeAccountFile(base, ours, theirs) {
   if (ours === null) return { value: theirs, conflicts: [] };
   if (theirs === null) return { value: ours, conflicts: [] };
 
+  return mergeObjects(base, ours, theirs, ours.updatedAt, theirs.updatedAt, true);
+}
+
+/**
+ * @param {Record<string, unknown>|null} base
+ * @param {Record<string, unknown>} ours
+ * @param {Record<string, unknown>} theirs
+ * @param {unknown} oursUpdatedAt
+ * @param {unknown} theirsUpdatedAt
+ * @param {boolean} metadataTimestamp
+ * @returns {{ value: Record<string, unknown>, conflicts: FieldConflict[] }}
+ */
+function mergeObjects(base, ours, theirs, oursUpdatedAt, theirsUpdatedAt, metadataTimestamp) {
   const ancestor = base ?? {};
   const keys = new Set([...Object.keys(ancestor), ...Object.keys(ours), ...Object.keys(theirs)]);
   /** @type {Record<string, unknown>} */
@@ -49,12 +71,12 @@ export function mergeAccountFile(base, ours, theirs) {
     let selected;
     if (equalField(o, t) || equalField(b, t)) selected = o;
     else if (equalField(b, o)) selected = t;
-    else if (key === 'updatedAt' && typeof o.value === 'string' && typeof t.value === 'string'
+    else if (metadataTimestamp && key === 'updatedAt' && typeof o.value === 'string' && typeof t.value === 'string'
       && Number.isFinite(Date.parse(o.value)) && Number.isFinite(Date.parse(t.value))) {
       selected = Date.parse(o.value) >= Date.parse(t.value) ? o : t;
     } else {
-      const ourTime = typeof ours.updatedAt === 'string' ? Date.parse(ours.updatedAt) : NaN;
-      const theirTime = typeof theirs.updatedAt === 'string' ? Date.parse(theirs.updatedAt) : NaN;
+      const ourTime = typeof oursUpdatedAt === 'string' ? Date.parse(oursUpdatedAt) : NaN;
+      const theirTime = typeof theirsUpdatedAt === 'string' ? Date.parse(theirsUpdatedAt) : NaN;
       if (!Number.isFinite(ourTime) || !Number.isFinite(theirTime)) {
         throw new Error('ACCOUNT_DATA_CONFLICT_TIME');
       }
@@ -67,4 +89,68 @@ export function mergeAccountFile(base, ours, theirs) {
     });
   }
   return { value, conflicts };
+}
+
+/**
+ * Merges a profile or certification file. Only `enc` is decrypted; other fields stay in clear.
+ * The sensitive conflicts are themselves sealed and use distinct authenticated data.
+ * @param {Record<string, unknown>|null} base
+ * @param {Record<string, unknown>|null} ours
+ * @param {Record<string, unknown>|null} theirs
+ * @param {import('./secret-box.js').SecretBox} box
+ * @param {{ id: string, format: number }} item
+ * @returns {Promise<{ value: Record<string, unknown>|null, conflicts: FieldConflict[], sealedConflicts: import('./secret-box.js').SealedBlock|null }>}
+ */
+export async function mergeEncryptedAccountFile(base, ours, theirs, box, item) {
+  for (const file of [base, ours, theirs]) {
+    if (file === null) continue;
+    if (!isObject(file) || file.format !== item.format || ('id' in file && file.id !== item.id)) {
+      throw new Error('INVALID_ACCOUNT_FILE');
+    }
+    if (item.id === 'profile' && Object.hasOwn(file, 'dateOfBirth')) throw new Error('LEGACY_BIRTH_DATE');
+  }
+  /** @param {Record<string, unknown>|null} file @returns {Promise<FieldVersion>} */
+  async function decrypt(file) {
+    if (file === null || !Object.hasOwn(file, 'enc')) return { present: false };
+    if (!isSealedBlock(file.enc)) throw new Error('UNKNOWN_ENCRYPTION');
+    const value = await box.open(file.enc, item);
+    if (!isObject(value)) throw new Error('INVALID_ENCRYPTED_DATA');
+    return { present: true, value };
+  }
+  const [b, o, t] = await Promise.all([decrypt(base), decrypt(ours), decrypt(theirs)]);
+  if (equalFile(ours, theirs)) return { value: ours, conflicts: [], sealedConflicts: null };
+  if (equalFile(base, ours)) return { value: theirs, conflicts: [], sealedConflicts: null };
+  if (equalFile(base, theirs)) return { value: ours, conflicts: [], sealedConflicts: null };
+  if (ours === null) return { value: theirs, conflicts: [], sealedConflicts: null };
+  if (theirs === null) return { value: ours, conflicts: [], sealedConflicts: null };
+  /** @param {Record<string, unknown>|null} file */
+  const withoutEnc = (file) => {
+    if (file === null) return null;
+    const { enc, ...rest } = file;
+    return rest;
+  };
+  const metadata = mergeAccountFile(withoutEnc(base), withoutEnc(ours), withoutEnc(theirs));
+  if (!metadata.value) throw new Error('INVALID_ACCOUNT_FILE');
+
+  /** @type {FieldVersion} */
+  let selected;
+  /** @type {FieldConflict[]} */
+  let sensitiveConflicts;
+  if (o.present && t.present && isObject(o.value) && isObject(t.value)) {
+    if (b.present && !isObject(b.value)) throw new Error('INVALID_ENCRYPTED_DATA');
+    const merged = mergeObjects(b.present && isObject(b.value) ? b.value : null, o.value, t.value, ours.updatedAt, theirs.updatedAt, false);
+    selected = { present: true, value: merged.value };
+    sensitiveConflicts = merged.conflicts;
+  } else {
+    /** @param {Record<string, unknown>|null} file @param {FieldVersion} v */
+    const wrapper = (file, v) => file === null ? null : { updatedAt: file.updatedAt, ...(v.present ? { enc: v.value } : {}) };
+    const merged = mergeAccountFile(wrapper(base, b), wrapper(ours, o), wrapper(theirs, t));
+    selected = merged.value ? field(merged.value, 'enc') : { present: false };
+    sensitiveConflicts = merged.conflicts;
+  }
+  if (selected.present) metadata.value.enc = await box.seal(selected.value, item);
+  const sealedConflicts = sensitiveConflicts.length
+    ? await box.seal(sensitiveConflicts, { id: `${item.id}:conflicts`, format: item.format })
+    : null;
+  return { value: metadata.value, conflicts: metadata.conflicts, sealedConflicts };
 }
