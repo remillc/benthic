@@ -224,8 +224,8 @@
     <div class="bc-validate--fields">
       <TextField label={t('validation.name')} bind:value={name} invalid={touched && !!problems.name} supporting={touched && problems.name ? t('validation.nameRequired') : ''} autocomplete="name" />
       <div class="bc-validate--role">
-        <span class="bc-validate--label" id="od-validate-role">{t('validation.role')}</span>
-        <ButtonGroup options={roleOptions} value={role} onchange={(v) => (role = v)} ariaLabelledby="od-validate-role" />
+        <span class="bc-validate--label" id="bc-validate-role">{t('validation.role')}</span>
+        <ButtonGroup options={roleOptions} value={role} onchange={(v) => (role = v)} ariaLabelledby="bc-validate-role" />
       </div>
       <TextField label={t('validation.number')} bind:value={instructorNumber} />
       <div class="bc-validate--pad">
@@ -265,7 +265,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-validate.page) {
       background: var(--bc-background);
     }

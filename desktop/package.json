@@ -1,5 +1,5 @@
 {
-  "name": "opendives-desktop",
+  "name": "benthic-desktop",
   "private": true,
   "description": "Benthic, the desktop app (Windows, macOS, Linux): the app's interface in Electron, the Subsurface core in a helper process.",
   "license": "GPL-2.0-only",
@@ -7,7 +7,7 @@
   "main": "main.cjs",
   "scripts": {
     "start": "electron .",
-    "dev": "cross-env OD_DEV_URL=http://localhost:5180 electron .",
+    "dev": "cross-env BC_DEV_URL=http://localhost:5180 electron .",
     "pack": "node scripts/prepare.cjs && electron-builder --dir",
     "dist": "node scripts/prepare.cjs && electron-builder"
   },
@@ -17,7 +17,7 @@
     "electron-builder": "^26.0.12"
   },
   "build": {
-    "appId": "org.opendives.app",
+    "appId": "app.benthicdivelog",
     "productName": "Benthic Log",
     "directories": {
       "output": "../build/desktop/dist",
@@ -33,6 +33,11 @@
       "windows.cjs",
       "preload.cjs",
       "process-errors.cjs",
+      "network.cjs",
+      "notifications.cjs",
+      "crash-reports.cjs",
+      "legacy-migration.cjs",
+      "legacy-origin-preload.cjs",
       "package.json",
       "resources/icon-round.png"
     ],
@@ -75,7 +80,7 @@
       "icon": "resources/icon-round.png"
     },
     "appx": {
-      "identityName": "OpenDives",
+      "identityName": "Benthic",
       "publisherDisplayName": "Christian Rémillard"
     },
     "mac": {

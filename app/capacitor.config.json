@@ -1,9 +1,9 @@
 {
-  "appId": "org.opendives.app",
+  "appId": "app.benthicdivelog",
   "appName": "Benthic Log",
   "webDir": "dist",
   "loggingBehavior": "none",
-  "appendUserAgent": "OpenDives",
+  "appendUserAgent": "Benthic",
   "ios": {
     "loggingBehavior": "debug"
   },

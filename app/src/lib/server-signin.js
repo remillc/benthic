@@ -1,5 +1,5 @@
 // @ts-check
-// The rules of the OpenDives server's sign-in screens (release edition, tasks 2026-11-16-259 and 260), kept apart from
+// The rules of the Benthic server's sign-in screens (release edition, tasks 2026-11-16-259 and 260), kept apart from
 // the screens so that node:test can check them: the countdown of « Renvoyer le code », what each error does to the
 // buttons, and the order of the entry points.
 import { codeComplete } from './code-input.js';
@@ -54,7 +54,7 @@ export function resendLeft(resendAfterSeconds, sentAt, now) {
 }
 
 /**
- * The first choices of « Où est-il ? »: the OpenDives server only. The beta never offers to open a logbook in a cloud
+ * The first choices of « Où est-il ? »: the Benthic server only. The beta never offers to open a logbook in a cloud
  * drive (OneDrive, Google Drive, WebDAV…) or in a personal git repository (decided on 18 November 2026).
  * @param {'open'} list
  * @returns {{ key: 'server', main: boolean }[]}

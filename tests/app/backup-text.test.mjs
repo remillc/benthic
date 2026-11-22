@@ -94,7 +94,7 @@ test('the screens, the dialog and the dive menu are wired', () => {
   const logbook = read('lib/logbook.svelte.js');
   assert.match(logbook, /logbook\.autoSync && syncAllowedOnThisNetwork\(\) && !logbook\.browsing/);
   assert.match(logbook, /if \(logbook\.browsing\) return \/\*\* @type \{SyncOutcome\} \*\/ \('failed'\)/);
-  // Every css class of the screens is prefixed od- and names its component.
+  // Every css class of the screens is prefixed bc- and names its component.
   for (const f of ['BackupMain', 'BackupTimeline', 'BackupVersion', 'BackupDivePick', 'BackupDive', 'BackupDeleted', 'BackupBrowse', 'BackupPanes']) {
     const classes = [...read(`components/${f}.svelte`).matchAll(/class(?:name)?="([^"{]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('bc-backup'));
     assert.ok(classes.length, f);

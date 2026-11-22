@@ -116,7 +116,7 @@
     </header>
 
     <div class="bc-desktop-tools--columns">
-      <nav class="bc-desktop-tools--list" data-od-scroll aria-label={t('tools.title')}>
+      <nav class="bc-desktop-tools--list" data-bc-scroll aria-label={t('tools.title')}>
         {#each groups as group (group.id)}
           <h2 class="bc-desktop-tools--heading">{t(group.heading)}</h2>
           <ul role="list" onkeydown={listKey}>
@@ -142,7 +142,7 @@
         {/each}
       </nav>
 
-      <main class="bc-desktop-tools--pane" data-od-scroll aria-label={t(current.name)}>
+      <main class="bc-desktop-tools--pane" data-bc-scroll aria-label={t(current.name)}>
         {#if current.id === 'planner'}
           <!-- The tools are their own chunks, read when first shown. -->
           {#if loaded.planner}{@const Planner = loaded.planner}<Planner />{/if}
@@ -164,7 +164,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-tools--frame {
       display: flex;
       flex-direction: column;
@@ -283,8 +283,8 @@
       min-width: 0;
       padding: 8px 32px 32px;
       overflow-y: auto;
-      /* The tools lay out by the pane's width, not the window's (@container od-tool). */
-      container: od-tool / inline-size;
+      /* The tools lay out by the pane's width, not the window's (@container bc-tool). */
+      container: bc-tool / inline-size;
     }
     .bc-desktop-tools--pane-title {
       margin: 0 0 20px;

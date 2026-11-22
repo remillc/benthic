@@ -4,7 +4,7 @@
 //  - a ZIP archive in open formats, written chunk by chunk to a file in the app's cache (or the desktop's temp
 //    folder), never held in memory and never written anywhere public;
 //  - the logbook in Subsurface's format (`logbook/logbook.ssrf`, the core's own export);
-//  - what only OpenDives keeps, as JSON under `opendives/`: equipment, kits, maintenance, what each dive used, the
+//  - what only Benthic keeps, as JSON under `benthic/`: equipment, kits, maintenance, what each dive used, the
 //    diver profile, the certifications with their photos, the settings of the device. The sealed items (blood group,
 //    emergency contact, certifications, card photos) are opened with the device's key and written IN CLEAR: the
 //    screen before the export says so (`containsSensitive`);
@@ -14,12 +14,12 @@
 //   manifest.json
 //   README.txt
 //   logbook/logbook.ssrf
-//   opendives/gear/<id>.json, kits/<id>.json, maintenance/<id>.json, dive-equipment/<id>.json   (copied as stored)
-//   opendives/profile/diver.json                    decrypted: dateOfBirth, emergencyContact, bloodGroup, healthConsent
-//   opendives/certifications/<id>.json              decrypted, `documents` point at the photos
-//   opendives/certifications/photos/<id>-<side>.jpg   (<id>-page-<n>.jpg for the pages of a document, .pdf for a PDF)
-//   opendives/media/<id>.jpg                         the photos of pieces and invoices
-//   opendives/settings.json                          the device's settings and the core's preferences
+//   benthic/gear/<id>.json, kits/<id>.json, maintenance/<id>.json, dive-equipment/<id>.json   (copied as stored)
+//   benthic/profile/diver.json                    decrypted: dateOfBirth, emergencyContact, bloodGroup, healthConsent
+//   benthic/certifications/<id>.json              decrypted, `documents` point at the photos
+//   benthic/certifications/photos/<id>-<side>.jpg   (<id>-page-<n>.jpg for the pages of a document, .pdf for a PDF)
+//   benthic/media/<id>.jpg                         the photos of pieces and invoices
+//   benthic/settings.json                          the device's settings and the core's preferences
 //   dive-media/<name>                                the dives' original photos and videos (only when asked)
 // Everything the engine needs from the platform is given in `deps` (the tests give fakes); `defaultDeps()` wires
 // the real ones. The last step (share sheet on the phone, save dialog on the desktop) is `deliverExport`.
@@ -53,7 +53,7 @@ const enc = new TextEncoder();
  * @typedef {Object} MediaItem
  * @property {string} name file name in `dive-media/` (unique)
  * @property {number} size bytes
- * @property {boolean} onDevice false when the original is only on the OpenDives server: it is « to download »
+ * @property {boolean} onDevice false when the original is only on the Benthic server: it is « to download »
  * @property {() => AsyncIterable<Uint8Array>} [open] reads it from the device, in chunks
  * @property {(signal?: AbortSignal) => AsyncIterable<Uint8Array>} [download] fetches it from the server (not built yet: a seam)
  */
@@ -76,7 +76,7 @@ const enc = new TextEncoder();
 
 /**
  * @typedef {Object} ExportDeps
- * @property {import('./file-store.js').FileStore} store the OpenDives data (gear, kits, maintenance...)
+ * @property {import('./file-store.js').FileStore} store the Benthic data (gear, kits, maintenance...)
  * @property {import('./profile.js').Profile} profile the diver profile and the certifications, with their key
  * @property {string} appVersion
  * @property {() => Date} [now]
@@ -89,7 +89,7 @@ const enc = new TextEncoder();
  */
 
 /**
- * One file of the OpenDives data, with its size known before it is read.
+ * One file of the Benthic data, with its size known before it is read.
  * @typedef {Object} DataEntry
  * @property {string} path path in the archive
  * @property {string} area gear, kits, maintenance, diveEquipment, profile, certifications, certificationPhotos, media, settings, other
@@ -120,7 +120,7 @@ function decodeDataUrl(dataUrl) {
 const HANDLED_APART = ['meta/', 'documents/', 'profile/', 'certifications/', 'media/'];
 
 /**
- * Every file of the OpenDives data, the sealed items opened. Sizes are exact; bytes are read when written.
+ * Every file of the Benthic data, the sealed items opened. Sizes are exact; bytes are read when written.
  * @param {ExportDeps} deps
  * @returns {Promise<DataEntry[]>}
  */
@@ -135,7 +135,7 @@ export async function collectData(deps) {
     const value = await store.read(path);
     if (value == null) continue;
     const area = { gear: 'gear', kits: 'kits', maintenance: 'maintenance', 'dive-equipment': 'diveEquipment' }[path.split('/')[0]] ?? 'other';
-    out.push(jsonEntry(`opendives/${path}`, area, value));
+    out.push(jsonEntry(`benthic/${path}`, area, value));
   }
 
   // Photos of pieces and invoices (data URLs in the store): real image files.
@@ -143,7 +143,7 @@ export async function collectData(deps) {
     const file = await store.read(path);
     if (!file || typeof file.dataUrl !== 'string') continue;
     const { bytes, ext } = decodeDataUrl(file.dataUrl);
-    out.push({ path: `opendives/media/${file.id ?? path.slice(6, -5)}.${ext}`, area: 'media', size: bytes.length, sensitive: false, data: async () => bytes });
+    out.push({ path: `benthic/media/${file.id ?? path.slice(6, -5)}.${ext}`, area: 'media', size: bytes.length, sensitive: false, data: async () => bytes });
   }
 
   // The diver profile, opened.
@@ -153,7 +153,7 @@ export async function collectData(deps) {
   if (diverFile) {
     out.push(
       jsonEntry(
-        'opendives/profile/diver.json',
+        'benthic/profile/diver.json',
         'profile',
         {
           format: 1,
@@ -177,7 +177,7 @@ export async function collectData(deps) {
       const file = `certifications/photos/${c.id}-${d.side}${d.page ? `-${d.page}` : ''}.${fileExtension(d.mime)}`;
       documents.push({ side: d.side, ...(d.page ? { page: d.page } : {}), mime: d.mime, size: d.size, file });
       out.push({
-        path: `opendives/${file}`,
+        path: `benthic/${file}`,
         area: 'certificationPhotos',
         size: d.size,
         sensitive: true,
@@ -188,11 +188,11 @@ export async function collectData(deps) {
         },
       });
     }
-    out.push(jsonEntry(`opendives/certifications/${c.id}.json`, 'certifications', { format: 1, ...c, documents }, true));
+    out.push(jsonEntry(`benthic/certifications/${c.id}.json`, 'certifications', { format: 1, ...c, documents }, true));
   }
 
   // The settings of the device.
-  out.push(jsonEntry('opendives/settings.json', 'settings', { format: 1, ...(await deps.settings()) }));
+  out.push(jsonEntry('benthic/settings.json', 'settings', { format: 1, ...(await deps.settings()) }));
   return out.sort((a, b) => a.path.localeCompare(b.path));
 }
 
@@ -256,9 +256,9 @@ const README = `Benthic: all my data
 
 manifest.json              every file of this archive with its size and its SHA-256
 logbook/logbook.ssrf       the dive log in Subsurface's format (open it with Subsurface)
-opendives/                 what only Benthic keeps, as JSON: gear, kits, maintenance, what each dive used,
+benthic/                 what only Benthic keeps, as JSON: gear, kits, maintenance, what each dive used,
                            the diver profile, the certifications, the settings of the device
-opendives/media/           the photos of pieces and of invoices
+benthic/media/           the photos of pieces and of invoices
 dive-media/                the original photos and videos of the dives (only when they were asked for)
 
 This archive is NOT encrypted. The date of birth, the emergency contact, the blood group and the
@@ -392,7 +392,7 @@ export async function buildExport({ withMedia = false, onProgress, signal, zip64
     const sensitive = data.some((e) => e.sensitive);
     const manifest = {
       format: EXPORT_FORMAT,
-      app: 'OpenDives',
+      app: 'Benthic',
       appVersion: deps.appVersion,
       exportedAt: now.toISOString(),
       withMedia,

@@ -26,7 +26,7 @@ if (!src) {
   process.exit(1);
 }
 const out = path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..', 'core', 'data', 'regions.txt');
-const work = mkdtempSync(path.join(tmpdir(), 'od-regions-'));
+const work = mkdtempSync(path.join(tmpdir(), 'bc-regions-'));
 const mapshaper = (...args) => execFileSync('npx', ['-y', 'mapshaper@0.6', ...args], { stdio: 'inherit', shell: true });
 
 mapshaper(path.join(src, 'ne_10m_admin_1_states_provinces.shp'), '-simplify', '5%', 'keep-shapes',
@@ -72,5 +72,5 @@ for (const f of regions) {
     lines.push('P\t' + values.join(','));
   }
 }
-writeFileSync(out, '# OpenDives offline regions: Natural Earth 1:10m (public domain), built by tools/build-regions.mjs\n' + lines.join('\n') + '\n');
+writeFileSync(out, '# Benthic offline regions: Natural Earth 1:10m (public domain), built by tools/build-regions.mjs\n' + lines.join('\n') + '\n');
 console.log(`${countries.length} countries, ${regions.length - skipped} regions (${skipped} skipped) -> ${out}`);

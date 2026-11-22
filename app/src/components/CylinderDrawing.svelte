@@ -12,7 +12,7 @@
   /** @type {{ ratio?: number, startRatio?: number|null, hatched?: boolean, width?: number, stroke?: number }} */
   let { ratio = 0, startRatio = null, hatched = false, width = 44, stroke = 2 } = $props();
 
-  const id = `od-cylinder-drawing-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-cylinder-drawing-${Math.random().toString(36).slice(2, 9)}`;
   // The cylinder (task 2026-11-13-85): a slim body with shoulders narrowing into a
   // short neck and a rounded bottom, no valve. Filled, used as the clip of the
   // levels, then drawn again as the outline.
@@ -56,7 +56,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-cylinder-drawing {
       flex: none;
     }

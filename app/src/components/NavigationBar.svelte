@@ -40,7 +40,7 @@
 </nav>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-navigation-bar {
       position: fixed;
       left: 0;

@@ -193,14 +193,14 @@ export async function computerFigures(g) {
   }
 }
 
-/** Sets or lifts the read-only state: what the end of an Benthic+ subscription will do (no billing exists yet). @param {boolean} on */
+/** Sets or lifts the read-only state: what the end of a Benthic+ subscription will do (no billing exists yet). @param {boolean} on */
 export const setReadOnly = (on) => change((inv) => inv.setReadOnly(on));
 
 /**
  * After a download: the computer it came from enters the inventory the first time, with its serial number and
  * its firmware. The logbook's entry for it gives the serial as « Ordinateurs du carnet » writes it.
  * @param {import('benthic-core').DownloadResult} result
- * @param {boolean} [subscriber] an Benthic+ account: the end of the download offers to add the computer
+ * @param {boolean} [subscriber] a Benthic+ account: the end of the download offers to add the computer
  */
 export async function noteDownloadedComputer(result, subscriber = false) {
   computerOffer.computer = null;
@@ -234,7 +234,7 @@ export const computerOffer = $state({ computer: null });
 
 /** @param {{ model: string, serial: string }} c */
 const offerKey = (c) => `${c.model}|${c.serial}`;
-const HIDDEN_KEY = 'od.computerOfferHidden';
+const HIDDEN_KEY = 'bc.computerOfferHidden';
 /** The computers whose offer was put off with « Plus tard », on this device. @returns {string[]} */
 function hiddenOffers() {
   try {
@@ -265,5 +265,5 @@ export function putOffComputer() {
 
 if (import.meta.env?.DEV) /** @type {any} */ (globalThis).__inventory = { gear, loadInventory, change, setReadOnly };
 
-/** The inventory's store and writes, for the other OpenDives data of a dive (lib/validation.svelte.js). */
+/** The inventory's store and writes, for the other Benthic data of a dive (lib/validation.svelte.js). */
 export const inventoryApi = () => open();

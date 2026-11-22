@@ -159,7 +159,7 @@ internal class BluetoothTransport(
             error = "invalid address $address"
             return false
         }
-        // OpenDives: Android often fails a first connection with status 133
+        // Benthic: Android often fails a first connection with status 133
         // (GATT_ERROR); one more attempt, as Subsurface does on Linux.
         for (attempt in 1..2) {
             Log.i(TAG, "GATT connect to $address (type ${device.type}, attempt $attempt)")

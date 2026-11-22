@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Development only: reach the local OpenDives development stack from an Android phone or emulator over USB, and try the
+# Development only: reach the local Benthic development stack from an Android phone or emulator over USB, and try the
 # Benthic+ flow with the simulated Google sign-in (docs/dev-accounts.md).
 #
 # Usage: tools/dev-phone.sh <adb-serial> [--no-start]

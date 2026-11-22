@@ -51,7 +51,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-rename-computer--field {
       padding: 0 24px;
     }

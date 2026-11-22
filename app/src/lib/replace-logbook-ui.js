@@ -14,7 +14,7 @@ import { showSnackbar } from './snackbar.js';
 import { t } from './i18n.js';
 
 /** The open logbook's name on this device. */
-export const openLogbookName = () => deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName');
+export const openLogbookName = () => deviceStore.getItem('bc.logbookName') || t('welcomeSteps.defaultName');
 
 /**
  * « Exporter d'abord ce carnet »: the open logbook as a Subsurface `.ssrf`, through the same export as « Exporter mon

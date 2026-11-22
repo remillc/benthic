@@ -17,8 +17,8 @@
     {@const fill = starFill(value, i)}
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       {#if fill > 0 && fill < 1}
-        <defs><clipPath id="od-stars-{uid}-{i}"><rect x="0" y="0" width={24 * fill} height="24" /></clipPath></defs>
-        <path d={STAR} class="bc-stars--part" clip-path="url(#od-stars-{uid}-{i})" />
+        <defs><clipPath id="bc-stars-{uid}-{i}"><rect x="0" y="0" width={24 * fill} height="24" /></clipPath></defs>
+        <path d={STAR} class="bc-stars--part" clip-path="url(#bc-stars-{uid}-{i})" />
       {/if}
       <path d={STAR} class:bc-stars--filled={fill >= 1} />
     </svg>
@@ -26,7 +26,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-stars {
       display: inline-flex;
       gap: 2px;

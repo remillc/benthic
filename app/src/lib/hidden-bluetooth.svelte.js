@@ -1,11 +1,11 @@
 // @ts-check
 // Bluetooth devices the user marked "Not a dive computer": hidden from the
 // nearby list of the download screen by their Bluetooth address, until shown
-// again in Settings. Kept on this device (device-store.js, key od.hiddenBluetooth,
+// again in Settings. Kept on this device (device-store.js, key bc.hiddenBluetooth,
 // a JSON list of addresses).
 import { deviceStore } from './device-store.js';
 
-const KEY = 'od.hiddenBluetooth';
+const KEY = 'bc.hiddenBluetooth';
 
 /** @returns {string[]} */
 function read() {

@@ -22,7 +22,7 @@ mark('main');
 // The Mac's Réglages window shows the settings only: the main window owns the logbook.
 if (!sideWindow) noteFirstOpen();
 // The paper grain trial's choice (task 2026-11-13-108): the grain is now always on (task 109).
-deviceStore.removeItem('od.paperGrain');
+deviceStore.removeItem('bc.paperGrain');
 if (!sideWindow) boot();
 installRippleFix();
 // Error reports (task #102): the catchers start with the app; a report is only ever offered, never sent without a tap.

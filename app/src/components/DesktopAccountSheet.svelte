@@ -27,7 +27,7 @@
   import { t } from '../lib/i18n.js';
 
   const email = $derived(emailOfAccount(benthicPlusAccount, logbook));
-  // An Benthic+ account shows the diver's full name first and the e-mail under it (task 2026-11-19-312).
+  // A Benthic+ account shows the diver's full name first and the e-mail under it (task 2026-11-19-312).
   const fullName = $derived(benthicPlusSubscriber() ? diver.info.fullName : '');
   const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(fullName || email || t('menu.noAccount'));
@@ -36,7 +36,7 @@
   const server = $derived(git && logbook.benthicPlus);
 
   // The versions of the sheet (task 2026-11-18-281; bureau-compte-gratuit, bureau-profil-compte). The release edition
-  // without an Benthic+ account has the free one; there is no tablet or desktop offer screen yet, so « S'abonner » opens
+  // without a Benthic+ account has the free one; there is no tablet or desktop offer screen yet, so « S'abonner » opens
   // the phone's offer content.
   const variant = $derived(sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email, git, repository: logbook.repository }));
   const free = $derived(variant === 'free');
@@ -122,7 +122,7 @@
 </script>
 
 {#if navigation.accountOpen && subscriber}
-  <!-- An Benthic+ account (task 2026-11-19-292, docs/mockups/bureau-profil-compte.dc.html): the logo, the account group
+  <!-- A Benthic+ account (task 2026-11-19-292, docs/mockups/bureau-profil-compte.dc.html): the logo, the account group
        (the buttons beside what they act on), « Mon profil de plongeur » and the backup, then Réglages and À propos, each
        entry with its icon in a small blue tile. No close button: a click outside or Esc closes it. -->
   <div class="bc-desktop-account bc-desktop-account--plus" role="dialog" aria-label={t('desktopSettings.account.sheet')} bind:this={sheet}>
@@ -351,7 +351,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-account {
       position: fixed;
       z-index: 13000;
@@ -557,7 +557,7 @@
       color: var(--bc-on-action);
     }
 
-    /* An Benthic+ account (task 2026-11-19-292): the sheet's background, white rounded groups, a 36 px blue tile per entry. */
+    /* A Benthic+ account (task 2026-11-19-292): the sheet's background, white rounded groups, a 36 px blue tile per entry. */
     .bc-desktop-account--plus {
       padding: 12px;
       display: flex;

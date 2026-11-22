@@ -20,10 +20,10 @@
   <Md3Dialog class="bc-import-formats" title={t('importFormats.title')} text={t('importFormats.text')} oncancel={() => closeFormats(state)}>
     <div class="bc-import-formats--columns">
       {#each FORMAT_COLUMNS as column (column)}
-        <section class="bc-import-formats--column" aria-labelledby="od-import-formats-{column}">
+        <section class="bc-import-formats--column" aria-labelledby="bc-import-formats-{column}">
           <header class="bc-import-formats--head">
             <span class="bc-import-formats--tile"><Icon name={icons[column]} size={20} /></span>
-            <h3 id="od-import-formats-{column}" class="bc-import-formats--title">{t(`importFormats.column.${column}`)}</h3>
+            <h3 id="bc-import-formats-{column}" class="bc-import-formats--title">{t(`importFormats.column.${column}`)}</h3>
           </header>
           <ul class="bc-import-formats--list">
             {#each formatsOf(column) as format (format.report)}
@@ -45,7 +45,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Under « Un fichier » (task 2026-11-16-226): a 48 dp touch target, 4 dp of padding on each side,
        4 dp from each row (the rows' 12 px gap less 8). */
     .bc-import-formats--link {

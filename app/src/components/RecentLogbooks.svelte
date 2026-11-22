@@ -57,8 +57,8 @@
   }
 </script>
 
-<section class="bc-recent-logbooks" aria-labelledby="od-recent-logbooks-title">
-  <h2 id="od-recent-logbooks-title" class="bc-recent-logbooks--title">{t('desktopLogbooks.recents.title')}</h2>
+<section class="bc-recent-logbooks" aria-labelledby="bc-recent-logbooks-title">
+  <h2 id="bc-recent-logbooks-title" class="bc-recent-logbooks--title">{t('desktopLogbooks.recents.title')}</h2>
   <ul class="bc-recent-logbooks--list">
     {#each rows as row (row.id)}
       <li>
@@ -89,7 +89,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-recent-logbooks--title {
       margin: 0 0 14px;
       font-size: 24px;

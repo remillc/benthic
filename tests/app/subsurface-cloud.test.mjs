@@ -23,9 +23,9 @@ test('the logbook loader applies the rule and the beta keeps its own start state
   const lb = src('lib/logbook.svelte.js');
   assert.match(lb, /isIgnoredCloudAccount\(account, isRelease\)/g);
   assert.equal(lb.match(/isIgnoredCloudAccount\(/g).length, 2); // startApp + loadCloud
-  assert.match(lb, /WELCOME_KEY = isRelease \? 'od\.welcomeBeta' : 'od\.welcome'/);
-  assert.match(lb, /ACCOUNT_HINT = isRelease \? 'od\.repositoryAccount' : 'od\.cloudAccount'/);
-  assert.match(src('lib/snapshot.js'), /isRelease \? 'od\.logbookSnapshotBeta' : 'od\.logbookSnapshot'/);
+  assert.match(lb, /WELCOME_KEY = isRelease \? 'bc.welcomeBeta' : 'bc.welcome'/);
+  assert.match(lb, /ACCOUNT_HINT = isRelease \? 'bc.repositoryAccount' : 'bc.cloudAccount'/);
+  assert.match(src('lib/snapshot.js'), /isRelease \? 'bc.logbookSnapshotBeta' : 'bc.logbookSnapshot'/);
 });
 
 test('the Subsurface-cloud sign-in routes exist only in the alpha', () => {

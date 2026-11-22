@@ -62,7 +62,7 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
     offlineMaps.viewBbox = null;
   });
 
-  const SORT_KEY = 'od.sitesSort';
+  const SORT_KEY = 'bc.sitesSort';
   /** The order of the list, a setting of this device. */
   let sortBy = $state(/** @type {'name'|'recent'} */ (deviceStore.getItem(SORT_KEY) === 'recent' ? 'recent' : 'name'));
 
@@ -190,8 +190,8 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   // The system Back (lib/back-button.js) asks the open search to close.
   $effect(() => {
     const el = searchEl;
-    el?.addEventListener('od-cancel', closeSearch);
-    return () => el?.removeEventListener('od-cancel', closeSearch);
+    el?.addEventListener('bc-cancel', closeSearch);
+    return () => el?.removeEventListener('bc-cancel', closeSearch);
   });
 
   /** The sites checked, by uuid. */
@@ -761,7 +761,7 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
       <div class="bc-sites--split" class:ios>
         <div class="bc-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
           <!-- Like the Carnet: the band tops the list pane, the map stays beside it. -->
-          <div class="bc-sites--scroll" data-od-scroll>{@render band(false)}{@render panel()}</div>
+          <div class="bc-sites--scroll" data-bc-scroll>{@render band(false)}{@render panel()}</div>
           {@render fab()}
         </div>
         <div class="bc-sites--map-pane">{@render mapBlock('100%')}</div>
@@ -821,7 +821,7 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Keep the map width stable when the shared list appears or disappears. */
     :global(.bc-sites:not(.bc-sites--tablet) > .page-content) {
       scrollbar-gutter: stable;

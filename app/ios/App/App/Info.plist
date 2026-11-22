@@ -55,10 +55,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>org.opendives.app</string>
+			<string>app.benthicdivelog</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>opendives</string>
+				<string>benthic</string>
 			</array>
 		</dict>
 	</array>
@@ -85,7 +85,7 @@
 		</dict>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>org.opendives.ssrf</string>
+			<string>app.benthicdivelog.ssrf</string>
 			<key>UTTypeDescription</key>
 			<string>Subsurface logbook</string>
 			<key>UTTypeConformsTo</key>
@@ -104,7 +104,7 @@
 		</dict>
 		<dict>
 			<key>UTTypeIdentifier</key>
-			<string>org.opendives.divefile</string>
+			<string>app.benthicdivelog.divefile</string>
 			<key>UTTypeDescription</key>
 			<string>Dive log file</string>
 			<key>UTTypeConformsTo</key>
@@ -151,7 +151,7 @@
 			<string>Alternate</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>org.opendives.ssrf</string>
+				<string>app.benthicdivelog.ssrf</string>
 				<string>public.xml</string>
 			</array>
 		</dict>
@@ -164,7 +164,7 @@
 			<string>Alternate</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>org.opendives.divefile</string>
+				<string>app.benthicdivelog.divefile</string>
 			</array>
 		</dict>
 	</array>
@@ -177,17 +177,17 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>org.opendives.app.maps-download</string>
+		<string>app.benthicdivelog.maps-download</string>
 	</array>
-	<!-- The app's iCloud Drive folder shows in the Files app as « OpenDives » (task 2026-11-16-261). -->
+	<!-- The app's iCloud Drive folder shows in the Files app as « Benthic » (task 2026-11-16-261). -->
 	<key>NSUbiquitousContainers</key>
 	<dict>
-		<key>iCloud.org.opendives.app</key>
+		<key>iCloud.app.benthicdivelog</key>
 		<dict>
 			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
 			<true/>
 			<key>NSUbiquitousContainerName</key>
-			<string>OpenDives</string>
+			<string>Benthic</string>
 			<key>NSUbiquitousContainerSupportedFolderLevels</key>
 			<string>Any</string>
 		</dict>

@@ -103,7 +103,7 @@
   );
 
   const uid = $props.id();
-  const deviceMenuId = `od-download-menu-${uid}`;
+  const deviceMenuId = `bc-download-menu-${uid}`;
   let menuDevice = $state(/** @type {BluetoothDevice|null} */ (null));
 
   /** @param {MouseEvent} e @param {BluetoothDevice} d */
@@ -708,7 +708,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* MD3 lists (Android): 14 sp subheaders, two-line 72 dp items with a
        40 dp leading avatar; iOS keeps the same order with its sizes. */
     .bc-download--intro {
@@ -968,7 +968,7 @@
       border: 2px solid var(--bc-separator);
       border-top-color: var(--bc-text);
       border-radius: 50%;
-      animation: od-download-spin 0.9s linear infinite;
+      animation: bc-download-spin 0.9s linear infinite;
     }
 
     /* « Ajouter le … à votre équipement ? »: a pale blue card, the photo, two lines, « Plus tard » and « Ajouter ». */
@@ -1082,7 +1082,7 @@
     .bc-download--indeterminate .bc-download--fill {
       position: absolute;
       width: 40%;
-      animation: od-download-slide 1.4s ease-in-out infinite;
+      animation: bc-download-slide 1.4s ease-in-out infinite;
     }
 
     .bc-download--stop {
@@ -1184,13 +1184,13 @@
       }
     }
 
-    @keyframes od-download-spin {
+    @keyframes bc-download-spin {
       to {
         transform: rotate(360deg);
       }
     }
 
-    @keyframes od-download-slide {
+    @keyframes bc-download-slide {
       from {
         left: -40%;
       }

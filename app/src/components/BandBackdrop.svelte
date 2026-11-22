@@ -85,7 +85,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Stays at the top of the scrolling area, under the title; takes no room. */
     .bc-band-backdrop--holder {
       position: sticky;

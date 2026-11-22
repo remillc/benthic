@@ -6,8 +6,8 @@
 // Where things are kept:
 //   - the links (logbook site uuid → base site id) in the Benthic data store, `shared-sites/links.json`, with the
 //     account's other Benthic data (never in the Subsurface logbook, which desktop Subsurface reads too);
-//   - the terms version accepted and the fingerprint of the last list sent, in the device store (`od.sharedSitesTerms`,
-//     `od.sharedSitesSent`): what the server answers wins.
+//   - the terms version accepted and the fingerprint of the last list sent, in the device store (`bc.sharedSitesTerms`,
+//     `bc.sharedSitesSent`): what the server answers wins.
 // Only a subscribed Benthic+ account contributes (whatever the server's reading switch says).
 import { BenthicCore } from 'benthic-core';
 import { deviceStore } from './device-store.js';
@@ -21,9 +21,9 @@ import { siteChange } from './sites.svelte.js';
 import { connection } from './online.svelte.js';
 import { contributionOf, contributionStamp, createSharedSitesApi, mergeLinks, redirectLinks, SharedSitesError } from './shared-sites.js';
 
-const TERMS_KEY = 'od.sharedSitesTerms';
-const SENT_KEY = 'od.sharedSitesSent';
-const MODE_KEY = 'od.sitesMode';
+const TERMS_KEY = 'bc.sharedSitesTerms';
+const SENT_KEY = 'bc.sharedSitesSent';
+const MODE_KEY = 'bc.sitesMode';
 const LINKS_PATH = 'shared-sites/links.json';
 
 export const sharedSites = $state({

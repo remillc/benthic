@@ -4,7 +4,7 @@
   // what the switch does, and the switch at the end of the row. Same switch as Réglages (Framework7's toggle).
 
   /** @type {{ label: string, checked: boolean, supporting?: string, disabled?: boolean, id?: string, onchange?: (checked: boolean) => void }} */
-  let { label, checked = $bindable(), supporting = '', disabled = false, id = `od-switch-${Math.random().toString(36).slice(2, 8)}`, onchange } = $props();
+  let { label, checked = $bindable(), supporting = '', disabled = false, id = `bc-switch-${Math.random().toString(36).slice(2, 8)}`, onchange } = $props();
 </script>
 
 <div class="bc-switch-field">
@@ -16,7 +16,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-switch-field {
       min-height: 56px;
       padding: 8px 0;

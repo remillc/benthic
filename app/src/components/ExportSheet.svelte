@@ -28,7 +28,7 @@
    */
   let { count, whole = false, logbookName = '', onexport, onclose } = $props();
 
-  const KEY = 'od.exportFormat';
+  const KEY = 'bc.exportFormat';
   // « Fichier Benthic » comes first, for the whole logbook only (task 2026-11-22-323).
   // svelte-ignore state_referenced_locally
   const FORMATS = exportFormats(whole);
@@ -90,9 +90,9 @@
 
 {#if phone}
   <Sheet {opened} swipeToClose backdrop class="bc-export-sheet bc-sheet-dialog" style="height: auto" onSheetClosed={onclose}>
-    <div class="bc-export-sheet--sheet" role="dialog" aria-labelledby="od-export-title">
+    <div class="bc-export-sheet--sheet" role="dialog" aria-labelledby="bc-export-title">
       <div class="bc-export-sheet--handle" aria-hidden="true"></div>
-      <h2 id="od-export-title" class="bc-export-sheet--title">{whole ? t('export.titleLogbook') : t('export.title', { n: count })}</h2>
+      <h2 id="bc-export-title" class="bc-export-sheet--title">{whole ? t('export.titleLogbook') : t('export.title', { n: count })}</h2>
       <p class="bc-export-sheet--text">{whole ? t('export.textLogbook', { name: logbookName, n: count }) : t('export.textSelection')}</p>
       <div class="bc-export-sheet--formats">{@render content()}</div>
       <p class="bc-export-sheet--footnote">{t('export.footnotePhone')}</p>
@@ -119,7 +119,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-export-sheet.sheet-modal) {
       border-radius: 28px 28px 0 0;
       background: var(--bc-dialog);

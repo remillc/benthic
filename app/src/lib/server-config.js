@@ -1,5 +1,5 @@
 // @ts-check
-// Where the OpenDives server is (release edition, tasks 2026-11-16-259 and 260). The address comes from the build's
+// Where the Benthic server is (release edition, tasks 2026-11-16-259 and 260). The address comes from the build's
 // configuration (`VITE_SERVER_URL`); a development server answers on the Android emulator's host alias or on the
 // loopback. A release build never carries a development address: without the variable its address is empty and
 // the app shows « Le serveur ne répond pas » (docs/architecture.md, section 11.2).

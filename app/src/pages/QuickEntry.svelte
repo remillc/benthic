@@ -229,7 +229,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-quick-entry--bar {
       height: 64px;
       padding: calc(var(--f7-safe-area-top) + 0px) 4px 0 4px;

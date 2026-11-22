@@ -272,8 +272,8 @@
 
 {#snippet notify()}
   <div class="bc-doc-edit--notify">
-    <span class="bc-doc-edit--notify-label" id="od-doc-notify">{t('docs.insurance.notify')}</span>
-    <ButtonGroup ariaLabelledby="od-doc-notify" value={String(notifyDays)} onchange={(v) => v && (notifyDays = /** @type {14|30|60} */ (Number(v)))} options={notifyOptions} />
+    <span class="bc-doc-edit--notify-label" id="bc-doc-notify">{t('docs.insurance.notify')}</span>
+    <ButtonGroup ariaLabelledby="bc-doc-notify" value={String(notifyDays)} onchange={(v) => v && (notifyDays = /** @type {14|30|60} */ (Number(v)))} options={notifyOptions} />
   </div>
 {/snippet}
 
@@ -333,7 +333,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-doc-edit .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }

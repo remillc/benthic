@@ -2,7 +2,7 @@
   // @ts-check
   // The blue band at the top of the first launch on Android phones (tasks 2026-11-16-233, 234, 235 and 236;
   // docs/mockups/android-accueil-c.dc.html and android-premier-lancement-*.dc.html): the same panel as the
-  // tablet's (gradient, sheen, hatching), with the logo, « OpenDives » and the « Alpha » badge.
+  // tablet's (gradient, sheen, hatching), with the logo, « Benthic » and the « Alpha » badge.
   // `welcome`: 330 dp, with the headline, the line under it and the decorative dive profile.
   // `step`: 140 dp under the status bar, only the brand, a straight bottom edge (no wave, no profile).
   // The status bar is part of the band: its height (at least 24 dp) comes first.
@@ -22,8 +22,8 @@
   const TOP = 5.5;
   const line = decorativeProfilePath(WIDTH, TOP, 118);
   const area = `${line} L${WIDTH} ${TOP} Z`;
-  const gradient = `od-first-band-water-${Math.random().toString(36).slice(2, 9)}`;
-  const glow = `od-first-band-glow-${Math.random().toString(36).slice(2, 9)}`;
+  const gradient = `bc-first-band-water-${Math.random().toString(36).slice(2, 9)}`;
+  const glow = `bc-first-band-glow-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
 <header class="bc-first-launch-band" class:bc-first-launch-band--welcome={welcome}>
@@ -61,7 +61,7 @@
 </header>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-launch-band {
       --bc-first-band-top: max(var(--f7-safe-area-top), 24px);
       box-sizing: border-box;

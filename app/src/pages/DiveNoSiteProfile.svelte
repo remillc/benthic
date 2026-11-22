@@ -81,7 +81,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dive-no-site-profile--facts {
       margin: 14px 20px 0;
       font-size: 14px;

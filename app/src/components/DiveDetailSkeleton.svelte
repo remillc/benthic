@@ -45,7 +45,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Framework7 gives a skeleton block the whole width: the margins below would push it past the pane. */
     .bc-dive-detail-skeleton--profile,
     .bc-dive-detail-skeleton--desk-profile,

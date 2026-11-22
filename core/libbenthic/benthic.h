@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives façade over the Subsurface core. The rest of the application
+// Benthic façade over the Subsurface core. The rest of the application
 // never sees Subsurface's internal structures.
 // These functions are not reentrant: the core must run on a single thread.
 #ifndef BENTHIC_H
@@ -489,14 +489,14 @@ int plan_dive(const std::string &request, std::string &json, std::string &error)
 // [{"id", "date", "when", "site", "maxDepthMm", "durationSeconds", "salinity",
 //   "surfacePressureMbar", "profile", "levels": [{"depthMm", "durationSeconds"}],
 //   "gases": [{"o2Permille", "hePermille"}], "request": the plan as saved by
-//   OpenDives, a JSON text, or "", "title": the title kept with the plan, or ""}],
+//   Benthic, a JSON text, or "", "title": the title kept with the plan, or ""}],
 //   newest first.
 int list_plans(std::string &json);
 // Saves the plan of `request` (as plan_dive; cylinders without size or
 // pressure) as a planned dive, not numbered and in no trip, in one undoable
 // step; replace_id, when not 0, is the plan it replaces (Subsurface's
 // replan). INVALID_PLAN when the core refuses the plan. `title` is kept in the
-// extra data of the planned dive's first dive computer ("OpenDives title"),
+// extra data of the planned dive's first dive computer ("Benthic title"),
 // next to the plan; empty (after trimming) writes no key, so a replaced plan
 // loses its previous title.
 int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error,
@@ -509,7 +509,7 @@ int save_plan(const std::string &request, int replace_id, std::string &result_js
 // tokens or empty, `data` as filter_constraint_data_to_string() writes it
 // (core units: mm, seconds, mK, mL/min, mL, permille; strings separated by
 // commas; dive_mode and day_of_week as a bit field). Never accepted: weight,
-// weight_type, water_density, cylinder_n2 (spec). OpenDives additions, not in
+// weight_type, water_density, cylinder_n2 (spec). Benthic additions, not in
 // Subsurface's filter: "od_country", "od_region" (the site's taxonomy) and
 // "od_trip" (trip identifiers of the load), with comma-separated values.
 // Text values may also be given one per line ('\n'): then each is kept
@@ -637,7 +637,7 @@ int filter_preset_save(const std::string &name, const std::string &fulltext, con
 		       const std::vector<filter_rule> &rules, std::string &json, std::string &error);
 int filter_preset_delete(int index, std::string &json, std::string &error); // RemoveFilterPreset
 
-// --- Sync conflict (edit.cpp; spec, section 6, an OpenDives addition) ------
+// --- Sync conflict (edit.cpp; spec, section 6, a Benthic addition) ------
 // After Subsurface's automatic merge (union of the lines of each file), the
 // dives whose same line both sides changed differently. Read-only:
 // {"conflict":false} or {"conflict":true, "deviceTime", "cloudTime" (commit
@@ -714,10 +714,10 @@ using download_progress = void (*)(const std::string &json, void *userdata);
 // Subsurface), "classicAddress" (optional, the MAC of the same device paired
 // as Bluetooth Classic: when the BLE link fails, not the computer's protocol
 // nor a cancellation, the download is tried once more over Classic, with a
-// "retrying" progress state; an OpenDives addition), "name" (the device's
+// "retrying" progress state; a Benthic addition), "name" (the device's
 // Bluetooth name), "forceDownload" (all
 // dives, not only the new ones; default false), "defaultSalinity" (an
-// OpenDives addition: 10000, 10100, 10200 or 10300, the water type written
+// Benthic addition: 10000, 10100, 10200 or 10300, the water type written
 // as the dive's user salinity, like EditWaterTypeUser, on the received dives
 // that have no salinity from the computer and none of their own; 0 or
 // absent leaves them as they are), "logFile" (path of
@@ -797,8 +797,8 @@ int pending_changes(std::string &json);
 
 // History of the configured logbook (task 2026-11-19-290): its versions are the commits of its local repository, read
 // without network. `action` and `args` (strings): "info" -> {"head","remote","branch"}; "log" [skip, limit, changes 0|1]
-// (odgit_history_log); "stats" [commit…]; "diff" [from, to]; "read" [commit, path]; "files" [commit, prefix] (the
-// same JSON as odgit_history_*); "restore" [commit, message, path…] adds a commit with that version's content (all
+// (bgit_history_log); "stats" [commit…]; "diff" [from, to]; "read" [commit, path]; "files" [commit, prefix] (the
+// same JSON as bgit_history_*); "restore" [commit, message, path…] adds a commit with that version's content (all
 // of it, or only the paths), reads the log again from it, and leaves the sending to sync(); "open" [commit] loads
 // that version READ ONLY (no address: nothing can be saved or sent) and writes the dives as list_dives() does; "close"
 // reads the logbook again (as list_cloud_cached_dives) and forgets the opened version. Errors: NO_REPOSITORY,

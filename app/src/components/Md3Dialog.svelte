@@ -25,7 +25,7 @@
 
   let { title, text = '', oncancel, children, actions, class: extraClass = '', role = 'dialog', eyebrow = '', onclose, closeLabel = '' } = $props();
 
-  const id = `od-dialog-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-dialog-${Math.random().toString(36).slice(2, 9)}`;
 
   /**
    * The buttons stack when they do not fit on one line (task 2026-11-14-143): measured once
@@ -50,13 +50,13 @@
       e.stopPropagation();
       oncancel();
     };
-    node.addEventListener('od-cancel', cancel);
+    node.addEventListener('bc-cancel', cancel);
     // The dialog takes the focus (a screen reader reads its title); Tab then
     // reaches the selected choice, without a focus ring drawn at opening.
     queueMicrotask(() => /** @type {HTMLElement|null} */ (node.querySelector('[role="dialog"], [role="alertdialog"]'))?.focus({ preventScroll: true }));
     return {
       destroy() {
-        node.removeEventListener('od-cancel', cancel);
+        node.removeEventListener('bc-cancel', cancel);
         node.remove();
         previous?.focus?.();
       },
@@ -84,13 +84,13 @@
     {/if}
     <h2 {id}>{title}</h2>
     {#if text}<p class="bc-md3-dialog--text">{text}</p>{/if}
-    <div class="bc-md3-dialog--content" data-od-scroll>{@render children()}</div>
+    <div class="bc-md3-dialog--content" data-bc-scroll>{@render children()}</div>
     <div class="bc-md3-dialog--actions">{@render actions()}</div>
   </div>
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-md3-dialog {
       position: fixed;
       inset: 0;
@@ -125,21 +125,21 @@
        (effects spring); the scrim fades in. It is removed at once on closing. */
     :global(.md) .bc-md3-dialog--surface {
       animation:
-        od-dialog-grow var(--bc-motion-spatial-fast-ms) var(--bc-motion-spatial-fast) backwards,
-        od-dialog-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
+        bc-dialog-grow var(--bc-motion-spatial-fast-ms) var(--bc-motion-spatial-fast) backwards,
+        bc-dialog-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
     :global(.md) .bc-md3-dialog--scrim {
-      animation: od-dialog-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
+      animation: bc-dialog-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
-    @keyframes od-dialog-grow {
+    @keyframes bc-dialog-grow {
       from {
         transform: scale(0.9);
       }
     }
 
-    @keyframes od-dialog-fade {
+    @keyframes bc-dialog-fade {
       from {
         opacity: 0;
       }

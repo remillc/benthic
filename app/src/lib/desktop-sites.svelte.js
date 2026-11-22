@@ -12,8 +12,8 @@ import { filter, applyFilter, clearFilter, emptyCriteria } from './filter.svelte
 import { goToSection } from './navigation.svelte.js';
 import { desk } from './desktop-logbook.svelte.js';
 
-const SORT_KEY = 'od.desktopSitesSort';
-const WIDTH_KEY = 'od.desktopSitesWidth';
+const SORT_KEY = 'bc.desktopSitesSort';
+const WIDTH_KEY = 'bc.desktopSitesWidth';
 
 /** @template T @param {string} key @param {T} fallback @returns {T} */
 function remembered(key, fallback) {

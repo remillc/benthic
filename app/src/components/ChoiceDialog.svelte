@@ -23,7 +23,7 @@
 
   // svelte-ignore state_referenced_locally
   let selected = $state(value);
-  const name = `od-choice-${Math.random().toString(36).slice(2, 9)}`;
+  const name = `bc-choice-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
 <Md3Dialog class="bc-choice-dialog" {title} {oncancel}>
@@ -43,7 +43,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-choice-dialog--choices {
       display: flex;
       flex-direction: column;

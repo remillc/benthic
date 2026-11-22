@@ -75,7 +75,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-validation-confirm .page) {
       background: var(--bc-background);
     }

@@ -29,7 +29,7 @@
   import { accountEmail as emailOfAccount, profileRow, sheetVariant } from '../lib/account-sheet.js';
 
   const email = $derived(emailOfAccount(benthicPlusAccount, logbook));
-  // An Benthic+ account shows the diver's full name first and the e-mail under it, in smaller grey text (task 2026-11-19-312).
+  // A Benthic+ account shows the diver's full name first and the e-mail under it, in smaller grey text (task 2026-11-19-312).
   const fullName = $derived(benthicPlusSubscriber() ? diver.info.fullName : '');
   const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(fullName || email || t('menu.noAccount'));
@@ -39,7 +39,7 @@
   );
   const mapUpdates = $derived(updatesCount());
 
-  // The three versions of the sheet (task 2026-11-18-281): without an Benthic+ account (the release edition's free
+  // The three versions of the sheet (task 2026-11-18-281): without a Benthic+ account (the release edition's free
   // version), with one, and the alpha's or a cloud account's, which keeps what it had.
   const variant = $derived(sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email }));
   const free = $derived(variant === 'free');
@@ -56,7 +56,7 @@
   // sheet used to add « #compte » to the browser's history (task 2026-11-18-281, point 5); the routers own the history
   // and nothing is written to the browser's any more (docs/architecture.md, section 13).
 
-  /** « Gérer le compte »: the new screen for an Benthic+ account, the account page for the others. */
+  /** « Gérer le compte »: the new screen for a Benthic+ account, the account page for the others. */
   function manage() {
     navigation.accountOpen = false;
     if (subscriber) openManageAccount();
@@ -399,7 +399,7 @@
 
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
-    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages, and for an Benthic+
+    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages, and for a Benthic+
          account « Sauvegarde et restauration » below it (tasks 290 and 291); no chip next to a subscriber's entries. When a piece
          is overdue, the red badge and line (task 2026-11-18-281). -->
     {#if isRelease && !desktopApp}
@@ -466,7 +466,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.sheet-modal.bc-account-sheet) {
       --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;
@@ -905,7 +905,7 @@
       margin: 0 16px;
     }
 
-    /* « Mon profil de plongeur » of an Benthic+ account: the chip above the title, the overdue pieces in red. */
+    /* « Mon profil de plongeur » of a Benthic+ account: the chip above the title, the overdue pieces in red. */
     .bc-account-sheet--profile .bc-account-sheet--row-label {
       font-size: 16px;
       gap: 2px;

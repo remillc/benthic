@@ -22,7 +22,7 @@
   let reason = $state(/** @type {import('../lib/shared-sites.js').ReportReason} */ ('wrong_position'));
   let details = $state('');
   let sending = $state(false);
-  const group = `od-shared-report-${Math.random().toString(36).slice(2, 9)}`;
+  const group = `bc-shared-report-${Math.random().toString(36).slice(2, 9)}`;
   const tooLong = $derived(details.length > REPORT_DETAILS_MAX);
 
   async function send() {
@@ -63,7 +63,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-shared-report--reasons {
       display: flex;
       flex-direction: column;

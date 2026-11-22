@@ -197,7 +197,7 @@ export function criteriaName(criteria, dives) {
     .join(' · ');
 }
 
-const STORE_KEY = 'od.statistics';
+const STORE_KEY = 'bc.statistics';
 
 /** @returns {SavedStatistic[]} */
 function readSaved() {

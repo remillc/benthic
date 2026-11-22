@@ -175,8 +175,8 @@ test('the curve chips: none on by default (todo 124), the choice is kept in the 
   layers = setLayer(layers, 'ppo2', true);
   layers = setLayer(layers, 'ceiling', true);
   saveLayers(store, layers);
-  assert.equal(LAYER_KEY, 'od.profileLayers');
-  assert.equal(store.m.get('od.profileLayers'), '["temperature","ppo2","ceiling"]');
+  assert.equal(LAYER_KEY, 'bc.profileLayers');
+  assert.equal(store.m.get('bc.profileLayers'), '["temperature","ppo2","ceiling"]');
   // Another dive, another session: the same chips.
   assert.deepEqual(readLayers(store), ['temperature', 'ppo2', 'ceiling']);
   // Turning every chip off is a choice too.

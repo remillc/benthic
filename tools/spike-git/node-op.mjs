@@ -34,7 +34,7 @@ switch (a.op) {
     const { files, diveIds } = makeLogbook(a.n);
     const queueAll = diveIds.map((id) => [...files].filter(([p]) => p.startsWith(`dives/${id.slice(0, 2)}/${id}/`)).map(([p, text]) => ({ path: p, text })));
     const queue = a.maxDives ? queueAll.slice(0, a.maxDives) : queueAll;
-    const extra = a.preseed ? [] : [...files].filter(([p]) => !p.startsWith('dives/') && p !== 'opendives.json').map(([p, text]) => ({ path: p, text }));
+    const extra = a.preseed ? [] : [...files].filter(([p]) => !p.startsWith('dives/') && p !== 'benthic.json').map(([p, text]) => ({ path: p, text }));
     let calls = 0, bytes = 0, maxBody = 0;
     const callMs = [];
     async function commit(batch, message) {
@@ -51,7 +51,7 @@ switch (a.op) {
     const t = await time(async () => {
       for (let i = 0; i < extra.length; i += 100) await commit(extra.slice(i, i + 100), 'Send sites');
       for (let i = 0; i < queue.length; i += a.batch) await commit(queue.slice(i, i + a.batch).flat(), `Send ${a.batch} dives`);
-      await commit([{ path: 'opendives.json', text: files.get('opendives.json') }], 'Create the logbook');
+      await commit([{ path: 'benthic.json', text: files.get('benthic.json') }], 'Create the logbook');
     });
     Object.assign(out, { ms: t.ms, calls, uploadMB: r1(bytes / 1e6), maxBodyMB: r1(maxBody / 1e6) });
     if (a.preseed) {

@@ -102,7 +102,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-qr-received .page) {
       background: var(--bc-background);
     }

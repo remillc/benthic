@@ -30,7 +30,7 @@
    */
   let { selected, filtered, all, prefs, whole = false, onclose } = $props();
 
-  const FORMAT_KEY = 'od.desktopExportFormat';
+  const FORMAT_KEY = 'bc.desktopExportFormat';
 
   // svelte-ignore state_referenced_locally
   let scope = $state(whole ? 'all' : defaultScope(selected.length, !!filtered));
@@ -94,17 +94,17 @@
   <h3 class="bc-desktop-export--heading">{t('desktop.export.which')}</h3>
   <div class="bc-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.which')}>
     {#if selected.length}
-      <ChoiceRow name="od-export-scope" selected={scope === 'selection'} onselect={() => (scope = 'selection')}>
+      <ChoiceRow name="bc-export-scope" selected={scope === 'selection'} onselect={() => (scope = 'selection')}>
         <span class="bc-desktop-export--label">{t('desktop.export.selection', { n: selected.length })}</span>
         {#if numbers.length}<span class="bc-desktop-export--line">{t('desktop.numbers', { numbers: numbers.slice(0, 8).join(', ') + (numbers.length > 8 ? '…' : '') })}</span>{/if}
       </ChoiceRow>
     {/if}
     {#if filtered}
-      <ChoiceRow name="od-export-scope" selected={scope === 'filtered'} onselect={() => (scope = 'filtered')}>
+      <ChoiceRow name="bc-export-scope" selected={scope === 'filtered'} onselect={() => (scope = 'filtered')}>
         <span class="bc-desktop-export--label">{t('desktop.export.filtered', { n: filtered.length })}</span>
       </ChoiceRow>
     {/if}
-    <ChoiceRow name="od-export-scope" selected={scope === 'all'} onselect={() => (scope = 'all')}>
+    <ChoiceRow name="bc-export-scope" selected={scope === 'all'} onselect={() => (scope = 'all')}>
       <span class="bc-desktop-export--label">{t('desktop.export.all')}</span>
       <span class="bc-desktop-export--line">{t('trip.dives', { n: all.length })}</span>
     </ChoiceRow>
@@ -142,7 +142,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-export--heading,
     .bc-desktop-export--switch {
       padding-inline: 24px;

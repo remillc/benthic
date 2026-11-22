@@ -163,13 +163,13 @@ export function openProfile() {
   openOver('/profile');
 }
 
-/** « Gérer le compte » (an Benthic+ account): a page on the phone, a two-column dialog on a tablet and on the desktop. */
+/** « Gérer le compte » (a Benthic+ account): a page on the phone, a two-column dialog on a tablet and on the desktop. */
 export function openManageAccount() {
   if (layout.phone) openOver('/account/manage');
   else navigation.manageOpen = true;
 }
 
-/** « Sauvegarde et restauration » of an Benthic+ account: a dialog on the desktop, a page over the current section elsewhere. */
+/** « Sauvegarde et restauration » of a Benthic+ account: a dialog on the desktop, a page over the current section elsewhere. */
 export function openBackup() {
   if (layout.desktop) navigation.backupOpen = true;
   else openOver('/account/backup');
@@ -224,11 +224,11 @@ export function trackSection() {
 /** @param {HTMLElement|null} from */
 export function openMenu(from) {
   opener = from;
-  f7.panel.open('#od-menu');
+  f7.panel.open('#bc-menu');
 }
 
 export function closeMenu() {
-  f7.panel.close('#od-menu');
+  f7.panel.close('#bc-menu');
 }
 
 /** Focus back on the ☰ button, or the one of the screen now shown. */

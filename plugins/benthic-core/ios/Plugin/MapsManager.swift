@@ -31,7 +31,7 @@ import UIKit
 public final class MapsManager {
     public static let shared = MapsManager()
     /// Declared in the app's Info.plist (BGTaskSchedulerPermittedIdentifiers).
-    public static let backgroundTaskIdentifier = "org.opendives.app.maps-download"
+    public static let backgroundTaskIdentifier = "app.benthicdivelog.maps-download"
 
     static let maxTiles = 3000
     static let maxBytes: Int64 = 50 * 1024 * 1024
@@ -149,7 +149,7 @@ public final class MapsManager {
     private var _listener: (([String: Any]) -> Void)?
 
     /// The scheduling: `runner`, `suspended`, the background time and task. Serial.
-    private let control = DispatchQueue(label: "org.opendives.maps")
+    private let control = DispatchQueue(label: "app.benthicdivelog.maps")
     private var runner: Runner?
     /// The system took the background time back: nothing starts until the app
     /// comes back or a processing task runs.
@@ -183,7 +183,7 @@ public final class MapsManager {
     private func oldDir(_ id: String) -> URL { dir.appendingPathComponent(Self.oldPrefix + id, isDirectory: true) }
     private var stateURL: URL { base.appendingPathComponent(Self.stateFile) }
 
-    /// `OpenDives/<version> (dive log app; <repository>)`: no personal data.
+    /// `Benthic/<version> (dive log app; <repository>)`: no personal data.
     public static var userAgent: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
         return "Benthic/\(version) (dive log app; \(repoURL))"
@@ -312,7 +312,7 @@ public final class MapsManager {
             if first { self.pathKnown.signal() }
             self.schedule()
         }
-        pathMonitor.start(queue: DispatchQueue(label: "org.opendives.maps.path"))
+        pathMonitor.start(queue: DispatchQueue(label: "app.benthicdivelog.maps.path"))
 
         let center = NotificationCenter.default
         center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { [weak self] _ in
@@ -685,7 +685,7 @@ public final class MapsManager {
         askingBackgroundTime = true
         DispatchQueue.main.async {
             var id = UIBackgroundTaskIdentifier.invalid
-            id = UIApplication.shared.beginBackgroundTask(withName: "OpenDives offline map") { [weak self] in
+            id = UIApplication.shared.beginBackgroundTask(withName: "Benthic offline map") { [weak self] in
                 // iOS takes the time back: the download stops cleanly and waits for a processing task or the app.
                 self?.control.sync {
                     guard let self else { return }

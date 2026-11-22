@@ -59,8 +59,8 @@ import {
  *   | { kind: 'manage' }} MapsDialog
  */
 
-const REGIONS_KEY = 'od.offlineMaps';
-const SETTINGS_KEY = 'od.offlineMapsSettings';
+const REGIONS_KEY = 'bc.offlineMaps';
+const SETTINGS_KEY = 'bc.offlineMapsSettings';
 
 /** @param {string} key */
 function readJson(key) {

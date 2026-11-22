@@ -2,7 +2,7 @@
   // @ts-check
   // Sync conflict (docs/mockups/android-etat-conflit.dc.html,
   // android-etat-conflit-ordinateurs.dc.html, ios-etat-conflit.dc.html; spec,
-  // "Sync conflict dialog, redesigned"; an OpenDives addition). After
+  // "Sync conflict dialog, redesigned"; a Benthic addition). After
   // Subsurface's automatic merge, what changed differently here and in the
   // cloud: an MD3 dialog on Android, a sheet on iOS. It names what is in
   // conflict and shows each version; nothing is lost before the choice.
@@ -121,7 +121,7 @@
 
   /**
    * The full-screen dialog is moved under <body> (no page transform can clip
-   * it); Back and Escape dismiss it (lib/back-button.js sends od-cancel to a
+   * it); Back and Escape dismiss it (lib/back-button.js sends bc-cancel to a
    * .bc-dialog).
    * @param {HTMLElement} node
    */
@@ -131,11 +131,11 @@
       e.stopPropagation();
       dismiss();
     };
-    node.addEventListener('od-cancel', cancel);
+    node.addEventListener('bc-cancel', cancel);
     queueMicrotask(() => /** @type {HTMLElement|null} */ (node.querySelector('[role="dialog"]'))?.focus({ preventScroll: true }));
     return {
       destroy() {
-        node.removeEventListener('od-cancel', cancel);
+        node.removeEventListener('bc-cancel', cancel);
         node.remove();
       },
     };
@@ -236,7 +236,7 @@
         {#each sides as side (side)}
           {@const selected = sideOf(item) === side}
           <label class="bc-conflict-sheet--choice" class:bc-conflict-sheet--selected={selected}>
-            <input type="radio" name="od-conflict-{item.path}" value={side} checked={selected} disabled={forAll} onchange={() => (choices[item.path] = side)} />
+            <input type="radio" name="bc-conflict-{item.path}" value={side} checked={selected} disabled={forAll} onchange={() => (choices[item.path] = side)} />
             {#if selected || theme.ios}<span class="bc-conflict-sheet--mark" aria-hidden="true">{#if selected}<Icon name="check" size={16} weight={3} />{/if}</span>{/if}
             <span class="bc-conflict-sheet--card-text">
               <span class="bc-conflict-sheet--card-title">{t(side === 'device' ? 'conflict.deviceCard' : 'conflict.cloudCard')}</span>
@@ -263,7 +263,7 @@
       <label class="bc-conflict-sheet--small" class:bc-conflict-sheet--selected={selected} class:disabled>
         <input
           type="radio"
-          name="od-conflict-{item ? item.path : 'all'}"
+          name="bc-conflict-{item ? item.path : 'all'}"
           value={side}
           checked={selected}
           {disabled}
@@ -321,8 +321,8 @@
 {#if conflict}
   {#if theme.ios}
     <Sheet opened swipeToClose={false} backdrop class="bc-conflict-sheet" style={list ? 'height: 92%' : 'height: auto'}>
-      <div class="bc-conflict-sheet--sheet" class:bc-conflict-sheet--large={list} role="dialog" aria-labelledby="od-conflict-title">
-        <h2 id="od-conflict-title" class="bc-conflict-sheet--title">{title}</h2>
+      <div class="bc-conflict-sheet--sheet" class:bc-conflict-sheet--large={list} role="dialog" aria-labelledby="bc-conflict-title">
+        <h2 id="bc-conflict-title" class="bc-conflict-sheet--title">{title}</h2>
         {#if list && !detailItem}{@render many()}{:else}{@render body()}{/if}
         {#if detailItem}
           <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--wide" onclick={dismiss}>{t('conflict.back')}</button>
@@ -336,12 +336,12 @@
     <!-- Android, several dives: an MD3 full-screen dialog. ✕ is "Plus tard" (or back to the list from one dive). -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="bc-conflict-sheet bc-conflict-sheet--full bc-md3-dialog modal-in" use:portal onkeydown={keydown}>
-      <div class="bc-conflict-sheet--full-surface" role="dialog" aria-modal="true" aria-labelledby="od-conflict-title" tabindex="-1">
+      <div class="bc-conflict-sheet--full-surface" role="dialog" aria-modal="true" aria-labelledby="bc-conflict-title" tabindex="-1">
         <div class="bc-conflict-sheet--bar">
           <button type="button" class="bc-conflict-sheet--bar-close" aria-label={t(detailItem ? 'conflict.back' : 'conflict.later')} disabled={busy} onclick={dismiss}>
             <Icon name="close" weight={2} />
           </button>
-          <h1 id="od-conflict-title">{title}</h1>
+          <h1 id="bc-conflict-title">{title}</h1>
           {#if detailItem}
             <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--bar-action" onclick={dismiss}>{t('conflict.back')}</button>
           {:else}
@@ -365,7 +365,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-conflict-sheet--md-body {
       padding: 0 24px;
     }

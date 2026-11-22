@@ -46,7 +46,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* The slot keeps its size when there is no preview, so the titles do not move. */
     .bc-desktop-stat-preview {
       flex: none;

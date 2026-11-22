@@ -1,5 +1,5 @@
 // @ts-check
-// Backup and restore of an Benthic+ logbook (task 2026-11-19-290; docs/architecture.md, section 11.3). The logbook is a
+// Backup and restore of a Benthic+ logbook (task 2026-11-19-290; docs/architecture.md, section 11.3). The logbook is a
 // git repository in Subsurface's format: every sync is a commit, and a commit is a version. This file reads the versions
 // from the repository the core keeps on the device (the core's `history` calls, core/libbenthic/benthic.h) and says
 // what a version holds and how it differs from the current logbook. It decides nothing about the screens and keeps no

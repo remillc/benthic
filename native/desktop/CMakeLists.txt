@@ -11,8 +11,8 @@ if(NOT SS)
   set(SS "${ROOT}/third_party/subsurface")
 endif()
 set(COMPAT "${ROOT}/core/compat")
-if(NOT OD_BIN_DIR)
-  set(OD_BIN_DIR "${CMAKE_BINARY_DIR}/bin")
+if(NOT BC_BIN_DIR)
+  set(BC_BIN_DIR "${CMAKE_BINARY_DIR}/bin")
 endif()
 # DEPS: prefix of the dependencies (native/desktop/build-deps.sh).
 
@@ -41,7 +41,7 @@ list(APPEND SOURCES
   "${ROOT}/core/libbenthic/account.cpp"
   "${ROOT}/core/libbenthic/stats.cpp"
   "${ROOT}/core/libbenthic/download.cpp"
-  "${ROOT}/core/libbenthic/odgit.cpp")
+  "${ROOT}/core/libbenthic/bgit.cpp")
 
 file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")
 
@@ -49,66 +49,66 @@ add_library(benthic_core STATIC ${SOURCES})
 target_compile_features(benthic_core PUBLIC cxx_std_20)
 
 # Flags shared by the library and the executables that include the façade.
-set(OD_COMPILE_OPTIONS -w -O2
+set(BC_COMPILE_OPTIONS -w -O2
   "SHELL:-iquote ${COMPAT}/shadow"
   "SHELL:-include ${CMAKE_BINARY_DIR}/gen/build-defs.h")
-set(OD_INCLUDES
+set(BC_INCLUDES
   "${COMPAT}/qtshim" "${COMPAT}/gen" "${CMAKE_BINARY_DIR}/gen"
   "${ROOT}" "${SS}" "${SS}/libdivecomputer/include"
   "${DEPS}/include" "${DEPS}/include/libxml2")
 # Subsurface's Bluetooth paths in core/libdivecomputer.cpp, with the transport
 # of core/compat/bluetooth_compat.cpp.
-set(OD_DEFINITIONS BT_SUPPORT BLE_SUPPORT)
+set(BC_DEFINITIONS BT_SUPPORT BLE_SUPPORT)
 if(WIN32)
   # Static libraries, as on the other targets; Subsurface's windows.cpp needs
   # a Windows 7 API level at least (Winsock, shlobj, registry).
-  list(APPEND OD_DEFINITIONS LIBXML_STATIC LIBXSLT_STATIC LIBEXSLT_STATIC ZIP_STATIC NOMINMAX)
+  list(APPEND BC_DEFINITIONS LIBXML_STATIC LIBXSLT_STATIC LIBEXSLT_STATIC ZIP_STATIC NOMINMAX)
 endif()
 
-target_compile_options(benthic_core PRIVATE ${OD_COMPILE_OPTIONS})
-target_compile_definitions(benthic_core PUBLIC ${OD_DEFINITIONS})
-target_include_directories(benthic_core PUBLIC ${OD_INCLUDES})
+target_compile_options(benthic_core PRIVATE ${BC_COMPILE_OPTIONS})
+target_compile_definitions(benthic_core PUBLIC ${BC_DEFINITIONS})
+target_include_directories(benthic_core PUBLIC ${BC_INCLUDES})
 
 # Link libraries, in dependency order. Static runtime on Windows.
-set(OD_LIBS "${DEPS}/lib/libdivecomputer.a" "${DEPS}/lib/libgit2.a"
+set(BC_LIBS "${DEPS}/lib/libdivecomputer.a" "${DEPS}/lib/libgit2.a"
   "${DEPS}/lib/libmbedtls.a" "${DEPS}/lib/libmbedx509.a" "${DEPS}/lib/libmbedcrypto.a"
   "${DEPS}/lib/libzip.a" "${DEPS}/lib/libxslt.a" "${DEPS}/lib/libxml2.a"
   "${DEPS}/lib/libsqlite3.a" "${DEPS}/lib/libz.a")
 if(WIN32)
-  list(APPEND OD_LIBS pthread ws2_32 rpcrt4 crypt32 secur32 bcrypt advapi32 shell32 ole32 user32 shlwapi)
+  list(APPEND BC_LIBS pthread ws2_32 rpcrt4 crypt32 secur32 bcrypt advapi32 shell32 ole32 user32 shlwapi)
   target_link_options(benthic_core PUBLIC -static)
 elseif(APPLE)
-  list(APPEND OD_LIBS m iconv bz2 "-framework CoreFoundation" "-framework Security")
+  list(APPEND BC_LIBS m iconv bz2 "-framework CoreFoundation" "-framework Security")
 else()
-  list(APPEND OD_LIBS pthread dl m)
+  list(APPEND BC_LIBS pthread dl m)
 endif()
-target_link_libraries(benthic_core PUBLIC ${OD_LIBS})
+target_link_libraries(benthic_core PUBLIC ${BC_LIBS})
 
 # Test executables: the same programs as poc/build.sh, against benthic_core.
 # On Windows each executable carries a manifest that makes its narrow strings UTF-8.
-set(OD_EXE_EXTRA "")
+set(BC_EXE_EXTRA "")
 if(WIN32)
   enable_language(RC)
-  set(OD_EXE_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/utf8.rc")
+  set(BC_EXE_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/utf8.rc")
 endif()
 
 set(TESTS roundtrip facade)
 foreach(t ${TESTS})
-  add_executable(${t} "${ROOT}/tests/${t}.cpp" ${OD_EXE_EXTRA})
-  target_compile_options(${t} PRIVATE ${OD_COMPILE_OPTIONS})
+  add_executable(${t} "${ROOT}/tests/${t}.cpp" ${BC_EXE_EXTRA})
+  target_compile_options(${t} PRIVATE ${BC_COMPILE_OPTIONS})
   target_link_libraries(${t} PRIVATE benthic_core)
 endforeach()
 
 # benthic-host: the desktop application's native host, written in desktop/host/.
 file(GLOB HOST_SOURCES "${ROOT}/desktop/host/*.cpp")
 if(HOST_SOURCES)
-  add_executable(benthic-host ${HOST_SOURCES} ${OD_EXE_EXTRA})
-  target_compile_options(benthic-host PRIVATE ${OD_COMPILE_OPTIONS})
+  add_executable(benthic-host ${HOST_SOURCES} ${BC_EXE_EXTRA})
+  target_compile_options(benthic-host PRIVATE ${BC_COMPILE_OPTIONS})
   target_link_libraries(benthic-host PRIVATE benthic_core)
 endif()
 
 # Binaries in <build>/bin.
-set_target_properties(${TESTS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${OD_BIN_DIR}")
+set_target_properties(${TESTS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${BC_BIN_DIR}")
 if(HOST_SOURCES)
-  set_target_properties(benthic-host PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${OD_BIN_DIR}")
+  set_target_properties(benthic-host PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${BC_BIN_DIR}")
 endif()

@@ -2,7 +2,7 @@
 // Bluetooth transport of the platform, used by bluetooth_compat.cpp (the port
 // of Subsurface's core/qt-ble.cpp and core/qtserialbluetooth.cpp without Qt).
 //
-// Subsurface drives the system Bluetooth through Qt; OpenDives drives it
+// Subsurface drives the system Bluetooth through Qt; Benthic drives it
 // through the platform's own API (Android: android.bluetooth, in Kotlin, see
 // plugins/benthic-core/android/.../BluetoothTransport.kt). The platform only
 // provides the primitive operations below, each one synchronous and blocking

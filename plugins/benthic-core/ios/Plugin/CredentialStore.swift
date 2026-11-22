@@ -108,7 +108,7 @@ struct GitRemoteStore {
     }
 }
 
-/// The OpenDives server's session (release edition): "email
+/// The Benthic server's session (release edition): "email
 sessionToken
 repositoryUrl
 branch

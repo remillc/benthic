@@ -3,7 +3,7 @@
 // adds this file to a copy of the app). It calls the native plugin as the
 // pages do and prints "MAPS-TEST ..." lines; the last one is
 // "MAPS-TEST END passed=<n> failed=<n>".
-// window.OD_MAPS_LIMIT_TEST (set by run-maps.sh) adds the 50 MiB stop, which
+// window.BC_MAPS_LIMIT_TEST (set by run-maps.sh) adds the 50 MiB stop, which
 // downloads about 50 MiB from the tile server: on request only.
 (() => {
   const log = (...a) => console.log('MAPS-TEST', ...a);
@@ -109,7 +109,7 @@
     const progress = events.filter((e) => e.id === 'test-big' && e.status === 'downloading');
     log('progress events', progress.length);
 
-    if (window.OD_MAPS_LIMIT_TEST) {
+    if (window.BC_MAPS_LIMIT_TEST) {
       // A dense area at zoom 14, under 3,000 tiles but over 50 MiB.
       const heavy = request('test-limit', [2.1, 48.7, 2.6, 49.0], 14);
       check((await rejectCode(core.mapsTilesStart(heavy))) === 'resolved', 'heavy region started');

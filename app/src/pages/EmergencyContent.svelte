@@ -78,7 +78,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-emergency-content-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }

@@ -3,7 +3,7 @@
  * bureau-sauvegarde-*, ios-sauvegarde-*): the cards, the rows and the texts the screens share. The phone's pages, the
  * tablet's two panes and the desktop's dialog use the same classes.
  */
-@layer od.components {
+@layer bc.components {
   .bc-backup {
     box-sizing: border-box;
     padding: 8px 0 calc(16px + var(--bc-safe-bottom, 0px));

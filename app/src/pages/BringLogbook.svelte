@@ -125,7 +125,7 @@
   <div class="bc-bring-logbook--sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
     {#if deviceCount}
       <!-- The dives already on this device come first when there are some. -->
-      <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'device'} onselect={() => (source = 'device')} disabled={busy}>
+      <ChoiceRow class="bc-bring-logbook--source" name="bc-source" selected={source === 'device'} onselect={() => (source = 'device')} disabled={busy}>
         <span class="bc-bring-logbook--text">
           <span class="bc-bring-logbook--label">{t('bringLogbook.device', { n: deviceCount })}</span>
           <span class="bc-bring-logbook--consequence">{t('bringLogbook.deviceText')}</span>
@@ -133,14 +133,14 @@
       </ChoiceRow>
     {/if}
     <!-- Order of the mock-ups: empty logbook, divelogs.de, file (divelogs.de stays the default). -->
-    <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'empty'} onselect={() => (source = 'empty')} disabled={busy}>
+    <ChoiceRow class="bc-bring-logbook--source" name="bc-source" selected={source === 'empty'} onselect={() => (source = 'empty')} disabled={busy}>
       <span class="bc-bring-logbook--text">
         <span class="bc-bring-logbook--label">{t('bringLogbook.empty')}</span>
       </span>
     </ChoiceRow>
     <!-- Android: the chosen source and its fields form one tinted block. -->
     <div class="bc-bring-logbook--block" class:bc-bring-logbook--open={source === 'divelogs' && !theme.ios}>
-    <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'divelogs'} onselect={() => (source = 'divelogs')} disabled={busy} tinted={false}>
+    <ChoiceRow class="bc-bring-logbook--source" name="bc-source" selected={source === 'divelogs'} onselect={() => (source = 'divelogs')} disabled={busy} tinted={false}>
       <span class="bc-bring-logbook--text">
         <span class="bc-bring-logbook--label">{t('bringLogbook.divelogs')}</span>
         <span class="bc-bring-logbook--consequence">{t('bringLogbook.divelogsText')}</span>
@@ -161,7 +161,7 @@
       </div>
     {/if}
     </div>
-    <ChoiceRow class="bc-bring-logbook--source" name="od-source" selected={source === 'file'} onselect={() => (source = 'file')} disabled={busy}>
+    <ChoiceRow class="bc-bring-logbook--source" name="bc-source" selected={source === 'file'} onselect={() => (source = 'file')} disabled={busy}>
       <span class="bc-bring-logbook--text">
         <span class="bc-bring-logbook--label">{t('bringLogbook.file')}</span>
         <span class="bc-bring-logbook--consequence">{t('bringLogbook.fileText')}</span>
@@ -171,7 +171,7 @@
 </EditorialPage>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Android: plain rows on the page, the chosen one tinted and checked (no radio button). */
     .bc-bring-logbook--sources {
       margin: 12px 16px 0;

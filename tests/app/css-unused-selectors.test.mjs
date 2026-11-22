@@ -75,11 +75,11 @@ test('the first launch step transitions are in the built CSS, with keyframes the
   for (const kind of ['in-forward', 'in-back', 'out-forward', 'out-back']) {
     assert.ok(css.includes(`.bc-first-launch--${kind}`), `rule for ${kind}`);
     // The slide name sits in a custom property (--bc-first-launch-slide): Svelte does not rename it, so the keyframes must be global.
-    assert.ok(css.includes(`@keyframes od-first-launch-${kind} {`), `unscoped keyframes ${kind}`);
-    assert.ok(css.includes(`--bc-first-launch-slide: od-first-launch-${kind}`), `slide variable for ${kind}`);
+    assert.ok(css.includes(`@keyframes bc-first-launch-${kind} {`), `unscoped keyframes ${kind}`);
+    assert.ok(css.includes(`--bc-first-launch-slide: bc-first-launch-${kind}`), `slide variable for ${kind}`);
   }
-  assert.ok(css.includes('@keyframes od-first-launch-fade-in {'));
-  assert.ok(css.includes('@keyframes od-first-launch-fade-out {'));
+  assert.ok(css.includes('@keyframes bc-first-launch-fade-in {'));
+  assert.ok(css.includes('@keyframes bc-first-launch-fade-out {'));
 });
 
 test('the bold of the sign-out box and the iPhone error field reach the built CSS', () => {

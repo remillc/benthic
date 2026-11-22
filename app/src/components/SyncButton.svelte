@@ -63,7 +63,7 @@
 </button>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-sync-button {
       position: relative;
       overflow: hidden;
@@ -104,10 +104,10 @@
         color-mix(in srgb, var(--bc-on-tint) 24%, transparent) 70%,
         transparent
       );
-      animation: od-sync-sweep 1100ms ease-in-out infinite;
+      animation: bc-sync-sweep 1100ms ease-in-out infinite;
     }
 
-    @keyframes od-sync-sweep {
+    @keyframes bc-sync-sweep {
       from {
         transform: translateX(-100%);
       }

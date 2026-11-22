@@ -61,7 +61,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-wheel-dialog--wheels {
       padding: 0 24px;
       display: flex;

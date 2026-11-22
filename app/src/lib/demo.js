@@ -8,7 +8,7 @@
 // would start a synchronisation open the « Commencer mon carnet ? » dialog instead (App.svelte, `leaveGuard`).
 
 /** The device-store key that says the logbook on screen is the demo (components/DemoHost.svelte reads it at start). */
-export const DEMO_KEY = 'od.demo';
+export const DEMO_KEY = 'bc.demo';
 
 /**
  * The state: whether the demo is open, and the dialog on top of it.

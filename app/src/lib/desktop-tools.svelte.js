@@ -6,8 +6,8 @@ import { blenderTarget } from './desktop-tools.js';
 
 /** @typedef {'planner'|'desaturation'|'eadMod'|'bestMix'|'blender'} DesktopToolId */
 
-export const BLENDER_MODE_KEY = 'od.blenderMode';
-export const BLENDER_ORDER_KEY = 'od.blenderOrder';
+export const BLENDER_MODE_KEY = 'bc.blenderMode';
+export const BLENDER_ORDER_KEY = 'bc.blenderOrder';
 
 /** @returns {'nitrox'|'trimix'} */
 function readMode() {

@@ -127,7 +127,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-health-import--note {
       margin: 16px 20px;
       font-size: 15px;

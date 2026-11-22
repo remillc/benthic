@@ -129,7 +129,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-site-chooser--scrim {
       position: fixed;
       inset: 0;

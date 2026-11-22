@@ -41,7 +41,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-doc-thumb {
       flex: none;
       display: flex;

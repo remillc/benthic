@@ -29,7 +29,7 @@ list(APPEND SOURCES
   "${ROOT}/core/libbenthic/account.cpp"
   "${ROOT}/core/libbenthic/stats.cpp"
   "${ROOT}/core/libbenthic/download.cpp"
-  "${ROOT}/core/libbenthic/odgit.cpp"
+  "${ROOT}/core/libbenthic/bgit.cpp"
   "${ROOT}/plugins/benthic-core/android/src/main/cpp/benthic_jni.cpp")
 
 file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")

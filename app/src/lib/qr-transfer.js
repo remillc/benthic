@@ -126,7 +126,7 @@ export async function encodeTransfer({ kind, label, xml, transfer = newTransferI
  * Reads one scanned text.
  * @param {string} text
  * @returns {{ok: true, chunk: Chunk} | {ok: false, reason: 'foreign'|'version'}}
- *   "foreign": not an OpenDives code; "version": an OpenDives code of a later format
+ *   "foreign": not a Benthic code; "version": a Benthic code of a later format
  */
 export function parseChunk(text) {
   const parts = String(text).split('~');

@@ -41,7 +41,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-pf {
       --bc-pf-nav: var(--bc-pf-nav-width, 300px);
       --bc-pf-list: 340px;

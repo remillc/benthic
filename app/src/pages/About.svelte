@@ -23,7 +23,7 @@
   import { traceLines } from '../lib/nav-trace.js';
 
   /**
-   * Desktop app (task 2026-11-15-202): « À propos d'OpenDives » opens as a dialog over the section
+   * Desktop app (task 2026-11-15-202): « À propos d'Benthic » opens as a dialog over the section
    * (a popup, App.svelte), from the ⋮ menus; its subpages open inside the dialog.
    */
   const dialog = layout.desktop;
@@ -154,7 +154,7 @@
 </script>
 
 {#snippet aboutPage()}
-<Page data-od-scroll class="bc-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
+<Page data-bc-scroll class="bc-about" onPageBeforeIn={() => (navigation.page = 'about')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar title={t('about.title')}>
     {#snippet left()}
       {#if dialog}
@@ -184,11 +184,11 @@
        the logbook stays the diver's. The licence itself is named below, in « Licences ». -->
   <!-- Task 2026-11-19-296: the desktop dialog has one paragraph and no title (the app is paid there, so it never says « gratuit »);
        the phone and the tablet have the block « Libre, et votre carnet aussi ». -->
-  <section class="bc-about--free" class:bc-about--free-desktop={dialog} aria-labelledby={dialog ? undefined : 'od-about-free-title'} aria-label={dialog ? t('about.free.title') : undefined}>
+  <section class="bc-about--free" class:bc-about--free-desktop={dialog} aria-labelledby={dialog ? undefined : 'bc-about-free-title'} aria-label={dialog ? t('about.free.title') : undefined}>
     {#if dialog}
       <p>{t('about.desktopText')}</p>
     {:else}
-      <h2 id="od-about-free-title" class="bc-about--free-title">{t('about.free.title')}</h2>
+      <h2 id="bc-about-free-title" class="bc-about--free-title">{t('about.free.title')}</h2>
       <p>{t('about.free.code')}</p>
       <p>{t('about.free.logbook')}</p>
     {/if}
@@ -247,7 +247,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-about--head {
       display: flex;
       flex-direction: column;

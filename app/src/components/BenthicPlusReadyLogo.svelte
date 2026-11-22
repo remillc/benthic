@@ -32,7 +32,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-ready-logo {
       position: relative;
       width: var(--bc-ready-size, 72px);
@@ -81,24 +81,24 @@
 
     .bc-ready-logo--play {
       .bc-ready-logo--disc {
-        animation: od-ready-pop 2000ms linear 1 both;
+        animation: bc-ready-pop 2000ms linear 1 both;
       }
 
       .bc-ready-logo--white {
-        animation: od-ready-white 2000ms ease-out 1 both;
+        animation: bc-ready-white 2000ms ease-out 1 both;
       }
 
       .bc-ready-logo--mark {
-        animation: od-ready-line 2000ms ease-out 1 both;
+        animation: bc-ready-line 2000ms ease-out 1 both;
       }
 
       .bc-ready-logo--ring {
-        animation: od-ready-ring 2000ms ease-out 1 both;
+        animation: bc-ready-ring 2000ms ease-out 1 both;
       }
     }
 
     /* 0 to 0.3 s: the logo grows; 0.3 to 1.3 s: two turns, slowing down; 1.5 to 1.8 s: the bounce 1.14, 0.95, 1. */
-    @keyframes od-ready-pop {
+    @keyframes bc-ready-pop {
       0% {
         transform: scale(0) rotate(0deg);
         animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1.2);
@@ -122,7 +122,7 @@
       }
     }
 
-    @keyframes od-ready-white {
+    @keyframes bc-ready-white {
       0%,
       65% {
         opacity: 0;
@@ -133,7 +133,7 @@
       }
     }
 
-    @keyframes od-ready-line {
+    @keyframes bc-ready-line {
       0%,
       65% {
         stroke: var(--bc-release-on-panel);
@@ -144,7 +144,7 @@
       }
     }
 
-    @keyframes od-ready-ring {
+    @keyframes bc-ready-ring {
       0%,
       74.9% {
         opacity: 0;

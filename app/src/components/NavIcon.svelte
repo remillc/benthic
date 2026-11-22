@@ -28,7 +28,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-nav-icon {
       fill: none;
       stroke: currentColor;

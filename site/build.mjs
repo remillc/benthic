@@ -26,8 +26,8 @@ const SOURCE = 'https://github.com/remillc/benthic';
 
 // --- Links that open the app (decided on 13 November 2026) -----------------------
 /** The Android package and the iOS bundle identifier of the app. */
-const ANDROID_PACKAGE = 'org.opendives.app';
-const IOS_BUNDLE_ID = 'org.opendives.app';
+const ANDROID_PACKAGE = 'app.benthicdivelog';
+const IOS_BUNDLE_ID = 'app.benthicdivelog';
 /** SHA-256 fingerprints of the certificates that sign the Android app: the debug key now. */
 const DEBUG_FINGERPRINT = '7D:01:A3:29:6D:F9:18:27:45:48:41:A1:40:DC:49:A2:AB:11:AE:00:09:11:F9:F5:1F:94:D5:17:D6:4E:8A:90';
 /**
@@ -64,7 +64,7 @@ const languages = {
     open: {
       title: 'Open in Benthic',
       heading: 'This link opens in the Benthic app',
-      text: 'It leads to a dive, a site or a tool of an Benthic dive log. If Benthic is installed on this phone or tablet, open the link from there.',
+      text: 'It leads to a dive, a site or a tool of a Benthic dive log. If Benthic is installed on this phone or tablet, open the link from there.',
       button: 'Open in the app',
       install: 'Benthic is not installed yet? It is a free dive log for phones and tablets; the source code is open.',
     },
@@ -180,13 +180,13 @@ for (const [lang, l] of Object.entries(languages)) {
 await write('index.html', chooser);
 
 // An app link opened in a browser (the app is not installed, or does not handle it): one page,
-// both languages (the visitor's is first), and a button that tries the opendives:// form.
+// both languages (the visitor's is first), and a button that tries the benthic:// form.
 const openSection = (/** @type {string} */ lang) => {
   const o = languages[lang].open;
   return `<section lang="${lang}" class="open-${lang}">
 <h1>${o.heading}</h1>
 <p>${o.text}</p>
-<p><a class="button" id="open-app-${lang}" href="opendives://">${o.button}</a></p>
+<p><a class="button" id="open-app-${lang}" href="benthic://">${o.button}</a></p>
 <p>${o.install}</p>
 <p><a href="${SOURCE}">${languages[lang].home.sourceLink}</a> · <a href="/${lang}/">Benthic</a></p>
 </section>`;
@@ -211,7 +211,7 @@ ${codes.map(openSection).join('\n')}
 <script>
   // The address stays the one the visitor followed: the button gives it to the custom scheme.
   var path = location.pathname.replace(/^\\//, '') + location.search;
-  document.querySelectorAll('a.button').forEach(function (a) { a.href = 'opendives://' + path; });
+  document.querySelectorAll('a.button').forEach(function (a) { a.href = 'benthic://' + path; });
   // The visitor's language first, the other one below.
   if (!/^fr\\b/i.test(navigator.language)) document.querySelector('main').appendChild(document.querySelector('.open-fr'));
 </script>

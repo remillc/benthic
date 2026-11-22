@@ -20,7 +20,7 @@ if (!source) {
   process.exit(2);
 }
 const MB = 1024 * 1024;
-const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'od-large-'));
+const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bc-large-'));
 const stats = { largestCall: 0, calls: 0, peakHeap: 0, peakRss: 0 };
 const sampler = setInterval(() => {
   const m = process.memoryUsage();

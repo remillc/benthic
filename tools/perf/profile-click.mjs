@@ -9,22 +9,22 @@ import { killMine } from './kill-mine.mjs';
 
 const [ssrf, label = 'run', action = 'select'] = process.argv.slice(2);
 const root = path.resolve(import.meta.dirname, '../..');
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
+const env = { ...process.env, BC_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: `${MAIN}/build/desktop/stage`, BC_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
 await sleep(8000);
 await p.send('Profiler.enable');
 await p.send('Profiler.setSamplingInterval', { interval: 500 });
-await p.eval(`document.querySelectorAll('.od-desktop-logbook--row')[3].click()`);
+await p.eval(`document.querySelectorAll('.bc-desktop-logbook--row')[3].click()`);
 await sleep(4000);
 await p.send('Profiler.start');
-if (action === 'select') await p.eval(`document.querySelectorAll('.od-desktop-logbook--row')[8].click()`);
-else if (action === 'search') await p.eval(`(()=>{const i=document.querySelector('.od-desktop-logbook--search input');i.value='c';i.dispatchEvent(new Event('input',{bubbles:true}))})()`);
-else { await p.eval(`[...document.querySelectorAll('.od-nav-rail--item')].find(x=>x.getAttribute('href')==='#sites').click()`); await sleep(1500); await p.eval(`[...document.querySelectorAll('.od-nav-rail--item')].find(x=>x.getAttribute('href')==='#logbook').click()`); }
+if (action === 'select') await p.eval(`document.querySelectorAll('.bc-desktop-logbook--row')[8].click()`);
+else if (action === 'search') await p.eval(`(()=>{const i=document.querySelector('.bc-desktop-logbook--search input');i.value='c';i.dispatchEvent(new Event('input',{bubbles:true}))})()`);
+else { await p.eval(`[...document.querySelectorAll('.bc-nav-rail--item')].find(x=>x.getAttribute('href')==='#sites').click()`); await sleep(1500); await p.eval(`[...document.querySelectorAll('.bc-nav-rail--item')].find(x=>x.getAttribute('href')==='#logbook').click()`); }
 await sleep(6000);
 const { profile } = await p.send('Profiler.stop');
 const byId = new Map(profile.nodes.map((n) => [n.id, n]));

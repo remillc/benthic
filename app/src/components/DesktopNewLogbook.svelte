@@ -278,13 +278,13 @@
 <div class="bc-new-logbook">
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="bc-new-logbook--scrim" onclick={close}></div>
-  <div class="bc-new-logbook--surface" role="dialog" aria-modal="true" aria-labelledby="od-new-logbook-title" tabindex="-1">
+  <div class="bc-new-logbook--surface" role="dialog" aria-modal="true" aria-labelledby="bc-new-logbook-title" tabindex="-1">
     <button type="button" class="bc-new-logbook--close" aria-label={t('desktopLogbooks.new.closeLabel')} title={t('desktopLogbooks.new.closeTip')} onclick={close}><Icon name="close" size={24} weight={2} /></button>
     {#key step}
       <div class="bc-new-logbook--page" use:focusStep in:fade={{ duration: fadeMs() }} out:fade={{ duration: fadeMs() }}>
         <div class="bc-new-logbook--header">
           <p class="bc-new-logbook--step">{stepLine}</p>
-          <h2 id="od-new-logbook-title" class="bc-new-logbook--title">
+          <h2 id="bc-new-logbook-title" class="bc-new-logbook--title">
             {#if step === 'choice'}{t('desktopLogbooks.new.title')}
             {:else if step === 'provider'}{t('desktopLogbooks.new.cloud')}
             {:else if step === 'git'}{t('desktopLogbooks.new.git')}
@@ -294,12 +294,12 @@
         </div>
         {#if step === 'choice'}
           <div class="bc-new-logbook--body">
-            <label class="bc-new-logbook--label" for="od-new-logbook-name">{t('desktopLogbooks.new.nameLabel')}</label>
-            <input id="od-new-logbook-name" class="bc-new-logbook--input" type="text" bind:value={name} maxlength="100" autocomplete="off" aria-describedby="od-new-logbook-name-help" />
-            <p id="od-new-logbook-name-help" class="bc-new-logbook--help">{t('desktopLogbooks.new.nameHelp')}</p>
+            <label class="bc-new-logbook--label" for="bc-new-logbook-name">{t('desktopLogbooks.new.nameLabel')}</label>
+            <input id="bc-new-logbook-name" class="bc-new-logbook--input" type="text" bind:value={name} maxlength="100" autocomplete="off" aria-describedby="bc-new-logbook-name-help" />
+            <p id="bc-new-logbook-name-help" class="bc-new-logbook--help">{t('desktopLogbooks.new.nameHelp')}</p>
             <h3 class="bc-new-logbook--heading">{t('desktopLogbooks.new.whereLabel')}</h3>
             <div role="radiogroup" aria-label={t('desktopLogbooks.new.whereLabel')} class="bc-new-logbook--rows">
-              <ChoiceRow name="od-new-logbook-where" selected={where === 'computer'} onselect={() => (where = 'computer')}>
+              <ChoiceRow name="bc-new-logbook-where" selected={where === 'computer'} onselect={() => (where = 'computer')}>
                 <span class="bc-new-logbook--tile"><Icon name="desktop" size={22} /></span>
                 <span class="bc-new-logbook--text">
                   <span class="bc-new-logbook--row-title">{t('desktopLogbooks.new.computer')}</span>
@@ -308,14 +308,14 @@
               </ChoiceRow>
               <!-- The beta keeps its logbook on the computer: no cloud drive, no personal git repository (decided on 18 November 2026). -->
               {#if !isRelease}
-              <ChoiceRow name="od-new-logbook-where" selected={where === 'cloud'} onselect={() => (where = 'cloud')}>
+              <ChoiceRow name="bc-new-logbook-where" selected={where === 'cloud'} onselect={() => (where = 'cloud')}>
                 <span class="bc-new-logbook--tile"><Icon name="cloud" size={22} /></span>
                 <span class="bc-new-logbook--text">
                   <span class="bc-new-logbook--row-title">{t('desktopLogbooks.new.cloud')}</span>
                   <span class="bc-new-logbook--row-help">{t('desktopLogbooks.new.cloudHelp', { services })}</span>
                 </span>
               </ChoiceRow>
-              <ChoiceRow name="od-new-logbook-where" selected={where === 'git'} onselect={() => (where = 'git')}>
+              <ChoiceRow name="bc-new-logbook-where" selected={where === 'git'} onselect={() => (where = 'git')}>
                 <span class="bc-new-logbook--tile"><Icon name="git" size={22} /></span>
                 <span class="bc-new-logbook--text">
                   <span class="bc-new-logbook--row-title">{t('desktopLogbooks.new.git')}</span>
@@ -338,7 +338,7 @@
             <div role="radiogroup" aria-label={t('desktopLogbooks.new.cloud')} class="bc-new-logbook--rows">
               {#each rows as id (id)}
                 {@const usable = providerAvailable(statusOf(id))}
-                <ChoiceRow name="od-new-logbook-provider" selected={provider === id} disabled={!usable} onselect={() => chooseProvider(id)}>
+                <ChoiceRow name="bc-new-logbook-provider" selected={provider === id} disabled={!usable} onselect={() => chooseProvider(id)}>
                   <span class="bc-new-logbook--logo" data-provider={id}>
                     {#if id === 'webdav'}
                       <!-- WebDAV is a protocol, not a brand: a generic server. -->
@@ -363,15 +363,15 @@
         {:else if step === 'connect' && provider === 'webdav'}
           <div class="bc-new-logbook--body">
             <p class="bc-new-logbook--intro">{t('desktopCloud.webdav.intro', { file: fileNameFor(name) })}</p>
-            <label class="bc-new-logbook--label" for="od-new-logbook-server">{t('desktopCloud.webdav.server')}</label>
-            <input id="od-new-logbook-server" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!(serverCheck.error || serverError)} type="text" bind:value={server} oninput={() => (serverError = '')} placeholder={t('desktopCloud.webdav.serverPlaceholder')} autocomplete="off" autocapitalize="off" spellcheck="false" aria-invalid={!!(serverCheck.error || serverError)} />
+            <label class="bc-new-logbook--label" for="bc-new-logbook-server">{t('desktopCloud.webdav.server')}</label>
+            <input id="bc-new-logbook-server" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!(serverCheck.error || serverError)} type="text" bind:value={server} oninput={() => (serverError = '')} placeholder={t('desktopCloud.webdav.serverPlaceholder')} autocomplete="off" autocapitalize="off" spellcheck="false" aria-invalid={!!(serverCheck.error || serverError)} />
             {#if serverCheck.error || serverError}<p class="bc-new-logbook--error bc-new-logbook--error-small" role="alert">{serverCheck.error || serverError}</p>{/if}
-            <label class="bc-new-logbook--label" for="od-new-logbook-dav-user">{t('desktopCloud.webdav.username')}</label>
-            <input id="od-new-logbook-dav-user" class="bc-new-logbook--input" type="text" bind:value={davUser} oninput={() => (passwordError = '')} autocomplete="off" autocapitalize="off" spellcheck="false" />
-            <label class="bc-new-logbook--label" for="od-new-logbook-dav-password">{t('desktopCloud.webdav.password')}</label>
-            <input id="od-new-logbook-dav-password" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!passwordError} type="password" bind:value={davPassword} oninput={() => (passwordError = '')} autocomplete="off" spellcheck="false" aria-invalid={!!passwordError} aria-describedby="od-new-logbook-dav-password-help" />
+            <label class="bc-new-logbook--label" for="bc-new-logbook-dav-user">{t('desktopCloud.webdav.username')}</label>
+            <input id="bc-new-logbook-dav-user" class="bc-new-logbook--input" type="text" bind:value={davUser} oninput={() => (passwordError = '')} autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <label class="bc-new-logbook--label" for="bc-new-logbook-dav-password">{t('desktopCloud.webdav.password')}</label>
+            <input id="bc-new-logbook-dav-password" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!passwordError} type="password" bind:value={davPassword} oninput={() => (passwordError = '')} autocomplete="off" spellcheck="false" aria-invalid={!!passwordError} aria-describedby="bc-new-logbook-dav-password-help" />
             {#if passwordError}<p class="bc-new-logbook--error bc-new-logbook--error-small" role="alert">{passwordError}</p>{/if}
-            <p id="od-new-logbook-dav-password-help" class="bc-new-logbook--help">{t('desktopCloud.webdav.passwordHelp')}</p>
+            <p id="bc-new-logbook-dav-password-help" class="bc-new-logbook--help">{t('desktopCloud.webdav.passwordHelp')}</p>
             {#if error}<p class="bc-new-logbook--error" role="alert">{error}</p>{/if}
           </div>
           <div class="bc-new-logbook--footer">
@@ -434,22 +434,22 @@
           </div>
         {:else}
           <div class="bc-new-logbook--body">
-            <label class="bc-new-logbook--label" for="od-new-logbook-url">{t('desktopLogbooks.new.gitUrl')}</label>
-            <input id="od-new-logbook-url" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!urlCheck.error} type="url" bind:value={url} placeholder={t('desktopLogbooks.new.gitUrlPlaceholder')} autocomplete="off" spellcheck="false" aria-invalid={!!urlCheck.error} />
+            <label class="bc-new-logbook--label" for="bc-new-logbook-url">{t('desktopLogbooks.new.gitUrl')}</label>
+            <input id="bc-new-logbook-url" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!urlCheck.error} type="url" bind:value={url} placeholder={t('desktopLogbooks.new.gitUrlPlaceholder')} autocomplete="off" spellcheck="false" aria-invalid={!!urlCheck.error} />
             {#if urlCheck.error}<p class="bc-new-logbook--error bc-new-logbook--error-small" role="alert">{urlCheck.error}</p>{/if}
             <div class="bc-new-logbook--pair">
               <div>
-                <label class="bc-new-logbook--label" for="od-new-logbook-username">{t('desktopFollowups.newLogbook.gitUsername')}</label>
-                <input id="od-new-logbook-username" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!userCheck.error} type="text" bind:value={username} oninput={() => (userTyped = username.trim() !== '')} autocomplete="off" spellcheck="false" aria-invalid={!!userCheck.error} />
+                <label class="bc-new-logbook--label" for="bc-new-logbook-username">{t('desktopFollowups.newLogbook.gitUsername')}</label>
+                <input id="bc-new-logbook-username" class="bc-new-logbook--input" class:bc-new-logbook--invalid={!!userCheck.error} type="text" bind:value={username} oninput={() => (userTyped = username.trim() !== '')} autocomplete="off" spellcheck="false" aria-invalid={!!userCheck.error} />
                 {#if userCheck.error}<p class="bc-new-logbook--error bc-new-logbook--error-small" role="alert">{userCheck.error}</p>{:else}<p class="bc-new-logbook--help">{t('desktopFollowups.newLogbook.gitUsernameHelp')}</p>{/if}
               </div>
               <div>
-                <label class="bc-new-logbook--label" for="od-new-logbook-branch">{t('desktopLogbooks.new.gitBranch')}</label>
-                <input id="od-new-logbook-branch" class="bc-new-logbook--input" type="text" bind:value={branch} autocomplete="off" spellcheck="false" />
+                <label class="bc-new-logbook--label" for="bc-new-logbook-branch">{t('desktopLogbooks.new.gitBranch')}</label>
+                <input id="bc-new-logbook-branch" class="bc-new-logbook--input" type="text" bind:value={branch} autocomplete="off" spellcheck="false" />
               </div>
             </div>
-            <label class="bc-new-logbook--label" for="od-new-logbook-token">{t('desktopLogbooks.new.gitToken')}</label>
-            <input id="od-new-logbook-token" class="bc-new-logbook--input" type="password" bind:value={token} autocomplete="off" spellcheck="false" />
+            <label class="bc-new-logbook--label" for="bc-new-logbook-token">{t('desktopLogbooks.new.gitToken')}</label>
+            <input id="bc-new-logbook-token" class="bc-new-logbook--input" type="password" bind:value={token} autocomplete="off" spellcheck="false" />
             <p class="bc-new-logbook--help">
               {t('desktopLogbooks.new.gitTokenHelp')}
               <a href={tokenPageUrl(url)} target="_blank" rel="noopener">{t('desktopLogbooks.new.gitTokenLink')}</a>
@@ -470,7 +470,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-new-logbook {
       position: fixed;
       inset: 0;

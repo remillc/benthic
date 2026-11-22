@@ -49,8 +49,8 @@
 {#if !ios}
   <Md3Dialog class="bc-retire-dialog" {title} text={t(`gear.retire.text${suffix}`)} role="alertdialog" {oncancel}>
     <div class="bc-retire-dialog--reason">
-      <p id="od-retire-reason" class="bc-retire-dialog--label">{t('gear.retire.reasonLabel')}</p>
-      <div class="bc-retire-dialog--chips" role="group" aria-labelledby="od-retire-reason">
+      <p id="bc-retire-reason" class="bc-retire-dialog--label">{t('gear.retire.reasonLabel')}</p>
+      <div class="bc-retire-dialog--chips" role="group" aria-labelledby="bc-retire-reason">
         {#each RETIRE_REASONS as r (r)}
           <button type="button" class="bc-retire-dialog--chip" class:bc-retire-dialog--chip-on={reason === r} aria-pressed={reason === r} onclick={() => (reason = reason === r ? undefined : r)}>
             {#if reason === r}<Icon name="check" size={18} />{/if}{t(`gear.retire.reason.${r}`)}
@@ -66,7 +66,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-retire-dialog .bc-retire-dialog--reason) {
       margin: 16px 24px 0;
     }

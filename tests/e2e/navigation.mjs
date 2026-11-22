@@ -3,7 +3,7 @@
 //
 //   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
-// It starts the app's development server (app/vite.e2e.config.js, port OD_E2E_PORT, default 5541) and opens the
+// It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
 // step, once the transitions are over, it checks the invariants of the page stack of the view on screen:
 //   - exactly one page is current (the tablet's list and detail: the list plus the detail);
@@ -28,7 +28,7 @@ import { gestureFlows } from './navigation-gestures.mjs';
 import { regressionFlows } from './navigation-regressions.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const PORT = Number(process.env.OD_E2E_PORT || 5541);
+const PORT = Number(process.env.BC_E2E_PORT || 5541);
 const args = new Set(process.argv.slice(2));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -60,13 +60,12 @@ function findHost() {
     path.join(root, 'build/desktop/stage/bin', `benthic-host${exe}`),
     path.join(root, 'build/desktop/win-x64/bin', `benthic-host${exe}`),
     path.join(root, 'build/desktop/benthic-host'),
-    'F:/projets/OpenDives/build/desktop/stage/bin/benthic-host.exe',
-    'F:/projets/OpenDives/build/desktop/stage/bin/opendives-host.exe', // before the main folder is rebuilt after the rename
+    'F:/projets/benthic/build/desktop/stage/bin/benthic-host.exe',
   ]);
 }
 const chromePath = findChrome();
 const hostPath = findHost();
-const stage = findFirst([process.env.BENTHIC_STAGE, path.join(root, 'build/desktop/stage'), 'F:/projets/OpenDives/build/desktop/stage']);
+const stage = findFirst([process.env.BENTHIC_STAGE, path.join(root, 'build/desktop/stage'), 'F:/projets/benthic/build/desktop/stage']);
 const sample = findFirst([path.join(root, 'core/sample/SampleLogbook.ssrf'), path.join(stage || '', 'SampleDivesV2.ssrf')]);
 if (!chromePath || !hostPath || !sample) {
   console.log(`navigation e2e skipped: ${!chromePath ? 'no Chrome (set CHROME)' : !hostPath ? 'no core host (set BENTHIC_HOST)' : 'no sample log'}`);
@@ -75,7 +74,7 @@ if (!chromePath || !hostPath || !sample) {
 
 // --- Processes ---------------------------------------------------------------------------------------------------
 
-const work = mkdtempSync(path.join(tmpdir(), 'od-nav-'));
+const work = mkdtempSync(path.join(tmpdir(), 'bc-nav-'));
 const home = path.join(work, 'home');
 const temp = path.join(work, 'temp');
 mkdirSync(home, { recursive: true });
@@ -135,7 +134,7 @@ await core('importFile', { source: seeded, repo: `${path.join(home, 'carnet')}[m
 // The app's development server.
 const vite = spawn(process.execPath, [path.join(root, 'app/node_modules/vite/bin/vite.js'), '--config', 'vite.e2e.config.js'], {
   cwd: path.join(root, 'app'),
-  env: { ...process.env, OD_E2E_PORT: String(PORT) },
+  env: { ...process.env, BC_E2E_PORT: String(PORT) },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 children.push(vite);
@@ -223,7 +222,7 @@ class Tab {
   }
 }
 
-/** `opts`: `theme` (md or ios; else OD_THEME), `reducedMotion` (« Remove animations »), `throttle` (a slower processor; else OD_THROTTLE). */
+/** `opts`: `theme` (md or ios; else BC_THEME), `reducedMotion` (« Remove animations »), `throttle` (a slower processor; else BC_THROTTLE). */
 async function openTab(width, height, mobile, welcome = false, desktop = false, opts = {}) {
   const target = await (await fetch(`${wsBase}/json/new?about:blank`, { method: 'PUT' })).json();
   const ws = new WebSocket(target.webSocketDebuggerUrl);
@@ -236,15 +235,15 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
   await tab.send('Runtime.enable');
   await tab.send('Page.enable');
   await tab.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile });
-  const throttle = Number(opts.throttle || process.env.OD_THROTTLE || 0);
+  const throttle = Number(opts.throttle || process.env.BC_THROTTLE || 0);
   if (throttle) await tab.send('Emulation.setCPUThrottlingRate', { rate: throttle });
   if (opts.reducedMotion) await tab.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
   await tab.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   await tab.send('Emulation.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36' });
   // The stand-in of the desktop bridge: the core through this process, files in the work folder, nothing else.
-  await tab.send('Runtime.addBinding', { name: '__odCall' });
+  await tab.send('Runtime.addBinding', { name: '__bcCall' });
   tab.onBinding = async (name, payload) => {
-    if (name !== '__odCall') return;
+    if (name !== '__bcCall') return;
     const { token, kind, method, a } = JSON.parse(payload);
     let reply;
     try {
@@ -264,28 +263,28 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
     } catch (e) {
       reply = { ok: false, e: String(e.message) };
     }
-    tab.run((t, r) => window.__odAnswer(t, r), token, reply).catch(() => {});
+    tab.run((t, r) => window.__bcAnswer(t, r), token, reply).catch(() => {});
   };
   await tab.send('Page.addScriptToEvaluateOnNewDocument', {
     source: `(${function (home, temp, stage, welcome) {
       // The very first start (no value) shows the first launch; otherwise the logbook.
       if (welcome) {
-        localStorage.removeItem('CapacitorStorage.od.welcomeBeta');
-        localStorage.removeItem('CapacitorStorage.od.welcome');
+        localStorage.removeItem('CapacitorStorage.bc.welcomeBeta');
+        localStorage.removeItem('CapacitorStorage.bc.welcome');
       } else {
-        localStorage.setItem('CapacitorStorage.od.welcomeBeta', 'done');
-        localStorage.setItem('CapacitorStorage.od.welcome', 'done');
+        localStorage.setItem('CapacitorStorage.bc.welcomeBeta', 'done');
+        localStorage.setItem('CapacitorStorage.bc.welcome', 'done');
       }
       // The hardware Back flow ends on App.minimizeApp, which a browser does not implement: that error is queued as a report
       // (task #102) and would be offered over the next tab. Each tab starts with no report waiting.
-      localStorage.removeItem('CapacitorStorage.od.errorReports');
+      localStorage.removeItem('CapacitorStorage.bc.errorReports');
       const answers = new Map();
       let n = 0;
-      window.__odAnswer = (token, reply) => answers.get(token)?.(reply);
+      window.__bcAnswer = (token, reply) => answers.get(token)?.(reply);
       const call = (kind, method, a) => new Promise((resolve, reject) => {
         const token = ++n;
         answers.set(token, (r) => (answers.delete(token), r.ok ? resolve(r.v) : reject(new Error(r.e))));
-        window.__odCall(JSON.stringify({ token, kind, method, a }));
+        window.__bcCall(JSON.stringify({ token, kind, method, a }));
       });
       window.benthicDesktop = {
         platform: 'win32',
@@ -300,7 +299,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
       };
     }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)})`,
   });
-  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.OD_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
+  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.BC_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
   for (let i = 0; i < 100; i++) {
     await sleep(200);
     if (await tab.run((w) => !!document.querySelector(w ? '.bc-welcome.modal-in .bc-first-launch, .bc-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
@@ -417,15 +416,15 @@ const tapDive = async (tab) => {
 };
 /** The Android Back key: the app's listener of the Capacitor App plugin, as the native side calls it. */
 const hardwareBack = async (tab) => {
-  await tab.run(() => window.dispatchEvent(new Event('od:back')));
+  await tab.run(() => window.dispatchEvent(new Event('bc:back')));
   await sleep(60);
 };
 
-/** With OD_SHOTS=<folder>: a screenshot of the page, for a visual check against the mock-ups. */
+/** With BC_SHOTS=<folder>: a screenshot of the page, for a visual check against the mock-ups. */
 async function shot(tab, name) {
   const { data } = await tab.send('Page.captureScreenshot', { format: 'png' });
-  mkdirSync(process.env.OD_SHOTS, { recursive: true });
-  writeFileSync(path.join(process.env.OD_SHOTS, `${name}.png`), Buffer.from(data, 'base64'));
+  mkdirSync(process.env.BC_SHOTS, { recursive: true });
+  writeFileSync(path.join(process.env.BC_SHOTS, `${name}.png`), Buffer.from(data, 'base64'));
 }
 
 // --- Flows -------------------------------------------------------------------------------------------------------
@@ -447,7 +446,7 @@ async function phoneFlows() {
     await sleep(900);
     await tab.touch('touchEnd', row.x, row.y);
     await sleep(900);
-    if (process.env.OD_SHOTS) await shot(tab, `selection-toolbar${demo ? '-demo' : ''}`);
+    if (process.env.BC_SHOTS) await shot(tab, `selection-toolbar${demo ? '-demo' : ''}`);
     const g = await tab.run(() => {
       const t = document.querySelector('.bc-floating-toolbar')?.getBoundingClientRect();
       const b = document.querySelector('.bc-navigation-bar')?.getBoundingClientRect();
@@ -491,7 +490,7 @@ async function phoneFlows() {
   await tapDive(tab);
   await settled(tab, 'validation: dive opened', { route: /^\/dives\/\d+$/, setup: true });
   const validated = (await tab.run(readStack)).current;
-  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@opendives.test' }));
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
   await sleep(800);
   await tapText(tab, '^\\s*(Faire signer|Get it signed)\\s*$');
   await settled(tab, 'validation: choice opened', { route: /^\/validate(\?.*)?$/, setup: true });
@@ -520,7 +519,7 @@ async function phoneFlows() {
   const enabled = await tab.run(() => ![...document.querySelectorAll('.page-current .navbar a')].some((a) => /Signer|Sign/.test(a.textContent) && a.classList.contains('disabled')));
   checks++;
   if (!enabled) failures.push({ label: 'validation: Signer enabled', problems: ['« Signer » stays disabled after a name and a signature'] });
-  if (process.env.OD_SHOTS) await shot(tab, 'validation-signature');
+  if (process.env.BC_SHOTS) await shot(tab, 'validation-signature');
   await tapText(tab, '^\\s*(Signer|Sign)\\s*$', '.page-current .navbar');
   for (let i = 0; i < 60 && (await tab.run(readStack)).current !== validated; i++) await sleep(100);
   await settled(tab, 'validation: back on the dive', { route: validated });
@@ -530,7 +529,7 @@ async function phoneFlows() {
   }));
   checks++;
   if (!/Marc Gagnon/.test(shown.text) || !shown.signature) failures.push({ label: 'validation: section', problems: ['the Validations section shows "' + shown.text.slice(0, 80) + '", signature ' + shown.signature] });
-  if (process.env.OD_SHOTS) await shot(tab, 'validation-detail');
+  if (process.env.BC_SHOTS) await shot(tab, 'validation-detail');
   await tapBack(tab);
   await settled(tab, 'validation: back to the logbook', { route: '/' });
   const marked = await tab.run(() => !!document.querySelector('.page-current .bc-dive-row--validated'));
@@ -639,7 +638,7 @@ async function phoneFlows() {
     await sleep(300);
     if (!(await tab.run(() => document.querySelectorAll('.page-current .bc-chips-field--proposals button').length > 1))) await tab.send('Input.insertText', { text: 'a' });
     await sleep(300);
-    if (process.env.OD_SHOTS) await shot(tab, `suggestions-${label.replace(/\W/g, '')}-${process.env.OD_THEME === 'ios' ? 'ios' : 'android'}`);
+    if (process.env.BC_SHOTS) await shot(tab, `suggestions-${label.replace(/\W/g, '')}-${process.env.BC_THEME === 'ios' ? 'ios' : 'android'}`);
     const res = await tab.run(() => {
       const ul = [...document.querySelectorAll('.page-current .bc-chips-field--proposals')].find((u) => u.getClientRects().length);
       if (!ul) return { problem: 'no open list' };
@@ -687,7 +686,7 @@ async function phoneFlows() {
   });
   await settled(tab, 'quick entry opened', { route: quickRoute, setup: true });
   for (let i = 0; i < 40 && here && !(await tab.run(() => !!document.querySelector('.bc-quick-entry [role=option][aria-selected=true]'))); i++) await sleep(200);
-  if (process.env.OD_SHOTS) await shot(tab, `quick-entry-${process.env.OD_THEME === 'ios' ? 'ios' : 'android'}`);
+  if (process.env.BC_SHOTS) await shot(tab, `quick-entry-${process.env.BC_THEME === 'ios' ? 'ios' : 'android'}`);
   if (here) {
     const preselected = await tab.run(() => document.querySelector('.bc-quick-entry [role=option][aria-selected=true] .bc-quick-entry--nearest')?.textContent ?? '');
     checks++;
@@ -867,7 +866,7 @@ async function phoneFlows() {
 
   console.log(' subscriber with the logbook still on the device: the profile and the backup page open, never the offer');
   // What the development menu's « Abonné » does (lib/dev-tools.js): the account state, with no restart and the logbook untouched.
-  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, email: 'essai@opendives.test', subscribed: true }));
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, email: 'essai@benthic.test', subscribed: true }));
   for (const [row, route, page] of [['#profile', '/profile', '.bc-profile, .bc-profile-page, .page-current'], ['#backup', '/account/backup', '.bc-backup-not-on-server']]) {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
@@ -1229,8 +1228,8 @@ async function unitsMenuFlows(expect) {
       const { unitSystem, length, temperature, pressure, volume, weight } = logbook.prefs;
       return {
         prefs: { unitSystem, length, temperature, pressure, volume, weight },
-        core: deviceStore.getItem('od.corePrefs'),
-        app: deviceStore.getItem('od.appSettings'),
+        core: deviceStore.getItem('bc.corePrefs'),
+        app: deviceStore.getItem('bc.appSettings'),
       };
     });
     await tab.run(async (mobile) => {
@@ -1307,7 +1306,7 @@ async function unitsMenuFlows(expect) {
     await tab.run(async (before) => {
       await window.benthicDesktop.core('setPrefs', { changes: JSON.stringify(before.prefs) });
       const { deviceStore } = await import('/src/lib/device-store.js');
-      for (const [key, value] of [['od.corePrefs', before.core], ['od.appSettings', before.app]]) {
+      for (const [key, value] of [['bc.corePrefs', before.core], ['bc.appSettings', before.app]]) {
         if (value === null) deviceStore.removeItem(key);
         else deviceStore.setItem(key, value);
       }
@@ -1352,7 +1351,7 @@ async function profileInsetsFlows(expect) {
     for (const [route, bar] of [['/profile', 'none'], ['/profile/maintenance/', 'none'], ['/profile/certs/', 'main'], ['/profile/gear/new', 'steps']]) {
       const tab = await openTab(width, height, false, false, false, { theme: 'md' });
       await tab.run(async (path) => {
-        window.__odSetInsets({ top: 24, bottom: 48, left: 0, right: 0 });
+        window.__bcSetInsets({ top: 24, bottom: 48, left: 0, right: 0 });
         (await import('/src/lib/navigation.svelte.js')).openOver(path);
       }, route);
       await sleep(1600);
@@ -1383,7 +1382,7 @@ async function profileInsetsFlows(expect) {
       expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true, navWidth: true, barAligned: true }, state);
       if (label === 'landscape' && bar === 'steps') {
         const changed = await tab.run(() => {
-          window.__odSetInsets({ top: 40, bottom: 20, left: 0, right: 0 });
+          window.__bcSetInsets({ top: 40, bottom: 20, left: 0, right: 0 });
           const page = document.querySelector('.view.tab-active > .page-current:has(.bc-pf)');
           const frame = page.querySelector('.bc-pf').getBoundingClientRect();
           const box = page.querySelector('.bc-pf--box').getBoundingClientRect();
@@ -1656,7 +1655,7 @@ async function gearTypeDialogFlows(expect) {
       return animation;
     };
     const animation = await selectType('suit');
-    if (theme === 'md') expect(`${label}: the form uses the Expressive shared-axis motion`, { animated: true }, { animated: animation.includes('od-piece-in-forward') && animation.includes('od-piece-fade-in') });
+    if (theme === 'md') expect(`${label}: the form uses the Expressive shared-axis motion`, { animated: true }, { animated: animation.includes('bc-piece-in-forward') && animation.includes('bc-piece-fade-in') });
     const fields = await tab.run(async () => {
       const { t } = await import('/src/lib/i18n.js');
       const page = document.querySelector('.page-current.bc-piece-edit');
@@ -1689,7 +1688,7 @@ async function gearTypeDialogFlows(expect) {
       }
       [...dialog.querySelectorAll('button')].find((button) => button.textContent.trim() === t('gear.fieldOption.suitType.dry')).click();
     }, `Dialog ${label}`);
-    await tab.run(() => window.dispatchEvent(new Event('od:back')));
+    await tab.run(() => window.dispatchEvent(new Event('bc:back')));
     await sleep(600);
     expect(`${label}: Back returns to the type choices`, { step: 'choose' }, { step: await tab.run(() => document.querySelector('.page-current .bc-piece-edit--stage').dataset.step) });
     await selectType('suit');
@@ -2030,7 +2029,7 @@ async function profileInfoWidthsFlows(expect) {
     }
     await edit();
     // The system Back leaves the editing without saving; the page stays.
-    await tab.run(() => window.dispatchEvent(new Event('od:back')));
+    await tab.run(() => window.dispatchEvent(new Event('bc:back')));
     await sleep(400);
     expect(`${label}: Back stops editing and stays on the page`, { route: '/profile/info', editing: false }, await state());
     await tab.run(() => document.querySelector('.page-current .bc-profile-info--edit-button').click());

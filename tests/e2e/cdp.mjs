@@ -7,7 +7,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 export const SERIAL = 'emulator-5554';
-export const PACKAGE = 'org.opendives.app';
+export const PACKAGE = 'app.benthicdivelog';
 const PORT = 9223;
 
 /** The adb to use: $ADB, the one on the PATH, or the Android SDK's. */

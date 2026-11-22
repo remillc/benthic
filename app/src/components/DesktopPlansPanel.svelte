@@ -41,9 +41,9 @@
 </script>
 
 <div class="bc-plans-panel--scrim" role="presentation" onclick={onclose}></div>
-<aside class="bc-plans-panel" role="dialog" aria-modal="true" aria-labelledby="od-plans-panel-title" bind:this={panel}>
+<aside class="bc-plans-panel" role="dialog" aria-modal="true" aria-labelledby="bc-plans-panel-title" bind:this={panel}>
   <header class="bc-plans-panel--head">
-    <h2 id="od-plans-panel-title">{t('plans.title')}</h2>
+    <h2 id="bc-plans-panel-title">{t('plans.title')}</h2>
     <button type="button" class="bc-plans-panel--close" aria-label={t('nav.close')} onclick={onclose}><Icon name="close" size={24} /></button>
   </header>
   <p class="bc-plans-panel--intro">{t('plans.intro')}</p>
@@ -71,7 +71,7 @@
 </aside>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-plans-panel--scrim {
       position: fixed;
       inset: 0;

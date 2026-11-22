@@ -4,7 +4,7 @@
 // native call here; lib/open-link.js acts on the result.
 //
 // Two forms of the same address, both opening the app:
-//   opendives://sites/12                 custom scheme
+//   benthic://sites/12                 custom scheme
 //   https://benthicdivelog.app/sites/12  verified link (https://opendives.app/... still opens too) (Android App Links, iOS Universal Links)
 // They differ only by the prefix; the path is the table below. Only screens that
 // are safe to land on are listed: never an editor, an account screen or a delete.
@@ -65,14 +65,14 @@ const ROUTES = {
 };
 
 /**
- * The path of a link: the part after opendives:// or after the host of an https link;
+ * The path of a link: the part after benthic:// or after the host of an https link;
  * null for any other address.
  * @param {string} url
  * @returns {string|null} starting with "/", without query or fragment
  */
 function linkPath(url) {
   let rest;
-  const custom = /^opendives:\/\/\/?([^?#]*)/i.exec(url);
+  const custom = /^benthic:\/\/\/?([^?#]*)/i.exec(url);
   if (custom) rest = custom[1];
   else {
     const https = /^https:\/\/([^/?#:]+)(?::443)?([^?#]*)/i.exec(url);

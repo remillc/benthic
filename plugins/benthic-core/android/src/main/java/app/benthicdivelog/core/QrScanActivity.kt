@@ -344,7 +344,7 @@ class QrScanActivity : AppCompatActivity() {
             .addOnCompleteListener { proxy.close() }
     }
 
-    /** Header of a chunk, or null when the text is not an OpenDives code (same rules as parseChunk). */
+    /** Header of a chunk, or null when the text is not a Benthic code (same rules as parseChunk). */
     private fun parseHeader(text: String): Header? {
         val parts = text.split("~")
         if (parts.size != 8 || parts[0] != "OD1") return null
@@ -371,7 +371,7 @@ class QrScanActivity : AppCompatActivity() {
         }
         val head = parseHeader(text)
         if (head == null) {
-            // "OD2~..." is an OpenDives code of another format version; anything else is foreign.
+            // "OD2~..." is a Benthic code of another format version; anything else is foreign.
             flashMessage(if (OTHER_VERSION.matches(text.substringBefore("~"))) str("newerVersion") else str("foreign"))
             return
         }

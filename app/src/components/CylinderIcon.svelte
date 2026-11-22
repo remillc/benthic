@@ -14,7 +14,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-cylinder-icon {
       flex: none;
     }

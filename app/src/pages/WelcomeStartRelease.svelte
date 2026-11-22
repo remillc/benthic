@@ -70,7 +70,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-welcome-release) {
       --f7-page-bg-color: var(--bc-background);
 

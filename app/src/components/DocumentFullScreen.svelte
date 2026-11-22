@@ -58,7 +58,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-doc-full {
       position: fixed;
       inset: 0;

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives desktop (task 2026-11-15-169, Electron per task 170): one window per logbook
+// Benthic desktop (task 2026-11-15-169, Electron per task 170): one window per logbook
 // (task 173, windows.cjs) running the app's web interface (app/dist, or the Vite server in
 // development), the Subsurface core in one helper process per window (bridge.cjs), a native menu
 // bar on macOS only (menu.cjs).
 //
 // Development: run the Vite server (`npx vite --port 5180` in app/), then `npm run dev`
-// here. OD_HOST points at the helper (build/desktop/<target>/bin/benthic-host).
+// here. BC_HOST points at the helper (build/desktop/<target>/bin/benthic-host).
 'use strict';
 
 const path = require('node:path');
@@ -25,26 +25,36 @@ const { isBrokenPipe, guardProcessPipes, safeWrite } = require('./process-errors
 
 guardProcessPipes(process);
 
-const devUrl = process.env.OD_DEV_URL || '';
+const devUrl = process.env.BC_DEV_URL || '';
 const resources = app.isPackaged
   ? process.resourcesPath
-  : process.env.OD_STAGE || path.join(__dirname, '..', 'build', 'desktop', 'stage');
+  : process.env.BC_STAGE || path.join(__dirname, '..', 'build', 'desktop', 'stage');
 const webRoot = path.join(resources, 'web');
 
-/** The helper: OD_HOST in development, else the one shipped with the app. */
+/** The helper: BC_HOST in development, else the one shipped with the app. */
 function hostPath() {
-  if (process.env.OD_HOST) return process.env.OD_HOST;
+  if (process.env.BC_HOST) return process.env.BC_HOST;
   return path.join(resources, 'bin', process.platform === 'win32' ? 'benthic-host.exe' : 'benthic-host');
 }
 
-// The interface is served from app://opendives/, a stable origin (its storage stays
+// The interface is served from app://benthic/, a stable origin (its storage stays
 // between versions), never from file://.
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } },
 ]);
 
-// Checks and tests: a data folder of their own, beside the diver's (OD_USER_DATA).
-if (process.env.OD_USER_DATA) app.setPath('userData', process.env.OD_USER_DATA);
+// Checks and tests: a data folder of their own, beside the diver's (BC_USER_DATA).
+if (process.env.BC_USER_DATA) app.setPath('userData', process.env.BC_USER_DATA);
+
+// The rename to Benthic (22 November 2026): the data folder was `opendives-desktop` and the working copies of the
+// server's logbooks were in `odgit`; both move once, before anything opens them (legacy-migration.cjs).
+// BC_LEGACY_USER_DATA names the old folder in checks (with BC_USER_DATA, the old sibling is never touched).
+const legacy = require('./legacy-migration.cjs');
+if (!process.env.BC_USER_DATA || process.env.BC_LEGACY_USER_DATA) {
+  const moved = legacy.migrateUserDataFolder({ userData: app.getPath('userData'), legacyUserData: process.env.BC_LEGACY_USER_DATA });
+  if (moved === 'failed') console.error('[desktop] The data folder of the previous name could not be moved');
+}
+legacy.migrateGitFolder(app.getPath('userData'));
 
 if (!app.requestSingleInstanceLock()) app.quit();
 
@@ -81,7 +91,7 @@ let windows = null;
 let settingsWin = null;
 /** @type {import('electron').BrowserWindow|null} */
 let profileWin = null;
-/** « Mon profil de plongeur » is an Benthic+ feature: the menu item is on while the interface says the diver has it. */
+/** « Mon profil de plongeur » is a Benthic+ feature: the menu item is on while the interface says the diver has it. */
 let profileAvailable = false;
 
 /**
@@ -111,7 +121,7 @@ function openSettingsWindow() {
     if (/^https?:/.test(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
-  const url = new URL(devUrl || 'app://opendives/index.html');
+  const url = new URL(devUrl || 'app://benthic/index.html');
   url.searchParams.set('settings-window', '1');
   settingsWin.loadURL(url.toString());
   settingsWin.on('closed', () => {
@@ -144,7 +154,7 @@ function openProfileWindow() {
     if (/^https?:/.test(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
-  const url = new URL(devUrl || 'app://opendives/index.html');
+  const url = new URL(devUrl || 'app://benthic/index.html');
   url.searchParams.set('profile-window', '1');
   profileWin.loadURL(url.toString());
   profileWin.on('closed', () => {
@@ -152,9 +162,9 @@ function openProfileWindow() {
   });
 }
 
-/** The menu bar's commands reach the interface of the focused window as "od:menu" messages. */
+/** The menu bar's commands reach the interface of the focused window as "bc:menu" messages. */
 function sendMenu(/** @type {string} */ command) {
-  BrowserWindow.getFocusedWindow()?.webContents.send('od:menu', command);
+  BrowserWindow.getFocusedWindow()?.webContents.send('bc:menu', command);
 }
 
 /** Translations of the menu bar: the app's own files, in the system's language. */
@@ -204,13 +214,30 @@ function rebuildMenu() {
   );
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   protocol.handle('app', (request) => {
-    const { pathname } = new URL(request.url);
+    const { host, pathname } = new URL(request.url);
+    // The page of the one-time hand-over of the web storage, from the old origin (app://opendives) to this one.
+    if (pathname === legacy.HANDOVER_PAGE && (host === legacy.NEW_HOST || host === legacy.OLD_HOST)) {
+      return new Response(legacy.HANDOVER_HTML, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+    }
+    if (host !== legacy.NEW_HOST) return new Response('', { status: 404 });
     const file = path.normalize(path.join(webRoot, decodeURIComponent(pathname)));
     if (!file.startsWith(webRoot)) return new Response('', { status: 404 });
     return net.fetch(pathToFileURL(file).toString());
   });
+  // The web storage of the previous origin (settings, equipment, profile) moves to this origin, once, before the
+  // first window reads it.
+  if (!devUrl && legacy.hasLegacyOriginData(app.getPath('userData'))) {
+    handingOver = true;
+    const handOver = await legacy.handOverLegacyOrigin({
+      BrowserWindow,
+      ipcMain,
+      preload: path.join(__dirname, 'legacy-origin-preload.cjs'),
+      userData: app.getPath('userData'),
+    });
+    if (handOver.status === 'failed') console.error('[desktop] Handing over the previous web storage', handOver.error);
+  }
   // The personal clouds (task 173): the client keys are read when asked, so a file put there while the app
   // runs is found at the next sign-in. Never logged.
   const clientsFiles = [path.join(__dirname, 'oauth-clients.local.json'), path.join(resources, 'oauth-clients.local.json'), path.join(app.getPath('userData'), 'oauth-clients.local.json')];
@@ -229,10 +256,10 @@ app.whenReady().then(() => {
   // « Seulement sur Wi-Fi ou câble » (task 2026-11-15-202): the connection type, asked of the system here (network.cjs).
   const network = createNetworkMonitor({
     onChange: (cost) => {
-      for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('od:network', cost);
+      for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('bc:network', cost);
     },
   });
-  ipcMain.handle('od:network', async (_event, op) => {
+  ipcMain.handle('bc:network', async (_event, op) => {
     try {
       if (op === 'watch') network.watch();
       return { ok: true, value: op === 'refresh' ? await network.refresh() : await network.status() };
@@ -249,15 +276,15 @@ app.whenReady().then(() => {
       if (win.isMinimized()) win.restore();
       win.show();
       win.focus();
-      win.webContents.send('od:notification-click', extra);
+      win.webContents.send('bc:notification-click', extra);
     },
   });
-  ipcMain.handle('od:notifications', (event, notifications) => {
+  ipcMain.handle('bc:notifications', (event, notifications) => {
     try {
       const id = event.sender.id;
       notifier.schedule(id, notifications?.notifications);
-      if (!event.sender.__odNotifyWatch) {
-        event.sender.__odNotifyWatch = true;
+      if (!event.sender.__bcNotifyWatch) {
+        event.sender.__bcNotifyWatch = true;
         event.sender.once('destroyed', () => notifier.forget(id));
       }
       return { ok: true, value: true };
@@ -265,11 +292,11 @@ app.whenReady().then(() => {
       return { ok: false, error: String(e && e.message ? e.message : e) };
     }
   });
-  ipcMain.handle('od:crash', (_event, op) => {
+  ipcMain.handle('bc:crash', (_event, op) => {
     if (op === 'clear') crashes.clear();
     return { ok: true, value: op === 'pending' ? crashes.pending() : true };
   });
-  ipcMain.handle('od:profileAvailable', (_event, on) => {
+  ipcMain.handle('bc:profileAvailable', (_event, on) => {
     const next = !!on;
     if (next !== profileAvailable) {
       profileAvailable = next;
@@ -277,11 +304,11 @@ app.whenReady().then(() => {
     }
     return { ok: true, value: true };
   });
-  ipcMain.handle('od:profileWindow', () => {
+  ipcMain.handle('bc:profileWindow', () => {
     openProfileWindow();
     return { ok: true, value: true };
   });
-  ipcMain.handle('od:settingsWindow', () => {
+  ipcMain.handle('bc:settingsWindow', () => {
     openSettingsWindow();
     return { ok: true, value: true };
   });
@@ -295,8 +322,8 @@ app.whenReady().then(() => {
     platform: process.platform,
     preload: path.join(__dirname, 'preload.cjs'),
     icon: path.join(__dirname, 'resources', 'icon-round.png'),
-    entryUrl: devUrl || 'app://opendives/index.html',
-    isAppUrl: (url) => url.startsWith('app://opendives/') || !!(devUrl && url.startsWith(devUrl)),
+    entryUrl: devUrl || 'app://benthic/index.html',
+    isAppUrl: (url) => url.startsWith('app://benthic/') || !!(devUrl && url.startsWith(devUrl)),
     windowState,
     onChange: rebuildMenu,
     home: app.getPath('home'),
@@ -308,20 +335,22 @@ app.whenReady().then(() => {
   if (process.platform === 'darwin') rebuildMenu();
   else Menu.setApplicationMenu(null);
   // Checks without a screen (desktop/scripts/screenshots.mjs): the menu bar's items, as a file.
-  if (process.env.OD_DUMP_MENU) {
+  if (process.env.BC_DUMP_MENU) {
     const items = (menu) => menu?.items.map((i) => ({ label: i.label, accelerator: i.accelerator ?? '', role: i.role ?? '', type: i.type, submenu: items(i.submenu) }));
-    fs.writeFileSync(process.env.OD_DUMP_MENU, JSON.stringify(items(Menu.getApplicationMenu()) ?? null, null, 2));
+    fs.writeFileSync(process.env.BC_DUMP_MENU, JSON.stringify(items(Menu.getApplicationMenu()) ?? null, null, 2));
   }
   // « Ouvrir au démarrage » (Réglages): the logbooks open at the last quit, or the start screen; a file given
   // on the command line (or by the system) opens in a window of its own.
   for (const arg of process.argv.slice(1)) if (isLogbookFile(arg)) pendingFiles.push(path.resolve(arg));
   windows.openStartup().then(
     () => {
+      handingOver = false;
       for (const file of pendingFiles.splice(0)) openRequestedFile(file);
     },
     (e) => {
       console.error('[desktop] Opening the logbooks', e.message);
       windows.openMain();
+      handingOver = false;
     },
   );
   app.on('activate', () => {
@@ -329,6 +358,9 @@ app.whenReady().then(() => {
   });
 });
 
+// The two hidden windows of the one-time web-storage hand-over (legacy-migration.cjs) are the only windows for a moment:
+// closing them must not quit the app.
+let handingOver = false;
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin' && !handingOver) app.quit();
 });

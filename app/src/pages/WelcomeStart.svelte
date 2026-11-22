@@ -145,7 +145,7 @@
   {:else}
   <svg class="bc-welcome-start--profile" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
     <defs>
-      <linearGradient id="od-welcome-water" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="bc-welcome-water" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" class="bc-welcome-start--water-top"></stop>
         <stop offset="1" class="bc-welcome-start--water-bottom"></stop>
       </linearGradient>
@@ -193,7 +193,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-welcome-start) {
       --bc-welcome-ground: var(--bc-surface-2);
 
@@ -502,7 +502,7 @@
     }
 
     .bc-welcome-start--water {
-      fill: url(#od-welcome-water);
+      fill: url(#bc-welcome-water);
     }
 
     .bc-welcome-start--trace {

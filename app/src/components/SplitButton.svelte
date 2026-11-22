@@ -14,7 +14,7 @@
    */
   let { label, lead, menu } = $props();
 
-  const id = `od-split-menu-${Math.random().toString(36).slice(2, 8)}`;
+  const id = `bc-split-menu-${Math.random().toString(36).slice(2, 8)}`;
   let open = $state(false);
   /** @type {HTMLElement|undefined} */
   let trigger = $state();
@@ -76,7 +76,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-split-button {
       display: inline-flex;
       gap: 2px;

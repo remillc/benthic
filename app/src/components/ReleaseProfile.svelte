@@ -16,7 +16,7 @@
   let width = $state(588);
   let height = $state(300);
   const shape = $derived(scaledProfile(width, height));
-  const gradient = `od-release-profile-${Math.random().toString(36).slice(2, 9)}`;
+  const gradient = `bc-release-profile-${Math.random().toString(36).slice(2, 9)}`;
   const glow = `${gradient}-glow`;
 </script>
 
@@ -46,7 +46,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-release-profile {
       position: relative;
       /* Fills the box its page gives it; the curve is scaled to it. */
@@ -90,7 +90,7 @@
       stroke-linejoin: round;
       stroke-linecap: round;
       stroke-dasharray: 1;
-      animation: od-release-draw 1.6s cubic-bezier(0.2, 0, 0, 1) both;
+      animation: bc-release-draw 1.6s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
     /* The deepest point of the curve: 78.2 / 588 across and 284.7 / 300 down in the mock-up. */
@@ -104,7 +104,7 @@
       border-radius: 6px;
       background: var(--bc-release-on-panel);
       box-shadow: 0 0 0 5px var(--bc-release-dot-ring);
-      animation: od-release-in 0.5s 1.2s cubic-bezier(0.2, 0, 0, 1) both;
+      animation: bc-release-in 0.5s 1.2s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
     .bc-release-profile--chip {
@@ -118,7 +118,7 @@
       display: flex;
       flex-direction: column;
       white-space: nowrap;
-      animation: od-release-in 0.5s 1.2s cubic-bezier(0.2, 0, 0, 1) both;
+      animation: bc-release-in 0.5s 1.2s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
     .bc-release-profile--value {
@@ -166,7 +166,7 @@
       }
     }
 
-    @keyframes od-release-draw {
+    @keyframes bc-release-draw {
       from {
         stroke-dashoffset: 1;
       }
@@ -175,7 +175,7 @@
       }
     }
 
-    @keyframes od-release-in {
+    @keyframes bc-release-in {
       from {
         opacity: 0;
         transform: translateY(8px);

@@ -45,7 +45,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-sync-failure-row--failure {
       display: flex;
       align-items: center;

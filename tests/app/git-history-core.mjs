@@ -11,7 +11,7 @@ const EMPTY_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 export class GitLogbook {
   /** A new repository in a temporary folder, branch `main`. */
   constructor() {
-    this.dir = mkdtempSync(join(tmpdir(), 'od-history-'));
+    this.dir = mkdtempSync(join(tmpdir(), 'bc-history-'));
     this.git('init', '-q', '-b', 'main');
     this.git('config', 'user.email', 't@example.invalid');
     this.git('config', 'user.name', 'Test');

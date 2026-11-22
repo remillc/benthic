@@ -1,2 +1,2 @@
-#define CANONICAL_VERSION_STRING "6.0.5738-opendives-poc"
+#define CANONICAL_VERSION_STRING "6.0.5738-benthic-poc"
 #define CANONICAL_VERSION_STRING_4 "6.0.5738.0"

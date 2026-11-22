@@ -423,7 +423,7 @@
       if (format === 'benthic') {
         // The archive of « Télécharger mes données » (lib/full-export.js), through the share sheet.
         const { buildExport, deliverExport } = await import('../lib/full-export.js');
-        const { file } = await buildExport({ withMedia, logbookName: deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName') });
+        const { file } = await buildExport({ withMedia, logbookName: deviceStore.getItem('bc.logbookName') || t('welcomeSteps.defaultName') });
         await deliverExport(file);
         return;
       }
@@ -804,8 +804,8 @@
   $effect(() => {
     const el = selectionBar;
     if (!el) return;
-    el.addEventListener('od-cancel', endSelection);
-    return () => el.removeEventListener('od-cancel', endSelection);
+    el.addEventListener('bc-cancel', endSelection);
+    return () => el.removeEventListener('bc-cancel', endSelection);
   });
 
   // Each load gives new dive identifiers and maybe new values: the criteria
@@ -944,16 +944,16 @@
   const releaseEmpty = $derived(isRelease && layout.split && !logbook.loading && !logbook.error && logbook.dives.length === 0);
 
   let renaming = $state(false);
-  let logbookName = $state(deviceStore.getItem('od.logbookName') || '');
+  let logbookName = $state(deviceStore.getItem('bc.logbookName') || '');
   $effect(() => {
     logbook.welcome;
     logbook.dives;
-    logbookName = deviceStore.getItem('od.logbookName') || '';
+    logbookName = deviceStore.getItem('bc.logbookName') || '';
   });
 
   /** @param {string} name */
   async function rename(name) {
-    await deviceStore.setItemConfirmed('od.logbookName', name);
+    await deviceStore.setItemConfirmed('bc.logbookName', name);
     logbookName = name;
   }
 
@@ -1308,7 +1308,7 @@
   }
 </script>
 
-<Page data-od-scroll class="bc-logbook" onPageInit={keepInSvelteRange}>
+<Page data-bc-scroll class="bc-logbook" onPageInit={keepInSvelteRange}>
   <Navbar large={theme.ios} class="{theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-tall bc-band-titled'} {showPill && !theme.ios ? 'bc-band-pill' : ''}" title={!desktopApp && logbookName ? logbookName : t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -1753,7 +1753,7 @@
     align-items: flex-start;
   }
 
-  @layer od.components {
+  @layer bc.components {
     .bc-logbook--count {
       margin: 8px 16px 0;
       font-size: 15px;

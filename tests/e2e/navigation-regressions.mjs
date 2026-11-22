@@ -12,10 +12,10 @@ export async function regressionFlows(h) {
   const settled = async (t, label, o) => {
     const before = h.failureCount();
     await h.settled(t, label, o);
-    // OD_DUMP=1: the view's pages after each step, and its child nodes with Svelte's markers (how the fault of the
+    // BC_DUMP=1: the view's pages after each step, and its child nodes with Svelte's markers (how the fault of the
     // page order was found: a page inside another page's markers leaves with it).
-    if (process.env.OD_DUMP) console.log('    nodes:', await t.run(() => [...document.querySelector('.views > .view.tab-active').childNodes].map((n) => (n.nodeType === 8 ? '<!' + n.data + '>' : n.nodeType === 3 ? 'text' : (n.f7Page?.route?.url ?? n.className).replace(/[?].*/, ''))).join(' ')));
-    if (process.env.OD_DUMP) console.log('    pages:', (await t.run(readStack)).pages.map((p) => `${p.route.replace(/[?].*/, '')}[${p.cls.split(' ').filter((c) => c.startsWith('page-')).join(',')}]`).join('  '), '| history', JSON.stringify((await t.run(readStack)).history));
+    if (process.env.BC_DUMP) console.log('    nodes:', await t.run(() => [...document.querySelector('.views > .view.tab-active').childNodes].map((n) => (n.nodeType === 8 ? '<!' + n.data + '>' : n.nodeType === 3 ? 'text' : (n.f7Page?.route?.url ?? n.className).replace(/[?].*/, ''))).join(' ')));
+    if (process.env.BC_DUMP) console.log('    pages:', (await t.run(readStack)).pages.map((p) => `${p.route.replace(/[?].*/, '')}[${p.cls.split(' ').filter((c) => c.startsWith('page-')).join(',')}]`).join('  '), '| history', JSON.stringify((await t.run(readStack)).history));
     if (h.failureCount() > before) console.log(`    trace: ${await t.run(async () => (await import('/src/lib/nav-trace.js')).traceText().split('\n').slice(-14).join(' / ')).catch(() => '')}`);
   };
   /** The app's own invariants on the page (app/src/lib/nav-invariants.js). */

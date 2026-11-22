@@ -35,7 +35,7 @@ test('every automatic sync asks, the manual one does not', () => {
 });
 
 test('the desktop bridge exposes the connection type and the main process answers it', () => {
-  assert.match(read('desktop/preload.cjs'), /network: \{[\s\S]*od:network/);
-  assert.match(read('desktop/main.cjs'), /ipcMain\.handle\('od:network'/);
+  assert.match(read('desktop/preload.cjs'), /network: \{[\s\S]*bc:network/);
+  assert.match(read('desktop/main.cjs'), /ipcMain\.handle\('bc:network'/);
   assert.match(read('app/src/lib/sync-network.svelte.js'), /benthicDesktop\)?\??\.network/);
 });

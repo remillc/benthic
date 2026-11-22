@@ -184,7 +184,7 @@
 </script>
 
 {#if site}
-  <section class="bc-site-sheet-desk" data-od-scroll aria-label={site.name || t('sites.noName')}>
+  <section class="bc-site-sheet-desk" data-bc-scroll aria-label={site.name || t('sites.noName')}>
     <header class="bc-site-sheet-desk--head">
       <div class="bc-site-sheet-desk--titles">
         <h2 class="bc-site-sheet-desk--title">{site.name || t('sites.noName')}</h2>
@@ -226,12 +226,12 @@
 
       <div class="bc-site-sheet-desk--right">
         <div class="bc-site-sheet-desk--fields">
-          <label for="od-site-name">{t('sites.name')}</label>
-          <DesktopSiteField id="od-site-name" bind:this={nameField} value={site.name} placeholder={t('desktopSites.addName')} onkeep={(v) => edit('name', v.trim())} />
+          <label for="bc-site-name">{t('sites.name')}</label>
+          <DesktopSiteField id="bc-site-name" bind:this={nameField} value={site.name} placeholder={t('desktopSites.addName')} onkeep={(v) => edit('name', v.trim())} />
 
-          <label for="od-site-coords">{t('sites.coordinates')}</label>
+          <label for="bc-site-coords">{t('sites.coordinates')}</label>
           <DesktopSiteField
-            id="od-site-coords"
+            id="bc-site-coords"
             bind:this={coordsField}
             value={coordsText}
             placeholder={t('desktopSites.addCoordinates')}
@@ -242,9 +242,9 @@
             oncancel={cancelCoordinates}
           />
 
-          <label for="od-site-country">{t('sites.country')}</label>
+          <label for="bc-site-country">{t('sites.country')}</label>
           <DesktopSiteField
-            id="od-site-country"
+            id="bc-site-country"
             value={site.country}
             placeholder={t('desktopSites.addCountry')}
             {updating}
@@ -254,9 +254,9 @@
             onkeep={(v) => edit('country', v.trim())}
           />
 
-          <label for="od-site-region">{t('sites.region')}</label>
+          <label for="bc-site-region">{t('sites.region')}</label>
           <DesktopSiteField
-            id="od-site-region"
+            id="bc-site-region"
             value={site.region.value}
             placeholder={t('desktopSites.addRegion')}
             {updating}
@@ -266,11 +266,11 @@
             onkeep={(v) => edit('region', v.trim())}
           />
 
-          <label for="od-site-description">{t('sites.description')}</label>
-          <DesktopSiteField id="od-site-description" multiline value={site.description} placeholder={t('desktopSites.addDescription')} onkeep={(v) => edit('description', v)} />
+          <label for="bc-site-description">{t('sites.description')}</label>
+          <DesktopSiteField id="bc-site-description" multiline value={site.description} placeholder={t('desktopSites.addDescription')} onkeep={(v) => edit('description', v)} />
 
-          <label for="od-site-notes">{t('sites.notes')}</label>
-          <DesktopSiteField id="od-site-notes" multiline value={site.notes} placeholder={t('desktopSites.addNotes')} onkeep={(v) => edit('notes', v)} />
+          <label for="bc-site-notes">{t('sites.notes')}</label>
+          <DesktopSiteField id="bc-site-notes" multiline value={site.notes} placeholder={t('desktopSites.addNotes')} onkeep={(v) => edit('notes', v)} />
         </div>
         <p class="bc-site-sheet-desk--saved"><Icon name="info" size={16} />{t('desktopSites.savedAtOnce')}</p>
       </div>
@@ -282,7 +282,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-site-sheet-desk {
       box-sizing: border-box;
       height: 100%;

@@ -1,7 +1,7 @@
 // @ts-check
-// A small file store for the data the app keeps in its own working copy and that follows the OpenDives logbook
+// A small file store for the data the app keeps in its own working copy and that follows the Benthic logbook
 // format (docs/architecture.md, section 11.3): JSON files under paths such as `gear/<id>.json`. It is the one door
-// to that data, so that the same code can later be synchronised with the OpenDives server file by file.
+// to that data, so that the same code can later be synchronised with the Benthic server file by file.
 //
 // Why not device-store.js: that module is for settings (small texts in the system's preferences). Why not a
 // file in the app's data directory: it needs a Capacitor file plugin the app does not have yet (to be decided
@@ -61,8 +61,65 @@ export function memoryBackend() {
   };
 }
 
-const DB_NAME = 'opendives-files';
+const DB_NAME = 'benthic-files';
 const STORE = 'files';
+/** The database's name before the rename to Benthic (22 November 2026). */
+const LEGACY_DB_NAME = 'opendives-files';
+
+/** @template T @param {IDBRequest<T>} request @returns {Promise<T>} */
+const done = (request) =>
+  new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+
+/**
+ * Moves the files of the database kept under the old name to the new one, once: every file the new database does
+ * not have yet is copied, then the old database is deleted. Nothing happens when there is no old database (or the
+ * system cannot list the databases), so it is safe to run at each opening.
+ * @param {IDBFactory} factory
+ * @returns {Promise<number>} the files copied
+ */
+export async function migrateLegacyFilesDatabase(factory) {
+  if (typeof factory.databases !== 'function') return 0;
+  const names = (await factory.databases()).map((d) => d.name);
+  if (!names.includes(LEGACY_DB_NAME)) return 0;
+  const old = await done(factory.open(LEGACY_DB_NAME));
+  /** @type {[string, unknown][]} */
+  let files = [];
+  try {
+    if (old.objectStoreNames.contains(STORE)) {
+      const store = old.transaction(STORE, 'readonly').objectStore(STORE);
+      const [keys, values] = await Promise.all([done(store.getAllKeys()), done(store.getAll())]);
+      files = keys.map((key, i) => [String(key), values[i]]);
+    }
+  } finally {
+    old.close();
+  }
+  const request = factory.open(DB_NAME, 1);
+  request.onupgradeneeded = () => request.result.createObjectStore(STORE);
+  const db = await done(request);
+  let copied = 0;
+  try {
+    const present = new Set((await done(db.transaction(STORE, 'readonly').objectStore(STORE).getAllKeys())).map(String));
+    const missing = files.filter(([path]) => !present.has(path));
+    if (missing.length) {
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        const store = tx.objectStore(STORE);
+        for (const [path, value] of missing) store.put(value, path);
+        tx.oncomplete = () => resolve(undefined);
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+    }
+    copied = missing.length;
+  } finally {
+    db.close();
+  }
+  await done(factory.deleteDatabase(LEGACY_DB_NAME));
+  return copied;
+}
 
 /**
  * A backend in IndexedDB: one object store, the path as the key. `apply` is one read-write transaction.
@@ -73,12 +130,17 @@ export function indexedDbBackend(factory = globalThis.indexedDB) {
   /** @type {Promise<IDBDatabase>|null} */
   let opened = null;
   const open = () =>
-    (opened ??= new Promise((resolve, reject) => {
-      const request = factory.open(DB_NAME, 1);
-      request.onupgradeneeded = () => request.result.createObjectStore(STORE);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    }));
+    (opened ??= migrateLegacyFilesDatabase(factory)
+      .catch((e) => console.error('Moving the files of the previous database', e))
+      .then(
+        () =>
+          new Promise((resolve, reject) => {
+            const request = factory.open(DB_NAME, 1);
+            request.onupgradeneeded = () => request.result.createObjectStore(STORE);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          }),
+      ));
   /** @template T @param {IDBTransactionMode} mode @param {(s: IDBObjectStore) => IDBRequest<T>} work @returns {Promise<T>} */
   const run = async (mode, work) => {
     const db = await open();

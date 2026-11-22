@@ -23,7 +23,7 @@
   let open = $state(false);
   /** @type {HTMLInputElement|undefined} */
   let input = $state();
-  const id = `od-combo-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-combo-${Math.random().toString(36).slice(2, 9)}`;
   const floated = $derived(focused || value !== '');
 
   /** Lower case without accents, for matching ("Carrière" ~ "carriere"). @param {string} s */
@@ -134,7 +134,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-combo-field--field {
       position: relative;
       margin: 18px var(--bc-field-margin, 16px) 0;

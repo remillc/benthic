@@ -29,9 +29,9 @@
 </script>
 
 <Sheet opened swipeToClose backdrop class="bc-share-sheet{layout.split ? ' bc-share-sheet--dialog' : ''}" style="height: auto" onSheetClosed={onclose}>
-  <div class="bc-share-sheet--sheet" role="dialog" aria-labelledby="od-share-title">
+  <div class="bc-share-sheet--sheet" role="dialog" aria-labelledby="bc-share-title">
     <div class="bc-share-sheet--handle" aria-hidden="true"></div>
-    <h2 id="od-share-title" class="bc-share-sheet--title">{heading}</h2>
+    <h2 id="bc-share-title" class="bc-share-sheet--title">{heading}</h2>
     {#if rows}
       {#each rows as row (row.id)}
         <button type="button" class="bc-share-sheet--row" class:bc-share-sheet--disabled={row.disabled} disabled={row.disabled} onclick={row.onclick}>
@@ -74,7 +74,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-share-sheet) {
       border-radius: 28px 28px 0 0;
       background: var(--bc-dialog);

@@ -367,7 +367,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-site-edit--map-card {
       position: relative;
       margin: 8px 16px 0;

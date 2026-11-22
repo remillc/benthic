@@ -13,14 +13,14 @@ const [ssrf, label = 'run'] = process.argv.slice(2);
 const cpu = Number((process.argv.find((a) => a.startsWith('--cpu=')) || '--cpu=1').slice(6));
 const root = path.resolve(import.meta.dirname, '../..');
 const ud = path.join(root, 'build/perf', `ud-${label}`);
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 
 killMine();
 await sleep(1500);
 rmSync(ud, { recursive: true, force: true });
 mkdirSync(ud, { recursive: true });
 
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
+const env = { ...process.env, BC_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: `${MAIN}/build/desktop/stage`, BC_USER_DATA: ud };
 delete env.ELECTRON_RUN_AS_NODE;
 const t0 = Date.now();
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
@@ -35,7 +35,7 @@ const poll = async (expr, ms = 180000) => {
   while (Date.now() - s < ms) { try { if (await p.eval(expr)) return Date.now() - s; } catch { /* page busy */ } await sleep(50); }
   return -1;
 };
-const ROWS = `document.querySelectorAll('.od-desktop-logbook--row').length>0`;
+const ROWS = `document.querySelectorAll('.bc-desktop-logbook--row').length>0`;
 await poll(ROWS);
 R.coldFromSpawnMs = Date.now() - t0;
 await sleep(4000);
@@ -45,7 +45,7 @@ const snap = async (name) => {
   await p.send('HeapProfiler.collectGarbage');
   const m = await p.metrics();
   const dom = await p.eval(`(()=>{const per={};for(const e of document.querySelectorAll('.page'))per[e.className.split(' ')[0]+(e.className.includes('page-current')?'*':'')]=e.querySelectorAll('*').length;
-    return {nodes:document.querySelectorAll('*').length,pages:per,pageCount:document.querySelectorAll('.page').length,rows:document.querySelectorAll('.od-desktop-logbook--row').length,svgNodes:document.querySelectorAll('svg *').length}})()`);
+    return {nodes:document.querySelectorAll('*').length,pages:per,pageCount:document.querySelectorAll('.page').length,rows:document.querySelectorAll('.bc-desktop-logbook--row').length,svgNodes:document.querySelectorAll('svg *').length}})()`);
   R[name] = { ...dom, jsHeapMB: +(m.JSHeapUsedSize / 1e6).toFixed(1), layoutCount: m.LayoutCount, recalcStyle: m.RecalcStyleCount, layoutMs: +(m.LayoutDuration * 1000).toFixed(0), scriptMs: +(m.ScriptDuration * 1000).toFixed(0), taskMs: +(m.TaskDuration * 1000).toFixed(0), listeners: m.JSEventListeners };
 };
 console.error('idle');await snap('idle');console.error('snap ok');
@@ -56,22 +56,22 @@ await p.eval(`window.__lt=[];new PerformanceObserver(l=>{for(const e of l.getEnt
 const T = {};
 const time = async (name, js) => { T[name] = await p.eval(`window.__time(async()=>{${js}})`); };
 
-await time('selectDive', `document.querySelectorAll('.od-desktop-logbook--row')[3].click()`);
+await time('selectDive', `document.querySelectorAll('.bc-desktop-logbook--row')[3].click()`);
 await sleep(800);
 await snap('afterSelect');
-console.error('selected');await time('selectOther', `document.querySelectorAll('.od-desktop-logbook--row')[6].click()`);
+console.error('selected');await time('selectOther', `document.querySelectorAll('.bc-desktop-logbook--row')[6].click()`);
 await sleep(400);
 await time('sortByDepth', `const th=[...document.querySelectorAll('th')].find(x=>/Prof|Depth/i.test(x.textContent));(th.querySelector('button')||th).click()`);
 await sleep(400);
 await time('sortByDate', `const th=[...document.querySelectorAll('th')].find(x=>/^\\s*Date/i.test(x.textContent));(th.querySelector('button')||th).click()`);
 await sleep(400);
-console.error('sorted');T.search = await p.eval(`(async()=>{const i=document.querySelector('.od-desktop-logbook--search input');const out=[];let v='';
+console.error('sorted');T.search = await p.eval(`(async()=>{const i=document.querySelector('.bc-desktop-logbook--search input');const out=[];let v='';
  for(const ch of 'canyon'){v+=ch;const a=performance.now();i.value=v;i.dispatchEvent(new Event('input',{bubbles:true}));const s=performance.now()-a;await window.__frames(2);out.push([Math.round(s),Math.round(performance.now()-a)])}
- const rows=document.querySelectorAll('.od-desktop-logbook--row').length;i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));await window.__frames(2);return {keystrokes_sync_total_ms:out,rowsAfter:rows}})()`);
-await time('scrollList', `const sc=[...document.querySelectorAll('.od-desktop-logbook *')].find(e=>e.scrollHeight>e.clientHeight+200&&getComputedStyle(e).overflowY!=='visible');if(sc){for(let i=0;i<10;i++){sc.scrollTop+=sc.clientHeight;await window.__frames(1)}}`);
-console.error('scrolled');R.navs = await p.eval(`[...document.querySelectorAll('.od-nav-rail--item')].map(a=>a.getAttribute('href'))`);
+ const rows=document.querySelectorAll('.bc-desktop-logbook--row').length;i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));await window.__frames(2);return {keystrokes_sync_total_ms:out,rowsAfter:rows}})()`);
+await time('scrollList', `const sc=[...document.querySelectorAll('.bc-desktop-logbook *')].find(e=>e.scrollHeight>e.clientHeight+200&&getComputedStyle(e).overflowY!=='visible');if(sc){for(let i=0;i<10;i++){sc.scrollTop+=sc.clientHeight;await window.__frames(1)}}`);
+console.error('scrolled');R.navs = await p.eval(`[...document.querySelectorAll('.bc-nav-rail--item')].map(a=>a.getAttribute('href'))`);
 for (const name of ['sites', 'statistics', 'tools', 'logbook']) {
-  T['nav_' + name] = await p.eval(`window.__time(async()=>{[...document.querySelectorAll('.od-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()})`);
+  T['nav_' + name] = await p.eval(`window.__time(async()=>{[...document.querySelectorAll('.bc-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()})`);
   await sleep(1000);
   await snap('after_' + name);
 }
@@ -80,8 +80,8 @@ R.longTasksInteractions = await p.eval(`window.__lt`);
 
 console.error('navs');const heaps = [];
 for (let i = 0; i < 10; i++) {
-  for (const name of ['sites', 'statistics', 'tools', 'logbook']) { await p.eval(`[...document.querySelectorAll('.od-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()`); await sleep(300); }
-  await p.eval(`document.querySelectorAll('.od-desktop-logbook--row')[${(i % 5) + 1}]?.click()`); await sleep(300);
+  for (const name of ['sites', 'statistics', 'tools', 'logbook']) { await p.eval(`[...document.querySelectorAll('.bc-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()`); await sleep(300); }
+  await p.eval(`document.querySelectorAll('.bc-desktop-logbook--row')[${(i % 5) + 1}]?.click()`); await sleep(300);
   await p.send('HeapProfiler.collectGarbage');
   const m = await p.metrics();
   heaps.push([+(m.JSHeapUsedSize / 1e6).toFixed(1), m.Nodes, m.JSEventListeners]);

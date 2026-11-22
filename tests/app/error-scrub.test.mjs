@@ -4,7 +4,7 @@ import { scrub, scrubRoute, scrubLines } from '../../app/src/lib/error-scrub.js'
 
 test('e-mail addresses go', () => {
   assert.equal(scrub('failed for jean.dupont+log@example.co.uk now'), 'failed for [email] now');
-  assert.equal(scrub('essai-ab12@opendives.test'), '[email]');
+  assert.equal(scrub('essai-ab12@benthic.test'), '[email]');
 });
 
 test('tokens, secrets and credentials go', () => {
@@ -24,7 +24,7 @@ test('coordinates go, versions and line numbers stay', () => {
   assert.equal(scrub('latitude":"43.29"'), 'latitude":[coordinate]');
   assert.equal(scrub('43°17\'46"N'), '[coordinate]');
   assert.equal(scrub('-122.419416'), '[coordinate]');
-  assert.equal(scrub('OpenDives 0.3.0 on Chrome/120.0.6099.109 at app.js:1234:56'), 'OpenDives 0.3.0 on Chrome/120.0.6099.109 at app.js:1234:56');
+  assert.equal(scrub('Benthic 0.3.0 on Chrome/120.0.6099.109 at app.js:1234:56'), 'Benthic 0.3.0 on Chrome/120.0.6099.109 at app.js:1234:56');
   assert.equal(scrub('depth 18.5 m'), 'depth 18.5 m');
 });
 
@@ -32,7 +32,7 @@ test('home folders lose the user name', () => {
   assert.equal(scrub('C:\\Users\\chris\\AppData\\Local\\x.json'), 'C:\\Users\\[user]\\AppData\\Local\\x.json');
   assert.equal(scrub('file:///C:/Users/chris/x'), 'file:///C:/Users/[user]/x');
   assert.equal(scrub('/Users/marie/Library/x'), '/Users/[user]/Library/x');
-  assert.equal(scrub('at /home/bob/.config/opendives/log'), 'at /home/[user]/.config/opendives/log');
+  assert.equal(scrub('at /home/bob/.config/benthic/log'), 'at /home/[user]/.config/benthic/log');
   assert.equal(scrub('/storage/emulated/0/Download/x.ssrf'), '/storage/emulated/[user]/Download/x.ssrf');
 });
 

@@ -26,10 +26,10 @@
   class="bc-error-report bc-error-report--sheet"
   style="height: auto"
   onSheetClosed={() => errorReport.open && declineCurrent()}>
-  <div class="bc-error-report--panel {ios ? 'bc-error-report--ios' : 'bc-error-report--material'}" role="alertdialog" aria-labelledby="od-error-report-title" aria-describedby="od-error-report-text">
+  <div class="bc-error-report--panel {ios ? 'bc-error-report--ios' : 'bc-error-report--material'}" role="alertdialog" aria-labelledby="bc-error-report-title" aria-describedby="bc-error-report-text">
     <div class="bc-error-report--handle" aria-hidden="true"></div>
-    <h2 id="od-error-report-title" class="bc-error-report--title">{t(shown?.kind === 'native' ? 'errorReport.titleCrash' : 'errorReport.title')}</h2>
-    <p id="od-error-report-text" class="bc-error-report--text">{t('errorReport.text')}</p>
+    <h2 id="bc-error-report-title" class="bc-error-report--title">{t(shown?.kind === 'native' ? 'errorReport.titleCrash' : 'errorReport.title')}</h2>
+    <p id="bc-error-report-text" class="bc-error-report--text">{t('errorReport.text')}</p>
     <pre class="bc-error-report--contents" tabindex="0" aria-label={t('errorReport.contents')}>{body}</pre>
     {#if offline}<p class="bc-error-report--offline" role="status">{t('errorReport.offline')}</p>{/if}
     <div class="bc-error-report--actions">
@@ -40,7 +40,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-error-report--sheet) {
       border-radius: 28px 28px 0 0;
       background: var(--bc-dialog);

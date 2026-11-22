@@ -30,13 +30,13 @@ export function heroOf(book, account) {
 
 /** @param {{ name: string, total: number, since: number }} hero */
 export function rememberHero(hero) {
-  deviceStore.setItem('od.profileHero', JSON.stringify(hero));
+  deviceStore.setItem('bc.profileHero', JSON.stringify(hero));
 }
 
 /** @returns {{ name: string, total: number, since: number }} */
 export function readHero() {
   try {
-    return { name: '', total: 0, since: 9999, ...JSON.parse(deviceStore.getItem('od.profileHero') ?? '{}') };
+    return { name: '', total: 0, since: 9999, ...JSON.parse(deviceStore.getItem('bc.profileHero') ?? '{}') };
   } catch {
     return { name: '', total: 0, since: 9999 };
   }

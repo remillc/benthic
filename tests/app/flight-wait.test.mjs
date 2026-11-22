@@ -123,7 +123,7 @@ test('the notification: none when the wait is over or without dives', () => {
 });
 
 test('tapping the notification opens the Desaturation tool', () => {
-  assert.equal(FLIGHT_LINK, 'opendives://tools/desaturation');
+  assert.equal(FLIGHT_LINK, 'benthic://tools/desaturation');
 });
 
 test('the desktop logbook shows the shared flight banner above its dive table', () => {

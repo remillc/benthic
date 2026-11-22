@@ -31,7 +31,7 @@
 </Popup>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.popup.bc-account-manage-dialog) {
       --f7-popup-tablet-width: min(800px, calc(100vw - 48px));
       --f7-popup-tablet-height: 640px;

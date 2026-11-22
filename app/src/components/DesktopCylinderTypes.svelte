@@ -111,7 +111,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-cylinder-types--intro {
       margin: 0;
       padding: 14px 16px 4px;

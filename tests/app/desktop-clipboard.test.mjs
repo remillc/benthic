@@ -47,7 +47,7 @@ test('the dives of a clipboard: the private type first, else a <divelog> text, e
   assert.equal(divesIn({ text: 'N°\tDate', dives: '' }), '');
   assert.equal(divesIn({ text: '', dives: 'not xml' }), '');
   assert.equal(divesIn(null), '');
-  assert.equal(DIVES_TYPE, 'application/x-opendives-dives');
+  assert.equal(DIVES_TYPE, 'application/x-benthic-dives');
 });
 
 test('the text goes to the core as base64 of its UTF-8 bytes', () => {

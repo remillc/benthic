@@ -110,11 +110,11 @@ isomorphic-git needs a `Buffer` implementation in the browser (the `buffer` pack
 
 ## How to rerun
 
-Start the dev stack, `proxy.mjs 3100 0` and `proxy.mjs 3180 80`, load the credentials into `OD_FORGEJO_USER` / `OD_FORGEJO_PASSWORD` in the environment, then `tools/spike-git/run-all.sh`, `node tools/spike-git/tables.mjs`, `node tools/spike-git/merge.mjs`, `node tools/spike-git/browser-run.mjs 1000`.
+Start the dev stack, `proxy.mjs 3100 0` and `proxy.mjs 3180 80`, load the credentials into `BC_FORGEJO_USER` / `BC_FORGEJO_PASSWORD` in the environment, then `tools/spike-git/run-all.sh`, `node tools/spike-git/tables.mjs`, `node tools/spike-git/merge.mjs`, `node tools/spike-git/browser-run.mjs 1000`.
 
 ## Second round (18 November 2026): the app's real git layer at phone CPU speed
 
-The harness `tools/spike-git/odgit-entry.js` + `build-odgit.mjs` + `odgit-run.mjs` runs the app's own git layer (`app/src/lib/odgit/`: `repo.js`, `fs-adapter.js`, `http-adapter.js`) in headless Chrome 142 with CPU throttling 4x, against the dev Forgejo through `proxy.mjs 3100 0` (no latency, CORS added). Two file backends under the same adapter:
+The harness `tools/spike-git/bgit-entry.js` + `build-bgit.mjs` + `bgit-run.mjs` runs the app's own git layer (`app/src/lib/bgit/`: `repo.js`, `fs-adapter.js`, `http-adapter.js`) in headless Chrome 142 with CPU throttling 4x, against the dev Forgejo through `proxy.mjs 3100 0` (no latency, CORS added). Two file backends under the same adapter:
 
 - `lightning`: LightningFS (IndexedDB), the pure web-view case.
 - `bridge`: every file operation leaves the page as an asynchronous call with base64 data and is done by Node's `fs` (puppeteer `exposeFunction`). It models the shape of `@capacitor/filesystem` (JSON bridge, base64), not its speed: the Node side is not throttled, the CDP binding is slower than Capacitor's bridge. Read it as a pessimistic bound for the bridge cost.
@@ -147,7 +147,7 @@ Two copies, A pushes first, B (with a local commit) fetches then `git.merge({ ab
 | Same dive, adjacent fields (`maxDepthMm`, `meanDepthMm` on neighbouring lines) | `MergeConflictError` although the fields differ: git merges lines, and neighbouring lines conflict |
 | Same dive, same field | `MergeConflictError` naming the file (`bothModified`) |
 
-On a conflict with `abortOnConflict: true` the working copy is left as it was (checked in `tests/app/odgit-repo.test.mjs`). With `abortOnConflict: false`, isomorphic-git writes `<<<<<<<`/`=======`/`>>>>>>>` markers into the JSON file and still throws. The three versions are readable in about 8 to 10 ms (`findMergeBase`, `readBlob` on the merge base, ours and theirs), which is what a field-level JSON merge by the app needs: it would turn the adjacent-field conflicts into clean merges. `merge.mjs` ran at 300 dives (the merge does not depend on the size).
+On a conflict with `abortOnConflict: true` the working copy is left as it was (checked in `tests/app/bgit-repo.test.mjs`). With `abortOnConflict: false`, isomorphic-git writes `<<<<<<<`/`=======`/`>>>>>>>` markers into the JSON file and still throws. The three versions are readable in about 8 to 10 ms (`findMergeBase`, `readBlob` on the merge base, ours and theirs), which is what a field-level JSON merge by the app needs: it would turn the adjacent-field conflicts into clean merges. `merge.mjs` ran at 300 dives (the merge does not depend on the size).
 
 ### Not done in this round
 
@@ -156,6 +156,6 @@ On a conflict with `abortOnConflict: true` the working copy is left as it was (c
 
 ## Third round: libgit2 (façade built, not yet measured)
 
-Decision of 18 November 2026: git on the device is libgit2, already linked in the core, behind a few generic façade calls (`core/libbenthic/odgit.h`: clone, pull, commit, push, status, unpushed, head, listFiles, remove, cancel), exposed on Android, the desktop host and (written, not built) iOS. `tests/run-odgit-test.sh` drives them against a local git http server: clone of an empty repository, commit, push, fast-forward, clean merge, conflict and its resolution, a rejected push, a wrong token, 300 files. 35 checks pass.
+Decision of 18 November 2026: git on the device is libgit2, already linked in the core, behind a few generic façade calls (`core/libbenthic/bgit.h`: clone, pull, commit, push, status, unpushed, head, listFiles, remove, cancel), exposed on Android, the desktop host and (written, not built) iOS. `tests/run-bgit-test.sh` drives them against a local git http server: clone of an empty repository, commit, push, fast-forward, clean merge, conflict and its resolution, a rejected push, a wrong token, 300 files. 35 checks pass.
 
 Not done: the app's git layer still uses isomorphic-git, and there are no timings on the emulator or the desktop yet (the logbook format is being reconsidered).

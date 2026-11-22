@@ -87,7 +87,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-linear-wavy-progress {
       display: block;
       width: 100%;

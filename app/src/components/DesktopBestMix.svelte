@@ -112,7 +112,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-best-mix {
       display: grid;
       grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
@@ -120,7 +120,7 @@
       align-items: start;
     }
     /* Fluid layout: in a narrow pane the results go under the inputs. */
-    @container od-tool (max-width: 799px) {
+    @container bc-tool (max-width: 799px) {
       .bc-desktop-best-mix {
         grid-template-columns: minmax(0, 1fr);
         gap: 20px;

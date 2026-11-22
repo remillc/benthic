@@ -445,10 +445,10 @@ export class BenthicCoreDesktop extends WebPlugin {
     }
   }
 
-  // --- Git on the device (odgit.h): the bridge maps `dir` onto <userData>/odgit/<dir> ---
+  // --- Git on the device (bgit.h): the bridge maps `dir` onto <userData>/bgit/<dir> ---
 
   /** @param {string} method @param {Record<string, any>} options */
-  async odgit(method, options) {
+  async bgit(method, options) {
     try {
       return { json: await this.bridge.core(method, options ?? {}) };
     } catch (/** @type {any} */ e) {
@@ -457,18 +457,18 @@ export class BenthicCoreDesktop extends WebPlugin {
       throw reject(message, message.split(':')[0] || 'CORE_ERROR');
     }
   }
-  odgitClone(/** @type {any} */ o) { return this.odgit('odgitClone', o); }
-  odgitPull(/** @type {any} */ o) { return this.odgit('odgitPull', o); }
-  odgitCommit(/** @type {any} */ o) { return this.odgit('odgitCommit', o); }
-  odgitPush(/** @type {any} */ o) { return this.odgit('odgitPush', o); }
-  odgitStatus(/** @type {any} */ o) { return this.odgit('odgitStatus', o); }
-  odgitUnpushed(/** @type {any} */ o) { return this.odgit('odgitUnpushed', o); }
-  odgitHead(/** @type {any} */ o) { return this.odgit('odgitHead', o); }
-  odgitListFiles(/** @type {any} */ o) { return this.odgit('odgitListFiles', o); }
-  async odgitRemove(/** @type {any} */ o) { await this.odgit('odgitRemove', o); }
-  async odgitCancel() { await this.bridge.core('odgitCancel', {}); }
+  bgitClone(/** @type {any} */ o) { return this.bgit('bgitClone', o); }
+  bgitPull(/** @type {any} */ o) { return this.bgit('bgitPull', o); }
+  bgitCommit(/** @type {any} */ o) { return this.bgit('bgitCommit', o); }
+  bgitPush(/** @type {any} */ o) { return this.bgit('bgitPush', o); }
+  bgitStatus(/** @type {any} */ o) { return this.bgit('bgitStatus', o); }
+  bgitUnpushed(/** @type {any} */ o) { return this.bgit('bgitUnpushed', o); }
+  bgitHead(/** @type {any} */ o) { return this.bgit('bgitHead', o); }
+  bgitListFiles(/** @type {any} */ o) { return this.bgit('bgitListFiles', o); }
+  async bgitRemove(/** @type {any} */ o) { await this.bgit('bgitRemove', o); }
+  async bgitCancel() { await this.bridge.core('bgitCancel', {}); }
 
-  /** Release edition: the OpenDives server's session, in safeStorage (bridge.cjs, kind 'server'). */
+  /** Release edition: the Benthic server's session, in safeStorage (bridge.cjs, kind 'server'). */
   async serverSessionSave(options) {
     await this.bridge.credentials.set('server', {
       email: options?.email ?? '',
@@ -480,7 +480,7 @@ export class BenthicCoreDesktop extends WebPlugin {
     });
   }
 
-  /** Who is signed in to the OpenDives server, without any token. */
+  /** Who is signed in to the Benthic server, without any token. */
   async serverSessionInfo() {
     const stored = await this.bridge.credentials.get('server');
     return { signedIn: stored != null, email: stored?.email ?? '', repositoryUrl: stored?.repositoryUrl ?? '', branch: stored?.branch ?? '' };
@@ -503,7 +503,7 @@ export class BenthicCoreDesktop extends WebPlugin {
     await this.bridge.credentials.set('datakey', { key: options?.key ?? '' });
   }
 
-  /** Signs out of the OpenDives server. */
+  /** Signs out of the Benthic server. */
   async serverSessionClear() {
     await this.bridge.credentials.clear('server');
   }
@@ -1104,7 +1104,7 @@ export class BenthicCoreDesktop extends WebPlugin {
     throw unavailable('The app settings');
   }
 
-  /** "Open with OpenDives": a mobile intent. */
+  /** "Open with Benthic": a mobile intent. */
   async readSharedFile() {
     throw unavailable('Reading a shared file');
   }

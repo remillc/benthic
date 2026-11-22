@@ -12,7 +12,7 @@
 // window is emulated at that size for the audit (CDP device metrics), then restored.
 //   node desktop/scripts/overflow-audit.mjs <DevTools port> [--size 768x560] [--shot file.png] [--json] [--reload] [--pre <js>] [--root <css selector>] [--allow <css selector>]...
 // Exit code 1 when a problem is found. `--allow` names panes whose vertical scroll is accepted (lists);
-// the panes marked `data-od-scroll` in the interface are accepted by default.
+// the panes marked `data-bc-scroll` in the interface are accepted by default.
 import fs from 'node:fs';
 
 const args = process.argv.slice(2);
@@ -113,7 +113,7 @@ function inspect(allow, rootSel) {
   const layers = rootSel ? [...document.querySelectorAll(rootSel)] : [...document.querySelectorAll('.popup.modal-in, .sheet-modal.modal-in, .dialog.modal-in, .popover.modal-in')];
   const root = layers.filter((l) => l.getClientRects().length).pop() || document.body;
   out.root = root === document.body ? 'body' : label(root);
-  const isAllowed = (el) => !!el.closest('[data-od-scroll]') || allow.some((s) => el.matches(s));
+  const isAllowed = (el) => !!el.closest('[data-bc-scroll]') || allow.some((s) => el.matches(s));
   const clipRect = (el) => {
     let left = 0;
     let top = 0;

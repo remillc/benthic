@@ -41,7 +41,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-gas-cards {
       display: flex;
       flex-wrap: wrap;

@@ -12,10 +12,10 @@ const [ssrf, label = 'run'] = process.argv.slice(2);
 const cpu = Number((process.argv.find((a) => a.startsWith('--cpu=')) || '--cpu=4').slice(6));
 const root = path.resolve(import.meta.dirname, '../..');
 const ud = path.join(root, 'build/perf', `ud-${label}`);
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
+const env = { ...process.env, BC_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: `${MAIN}/build/desktop/stage`, BC_USER_DATA: ud };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
@@ -36,11 +36,11 @@ await p.send('Emulation.setCPUThrottlingRate', { rate: cpu });
 await p.eval(`window.__lt=[];new PerformanceObserver(l=>{for(const e of l.getEntries())window.__lt.push(Math.round(e.duration))}).observe({type:'longtask',buffered:true});
  window.__frames=(n=2)=>new Promise(r=>{const f=()=>--n<=0?r():requestAnimationFrame(f);requestAnimationFrame(f)});`);
 const t0 = Date.now();
-for (let i = 0; i < 600; i++) { if (await p.eval(`document.querySelectorAll('.od-dive-row, .od-trip-row').length>0`)) break; await sleep(100); }
+for (let i = 0; i < 600; i++) { if (await p.eval(`document.querySelectorAll('.bc-dive-row, .bc-trip-row').length>0`)) break; await sleep(100); }
 R.phoneLayoutReadyMs = Date.now() - t0;
 await sleep(3000);
 await snap('phoneAfterSwap');
-R.phoneRows = await p.eval(`JSON.stringify({diveRows:document.querySelectorAll('.od-dive-row').length,tripRows:document.querySelectorAll('.od-trip-row').length,profileSvgs:document.querySelectorAll('.od-dive-row svg, .od-trip-row svg').length,svgNodes:document.querySelectorAll('svg *').length})`);
+R.phoneRows = await p.eval(`JSON.stringify({diveRows:document.querySelectorAll('.bc-dive-row').length,tripRows:document.querySelectorAll('.bc-trip-row').length,profileSvgs:document.querySelectorAll('.bc-dive-row svg, .bc-trip-row svg').length,svgNodes:document.querySelectorAll('svg *').length})`);
 R.longTasksSwap = await p.eval('window.__lt');
 const scrolled = await p.eval(`(async()=>{const sc=[...document.querySelectorAll('.page-current *')].find(e=>e.scrollHeight>e.clientHeight+500&&/auto|scroll/.test(getComputedStyle(e).overflowY));if(!sc)return null;const a=performance.now();for(let i=0;i<10;i++){sc.scrollTop+=sc.clientHeight;await window.__frames(1)}return {ms:Math.round(performance.now()-a),h:sc.scrollHeight}})()`);
 R.scroll10Screens = scrolled;

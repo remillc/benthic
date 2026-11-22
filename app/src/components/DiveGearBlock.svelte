@@ -51,7 +51,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dive-gear-block {
       margin-top: 8px;
       padding: 12px 16px;

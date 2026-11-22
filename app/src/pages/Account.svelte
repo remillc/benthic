@@ -35,14 +35,14 @@
   const signedIn = $derived(!!logbook.email);
   /** The logbook lives in the user's own git repository, not in the Subsurface cloud. */
   const git = $derived(logbook.mode === 'git');
-  /** The git repository is the OpenDives server account's (release edition): named « Serveur OpenDives », not edited. */
+  /** The git repository is the Benthic server account's (release edition): named « Serveur Benthic », not edited. */
   const server = $derived(git && logbook.benthicPlus);
   let serverEmail = $state('');
   $effect(() => {
     if (!server) return;
     BenthicCore.serverSessionInfo().then(
       (info) => (serverEmail = info.email),
-      (e) => console.error('Reading the OpenDives session', e),
+      (e) => console.error('Reading the Benthic session', e),
     );
   });
 
@@ -278,7 +278,7 @@
     </div>
 
     {#if server}
-      <!-- The OpenDives server: the repository is the account's, there is nothing to edit here. -->
+      <!-- The Benthic server: the repository is the account's, there is nothing to edit here. -->
     {:else if git && !isRelease}
       <!-- « Modifier le dépôt »: the alpha's. The beta never offers the personal git repository. -->
       <div class="block-title">{t('account.gitGroup')}</div>
@@ -394,7 +394,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-account--identity {
       margin: 16px 16px 0;
       padding: 16px;

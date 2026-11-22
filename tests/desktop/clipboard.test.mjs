@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // The clipboard calls of the bridge (task 2026-11-15-178, part 3), with a fake Electron: the plain
-// text and the dives' XML under the private type application/x-opendives-dives.
+// text and the dives' XML under the private type application/x-benthic-dives.
 // Run: node --test tests/desktop/clipboard.test.mjs
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,7 +34,7 @@ const invoke = async (channel, ...args) => {
 };
 
 before(() => {
-  root = mkdtempSync(path.join(tmpdir(), 'od-clip-'));
+  root = mkdtempSync(path.join(tmpdir(), 'bc-clip-'));
   mkdirSync(path.join(root, 'resources'));
   bridge = setupBridge({
     ipcMain: { handle: (channel, fn) => handlers.set(channel, fn), on: (channel, fn) => handlers.set(`on:${channel}`, fn) },
@@ -55,25 +55,25 @@ after(async () => {
 
 test('write puts the text on the clipboard, read gives the text and the dives back', async () => {
   const xml = '<divelog program="subsurface"><dives><dive number="1"/></dives></divelog>';
-  await invoke('od:clipboard', 'write', { text: 'Nr\tDate\n1\t2012', dives: xml });
+  await invoke('bc:clipboard', 'write', { text: 'Nr\tDate\n1\t2012', dives: xml });
   assert.equal(store.text, 'Nr\tDate\n1\t2012');
-  assert.deepEqual(await invoke('od:clipboard', 'read'), { text: 'Nr\tDate\n1\t2012', dives: xml });
+  assert.deepEqual(await invoke('bc:clipboard', 'read'), { text: 'Nr\tDate\n1\t2012', dives: xml });
 });
 
 test('another application copying something else drops the dives', async () => {
-  await invoke('od:clipboard', 'write', { text: 'first', dives: '<divelog/>' });
+  await invoke('bc:clipboard', 'write', { text: 'first', dives: '<divelog/>' });
   store.text = 'copied elsewhere';
-  assert.deepEqual(await invoke('od:clipboard', 'read'), { text: 'copied elsewhere', dives: '' });
+  assert.deepEqual(await invoke('bc:clipboard', 'read'), { text: 'copied elsewhere', dives: '' });
   // The same text copied again elsewhere would match: the dives come back, as the same rows.
 });
 
 test('a copy replaces the previous one', async () => {
-  await invoke('od:clipboard', 'write', { text: 'first', dives: '<divelog/>' });
-  await invoke('od:clipboard', 'write', { text: 'second', dives: '' });
-  assert.deepEqual(await invoke('od:clipboard', 'read'), { text: 'second', dives: '' });
+  await invoke('bc:clipboard', 'write', { text: 'first', dives: '<divelog/>' });
+  await invoke('bc:clipboard', 'write', { text: 'second', dives: '' });
+  assert.deepEqual(await invoke('bc:clipboard', 'read'), { text: 'second', dives: '' });
 });
 
 test('an unknown action or a huge copy is refused', async () => {
-  await assert.rejects(invoke('od:clipboard', 'wipe'), /BAD_ARGUMENT/);
-  await assert.rejects(invoke('od:clipboard', 'write', { text: 'x'.repeat(51 * 1024 * 1024) }), /BAD_ARGUMENT/);
+  await assert.rejects(invoke('bc:clipboard', 'wipe'), /BAD_ARGUMENT/);
+  await assert.rejects(invoke('bc:clipboard', 'write', { text: 'x'.repeat(51 * 1024 * 1024) }), /BAD_ARGUMENT/);
 });

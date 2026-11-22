@@ -9,7 +9,7 @@ import { loadMapLibre } from './maplibre.js';
 import { buildMapStyle } from './map-style.js';
 import { onTileOrigin } from './offline-tiles.js';
 
-const CACHE = 'od-site-maps-v4';
+const CACHE = 'bc-site-maps-v4';
 const ZOOM = 12;
 /** The picture, centred on the site, CSS pixels: wide enough for any screen, cropped when shown. */
 export const DRAW_WIDTH = 1000;

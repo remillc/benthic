@@ -57,7 +57,7 @@ export function rgb(hex) {
 /** A gradient stop of a spot: offset from the centre (0) to the edge (1), a colour variable, an opacity. */
 /** @typedef {{ offset: number, colour: string, alpha: number }} SpotStop */
 
-/** The three gradients of the mock-up (#od-heat-1, 2 and 3 in android-stats.dc.html). */
+/** The three gradients of the mock-up (#bc-heat-1, 2 and 3 in android-stats.dc.html). */
 export const SPOT_GRADIENTS = /** @type {const} */ ({
   one: [
     { offset: 0, colour: '--bc-heat-1', alpha: 0.8 },

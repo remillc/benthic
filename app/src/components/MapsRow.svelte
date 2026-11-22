@@ -32,7 +32,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-maps-row {
       box-sizing: border-box;
       min-height: 72px;

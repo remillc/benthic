@@ -8,7 +8,7 @@ export const FALLBACK_GIT_USER = 'git';
 /**
  * The problem a repository checked by `gitCheck` has for this path: a new logbook needs an empty repository
  * (« Ce dépôt contient déjà un carnet. »), an opened one needs a logbook (« Ce dépôt ne contient pas de carnet
- * OpenDives. »). Both are told under the address, with a link to the other path.
+ * Benthic. »). Both are told under the address, with a link to the other path.
  * @param {boolean} create
  * @param {{ empty?: boolean }} found
  * @returns {''|'notEmpty'|'noLogbook'}

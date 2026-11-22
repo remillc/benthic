@@ -56,12 +56,12 @@
     else f7router.back();
   }
 
-  // The system Back (lib/back-button.js) sends od-cancel to the wizard from step 2.
+  // The system Back (lib/back-button.js) sends bc-cancel to the wizard from step 2.
   $effect(() => {
     const node = wizard;
     if (!node) return;
-    node.addEventListener('od-cancel', back);
-    return () => node.removeEventListener('od-cancel', back);
+    node.addEventListener('bc-cancel', back);
+    return () => node.removeEventListener('bc-cancel', back);
   });
 
   /** « Annuler », at any step: the Account page, nothing erased. */
@@ -108,7 +108,7 @@
     {/snippet}
   </Navbar>
 
-  <!-- data-step: the system Back goes one step back (lib/back-button.js, od-cancel). -->
+  <!-- data-step: the system Back goes one step back (lib/back-button.js, bc-cancel). -->
   <div class="bc-delete-wizard--body" bind:this={wizard} data-step={step}>
     <div class="bc-delete-wizard--steps" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow={step} aria-label={t('deleteAccount.step', { n: step })}>
       <span class="bc-delete-wizard--segments">
@@ -219,7 +219,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* The steps fill the page; the actions sit at its bottom. */
     .bc-delete-wizard--body {
       box-sizing: border-box;

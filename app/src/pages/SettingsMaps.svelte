@@ -335,7 +335,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-settings-maps--no-network {
       margin: 8px 16px 0;
       padding: 14px 16px;

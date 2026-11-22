@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 #include "benthic.h"
 #include "internal.h"
-#include "odgit.h"
+#include "bgit.h"
 
 #include "core/device.h"
 #include "core/dive.h"
@@ -332,17 +332,11 @@ int list_plans(std::string &json)
 				",\"hePermille\":" + std::to_string(get_he(d.cylinders[i].gasmix)) + '}';
 		}
 		json += "],\"request\":";
-		std::string request;
-		for (const extra_data &e: d.dcs[0].extra_data)
-			if (e.key == "OpenDives plan")
-				request = e.value;
+		std::string request = internal::plan_extra_value(d.dcs[0], internal::PLAN_KEY, internal::LEGACY_PLAN_KEY);
 		std::replace(request.begin(), request.end(), '\'', '"');
 		append_json_string(json, request);
 		json += ",\"title\":";
-		std::string title;
-		for (const extra_data &e: d.dcs[0].extra_data)
-			if (e.key == "OpenDives title")
-				title = e.value;
+		std::string title = internal::plan_extra_value(d.dcs[0], internal::TITLE_KEY, internal::LEGACY_TITLE_KEY);
 		append_json_string(json, title);
 		json += '}';
 	}
@@ -1617,7 +1611,7 @@ int save_logbook_file(const std::string &path, std::string &error)
 }
 
 // --- History of the logbook (task 2026-11-19-290) -----------------------------------------------------------------
-// The commits of the logbook's own local repository are its versions (odgit.h, odgit_history_*). The repository is the
+// The commits of the logbook's own local repository are its versions (bgit.h, bgit_history_*). The repository is the
 // one the core keeps for the configured logbook; reading it needs neither the network nor a loaded log.
 
 static std::string version_folder(const std::string &localdir)
@@ -1646,32 +1640,32 @@ int history_call(const std::string &action, const std::vector<std::string> &args
 	const std::string dir = info.localdir, branch = info.branch;
 	auto arg = [&](size_t i) { return i < args.size() ? args[i] : std::string(); };
 	if (action == "info") {
-		int rc = odgit_head(dir, branch, json, error);
+		int rc = bgit_head(dir, branch, json, error);
 		if (rc)
 			return rc;
 		json.insert(json.size() - 1, ",\"branch\":\"" + branch + "\"");
 		return 0;
 	}
 	if (action == "log")
-		return odgit_history_log(dir, branch, atoi(arg(0).c_str()), atoi(arg(1).empty() ? "50" : arg(1).c_str()), arg(2) == "1",
+		return bgit_history_log(dir, branch, atoi(arg(0).c_str()), atoi(arg(1).empty() ? "50" : arg(1).c_str()), arg(2) == "1",
 					 json, error);
 	if (action == "adopt") {
-		// The device's own logbook from before the account: its commits join the history (odgit_history_adopt).
-		return odgit_history_adopt(dir, arg(0), arg(1).empty() ? "main" : arg(1), json, error);
+		// The device's own logbook from before the account: its commits join the history (bgit_history_adopt).
+		return bgit_history_adopt(dir, arg(0), arg(1).empty() ? "main" : arg(1), json, error);
 	}
 	if (action == "stats")
-		return odgit_history_stats(dir, args, json, error);
+		return bgit_history_stats(dir, args, json, error);
 	if (action == "diff")
-		return odgit_history_diff(dir, arg(0), arg(1), json, error);
+		return bgit_history_diff(dir, arg(0), arg(1), json, error);
 	if (action == "read")
-		return odgit_history_read(dir, arg(0), arg(1), json, error);
+		return bgit_history_read(dir, arg(0), arg(1), json, error);
 	if (action == "files")
-		return odgit_history_files(dir, arg(0), arg(1), json, error);
+		return bgit_history_files(dir, arg(0), arg(1), json, error);
 	if (action == "restore") {
 		// A restore is a new commit on the logbook's branch; the log in memory is then read again from it.
 		std::vector<std::string> paths(args.size() > 2 ? args.begin() + 2 : args.end(), args.end());
 		std::string message = arg(1).empty() ? "Restore an earlier version" : arg(1);
-		if (odgit_history_restore(dir, branch, arg(0), paths, message, OdgitAuthor(), json, error))
+		if (bgit_history_restore(dir, branch, arg(0), paths, message, BgitAuthor(), json, error))
 			return -1;
 		std::string cached;
 		if (cloud_list_cached_dives(cached, error) < 0)
@@ -1690,7 +1684,7 @@ int history_call(const std::string &action, const std::vector<std::string> &args
 		std::error_code ec;
 		std::filesystem::create_directories(version_folder(dir), ec);
 		std::string borrowed;
-		if (odgit_history_borrow(dir, commit, into, borrowed, error))
+		if (bgit_history_borrow(dir, commit, into, borrowed, error))
 			return -1;
 		bool was_local_only = git_local_only;
 		git_local_only = true;

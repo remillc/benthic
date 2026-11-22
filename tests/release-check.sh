@@ -29,7 +29,7 @@ OUT=$ROOT/build/release-check
 # Under WSL, node is the Windows one, and a Windows program only sees the variables listed in WSLENV.
 NODE=$(command -v node || command -v node.exe || true)
 [ -n "$NODE" ] || { echo "node not found"; exit 2; }
-export WSLENV="${WSLENV:+$WSLENV:}OD_JS_MUTATE:OD_TOOLS_MUTATE"
+export WSLENV="${WSLENV:+$WSLENV:}BC_JS_MUTATE:BC_TOOLS_MUTATE"
 # A git worktree made by Windows git has a .git file WSL's git cannot follow: use git.exe then.
 GIT=git
 git rev-parse HEAD >/dev/null 2>&1 || GIT=git.exe
@@ -91,7 +91,7 @@ mutations_cpp() {
   local bad=0
   for prog in plan plan-oracle; do
     for m in sac gf vpmb ascent water altitude; do
-      if OD_MUTATE=$m "build/poc/$prog" >"$OUT/logs/mutation-$prog-$m.log" 2>&1; then
+      if BC_MUTATE=$m "build/poc/$prog" >"$OUT/logs/mutation-$prog-$m.log" 2>&1; then
         echo "NOT DETECTED: $prog with $m"; bad=1
       else
         echo "detected: $prog with $m ($(grep -c '^FAIL' "$OUT/logs/mutation-$prog-$m.log") failures)"
@@ -103,7 +103,7 @@ mutations_cpp() {
 mutations_js() {
   local bad=0
   for m in psi cuft ft mod decomodel; do
-    if OD_JS_MUTATE=$m "$NODE" --import ./tests/app/register.mjs --test tests/app/planner.test.mjs >"$OUT/logs/mutation-app-$m.log" 2>&1; then
+    if BC_JS_MUTATE=$m "$NODE" --import ./tests/app/register.mjs --test tests/app/planner.test.mjs >"$OUT/logs/mutation-app-$m.log" 2>&1; then
       echo "NOT DETECTED: app with $m"; bad=1
     else
       echo "detected: app with $m"
@@ -111,20 +111,20 @@ mutations_js() {
   done
   return $bad
 }
-# The tools test takes a log and reads OD_TOOLS_MUTATE (a wrong input sent to the façade only).
+# The tools test takes a log and reads BC_TOOLS_MUTATE (a wrong input sent to the façade only).
 # The gas tools are in JavaScript: tests/app/gas-tools.test.mjs reads the same variable.
 TOOLS_LOG=third_party/subsurface/dives/SampleDivesV2.ssrf
 mutations_tools() {
   local bad=0
   for m in desat; do
-    if OD_TOOLS_MUTATE=$m build/poc/tools "$TOOLS_LOG" >"$OUT/logs/mutation-tools-$m.log" 2>&1; then
+    if BC_TOOLS_MUTATE=$m build/poc/tools "$TOOLS_LOG" >"$OUT/logs/mutation-tools-$m.log" 2>&1; then
       echo "NOT DETECTED: tools with $m"; bad=1
     else
       echo "detected: tools with $m ($(grep -c '^FAIL' "$OUT/logs/mutation-tools-$m.log") failures)"
     fi
   done
   for m in calc blend; do
-    if OD_TOOLS_MUTATE=$m "$NODE" --import ./tests/app/register.mjs --test tests/app/gas-tools.test.mjs >"$OUT/logs/mutation-gas-tools-$m.log" 2>&1; then
+    if BC_TOOLS_MUTATE=$m "$NODE" --import ./tests/app/register.mjs --test tests/app/gas-tools.test.mjs >"$OUT/logs/mutation-gas-tools-$m.log" 2>&1; then
       echo "NOT DETECTED: gas tools (JavaScript) with $m"; bad=1
     else
       echo "detected: gas tools (JavaScript) with $m ($(grep -E '^ℹ fail ' "$OUT/logs/mutation-gas-tools-$m.log" | tr -d 'ℹ'))"

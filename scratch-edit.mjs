@@ -50,7 +50,7 @@ fs.writeFileSync(f, s);
 
 const o = 'app/src/lib/open-link.js';
 s = fs.readFileSync(o, 'utf8');
-rep(`  confirm: (/** @type {any} */ o,`, `  logbookName: () => deviceStore.getItem('od.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
+rep(`  confirm: (/** @type {any} */ o,`, `  logbookName: () => deviceStore.getItem('bc.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
   // One logbook at a time on a phone or a tablet (the device's copy, or the account's): « Nouveau carnet » would
   // replace the open one, so it is not offered there; the desktop opens one logbook per window and takes no shared file.
   canCreateLogbook: () => false,

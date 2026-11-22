@@ -156,7 +156,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-tools--content {
       container-type: inline-size;
     }

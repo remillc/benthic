@@ -18,7 +18,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-ready-bubbles {
       position: absolute;
       inset: 0;
@@ -32,15 +32,15 @@
       stroke: var(--bc-plus-bubble);
       stroke-width: 1.2;
       animation:
-        od-ready-rise var(--d) linear 1 forwards,
-        od-ready-sway 700ms ease-in-out var(--phase) 6 alternate;
+        bc-ready-rise var(--d) linear 1 forwards,
+        bc-ready-sway 700ms ease-in-out var(--phase) 6 alternate;
     }
 
     .bc-ready-bubbles--still .bc-ready-bubbles--bubble {
       animation: none;
     }
 
-    @keyframes od-ready-rise {
+    @keyframes bc-ready-rise {
       from {
         transform: translateY(0);
       }
@@ -49,7 +49,7 @@
       }
     }
 
-    @keyframes od-ready-sway {
+    @keyframes bc-ready-sway {
       from {
         translate: -5px 0;
       }

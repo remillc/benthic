@@ -593,7 +593,7 @@
           <div class="bc-desktop-planner--card">
             <svg class="bc-desktop-planner--profile" viewBox="0 0 {W} {H}" role="img" aria-label={profileLabel}>
               <defs>
-                <linearGradient id="od-desktop-plan-water" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="bc-desktop-plan-water" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0" style="stop-color: var(--bc-water-top)" />
                   <stop offset="1" style="stop-color: {shape.bottom}" />
                 </linearGradient>
@@ -602,7 +602,7 @@
                 <path class="bc-desktop-planner--grid" d="M{LEFT} {tick.y} H{W - RIGHT}" />
                 <text class="bc-desktop-planner--axis" x={LEFT - 6} y={tick.y + 4} text-anchor="end">{tick.text}</text>
               {/each}
-              <path d={shape.area} fill="url(#od-desktop-plan-water)" opacity="0.9" />
+              <path d={shape.area} fill="url(#bc-desktop-plan-water)" opacity="0.9" />
               <path d={shape.line} class="bc-desktop-planner--line" />
               {#each shape.xTicks as tick (tick.text)}
                 <text class="bc-desktop-planner--axis" x={tick.x} y={H - 8} text-anchor="middle">{tick.text}</text>
@@ -676,7 +676,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-planner {
       display: flex;
       flex-direction: column;
@@ -756,7 +756,7 @@
       align-items: start;
     }
     /* Fluid layout: in a narrow pane the results go under the inputs. */
-    @container od-tool (max-width: 659px) {
+    @container bc-tool (max-width: 659px) {
       .bc-desktop-planner--body {
         grid-template-columns: minmax(0, 1fr);
         gap: 20px;

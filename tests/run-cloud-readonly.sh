@@ -1,5 +1,5 @@
 #!/bin/bash
-# OpenDives — round trip on a real Subsurface cloud log, READ-ONLY.
+# Benthic — round trip on a real Subsurface cloud log, READ-ONLY.
 #
 #   0. probe: the log branch exists (otherwise stop); its head is recorded
 #   1. load through the core: clone (or update) of the local cache

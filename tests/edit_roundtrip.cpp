@@ -29,6 +29,7 @@
 #include "core/divesite.h"
 #include "core/divecomputer.h"
 #include "core/extradata.h"
+#include "core/git-access.h"
 #include "core/equipment.h"
 #include "core/filterpreset.h"
 #include "core/filterpresettable.h"
@@ -160,8 +161,8 @@ static bool make_change(const dive &d, const std::string &field, std::string &re
 {
 	if (field == "notes" || field == "suit") {
 		std::string old = field == "notes" ? d.notes : d.suit;
-		std::string value = field == "notes" ? old + (old.empty() ? "" : "\n") + "OpenDives edit test, \"quoted\" é"
-						     : "OpenDives test suit";
+		std::string value = field == "notes" ? old + (old.empty() ? "" : "\n") + "Benthic edit test, \"quoted\" é"
+						     : "Benthic test suit";
 		if (value == old)
 			value += " 2";
 		request = "{" + json_string(field) + ":" + json_string(value) + "}";
@@ -232,7 +233,7 @@ static bool make_change(const dive &d, const std::string &field, std::string &re
 	if (field == "buddies" || field == "diveguide" || field == "tags") {
 		std::vector<std::string> old = field == "buddies" ? split(d.buddy) : field == "diveguide" ? split(d.diveguide) : tags_of(d);
 		std::vector<std::string> wanted(old.begin() + (old.empty() ? 0 : 1), old.end());
-		wanted.push_back(field == "buddies" ? "OpenDives Buddy" : field == "diveguide" ? "OpenDives Guide" : "opendives-test");
+		wanted.push_back(field == "buddies" ? "Benthic Buddy" : field == "diveguide" ? "Benthic Guide" : "benthic-test");
 		request = "{" + json_string(field) + ":" + json_list(wanted) + "}";
 		if (field == "tags")
 			std::sort(wanted.begin(), wanted.end());
@@ -437,14 +438,14 @@ int main(int argc, char **argv)
 		if (!divelog.dives.get_by_uniq_id(logged->id))
 			return fail("the dive left the log");
 
-		// The title of a plan: extra data "OpenDives title" of the first dive
+		// The title of a plan: extra data "Benthic title" of the first dive
 		// computer, written with the plan in the same undoable step, back after
 		// a reload, gone when saved empty, and never in the notes, site or tags.
 		{
 			auto title_of = [](const dive &d) {
 				std::string title = "<none>";
 				for (const extra_data &e: d.dcs[0].extra_data)
-					if (e.key == "OpenDives title")
+					if (e.key == "Benthic title")
 						title = e.value;
 				return title;
 			};
@@ -504,6 +505,36 @@ int main(int argc, char **argv)
 				return fail("the title did not survive a reload");
 			if (traits(*target) != untitled)
 				return fail("a reload changed the notes, the site or the tags");
+			// A logbook written before the rename to Benthic holds "OpenDives plan" and "OpenDives title": both are read, and
+			// a save writes the new keys (the old ones are gone from the saved dive).
+			{
+				for (extra_data &e: target->dcs[0].extra_data) {
+					if (e.key == "Benthic title")
+						e.key = "OpenDives title";
+					else if (e.key == "Benthic plan")
+						e.key = "OpenDives plan";
+				}
+				if (listed_title(target->id) != "\"Wreck trip\"")
+					return fail("the title under the old key is not read");
+				const std::string legacy_copy = log.substr(0, log.rfind('[')) + "-legacy[main]";
+				if (git_create_local_repo(legacy_copy) || save_as(legacy_copy, error)) {
+					printf("error=%s\n", error.c_str());
+					return 1;
+				}
+				if (open_log(legacy_copy))
+					return 1;
+				target = divelog.dives.back().get();
+				bool old_left = false, plan_new = false;
+				for (const extra_data &e: target->dcs[0].extra_data) {
+					old_left = old_left || e.key == "OpenDives title" || e.key == "OpenDives plan";
+					plan_new = plan_new || e.key == "Benthic plan";
+				}
+				if (old_left || !plan_new || title_of(*target) != "Wreck trip" || listed_title(target->id) != "\"Wreck trip\"")
+					return fail("a save did not rewrite the old keys");
+				if (open_log(log))
+					return 1;
+				target = divelog.dives.back().get();
+			}
 			// Saved again with an empty title: the key is gone, after a reload too.
 			if (save_plan(request, target->id, result, error, "   ") || title_of(*divelog.dives.back()) != "<none>")
 				return fail("an empty title kept the key");
@@ -583,7 +614,7 @@ int main(int argc, char **argv)
 			const char *field, *value;
 			int lat, lon;
 		};
-		for (Edit e: { Edit{ "name", "OpenDives site", 0, 0 }, Edit{ "location", "", 45500000, -73500000 },
+		for (Edit e: { Edit{ "name", "Benthic site", 0, 0 }, Edit{ "location", "", 45500000, -73500000 },
 			       Edit{ "country", "Testland", 0, 0 }, Edit{ "notes", "site notes", 0, 0 } }) {
 			if (site_edit(a, e.field, e.value, e.lat, e.lon, json, error)) {
 				printf("error=edit %s: %s\n", e.field, error.c_str());
@@ -615,7 +646,7 @@ int main(int argc, char **argv)
 			printf("error=delete used site: the undo did not give the dives their site back\n");
 			return 1;
 		}
-		if (site_create("OpenDives new site", 45500000, -73500000, json, error)) {
+		if (site_create("Benthic new site", 45500000, -73500000, json, error)) {
 			printf("error=create: %s\n", error.c_str());
 			return 1;
 		}
@@ -676,8 +707,8 @@ int main(int argc, char **argv)
 			  [&] { return divelog.trips.size() == trips0 - 1; } },
 			{ "merge", [&](std::string &j, std::string &e) { return trips_merge(trip_id, other_id, j, e); },
 			  [&] { return divelog.trips.size() == trips0 - 1; } },
-			{ "location", [&](std::string &j, std::string &e) { return edit_trip(trip_id, "location", "OpenDives test", j, e); },
-			  [&] { return trip_location(trip_id) == "OpenDives test"; } },
+			{ "location", [&](std::string &j, std::string &e) { return edit_trip(trip_id, "location", "Benthic test", j, e); },
+			  [&] { return trip_location(trip_id) == "Benthic test"; } },
 			{ "remove2", [&](std::string &j, std::string &e) { return trip_remove_dives({ first_in_trip, second }, j, e); },
 			  [&] { return size0 > 2 ? trip_by_id_size(trip_id) == size0 - 2 : divelog.trips.size() == trips0 - 1; } },
 			{ "create", [&](std::string &j, std::string &e) { return trip_create({ second }, j, e); },
@@ -724,7 +755,7 @@ int main(int argc, char **argv)
 			return true;
 		};
 		std::string fields = "{\"date\":\"2001-02-03T10:20\",\"durationSeconds\":2700,\"maxDepthMm\":18300,"
-				     "\"buddies\":[\"OpenDives test\"],\"rating\":3,\"notes\":\"logged by hand\","
+				     "\"buddies\":[\"Benthic test\"],\"rating\":3,\"notes\":\"logged by hand\","
 				     "\"waterTempMk\":291150,\"cylinderType\":\"AL80\",\"startMbar\":200000,"
 				     "\"endMbar\":60000,\"o2Permille\":320,\"hePermille\":0}";
 		if (create_dive(fields, json, error)) {
@@ -736,7 +767,7 @@ int main(int argc, char **argv)
 			if (dv->notes == "logged by hand")
 				added = dv.get();
 		if (divelog.dives.size() != dives0 + 1 || !added || added->duration.seconds != 2700 ||
-		    added->maxdepth.mm != 18300 || added->dcs[0].samples.empty() || added->buddy != "OpenDives test" ||
+		    added->maxdepth.mm != 18300 || added->dcs[0].samples.empty() || added->buddy != "Benthic test" ||
 		    added->watertemp.mkelvin != 291150 || added->cylinders.empty() ||
 		    added->cylinders[0].type.description != "AL80" || added->cylinders[0].type.size.mliter <= 0 ||
 		    added->cylinders[0].start.mbar != 200000 || added->cylinders[0].end.mbar != 60000 ||
@@ -914,7 +945,7 @@ int main(int argc, char **argv)
 		std::string json, error;
 		size_t presets0 = divelog.filter_presets.size();
 		std::vector<filter_rule> deep = { { "depth", "", "greater", "10000,0", false } };
-		std::vector<filter_rule> people = { { "people", "exact", "", "OpenDives test\n", false } };
+		std::vector<filter_rule> people = { { "people", "exact", "", "Benthic test\n", false } };
 		auto undo_and_save = [&](const char *name) {
 			printf("step=%s\n", undo_text().c_str());
 			if (save_local(error) || undo(json, error) || save_local(error)) {
@@ -923,42 +954,42 @@ int main(int argc, char **argv)
 			}
 			return true;
 		};
-		if (filter_preset_save("OpenDives test", "", "", deep, json, error) ||
+		if (filter_preset_save("Benthic test", "", "", deep, json, error) ||
 		    divelog.filter_presets.size() != presets0 + 1 || !undo_and_save("create") ||
 		    divelog.filter_presets.size() != presets0) {
 			printf("error=create preset: %s\n", error.c_str());
 			return 1;
 		}
-		// Refused: OpenDives criteria and values with commas cannot be kept in the log.
+		// Refused: Benthic criteria and values with commas cannot be kept in the log.
 		if (!filter_preset_save("x", "", "", { { "od_country", "", "", "France", false } }, json, error) ||
 		    !filter_preset_save("x", "", "", { { "suit", "exact", "", "wet, 3mm\n", false } }, json, error)) {
 			printf("error=a preset the log cannot keep was accepted\n");
 			return 1;
 		}
 		// Create, save, read again, edit, delete, each undone in turn.
-		if (filter_preset_save("OpenDives test", "wreck", "substring", deep, json, error) || save_local(error) ||
+		if (filter_preset_save("Benthic test", "wreck", "substring", deep, json, error) || save_local(error) ||
 		    open_log(repo)) {
 			printf("error=create and save: %s\n", error.c_str());
 			return 1;
 		}
-		int index = divelog.filter_presets.preset_id("OpenDives test");
+		int index = divelog.filter_presets.preset_id("Benthic test");
 		if (index < 0 || divelog.filter_presets[index].data.constraints.size() != 1 ||
 		    divelog.filter_presets[index].fulltext_query() != "wreck") {
 			printf("error=preset not read back from git\n");
 			return 1;
 		}
-		if (filter_preset_save("OpenDives test", "", "", people, json, error) || !undo_and_save("edit")) {
+		if (filter_preset_save("Benthic test", "", "", people, json, error) || !undo_and_save("edit")) {
 			printf("error=edit: %s\n", error.c_str());
 			return 1;
 		}
-		if (filter_preset_delete(divelog.filter_presets.preset_id("OpenDives test"), json, error) ||
+		if (filter_preset_delete(divelog.filter_presets.preset_id("Benthic test"), json, error) ||
 		    divelog.filter_presets.size() != presets0 || !undo_and_save("delete") ||
 		    divelog.filter_presets.size() != presets0 + 1) {
 			printf("error=delete: %s\n", error.c_str());
 			return 1;
 		}
 		// Back to the original: delete the preset for good.
-		if (filter_preset_delete(divelog.filter_presets.preset_id("OpenDives test"), json, error) || save_local(error)) {
+		if (filter_preset_delete(divelog.filter_presets.preset_id("Benthic test"), json, error) || save_local(error)) {
 			printf("error=final delete: %s\n", error.c_str());
 			return 1;
 		}

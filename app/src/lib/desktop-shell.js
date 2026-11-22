@@ -1,7 +1,7 @@
 // @ts-check
 // What the desktop app does in every section (task 2026-11-15-202): Ctrl+, opens Réglages,
 // Ctrl++ / Ctrl+- / Ctrl+0 change « Taille du texte », and the Mac's menu bar commands « À propos
-// d'OpenDives » and the text size. On the Mac, a change made in the separate Réglages window
+// d'Benthic » and the text size. On the Mac, a change made in the separate Réglages window
 // reaches this window through the shared storage.
 import { desktopApp, desktopMac, sideWindow } from './layout.svelte.js';
 import { openSettings, openAbout } from './navigation.svelte.js';
@@ -44,12 +44,12 @@ export function startDesktopShell() {
   });
 
   // Mac: the Réglages window writes the settings (Capacitor's Preferences are the web storage's
-  // « CapacitorStorage.od.* » keys); this window reads them again from a fresh start.
+  // « CapacitorStorage.bc.* » keys); this window reads them again from a fresh start.
   if (desktopMac && !sideWindow) {
     /** @type {ReturnType<typeof setTimeout>|undefined} */
     let timer;
     window.addEventListener('storage', (e) => {
-      if (!e.key?.startsWith('CapacitorStorage.od.')) return;
+      if (!e.key?.startsWith('CapacitorStorage.bc.')) return;
       clearTimeout(timer);
       timer = setTimeout(() => location.reload(), 500);
     });

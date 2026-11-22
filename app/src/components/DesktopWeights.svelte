@@ -125,7 +125,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-weights {
       min-width: 0;
     }

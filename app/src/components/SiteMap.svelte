@@ -710,7 +710,7 @@
   aria-label={label}
   bind:this={root}
   use:lift={full}
-  onod-cancel={() => setFull(false)}
+  onbc-cancel={() => setFull(false)}
   onkeydown={(e) => {
     if (full && e.key === 'Escape') setFull(false);
   }}
@@ -740,7 +740,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-site-map {
       position: relative;
       width: 100%;

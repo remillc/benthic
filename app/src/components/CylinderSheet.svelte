@@ -24,7 +24,7 @@
    */
   let { n, gas, ratio, onclose, ondelete, children } = $props();
 
-  const id = `od-cylinder-sheet-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-cylinder-sheet-${Math.random().toString(36).slice(2, 9)}`;
 
   /** @param {HTMLElement} node */
   function portal(node) {
@@ -35,11 +35,11 @@
       e.stopPropagation();
       onclose();
     };
-    node.addEventListener('od-cancel', cancel);
+    node.addEventListener('bc-cancel', cancel);
     queueMicrotask(() => /** @type {HTMLElement|null} */ (node.querySelector('[role="dialog"]'))?.focus({ preventScroll: true }));
     return {
       destroy() {
-        node.removeEventListener('od-cancel', cancel);
+        node.removeEventListener('bc-cancel', cancel);
         node.remove();
         previous?.focus?.();
       },
@@ -181,7 +181,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-cylinder-sheet {
       position: fixed;
       inset: 0;
@@ -214,20 +214,20 @@
     }
 
     :global(.md) .bc-cylinder-sheet--surface {
-      animation: od-cylinder-sheet-rise var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards;
+      animation: bc-cylinder-sheet-rise var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards;
     }
 
     :global(.md) .bc-cylinder-sheet--scrim {
-      animation: od-cylinder-sheet-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
+      animation: bc-cylinder-sheet-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
-    @keyframes od-cylinder-sheet-rise {
+    @keyframes bc-cylinder-sheet-rise {
       from {
         transform: translateY(100%);
       }
     }
 
-    @keyframes od-cylinder-sheet-fade {
+    @keyframes bc-cylinder-sheet-fade {
       from {
         opacity: 0;
       }

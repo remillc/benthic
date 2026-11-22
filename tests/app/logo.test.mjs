@@ -70,7 +70,7 @@ test('the web logos are the relief drawing', () => {
   for (const f of ['logo-light.svg', 'logo-dark.svg', 'logo-menu.svg']) {
     const s = read(join(root, 'app/public', f));
     assert.match(s, RELIEF, f);
-    assert.match(s, /stroke="url\(#od-rim\)"/, f);
+    assert.match(s, /stroke="url\(#bc-rim\)"/, f);
     assert.match(s, /M5 14\.1q3\.5-3 7 0t7 0/, f);
     assert.match(s, /stroke="#072A4D" stroke-opacity="0\.35" stroke-width="2\.2"/, f);
     assert.match(s, /M5 13q3\.5-3 7 0t7 0" fill="none" stroke="#FFFFFF" stroke-width="2\.2"/, f);
@@ -83,7 +83,7 @@ test('the favicon keeps the disc gradient and one thick white wave, simplified f
   assert.match(fav, /viewBox="0 0 24 24"/);
   assert.match(fav, /<circle cx="12" cy="12" r="11"/);
   assert.match(fav, /M5 13q3\.5-3 7 0t7 0/);
-  assert.doesNotMatch(fav, /od-rim|#072A4D/);
+  assert.doesNotMatch(fav, /bc-rim|#072A4D/);
   assert.ok(Number(fav.match(/stroke-width="([\d.]+)"/)[1]) >= 2.4, 'the wave is thick enough at 16 px');
 });
 
@@ -94,7 +94,7 @@ test('the brand files are the relief drawing; the flat ones are in previous/', (
   // App icons are blue to their edge (no white ring once masked): the gradient over the whole icon, the wave on top.
   for (const f of ['benthic-icon-light-round.svg', 'benthic-icon-dark-squircle.svg', 'benthic-icon-light-fullbleed.svg']) {
     const icon = read(join(root, 'docs/brand', f));
-    assert.ok(icon.includes('<rect width="108" height="108" fill="url(#od-icon)"/>'), f);
+    assert.ok(icon.includes('<rect width="108" height="108" fill="url(#bc-icon)"/>'), f);
     assert.doesNotMatch(icon, /#F4F4F2|#121314/i, f);
   }
   assert.ok(!existsSync(join(root, 'docs/brand/benthic-logo-relief.svg')));
@@ -142,7 +142,7 @@ test('the logo files and the inline logos share no gradient id', () => {
   // The app draws its logos with <img>, so every file has its own ids; an inline <svg> logo would need unique ones.
   for (const p of searched.filter((f) => f.endsWith('.svelte'))) {
     const s = read(p);
-    if (/<svg[^>]*>[\s\S]*?linearGradient[^>]*id="od-(disc|rim)"/.test(s)) assert.match(s, /\$props\.id\(\)|\$\{[^}]*id[^}]*\}-disc/, relative(root, p));
+    if (/<svg[^>]*>[\s\S]*?linearGradient[^>]*id="bc-(disc|rim)"/.test(s)) assert.match(s, /\$props\.id\(\)|\$\{[^}]*id[^}]*\}-disc/, relative(root, p));
   }
 });
 

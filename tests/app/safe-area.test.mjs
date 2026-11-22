@@ -62,7 +62,7 @@ test('installSafeArea does nothing without the native interface (iOS, desktop, b
   const win = fakeWindow(undefined);
   assert.equal(installSafeArea(win), false);
   assert.equal(win.root.props.size, 0);
-  assert.equal(typeof win.__odSetInsets, 'function');
+  assert.equal(typeof win.__bcSetInsets, 'function');
 });
 
 test('installSafeArea reads the boot value, then follows the pushes', () => {
@@ -70,7 +70,7 @@ test('installSafeArea reads the boot value, then follows the pushes', () => {
   assert.equal(installSafeArea(win), true);
   assert.equal(win.root.props.get('--bc-safe-bottom'), '24px');
   assert.equal(win.events.length, 1);
-  win.__odSetInsets({ top: 24, right: 0, bottom: 48, left: 0 });
+  win.__bcSetInsets({ top: 24, right: 0, bottom: 48, left: 0 });
   assert.equal(win.root.props.get('--bc-safe-top'), '24px');
   assert.equal(win.root.props.get('--bc-safe-bottom'), '48px');
   assert.equal(win.events.length, 2);

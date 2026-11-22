@@ -3,7 +3,7 @@ package app.benthicdivelog.core
 
 import android.content.Context
 
-/** The session of the OpenDives server (release edition): who is signed in, and the access to the repository. */
+/** The session of the Benthic server (release edition): who is signed in, and the access to the repository. */
 internal data class ServerSession(
     val email: String,
     val sessionToken: String,
@@ -22,7 +22,7 @@ internal data class ServerSession(
  * never in a log; the web layer only reads who is signed in (`serverSessionInfo`).
  */
 internal class ServerSessionStore(context: Context) {
-    private val sealed = SealedFile(context, "opendives-server-session", "server-session.bin")
+    private val sealed = SealedFile(context, "benthic-server-session", "server-session.bin", legacyAlias = "opendives-server-session")
 
     fun read(): ServerSession? {
         val parts = sealed.read()?.split('\n') ?: return null

@@ -24,12 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep links (lib/deep-link.js): opendives://sites/12 -->
+            <!-- Deep links (lib/deep-link.js): benthic://sites/12 -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="opendives" />
+                <data android:scheme="benthic" />
             </intent-filter>
 
             <!-- Verified links (App Links): https://benthicdivelog.app/sites/12 (and the old host opendives.app, kept). The paths are those of the
@@ -180,7 +180,7 @@
                 <data android:pathPattern=".*\\..*\\..*\\.BENTHIC" />
             </intent-filter>
 
-            <!-- "Share to OpenDives" (ACTION_SEND and SEND_MULTIPLE): the file is in EXTRA_STREAM; the plugin hands
+            <!-- "Share to Benthic" (ACTION_SEND and SEND_MULTIPLE): the file is in EXTRA_STREAM; the plugin hands
                  it to the web layer as the "sharedFile" event (BenthicCorePlugin.offerSharedFiles). A share of
                  plain text without a file does nothing. -->
             <intent-filter>

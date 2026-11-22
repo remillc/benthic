@@ -4,7 +4,7 @@
 //
 //   node tests/e2e/navigation-parallel.mjs [--shards=3] [other options of navigation.mjs]
 //
-// OD_E2E_PORT (default 5541) is the port of the first shard; the others take the ports after it. The exit code is 0 only
+// BC_E2E_PORT (default 5541) is the port of the first shard; the others take the ports after it. The exit code is 0 only
 // when every shard passed. A shard that cannot start (no Chrome, no core host) ends the run with its own code 2.
 import { spawn } from 'node:child_process';
 import path from 'node:path';
@@ -12,16 +12,16 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const given = process.argv.slice(2);
-const shards = Number(given.find((a) => a.startsWith('--shards='))?.slice(9) || process.env.OD_E2E_SHARDS || 3);
+const shards = Number(given.find((a) => a.startsWith('--shards='))?.slice(9) || process.env.BC_E2E_SHARDS || 3);
 const forwarded = given.filter((a) => !a.startsWith('--shards='));
-const firstPort = Number(process.env.OD_E2E_PORT || 5541);
+const firstPort = Number(process.env.BC_E2E_PORT || 5541);
 const started = Date.now();
 
 /** @param {number} index from 1 @returns {Promise<{ index: number, code: number, checks: number, failures: number }>} */
 function run(index) {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, [path.join(here, 'navigation.mjs'), `--shard=${index}/${shards}`, ...forwarded], {
-      env: { ...process.env, OD_E2E_PORT: String(firstPort + index - 1) },
+      env: { ...process.env, BC_E2E_PORT: String(firstPort + index - 1) },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     let out = '';

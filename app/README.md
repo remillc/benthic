@@ -55,7 +55,7 @@ The libraries already contain all dependencies, except the system zlib. No relea
 - **Trips on screen:** the file declares 4, but it also enables automatic grouping. `listDives` therefore returns 6, with 5 different names, because two isolated dives each form an automatic trip. The location "Hoodsport" appears twice, because these are two separate trips.
 - **Trip identifiers:** they change on every load and must not be stored.
 - **Screen:** the time and the status bar icons, in white, are hard to read on the light background. Values are written "4.1 m", not "4,1 m" (French format). To be revisited with the real interface.
-- **Application identifier:** `org.opendives.app` is provisional, to be confirmed before any release.
+- **Application identifier:** `app.benthicdivelog` is provisional, to be confirmed before any release.
 - **Outside this skeleton:** iOS, download from a dive computer, editing dives, upload to the cloud.
 
 ## Read-only Subsurface cloud (5 November 2026)
@@ -92,9 +92,9 @@ The libraries already contain all dependencies, except the system zlib. No relea
 ```powershell
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 # install (the file is read on the development machine, never displayed)
-Get-Content -Raw "$env:USERPROFILE\.opendives\cloud-dev.env" | & $adb shell "run-as org.opendives.app sh -c 'umask 077; cat > files/cloud-dev.env'"
+Get-Content -Raw "$env:USERPROFILE\.opendives\cloud-dev.env" | & $adb shell "run-as app.benthicdivelog sh -c 'umask 077; cat > files/cloud-dev.env'"
 # remove
-& $adb shell "run-as org.opendives.app rm files/cloud-dev.env"
+& $adb shell "run-as app.benthicdivelog rm files/cloud-dev.env"
 ```
 
 **Deviations from the architecture:** the server check uses OpenSSL in native code rather than Android's network stack. It therefore does not follow the system proxy, which must be revisited with the sign-in screen. The list of 1,353 dives is rendered in one block, without a virtual list.
@@ -118,7 +118,7 @@ The screenshots come from the Subsurface sample log, never from a personal log.
 - **Theme:**
   - The `--bc-*` color tokens are declared, in light and dark.
   - `colors.primary` is `#1E4D3A`, with cream backgrounds in light mode.
-  - The CSS is organised in layers: `framework7`, `od.tokens`, `od.base`, `od.components`.
+  - The CSS is organised in layers: `framework7`, `bc.tokens`, `bc.base`, `bc.components`.
   - The `--f7-*` overrides stay outside any layer, otherwise the colors Framework7 injects at startup would override them. They were checked in the WebView: primary is #1e4d3a in light and #8fcfae in dark.
 - **Components:** `<ProfileThumbnail>`, `<DiveRow>`, `<TripRow>`, `<DiveProfile>` (water column, finger cursor, Gas layer) and `<SyncStatus>`, plus icons drawn for the project.
 - **Logbook:**
@@ -292,7 +292,7 @@ VITE_EDITION=alpha npx vite            # development server, alpha behaviour
 VITE_EDITION=alpha npm run build       # build with the alpha behaviour
 ```
 
-On Windows PowerShell: `$env:VITE_EDITION = "alpha"` first. A line `VITE_EDITION=alpha` in `.env.local` does the same. In the release edition, every cloud action (« Se connecter à {service} » and the others) only says that the cloud comes in a later version (idea #74). The logbook's name is kept as a label on the device (`od.logbookName`); renaming the device logbook file needs a native change (see task 218). In a development build, `window.__firstLaunch` exposes the first launch's state for headless checks.
+On Windows PowerShell: `$env:VITE_EDITION = "alpha"` first. A line `VITE_EDITION=alpha` in `.env.local` does the same. In the release edition, every cloud action (« Se connecter à {service} » and the others) only says that the cloud comes in a later version (idea #74). The logbook's name is kept as a label on the device (`bc.logbookName`); renaming the device logbook file needs a native change (see task 218). In a development build, `window.__firstLaunch` exposes the first launch's state for headless checks.
 
 ## Reproduce
 

@@ -31,11 +31,11 @@ test('the water gradient ends in --bc-water-bottom and the line is --bc-trace', 
 
 // Tasks 210 and 211 (the larger brand row and the profile off the screen edges) and the tablet half of tasks
 // 225 and 229 (the pill badge after the name) described the old tablet head. Task 237 replaces that head with the
-// blue panel (components/FirstLaunchPanel.svelte): the logo is 96 dp and « OpenDives » 48 sp as in task 210, the
+// blue panel (components/FirstLaunchPanel.svelte): the logo is 96 dp and « Benthic » 48 sp as in task 210, the
 // badge is the panel's own (12 sp, task 237); the profile is the animated one. The assertions moved to
 // tests/app/tablet-first-launch.test.mjs; what stays here is the phone and iOS side.
 test('the tablet head of tasks 210 and 211 is gone, the phone and iOS keep what they had', () => {
-  assert.doesNotMatch(source, /od-welcome-start--head["\s]|od-welcome-start--wide-profile|od-welcome-start--brand/);
+  assert.doesNotMatch(source, /bc-welcome-start--head["\s]|bc-welcome-start--wide-profile|bc-welcome-start--brand/);
   assert.doesNotMatch(source, /DecorativeProfile/);
   // The phone's low-window rule keeps its tighter gap.
   assert.match(source, /@media \(max-width: 767\.98px\) and \(max-height: 820px\) \{\s*\.bc-welcome-start--buttons \{\s*gap: 8px;/);

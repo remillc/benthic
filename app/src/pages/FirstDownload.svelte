@@ -98,7 +98,7 @@
 </EditorialPage>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-download--steps {
       margin: 12px 0 0;
       padding: 20px 20px 22px;

@@ -44,7 +44,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Over the empty detail pane of the list-and-detail pair: to the right of the rail and the list. */
     .bc-release-empty {
       position: fixed;

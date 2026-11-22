@@ -5,7 +5,7 @@
 //  - *.json is loaded as a default export (the translations);
 //  - 'benthic-core' (the native plugin) is replaced by a stub: the tests
 //    never call the core, they test what is sent to it and what is shown;
-//  - OD_JS_MUTATE=<name> changes a constant or a rule in the source as it is
+//  - BC_JS_MUTATE=<name> changes a constant or a rule in the source as it is
 //    loaded (a wrong psi factor, a wrong comparison...): the tests must then
 //    fail. It is how tests/release-check.sh proves that these tests detect errors.
 import { readFile } from 'node:fs/promises';
@@ -29,7 +29,7 @@ const MUTATIONS = {
 };
 
 function mutate(url, source) {
-  const name = process.env.OD_JS_MUTATE;
+  const name = process.env.BC_JS_MUTATE;
   if (!name || !url.startsWith(srcPrefix)) return source;
   const m = MUTATIONS[name];
   if (!m) throw new Error(`unknown mutation ${name}`);

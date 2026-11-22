@@ -6,7 +6,7 @@ import { deviceStore } from './device-store.js';
 import { desktopApp } from './layout.svelte.js';
 import { textSizeOf, zoomOf, stepTextSize } from './desktop-settings.js';
 
-const KEY = 'od.textSize';
+const KEY = 'bc.textSize';
 
 function read() {
   try {

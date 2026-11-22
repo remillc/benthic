@@ -121,7 +121,7 @@ The repositories `A[main]`, `B[main]`, etc. are local git repositories: this tes
 **Reproduce.** The credentials are in a file outside the repository, with `BENTHIC_CLOUD_EMAIL=` and `BENTHIC_CLOUD_PASSWORD=`. The password is never displayed.
 
 ```sh
-tests/run-cloud-readonly.sh build/poc/cloud build/poc/roundtrip /mnt/c/Users/<you>/.opendives/cloud-dev.env ~/opendives-cloud-rt
+tests/run-cloud-readonly.sh build/poc/cloud build/poc/roundtrip /mnt/c/Users/<you>/.opendives/cloud-dev.env ~/benthic-cloud-rt
 ```
 
 ## What remains outside the POC

@@ -25,7 +25,7 @@
 </button>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-search-clear {
       flex: none;
       width: 48px;

@@ -132,8 +132,8 @@
 </script>
 
 <div class="bc-dive-gear--fill">
-  <span class="bc-dive-gear--fill-label" id="od-fill-with">{t('gear.diveGear.fillWith')}</span>
-  <div class="bc-dive-gear--group" role="group" aria-labelledby="od-fill-with">
+  <span class="bc-dive-gear--fill-label" id="bc-fill-with">{t('gear.diveGear.fillWith')}</span>
+  <div class="bc-dive-gear--group" role="group" aria-labelledby="bc-fill-with">
     <button type="button" class="bc-dive-gear--segment" disabled={gear.readOnly} onclick={kitMenu} aria-haspopup="menu">
       <Icon name="briefcase" size={20} />{t('gear.diveGear.oneKit')}<Icon name="expand" size={18} />
     </button>
@@ -160,7 +160,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dive-gear--warnings {
       margin: 8px 16px 0;
       padding: 0;

@@ -5,7 +5,7 @@
 // section 8, "Motion").
 //
 // Spatial springs (position, size, scale) may overshoot; effects springs
-// (opacity, colour) never do. "Anchored" is OpenDives' own variant for
+// (opacity, colour) never do. "Anchored" is Benthic's own variant for
 // surfaces fixed to a screen edge (drawer, sheets, popups): the spatial
 // stiffness with a damping ratio of 1, so they never leave the edge.
 

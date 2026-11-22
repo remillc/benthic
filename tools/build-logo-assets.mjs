@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds the files of the OpenDives logo, « Simple en relief » (task 2026-11-15-209), from one drawing:
+// Builds the files of the Benthic logo, « Simple en relief » (task 2026-11-15-209), from one drawing:
 // the docs/brand SVGs and PNGs, the web logos, the Android launcher PNGs, the iOS icons and splash images.
 // The Android vector drawables (gradients in aapt:attr) are written by hand, not here.
 // PNGs are drawn by Microsoft Edge (headless). Usage: node tools/build-logo-assets.mjs [--png-only | --svg-only]
@@ -33,8 +33,8 @@ export function logoBody(id = 'od') {
 // The favicon drops the rim and the shadow wave: at 16 px they turn the wave grey. Disc gradient and one white wave stay.
 const FAVICON =
   '<!-- The simple logo with relief, simplified for 16 px (docs/brand/benthic-logo.svg without the rim and the shadow wave); the same in light and dark mode. -->' +
-  '<defs><linearGradient id="od-disc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F5C99"/><stop offset="1" stop-color="#0C3866"/></linearGradient></defs>' +
-  '<circle cx="12" cy="12" r="11" fill="url(#od-disc)"/>' +
+  '<defs><linearGradient id="bc-disc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F5C99"/><stop offset="1" stop-color="#0C3866"/></linearGradient></defs>' +
+  '<circle cx="12" cy="12" r="11" fill="url(#bc-disc)"/>' +
   '<path d="M5 13q3.5-3 7 0t7 0" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>';
 const svg = (w, h, vb, inner) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb}">${inner}</svg>\n`;
 const placed = `<g transform="translate(54 54) scale(2.72727) translate(-12 -12)">${logoBody()}</g>`;
@@ -46,8 +46,8 @@ const iconWave =
   '<path d="M5 13q3.5-3 7 0t7 0" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>';
 const icon = (_bg, shape) => {
   const blue =
-    '<defs><linearGradient id="od-icon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F5C99"/><stop offset="1" stop-color="#0C3866"/></linearGradient></defs>' +
-    '<rect width="108" height="108" fill="url(#od-icon)"/>' +
+    '<defs><linearGradient id="bc-icon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F5C99"/><stop offset="1" stop-color="#0C3866"/></linearGradient></defs>' +
+    '<rect width="108" height="108" fill="url(#bc-icon)"/>' +
     `<g transform="translate(54 54) scale(4.909) translate(-12 -12)">${iconWave}</g>`;
   if (shape === 'fullbleed') return svg(108, 108, '0 0 108 108', blue);
   const clip = shape === 'round' ? '<circle cx="54" cy="54" r="54"/>' : '<rect width="108" height="108" rx="26"/>';
@@ -107,7 +107,7 @@ function toRGB(png) {
   return Buffer.concat([png.subarray(0, 8), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(out, { level: 9 })), chunk('IEND', Buffer.alloc(0))]);
 }
 
-const tmp = mkdtempSync(join(tmpdir(), 'od-logo-'));
+const tmp = mkdtempSync(join(tmpdir(), 'bc-logo-'));
 /** Draws an SVG string at size x size with Edge, on a transparent background. */
 function raster(svgText, size, out, opaque = false) {
   const html = join(tmp, 'p.html'), shot = join(tmp, 'p.png');

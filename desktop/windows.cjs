@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // The windows of the desktop app (task 2026-11-15-173): one window per logbook. This module opens,
-// reuses and closes them, keeps the recent logbooks, and answers the interface's 'od:logbooks'
+// reuses and closes them, keeps the recent logbooks, and answers the interface's 'bc:logbooks'
 // messages (new logbook, open, close, save a copy). Electron's objects are passed in, so that
 // tests/desktop/windows.test.mjs runs it with a fake Electron.
 'use strict';
@@ -349,7 +349,7 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
   /** A git username when the diver gave none: the owner in the address, else a fixed word (a token needs any). */
   function gitUserName(/** @type {string} */ url) {
     const parts = url.replace(/^[a-z]+:\/\//i, '').split('/');
-    return /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(parts[1] || '') ? parts[1] : 'opendives';
+    return /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(parts[1] || '') ? parts[1] : 'benthic';
   }
 
   /** A new logbook, from the dialog. @param {any} spec @param {any} win */
@@ -388,7 +388,7 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
 
   /**
    * A new logbook in a personal cloud: an empty .ssrf in the service's OpenDives folder (the app's folder
-   * root for OneDrive and Dropbox, a folder OpenDives creates for Google Drive and WebDAV), and a working copy here. EXISTS when the
+   * root for OneDrive and Dropbox, a folder Benthic creates for Google Drive and WebDAV), and a working copy here. EXISTS when the
    * service already has a file by that name.
    */
   async function createCloudLogbook(/** @type {any} */ spec, /** @type {string} */ name, /** @type {any} */ win) {
@@ -495,7 +495,7 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     }
   }
 
-  ipcMain.handle('od:logbooks', answer((event, op, options) => handle(event, op, options)));
+  ipcMain.handle('bc:logbooks', answer((event, op, options) => handle(event, op, options)));
 
   return {
     openMain,

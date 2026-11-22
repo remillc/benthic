@@ -54,12 +54,12 @@ static void check_true(const char *what, bool ok)
 // ---------------------------------------------------------------------------
 // Independent references
 // ---------------------------------------------------------------------------
-// OD_TOOLS_MUTATE=desat sends a wrong input to the façade only (the
+// BC_TOOLS_MUTATE=desat sends a wrong input to the façade only (the
 // references keep the true one): the run must then fail. The release check
 // (tests/release-check.sh, "mutations") runs each of them.
 static bool mutated(const char *name)
 {
-	const char *m = getenv("OD_TOOLS_MUTATE");
+	const char *m = getenv("BC_TOOLS_MUTATE");
 	return m && !strcmp(m, name);
 }
 

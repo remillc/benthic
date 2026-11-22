@@ -128,8 +128,8 @@ test('a row opens its logbook; a missing one opens the dialog with « Retirer de
   assert.match(state, /bridge\(\)\.logbooks\.forget\(\{ id \}\)/);
   assert.match(state, /bridge\(\)\.logbooks\.relocate\(\{ id \}\)/);
   const preload = readFileSync(new URL('../../desktop/preload.cjs', import.meta.url), 'utf8');
-  assert.match(preload, /exists: \(\) => invoke\('od:logbooks', 'exists'\)/);
-  assert.match(preload, /relocate: \(options\) => invoke\('od:logbooks', 'relocate', options\)/);
+  assert.match(preload, /exists: \(\) => invoke\('bc:logbooks', 'exists'\)/);
+  assert.match(preload, /relocate: \(options\) => invoke\('bc:logbooks', 'relocate', options\)/);
 });
 
 test('the colours of the new screens are tokens, in light and dark', () => {

@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // « Sauvegarde et restauration » of an Benthic+ account (tasks 2026-11-19-290 and 2026-11-22-319), opened from the account sheet.
+  // « Sauvegarde et restauration » of a Benthic+ account (tasks 2026-11-19-290 and 2026-11-22-319), opened from the account sheet.
   // On a phone « Que voulez-vous récupérer ? » and each of its three choices (the deleted dives, a version of a dive, the whole
   // logbook at a date, then one version) are pages with a back arrow (AccountBackupDeleted and the others); from the tablet layout
   // the choices and what one shows sit side by side in this page (the desktop opens the same panes in a
@@ -40,7 +40,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-account-backup-page--panes {
       height: 100%;
     }

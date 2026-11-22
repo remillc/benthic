@@ -138,7 +138,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Phone header (task 2026-11-18-278): the top of the trip's white card, pale blue. */
     .bc-trip-row--card {
       list-style: none;

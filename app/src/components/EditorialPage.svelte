@@ -241,7 +241,7 @@
     }
   }
 
-  @layer od.components {
+  @layer bc.components {
     /* No close button (an import that runs): no empty bar button either. */
     :global(.bc-editorial-page--bar .left:not(:has(a))) {
       display: none;
@@ -385,10 +385,10 @@
       border-right-color: transparent;
       border-radius: 50%;
       box-sizing: border-box;
-      animation: od-spin 0.9s linear infinite;
+      animation: bc-spin 0.9s linear infinite;
     }
 
-    @keyframes od-spin {
+    @keyframes bc-spin {
       to {
         transform: rotate(360deg);
       }

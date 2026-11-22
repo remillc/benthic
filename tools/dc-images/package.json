@@ -1,5 +1,5 @@
 {
-  "name": "opendives-dc-images",
+  "name": "benthic-dc-images",
   "private": true,
   "type": "module",
   "description": "Builds the dive computer image catalog (data/dive-computer-images).",

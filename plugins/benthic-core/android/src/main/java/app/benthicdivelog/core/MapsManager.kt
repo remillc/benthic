@@ -125,7 +125,7 @@ object MapsManager {
     fun partDir(id: String) = File(dir, "$PART_PREFIX$id")
     private fun oldDir(id: String) = File(dir, "$OLD_PREFIX$id")
 
-    /** `OpenDives/<versionName> (dive log app; <repository>)`: no personal data. */
+    /** `Benthic/<versionName> (dive log app; <repository>)`: no personal data. */
     val userAgent: String
         get() {
             val version = try {

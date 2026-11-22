@@ -232,7 +232,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-plan-slate--title {
       margin: 0;
       padding: 22px 20px 8px;

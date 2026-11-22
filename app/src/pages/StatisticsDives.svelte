@@ -121,7 +121,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-statistics-dives--list {
       margin-top: 12px;
     }

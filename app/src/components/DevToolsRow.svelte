@@ -23,7 +23,7 @@
 </button>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dev-tools-row {
       display: flex;
       align-items: center;

@@ -30,16 +30,16 @@ test('the animation timing is the one of the brief: 2.2 s line, dot at 0.7 s ove
   const style = css(hero);
   // The line and its glow: the stroke length is trimmed (pathLength 1, dash 1, offset 1 -> 0), left to right.
   for (const part of ['glow', 'line']) {
-    assert.match(style, new RegExp(`\\.bc-profile-hero--${part} \\{[^}]*stroke-dasharray: 1;[^}]*animation: od-profile-hero-draw 2\\.2s cubic-bezier\\(0\\.4, 0, 0\\.2, 1\\) both;`));
+    assert.match(style, new RegExp(`\\.bc-profile-hero--${part} \\{[^}]*stroke-dasharray: 1;[^}]*animation: bc-profile-hero-draw 2\\.2s cubic-bezier\\(0\\.4, 0, 0\\.2, 1\\) both;`));
   }
   assert.equal((hero.match(/pathLength="1"/g) ?? []).length, 2);
-  assert.match(style, /@keyframes od-profile-hero-draw \{\s*from \{\s*stroke-dashoffset: 1;\s*\}\s*to \{\s*stroke-dashoffset: 0;/);
+  assert.match(style, /@keyframes bc-profile-hero-draw \{\s*from \{\s*stroke-dashoffset: 1;\s*\}\s*to \{\s*stroke-dashoffset: 0;/);
   // The dot: 0.3 s after 0.7 s, from 40 % to 100 % with a fade-in.
-  assert.match(style, /\.bc-profile-hero--dot \{[^}]*animation: od-profile-hero-pop 0\.3s 0\.7s [^;]*both;/);
-  assert.match(style, /@keyframes od-profile-hero-pop \{\s*from \{\s*opacity: 0;\s*transform: scale\(0\.4\);\s*\}\s*to \{\s*opacity: 1;\s*transform: none;/);
+  assert.match(style, /\.bc-profile-hero--dot \{[^}]*animation: bc-profile-hero-pop 0\.3s 0\.7s [^;]*both;/);
+  assert.match(style, /@keyframes bc-profile-hero-pop \{\s*from \{\s*opacity: 0;\s*transform: scale\(0\.4\);\s*\}\s*to \{\s*opacity: 1;\s*transform: none;/);
   // The labels: 0.5 s after 2.1 s, fade in and rise 8 dp.
-  assert.match(style, /\.bc-profile-hero--label \{[^}]*animation: od-profile-hero-in 0\.5s 2\.1s [^;]*both;/);
-  assert.match(style, /@keyframes od-profile-hero-in \{\s*from \{\s*opacity: 0;\s*transform: translateY\(8px\);/);
+  assert.match(style, /\.bc-profile-hero--label \{[^}]*animation: bc-profile-hero-in 0\.5s 2\.1s [^;]*both;/);
+  assert.match(style, /@keyframes bc-profile-hero-in \{\s*from \{\s*opacity: 0;\s*transform: translateY\(8px\);/);
 });
 
 test('the water column is visible from the start: nothing animates it', () => {

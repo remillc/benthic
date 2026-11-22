@@ -1,4 +1,4 @@
-// The OpenDives server screens of the release edition (tasks 2026-11-16-259 and 260): the API client and how it maps
+// The Benthic server screens of the release edition (tasks 2026-11-16-259 and 260): the API client and how it maps
 // errors, the countdown and the disabled « Renvoyer le code », the code field's completeness, the order of the entry
 // points, the address that a release build never takes from the development default, the steps and their order, the
 // download of the repository and what is kept where. The screens are read from their source; the logic runs here.
@@ -162,7 +162,7 @@ test('the six boxes spread on the phone and stay together, 12 dp apart, on wide 
 
 // --- Entry points and steps ---------------------------------------------------------------------------------
 
-test('the OpenDives server is the only choice of « Ouvrir mon carnet »: no cloud drive, no personal git repository (18 November 2026)', () => {
+test('the Benthic server is the only choice of « Ouvrir mon carnet »: no cloud drive, no personal git repository (18 November 2026)', () => {
   // The decided change: the rows « Dans mon nuage » and « Dans un dépôt git » are gone from the beta.
   assert.deepEqual(entryRows('open').map((r) => r.key), ['server']);
   assert.deepEqual(entryRows('open').filter((r) => r.main).map((r) => r.key), ['server']);
@@ -303,7 +303,7 @@ test('opening: the repository is looked at, connected like a personal git reposi
 });
 
 test('opening: an empty repository, or one without the main branch, has no logbook; nothing is connected', async () => {
-  for (const found of [{ status: 'ok', empty: true, branches: [] }, { status: 'ok', empty: false, branches: ['opendives'] }]) {
+  for (const found of [{ status: 'ok', empty: true, branches: [] }, { status: 'ok', empty: false, branches: ['benthic'] }]) {
     const core = fakeCore({ gitCheck: async () => found });
     assert.deepEqual(await openServerLogbook(core, access), { state: 'none' });
     assert.deepEqual(core.calls, []);

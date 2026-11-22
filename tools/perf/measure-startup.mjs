@@ -11,15 +11,15 @@ import { killMine } from './kill-mine.mjs';
 
 const [ssrf, label = 'run', runsArg = '3'] = process.argv.slice(2);
 const root = path.resolve(import.meta.dirname, '../..');
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 const phone = process.env.PHONE === '1';
 const results = [];
 for (let run = 0; run < Number(runsArg); run++) {
   killMine();
   await sleep(1500);
-  const env = { ...process.env, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: path.join(root, 'build/perf', process.env.STAGE || 'stage-prod'), OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
+  const env = { ...process.env, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: path.join(root, 'build/perf', process.env.STAGE || 'stage-prod'), BC_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
   delete env.ELECTRON_RUN_AS_NODE;
-  delete env.OD_DEV_URL;
+  delete env.BC_DEV_URL;
   const t0 = Date.now();
   const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
   const p = await attachLogbook();
@@ -32,7 +32,7 @@ for (let run = 0; run < Number(runsArg); run++) {
     await p.send('Page.reload');
     const r0 = Date.now();
     await sleep(500);
-    for (let i = 0; i < 600; i++) { try { if (await p.eval(`document.querySelectorAll('.od-dive-row, .od-trip-row').length > 0`)) break; } catch { /* reloading */ } await sleep(100); }
+    for (let i = 0; i < 600; i++) { try { if (await p.eval(`document.querySelectorAll('.bc-dive-row, .bc-trip-row').length > 0`)) break; } catch { /* reloading */ } await sleep(100); }
     rowsMs = Date.now() - r0;
   }
   await sleep(2500);

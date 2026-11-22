@@ -440,7 +440,7 @@
     {:else}
       <div class="bc-desktop-statistics--body">
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <section class="bc-desktop-statistics--list" data-od-scroll aria-label={t('desktopStats.list')} onkeydown={listKey}>
+        <section class="bc-desktop-statistics--list" data-bc-scroll aria-label={t('desktopStats.list')} onkeydown={listKey}>
           <ul role="list">
             {#each rows as row (row.key)}
               <li>
@@ -516,7 +516,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-statistics--frame {
       position: relative;
       display: flex;

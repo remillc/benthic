@@ -1,9 +1,9 @@
 // @ts-check
 // The tab of the desktop detail pane that was last chosen (task 2026-11-15-191): kept when another
 // dive is selected and between sessions, in the settings of this computer (device-store.js,
-// key `od.detailTab`).
+// key `bc.detailTab`).
 
-export const TAB_KEY = 'od.detailTab';
+export const TAB_KEY = 'bc.detailTab';
 export const DETAIL_TABS = /** @type {const} */ (['info', 'equipment', 'gas', 'notes', 'map']);
 /** @typedef {typeof DETAIL_TABS[number]} DetailTab */
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
-// Git on the device over libgit2 (odgit.h). The TLS setup (Mbed TLS, the CA file) is the core's: set_ca_file() sets
+// Git on the device over libgit2 (bgit.h). The TLS setup (Mbed TLS, the CA file) is the core's: set_ca_file() sets
 // libgit2's certificate locations once for the whole process, and certificates are always checked here.
-#include "core/libbenthic/odgit.h"
+#include "core/libbenthic/bgit.h"
 
 #include <git2.h>
 
@@ -92,8 +92,8 @@ void append_oid(std::string &out, const git_oid *oid)
 
 // What the callbacks share during one call.
 struct Call {
-	const OdgitAuth *auth = nullptr;
-	OdgitProgress progress;
+	const BgitAuth *auth = nullptr;
+	BgitProgress progress;
 	int credential_asks = 0;
 	bool push_refused = false;
 	std::string push_refusal;
@@ -217,7 +217,7 @@ bool valid_address(const std::string &url)
 	return false;
 }
 
-bool valid_auth(const OdgitAuth &auth)
+bool valid_auth(const BgitAuth &auth)
 {
 	for (const std::string *s : { &auth.user, &auth.token })
 		for (unsigned char c : *s)
@@ -259,6 +259,34 @@ bool valid_branch(const std::string &branch)
 	return !branch.empty() && git_reference_is_valid_name(ref_of(branch).c_str()) == 1;
 }
 
+// Until the rename to Benthic (22 November 2026) the device's own history was kept under refs/opendives/device/.
+// Opening a working copy renames each of those references to refs/benthic/device/, once (nothing is left to rename
+// afterwards). A reference that already exists under the new name wins: the old one is just deleted.
+void rename_legacy_device_refs(git_repository *repo)
+{
+	static const std::string legacy = "refs/opendives/device/", current = "refs/benthic/device/";
+	git_reference_iterator *rawit = nullptr;
+	if (git_reference_iterator_glob_new(&rawit, repo, (legacy + "*").c_str()))
+		return;
+	std::vector<std::string> names;
+	const char *name = nullptr;
+	while (git_reference_next_name(&name, rawit) == 0)
+		names.push_back(name);
+	git_reference_iterator_free(rawit);
+	for (const std::string &old : names) {
+		const std::string wanted = current + old.substr(legacy.size());
+		git_reference *rawref = nullptr;
+		if (git_reference_lookup(&rawref, repo, old.c_str()))
+			continue;
+		git_reference *moved = nullptr;
+		if (git_reference_rename(&moved, rawref, wanted.c_str(), 0, "Benthic: rename the device history") == 0)
+			git_reference_free(moved);
+		else
+			git_reference_delete(rawref);
+		git_reference_free(rawref);
+	}
+}
+
 int open_repo(const std::string &dir, Repo &repo, std::string &error)
 {
 	git_repository *r = nullptr;
@@ -268,6 +296,7 @@ int open_repo(const std::string &dir, Repo &repo, std::string &error)
 		return -1;
 	}
 	repo.reset(r);
+	rename_legacy_device_refs(r);
 	return 0;
 }
 
@@ -310,7 +339,7 @@ int checkout_to(git_repository *repo, git_tree *tree, Call &call)
 	return git_checkout_tree(repo, reinterpret_cast<git_object *>(tree), &co);
 }
 
-int make_signature(const OdgitAuthor &author, Sig &sig)
+int make_signature(const BgitAuthor &author, Sig &sig)
 {
 	git_signature *raw = nullptr;
 	int rc = git_signature_now(&raw, author.name.c_str(), author.email.c_str());
@@ -372,11 +401,11 @@ bool has_working_copy(const std::string &dir)
 
 } // namespace
 
-void odgit_allow_http(bool allowed) { http_allowed = allowed; }
-void odgit_cancel() { cancel_flag = true; }
+void bgit_allow_http(bool allowed) { http_allowed = allowed; }
+void bgit_cancel() { cancel_flag = true; }
 
-int odgit_clone(const std::string &url, const std::string &dir, const std::string &branch, const OdgitAuth &auth,
-		const OdgitProgress &progress, std::string &json, std::string &error)
+int bgit_clone(const std::string &url, const std::string &dir, const std::string &branch, const BgitAuth &auth,
+		const BgitProgress &progress, std::string &json, std::string &error)
 {
 	cancel_flag = false;
 	if (!valid_address(url) || url.find('@') != std::string::npos || url.find('[') != std::string::npos) {
@@ -457,8 +486,8 @@ int odgit_clone(const std::string &url, const std::string &dir, const std::strin
 	return 0;
 }
 
-int odgit_pull(const std::string &dir, const std::string &branch, const OdgitAuth &auth, const OdgitAuthor &author,
-	       const OdgitProgress &progress, std::string &json, std::string &error)
+int bgit_pull(const std::string &dir, const std::string &branch, const BgitAuth &auth, const BgitAuthor &author,
+	       const BgitProgress &progress, std::string &json, std::string &error)
 {
 	cancel_flag = false;
 	if (!valid_auth(auth) || !valid_branch(branch)) {
@@ -519,7 +548,7 @@ int odgit_pull(const std::string &dir, const std::string &branch, const OdgitAut
 	if (!lookup_oid(repo.get(), ref_of(branch), ours_oid)) {
 		// Nothing committed here yet: the branch starts at the server's.
 		if ((rc = checkout_to(repo.get(), theirs_tree.get(), call)) ||
-		    (rc = point_branch(repo.get(), branch, theirs_oid, "OpenDives: start from the server"))) {
+		    (rc = point_branch(repo.get(), branch, theirs_oid, "Benthic: start from the server"))) {
 			error = local_error(rc);
 			return -1;
 		}
@@ -543,7 +572,7 @@ int odgit_pull(const std::string &dir, const std::string &branch, const OdgitAut
 	}
 	if (has_base && git_oid_equal(&base_oid, &ours_oid)) {
 		if ((rc = checkout_to(repo.get(), theirs_tree.get(), call)) ||
-		    (rc = point_branch(repo.get(), branch, theirs_oid, "OpenDives: fast-forward"))) {
+		    (rc = point_branch(repo.get(), branch, theirs_oid, "Benthic: fast-forward"))) {
 			error = local_error(rc);
 			return -1;
 		}
@@ -635,7 +664,7 @@ int odgit_pull(const std::string &dir, const std::string &branch, const OdgitAut
 	if ((rc = git_commit_create(&commit_oid, repo.get(), nullptr, sig.get(), sig.get(), nullptr, message.c_str(),
 				    merged_tree.get(), 2, parents)) ||
 	    (rc = checkout_to(repo.get(), merged_tree.get(), call)) ||
-	    (rc = point_branch(repo.get(), branch, commit_oid, "OpenDives: merge"))) {
+	    (rc = point_branch(repo.get(), branch, commit_oid, "Benthic: merge"))) {
 		error = local_error(rc);
 		return -1;
 	}
@@ -643,8 +672,8 @@ int odgit_pull(const std::string &dir, const std::string &branch, const OdgitAut
 	return 0;
 }
 
-int odgit_commit(const std::string &dir, const std::vector<std::string> &paths, const std::string &message,
-		 const OdgitAuthor &author, const std::string &merge_parent, std::string &json, std::string &error)
+int bgit_commit(const std::string &dir, const std::vector<std::string> &paths, const std::string &message,
+		 const BgitAuthor &author, const std::string &merge_parent, std::string &json, std::string &error)
 {
 	cancel_flag = false;
 	for (const std::string &p : paths)
@@ -754,7 +783,7 @@ int odgit_commit(const std::string &dir, const std::vector<std::string> &paths, 
 			error = "GIT_ERROR: HEAD is not on a branch";
 			return -1;
 		}
-		if ((rc = point_branch(repo.get(), branch.substr(11), commit_oid, "OpenDives: merge"))) {
+		if ((rc = point_branch(repo.get(), branch.substr(11), commit_oid, "Benthic: merge"))) {
 			error = local_error(rc);
 			return -1;
 		}
@@ -812,7 +841,7 @@ int odgit_commit(const std::string &dir, const std::vector<std::string> &paths, 
 	return 0;
 }
 
-int odgit_push(const std::string &dir, const std::string &branch, const OdgitAuth &auth, const OdgitProgress &progress,
+int bgit_push(const std::string &dir, const std::string &branch, const BgitAuth &auth, const BgitProgress &progress,
 	       std::string &json, std::string &error)
 {
 	cancel_flag = false;
@@ -862,7 +891,7 @@ int odgit_push(const std::string &dir, const std::string &branch, const OdgitAut
 	return 0;
 }
 
-int odgit_status(const std::string &dir, const std::vector<std::string> &paths, std::string &json, std::string &error)
+int bgit_status(const std::string &dir, const std::vector<std::string> &paths, std::string &json, std::string &error)
 {
 	cancel_flag = false;
 	for (const std::string &p : paths)
@@ -922,7 +951,7 @@ int odgit_status(const std::string &dir, const std::vector<std::string> &paths, 
 	return 0;
 }
 
-int odgit_unpushed(const std::string &dir, const std::string &branch, std::string &json, std::string &error)
+int bgit_unpushed(const std::string &dir, const std::string &branch, std::string &json, std::string &error)
 {
 	cancel_flag = false;
 	if (!valid_branch(branch)) {
@@ -959,7 +988,7 @@ int odgit_unpushed(const std::string &dir, const std::string &branch, std::strin
 	return 0;
 }
 
-int odgit_head(const std::string &dir, const std::string &branch, std::string &json, std::string &error)
+int bgit_head(const std::string &dir, const std::string &branch, std::string &json, std::string &error)
 {
 	cancel_flag = false;
 	if (!valid_branch(branch)) {
@@ -979,7 +1008,7 @@ int odgit_head(const std::string &dir, const std::string &branch, std::string &j
 	return 0;
 }
 
-int odgit_list_files(const std::string &dir, const std::string &prefix, std::string &json, std::string &error)
+int bgit_list_files(const std::string &dir, const std::string &prefix, std::string &json, std::string &error)
 {
 	cancel_flag = false;
 	Library lib;
@@ -1009,7 +1038,7 @@ int odgit_list_files(const std::string &dir, const std::string &prefix, std::str
 	return 0;
 }
 
-int odgit_remove(const std::string &dir, std::string &error)
+int bgit_remove(const std::string &dir, std::string &error)
 {
 	if (dir.empty()) {
 		error = "BAD_PATH";
@@ -1032,7 +1061,7 @@ int odgit_remove(const std::string &dir, std::string &error)
 namespace {
 
 // Where the commits of the device's own logbook are kept inside the account's repository: one reference per head.
-#define DEVICE_REFS "refs/opendives/device/"
+#define DEVICE_REFS "refs/benthic/device/"
 
 bool valid_utf8(const char *s, size_t n)
 {
@@ -1193,7 +1222,7 @@ void count_tree(git_repository *repo, git_tree *tree, bool in_sites, Counts &cou
 
 } // namespace
 
-int odgit_history_log(const std::string &dir, const std::string &branch, int skip, int limit, bool with_changes,
+int bgit_history_log(const std::string &dir, const std::string &branch, int skip, int limit, bool with_changes,
 		      std::string &json, std::string &error)
 {
 	cancel_flag = false;
@@ -1217,7 +1246,7 @@ int odgit_history_log(const std::string &dir, const std::string &branch, int ski
 		return -1;
 	}
 	std::unique_ptr<git_revwalk, Free<git_revwalk, git_revwalk_free>> walk(rawwalk);
-	// The history the device's own logbook had before the account (odgit_history_adopt) follows the branch's.
+	// The history the device's own logbook had before the account (bgit_history_adopt) follows the branch's.
 	git_revwalk_push_glob(walk.get(), DEVICE_REFS "*");
 	git_revwalk_sorting(walk.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
 	json = "{\"commits\":[";
@@ -1293,7 +1322,7 @@ int odgit_history_log(const std::string &dir, const std::string &branch, int ski
 	return 0;
 }
 
-int odgit_history_adopt(const std::string &dir, const std::string &source, const std::string &source_branch,
+int bgit_history_adopt(const std::string &dir, const std::string &source, const std::string &source_branch,
 			std::string &json, std::string &error)
 {
 	cancel_flag = false;
@@ -1344,7 +1373,7 @@ int odgit_history_adopt(const std::string &dir, const std::string &source, const
 	return 0;
 }
 
-int odgit_history_stats(const std::string &dir, const std::vector<std::string> &commits, std::string &json,
+int bgit_history_stats(const std::string &dir, const std::vector<std::string> &commits, std::string &json,
 			std::string &error)
 {
 	cancel_flag = false;
@@ -1360,7 +1389,7 @@ int odgit_history_stats(const std::string &dir, const std::vector<std::string> &
 			return -1;
 		Counts counts;
 		count_tree(repo.get(), tree.get(), false, counts, 0);
-		// OpenDives' own branch: the pieces of the inventory are the files of gear/.
+		// Benthic's own branch: the pieces of the inventory are the files of gear/.
 		const git_tree_entry *gear = git_tree_entry_byname(tree.get(), "gear");
 		if (gear && git_tree_entry_type(gear) == GIT_OBJECT_TREE) {
 			git_tree *sub = nullptr;
@@ -1381,7 +1410,7 @@ int odgit_history_stats(const std::string &dir, const std::vector<std::string> &
 	return 0;
 }
 
-int odgit_history_diff(const std::string &dir, const std::string &from, const std::string &to, std::string &json,
+int bgit_history_diff(const std::string &dir, const std::string &from, const std::string &to, std::string &json,
 		       std::string &error)
 {
 	cancel_flag = false;
@@ -1399,7 +1428,7 @@ int odgit_history_diff(const std::string &dir, const std::string &from, const st
 	return 0;
 }
 
-int odgit_history_read(const std::string &dir, const std::string &commit, const std::string &path, std::string &json,
+int bgit_history_read(const std::string &dir, const std::string &commit, const std::string &path, std::string &json,
 		       std::string &error)
 {
 	cancel_flag = false;
@@ -1463,7 +1492,7 @@ int files_walk_cb(const char *root, const git_tree_entry *entry, void *payload)
 
 } // namespace
 
-int odgit_history_files(const std::string &dir, const std::string &commit, const std::string &prefix, std::string &json,
+int bgit_history_files(const std::string &dir, const std::string &commit, const std::string &prefix, std::string &json,
 			std::string &error)
 {
 	cancel_flag = false;
@@ -1509,8 +1538,8 @@ int copy_walk_cb(const char *root, const git_tree_entry *entry, void *payload)
 
 } // namespace
 
-int odgit_history_restore(const std::string &dir, const std::string &branch, const std::string &commit,
-			  const std::vector<std::string> &paths, const std::string &message, const OdgitAuthor &author,
+int bgit_history_restore(const std::string &dir, const std::string &branch, const std::string &commit,
+			  const std::vector<std::string> &paths, const std::string &message, const BgitAuthor &author,
 			  std::string &json, std::string &error)
 {
 	cancel_flag = false;
@@ -1626,7 +1655,7 @@ int odgit_history_restore(const std::string &dir, const std::string &branch, con
 	return 0;
 }
 
-int odgit_history_borrow(const std::string &dir, const std::string &commit, const std::string &into, std::string &json,
+int bgit_history_borrow(const std::string &dir, const std::string &commit, const std::string &into, std::string &json,
 			 std::string &error)
 {
 	cancel_flag = false;
@@ -1667,7 +1696,7 @@ int odgit_history_borrow(const std::string &dir, const std::string &commit, cons
 	if (open_repo(into, borrowed, error))
 		return -1;
 	git_reference *ref = nullptr;
-	if (git_reference_create(&ref, borrowed.get(), "refs/heads/v", git_commit_id(wanted.get()), 1, "OpenDives version")) {
+	if (git_reference_create(&ref, borrowed.get(), "refs/heads/v", git_commit_id(wanted.get()), 1, "Benthic version")) {
 		error = local_error(-1);
 		return -1;
 	}

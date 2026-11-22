@@ -195,7 +195,7 @@
 </EditorialPage>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-import-progress--steps {
       list-style: none;
       margin: 16px 0 0;
@@ -263,10 +263,10 @@
       border-right-color: transparent;
       border-radius: 50%;
       box-sizing: border-box;
-      animation: od-step-spin 0.9s linear infinite;
+      animation: bc-step-spin 0.9s linear infinite;
     }
 
-    @keyframes od-step-spin {
+    @keyframes bc-step-spin {
       to {
         transform: rotate(360deg);
       }

@@ -30,7 +30,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-sync-pill--pill {
       position: relative;
       box-sizing: border-box;

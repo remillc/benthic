@@ -25,7 +25,7 @@
   let focused = $state(false);
   /** @type {HTMLInputElement|undefined} */
   let input = $state();
-  const id = `od-chips-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-chips-${Math.random().toString(36).slice(2, 9)}`;
   const floated = $derived(focused || values.length > 0 || typed !== '');
 
   /** The logbook's values that match what is typed, not chosen yet. */
@@ -125,7 +125,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-chips-field--field {
       position: relative;
       margin: 18px var(--bc-field-margin, 16px) 0;

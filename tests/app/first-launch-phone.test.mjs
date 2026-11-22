@@ -193,11 +193,11 @@ test('the tablet layout is untouched: the phone sizes are only inside the max-wi
 });
 
 test('the cascade layer order is declared first in the document, before any built stylesheet (spacing bug of task 263)', () => {
-  // The build links the shared chunk's CSS, which only names od.components, before the main CSS: without this line that
+  // The build links the shared chunk's CSS, which only names bc.components, before the main CSS: without this line that
   // layer comes first, so lowest, and Framework7's rules (p { margin: 1em 0 } ...) beat every component's.
   const order = html.match(/@layer\s+([^;]+);/);
   assert.ok(order, 'index.html declares the layer order');
-  assert.deepEqual(order[1].split(',').map((x) => x.trim()), ['framework7', 'maplibre', 'od.tokens', 'od.base', 'od.components']);
+  assert.deepEqual(order[1].split(',').map((x) => x.trim()), ['framework7', 'maplibre', 'bc.tokens', 'bc.base', 'bc.components']);
   const theme = read('theme.css').match(/^@layer\s+([^;]+);/m);
   assert.equal(order[1].replace(/\s/g, ''), theme[1].replace(/\s/g, ''));
   assert.ok(html.indexOf('@layer') < (html.indexOf('/src/main.js')));

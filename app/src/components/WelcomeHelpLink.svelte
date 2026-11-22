@@ -37,7 +37,7 @@
 </a>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-welcome-help-link {
       box-sizing: border-box;
       position: relative;

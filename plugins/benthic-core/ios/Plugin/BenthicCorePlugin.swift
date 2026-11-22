@@ -16,7 +16,7 @@ struct Failure: Error {
     }
 }
 
-/// The iOS side of the plugin whose contract is OpenDives' core-api.js, under
+/// The iOS side of the plugin whose contract is Benthic's core-api.js, under
 /// the same name as the Android one.
 @objc(BenthicCorePlugin)
 public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
@@ -43,16 +43,16 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "signIn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "createAccount", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitCheck", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitClone", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitPull", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitCommit", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitPush", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitStatus", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitUnpushed", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitHead", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitListFiles", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitRemove", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "odgitCancel", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitClone", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitPull", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitCommit", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitPush", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitStatus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitUnpushed", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitHead", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitListFiles", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitRemove", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitCancel", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConfig", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionSave", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
@@ -168,7 +168,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     private let credentials = CredentialStore()
     private let gitStore = GitRemoteStore()
-    /// The OpenDives server's session (release edition).
+    /// The Benthic server's session (release edition).
     private let serverStore = ServerSessionStore()
 
     /// An account being created or signed in to whose logbook does not exist yet:
@@ -1014,18 +1014,27 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    // MARK: Git on the device (odgit.h)
+    // MARK: Git on the device (bgit.h)
 
     /// Git work runs on its own queue: it never waits for the core, and a long clone does not hold the others.
     private let gitQueue = DispatchQueue(label: "app.benthicdivelog.core.git")
 
-    /// The working copies: `<Documents>/odgit/<dir>`. NOT BUILT OR TESTED YET (no Mac): this must be the folder
-    /// @capacitor/filesystem calls `Directory.Data` + `odgit/<dir>` (check which folder Directory.Data is on iOS).
-    private let odgitRoot: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("odgit")
+    /// The working copies: `<Documents>/bgit/<dir>`. NOT BUILT OR TESTED YET (no Mac): this must be the folder
+    /// @capacitor/filesystem calls `Directory.Data` + `bgit/<dir>` (check which folder Directory.Data is on iOS).
+    private let bgitRoot: URL = {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let root = documents.appendingPathComponent("bgit")
+        // The folder was `odgit` before the rename to Benthic (22 November 2026): renamed once, on first use.
+        let legacy = documents.appendingPathComponent("odgit")
+        if FileManager.default.fileExists(atPath: legacy.path) && !FileManager.default.fileExists(atPath: root.path) {
+            try? FileManager.default.moveItem(at: legacy, to: root)
+        }
+        return root
+    }()
 
     /// Runs one git call off the main thread and resolves `json`; rejects with the error code (UNREACHABLE, REFUSED,
     /// REJECTED, CANCELLED, ...). Progress goes out as "gitProgress" events ({dir, phase, done, total}).
-    private func odgit(_ call: CAPPluginCall, _ operation: String) {
+    private func bgit(_ call: CAPPluginCall, _ operation: String) {
         let name = call.getString("dir") ?? ""
         if operation != "cancel" && (name.isEmpty || name.hasPrefix("/") || name.contains("..") || name.contains("\\")) {
             call.reject("BAD_PATH", "BAD_PATH")
@@ -1036,14 +1045,14 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             if let value = call.getString(key) { args[key] = value }
         }
         args["paths"] = (call.getArray("paths") ?? []).compactMap { $0 as? String }
-        args["dir"] = odgitRoot.appendingPathComponent(name).path
+        args["dir"] = bgitRoot.appendingPathComponent(name).path
         #if DEBUG
         args["allowHttp"] = true // the development server is plain http
         #endif
         let run = { [self] in
             setupDone.wait()
             do {
-                let json = try BenthicNative.odgit(operation, args: args, progress: { [weak self] progress in
+                let json = try BenthicNative.bgit(operation, args: args, progress: { [weak self] progress in
                     var data = parseObject(progress)
                     data["dir"] = name
                     self?.notifyListeners("gitProgress", data: data)
@@ -1058,18 +1067,18 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         if operation == "cancel" { run() } else { gitQueue.async(execute: run) }
     }
 
-    @objc func odgitClone(_ call: CAPPluginCall) { odgit(call, "clone") }
-    @objc func odgitPull(_ call: CAPPluginCall) { odgit(call, "pull") }
-    @objc func odgitCommit(_ call: CAPPluginCall) { odgit(call, "commit") }
-    @objc func odgitPush(_ call: CAPPluginCall) { odgit(call, "push") }
-    @objc func odgitStatus(_ call: CAPPluginCall) { odgit(call, "status") }
-    @objc func odgitUnpushed(_ call: CAPPluginCall) { odgit(call, "unpushed") }
-    @objc func odgitHead(_ call: CAPPluginCall) { odgit(call, "head") }
-    @objc func odgitListFiles(_ call: CAPPluginCall) { odgit(call, "listFiles") }
-    @objc func odgitRemove(_ call: CAPPluginCall) { odgit(call, "remove") }
-    @objc func odgitCancel(_ call: CAPPluginCall) { odgit(call, "cancel") }
+    @objc func bgitClone(_ call: CAPPluginCall) { bgit(call, "clone") }
+    @objc func bgitPull(_ call: CAPPluginCall) { bgit(call, "pull") }
+    @objc func bgitCommit(_ call: CAPPluginCall) { bgit(call, "commit") }
+    @objc func bgitPush(_ call: CAPPluginCall) { bgit(call, "push") }
+    @objc func bgitStatus(_ call: CAPPluginCall) { bgit(call, "status") }
+    @objc func bgitUnpushed(_ call: CAPPluginCall) { bgit(call, "unpushed") }
+    @objc func bgitHead(_ call: CAPPluginCall) { bgit(call, "head") }
+    @objc func bgitListFiles(_ call: CAPPluginCall) { bgit(call, "listFiles") }
+    @objc func bgitRemove(_ call: CAPPluginCall) { bgit(call, "remove") }
+    @objc func bgitCancel(_ call: CAPPluginCall) { bgit(call, "cancel") }
 
-    /// Keeps the OpenDives server's session (release edition) in the Keychain.
+    /// Keeps the Benthic server's session (release edition) in the Keychain.
     @objc func serverSessionSave(_ call: CAPPluginCall) {
         let session = ServerSession(
             email: call.getString("email") ?? "",
@@ -1088,7 +1097,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// Who is signed in to the OpenDives server, without any token.
+    /// Who is signed in to the Benthic server, without any token.
     @objc func serverSessionInfo(_ call: CAPPluginCall) {
         let stored = serverStore.read()
         call.resolve([
@@ -1148,11 +1157,11 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             pendingAccount = nil
             let fileManager = FileManager.default
             for item in (try? fileManager.contentsOfDirectory(atPath: home.path)) ?? [] {
-                let device = item == "carnet" || item.hasPrefix("carnet.") || item == "odgit"
+                let device = item == "carnet" || item.hasPrefix("carnet.") || item == "bgit"
                 let alpha = item == ".subsurface" && !keepAlpha
                 if device || alpha { try? fileManager.removeItem(at: home.appendingPathComponent(item)) }
             }
-            try? fileManager.removeItem(at: odgitRoot)
+            try? fileManager.removeItem(at: bgitRoot)
             for item in (try? fileManager.contentsOfDirectory(atPath: cacheDir.path)) ?? [] where item.hasPrefix("import") || item == "exports" {
                 try? fileManager.removeItem(at: cacheDir.appendingPathComponent(item))
             }
@@ -1163,7 +1172,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         #endif
     }
 
-    /// Signs out of the OpenDives server: the tokens are erased from this device.
+    /// Signs out of the Benthic server: the tokens are erased from this device.
     @objc func serverSessionClear(_ call: CAPPluginCall) {
         serverStore.delete()
         call.resolve()
@@ -1325,7 +1334,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// iCloud Drive (task 2026-11-16-261; UNTESTED: written without a Mac, to be run on a device signed in to
     /// iCloud). Creates `<name>` in the OpenDives folder of the app's ubiquity container, so that it shows in the
-    /// Files app under iCloud Drive › OpenDives. No sign-in: the container belongs to the device's Apple account.
+    /// Files app under iCloud Drive › Benthic. No sign-in: the container belongs to the device's Apple account.
     /// `url(forUbiquityContainerIdentifier:)` may block, so it runs off the main thread; it returns nil when iCloud
     /// Drive is off, the account is signed out, or the iCloud entitlement is missing (NOT_AVAILABLE).
     @objc func createIcloudLogbook(_ call: CAPPluginCall) {
@@ -1455,7 +1464,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
     // MARK: - Offline maps (MapsManager)
 
     /// Reads the tiles and loads the maps state, off the main thread.
-    private let mapsIo = DispatchQueue(label: "org.opendives.maps.io", attributes: .concurrent)
+    private let mapsIo = DispatchQueue(label: "app.benthicdivelog.maps.io", attributes: .concurrent)
 
     /// The region id of a call: letters, digits, dot, dash, underscore (it names a directory).
     private func mapsId(_ call: CAPPluginCall) -> String? {
@@ -1818,7 +1827,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve()
     }
 
-    // MARK: - A file sent to the app (deep links, "Open in OpenDives")
+    // MARK: - A file sent to the app (deep links, "Open in Benthic")
 
     /// A file another app handed over (a file:// URL of the Inbox or of a provider), copied in pieces of
     /// 64 KB into the app's cache: {name, size, path}. Only the path crosses the bridge (a logbook of 100 MB as

@@ -40,7 +40,7 @@
 </Popup>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.popup.bc-backup-dialog) {
       --f7-popup-tablet-width: min(1000px, calc(100vw - 48px));
       --f7-popup-tablet-height: min(720px, calc(100vh - 48px));

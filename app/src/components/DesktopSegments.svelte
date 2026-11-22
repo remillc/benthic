@@ -38,7 +38,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-segments {
       display: inline-flex;
       height: 42px;

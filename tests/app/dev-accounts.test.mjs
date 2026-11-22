@@ -39,10 +39,10 @@ test('only this machine\'s servers are local', () => {
   for (const bad of ['https://api.example.org', 'http://192.168.1.20:8080', 'http://127.0.0.1.example.org', 'not an address', '']) assert.equal(isLocalServerUrl(bad), false, bad);
 });
 
-test('a temporary address looks like essai-xxxx@opendives.test and only such addresses can be deleted', () => {
-  assert.match(randomTempEmail(), /^essai-[a-z2-9]{4}@opendives\.test$/);
+test('a temporary address looks like essai-xxxx@benthic.test and only such addresses can be deleted', () => {
+  assert.match(randomTempEmail(), /^essai-[a-z2-9]{4}@benthic\.test$/);
   assert.notEqual(randomTempEmail(), randomTempEmail());
-  assert.equal(isTempEmail('essai-ab12@opendives.test'), true);
+  assert.equal(isTempEmail('essai-ab12@benthic.test'), true);
   assert.equal(isTempEmail('someone@example.org'), false);
 });
 
@@ -51,7 +51,7 @@ test('the dev calls refuse a server that is not local, before any request', asyn
   const transport = async () => (calls++, { status: 200, text: '{}' });
   for (const baseUrl of ['https://api.example.org', 'http://192.168.1.20:8080', '']) {
     const api = createDevApi({ baseUrl, transport });
-    await assert.rejects(api.signIn('a@opendives.test', 'A'), (e) => e instanceof ServerError && e.code === 'UNREACHABLE');
+    await assert.rejects(api.signIn('a@benthic.test', 'A'), (e) => e instanceof ServerError && e.code === 'UNREACHABLE');
     await assert.rejects(api.subscribe('t'), ServerError);
     await assert.rejects(api.reset('t'), ServerError);
   }
@@ -60,10 +60,10 @@ test('the dev calls refuse a server that is not local, before any request', asyn
 
 test('a local server: the sign-in, the simulated purchase and the deletion call the three dev routes', async () => {
   const seen = [];
-  const session = { sessionToken: 'a'.repeat(64), user: { id: '1', email: 'a@opendives.test', isNew: true, subscribed: false }, repository: { url: 'https://127.0.0.1:3443/x/logbook.git', branch: 'main' }, git: { username: 'x', token: 'tok' } };
+  const session = { sessionToken: 'a'.repeat(64), user: { id: '1', email: 'a@benthic.test', isNew: true, subscribed: false }, repository: { url: 'https://127.0.0.1:3443/x/logbook.git', branch: 'main' }, git: { username: 'x', token: 'tok' } };
   const transport = async (r) => (seen.push(r), { status: 200, text: JSON.stringify(r.url.endsWith('dev-google') ? session : { ok: true }) });
   const api = createDevApi({ baseUrl: 'http://127.0.0.1:8080', transport });
-  assert.equal((await api.signIn(' a@opendives.test ', ' Ann ')).user.subscribed, false);
+  assert.equal((await api.signIn(' a@benthic.test ', ' Ann ')).user.subscribed, false);
   await api.subscribe(session.sessionToken);
   await api.reset(session.sessionToken);
   assert.deepEqual(seen.map((r) => [r.method, r.url]), [
@@ -71,11 +71,11 @@ test('a local server: the sign-in, the simulated purchase and the deletion call 
     ['POST', 'http://127.0.0.1:8080/v1/account/dev-subscribe'],
     ['POST', 'http://127.0.0.1:8080/v1/account/dev-reset'],
   ]);
-  assert.deepEqual(seen[0].body, { email: 'a@opendives.test', name: 'Ann' });
+  assert.deepEqual(seen[0].body, { email: 'a@benthic.test', name: 'Ann' });
   assert.equal(seen[1].headers.Authorization, `Bearer ${session.sessionToken}`);
   // A server that answers 404 (not in dev mode) is seen as unreachable.
   const off = createDevApi({ baseUrl: 'http://127.0.0.1:8080', transport: async () => ({ status: 404, text: '{"error":{"code":"NOT_FOUND"}}' }) });
-  await assert.rejects(off.signIn('a@opendives.test', ''), (e) => e.code === 'UNREACHABLE');
+  await assert.rejects(off.signIn('a@benthic.test', ''), (e) => e.code === 'UNREACHABLE');
 });
 
 test('the download step of the simulated sign-in sits over the address step, so that Retour leaves for it', () => {
@@ -100,8 +100,8 @@ function bundleText(dir) {
 test('a build without the switch contains nothing of it; a build with it does', { timeout: 300000 }, () => {
   const app = fileURLToPath(new URL('../../app/', import.meta.url));
   const vite = fileURLToPath(new URL('../../app/node_modules/vite/bin/vite.js', import.meta.url));
-  const tmp = mkdtempSync(join(tmpdir(), 'od-devaccounts-'));
-  const marks = /dev-google|dev-subscribe|dev-unsubscribe|dev-reset|DevGoogle|od-dev-google|od-dev-delete|od-dev-tools|Outils de développement|essai-/;
+  const tmp = mkdtempSync(join(tmpdir(), 'bc-devaccounts-'));
+  const marks = /dev-google|dev-subscribe|dev-unsubscribe|dev-reset|DevGoogle|bc-dev-google|bc-dev-delete|bc-dev-tools|Outils de développement|essai-/;
   try {
     for (const [name, on] of [['off', ''], ['on', '1']]) {
       const outDir = join(tmp, name);

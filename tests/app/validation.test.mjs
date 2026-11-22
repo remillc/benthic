@@ -1,5 +1,5 @@
 // Dive validation (task 2026-11-19-309, point 2): the fingerprint that detects « modifiée après la validation », the
-// records in the OpenDives data store (round trip, follow a dive whose start was edited, the read-only flag), the QR text,
+// records in the Benthic data store (round trip, follow a dive whose start was edited, the read-only flag), the QR text,
 // the clock of a code (10 minutes, the server's grace), the answer of the server applied to a pending validation and the
 // queue of a signer who is offline. Also: every text the screens use exists in French and English.
 import test from 'node:test';
@@ -111,7 +111,7 @@ test('the QR text carries the code and the summary, and only a real code is read
   assert.equal(read?.token, token);
   assert.equal(read?.summary.dives[1].site, 'Reef');
   assert.equal(read?.summary.dives[0].date, '2026-08-01T09:30:12');
-  for (const bad of ['', 'not json', '{"odValidation":1}', qrText('short', summary), qrText(token, { diverName: '', dives: [] }), '<divelog/>']) assert.equal(parseQrText(bad), null, bad);
+  for (const bad of ['', 'not json', '{"bcValidation":1}', qrText('short', summary), qrText(token, { diverName: '', dives: [] }), '<divelog/>']) assert.equal(parseQrText(bad), null, bad);
   assert.equal(summaryOf(Array.from({ length: 30 }, () => dive())).dives.length, 20);
 });
 

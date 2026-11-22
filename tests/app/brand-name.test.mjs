@@ -31,7 +31,7 @@ test('no French elision of the old kind (« d’Benthic »)', () => {
 
 test('the pages of the privacy policy and the built site texts carry the new name', () => {
   for (const f of ['app/public/privacy/fr.html', 'app/public/privacy/en.html', 'site/build.mjs']) {
-    assert.doesNotMatch(read(f).replace(/org\.opendives|opendives:\/\/|remillc\/opendives/g, ''), /OpenDives|opendives\.app/, f);
+    assert.doesNotMatch(read(f).replace(/remillc\/opendives/g, ''), /OpenDives|opendives\.app/, f);
   }
 });
 
@@ -49,4 +49,30 @@ test('both hosts open the app: Android intent filters and iOS associated domains
   const ent = read('app/ios/App/App/App.entitlements');
   assert.match(ent, /applinks:benthicdivelog\.app/);
   assert.match(ent, /applinks:opendives\.app/);
+});
+
+test('the app identity is app.benthicdivelog everywhere, with no trace of org.opendives.app', () => {
+  assert.equal(JSON.parse(read('app/capacitor.config.json')).appId, 'app.benthicdivelog');
+  assert.equal(JSON.parse(read('desktop/package.json')).build.appId, 'app.benthicdivelog');
+  const gradle = read('app/android/app/build.gradle');
+  assert.match(gradle, /namespace "app.benthicdivelog"/);
+  assert.match(gradle, /applicationId "app.benthicdivelog"/);
+  assert.match(read('app/android/app/src/main/java/app/benthicdivelog/MainActivity.java'), /^package app.benthicdivelog;/);
+  assert.equal((read('app/ios/App/App.xcodeproj/project.pbxproj').match(/PRODUCT_BUNDLE_IDENTIFIER = app.benthicdivelog;/g) || []).length, 2);
+  const ent = read('app/ios/App/App/App.entitlements');
+  assert.match(ent, /iCloud.app.benthicdivelog/);
+  const site = read('site/build.mjs');
+  assert.match(site, /ANDROID_PACKAGE = 'app.benthicdivelog'/);
+  assert.match(site, /IOS_BUNDLE_ID = 'app.benthicdivelog'/);
+  assert.equal(JSON.parse(read('desktop/package.json')).name, 'benthic-desktop');
+  assert.equal(JSON.parse(read('desktop/package.json')).build.appx.identityName, 'Benthic');
+  for (const f of ['app/capacitor.config.json', 'app/android/app/build.gradle', 'app/ios/App/App/Info.plist', 'app/ios/App/App/App.entitlements', 'app/android/app/src/main/AndroidManifest.xml', 'plugins/benthic-core/ios/Plugin/MapsManager.swift', 'site/build.mjs']) {
+    assert.doesNotMatch(read(f), /org\.opendives/, f);
+  }
+});
+
+test('the custom scheme is benthic://', () => {
+  assert.match(read('app/android/app/src/main/AndroidManifest.xml'), /android:scheme="benthic"/);
+  assert.match(read('app/ios/App/App/Info.plist'), /<string>benthic<\/string>/);
+  assert.doesNotMatch(read('app/android/app/src/main/AndroidManifest.xml'), /android:scheme="opendives"/);
 });

@@ -21,7 +21,7 @@ import { showSnackbar } from './snackbar.js';
 import { t } from './i18n.js';
 
 const CHANNEL_ID = 'documents';
-const SNOOZE_KEY = 'od.documentSnooze';
+const SNOOZE_KEY = 'bc.documentSnooze';
 const TYPE_NEW = 'document-expires-new';
 const TYPE_SNOOZE = 'document-expires-snooze';
 

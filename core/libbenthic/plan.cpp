@@ -30,6 +30,7 @@
 #include "core/divelog.h"
 #include "core/equipment.h"
 #include "core/event.h"
+#include "core/extradata.h"
 #include "core/gas.h"
 #include "core/planner.h"
 #include "core/pref.h"
@@ -775,8 +776,47 @@ int build_plan(const std::string &request, struct dive &d, struct dive_site *&si
 	// writes the value as it is, and the request holds no other quoted text.
 	std::string kept = request;
 	std::replace(kept.begin(), kept.end(), '"', '\'');
-	add_extra_data(&d.dcs[0], "OpenDives plan", kept);
+	add_extra_data(&d.dcs[0], PLAN_KEY, kept);
 	return 0;
+}
+
+std::string plan_extra_value(const struct divecomputer &dc, const char *key, const char *legacy_key)
+{
+	std::string current, legacy;
+	for (const extra_data &e: dc.extra_data) {
+		if (e.key == key)
+			current = e.value;
+		else if (e.key == legacy_key)
+			legacy = e.value;
+	}
+	return current.empty() ? legacy : current;
+}
+
+int rewrite_legacy_extra_data()
+{
+	int renamed = 0;
+	for (auto &d: divelog.dives) {
+		for (struct divecomputer &dc: d->dcs) {
+			for (auto &e: dc.extra_data) {
+				const char *wanted = e.key == LEGACY_PLAN_KEY ? PLAN_KEY : e.key == LEGACY_TITLE_KEY ? TITLE_KEY : nullptr;
+				if (!wanted)
+					continue;
+				bool has_new = std::any_of(dc.extra_data.begin(), dc.extra_data.end(),
+							   [&](const extra_data &o) { return o.key == wanted; });
+				if (!has_new) {
+					e.key = wanted;
+					renamed++;
+				}
+			}
+			// What is left with an old key is a duplicate of a key already renamed: dropped.
+			dc.extra_data.erase(std::remove_if(dc.extra_data.begin(), dc.extra_data.end(),
+							   [](const extra_data &e) {
+								   return e.key == LEGACY_PLAN_KEY || e.key == LEGACY_TITLE_KEY;
+							   }),
+					    dc.extra_data.end());
+		}
+	}
+	return renamed;
 }
 
 } // namespace internal

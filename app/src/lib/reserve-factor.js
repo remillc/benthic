@@ -1,5 +1,5 @@
 // @ts-check
-// The planner's reserve factor (task 2026-11-12-74). OpenDives keeps two
+// The planner's reserve factor (task 2026-11-12-74). Benthic keeps two
 // values on the device: the stress factor and the number of divers on the gas.
 // The core knows one factor only (Subsurface's sacfactor, stored x100): it
 // receives their product. Pure functions, so node tests can check them.
@@ -10,7 +10,7 @@ export const DEFAULT_STRESS_FACTOR = 100;
 export const DEFAULT_DIVERS = 1;
 export const MIN_DIVERS = 1;
 export const MAX_DIVERS = 4;
-/** The core factor OpenDives used to set by default (2.0, x100): treated as never changed. */
+/** The core factor Benthic used to set by default (2.0, x100): treated as never changed. */
 export const OLD_DEFAULT_SAC_FACTOR = 200;
 
 /**
@@ -26,7 +26,7 @@ export function coreSacFactor(stressX100, divers) {
 /**
  * The two values at start. The app's own values win once they exist. Before
  * that, the core factor stored on this device is migrated: absent or 200 (the
- * old OpenDives default) means never changed, so 1.0 x 1; any other value is
+ * old Benthic default) means never changed, so 1.0 x 1; any other value is
  * the diver's own stress factor, with one diver.
  * @param {{ stressFactor?: unknown, reserveDivers?: unknown }} app the app's raw stored settings
  * @param {unknown} storedSacFactor the core value kept on this device, x100

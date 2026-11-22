@@ -2,8 +2,8 @@
 // The equipment inventory of « Mon profil de plongeur » (Benthic+, task 2026-11-17-267): the diver's pieces
 // (dive computers, regulators, suits, cylinders, lamps…), the kits they make up, and what each dive used.
 //
-// Subsurface does not store any of it. The data follows the OpenDives logbook format (docs/architecture.md,
-// section 11.3) so that it can later be synchronised file by file with the OpenDives server:
+// Subsurface does not store any of it. The data follows the Benthic logbook format (docs/architecture.md,
+// section 11.3) so that it can later be synchronised file by file with the Benthic server:
 //   gear/<uuid>.json            one piece
 //   kits/<uuid>.json            one kit: a name and the ids of its pieces
 //   dive-equipment/<uuid>.json  what one dive used (the on-device logbook has no stable id yet, see `diveKeyOf`)
@@ -105,7 +105,7 @@ export const isUuid = (id) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a
  * for one load only; the number changes at each renumbering. What does not move is the start time to the second
  * (Subsurface itself treats two dives that start together as the same dive, merging them), so a dive is keyed by it.
  * Editing the start time of a dive re-keys its record (`rekeyDive`). The key goes away when the logbook moves to the
- * OpenDives format and a dive has its own UUID: the record's content then joins the dive's file.
+ * Benthic format and a dive has its own UUID: the record's content then joins the dive's file.
  * @param {{ date: string }} dive a row of the list or a DiveDetail
  */
 export const diveKeyOf = (dive) => String(dive.date).slice(0, 19);
@@ -397,7 +397,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
 
   return {
     readState,
-    /** The store and the writes of the inventory, for the other OpenDives data of a dive (lib/validation.svelte.js). */
+    /** The store and the writes of the inventory, for the other Benthic data of a dive (lib/validation.svelte.js). */
     store,
     commitFiles: commit,
 

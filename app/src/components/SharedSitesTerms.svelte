@@ -42,7 +42,7 @@
 </script>
 
 <Popup class="bc-shared-terms" opened={sharedSites.termsOpen} onPopupClosed={() => ((sharedSites.termsOpen = false), (full = false))} aria-label={t('sharedSites.terms.title')}>
-  <Page data-od-scroll>
+  <Page data-bc-scroll>
     {#if full}
       <Navbar title={t('sharedSites.terms.fullTitle')}>
         {#snippet left()}
@@ -81,7 +81,7 @@
 </Popup>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-shared-terms) {
       --f7-page-bg-color: var(--bc-background);
     }

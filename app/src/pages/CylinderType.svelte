@@ -247,7 +247,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-cylinder-type--pair {
       display: flex;
       gap: 16px;

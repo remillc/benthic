@@ -30,7 +30,7 @@ export const LOG_LINES = 40;
 export const NAV_LINES = 60;
 /** Reports kept for a later offer (offline, or the app was closed before the answer). */
 export const MAX_PENDING = 5;
-const STORE_KEY = 'od.errorReports';
+const STORE_KEY = 'bc.errorReports';
 
 /** @type {string[]} */
 const ring = [];

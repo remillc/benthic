@@ -135,7 +135,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-stat-chart {
       position: relative;
       width: 100%;

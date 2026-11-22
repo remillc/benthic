@@ -1,10 +1,10 @@
 // @ts-check
 // « Me le rappeler dans 1 semaine » (task 2026-11-19-308): the day a late maintenance may remind again, per reminder,
-// kept on this device (device-store.js, key od.maintenanceSnooze, JSON { itemId: 'YYYY-MM-DD' }).
+// kept on this device (device-store.js, key bc.maintenanceSnooze, JSON { itemId: 'YYYY-MM-DD' }).
 import { deviceStore } from './device-store.js';
 import { addDays, todayIso } from './maintenance.js';
 
-const KEY = 'od.maintenanceSnooze';
+const KEY = 'bc.maintenanceSnooze';
 
 /** @returns {Record<string, string>} */
 export function readSnoozed() {

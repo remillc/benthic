@@ -105,7 +105,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-profile--emergency {
       margin: 12px 16px 0;
       min-height: 72px;

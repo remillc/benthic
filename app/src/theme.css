@@ -1,12 +1,12 @@
 /*
- * OpenDives style sheet (docs/ui-specification.md, section 1).
+ * Benthic style sheet (docs/ui-specification.md, section 1).
  *
  * Layers, from weakest to strongest:
  *   framework7     Framework7's CSS, imported here and not in main.js;
  *   maplibre       MapLibre's CSS (the Sites maps);
- *   od.tokens     OpenDives colors (--bc-*), each declared once;
- *   od.base        rules shared by the screens;
- *   od.components  styles of the Svelte components (each in this layer).
+ *   bc.tokens     Benthic colors (--bc-*), each declared once;
+ *   bc.base        rules shared by the screens;
+ *   bc.components  styles of the Svelte components (each in this layer).
  * A stronger layer wins whatever the specificity of the selectors.
  *
  * Palette: black and white with ink actions. Colour is allowed sparingly, within
@@ -14,7 +14,7 @@
  * never as the only carrier of meaning. The water column of the dive data goes
  * from --bc-water-top to --bc-water-bottom with depth.
  */
-@layer framework7, maplibre, od.tokens, od.base, od.components;
+@layer framework7, maplibre, bc.tokens, bc.base, bc.components;
 
 /* Framework7's core, then the components the app uses (src/framework7.js): the bundle also holds the
    calendar, the pickers, the photo browser, the swiper, the messages, the data tables... that no screen opens.
@@ -47,7 +47,7 @@
    window insets and lib/safe-area.js sets --bc-safe-* inline on <html>, which wins over these defaults.
    Every safe-area use in the app reads --bc-safe-*, never env() directly. Framework7's safe areas read
    them too, in the same places where it reads env(). */
-@layer od.base {
+@layer bc.base {
   :root {
     --bc-safe-top: env(safe-area-inset-top, 0px);
     --bc-safe-right: env(safe-area-inset-right, 0px);
@@ -96,7 +96,7 @@
   }
 }
 
-@layer od.tokens {
+@layer bc.tokens {
   /* Tablet: the depth line and the temperature curve of the dive profile at 1 dp (task 2026-11-16-238);
      the other curves keep --bc-profile-line-width, and high contrast keeps its 2 dp. */
   @media (min-width: 768px) {
@@ -190,7 +190,7 @@
     --bc-on-table-selected: #114477;
     /* « Continue with Google » and « Continue with Apple » (Google's Sign in with Google branding guidelines: light theme
        white, #747775 stroke, #1F1F1F text; dark theme #131314, #8E918F, #E3E3E3. Apple: white or black button, logo and title
-       the same colour). Fixed by the providers, not by the OpenDives theme. */
+       the same colour). Fixed by the providers, not by the Benthic theme. */
     --bc-brand-google-bg: #FFFFFF;
     --bc-brand-google-border: #747775;
     --bc-brand-google-ink: #1F1F1F;
@@ -985,7 +985,7 @@ html.ios {
   --f7-font-family: 'Source Sans 3', -apple-system, system-ui, sans-serif;
 }
 
-@layer od.base {
+@layer bc.base {
   /* Pointer (docs/system-design.md, « Pointer »): with a mouse, everything that acts shows the hand;
      what is disabled, or only shows something, keeps the arrow. */
   @media (hover: hover) and (pointer: fine) {
@@ -1001,7 +1001,7 @@ html.ios {
 /* Desktop app, scrollbars (docs/system-design.md, section 7, « Fluid desktop layout »): a pane that scrolls
    (a list, a long detail) shows a thin bar whose thumb is faint and whose track is transparent. A bar that takes
    15 dp from a pane is never left to the system. */
-@layer od.base {
+@layer bc.base {
   html.bc-desktop-app {
     scrollbar-color: color-mix(in srgb, var(--bc-text) 30%, transparent) transparent;
 
@@ -1017,7 +1017,7 @@ html.ios {
   }
 }
 
-@layer od.base {
+@layer bc.base {
   body {
     font-family: var(--f7-font-family);
   }
@@ -1599,7 +1599,7 @@ html.ios {
 }
 
 /* Overflow menus (⋮), components/MenuItem.svelte. */
-@layer od.components {
+@layer bc.components {
   /*
    * Tablet and desktop (task 2026-11-19-293): a modal bottom sheet becomes a dialog in the middle of the window from
    * the tablet width (Material 3 large-screen guidance). The sheet keeps its content; the grab handle goes.
@@ -1626,7 +1626,7 @@ html.ios {
   }
 }
 
-@layer od.components {
+@layer bc.components {
     /*
      * Android menu (spec, section 1, "Menus"): 16 dp corners (decided on
      * 7 November 2026), surface-container, elevation level 2, 8 dp above and
@@ -1757,7 +1757,7 @@ html.ios {
  * Reached by a swipe (a dive from the next or previous one, a section from
  * the next or previous one): the screen slides in from the side it came from.
  */
-@layer od.components {
+@layer bc.components {
   .bc-slide-next .page-content {
     animation: bc-slide-next 220ms ease-out;
   }
@@ -1769,14 +1769,14 @@ html.ios {
   /* Android: the slide is spatial, the fade is effects. */
   .md .bc-slide-next .page-content {
     animation:
-      od-slide-next-move var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default),
-      od-slide-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default);
+      bc-slide-next-move var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default),
+      bc-slide-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default);
   }
 
   .md .bc-slide-previous .page-content {
     animation:
-      od-slide-previous-move var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default),
-      od-slide-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default);
+      bc-slide-previous-move var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default),
+      bc-slide-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1789,19 +1789,19 @@ html.ios {
   }
 }
 
-@keyframes od-slide-next-move {
+@keyframes bc-slide-next-move {
   from {
     transform: translateX(40%);
   }
 }
 
-@keyframes od-slide-previous-move {
+@keyframes bc-slide-previous-move {
   from {
     transform: translateX(-40%);
   }
 }
 
-@keyframes od-slide-fade {
+@keyframes bc-slide-fade {
   from {
     opacity: 0;
   }
@@ -1824,11 +1824,11 @@ html.ios {
 /*
  * Android: Material 3 Expressive motion (lib/motion.js declares the
  * --bc-motion-* tokens on <html>; docs/system-design.md, section 8, "Motion").
- * Outside the framework7 layer's reach: od.base wins over Framework7's own
+ * Outside the framework7 layer's reach: bc.base wins over Framework7's own
  * durations and curves. "Remove animations" is handled by the
- * prefers-reduced-motion rule at the end of od.base (all durations ~0).
+ * prefers-reduced-motion rule at the end of bc.base (all durations ~0).
  */
-@layer od.base {
+@layer bc.base {
   /* Pages: the new page comes in with the default spatial spring; going back is
      faster (fast spatial), and the fade follows the effects spring. */
   .md .router-transition-forward .page-next {
@@ -1863,7 +1863,7 @@ html.md {
 }
 
 /* Framework7's dialogs (alerts, confirmations): grow (spatial) and fade (effects). */
-@layer od.base {
+@layer bc.base {
   .md .dialog {
     transition-property: transform, opacity;
     transition-duration: var(--bc-motion-spatial-fast-ms, 200ms), var(--bc-motion-effects-default-ms, 200ms);
@@ -1875,7 +1875,7 @@ html.md {
  * A swipe between main sections (lib/navigation.svelte.js): while the finger
  * moves, the next section is shown beside the current one.
  */
-@layer od.components {
+@layer bc.components {
   .views.bc-tab-sliding {
     overflow: hidden;
 
@@ -2016,7 +2016,7 @@ html.md {
  * The snackbar (ui-foundations, section 8): Framework7's toast, one style for
  * every message of the app (lib/snackbar.js). The same on iOS and Android.
  */
-@layer od.components {
+@layer bc.components {
   .toast.bc-snackbar {
     --bc-snackbar-bottom: calc(24px + var(--bc-bottom-nav-room, 0px));
     inset: auto 16px calc(var(--bc-snackbar-bottom) + var(--f7-safe-area-bottom)) 16px;

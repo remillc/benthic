@@ -11,7 +11,7 @@
 {#each segments as s, i (i)}{#if s.type === 'kbd'}<kbd class="bc-marked-text--kbd">{s.text}</kbd>{:else if s.type === 'code'}<code class="bc-marked-text--code">{s.text}</code>{:else}{s.text}{/if}{/each}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-marked-text--kbd {
       font-family: inherit;
       font-size: 14px;

@@ -1,6 +1,6 @@
 // @ts-check
 // The release edition (the beta) never opens a logbook on the Subsurface cloud: only a logbook on this
-// device, in a git repository of the diver's own, or on the OpenDives server. A Subsurface-cloud
+// device, in a git repository of the diver's own, or on the Benthic server. A Subsurface-cloud
 // account left on the device by the alpha is ignored (its files stay where they are, untouched, and the
 // alpha reads them again if it is installed back).
 

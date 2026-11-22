@@ -221,7 +221,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Android phone, first launch: the sentence under the title is the form's (8 dp under it). */
     :global(.bc-git-repository .bc-editorial-page--band-body .bc-editorial-page--title) {
       margin-bottom: 0;

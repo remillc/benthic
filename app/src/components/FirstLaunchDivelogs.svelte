@@ -178,7 +178,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-launch-divelogs--action {
       width: auto;
       align-self: flex-end;

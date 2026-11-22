@@ -13,13 +13,13 @@ import { BenthicCore } from 'benthic-core';
 import { invalidateCoreCache } from './core-cache.js';
 import { impliedPpUnit, systemAfterPpUnit, ppUnitAfterReset } from './pp-unit.js';
 import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, coreSacFactor, reserveSettings } from './reserve-factor.js';
-import { OD_CORE_DEFAULTS, coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
+import { BC_CORE_DEFAULTS, coreResetChanges, storedAfterReset, appSettingsAfterReset } from './settings-reset.js';
 
-const CORE_KEY = 'od.corePrefs';
-const LIBRARY_KEY = 'od.cylinderLibrary';
-const APP_KEY = 'od.appSettings';
+const CORE_KEY = 'bc.corePrefs';
+const LIBRARY_KEY = 'bc.cylinderLibrary';
+const APP_KEY = 'bc.appSettings';
 /** The last dive computer used and the four remembered ones (setPrefs diveComputerList). */
-const COMPUTERS_KEY = 'od.diveComputers';
+const COMPUTERS_KEY = 'bc.diveComputers';
 
 /** The units set one by one (Subsurface's "personalize" system). */
 const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'volume', 'weight']);
@@ -33,7 +33,7 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  * @property {'system'|'iso'|'medium'|'dmy'|'mdy'} dateFormat
  * @property {'system'|'24'|'12'} timeFormat
  * @property {'decimal'|'minutes'|'seconds'} coordinatesFormat GPS coordinates, formatted by
- *   OpenDives itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
+ *   Benthic itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
  * @property {'bar'|'ata'} ppUnit label of every partial pressure; the number never changes (1 bar = 1 ATA).
  *   Per device, never in the logbook. Métrique implies bar, Impérial ATA (pp-unit.js).
  * @property {boolean} showPhotos "Afficher les champs photos et vidéos" (advanced, off by default,
@@ -136,7 +136,7 @@ const storedCore = readJson(CORE_KEY) ?? {};
 if (storedCore.duration === 'hours') delete storedCore.duration;
 // Before Settings followed Subsurface, the conditions switch had its own key.
 try {
-  if (!('extraEnvironmental' in storedCore) && deviceStore.getItem('od.extraConditions') === 'true')
+  if (!('extraEnvironmental' in storedCore) && deviceStore.getItem('bc.extraConditions') === 'true')
     storedCore.extraEnvironmental = true;
 } catch {
   // Not fatal.
@@ -181,14 +181,14 @@ export function applyDeviceSettings() {
   // The core's one factor is the product of the app's stress factor and divers
   // (task 2026-11-12-74), instead of the core's 4.0.
   storedCore.sacFactor = coreSacFactor(settings.stressFactor, settings.reserveDivers);
-  // "Choisir le type d’eau dans l’éditeur" is on by default in OpenDives; the
+  // "Choisir le type d’eau dans l’éditeur" is on by default in Benthic; the
   // depth grid is no longer a setting: the core's default.
   storedCore.salinityEdit ??= true;
-  // "Proposer les tailles standard" is off by default in OpenDives (task
+  // "Proposer les tailles standard" is off by default in Benthic (task
   // 2026-11-12-48), on in Subsurface: the cylinder type choice shows the
   // diver's own types and those of the logbook. A value chosen stays.
   storedCore.displayDefaultTankInfos ??= false;
-  // "Afficher les bouteilles inutilisées" is on by default in OpenDives (task
+  // "Afficher les bouteilles inutilisées" is on by default in Benthic (task
   // 2026-11-12-56), off in Subsurface: every cylinder entered or imported shows.
   storedCore.includeUnusedTanks ??= true;
   delete storedCore.threeMGrid;
@@ -328,17 +328,17 @@ export function setAppSetting(key, value) {
  * default (the core's `defaults`) and the app's own. The planner's own
  * parameters (core values of SETTING_KEYS, "Conditions par défaut") and trip
  * grouping (the logbook's) are not touched; nor are the diver's list of
- * cylinder types, the offline maps (od.offlineMaps*), the account or the logbook.
+ * cylinder types, the offline maps (bc.offlineMaps*), the account or the logbook.
  * @param {Partial<CorePrefValues>} defaults
  */
 export async function resetAllSettings(defaults) {
-  await BenthicCore.setPrefs({ changes: { ...coreResetChanges(defaults), ...OD_CORE_DEFAULTS } });
+  await BenthicCore.setPrefs({ changes: { ...coreResetChanges(defaults), ...BC_CORE_DEFAULTS } });
   const kept = storedAfterReset(storedCore);
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
-  Object.assign(storedCore, kept, OD_CORE_DEFAULTS);
+  Object.assign(storedCore, kept, BC_CORE_DEFAULTS);
   writeJson(CORE_KEY, Object.keys(storedCore).length ? storedCore : null);
   try {
-    deviceStore.removeItem('od.extraConditions');
+    deviceStore.removeItem('bc.extraConditions');
   } catch {
     // Not fatal.
   }

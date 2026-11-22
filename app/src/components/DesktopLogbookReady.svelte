@@ -24,8 +24,8 @@
   ];
 </script>
 
-<section class="bc-logbook-ready" aria-labelledby="od-logbook-ready-title">
-  <h2 id="od-logbook-ready-title" class="bc-logbook-ready--title">{t('desktopLogbooks.ready.title')}</h2>
+<section class="bc-logbook-ready" aria-labelledby="bc-logbook-ready-title">
+  <h2 id="bc-logbook-ready-title" class="bc-logbook-ready--title">{t('desktopLogbooks.ready.title')}</h2>
   {#if entry && kept}
     <p class="bc-logbook-ready--where">{t(`desktopLogbooks.ready.${kept.key}`, { name: displayName(entry, t), where: kept.where })}</p>
   {/if}
@@ -47,7 +47,7 @@
 </section>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-logbook-ready {
       width: 560px;
       max-width: calc(100% - 48px);

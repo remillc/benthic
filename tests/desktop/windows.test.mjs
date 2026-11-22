@@ -29,7 +29,7 @@ const invoke = async (sender, channel, ...args) => {
 const fakeContents = (id) => ({ id, send: () => {}, isDestroyed: () => false });
 
 before(() => {
-  root = mkdtempSync(path.join(tmpdir(), 'od-windows-'));
+  root = mkdtempSync(path.join(tmpdir(), 'bc-windows-'));
   userData = path.join(root, 'userData');
   const resources = path.join(root, 'resources');
   mkdirSync(resources);
@@ -52,7 +52,7 @@ test('two windows, two helpers: each window has its own process', async () => {
   const pidA = await bridge.callFor(11, 'ping');
   const pidB = await bridge.callFor(12, 'ping');
   assert.notEqual(pidA, pidB);
-  assert.equal(await invoke(a, 'od:core', 'ping'), pidA);
+  assert.equal(await invoke(a, 'bc:core', 'ping'), pidA);
   await bridge.detach(11);
   await bridge.detach(12);
 });
@@ -61,10 +61,10 @@ test('the preload gets the logbook of its window; a window without one gets null
   bridge.attach(fakeContents(21), null);
   bridge.attach(fakeContents(22), logbooks.fileDescriptor(path.join(root, 'x.ssrf')));
   const none = { sender: { id: 21 } };
-  handlers.get('on:od:paths')(none);
+  handlers.get('on:bc:paths')(none);
   assert.equal(none.returnValue.logbook, null);
   const file = { sender: { id: 22 } };
-  handlers.get('on:od:paths')(file);
+  handlers.get('on:bc:paths')(file);
   assert.equal(file.returnValue.logbook.kind, 'file');
 });
 
@@ -73,10 +73,10 @@ test('a file logbook is imported from its file at start and written back after a
   writeFileSync(file, '<divelog>one</divelog>');
   const d = logbooks.fileDescriptor(file);
   bridge.attach(fakeContents(31), d);
-  await invoke({ id: 31 }, 'od:core', 'logExists', { repo: path.join(userData, 'logbooks', d.id, 'repo[main]') });
-  await invoke({ id: 31 }, 'od:core', 'saveLocal');
+  await invoke({ id: 31 }, 'bc:core', 'logExists', { repo: path.join(userData, 'logbooks', d.id, 'repo[main]') });
+  await invoke({ id: 31 }, 'bc:core', 'saveLocal');
   assert.equal(readFileSync(file, 'utf8'), 'saved after <divelog>one</divelog>');
-  assert.ok(!existsSync(`${file}.od-tmp`));
+  assert.ok(!existsSync(`${file}.bc-tmp`));
   const meta = JSON.parse(readFileSync(path.join(userData, 'logbooks', d.id, 'meta.json'), 'utf8'));
   assert.equal(meta.hash, logbooks.fileHash(file));
   await bridge.detach(31);
@@ -85,7 +85,7 @@ test('a file logbook is imported from its file at start and written back after a
 test('a missing file is reported, not shown as an empty logbook', async () => {
   const d = logbooks.fileDescriptor(path.join(root, 'gone.ssrf'));
   bridge.attach(fakeContents(41), d);
-  await assert.rejects(invoke({ id: 41 }, 'od:core', 'logExists', { repo: path.join(userData, 'logbooks', d.id, 'repo') }), /FILE_MISSING/);
+  await assert.rejects(invoke({ id: 41 }, 'bc:core', 'logExists', { repo: path.join(userData, 'logbooks', d.id, 'repo') }), /FILE_MISSING/);
   await bridge.detach(41);
 });
 
@@ -93,12 +93,12 @@ test('the git token belongs to its logbook; the main logbook credentials are not
   const d = logbooks.gitDescriptor({ url: 'https://example.org/me/book.git', branch: 'main' });
   bridge.attach(fakeContents(61), d);
   bridge.storeGitAccess(d, { url: 'https://example.org/me/book.git[main]', username: 'me', branch: 'main', token: 'secret' });
-  assert.equal((await invoke({ id: 61 }, 'od:credentials', 'get', 'git')).token, 'secret');
-  assert.equal(await invoke({ id: 61 }, 'od:credentials', 'get', 'cloud'), null);
-  await assert.rejects(invoke({ id: 61 }, 'od:credentials', 'set', 'cloud', { email: 'a', password: 'b' }));
+  assert.equal((await invoke({ id: 61 }, 'bc:credentials', 'get', 'git')).token, 'secret');
+  assert.equal(await invoke({ id: 61 }, 'bc:credentials', 'get', 'cloud'), null);
+  await assert.rejects(invoke({ id: 61 }, 'bc:credentials', 'set', 'cloud', { email: 'a', password: 'b' }));
   bridge.attach(fakeContents(62), logbooks.MAIN);
-  assert.equal(await invoke({ id: 62 }, 'od:credentials', 'get', 'git'), null);
-  await assert.rejects(invoke({ id: 61 }, 'od:fs', 'exists', { path: path.join(userData, `git-remote-${d.id}.bin`) }));
+  assert.equal(await invoke({ id: 62 }, 'bc:credentials', 'get', 'git'), null);
+  await assert.rejects(invoke({ id: 61 }, 'bc:fs', 'exists', { path: path.join(userData, `git-remote-${d.id}.bin`) }));
   await bridge.detach(61);
   await bridge.detach(62);
 });
@@ -252,7 +252,7 @@ test('windows (task 242): the window without a logbook, after first use, lists t
   const wm = manager(fake);
   const store = new logbooks.LogbookStore(userData);
   store.clear();
-  // First start: the window holds the logbook of this computer (its first launch is the page's, « od.welcome » absent), never none.
+  // First start: the window holds the logbook of this computer (its first launch is the page's, « bc.welcome » absent), never none.
   const main = wm.openMain();
   assert.equal(bridge.descriptorOf(main.webContents.id).kind, 'main');
   // « Fermer le carnet »: the window has none, and the recent list, which the screen shows, holds the logbook just closed.

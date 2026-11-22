@@ -95,7 +95,7 @@
 </Popup>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-qr-share .page) {
       background: var(--bc-background);
     }

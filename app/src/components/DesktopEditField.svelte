@@ -218,10 +218,10 @@
 </script>
 
 <div class="bc-desktop-edit-field" class:bc-desktop-edit-field--multiline={multiline} class:bc-desktop-edit-field--stacked={stacked} class:bc-desktop-edit-field--card-root={card} data-field={name || undefined}>
-  <span class="bc-desktop-edit-field--label" class:bc-sr-only={card} id="od-df-{uid}">{label}</span>
+  <span class="bc-desktop-edit-field--label" class:bc-sr-only={card} id="bc-df-{uid}">{label}</span>
 
   {#if readonly}
-    <span class="bc-desktop-edit-field--value bc-value" aria-labelledby="od-df-{uid}">{#if leading}{@render leading()}{/if}{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>
+    <span class="bc-desktop-edit-field--value bc-value" aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>
   {:else if disabled}
     <!-- Not wired to any storage yet: grey and dimmed, nothing to edit. -->
     <div class="bc-desktop-edit-field--rest bc-desktop-edit-field--disabled" role="group" aria-disabled="true" aria-label="{label}, {restText}" title={invitation}>
@@ -277,20 +277,20 @@
           {#each Array.isArray(draft) ? draft : [] as item, i (i)}
             <span class="bc-desktop-edit-field--chip bc-desktop-edit-field--chip-edit">{item}<button type="button" class="bc-desktop-edit-field--chip-x" aria-label={t('desktopDetail.removeItem', { name: item })} onmousedown={(e) => e.preventDefault()} onclick={() => (draft = withoutItem(/** @type {string[]} */ (draft), i))}><Icon name="close" size={14} /></button></span>
           {/each}
-          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="od-df-{uid}" bind:value={typed} oninput={() => (highlighted = -1)} />
+          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={typed} oninput={() => (highlighted = -1)} />
         {:else if kind === 'site'}
-          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="od-df-{uid}" bind:value={draft} oninput={() => (highlighted = -1)} />
+          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={draft} oninput={() => (highlighted = -1)} />
         {:else if kind === 'choice'}
-          <select class="bc-desktop-edit-field--input" aria-labelledby="od-df-{uid}" value={draft} onchange={(e) => chooseOption(/** @type {HTMLSelectElement} */ (e.currentTarget).value)}>
+          <select class="bc-desktop-edit-field--input" aria-labelledby="bc-df-{uid}" value={draft} onchange={(e) => chooseOption(/** @type {HTMLSelectElement} */ (e.currentTarget).value)}>
             <option value="">{invitation}</option>
             {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
           </select>
         {:else if kind === 'stars'}
           <StarsInput value={Number(draft)} label={label} onchange={chooseStars} />
         {:else if multiline}
-          <textarea class="bc-desktop-edit-field--input bc-desktop-edit-field--textarea" aria-labelledby="od-df-{uid}" rows="4" bind:value={draft} oninput={grow}></textarea>
+          <textarea class="bc-desktop-edit-field--input bc-desktop-edit-field--textarea" aria-labelledby="bc-df-{uid}" rows="4" bind:value={draft} oninput={grow}></textarea>
         {:else}
-          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="od-df-{uid}" aria-invalid={invalid} bind:value={draft} />
+          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" aria-invalid={invalid} bind:value={draft} />
           {#if unit}<span class="bc-desktop-edit-field--unit">{unit}</span>{/if}
         {/if}
       </div>
@@ -315,7 +315,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-edit-field {
       position: relative;
       display: grid;

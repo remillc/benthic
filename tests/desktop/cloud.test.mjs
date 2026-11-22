@@ -63,7 +63,7 @@ function service(overrides = {}) {
 
 before(async () => {
   fake = await startFakeCloud();
-  root = mkdtempSync(path.join(tmpdir(), 'od-cloud-'));
+  root = mkdtempSync(path.join(tmpdir(), 'bc-cloud-'));
 });
 beforeEach(() => {
   userData = path.join(root, `u${Math.random().toString(16).slice(2)}`);
@@ -515,11 +515,11 @@ test('the tokens and the client keys never reach the interface', async () => {
   assert.ok(existsSync(file));
   const sender = { id: 0 };
   const invoke = (channel, ...args) => d.handlers.get(channel)({ sender }, ...args);
-  assert.equal((await invoke('od:fs', 'exists', { path: file })).ok, false);
-  assert.equal((await invoke('od:fs', 'readFile', { path: file })).ok, false);
-  assert.equal((await invoke('od:core', 'importDives', { file })).ok, false);
-  assert.equal((await invoke('od:core', 'importFile', { source: file, repo: path.join(d.data, 'x') })).ok, false);
-  assert.equal((await invoke('od:core', 'importFile', { source: path.join(d.data, 'oauth-clients.local.json'), repo: path.join(d.data, 'x') })).ok, false);
+  assert.equal((await invoke('bc:fs', 'exists', { path: file })).ok, false);
+  assert.equal((await invoke('bc:fs', 'readFile', { path: file })).ok, false);
+  assert.equal((await invoke('bc:core', 'importDives', { file })).ok, false);
+  assert.equal((await invoke('bc:core', 'importFile', { source: file, repo: path.join(d.data, 'x') })).ok, false);
+  assert.equal((await invoke('bc:core', 'importFile', { source: path.join(d.data, 'oauth-clients.local.json'), repo: path.join(d.data, 'x') })).ok, false);
   // The preload exposes no function that returns a token.
   const preload = readFileSync(path.join(here, '..', '..', 'desktop', 'preload.cjs'), 'utf8');
   assert.ok(!/refreshToken|accessToken|clientSecret/.test(preload));
@@ -531,7 +531,7 @@ test('« Annuler la connexion » ends a sign-in waiting for the browser at once'
   let cloud;
   cloud = service({
     signInTimeoutMs: 60_000,
-    // The page was opened, then closed by the diver: OpenDives cancels the wait.
+    // The page was opened, then closed by the diver: Benthic cancels the wait.
     openExternal: async () => {
       setTimeout(() => cloud.cancelSignIn('oneDrive'), 20);
     },

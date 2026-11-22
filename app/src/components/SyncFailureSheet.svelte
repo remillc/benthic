@@ -45,10 +45,10 @@
 </script>
 
 <Sheet opened={logbook.syncFailureOpen && !!logbook.syncFailure} swipeToClose backdrop class="bc-sync-failure-sheet bc-sync-failure-sheet--failure-sheet bc-sheet-dialog" style="height: auto" onSheetClosed={close}>
-  <div class="bc-sync-failure-sheet--sheet" role="dialog" aria-labelledby="od-failure-title">
+  <div class="bc-sync-failure-sheet--sheet" role="dialog" aria-labelledby="bc-failure-title">
     <div class="bc-sync-failure-sheet--handle" aria-hidden="true"></div>
     <span class="badge" aria-hidden="true"><Icon name={gitServer && !logbook.benthicPlus ? 'git' : ICONS[cause]} weight={2} /></span>
-    <h2 id="od-failure-title" class="bc-sync-failure-sheet--title">{t(`sync.failure.${cause}.title${flavour}`)}</h2>
+    <h2 id="bc-failure-title" class="bc-sync-failure-sheet--title">{t(`sync.failure.${cause}.title${flavour}`)}</h2>
     <p class="bc-sync-failure-sheet--text">
       {t(`sync.failure.${cause}.intro${flavour}`)}
       {#if cause === 'server' && logbook.retryMinutes}{t('sync.failure.server.retry', { n: logbook.retryMinutes })}{/if}
@@ -62,7 +62,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-sync-failure-sheet--failure-sheet) {
       border-radius: 28px 28px 0 0;
       background: var(--bc-dialog);

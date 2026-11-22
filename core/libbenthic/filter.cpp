@@ -5,7 +5,7 @@
 // as DiveFilter::showDive() and DiveFilter::update() do (desktop
 // core/divefilter.cpp, not compiled here because of its Qt models): every
 // constraint must match, and the fulltext query if there is one
-// (core/fulltext.cpp). Three OpenDives criteria that Subsurface's filter does
+// (core/fulltext.cpp). Three Benthic criteria that Subsurface's filter does
 // not have are added: the site's country and region (from its taxonomy) and
 // the trip.
 #include "benthic.h"
@@ -91,7 +91,7 @@ void append_set(std::string &json, const char *key, const std::set<std::string> 
 	json += ']';
 }
 
-// Subsurface criteria offered by OpenDives. Never offered (spec): weight,
+// Subsurface criteria offered by Benthic. Never offered (spec): weight,
 // weight type, water density and nitrogen percentage.
 bool allowed_type(const std::string &type)
 {
@@ -109,7 +109,7 @@ bool known(const std::string &value, std::initializer_list<const char *> tokens)
 	return std::any_of(tokens.begin(), tokens.end(), [&value](const char *t) { return value == t; });
 }
 
-// OpenDives criteria: a list of values, one of which must equal the dive's
+// Benthic criteria: a list of values, one of which must equal the dive's
 // (ignoring case, as Subsurface's "exact" mode does), or of trip identifiers.
 struct ExtraRule {
 	enum Kind { COUNTRY, REGION, TRIP } kind;
@@ -268,7 +268,7 @@ int filter_options(std::string &json)
 
 namespace {
 
-// Subsurface's constraints and the OpenDives criteria of a filter. Fulltext
+// Subsurface's constraints and the Benthic criteria of a filter. Fulltext
 // mode tokens: "starts_with" (or "startswith", as filter presets write it),
 // "substring", "exact".
 int parse_rules(const std::string &fulltext_mode, const std::vector<filter_rule> &rules,

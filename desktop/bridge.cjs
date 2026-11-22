@@ -11,7 +11,7 @@
 //   platform                 'win32' | 'darwin' | 'linux'                   (value)
 //   paths                    { userData, temp, resourcesDir, xsltDir, caFile }   (values)
 //                            userData: the app data directory (the logbook is <userData>/carnet);
-//                            temp: <system temp>/opendives, where imports and shares are staged;
+//                            temp: <system temp>/benthic, where imports and shares are staged;
 //                            resourcesDir: the bundled files (xslt/, SampleDivesV2.ssrf);
 //                            xsltDir: Subsurface's stylesheets; caFile: the PEM bundle written
 //                            from Node's root certificates.
@@ -24,7 +24,7 @@
 //                            Events: 'syncProgress' {message}, 'coreRestarted' {} (the host died and
 //                            started again: the log must be loaded again).
 //   credentials.get(kind)    the stored secret or null: kind 'cloud' {email, password},
-//                            'git' {url, username, branch, token} or 'server' (release edition: the OpenDives
+//                            'git' {url, username, branch, token} or 'server' (release edition: the Benthic
 //                            server's session {email, sessionToken, repositoryUrl, branch, gitUsername, gitToken})
 //   credentials.set(kind, value)   stores it (Electron safeStorage, encrypted in <userData>)
 //   credentials.clear(kind?) forgets one kind, or both without an argument
@@ -49,13 +49,13 @@
 //                            kept by the main process with it (task 2026-11-15-178)
 //   clipboard.read()         resolves { text, dives }: the plain text, and the dives' XML while the clipboard
 //                            still holds the text copied with them ('' otherwise)
-//   server.request({method, url, headers, body})   release edition: one call to the OpenDives server, https or
+//   server.request({method, url, headers, body})   release edition: one call to the Benthic server, https or
 //                            the development server's loopback; resolves { status, text } (`binary: true`: { status, base64 })
 //   placesSearch({url})      a Nominatim request with the app's User-Agent: resolves { status, body }
 //
-// One window, one logbook, one helper (task 2026-11-15-173): `od:paths` also returns `logbook`, the
-// descriptor of the sender's window (desktop/logbooks.cjs; null on the start screen), and od:core,
-// od:credentials and od:fs run in the sender's context. The git token of a logbook other than the main
+// One window, one logbook, one helper (task 2026-11-15-173): `bc:paths` also returns `logbook`, the
+// descriptor of the sender's window (desktop/logbooks.cjs; null on the start screen), and bc:core,
+// bc:credentials and bc:fs run in the sender's context. The git token of a logbook other than the main
 // one is its own file; a .ssrf file logbook is written back after saveLocal and sync.
 //
 // The renderer is untrusted: methods are checked against the host's list, and
@@ -69,8 +69,8 @@
 //   <- {"id":7,"result":<value>} | {"id":7,"error":"message"}
 //   <- {"event":"syncProgress","data":{"message":"..."}}
 //
-// ipc channels: 'od:core', 'od:credentials', 'od:fs', 'od:htmlToPdf', 'od:placesSearch' (invoke,
-// answered { ok: true, value } or { ok: false, error }), 'od:paths' (sendSync), and 'od:core-event'
+// ipc channels: 'bc:core', 'bc:credentials', 'bc:fs', 'bc:htmlToPdf', 'bc:placesSearch' (invoke,
+// answered { ok: true, value } or { ok: false, error }), 'bc:paths' (sendSync), and 'bc:core-event'
 // (main to renderer: name, data).
 
 const { spawn } = require('node:child_process');
@@ -92,9 +92,9 @@ const CORE_METHODS = new Set([
   'saveLogbookFile', 'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
   'plannerSetup', 'planDive', 'listPlans', 'savePlan', 'listDives', 'statsQuery', 'dcFromBluetoothName',
   'dcBluetoothModels', 'downloadPartial', 'downloadCancel', 'setSyncListener', 'ping',
-  // Git on the device (odgit.h): the working copies of the OpenDives server's logbooks, under <userData>/odgit.
-  'odgitClone', 'odgitPull', 'odgitCommit', 'odgitPush', 'odgitStatus', 'odgitUnpushed', 'odgitHead', 'odgitListFiles',
-  'odgitRemove', 'odgitCancel',
+  // Git on the device (bgit.h): the working copies of the Benthic server's logbooks, under <userData>/bgit.
+  'bgitClone', 'bgitPull', 'bgitCommit', 'bgitPush', 'bgitStatus', 'bgitUnpushed', 'bgitHead', 'bgitListFiles',
+  'bgitRemove', 'bgitCancel',
 ]);
 
 /**
@@ -126,7 +126,7 @@ const DEV_FILES = new Set(['cloud-dev.env', 'cloud-test.env']);
 const CREDENTIAL_FIELDS = {
   cloud: ['email', 'password'],
   git: ['url', 'username', 'branch', 'token'],
-  // Release edition: the OpenDives server's session (the e-mail sign-in's answer), kept for the whole app.
+  // Release edition: the Benthic server's session (the e-mail sign-in's answer), kept for the whole app.
   server: ['email', 'sessionToken', 'repositoryUrl', 'branch', 'gitUsername', 'gitToken'],
   // Release edition: the device's data key for the sensitive items (docs/architecture.md, section 11.5), for the whole app.
   datakey: ['key'],
@@ -329,7 +329,7 @@ class HostProcess {
  */
 function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resourcesDir, broadcast, electron, cloud, onHostCrash }) {
   const userData = app.getPath('userData');
-  const tempDir = path.join(app.getPath('temp'), 'opendives');
+  const tempDir = path.join(app.getPath('temp'), 'benthic');
   const resources = resourcesDir
     || (app.isPackaged ? path.join(process.resourcesPath, 'resources') : path.join(__dirname, 'resources'));
   const paths = {
@@ -391,10 +391,10 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
       hostPath,
       hostArgs,
       log,
-      onEvent: (name, data) => emit(ctx, 'od:core-event', name, data),
+      onEvent: (name, data) => emit(ctx, 'bc:core-event', name, data),
       onExit: (reason) => {
         onHostCrash?.(reason);
-        emit(ctx, 'od:core-event', 'coreRestarted', {});
+        emit(ctx, 'bc:core-event', 'coreRestarted', {});
       },
       async onStart(sendRaw) {
         await coreSetup(sendRaw);
@@ -497,7 +497,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   // --- A cloud logbook: the working copy and the remote file (cloud.cjs) ---
 
-  const cloudEvent = (ctx, state) => emit(ctx, 'od:core-event', 'cloudSync', { state });
+  const cloudEvent = (ctx, state) => emit(ctx, 'bc:core-event', 'cloudSync', { state });
 
   /** Sends the working copy up; the revision, and no pending change, are kept. */
   async function cloudUpload(ctx, expectedRev) {
@@ -513,7 +513,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     const id = ctx.descriptor.id;
     const meta = logbooks.readMeta(userData, id);
     const local = localFileOf(ctx);
-    const tmp = `${local}.od-download`;
+    const tmp = `${local}.bc-download`;
     const got = await cloud.download(ctx.descriptor, remote?.ref ?? meta.remote, tmp);
     fs.mkdirSync(path.dirname(local), { recursive: true });
     fs.renameSync(tmp, local);
@@ -614,7 +614,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     try {
       // Subsurface's own File > Save As: the whole log, with its settings, sites and filter presets.
       await ctx.host.call('saveLogbookFile', { path: staged });
-      const tmp = `${target}.od-tmp`;
+      const tmp = `${target}.bc-tmp`;
       fs.copyFileSync(staged, tmp);
       try {
         fs.renameSync(tmp, target);
@@ -688,11 +688,11 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   /**
    * The folder of a git working copy: the page names it (`dir`, relative), the bridge makes it absolute under
-   * <userData>/odgit.
+   * <userData>/bgit.
    */
-  function odgitDir(name) {
+  function bgitDir(name) {
     if (typeof name !== 'string' || !name || name.includes('\0') || name.includes('\\') || path.isAbsolute(name)) throw new Error('BAD_PATH');
-    const root = path.join(userData, 'odgit');
+    const root = path.join(userData, 'bgit');
     const full = path.resolve(root, name);
     if (!inside(full, root)) throw new Error('BAD_PATH');
     return full;
@@ -702,9 +702,9 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   function checkedArgs(method, args) {
     if (args === undefined || args === null) return {};
     if (typeof args !== 'object' || Array.isArray(args)) throw new Error('BAD_ARGUMENT: the arguments are not an object');
-    if (method.startsWith('odgit') && method !== 'odgitCancel') {
+    if (method.startsWith('bgit') && method !== 'bgitCancel') {
       // http (the development server) only when the app is not a packaged build; the page cannot ask for it.
-      return { ...args, dir: odgitDir(args.dir), allowHttp: !app.isPackaged };
+      return { ...args, dir: bgitDir(args.dir), allowHttp: !app.isPackaged };
     }
     // The device's own logbook is always the main one, whatever the page passes.
     if (method === 'history' && args.action === 'adopt') return { ...args, args: [path.join(userData, 'carnet')] };
@@ -822,7 +822,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     }
   }
 
-  // --- The OpenDives server (release edition) ---
+  // --- The Benthic server (release edition) ---
 
   /**
    * One HTTP call for the page: https, or http for this machine's development server only. Answers `{ status, text }`;
@@ -839,7 +839,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
     if (url.protocol !== 'https:' && !local) throw new Error('BAD_ARGUMENT: not an allowed address');
     const method = request?.method === 'POST' || request?.method === 'PUT' ? request.method : 'GET';
-    const headers = { Accept: request?.binary ? 'image/webp,*/*' : 'application/json', 'User-Agent': 'OpenDives', ...(request?.headers ?? {}) };
+    const headers = { Accept: request?.binary ? 'image/webp,*/*' : 'application/json', 'User-Agent': 'Benthic', ...(request?.headers ?? {}) };
     if (request?.body !== undefined) headers['Content-Type'] = 'application/json';
     const response = await fetch(url, { method, headers, body: request?.body !== undefined ? JSON.stringify(request.body) : undefined, signal: AbortSignal.timeout(20000) });
     // `binary`: a picture (the dive computer images, task 2026-11-19-302): the body comes back as base64, 2 MB at most.
@@ -1041,24 +1041,24 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     }
   };
 
-  ipcMain.on('od:paths', (event) => {
+  ipcMain.on('bc:paths', (event) => {
     event.returnValue = { ...paths, platform: process.platform, logbook: contextFor(event).descriptor };
   });
-  ipcMain.handle('od:core', answer((event, method, args) => coreCall(method, args, contextFor(event))));
-  ipcMain.handle('od:credentials', answer((event, op, kind, value) => {
+  ipcMain.handle('bc:core', answer((event, method, args) => coreCall(method, args, contextFor(event))));
+  ipcMain.handle('bc:credentials', answer((event, op, kind, value) => {
     const ctx = contextFor(event);
     if (op === 'get') return readCredentials(kind, ctx);
     if (op === 'set') return writeCredentials(kind, value, ctx) ?? null;
     if (op === 'clear') return clearCredentials(kind, ctx) ?? null;
     throw new Error(`Unknown credentials operation ${op}`);
   }));
-  // Release edition: the OpenDives server's JSON calls and the repository downloads (no CORS in the main process).
-  ipcMain.handle('od:server', answer((_event, request) => serverRequest(request)));
-  ipcMain.handle('od:fs', answer((event, op, options) => fsCall(op, options, contextFor(event))));
-  ipcMain.handle('od:htmlToPdf', answer((_event, options) => htmlToPdf(options)));
-  ipcMain.handle('od:placesSearch', answer((_event, options) => placesSearch(options)));
+  // Release edition: the Benthic server's JSON calls and the repository downloads (no CORS in the main process).
+  ipcMain.handle('bc:server', answer((_event, request) => serverRequest(request)));
+  ipcMain.handle('bc:fs', answer((event, op, options) => fsCall(op, options, contextFor(event))));
+  ipcMain.handle('bc:htmlToPdf', answer((_event, options) => htmlToPdf(options)));
+  ipcMain.handle('bc:placesSearch', answer((_event, options) => placesSearch(options)));
   // « Afficher dans le dossier » (task 2026-11-15-202): only a folder of the app's data (the logbooks).
-  ipcMain.handle('od:showInFolder', answer((_event, options) => {
+  ipcMain.handle('bc:showInFolder', answer((_event, options) => {
     const target = path.resolve(String(options?.path ?? ''));
     if (target !== userData && !(path.dirname(target) === userData && /^carnet(\.[A-Za-z0-9._-]+)?$/.test(path.basename(target)))) throw new Error('BAD_ARGUMENT: not a logbook folder');
     const { shell } = electron_();
@@ -1068,7 +1068,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   }));
   // « Exporter… » on desktop (task 2026-11-15-189): the system's save dialog, then the file staged
   // in <temp>/share copied where the diver chose. Resolves { saved, path }.
-  ipcMain.handle('od:saveAs', async (event, options) => {
+  ipcMain.handle('bc:saveAs', async (event, options) => {
     try {
       const from = String(options?.path ?? '').startsWith('file:') ? require('node:url').fileURLToPath(options.path) : String(options?.path ?? '');
       if (!allowed(from, 'temp')) throw new Error('BAD_ARGUMENT: not an allowed path');
@@ -1086,14 +1086,14 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   // Copy and paste of dives (task 2026-11-15-178). Electron cannot put the plain text and a custom
   // type on the clipboard together: every write (writeText, writeBuffer) replaces the others, so
-  // writing the private type application/x-opendives-dives would lose the text a spreadsheet pastes.
+  // writing the private type application/x-benthic-dives would lose the text a spreadsheet pastes.
   // The plain text is written, and the dives' XML (the private type's content) is kept here, in the
   // main process, tied to that text: read() gives it back while the clipboard still holds exactly that
   // text, from any window of this app. Another application's copy replaces the text, so the dives
   // are then not offered (a pasted `<divelog>` text still is, by the renderer).
   const CLIPBOARD_LIMIT = 50 * 1024 * 1024;
   let copied = { text: '', dives: '' };
-  ipcMain.handle('od:clipboard', async (_event, action, options) => {
+  ipcMain.handle('bc:clipboard', async (_event, action, options) => {
     try {
       const { clipboard } = electron_();
       if (action === 'write') {

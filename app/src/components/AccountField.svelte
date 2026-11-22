@@ -53,7 +53,7 @@
 
   const ios = f7.theme === 'ios';
   let shown = $state(false);
-  const id = `od-account-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-account-${Math.random().toString(36).slice(2, 9)}`;
   const footerText = $derived(footer ?? (error || supporting));
   const footerIsError = $derived(footerError ?? !!error);
 </script>
@@ -141,7 +141,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Outlined field (docs/mockups/android-premier-lancement-*.dc.html): 52 dp, 12 dp corners, the label on the border. */
     .bc-account-field--outlined {
       position: relative;

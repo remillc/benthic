@@ -112,9 +112,9 @@
   <p class="bc-maintenance-note--what">{[piece?.name ?? '', item ? taskLabel(item).toLocaleLowerCase() : ''].filter(Boolean).join(' · ')}</p>
 
   <div class="bc-maintenance-note--fields">
-    <h2 class="bc-maintenance-note--group" id="od-note-kind">{t('maintenance.note.type')}</h2>
+    <h2 class="bc-maintenance-note--group" id="bc-note-kind">{t('maintenance.note.type')}</h2>
     <ButtonGroup
-      ariaLabelledby="od-note-kind"
+      ariaLabelledby="bc-note-kind"
       marked
       value={kind}
       onchange={(v) => (kind = /** @type {any} */ (v))}
@@ -169,7 +169,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
     :global(.bc-maintenance-note .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));

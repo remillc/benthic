@@ -136,7 +136,7 @@
 />
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-emergency {
       max-width: 720px;
       margin-inline: auto;

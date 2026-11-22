@@ -6,7 +6,7 @@ import { formatDate } from './format.js';
 import { flightWait } from './tools.js';
 
 /** Where a tap on the notification goes: the Desaturation tool (lib/deep-link.js). */
-export const FLIGHT_LINK = 'opendives://tools/desaturation';
+export const FLIGHT_LINK = 'benthic://tools/desaturation';
 
 /**
  * A local wall-clock time ("2026-11-07T08:35:00") as a moment of the device clock.

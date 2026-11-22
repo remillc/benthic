@@ -13,7 +13,7 @@ const { createCrashStore, FILE } = require('../../desktop/crash-reports.cjs');
 const fixed = () => new Date('2026-11-19T10:00:00Z');
 
 test('a crash is saved, read back, and cleared', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'od-crash-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bc-crash-'));
   try {
     const store = createCrashStore({ dir, osVersion: 'win32 10.0.26300', device: 'Electron 33 x64', now: fixed });
     assert.equal(store.pending(), '');
@@ -34,7 +34,7 @@ test('a crash is saved, read back, and cleared', () => {
 });
 
 test('only the last crash is kept, text and objects are accepted, and a failing disk raises nothing', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'od-crash-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bc-crash-'));
   try {
     const store = createCrashStore({ dir, now: fixed });
     store.write('Core helper', 'The core stopped (1)');

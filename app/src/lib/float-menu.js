@@ -19,7 +19,7 @@ export function floatMenu(node, anchorSelector) {
   const anchor = /** @type {HTMLElement|null} */ ((anchorSelector && parent?.querySelector(anchorSelector)) || parent);
   node.setAttribute('popover', 'manual');
   // How the Back dispatcher finds an open list (lib/back-button.js): Back closes it before anything under it.
-  node.setAttribute('data-od-float-menu', '');
+  node.setAttribute('data-bc-float-menu', '');
   try {
     node.showPopover?.();
   } catch {

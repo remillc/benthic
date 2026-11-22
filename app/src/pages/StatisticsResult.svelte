@@ -137,7 +137,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-statistics-result--chips {
       margin: 4px 16px 0;
       display: flex;

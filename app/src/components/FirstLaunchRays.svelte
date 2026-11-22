@@ -60,7 +60,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-launch-rays {
       position: absolute;
       inset: 0;

@@ -6,10 +6,10 @@ import { checkSharedFile, diveLink, importErrorKey, isSubsurfaceXml, parseLink, 
 
 test('both forms of an address mean the same thing', () => {
   for (const [custom, https] of [
-    ['opendives://sites/12', 'https://benthicdivelog.app/sites/12'],
-    ['opendives://plan/new', 'https://benthicdivelog.app/plan/new'],
-    ['opendives://tools/', 'https://benthicdivelog.app/tools/'],
-    ['opendives://dives/at/20121105T101500', 'https://benthicdivelog.app/dives/at/20121105T101500'],
+    ['benthic://sites/12', 'https://benthicdivelog.app/sites/12'],
+    ['benthic://plan/new', 'https://benthicdivelog.app/plan/new'],
+    ['benthic://tools/', 'https://benthicdivelog.app/tools/'],
+    ['benthic://dives/at/20121105T101500', 'https://benthicdivelog.app/dives/at/20121105T101500'],
   ]) {
     assert.deepEqual(parseLink(custom), parseLink(https), custom);
     assert.notEqual(parseLink(custom).kind, 'unknown', custom);
@@ -31,20 +31,20 @@ test('the links the app shares come back as the same dive and site', () => {
 });
 
 test('sites, tools, planner and sections', () => {
-  assert.deepEqual(parseLink('opendives://sites/7'), { kind: 'site', uuid: 7 });
-  assert.deepEqual(parseLink('opendives://sites/'), { kind: 'route', section: 'sites', path: '/sites/' });
-  assert.deepEqual(parseLink('opendives://sites'), { kind: 'route', section: 'sites', path: '/sites/' });
-  assert.deepEqual(parseLink('opendives://tools/ead-mod'), { kind: 'route', section: 'tools', path: '/tools/ead-mod' });
-  assert.deepEqual(parseLink('opendives://tools/ead-mod/'), { kind: 'route', section: 'tools', path: '/tools/ead-mod' });
-  assert.deepEqual(parseLink('opendives://plan/new'), { kind: 'route', section: 'tools', path: '/plan/new' });
-  assert.deepEqual(parseLink('opendives:///statistics/?x=1#y'), { kind: 'route', section: 'statistics', path: '/statistics/' });
-  assert.deepEqual(parseLink('opendives://'), { kind: 'route', section: 'logbook', path: '/' });
-  assert.deepEqual(parseLink('opendives://settings/planner'), { kind: 'route', section: 'account', path: '/settings/planner', over: true });
+  assert.deepEqual(parseLink('benthic://sites/7'), { kind: 'site', uuid: 7 });
+  assert.deepEqual(parseLink('benthic://sites/'), { kind: 'route', section: 'sites', path: '/sites/' });
+  assert.deepEqual(parseLink('benthic://sites'), { kind: 'route', section: 'sites', path: '/sites/' });
+  assert.deepEqual(parseLink('benthic://tools/ead-mod'), { kind: 'route', section: 'tools', path: '/tools/ead-mod' });
+  assert.deepEqual(parseLink('benthic://tools/ead-mod/'), { kind: 'route', section: 'tools', path: '/tools/ead-mod' });
+  assert.deepEqual(parseLink('benthic://plan/new'), { kind: 'route', section: 'tools', path: '/plan/new' });
+  assert.deepEqual(parseLink('benthic:///statistics/?x=1#y'), { kind: 'route', section: 'statistics', path: '/statistics/' });
+  assert.deepEqual(parseLink('benthic://'), { kind: 'route', section: 'logbook', path: '/' });
+  assert.deepEqual(parseLink('benthic://settings/planner'), { kind: 'route', section: 'account', path: '/settings/planner', over: true });
 });
 
 test('only listed screens open: no editor, account or delete', () => {
   for (const path of ['/dives/new', '/sites/new', '/sites/7/edit', '/account/delete', '/account', '/welcome', '/settings/computers/edit', '/download', '/plan/3', '/sites/abc', '/sites/-1'])
-    assert.equal(parseLink('opendives:/' + path).kind, 'unknown', path);
+    assert.equal(parseLink('benthic:/' + path).kind, 'unknown', path);
 });
 
 test('another host, another scheme and http are not ours', () => {
@@ -54,7 +54,7 @@ test('another host, another scheme and http are not ours', () => {
   assert.equal(parseLink('https://user@benthicdivelog.app/sites/12').kind, 'unknown');
   assert.equal(parseLink('').kind, 'unknown');
   assert.equal(parseLink(/** @type {any} */ (undefined)).kind, 'unknown');
-  assert.equal(parseLink('opendives://sites/%E0%A4%A').kind, 'unknown');
+  assert.equal(parseLink('benthic://sites/%E0%A4%A').kind, 'unknown');
 });
 
 test('a file received from another app', () => {

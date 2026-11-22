@@ -83,8 +83,8 @@ export { waterTypeOf };
  * @property {string} progress "{n} codes lus sur {total}": with the placeholders {n} and {total}
  * @property {string} progressOne "1 code lu sur {total}"
  * @property {string} progressBar accessible name of the segmented bar
- * @property {string} foreign "Ce code QR ne vient pas d'OpenDives."
- * @property {string} newerVersion an OpenDives code of a later format
+ * @property {string} foreign "Ce code QR ne vient pas d'Benthic."
+ * @property {string} newerVersion a Benthic code of a later format
  * @property {string} otherTitle asked when a code of another transfer arrives
  * @property {string} otherText
  * @property {string} otherRestart
@@ -351,8 +351,8 @@ export { waterTypeOf };
  * @property {number[]} profile
  * @property {{depthMm: number, durationSeconds: number}[]} levels
  * @property {{o2Permille: number, hePermille: number}[]} gases
- * @property {string} request the plan as saved by OpenDives (JSON), or "" for one made elsewhere
- * @property {string} title the title the diver gave it (extra data "OpenDives title" of the first dive computer), or ""
+ * @property {string} request the plan as saved by Benthic (JSON), or "" for one made elsewhere
+ * @property {string} title the title the diver gave it (extra data "Benthic title" of the first dive computer), or ""
  */
 
 /**
@@ -445,7 +445,7 @@ export { waterTypeOf };
 /**
  * One free-filter rule, in the text form of Subsurface's filter presets
  * (benthic.h, filter_rule): type token ("suit", "depth", "dive_mode"…, or
- * the OpenDives od_country, od_region, od_trip), modes as tokens or empty,
+ * the Benthic od_country, od_region, od_trip), modes as tokens or empty,
  * data in core units.
  * @typedef {{type: string, stringMode?: ''|'starts_with'|'substring'|'exact',
  *   rangeMode?: ''|'equal'|'less'|'greater'|'range', negate?: boolean, data: string}} FilterRule
@@ -561,7 +561,7 @@ export { waterTypeOf };
  */
 
 /**
- * Git on the device (core/libbenthic/odgit.h). `dir` names a working copy: the folder `odgit/<dir>` of the app's
+ * Git on the device (core/libbenthic/bgit.h). `dir` names a working copy: the folder `bgit/<dir>` of the app's
  * data (Capacitor's Directory.Data on a phone, <userData> on the desktop), where JavaScript reads and writes the
  * files (@capacitor/filesystem) and the core commits them. Credentials are the session's (serverSessionAccess).
  * Every call rejects with a code: BAD_ADDRESS, BAD_CREDENTIALS, BAD_PATH, EXISTS, NO_WORKING_COPY, UNREACHABLE,
@@ -591,32 +591,32 @@ export { waterTypeOf };
  *   with no token typed): as for a push, which checks the token and its right
  *   to write ('ok', 'denied', 'none'). Network only; nothing is stored.
  *   Rejects with BAD_ADDRESS (not HTTPS, or holding credentials) or BAD_CREDENTIALS.
- * @property {(options: GitAccess & {url: string}) => Promise<{result: 'cloned'|'empty', head: string|null}>} odgitClone
+ * @property {(options: GitAccess & {url: string}) => Promise<{result: 'cloned'|'empty', head: string|null}>} bgitClone
  *   Makes the working copy from the branch of the repository ('empty': the server has no such branch yet).
- * @property {(options: GitAccess & {authorName?: string, authorEmail?: string}) => Promise<GitPullResult>} odgitPull
+ * @property {(options: GitAccess & {authorName?: string, authorEmail?: string}) => Promise<GitPullResult>} bgitPull
  *   Fetch and merge. On a conflict nothing changes on disk: resolve the files in JavaScript, write them in the working
- *   copy and call odgitCommit with `mergeParent` = `theirs`.
- * @property {(options: {dir: string, paths: string[], message: string, mergeParent?: string, authorName?: string, authorEmail?: string}) => Promise<{commit: string|null}>} odgitCommit
+ *   copy and call bgitCommit with `mergeParent` = `theirs`.
+ * @property {(options: {dir: string, paths: string[], message: string, mergeParent?: string, authorName?: string, authorEmail?: string}) => Promise<{commit: string|null}>} bgitCommit
  *   Stages the files (a missing file is a deletion) and commits; `commit` is null when nothing changed.
- * @property {(options: GitAccess) => Promise<{result: 'pushed'|'upToDate', head: string|null}>} odgitPush
- * @property {(options: {dir: string, paths?: string[]}) => Promise<{changes: {path: string, state: 'new'|'modified'|'deleted'}[]}>} odgitStatus
- * @property {(options: {dir: string, branch: string}) => Promise<{ahead: number, behind: number}>} odgitUnpushed
+ * @property {(options: GitAccess) => Promise<{result: 'pushed'|'upToDate', head: string|null}>} bgitPush
+ * @property {(options: {dir: string, paths?: string[]}) => Promise<{changes: {path: string, state: 'new'|'modified'|'deleted'}[]}>} bgitStatus
+ * @property {(options: {dir: string, branch: string}) => Promise<{ahead: number, behind: number}>} bgitUnpushed
  *   The commits the server does not have, as of the last fetch or push.
- * @property {(options: {dir: string, branch: string}) => Promise<{head: string|null, remote: string|null}>} odgitHead
- * @property {(options: {dir: string, prefix?: string}) => Promise<{files: string[]}>} odgitListFiles
- * @property {(options: {dir: string}) => Promise<void>} odgitRemove
- * @property {() => Promise<void>} odgitCancel
+ * @property {(options: {dir: string, branch: string}) => Promise<{head: string|null, remote: string|null}>} bgitHead
+ * @property {(options: {dir: string, prefix?: string}) => Promise<{files: string[]}>} bgitListFiles
+ * @property {(options: {dir: string}) => Promise<void>} bgitRemove
+ * @property {() => Promise<void>} bgitCancel
  *   Stops the running git call, which rejects with CANCELLED.
  * @property {(options: {email: string, sessionToken: string, repositoryUrl: string, branch: string, gitUsername: string, gitToken: string}) => Promise<void>} serverSessionSave
- *   Release edition: keeps the OpenDives server's session (session token and git token) in the platform's secure
+ *   Release edition: keeps the Benthic server's session (session token and git token) in the platform's secure
  *   storage (Android Keystore, iOS Keychain, Electron safeStorage). Rejects with BAD_ARGUMENT or CREDENTIALS_NOT_SAVED.
  * @property {() => Promise<{signedIn: boolean, email: string, repositoryUrl: string, branch: string}>} serverSessionInfo
- *   Who is signed in to the OpenDives server, without any token.
+ *   Who is signed in to the Benthic server, without any token.
  * @property {() => Promise<{repositoryUrl: string, branch: string, username: string, token: string, sessionToken: string}>} serverSessionAccess
  *   The access to the repository, for the download, and the session token for the account calls (the health-data
  *   consent). Rejects with NOT_SIGNED_IN.
  * @property {() => Promise<void>} serverSessionClear
- *   Signs out of the OpenDives server: the tokens are erased.
+ *   Signs out of the Benthic server: the tokens are erased.
  * @property {(options?: {keepAlpha?: boolean}) => Promise<void>} devResetApp
  *   DEVELOPMENT ONLY (debug builds: rejects NOT_DEBUG otherwise): the app's own data is erased as on a first install. The
  *   core closes its log; the device logbook, the working copies of the server, every credential and the data key, the
@@ -824,7 +824,7 @@ export { waterTypeOf };
  *   enforces the terms of the tile server, whatever the caller does: it counts the tiles itself
  *   and rejects with TOO_MANY_TILES above 3,000 (BAD_ARGUMENT for a malformed request; `id` is
  *   letters, digits, ".", "-", "_"); it sends at most 4 requests at a time, each with the
- *   User-Agent `OpenDives/<versionName> (dive log app; https://github.com/remillc/benthic)`;
+ *   User-Agent `Benthic/<versionName> (dive log app; https://github.com/remillc/benthic)`;
  *   it stops at 50 MiB with status "failed", error "limit", and removes the tiles. One region
  *   runs at a time, in the background with a notification titled `title`. Wi-Fi (an unmetered
  *   network) only unless `allowCellular`: status "waiting-wifi" meanwhile. The same request
@@ -845,7 +845,7 @@ export { waterTypeOf };
  * @property {() => Promise<PlannedDive[]>} listPlans
  * @property {(options: {request: PlanRequest, replaceId?: number, title?: string}) => Promise<EditResult>} savePlan
  *   Saves the plan as a planned dive, or replaces one: one undoable step. `title` is kept
- *   with the plan as extra data "OpenDives title" of its first dive computer; empty or
+ *   with the plan as extra data "Benthic title" of its first dive computer; empty or
  *   missing writes no key (a replaced plan loses its previous title).
  * @property {() => Promise<BluetoothStatus>} bluetoothStatus
  * @property {() => Promise<BluetoothStatus>} requestBluetoothPermission
@@ -976,32 +976,32 @@ export const BenthicCore = {
   async gitCheck(options) {
     return JSON.parse((await native.gitCheck(options)).json);
   },
-  async odgitClone(options) {
-    return JSON.parse((await native.odgitClone(options)).json);
+  async bgitClone(options) {
+    return JSON.parse((await native.bgitClone(options)).json);
   },
-  async odgitPull(options) {
-    return JSON.parse((await native.odgitPull(options)).json);
+  async bgitPull(options) {
+    return JSON.parse((await native.bgitPull(options)).json);
   },
-  async odgitCommit(options) {
-    return JSON.parse((await native.odgitCommit(options)).json);
+  async bgitCommit(options) {
+    return JSON.parse((await native.bgitCommit(options)).json);
   },
-  async odgitPush(options) {
-    return JSON.parse((await native.odgitPush(options)).json);
+  async bgitPush(options) {
+    return JSON.parse((await native.bgitPush(options)).json);
   },
-  async odgitStatus(options) {
-    return JSON.parse((await native.odgitStatus({ paths: [], ...options })).json);
+  async bgitStatus(options) {
+    return JSON.parse((await native.bgitStatus({ paths: [], ...options })).json);
   },
-  async odgitUnpushed(options) {
-    return JSON.parse((await native.odgitUnpushed(options)).json);
+  async bgitUnpushed(options) {
+    return JSON.parse((await native.bgitUnpushed(options)).json);
   },
-  async odgitHead(options) {
-    return JSON.parse((await native.odgitHead(options)).json);
+  async bgitHead(options) {
+    return JSON.parse((await native.bgitHead(options)).json);
   },
-  async odgitListFiles(options) {
-    return JSON.parse((await native.odgitListFiles({ prefix: '', ...options })).json);
+  async bgitListFiles(options) {
+    return JSON.parse((await native.bgitListFiles({ prefix: '', ...options })).json);
   },
-  odgitRemove: (options) => native.odgitRemove(options),
-  odgitCancel: () => native.odgitCancel(),
+  bgitRemove: (options) => native.bgitRemove(options),
+  bgitCancel: () => native.bgitCancel(),
   gitConfig: () => native.gitConfig(),
   serverSessionSave: (options) => native.serverSessionSave(options),
   serverSessionInfo: () => native.serverSessionInfo(),

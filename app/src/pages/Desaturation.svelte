@@ -3,7 +3,7 @@
   // Desaturation (docs/ui-specification.md, section 1, "Tools";
   // docs/mockups/outils-desaturation-android.dc.html). The tissues come from
   // the core's model, loaded with the logbook dives before now (toolQuery
-  // 'desaturation'); the wait before flying is OpenDives' own recommendation
+  // 'desaturation'); the wait before flying is Benthic's own recommendation
   // (lib/tools.js), never a guarantee.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { BenthicCore } from 'benthic-core';
@@ -251,7 +251,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desaturation--lead {
       margin: 8px 20px 0;
       font-size: 14px;

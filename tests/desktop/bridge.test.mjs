@@ -33,7 +33,7 @@ const invoke = async (channel, ...args) => {
 };
 
 before(() => {
-  root = mkdtempSync(path.join(tmpdir(), 'od-bridge-'));
+  root = mkdtempSync(path.join(tmpdir(), 'bc-bridge-'));
   userData = path.join(root, 'userData');
   resources = path.join(root, 'resources');
   mkdirSync(resources);
@@ -64,7 +64,7 @@ before(() => {
     resourcesDir: resources,
     broadcast: () => {},
   });
-  temp = path.join(root, 'tmp', 'opendives');
+  temp = path.join(root, 'tmp', 'benthic');
 });
 
 after(async () => {
@@ -74,7 +74,7 @@ after(async () => {
 
 test('the paths: userData, temp, resources, stylesheets and the certificate file', () => {
   const event = {};
-  handlers.get('on:od:paths')(event);
+  handlers.get('on:bc:paths')(event);
   assert.equal(event.returnValue.userData, userData);
   assert.equal(event.returnValue.temp, temp);
   assert.equal(event.returnValue.resourcesDir, resources);
@@ -86,7 +86,7 @@ test('the paths: userData, temp, resources, stylesheets and the certificate file
 
 test('the host is set up before the first call: init, certificates, stylesheets', async () => {
   // The fake host answers any method with its name; the first call starts it.
-  assert.equal(await invoke('od:core', 'listLoadedDives'), 'listLoadedDives');
+  assert.equal(await invoke('bc:core', 'listLoadedDives'), 'listLoadedDives');
   assert.ok(existsSync(path.join(userData, 'cacerts.pem')));
   assert.match(readFileSync(path.join(userData, 'cacerts.pem'), 'utf8'), /BEGIN CERTIFICATE/);
 });
@@ -112,16 +112,16 @@ test('the setup calls come first and carry the right arguments', async () => {
 
 test('only the host methods can be called, and the setup ones cannot', async () => {
   for (const method of ['init', 'setCaFile', 'setXsltDir', 'downloadDives', 'constructor', '__proto__', 42]) {
-    assert.match((await rejection(invoke('od:core', method, {}))).message, /Unknown method/, String(method));
+    assert.match((await rejection(invoke('bc:core', method, {}))).message, /Unknown method/, String(method));
   }
-  assert.match((await rejection(invoke('od:core', 'getDive', [1]))).message, /BAD_ARGUMENT/);
+  assert.match((await rejection(invoke('bc:core', 'getDive', [1]))).message, /BAD_ARGUMENT/);
 });
 
 test('path arguments of core calls: userData and temp only, resources to read, no secrets', async () => {
   const repo = `${path.join(userData, 'carnet')}[main]`;
-  assert.equal(await invoke('od:core', 'logExists', { repo }), 'logExists');
-  assert.equal(await invoke('od:core', 'importFile', { source: path.join(resources, 'SampleDivesV2.ssrf'), repo }), 'importFile');
-  assert.equal(await invoke('od:core', 'exportDives', { ids: [1], format: 'ssrf', path: path.join(temp, 'share', 'a.ssrf') }), 'exportDives');
+  assert.equal(await invoke('bc:core', 'logExists', { repo }), 'logExists');
+  assert.equal(await invoke('bc:core', 'importFile', { source: path.join(resources, 'SampleDivesV2.ssrf'), repo }), 'importFile');
+  assert.equal(await invoke('bc:core', 'exportDives', { ids: [1], format: 'ssrf', path: path.join(temp, 'share', 'a.ssrf') }), 'exportDives');
   for (const [method, args] of [
     ['logExists', { repo: '/etc[main]' }],
     ['listDives', { repo: path.join(userData, '..', 'elsewhere') }],
@@ -131,17 +131,17 @@ test('path arguments of core calls: userData and temp only, resources to read, n
     ['importCount', { path: path.join(userData, 'cloud-dev.env') }],
     ['cloudCreateLog', { importPath: '/home/x/log.xml' }],
   ]) {
-    assert.match((await rejection(invoke('od:core', method, args))).message, /BAD_ARGUMENT/, `${method} ${JSON.stringify(args)}`);
+    assert.match((await rejection(invoke('bc:core', method, args))).message, /BAD_ARGUMENT/, `${method} ${JSON.stringify(args)}`);
   }
   // An empty path means none.
-  assert.equal(await invoke('od:core', 'cloudCreateLog', { importPath: '' }), 'cloudCreateLog');
+  assert.equal(await invoke('bc:core', 'cloudCreateLog', { importPath: '' }), 'cloudCreateLog');
 });
 
-test('git working copies: the page names a folder under userData/odgit, nothing else', async () => {
-  assert.equal(await invoke('od:core', 'odgitStatus', { dir: 'server/main' }), 'odgitStatus');
-  assert.equal(await invoke('od:core', 'odgitCancel', {}), 'odgitCancel');
+test('git working copies: the page names a folder under userData/bgit, nothing else', async () => {
+  assert.equal(await invoke('bc:core', 'bgitStatus', { dir: 'server/main' }), 'bgitStatus');
+  assert.equal(await invoke('bc:core', 'bgitCancel', {}), 'bgitCancel');
   for (const dir of ['', '..', '../carnet', 'a/../../x', '/etc', 'a\\b', undefined]) {
-    assert.match((await rejection(invoke('od:core', 'odgitStatus', { dir }))).message, /BAD_PATH/, String(dir));
+    assert.match((await rejection(invoke('bc:core', 'bgitStatus', { dir }))).message, /BAD_PATH/, String(dir));
   }
 });
 
@@ -236,96 +236,96 @@ test('host process: stop lets the queued requests finish', async () => {
 });
 
 test('credentials: stored encrypted, read back, cleared; incomplete or unencrypted refused', async () => {
-  assert.equal(await invoke('od:credentials', 'get', 'cloud'), null);
-  await invoke('od:credentials', 'set', 'cloud', { email: 'a@b.c', password: 'pw', extra: 'dropped' });
+  assert.equal(await invoke('bc:credentials', 'get', 'cloud'), null);
+  await invoke('bc:credentials', 'set', 'cloud', { email: 'a@b.c', password: 'pw', extra: 'dropped' });
   const file = path.join(userData, 'cloud-account.bin');
   assert.ok(readFileSync(file, 'utf8').startsWith('enc:'));
   assert.ok(!readFileSync(file, 'utf8').includes('dropped'));
-  assert.deepEqual(await invoke('od:credentials', 'get', 'cloud'), { email: 'a@b.c', password: 'pw' });
-  await invoke('od:credentials', 'set', 'git', { url: 'https://h/p[main]', username: 'u', branch: 'main', token: 't' });
-  assert.equal((await invoke('od:credentials', 'get', 'git')).token, 't');
-  assert.match((await rejection(invoke('od:credentials', 'set', 'cloud', { email: 'a' }))).message, /incomplete/);
-  assert.match((await rejection(invoke('od:credentials', 'get', 'nope'))).message, /unknown credentials kind/);
+  assert.deepEqual(await invoke('bc:credentials', 'get', 'cloud'), { email: 'a@b.c', password: 'pw' });
+  await invoke('bc:credentials', 'set', 'git', { url: 'https://h/p[main]', username: 'u', branch: 'main', token: 't' });
+  assert.equal((await invoke('bc:credentials', 'get', 'git')).token, 't');
+  assert.match((await rejection(invoke('bc:credentials', 'set', 'cloud', { email: 'a' }))).message, /incomplete/);
+  assert.match((await rejection(invoke('bc:credentials', 'get', 'nope'))).message, /unknown credentials kind/);
   writeFileSync(file, 'garbage');
-  assert.equal(await invoke('od:credentials', 'get', 'cloud'), null); // a key lost: as no account
+  assert.equal(await invoke('bc:credentials', 'get', 'cloud'), null); // a key lost: as no account
   encryption = false;
-  assert.equal((await rejection(invoke('od:credentials', 'set', 'cloud', { email: 'a', password: 'b' }))).message, 'CREDENTIALS_NOT_SAVED');
-  assert.equal(await invoke('od:credentials', 'get', 'git'), null);
+  assert.equal((await rejection(invoke('bc:credentials', 'set', 'cloud', { email: 'a', password: 'b' }))).message, 'CREDENTIALS_NOT_SAVED');
+  assert.equal(await invoke('bc:credentials', 'get', 'git'), null);
   encryption = true;
-  await invoke('od:credentials', 'clear', 'cloud');
+  await invoke('bc:credentials', 'clear', 'cloud');
   assert.ok(!existsSync(file));
   assert.ok(existsSync(path.join(userData, 'git-remote.bin')));
-  await invoke('od:credentials', 'clear');
+  await invoke('bc:credentials', 'clear');
   assert.ok(!existsSync(path.join(userData, 'git-remote.bin')));
 });
 
 test('files: staged in temp, read back, deleted; names reduced; nothing outside', async () => {
-  const { path: staged } = await invoke('od:fs', 'writeFile', { area: 'import', name: '../../evil/a:b.xml', base64: Buffer.from('<x/>').toString('base64') });
+  const { path: staged } = await invoke('bc:fs', 'writeFile', { area: 'import', name: '../../evil/a:b.xml', base64: Buffer.from('<x/>').toString('base64') });
   assert.equal(path.dirname(staged), path.join(temp, 'import'));
   assert.equal(path.basename(staged), 'a_b.xml');
-  assert.equal(Buffer.from(await invoke('od:fs', 'readFile', { path: staged }), 'base64').toString(), '<x/>');
-  assert.equal(await invoke('od:fs', 'exists', { path: staged }), true);
-  assert.equal(await invoke('od:fs', 'remove', { path: staged }), true);
-  assert.equal(await invoke('od:fs', 'remove', { path: staged }), false);
-  assert.match((await rejection(invoke('od:fs', 'writeFile', { area: 'elsewhere', name: 'a', base64: '' }))).message, /unknown area/);
-  assert.match((await rejection(invoke('od:fs', 'readFile', { path: path.join(userData, 'cloud-account.bin') }))).message, /not an allowed path/);
-  assert.match((await rejection(invoke('od:fs', 'remove', { path: path.join(root, 'outside') }))).message, /not an allowed path/);
-  assert.match((await rejection(invoke('od:fs', 'exists', { path: path.join(root, 'outside') }))).message, /not an allowed path/);
+  assert.equal(Buffer.from(await invoke('bc:fs', 'readFile', { path: staged }), 'base64').toString(), '<x/>');
+  assert.equal(await invoke('bc:fs', 'exists', { path: staged }), true);
+  assert.equal(await invoke('bc:fs', 'remove', { path: staged }), true);
+  assert.equal(await invoke('bc:fs', 'remove', { path: staged }), false);
+  assert.match((await rejection(invoke('bc:fs', 'writeFile', { area: 'elsewhere', name: 'a', base64: '' }))).message, /unknown area/);
+  assert.match((await rejection(invoke('bc:fs', 'readFile', { path: path.join(userData, 'cloud-account.bin') }))).message, /not an allowed path/);
+  assert.match((await rejection(invoke('bc:fs', 'remove', { path: path.join(root, 'outside') }))).message, /not an allowed path/);
+  assert.match((await rejection(invoke('bc:fs', 'exists', { path: path.join(root, 'outside') }))).message, /not an allowed path/);
 });
 
 test('files: appendFile adds bytes to a staged file, in temp only', async () => {
   const b64 = (t) => Buffer.from(t).toString('base64');
-  const { path: staged } = await invoke('od:fs', 'writeFile', { area: 'share', name: 'export.zip', base64: b64('ab') });
-  assert.equal(await invoke('od:fs', 'appendFile', { path: staged, base64: b64('cd') }), true);
-  assert.equal(Buffer.from(await invoke('od:fs', 'readFile', { path: staged }), 'base64').toString(), 'abcd');
-  await invoke('od:fs', 'remove', { path: staged });
-  assert.match((await rejection(invoke('od:fs', 'appendFile', { path: path.join(root, 'outside'), base64: b64('x') }))).message, /not an allowed path/);
+  const { path: staged } = await invoke('bc:fs', 'writeFile', { area: 'share', name: 'export.zip', base64: b64('ab') });
+  assert.equal(await invoke('bc:fs', 'appendFile', { path: staged, base64: b64('cd') }), true);
+  assert.equal(Buffer.from(await invoke('bc:fs', 'readFile', { path: staged }), 'base64').toString(), 'abcd');
+  await invoke('bc:fs', 'remove', { path: staged });
+  assert.match((await rejection(invoke('bc:fs', 'appendFile', { path: path.join(root, 'outside'), base64: b64('x') }))).message, /not an allowed path/);
 });
 
 test('files: a big file is read in pieces (readChunk) and built from ranges and text (assemble), in temp only', async () => {
   const b64 = (t) => Buffer.from(t).toString('base64');
-  const { path: staged } = await invoke('od:fs', 'writeFile', { area: 'import', name: 'import-1-big.ssrf', base64: b64('<divelog><dives/></divelog>') });
-  const piece = await invoke('od:fs', 'readChunk', { path: staged, offset: 9, length: 7 });
+  const { path: staged } = await invoke('bc:fs', 'writeFile', { area: 'import', name: 'import-1-big.ssrf', base64: b64('<divelog><dives/></divelog>') });
+  const piece = await invoke('bc:fs', 'readChunk', { path: staged, offset: 9, length: 7 });
   assert.deepEqual({ text: Buffer.from(piece.data, 'base64').toString(), size: piece.size }, { text: '<dives/', size: 27 });
   // Past the end: what is left; a length of 0 gives only the size; never more than 4 MB at once.
-  assert.equal(Buffer.from((await invoke('od:fs', 'readChunk', { path: staged, offset: 20, length: 100 })).data, 'base64').toString(), 'ivelog>');
-  assert.equal((await invoke('od:fs', 'readChunk', { path: staged, offset: 0, length: 0 })).size, 27);
-  const joined = await invoke('od:fs', 'assemble', { name: 'import-2-big.ssrf', parts: [{ path: staged, start: 0, end: 9 }, { text: '<divesites/>' }, { path: staged, start: 9, end: 27 }] });
+  assert.equal(Buffer.from((await invoke('bc:fs', 'readChunk', { path: staged, offset: 20, length: 100 })).data, 'base64').toString(), 'ivelog>');
+  assert.equal((await invoke('bc:fs', 'readChunk', { path: staged, offset: 0, length: 0 })).size, 27);
+  const joined = await invoke('bc:fs', 'assemble', { name: 'import-2-big.ssrf', parts: [{ path: staged, start: 0, end: 9 }, { text: '<divesites/>' }, { path: staged, start: 9, end: 27 }] });
   assert.equal(path.dirname(joined.path), path.join(temp, 'import'));
   assert.equal(readFileSync(joined.path, 'utf8'), '<divelog><divesites/><dives/></divelog>');
   const outside = path.join(root, 'outside');
-  assert.match((await rejection(invoke('od:fs', 'readChunk', { path: outside, offset: 0, length: 1 }))).message, /not an allowed path/);
-  assert.match((await rejection(invoke('od:fs', 'assemble', { name: 'x.ssrf', parts: [{ path: outside, start: 0, end: 1 }] }))).message, /not an allowed path/);
+  assert.match((await rejection(invoke('bc:fs', 'readChunk', { path: outside, offset: 0, length: 1 }))).message, /not an allowed path/);
+  assert.match((await rejection(invoke('bc:fs', 'assemble', { name: 'x.ssrf', parts: [{ path: outside, start: 0, end: 1 }] }))).message, /not an allowed path/);
   assert.ok(!existsSync(path.join(temp, 'import', 'x.ssrf')), 'a refused assembly leaves no file');
-  await invoke('od:fs', 'remove', { path: staged });
-  await invoke('od:fs', 'remove', { path: joined.path });
+  await invoke('bc:fs', 'remove', { path: staged });
+  await invoke('bc:fs', 'remove', { path: joined.path });
 });
 
 test('files: only logbook folders of userData are removed or renamed', async () => {
   const kept = path.join(userData, 'carnet.new');
   mkdirSync(kept);
   writeFileSync(path.join(kept, 'x'), '1');
-  await invoke('od:fs', 'rename', { from: kept, to: path.join(userData, 'carnet.before-1') });
+  await invoke('bc:fs', 'rename', { from: kept, to: path.join(userData, 'carnet.before-1') });
   assert.ok(existsSync(path.join(userData, 'carnet.before-1', 'x')));
-  await invoke('od:fs', 'removeTree', { path: path.join(userData, 'carnet.before-1') });
+  await invoke('bc:fs', 'removeTree', { path: path.join(userData, 'carnet.before-1') });
   assert.ok(!existsSync(path.join(userData, 'carnet.before-1')));
   for (const bad of [userData, root, path.join(userData, 'cacerts.pem'), path.join(userData, 'carnet', 'sub'), path.join(userData, '..', 'carnet')]) {
-    assert.match((await rejection(invoke('od:fs', 'removeTree', { path: bad }))).message, /not a logbook folder/, bad);
+    assert.match((await rejection(invoke('bc:fs', 'removeTree', { path: bad }))).message, /not a logbook folder/, bad);
   }
 });
 
 test('files: the development env files, read and deleted by name only', async () => {
-  assert.equal(await invoke('od:fs', 'readDevEnv', { name: 'cloud-test.env' }), '');
+  assert.equal(await invoke('bc:fs', 'readDevEnv', { name: 'cloud-test.env' }), '');
   writeFileSync(path.join(userData, 'cloud-test.env'), 'BENTHIC_CLOUD_TEST_EMAIL=t@t.t\n');
-  assert.match(await invoke('od:fs', 'readDevEnv', { name: 'cloud-test.env' }), /t@t\.t/);
-  assert.match((await rejection(invoke('od:fs', 'readDevEnv', { name: 'cloud-account.bin' }))).message, /unknown file/);
-  assert.match((await rejection(invoke('od:fs', 'deleteDevEnv', { name: 'cloud-test.env' }))).message, /unknown file/);
+  assert.match(await invoke('bc:fs', 'readDevEnv', { name: 'cloud-test.env' }), /t@t\.t/);
+  assert.match((await rejection(invoke('bc:fs', 'readDevEnv', { name: 'cloud-account.bin' }))).message, /unknown file/);
+  assert.match((await rejection(invoke('bc:fs', 'deleteDevEnv', { name: 'cloud-test.env' }))).message, /unknown file/);
   writeFileSync(path.join(userData, 'cloud-dev.env'), 'x');
-  await invoke('od:fs', 'deleteDevEnv', { name: 'cloud-dev.env' });
+  await invoke('bc:fs', 'deleteDevEnv', { name: 'cloud-dev.env' });
   assert.ok(!existsSync(path.join(userData, 'cloud-dev.env')));
 });
 
 test('places search only goes to Nominatim; htmlToPdf needs html and a name', async () => {
-  assert.match((await rejection(invoke('od:placesSearch', { url: 'https://example.com/' }))).message, /bad address/);
-  assert.match((await rejection(invoke('od:htmlToPdf', { html: 'x' }))).message, /missing html or name/);
+  assert.match((await rejection(invoke('bc:placesSearch', { url: 'https://example.com/' }))).message, /bad address/);
+  assert.match((await rejection(invoke('bc:htmlToPdf', { html: 'x' }))).message, /missing html or name/);
 });

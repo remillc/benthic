@@ -12,10 +12,10 @@ import { killMine } from './kill-mine.mjs';
 const [ssrf, label = 'run'] = process.argv.slice(2);
 const root = path.resolve(import.meta.dirname, '../..');
 const ud = path.join(root, 'build/perf', `ud-${label}`);
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
+const env = { ...process.env, BC_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: `${MAIN}/build/desktop/stage`, BC_USER_DATA: ud };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), '--remote-debugging-port=' + (process.env.CDP_PORT || 9391), path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
@@ -46,15 +46,15 @@ const R = { label };
 await p.send('Page.reload');
 await sleep(500);
 const t0 = Date.now();
-for (let i = 0; i < 300; i++) { try { if (await p.eval(`document.querySelectorAll('.od-desktop-logbook--row').length > 0`)) break; } catch { /* reloading */ } await sleep(100); }
+for (let i = 0; i < 300; i++) { try { if (await p.eval(`document.querySelectorAll('.bc-desktop-logbook--row').length > 0`)) break; } catch { /* reloading */ } await sleep(100); }
 R.rowsMs = Date.now() - t0;
 await sleep(4000);
 await summarise('reloadToRows', R);
-R.detailShown = await p.eval(`!!document.querySelector('.od-desktop-edit-field')`);
+R.detailShown = await p.eval(`!!document.querySelector('.bc-desktop-edit-field')`);
 const frames = `window.__frames=(n=2)=>new Promise(r=>{const f=()=>--n<=0?r():requestAnimationFrame(f);requestAnimationFrame(f)})`;
 await p.eval(frames);
 for (const [name, index] of [['click1', 3], ['click2', 4], ['click3', 5]]) {
-  await p.eval(`(async()=>{document.querySelectorAll('.od-desktop-logbook--row')[${index}].click();await window.__frames(2)})()`);
+  await p.eval(`(async()=>{document.querySelectorAll('.bc-desktop-logbook--row')[${index}].click();await window.__frames(2)})()`);
   await sleep(1500);
   await summarise(name, R);
 }

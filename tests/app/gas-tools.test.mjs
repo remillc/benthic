@@ -7,7 +7,7 @@
 //
 // These checks moved from tests/tools_test.cpp (when the gas math moved from the C++ façade to
 // JavaScript) with the same inputs, the same expected values and the same tolerances.
-// OD_TOOLS_MUTATE=<calc|blend> sends a wrong input to the code under test only (the references
+// BC_TOOLS_MUTATE=<calc|blend> sends a wrong input to the code under test only (the references
 // keep the true one): the run must then fail. The release check (tests/release-check.sh,
 // "mutations") runs each of them.
 import test from 'node:test';
@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { gasCalculator } from '../../app/src/lib/gas-calculator.js';
 import { gasBlend, compressibilityFactor } from '../../app/src/lib/gas-blend.js';
 
-const mutated = (name) => process.env.OD_TOOLS_MUTATE === name;
+const mutated = (name) => process.env.BC_TOOLS_MUTATE === name;
 
 // Tolerances of the references, set just above the differences measured (the reasons are given
 // where they are used).
@@ -332,7 +332,7 @@ const vsReference = (what, o2, he, finalMbar, ml, startMbar, startO2, startHe, t
     }
     if (r.bleedBar >= 0) ok = ok && Math.abs(j.bleedToMbar / 1000.0 - r.bleedBar) <= 1.0 / 1000.0; // floored to 1 mbar
     else ok = ok && j.bleedToMbar === undefined;
-    if (process.env.OD_TOOLS_DUMP) console.log(`reference blend, ${what}: worst difference ${worstP.toFixed(2)} mbar and ${worstV.toFixed(1)} ml`);
+    if (process.env.BC_TOOLS_DUMP) console.log(`reference blend, ${what}: worst difference ${worstP.toFixed(2)} mbar and ${worstV.toFixed(1)} ml`);
     assert.ok(ok, `worst difference ${worstP.toFixed(2)} mbar and ${worstV.toFixed(1)} ml${r.bleedBar >= 0 ? ', with bleed-down' : ''}`);
   });
 };

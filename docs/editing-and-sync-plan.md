@@ -79,7 +79,7 @@ Only after all the tests above pass, and only with Christian's explicit go-ahead
 
 - The editing screen follows the mock-ups "Modifier une plongée" (`ios-edition`, `android-edition`), limited to the fields of section 1 for now; the others stay visible but read only.
 - Save applies the edit, saves locally and starts a sync in the background; the screen closes at once. Undo is offered in a snackbar (Android) or a banner (iOS) for a few seconds.
-- `<SyncStatus>` and the dive rows show pending changes in `--od-pending`, with the text of the change ("Notes edited, waiting to be sent").
+- `<SyncStatus>` and the dive rows show pending changes in `--bc-pending`, with the text of the change ("Notes edited, waiting to be sent").
 - Errors are shown with the codes above, translated; never the raw core message.
 
 ## 8. What to report after each step

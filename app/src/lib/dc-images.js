@@ -1,6 +1,6 @@
 // @ts-check
 // The pictures of dive computers (docs/architecture.md, section 12; tasks 2026-11-19-302 and 303). They are free
-// for everyone: fetched from the OpenDives server on demand, without an account, then kept on the device for good
+// for everyone: fetched from the Benthic server on demand, without an account, then kept on the device for good
 // and shown offline from then on. Nothing is bundled in the app. A model without a picture, or a download that
 // fails, gives null and the caller shows the generic computer icon.
 //
@@ -19,11 +19,11 @@ import { imageEntry } from './dc-model.js';
 
 /** @typedef {import('./dc-model.js').CatalogEntry} CatalogEntry */
 
-const REFRESH_KEY = 'od.dcImagesCatalogAt';
+const REFRESH_KEY = 'bc.dcImagesCatalogAt';
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** A failed fetch is not tried again before this. */
 const RETRY_MS = 5 * 60 * 1000;
-const DB_NAME = 'od-dc-images';
+const DB_NAME = 'bc-dc-images';
 
 /**
  * Where the files are kept.

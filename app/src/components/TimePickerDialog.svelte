@@ -302,7 +302,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-time-picker .bc-md3-dialog--surface) {
       width: min(328px, calc(100% - 32px));
       padding-top: 16px;

@@ -6,7 +6,7 @@ import { defineConfig, mergeConfig } from 'vite';
 import base from './vite.config.js';
 const resolved = typeof base === 'function' ? base : () => base;
 export default defineConfig((env) => mergeConfig(resolved(env), {
-  server: { port: Number(process.env.OD_E2E_PORT || 5541), strictPort: true, host: '127.0.0.1' },
+  server: { port: Number(process.env.BC_E2E_PORT || 5541), strictPort: true, host: '127.0.0.1' },
   plugins: [{
     name: 'repro-not-desktop',
     enforce: 'pre',

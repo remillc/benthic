@@ -11,8 +11,8 @@ const path = require('node:path');
 const { execSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '..', '..');
-// OD_STAGE: another folder, e.g. while a development window runs from the usual one.
-const stage = process.env.OD_STAGE ? path.resolve(process.env.OD_STAGE) : path.join(root, 'build', 'desktop', 'stage');
+// BC_STAGE: another folder, e.g. while a development window runs from the usual one.
+const stage = process.env.BC_STAGE ? path.resolve(process.env.BC_STAGE) : path.join(root, 'build', 'desktop', 'stage');
 const arch = process.arch === 'arm64' ? 'arm64' : 'x64';
 const system = { win32: 'win', darwin: 'mac', linux: 'linux' }[process.platform];
 const target = process.argv[2] || `${system}-${arch}`;

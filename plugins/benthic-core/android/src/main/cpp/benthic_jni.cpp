@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // JNI bridge between the Kotlin plugin and the C++ façade.
 #include "core/libbenthic/benthic.h"
-#include "core/libbenthic/odgit.h"
+#include "core/libbenthic/bgit.h"
 #include "core/compat/bt_transport.h"
 
 #include <android/log.h>
@@ -985,7 +985,7 @@ Java_app_benthicdivelog_core_NativeCore_gitCheck(JNIEnv *env, jobject, jstring u
 	return json_or_throw(env, ret, json, error);
 }
 
-// Git on the device (odgit.h): any thread, one call at a time per working copy. The token is only passed through.
+// Git on the device (bgit.h): any thread, one call at a time per working copy. The token is only passed through.
 static std::vector<std::string> string_array(JNIEnv *env, jobjectArray in)
 {
 	std::vector<std::string> out;
@@ -999,9 +999,9 @@ static std::vector<std::string> string_array(JNIEnv *env, jobjectArray in)
 	return out;
 }
 
-static benthic::OdgitAuthor odgit_author(JNIEnv *env, jstring name, jstring email)
+static benthic::BgitAuthor bgit_author(JNIEnv *env, jstring name, jstring email)
 {
-	benthic::OdgitAuthor author;
+	benthic::BgitAuthor author;
 	if (name && email) {
 		author.name = to_string(env, name);
 		author.email = to_string(env, email);
@@ -1010,7 +1010,7 @@ static benthic::OdgitAuthor odgit_author(JNIEnv *env, jstring name, jstring emai
 }
 
 // The progress of a call goes to `listener` (onProgress(json)) on the calling thread.
-static benthic::OdgitProgress odgit_progress(JNIEnv *env, jobject listener, ProgressTarget &target)
+static benthic::BgitProgress bgit_progress(JNIEnv *env, jobject listener, ProgressTarget &target)
 {
 	if (!listener)
 		return nullptr;
@@ -1027,93 +1027,93 @@ static benthic::OdgitProgress odgit_progress(JNIEnv *env, jobject listener, Prog
 }
 
 JNIEXPORT void JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitAllowHttp(JNIEnv *, jobject, jboolean allowed)
+Java_app_benthicdivelog_core_NativeCore_bgitAllowHttp(JNIEnv *, jobject, jboolean allowed)
 {
-	benthic::odgit_allow_http(allowed);
+	benthic::bgit_allow_http(allowed);
 }
 
 JNIEXPORT void JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitCancel(JNIEnv *, jobject)
+Java_app_benthicdivelog_core_NativeCore_bgitCancel(JNIEnv *, jobject)
 {
-	benthic::odgit_cancel();
+	benthic::bgit_cancel();
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitClone(JNIEnv *env, jobject, jstring url, jstring dir, jstring branch, jstring user,
+Java_app_benthicdivelog_core_NativeCore_bgitClone(JNIEnv *env, jobject, jstring url, jstring dir, jstring branch, jstring user,
 					      jstring token, jobject listener)
 {
 	std::string json, error;
 	ProgressTarget target{};
-	auto progress = odgit_progress(env, listener, target);
-	int ret = benthic::odgit_clone(to_string(env, url), to_string(env, dir), to_string(env, branch),
+	auto progress = bgit_progress(env, listener, target);
+	int ret = benthic::bgit_clone(to_string(env, url), to_string(env, dir), to_string(env, branch),
 					 { to_string(env, user), to_string(env, token) }, progress, json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitPull(JNIEnv *env, jobject, jstring dir, jstring branch, jstring user, jstring token,
+Java_app_benthicdivelog_core_NativeCore_bgitPull(JNIEnv *env, jobject, jstring dir, jstring branch, jstring user, jstring token,
 					     jstring authorName, jstring authorEmail, jobject listener)
 {
 	std::string json, error;
 	ProgressTarget target{};
-	auto progress = odgit_progress(env, listener, target);
-	int ret = benthic::odgit_pull(to_string(env, dir), to_string(env, branch), { to_string(env, user), to_string(env, token) },
-					odgit_author(env, authorName, authorEmail), progress, json, error);
+	auto progress = bgit_progress(env, listener, target);
+	int ret = benthic::bgit_pull(to_string(env, dir), to_string(env, branch), { to_string(env, user), to_string(env, token) },
+					bgit_author(env, authorName, authorEmail), progress, json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitCommit(JNIEnv *env, jobject, jstring dir, jobjectArray paths, jstring message,
+Java_app_benthicdivelog_core_NativeCore_bgitCommit(JNIEnv *env, jobject, jstring dir, jobjectArray paths, jstring message,
 					       jstring authorName, jstring authorEmail, jstring mergeParent)
 {
 	std::string json, error;
-	int ret = benthic::odgit_commit(to_string(env, dir), string_array(env, paths), to_string(env, message),
-					  odgit_author(env, authorName, authorEmail),
+	int ret = benthic::bgit_commit(to_string(env, dir), string_array(env, paths), to_string(env, message),
+					  bgit_author(env, authorName, authorEmail),
 					  mergeParent ? to_string(env, mergeParent) : std::string(), json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitPush(JNIEnv *env, jobject, jstring dir, jstring branch, jstring user, jstring token,
+Java_app_benthicdivelog_core_NativeCore_bgitPush(JNIEnv *env, jobject, jstring dir, jstring branch, jstring user, jstring token,
 					     jobject listener)
 {
 	std::string json, error;
 	ProgressTarget target{};
-	auto progress = odgit_progress(env, listener, target);
-	int ret = benthic::odgit_push(to_string(env, dir), to_string(env, branch), { to_string(env, user), to_string(env, token) },
+	auto progress = bgit_progress(env, listener, target);
+	int ret = benthic::bgit_push(to_string(env, dir), to_string(env, branch), { to_string(env, user), to_string(env, token) },
 					progress, json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitStatus(JNIEnv *env, jobject, jstring dir, jobjectArray paths)
+Java_app_benthicdivelog_core_NativeCore_bgitStatus(JNIEnv *env, jobject, jstring dir, jobjectArray paths)
 {
 	std::string json, error;
-	int ret = benthic::odgit_status(to_string(env, dir), string_array(env, paths), json, error);
+	int ret = benthic::bgit_status(to_string(env, dir), string_array(env, paths), json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitUnpushed(JNIEnv *env, jobject, jstring dir, jstring branch)
+Java_app_benthicdivelog_core_NativeCore_bgitUnpushed(JNIEnv *env, jobject, jstring dir, jstring branch)
 {
 	std::string json, error;
-	int ret = benthic::odgit_unpushed(to_string(env, dir), to_string(env, branch), json, error);
+	int ret = benthic::bgit_unpushed(to_string(env, dir), to_string(env, branch), json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitHead(JNIEnv *env, jobject, jstring dir, jstring branch)
+Java_app_benthicdivelog_core_NativeCore_bgitHead(JNIEnv *env, jobject, jstring dir, jstring branch)
 {
 	std::string json, error;
-	int ret = benthic::odgit_head(to_string(env, dir), to_string(env, branch), json, error);
+	int ret = benthic::bgit_head(to_string(env, dir), to_string(env, branch), json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
 JNIEXPORT jstring JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitListFiles(JNIEnv *env, jobject, jstring dir, jstring prefix)
+Java_app_benthicdivelog_core_NativeCore_bgitListFiles(JNIEnv *env, jobject, jstring dir, jstring prefix)
 {
 	std::string json, error;
-	int ret = benthic::odgit_list_files(to_string(env, dir), to_string(env, prefix), json, error);
+	int ret = benthic::bgit_list_files(to_string(env, dir), to_string(env, prefix), json, error);
 	return json_or_throw(env, ret, json, error);
 }
 
@@ -1130,10 +1130,10 @@ Java_app_benthicdivelog_core_NativeCore_history(JNIEnv *env, jobject, jstring ac
 }
 
 JNIEXPORT void JNICALL
-Java_app_benthicdivelog_core_NativeCore_odgitRemove(JNIEnv *env, jobject, jstring dir)
+Java_app_benthicdivelog_core_NativeCore_bgitRemove(JNIEnv *env, jobject, jstring dir)
 {
 	std::string error;
-	if (benthic::odgit_remove(to_string(env, dir), error))
+	if (benthic::bgit_remove(to_string(env, dir), error))
 		throw_core_error(env, error);
 }
 

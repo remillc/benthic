@@ -45,12 +45,12 @@ test('the bubbles: 1.6 to 2.5 s, the lowest the longest, at a constant speed, at
 
 test('the logo and the bubbles: the timings of the brief, on transform and opacity, colours as tokens', () => {
   const logo = read('components/BenthicPlusReadyLogo.svelte');
-  assert.match(logo, /od-ready-pop 2000ms linear 1 both/);
+  assert.match(logo, /bc-ready-pop 2000ms linear 1 both/);
   assert.match(logo, /15% \{\s*transform: scale\(1\) rotate\(0deg\)/);
   assert.match(logo, /65% \{\s*transform: scale\(1\) rotate\(720deg\)/);
   assert.match(logo, /scale\(1\.14\)/);
   assert.match(logo, /scale\(0\.95\)/);
-  assert.match(logo, /@keyframes od-ready-ring/);
+  assert.match(logo, /@keyframes bc-ready-ring/);
   assert.match(logo, /prefers-reduced-motion: reduce/);
   assert.match(logo, /<animate [^>]*attributeName="d"/);
   const bubbles = read('components/BenthicPlusReadyBubbles.svelte');

@@ -15,7 +15,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-plus-chip {
       display: inline-flex;
       align-items: center;

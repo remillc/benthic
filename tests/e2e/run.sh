@@ -38,8 +38,8 @@ fi
 APK=$ROOT/app/android/app/build/outputs/apk/debug/app-debug.apk
 [ -f "$APK" ] || { echo "no APK: $APK"; exit 2; }
 adb install -r "$(winpath "$APK")" | tail -1
-adb shell am force-stop org.opendives.app
-adb shell monkey -p org.opendives.app -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+adb shell am force-stop app.benthicdivelog
+adb shell monkey -p app.benthicdivelog -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 # The app loads the log: wait for the account screen to be filled.
 sleep 20
 case "$ADB" in *.exe) NODE=node.exe ;; *) NODE=node ;; esac # the adb forward lives where adb runs

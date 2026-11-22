@@ -68,7 +68,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-choice-row {
       display: flex;
       align-items: center;

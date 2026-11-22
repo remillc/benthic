@@ -133,7 +133,7 @@ test('adding, downloading or importing in the demo opens « demo-ajout » and do
 
 test('the demo survives a restart through the device store, and only as the exact text « true »', () => {
   const store = (value) => ({ getItem: (k) => (k === DEMO_KEY ? value : null) });
-  assert.equal(DEMO_KEY, 'od.demo');
+  assert.equal(DEMO_KEY, 'bc.demo');
   assert.equal(storedDemo(store('true')), true);
   assert.equal(storedDemo(store(null)), false);
   assert.equal(storedDemo(store('false')), false);

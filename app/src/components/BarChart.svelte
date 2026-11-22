@@ -116,7 +116,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-bar-chart--chart {
       width: 100%;
     }

@@ -306,9 +306,9 @@
   {/if}
 
   {#if showMode && !search.trim()}
-    <h2 class="bc-filter--group-title" id="od-filter-mode">{t('filter.mode')}</h2>
+    <h2 class="bc-filter--group-title" id="bc-filter-mode">{t('filter.mode')}</h2>
     <div class="bc-filter--mode">
-      <ButtonGroup ariaLabelledby="od-filter-mode" value={filter.draft.mode} options={modes.map((mode) => ({ value: mode, label: t(`filter.modes.${mode}`) }))} onchange={(mode) => setMode(/** @type {any} */ (mode))} />
+      <ButtonGroup ariaLabelledby="bc-filter-mode" value={filter.draft.mode} options={modes.map((mode) => ({ value: mode, label: t(`filter.modes.${mode}`) }))} onchange={(mode) => setMode(/** @type {any} */ (mode))} />
     </div>
   {/if}
 
@@ -425,7 +425,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-filter .page-content) {
       padding-bottom: 160px;
     }

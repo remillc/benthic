@@ -1,6 +1,6 @@
 <script module>
   // Kept while the app runs, so that the tool shows the last values again.
-  const MODE_KEY = 'od.blenderMode';
+  const MODE_KEY = 'bc.blenderMode';
   const saved = {
     o2: '32',
     he: '35',
@@ -72,7 +72,7 @@
   }
   const trimix = $derived(mode === 'trimix');
 
-  const ORDER_KEY = 'od.blenderOrder';
+  const ORDER_KEY = 'bc.blenderOrder';
   /** @returns {'helium'|'oxygen'} */
   function readOrder() {
     try {
@@ -336,7 +336,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gas-blender--modes {
       margin: 8px 16px 0;
     }

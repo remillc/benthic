@@ -44,7 +44,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-key-figures--figures {
       margin: 8px 16px 0;
       padding: 16px;

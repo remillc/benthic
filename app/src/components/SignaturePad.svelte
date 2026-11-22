@@ -119,7 +119,7 @@
 ></canvas>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-signature-pad {
       display: block;
       width: 100%;

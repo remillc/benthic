@@ -9,16 +9,31 @@
 //
 // The rules, so that every setting is stored the same way:
 //  - one module: nothing else in the app reads or writes these values;
-//  - keys "od.<name>", values as text (JSON for objects and lists);
+//  - keys "bc.<name>", values as text (JSON for objects and lists);
 //  - read synchronously from memory, loaded once before the app starts
 //    (main.js); each change is kept in memory and sent to the system at once.
 // Not here: the logbook snapshot (lib/snapshot.js) and the detail snapshot (lib/detail-snapshot.js),
 // caches of what is shown at start, too large for preferences and rebuilt from the logbook when missing.
 
 /** Keys that are not settings: they stay in the WebView's storage. */
-export const NOT_SETTINGS = new Set(['od.logbookSnapshot', 'od.logbookSnapshotBeta', 'od.detailSnapshot', 'od.detailSnapshotBeta']);
+export const NOT_SETTINGS = new Set(['bc.logbookSnapshot', 'bc.logbookSnapshotBeta', 'bc.detailSnapshot', 'bc.detailSnapshotBeta']);
 /** Set once the values kept in localStorage before 15 November 2026 have been copied. */
-const MOVED_KEY = 'od.storeVersion';
+const MOVED_KEY = 'bc.storeVersion';
+
+// Until the rename to Benthic (22 November 2026) every key started with "od." and one was named after the old
+// paid offer. The old keys are copied to the new names once, then deleted (idempotent: nothing is left to rename).
+const OLD_PREFIX = 'od.';
+const RENAMED = new Map([['od.odplusSubscribed', 'bc.benthicPlusSubscribed']]);
+
+/**
+ * The new name of a key stored under the old naming, or null for a key that is not an old one.
+ * @param {string} key
+ * @returns {string|null}
+ */
+export function renamedKey(key) {
+  if (RENAMED.has(key)) return /** @type {string} */ (RENAMED.get(key));
+  return key.startsWith(OLD_PREFIX) ? `bc.${key.slice(OLD_PREFIX.length)}` : null;
+}
 
 /** @type {Map<string, string>} */
 const memory = new Map();
@@ -39,12 +54,55 @@ export async function loadDeviceStore() {
       const value = values[i].value;
       if (value != null) memory.set(key, value);
     });
+    await migrateOldKeys();
+    migrateOldLocalStorageCaches();
     if (!memory.has(MOVED_KEY)) await moveFromLocalStorage();
   } catch (e) {
     // Without the plugin (a test, a broken install): memory only, from localStorage.
     console.error('Settings storage', e);
     system = null;
     if (!memory.size) copyLocalStorage();
+    migrateOldLocalStorageCaches();
+  }
+}
+
+/**
+ * Copies every "od." key of the system's preferences to its "bc." name, then deletes the old one. A value already
+ * kept under the new name wins (the old one is then just deleted).
+ */
+async function migrateOldKeys() {
+  const s = system;
+  for (const [key, value] of [...memory]) {
+    const name = renamedKey(key);
+    if (!name) continue;
+    if (!memory.has(name)) {
+      memory.set(name, value);
+      if (s) await s.set({ key: name, value });
+    }
+    memory.delete(key);
+    if (s) await s.remove({ key });
+  }
+}
+
+/**
+ * The caches that stay in the WebView's localStorage (the logbook snapshot and the detail snapshot, with the suffix
+ * of the logbook they belong to) keep their content under the new names.
+ */
+function migrateOldLocalStorageCaches() {
+  try {
+    const old = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(OLD_PREFIX)) old.push(key);
+    }
+    for (const key of old) {
+      const name = renamedKey(key);
+      const value = localStorage.getItem(key);
+      if (name && value != null && localStorage.getItem(name) == null) localStorage.setItem(name, value);
+      localStorage.removeItem(key);
+    }
+  } catch {
+    // No localStorage, or full: the caches are rebuilt from the logbook.
   }
 }
 
@@ -53,9 +111,10 @@ function copyLocalStorage() {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (!key || !key.startsWith('od.') || NOT_SETTINGS.has(key)) continue;
+      const name = key ? (renamedKey(key) ?? key) : '';
+      if (!name.startsWith('bc.') || NOT_SETTINGS.has(name)) continue;
       const value = localStorage.getItem(key);
-      if (value != null && !memory.has(key)) memory.set(key, value);
+      if (value != null && !memory.has(name)) memory.set(name, value);
     }
   } catch {
     // No localStorage: nothing to copy.
@@ -71,7 +130,7 @@ async function moveFromLocalStorage() {
 
 /** @param {string} key */
 function check(key) {
-  if (!key.startsWith('od.') || NOT_SETTINGS.has(key)) throw new Error(`Not a setting of this device: ${key}`);
+  if (!key.startsWith('bc.') || NOT_SETTINGS.has(key)) throw new Error(`Not a setting of this device: ${key}`);
 }
 
 /**

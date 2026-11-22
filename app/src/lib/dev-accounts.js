@@ -26,7 +26,7 @@ export function isLocalServerUrl(url) {
 }
 
 /**
- * A random temporary address: `essai-xxxx@opendives.test`.
+ * A random temporary address: `essai-xxxx@benthic.test`.
  * @param {() => number} [random]
  * @returns {string}
  */
@@ -34,12 +34,12 @@ export function randomTempEmail(random = Math.random) {
   const letters = 'abcdefghjkmnpqrstuvwxyz23456789';
   let suffix = '';
   for (let i = 0; i < 4; i++) suffix += letters[Math.floor(random() * letters.length)];
-  return `essai-${suffix}@opendives.test`;
+  return `essai-${suffix}@benthic.test`;
 }
 
 /** Only the addresses of temporary accounts can be deleted (the server checks it too). @param {string} email */
 export function isTempEmail(email) {
-  return /@opendives\.test$/i.test(email.trim());
+  return /@benthic\.test$/i.test(email.trim());
 }
 
 /**

@@ -65,7 +65,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-profile-thumbnail--thumbnail {
       display: block;
       width: 56px;

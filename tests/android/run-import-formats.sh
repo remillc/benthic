@@ -10,7 +10,7 @@ set -uo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 ABI=${1:-x86_64}
 SERIAL=emulator-5554
-DIR=/data/local/tmp/opendives-import-tests
+DIR=/data/local/tmp/benthic-import-tests
 
 find_adb() {
   if [ -n "${ADB:-}" ]; then echo "$ADB"; return; fi

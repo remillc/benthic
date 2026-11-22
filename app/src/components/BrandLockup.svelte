@@ -22,7 +22,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-brand-lockup {
       --bc-lockup-logo: 84px;
       --bc-lockup-gap: 20px;

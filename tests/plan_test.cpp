@@ -6,7 +6,7 @@
 // the plan of the planner mock-ups and the façade's own behaviour.
 // usage: plan
 //
-// OD_MUTATE=<name> sends a wrong input (a mutation) with every request while
+// BC_MUTATE=<name> sends a wrong input (a mutation) with every request while
 // the expected values stay the same: the run must then fail. It is how
 // tests/release-check.sh proves that these tests detect errors. Names: sac
 // (SAC +10 %), gf (gradient factor high altered), vpmb (conservatism +1),
@@ -51,11 +51,11 @@ static size_t item(const std::string &json, const std::string &key, int n)
 	return at;
 }
 
-// The mutation asked for by OD_MUTATE, as keys added at the end of the request
+// The mutation asked for by BC_MUTATE, as keys added at the end of the request
 // (the last value of a key wins in the façade's reader).
 static std::string mutated(std::string request)
 {
-	const char *m = getenv("OD_MUTATE");
+	const char *m = getenv("BC_MUTATE");
 	std::string extra;
 	if (!m || !*m)
 		return request;

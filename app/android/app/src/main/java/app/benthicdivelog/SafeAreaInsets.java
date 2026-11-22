@@ -1,4 +1,4 @@
-package org.opendives.app;
+package app.benthicdivelog;
 
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -17,7 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
  *  - the page reads them at boot through the BenthicInsets interface (synchronous, there before
  *    the first script runs, so there is no race with the page load);
  *  - every change (rotation, gesture or 3-button navigation, multi-window, cutout) is pushed to the
- *    page by calling window.__odSetInsets (src/lib/safe-area.js).
+ *    page by calling window.__bcSetInsets (src/lib/safe-area.js).
  * The insets are not consumed: the WebView still receives them.
  *
  * The same message carries the widths of the system's Back gesture zones at the left and right edges
@@ -83,7 +83,7 @@ final class SafeAreaInsets {
         sentAt = android.os.SystemClock.uptimeMillis();
         Log.i(TAG, "insets " + next + " density " + density);
         webView.post(() -> webView.evaluateJavascript(
-            "window.__odSetInsets && window.__odSetInsets(" + next + ")", null));
+            "window.__bcSetInsets && window.__bcSetInsets(" + next + ")", null));
     }
 
     private static String css(int px, float density) {

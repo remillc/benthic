@@ -111,7 +111,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.sheet-modal.bc-add-equipment) {
       --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;

@@ -1,5 +1,5 @@
 // @ts-check
-// What « Gérer le compte » asks of the OpenDives server and of the platform (task 2026-11-18-281). Each call is one
+// What « Gérer le compte » asks of the Benthic server and of the platform (task 2026-11-18-281). Each call is one
 // function; the screen calls these and nothing else.
 //   - overview: how the diver signs in, the subscription (store, price, renewal) and the photo space. The server does not
 //     answer `GET /v1/account` yet: the answer is `null` and the screen shows its placeholder.

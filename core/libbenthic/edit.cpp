@@ -138,7 +138,7 @@ struct Step {
 	std::vector<std::pair<dive *, int>> renumbered;
 	// A download from a dive computer (download.cpp): the core's fingerprint
 	// table to swap in on the next undo or redo, so that undoing the download
-	// also forgets the fingerprint of its newest dive (an OpenDives addition:
+	// also forgets the fingerprint of its newest dive (a Benthic addition:
 	// Subsurface keeps it, and the next download then skips those dives).
 	bool swap_fingerprints = false;
 	fingerprint_table fingerprints;
@@ -564,6 +564,7 @@ int save_to(const std::string &log, std::string &error)
 	bool was_local_only = git_local_only;
 	git_local_only = true;
 	uncache_shared_start_times();
+	internal::rewrite_legacy_extra_data();
 	int ret = save_dives(log.c_str());
 	git_local_only = was_local_only;
 	if (ret) {
@@ -1558,7 +1559,7 @@ int cylinder_type_rename(const std::string &old_name, const std::string &new_nam
 	return cylinder_types(json);
 }
 
-// Deleting one of the diver's cylinder types (an OpenDives addition): the
+// Deleting one of the diver's cylinder types (a Benthic addition): the
 // cylinders of that type leave the dives that use them, with their pressures
 // and gas mix, unless taking one out would damage the dive. A cylinder stays
 // (only its type description is replaced by "unknown", size, pressures and mix are kept) when:
@@ -2184,7 +2185,7 @@ static void apply_filter_preset(Step &step)
 }
 
 // The latest dive of the log that is not a plan; the plans do not count in
-// the numbering (OpenDives lists them apart). `usable`: leaves invalid dives out.
+// the numbering (Benthic lists them apart). `usable`: leaves invalid dives out.
 static const dive *last_real_dive(bool usable)
 {
 	for (auto it = divelog.dives.rbegin(); it != divelog.dives.rend(); ++it)
@@ -2756,7 +2757,7 @@ static int sync_and_reload_if_needed(const std::string &log, const std::string &
 }
 
 // ---------------------------------------------------------------------------
-// Sync conflict (spec, section 6, "Conflict"; an OpenDives addition). When the
+// Sync conflict (spec, section 6, "Conflict"; a Benthic addition). When the
 // device and the cloud both changed the log, Subsurface's sync merges them
 // (try_to_git_merge() in core/git-access.cpp, files merged by the union of
 // their lines) and commits "Automatic merge". When both sides changed the same
@@ -3208,7 +3209,7 @@ int resolve_conflicts(const std::string &choices_json, std::string &error)
 		goto done;
 	{
 		git_reference *moved = nullptr;
-		if (git_reference_set_target(&moved, ref, &commit_oid, "OpenDives conflict resolution"))
+		if (git_reference_set_target(&moved, ref, &commit_oid, "Benthic conflict resolution"))
 			goto done;
 		git_reference_free(moved);
 	}
@@ -3269,7 +3270,7 @@ int cancel_conflict_resolution(std::string &error)
 	} else if (git_commit_parent(&parent, head, 0) || git_commit_tree(&parent_tree, parent) ||
 		   (git_branch_is_head(ref) == 1 && !git_repository_is_bare(repo) &&
 		    update_git_checkout(repo, reinterpret_cast<git_object *>(head), parent_tree)) ||
-		   git_reference_set_target(&moved, ref, git_commit_id(parent), "OpenDives conflict resolution cancelled")) {
+		   git_reference_set_target(&moved, ref, git_commit_id(parent), "Benthic conflict resolution cancelled")) {
 		error = std::string("GIT_ERROR: ") + (git_error_last() ? git_error_last()->message : "cancel failed");
 	} else {
 		ret = 0;
@@ -3815,12 +3816,12 @@ int save_plan(const std::string &request, int replace_id, std::string &result_js
 	dive_site *site = nullptr;
 	if (internal::build_plan(request, *d, site, error))
 		return -1;
-	// The title, next to "OpenDives plan" (build_plan): no key when empty.
+	// The title, next to "Benthic plan" (build_plan): no key when empty.
 	{
 		size_t from = title.find_first_not_of(" \t\r\n");
 		if (from != std::string::npos) {
 			size_t to = title.find_last_not_of(" \t\r\n");
-			add_extra_data(&d->dcs[0], "OpenDives title", title.substr(from, to - from + 1));
+			add_extra_data(&d->dcs[0], internal::TITLE_KEY, title.substr(from, to - from + 1));
 		}
 	}
 	// DivePlannerPointsModel::createPlan(), without a number or a trip. Two
@@ -3979,7 +3980,7 @@ int renumber_dives(const std::vector<int> &ids, int start, std::string &result_j
 	return 0;
 }
 
-// An OpenDives addition to the numbering of downloaded dives. Subsurface
+// A Benthic addition to the numbering of downloaded dives. Subsurface
 // (divelog::process_imported_dives) numbers the new dives only when none of
 // them falls before the last dive of the log: one older dive read again (a
 // dive deleted from the log, a full download) leaves every new dive at 0.

@@ -1,4 +1,4 @@
-// OpenDives proof of concept: load a dive log with Subsurface's own core code
+// Benthic proof of concept: load a dive log with Subsurface's own core code
 // (built without Qt) and save it again, as XML or as a Subsurface git repository.
 // Usage: roundtrip <input> <output>
 //   input/output: a .xml/.ssrf file, or a git repository written as "path[branch]".

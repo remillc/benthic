@@ -7,7 +7,7 @@ Nothing of it exists in a release: the switch below is read at build time, and a
 ## What it adds
 
 - **The switch:** `VITE_DEV_ACCOUNTS=1` in `app/.env.local` (git-ignored; never set it in a release build).
-- **« Continuer avec Google »** opens a small sheet marked « Simulation (développement) » with an e-mail (prefilled with `essai-xxxx@opendives.test`) and a name. It calls the development server's simulated sign-in and continues the real flow: a subscribed account goes to its logbook (download, or the choices that create one); any other account goes to the offer.
+- **« Continuer avec Google »** opens a small sheet marked « Simulation (développement) » with an e-mail (prefilled with `essai-xxxx@benthic.test`) and a name. It calls the development server's simulated sign-in and continues the real flow: a subscribed account goes to its logbook (download, or the choices that create one); any other account goes to the offer.
 - **« S'abonner »** (offer) calls the simulated purchase, then « Bienvenue dans Benthic+ », « Vos données de santé » and the download (or the choices that create a logbook: import a Subsurface file, send the logbook of this device, start blank).
 - **« Supprimer ce compte d'essai »** on the account page (temporary accounts only) deletes the account and its repository on the development server, then signs out of the device.
 - The app refuses these calls at run time when the server address is not this machine's (`127.0.0.1`, `10.0.2.2`, `localhost`, `[::1]`).
@@ -38,9 +38,9 @@ Same switch (`VITE_DEV_ACCOUNTS=1`), same local-server guard. A row marked « DE
 - **Passer en compte gratuit** (two items): sign out of Benthic+ keeping the device logbook (the app opens it), or keep the session and mark the account not subscribed (`POST /v1/account/dev-unsubscribe`).
 - **Passer en compte abonné**: without a session, a temporary account (`dev-google`) then `dev-subscribe`; with a session, `dev-subscribe`.
 - **Nouveau compte d'essai**: a fresh temporary account, not subscribed, replacing the session.
-- **Supprimer ce compte d'essai**: `dev-reset`, then sign out with the device copy (temporary `@opendives.test` accounts only).
-- **Rejouer le premier lancement**: sets `od.welcomeBeta` to `show`; logbooks and session stay.
+- **Supprimer ce compte d'essai**: `dev-reset`, then sign out with the device copy (temporary `@benthic.test` accounts only).
+- **Rejouer le premier lancement**: sets `bc.welcomeBeta` to `show`; logbooks and session stay.
 
-Each action ends with a snackbar and an automatic reload of the app, so that every screen (sheet, profile access, sync) reads the new state. The subscribed state is remembered on the device (`od.devSubscribed`) because the server has no « am I subscribed » route yet.
+Each action ends with a snackbar and an automatic reload of the app, so that every screen (sheet, profile access, sync) reads the new state. The subscribed state is remembered on the device (`bc.devSubscribed`) because the server has no « am I subscribed » route yet.
 
 Code: `app/src/lib/dev-tools.js` (actions, tested in `tests/app/dev-tools.test.mjs`), `components/DevToolsRow.svelte`, `DevToolsMenu.svelte`, `DevToolsHost.svelte`. `vite.config.js` stubs these files in a build without the switch, and `tests/app/dev-accounts.test.mjs` searches the bundle for them.

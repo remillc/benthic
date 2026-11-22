@@ -72,7 +72,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* A card over every screen, above the bottom bar and clear of the gesture bar; fixed, so nothing moves under it. */
     .bc-import-progress {
       position: fixed;
@@ -131,10 +131,10 @@
     .bc-import-progress--indeterminate .bc-import-progress--fill {
       position: absolute;
       width: 40%;
-      animation: od-import-progress-slide 1.4s ease-in-out infinite;
+      animation: bc-import-progress-slide 1.4s ease-in-out infinite;
     }
 
-    @keyframes od-import-progress-slide {
+    @keyframes bc-import-progress-slide {
       from {
         left: -40%;
       }

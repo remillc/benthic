@@ -27,8 +27,8 @@
   let { label, accessibleLabel, value = $bindable(''), error = '', disabled = false, gap = 8, spread = false, onsubmit, oninput } = $props();
 
   const uid = Math.random().toString(36).slice(2, 9);
-  const id = `od-code-${uid}`;
-  const errorId = `od-code-error-${uid}`;
+  const id = `bc-code-${uid}`;
+  const errorId = `bc-code-error-${uid}`;
   /** @type {HTMLInputElement | undefined} */
   let input = $state();
   let focused = $state(false);
@@ -115,7 +115,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-code-field {
       /* In the editorial card (margin 0) or, on iOS, on the page (--bc-field-margin 16). */
       margin: 8px var(--bc-field-margin, 0) 0;
@@ -172,10 +172,10 @@
       width: 2px;
       height: 28px;
       background: var(--bc-code-active);
-      animation: od-code-caret 1s steps(1) infinite;
+      animation: bc-code-caret 1s steps(1) infinite;
     }
 
-    @keyframes od-code-caret {
+    @keyframes bc-code-caret {
       50% {
         opacity: 0;
       }

@@ -65,7 +65,7 @@
 </section>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-maintenance-list {
       flex: none;
       width: var(--bc-pf-list);

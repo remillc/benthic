@@ -8,7 +8,7 @@ set -uo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 ABI=${1:-x86_64}
 SERIAL=emulator-5554
-DIR=/data/local/tmp/opendives-plan-tests
+DIR=/data/local/tmp/benthic-plan-tests
 
 # adb: $ADB, the PATH, the Android SDK (also the Windows one, from WSL).
 find_adb() {

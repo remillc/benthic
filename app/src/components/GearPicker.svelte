@@ -49,7 +49,7 @@
 {/each}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gear-picker--group {
       margin: 16px 16px 4px;
       font-size: 14px;

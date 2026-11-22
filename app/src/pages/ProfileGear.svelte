@@ -221,7 +221,7 @@
 <GearExportSheet opened={exporting} pieces={gear.pieces} onclose={() => (exporting = false)} />
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gear-page--upkeep {
       margin: 8px 16px 0;
       min-height: 64px;

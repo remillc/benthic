@@ -11,10 +11,10 @@ import { killMine } from './kill-mine.mjs';
 const [ssrf, label = 'run', section = 'logbook', marks = '1,5,20'] = process.argv.slice(2);
 const checkpoints = marks.split(',').map(Number);
 const root = path.resolve(import.meta.dirname, '../..');
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
+const env = { ...process.env, BC_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: `${MAIN}/build/desktop/stage`, BC_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, '--disable-features=CalculateNativeWinOcclusion', '--disable-backgrounding-occluded-windows', path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
@@ -23,11 +23,11 @@ await p.send('Runtime.enable');
 const errors = [];
 p.on((m) => { if (m.method === 'Runtime.exceptionThrown') errors.push(m.params.exceptionDetails.text + ' ' + (m.params.exceptionDetails.exception?.description || '')); if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') errors.push(m.params.args.map((a) => a.value ?? a.description).join(' ')); });
 await sleep(3000);
-const go = (name) => p.eval(`[...document.querySelectorAll('.od-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()`);
+const go = (name) => p.eval(`[...document.querySelectorAll('.bc-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()`);
 if (section !== 'logbook') { await go(section); await sleep(800); }
-if (section === 'logbook') { await p.eval(`document.querySelectorAll('.od-desktop-logbook--row')[3]?.click()`); await sleep(600); }
-if (section === 'tools') { await p.eval(`document.querySelectorAll('.od-desktop-tools--list button')[2]?.click()`); await sleep(600); }
-const state = () => p.eval(`JSON.stringify({ hash: location.hash, pages: document.querySelectorAll('.page').length, sel: document.querySelectorAll('.od-desktop-logbook--row[aria-selected=true],.od-desktop-logbook--row.selected').length, title: document.querySelector('.page-current h1')?.textContent })`);
+if (section === 'logbook') { await p.eval(`document.querySelectorAll('.bc-desktop-logbook--row')[3]?.click()`); await sleep(600); }
+if (section === 'tools') { await p.eval(`document.querySelectorAll('.bc-desktop-tools--list button')[2]?.click()`); await sleep(600); }
+const state = () => p.eval(`JSON.stringify({ hash: location.hash, pages: document.querySelectorAll('.page').length, sel: document.querySelectorAll('.bc-desktop-logbook--row[aria-selected=true],.bc-desktop-logbook--row.selected').length, title: document.querySelector('.page-current h1')?.textContent })`);
 const out = [];
 const counters = async (step) => {
   await p.send('HeapProfiler.collectGarbage');
