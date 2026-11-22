@@ -2743,6 +2743,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Tablette et bureau : la plongée à côté du carnet s’affiche dès le lancement, comme le carnet ; les données des statistiques, des sites et des outils se lisent une fois la première plongée affichée.",
       "Premier lancement : « Le serveur ne répond pas » est centré, boutons compris.",
       "Outils, désaturation : la légende sous les graphiques des tissus est plus courte.",
       "Premier lancement : des rayons de lumière venus du coin supérieur droit remplacent les bandes du bandeau bleu.",

@@ -2743,6 +2743,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Tablet and desktop: the dive beside the list is drawn at once when the app starts, as the list is; the Statistics, Sites and Tools data is read once the first dive is shown.",
       "First launch: « The server does not respond » is centred, buttons included.",
       "Tools, decompression: the caption under the tissue charts is shorter.",
       "First launch: light rays from the top right corner replace the stripes of the blue band.",
