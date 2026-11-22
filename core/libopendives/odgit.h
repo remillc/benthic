@@ -101,9 +101,18 @@ int odgit_list_files(const std::string &dir, const std::string &prefix, std::str
 
 // The commits of `branch` (the local branch, else the server's as of the last fetch), newest first by time, `limit`
 // (1..1000) after `skip`. {"commits":[{"id","time","author","summary","message","parents":[…],"changes":[{"path",
-// "state"}] (with_changes: the difference with the first parent)}], "more": bool}.
+// "state"}] (with_changes: the difference with the first parent)}], "more": bool}. The commits adopted by
+// odgit_history_adopt come after those of the branch.
 int odgit_history_log(const std::string &dir, const std::string &branch, int skip, int limit, bool with_changes,
 		      std::string &json, std::string &error);
+
+// Brings the commits of `source_branch` of the repository in the folder `source` (the device's own logbook, from
+// before the account) into `dir`, under refs/opendives/device/<head>, so that the history of the logbook before the
+// account is read and restored from like any other. Nothing is sent anywhere and nothing is replaced: a head that is
+// already there is left, and each new head of the source gets its own reference. A source that holds no repository
+// or no such branch is not an error. {"result":"adopted"|"unchanged"|"none","head":sha|null}.
+int odgit_history_adopt(const std::string &dir, const std::string &source, const std::string &source_branch,
+			std::string &json, std::string &error);
 
 // Counts of Subsurface's git format at each commit: {"stats":[{"id","dives","sites","pieces":n|null}]}. A dive is a
 // "Dive" or "Dive-<n>" file; a site a "Site-*" file of 01-Divesites; the pieces are the files of gear/ (OpenDives' branch).

@@ -715,6 +715,8 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
       // http (the development server) only when the app is not a packaged build; the page cannot ask for it.
       return { ...args, dir: odgitDir(args.dir), allowHttp: !app.isPackaged };
     }
+    // The device's own logbook is always the main one, whatever the page passes.
+    if (method === 'history' && args.action === 'adopt') return { ...args, args: [path.join(userData, 'carnet')] };
     for (const [name, kind] of Object.entries(PATH_ARGS[method] || {})) {
       const value = args[name];
       // An empty value is "none" (cloudCreateLog, cloudDeleteAccount).

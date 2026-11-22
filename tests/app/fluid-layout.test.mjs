@@ -24,6 +24,33 @@ test('scrollbars: thin in the desktop app, never on the page itself', () => {
   assert.match(css, /html\.bc-desktop-app body \{\s*scrollbar-width: none;/);
 });
 
+test('backup panes show a scrollbar in each scrollable section', () => {
+  const css = read('app/src/components/backup.css');
+  for (const selector of [
+    '.bc-backup-main--versions',
+    '.bc-backup-main--only',
+    '.bc-backup-panes--detail',
+  ]) {
+    assert.ok(css.includes(`${selector}::-webkit-scrollbar`), selector);
+  }
+  assert.match(css, /scrollbar-color: color-mix/);
+});
+
+test('backup history shows loading skeletons and keeps restore beside the dive details', () => {
+  const main = read('app/src/components/BackupMain.svelte');
+  assert.match(main, /bc-backup-main--skeleton-list skeleton-effect-wave" role="status" aria-busy="true"/);
+  assert.match(main, /bc-backup-main--deleted-skeleton/);
+
+  const deleted = read('app/src/components/BackupDeleted.svelte');
+  assert.match(deleted, /bc-backup-deleted--facts/);
+  const css = read('app/src/components/backup.css');
+  assert.match(css, /\.bc-backup-deleted--restore,\s*\.bc-backup-deleted--state button \{\s*width: auto;/);
+  assert.match(css, /\.bc-backup-deleted--facts \{\s*display: grid;\s*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
+  for (const field of ['depth', 'duration', 'mode', 'computer']) {
+    assert.ok(deleted.includes(`bc-backup-deleted--fact-${field}`), field);
+  }
+});
+
 test('the tools, the site sheet and the clean-up lay out by their pane, not the window', () => {
   assert.match(read('app/src/pages/DesktopTools.svelte'), /container: od-tool \/ inline-size/);
   for (const file of ['DesktopBestMix', 'DesktopBlender', 'DesktopEadMod', 'DesktopPlanner']) {
