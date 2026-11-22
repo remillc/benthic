@@ -394,7 +394,7 @@ test('the profile is drawn to the size it is given and keeps its shape', () => {
 
 test('the left panel is kept and plays its line only when the page opens, not on each step', () => {
   assert.match(sources.page, /<ReleaseProfile \/>/);
-  assert.match(sources.page, /<FirstLaunchSteps \{f7router\} \/>/);
+  assert.match(sources.page, /<FirstLaunchSteps \{f7router\}[^>]*\/>/);
   // The panel is outside the stepped column: its content does not change with the step. Only its height does, in
   // portrait (540 dp from the second step on, task 224).
   assert.doesNotMatch(sources.page, /\{#key|\{#if[^}]*flow\./);

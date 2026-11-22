@@ -16,7 +16,7 @@
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import { OpenDivesCore } from 'opendives-core';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
-  import { showSection } from '../lib/navigation.svelte.js';
+  import { showSection, navigation } from '../lib/navigation.svelte.js';
 
   /**
    * Android phone: back to the page Compte was opened over (the account sheet opens it over a
@@ -61,8 +61,19 @@
 
   /** Dives logged on this device without an account, which the account can take (0: none). */
   let deviceCount = $state(0);
+  /**
+   * Counting reads the whole device logbook in the core (about 1.4 s on a tablet), and the core runs one call at a time:
+   * done while the page is mounted but hidden (the Account tab, built at start), it delayed the first dive of the
+   * logbook. Counted only when the page is on screen: its tab is shown, or it was opened over another section.
+   */
+  let inAccountTab = $state(true);
+  /** @param {any} page */
+  function pageInit(page) {
+    inAccountTab = Boolean(page?.el?.closest?.('#view-account'));
+  }
+  const onScreen = $derived(!inAccountTab || navigation.section === 'account');
   $effect(() => {
-    if (signedIn && !logbook.loading) deviceDiveCount().then((n) => (deviceCount = n));
+    if (signedIn && !logbook.loading && onScreen) deviceDiveCount().then((n) => (deviceCount = n));
   });
   const count = $derived(logbook.dives.length);
 
@@ -161,7 +172,7 @@
   }
 </script>
 
-<Page class="bc-account">
+<Page class="bc-account" onPageInit={pageInit}>
   <Navbar large={theme.ios && !bottomNav()} class={theme.ios ? 'bc-ios-bar' : 'bc-band-bar'} title={t('account.title')}>
     {#snippet left()}
       {#if bottomNav()}
