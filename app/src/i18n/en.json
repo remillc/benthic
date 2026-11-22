@@ -2741,6 +2741,7 @@
       "Shared map: the list follows the visible area, including sites grouped on the map.",
       "Shared map: a message explains when sites are unavailable offline.",
       "Shared map: added sites from OpenDiving Commons.",
+      "Sites: changes received by sync appear without reopening the app.",
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
       "Sites: names appear when zooming in on either map; on tablets, the embedded map can be panned and zoomed and clears the system navigation area.",
       "Shared map: the mode buttons are easier to tap.",
