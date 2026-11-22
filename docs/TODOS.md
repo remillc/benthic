@@ -51,7 +51,7 @@ Next number: 170
 - #127 [design] améliorer les icônes d'équipement.
 - #129 [code] On /profile/gear/new, show the maintenance reminder field only for regulators and cylinders, which generally require periodic maintenance.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
-- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application.
+- #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
 - #137 [code] On tablet and desktop, the initial display of /dives/:id takes too long to load. Propose ways to speed up the loading.
 - #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
@@ -75,3 +75,4 @@ Next number: 170
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.
 - #162 [code] créer un skeleton pour la page /dives/:id sur tablette et desktop
 - #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158).
+- #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
