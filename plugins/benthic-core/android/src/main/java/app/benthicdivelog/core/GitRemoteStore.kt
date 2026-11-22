@@ -17,7 +17,7 @@ internal data class GitRemote(val url: String, val username: String, val branch:
  * in the web layer, nothing logged; the token is handed to the core only.
  */
 internal class GitRemoteStore(context: Context) {
-    private val sealed = SealedFile(context, "opendives-git-remote", "git-remote.bin")
+    private val sealed = SealedFile(context, "benthic-git-remote", "git-remote.bin", legacyAlias = "opendives-git-remote")
 
     fun read(): GitRemote? {
         val parts = sealed.read()?.split('\n') ?: return null

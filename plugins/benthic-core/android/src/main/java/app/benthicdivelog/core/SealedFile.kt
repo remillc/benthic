@@ -16,13 +16,20 @@ import javax.crypto.spec.GCMParameterSpec
  * that never leaves the Android Keystore (hardware-backed when available).
  * Only the ciphertext is stored. One alias and one file per secret.
  */
-internal class SealedFile(context: Context, private val keyAlias: String, fileName: String) {
+internal class SealedFile(
+    context: Context,
+    private val keyAlias: String,
+    fileName: String,
+    /** The alias this secret had before the rename to Benthic (22 November 2026), moved to `keyAlias` on first use. */
+    private val legacyAlias: String? = null,
+) {
     private val name = fileName
     private val file = File(context.filesDir, fileName)
 
     /** The text, or null when there is none or it cannot be decrypted (a key lost with a restore). */
     fun read(): String? {
         if (!file.exists()) return null
+        moveLegacyKey()
         return try {
             val bytes = file.readBytes()
             val iv = bytes.copyOfRange(0, IV_SIZE)
@@ -49,10 +56,33 @@ internal class SealedFile(context: Context, private val keyAlias: String, fileNa
     fun delete() {
         file.delete()
         File(file.parentFile, "$name.tmp").delete()
+        for (alias in listOfNotNull(keyAlias, legacyAlias)) {
+            try {
+                keyStore().deleteEntry(alias)
+            } catch (e: Exception) {
+                // Nothing to delete.
+            }
+        }
+    }
+
+    /**
+     * A file sealed under the old alias is decrypted with that key and sealed again under the new alias; the old
+     * key is then deleted. Nothing happens when there is no old key or the new one exists (so it runs once).
+     */
+    private fun moveLegacyKey() {
+        val old = legacyAlias ?: return
         try {
-            keyStore().deleteEntry(keyAlias)
+            val store = keyStore()
+            if (store.containsAlias(keyAlias) || !store.containsAlias(old)) return
+            val oldKey = (store.getEntry(old, null) as? KeyStore.SecretKeyEntry)?.secretKey ?: return
+            val bytes = file.readBytes()
+            val cipher = Cipher.getInstance(TRANSFORMATION)
+            cipher.init(Cipher.DECRYPT_MODE, oldKey, GCMParameterSpec(TAG_BITS, bytes.copyOfRange(0, IV_SIZE)))
+            val text = String(cipher.doFinal(bytes, IV_SIZE, bytes.size - IV_SIZE), Charsets.UTF_8)
+            write(text)
+            store.deleteEntry(old)
         } catch (e: Exception) {
-            // Nothing to delete.
+            // The old key cannot be used: the secret reads as missing and the diver signs in again.
         }
     }
 

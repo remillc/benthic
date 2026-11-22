@@ -10,7 +10,7 @@ import android.content.Context
  * (see SealedFile). Nothing in the web layer, nothing logged.
  */
 internal class CredentialStore(context: Context) {
-    private val sealed = SealedFile(context, "opendives-cloud-account", "cloud-account.bin")
+    private val sealed = SealedFile(context, "benthic-cloud-account", "cloud-account.bin", legacyAlias = "opendives-cloud-account")
 
     fun read(): Pair<String, String>? {
         val text = sealed.read() ?: return null
