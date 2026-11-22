@@ -6,7 +6,7 @@
   // with a position and "centre on my position", then the list panel: the
   // count, the list items that apply (dives without a site, sites without
   // coordinates, possible duplicates), a divider and the sites.
-  import { tick, untrack } from 'svelte';
+  import { onDestroy, tick, untrack } from 'svelte';
   import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
@@ -347,6 +347,78 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   let baseBox = $state.raw(/** @type {{ mode: string, total: number, sites: import('../lib/shared-sites.js').BaseSite[], clusters: { lat: number, lon: number, count: number }[] }|null} */ (null));
   /** The base sites in the visible area, including those grouped into clusters. */
   let baseList = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  /** @type {HTMLElement|undefined} */
+  let baseListEl = $state();
+  /** @type {any} */
+  let baseVirtualList = null;
+  let baseVisible = $state({ items: /** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]), from: 0, top: 0 });
+  /** @type {Map<string, number>} */
+  const baseHeights = new Map();
+  let baseTypicalHeight = 72;
+  /** @type {ResizeObserver|undefined} */
+  let baseResize;
+
+  /** @param {import('../lib/shared-sites.js').BaseSite} site */
+  const baseRowHeight = (site) => baseHeights.get(site.id) ?? baseTypicalHeight;
+
+  async function measureBaseRows() {
+    const list = baseVirtualList;
+    await tick();
+    if (!list || list !== baseVirtualList || !baseListEl) return;
+    let changed = false;
+    for (const row of baseListEl.querySelectorAll('li[data-virtual-list-index]')) {
+      const site = list.items[Number(row.getAttribute('data-virtual-list-index'))];
+      const height = /** @type {HTMLElement} */ (row).offsetHeight;
+      if (!site || !height || baseRowHeight(site) === height) continue;
+      baseHeights.set(site.id, height);
+      baseTypicalHeight = height;
+      changed = true;
+    }
+    if (changed) list.update();
+  }
+
+  $effect(() => {
+    const items = baseList;
+    const el = baseListEl;
+    if (baseVirtualList && baseVirtualList.el !== el) {
+      baseResize?.disconnect();
+      baseVirtualList.destroy();
+      baseVirtualList = null;
+      baseHeights.clear();
+    }
+    if (!el) return;
+    if (!baseVirtualList) {
+      const scrollable = el.closest('.bc-sites--scroll') ?? el.closest('.page-content');
+      if (!scrollable) throw new Error('Shared site list has no scroll container');
+      baseVirtualList = f7.virtualList.create({
+        el,
+        items,
+        scrollableParentEl: scrollable,
+        height: baseRowHeight,
+        renderExternal: (/** @type {any} */ _list, /** @type {{ items: import('../lib/shared-sites.js').BaseSite[], fromIndex: number, topPosition: number }} */ data) => {
+          baseVisible = { items: data.items, from: data.fromIndex, top: data.topPosition };
+          void measureBaseRows();
+        },
+      });
+      let width = el.getBoundingClientRect().width;
+      baseResize = new ResizeObserver((entries) => {
+        const nextWidth = entries[0].contentRect.width;
+        if (nextWidth === width) return;
+        width = nextWidth;
+        baseHeights.clear();
+        baseVirtualList?.update();
+      });
+      baseResize.observe(el);
+    } else {
+      baseVirtualList.replaceAllItems(items);
+    }
+  });
+
+  onDestroy(() => {
+    baseResize?.disconnect();
+    baseVirtualList?.destroy();
+    baseVirtualList = null;
+  });
   /** @type {'idle'|'loading'|'ready'|'offer'|'failed'} */
   let baseState = $state('idle');
   let baseLoadingMore = $state(false);
@@ -538,10 +610,10 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {:else if baseState === 'ready' && baseBox}
       <p class="bc-sites--area-count" role="status">{t('sharedSites.areaCount', { n: baseBox.total })}</p>
       {#if baseList.length}
-        <nav class="list no-chevron bc-sites--surface bc-sites--list bc-sites--common-list" aria-label={t('sharedSites.listLabel')}>
+        <nav class="list no-chevron bc-sites--surface bc-sites--list bc-sites--common-list" aria-label={t('sharedSites.listLabel')} bind:this={baseListEl}>
           <ul>
-            {#each baseList as b (b.id)}
-              <li>
+            {#each baseVisible.items as b, i (b.id)}
+              <li data-virtual-list-index={baseVisible.from + i} aria-posinset={baseVisible.from + i + 1} aria-setsize={baseList.length} style:top="{baseVisible.top}px">
                 <a href="/sites/base/{encodeURIComponent(b.id)}" class="item-link item-content">
                   <span class="bc-sites--common-dot" class:bc-sites--common-mine={inYourSites(b.id, sharedSites.links)} aria-hidden="true"></span>
                   <div class="item-inner">
@@ -744,6 +816,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
 <style>
   @layer od.components {
+    /* Keep the map width stable when the shared list appears or disappears. */
+    :global(.bc-sites:not(.bc-sites--tablet) > .page-content) {
+      scrollbar-gutter: stable;
+    }
+
     /* Tablet: below the navigation bar, two panes side by side. */
     .bc-sites--split {
       position: absolute;
