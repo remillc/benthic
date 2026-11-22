@@ -60,7 +60,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-active-filter {
       margin: 8px 16px 0;
       display: flex;

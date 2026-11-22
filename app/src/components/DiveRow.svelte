@@ -166,7 +166,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* iOS: shifted on the left only, values and chevron aligned with the other
        rows. Android: a white surface, in theme.css. */
     :global(.ios) .bc-dive-row--in-trip .item-content {
@@ -181,30 +181,30 @@
 
     /* A trip just expanded: its dives slide down into place. */
     .bc-dive-row--appear {
-      animation: od-row-appear 220ms ease-out;
+      animation: bc-row-appear 220ms ease-out;
     }
 
     /* Android: the Expressive springs, the slide (spatial) and the fade (effects). */
     :global(.md) .bc-dive-row--appear {
       animation:
-        od-row-slide var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards,
-        od-row-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
+        bc-row-slide var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards,
+        bc-row-fade var(--bc-motion-effects-default-ms) var(--bc-motion-effects-default) backwards;
     }
 
-    @keyframes od-row-appear {
+    @keyframes bc-row-appear {
       from {
         opacity: 0;
         transform: translateY(-16px);
       }
     }
 
-    @keyframes od-row-slide {
+    @keyframes bc-row-slide {
       from {
         transform: translateY(-16px);
       }
     }
 
-    @keyframes od-row-fade {
+    @keyframes bc-row-fade {
       from {
         opacity: 0;
       }

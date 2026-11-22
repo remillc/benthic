@@ -27,7 +27,7 @@
 // Subsurface's own CNS table and gas compressibility, which this checker does
 // not copy.
 //
-// usage: plan-oracle           OD_MUTATE=<name> as for the plan test; OD_DUMP=1
+// usage: plan-oracle           BC_MUTATE=<name> as for the plan test; BC_DUMP=1
 //        prints the statistics of each check
 #include "../core/libbenthic/benthic.h"
 #include "zhl16c.h"
@@ -321,7 +321,7 @@ struct Stat {
 Stat s_ceiling, s_surface, s_minimal;       // GF points over the allowed
 Stat s_gas, s_gas_raw, s_cns, s_otu;                    // relative error
 int checked_plans = 0;
-bool trace = false; // OD_TRACE=<plan number>: print the walk of that plan
+bool trace = false; // BC_TRACE=<plan number>: print the walk of that plan
 
 struct Issue {
 	std::string what;
@@ -553,10 +553,10 @@ std::string request(const std::vector<std::pair<long, long>> &levels, const GasS
 	return r + "]}";
 }
 
-// The mutation of OD_MUTATE, sent to the façade only: the checker keeps the true parameters.
+// The mutation of BC_MUTATE, sent to the façade only: the checker keeps the true parameters.
 std::string mutate(std::string r)
 {
-	const char *m = getenv("OD_MUTATE");
+	const char *m = getenv("BC_MUTATE");
 	if (!m || !*m)
 		return r;
 	std::string name = m, extra;
@@ -596,7 +596,7 @@ int main()
 	prefs = default_prefs;
 	prefs.unit_system = METRIC;
 	prefs.units.length = units::METERS;
-	bool dump = getenv("OD_DUMP") != nullptr;
+	bool dump = getenv("BC_DUMP") != nullptr;
 
 	const int gf_low[] = { 30, 40, 50, 20, 100, 70, 35 };
 	const int gf_high[] = { 75, 85, 70, 90, 100, 70, 80 };
@@ -655,7 +655,7 @@ int main()
 		with_stops += stops;
 		gas_switches += sw;
 		checked_plans++;
-		trace = getenv("OD_TRACE") && atoi(getenv("OD_TRACE")) == n;
+		trace = getenv("BC_TRACE") && atoi(getenv("BC_TRACE")) == n;
 		if (trace)
 			printf("trace plan %d: %s\n     reported: cns %ld otu %ld runtime %ld gas used %ld %ld %ld\n", n, req.c_str(), plan.cns, plan.otu, plan.runtime, plan.cyl[0].gas_used_ml, plan.cyl.size() > 1 ? plan.cyl[1].gas_used_ml : 0L, plan.cyl.size() > 2 ? plan.cyl[2].gas_used_ml : 0L);
 		std::vector<Issue> issues = verify(plan, pr, true);

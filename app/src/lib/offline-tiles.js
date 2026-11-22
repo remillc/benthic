@@ -4,7 +4,7 @@
 // OpenFreeMap online, else nothing (the simplified world map, drawn by the
 // style, shows through).
 //
-// MapLibre asks for `odtiles://<channel>/{z}/{x}/{y}`. The channel names the
+// MapLibre asks for `bctiles://<channel>/{z}/{x}/{y}`. The channel names the
 // map asking (the visible map, or the off-screen drawer of site-image.js), so
 // that each can follow its own tiles.
 import { BenthicCore } from 'benthic-core';
@@ -12,7 +12,7 @@ import { offlineMaps } from './offline-maps.svelte.js';
 import { regionHasTile, inBbox, MAX_ZOOM_FULL } from './maps-logic.js';
 import { readTileSource } from './tilejson.js';
 
-export const TILE_PROTOCOL = 'odtiles';
+export const TILE_PROTOCOL = 'bctiles';
 /** Highest zoom of the downloaded regions and of OpenFreeMap's tiles. */
 export const TILE_MAX_ZOOM = MAX_ZOOM_FULL;
 /** OpenFreeMap's terms: at most 4 tile requests at a time. */
@@ -192,7 +192,7 @@ async function fetchTile(channel, z, x, y, signal) {
 let registered = false;
 
 /**
- * Teaches MapLibre the `odtiles://` addresses. Once per page.
+ * Teaches MapLibre the `bctiles://` addresses. Once per page.
  * @param {typeof import('maplibre-gl')} maplibregl
  */
 export function registerTileProtocol(maplibregl) {

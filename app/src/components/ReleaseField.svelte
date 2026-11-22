@@ -45,7 +45,7 @@
   /** On an iPhone the field is a row of a grouped inset list (task 2026-11-16-261; mock-up ios-premier-lancement-production-webdav). */
   const iphone = $derived(iosPhone(ios, layout.phone));
 
-  const id = `od-release-field-${Math.random().toString(36).slice(2, 8)}-${uid++}`;
+  const id = `bc-release-field-${Math.random().toString(36).slice(2, 8)}-${uid++}`;
 </script>
 
 <div class="bc-release-field {extra}" class:bc-release-field--error={!!error} class:bc-release-field--tall={tall} class:bc-release-field--ios={iphone} class:bc-release-field--noted={!!error || !!help}>
@@ -81,7 +81,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-release-field {
       margin-top: 14px;
       min-width: 0;

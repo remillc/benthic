@@ -57,7 +57,7 @@
 </EditorialPage>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-without-account--rows {
       margin: 0;
       padding: 2px 16px;

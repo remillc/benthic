@@ -31,7 +31,7 @@
 {#if url}<div class="bc-route-badge bc-route-badge--route" aria-hidden="true">{url}</div>{/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-route-badge--route {
       position: fixed;
       left: 8px;

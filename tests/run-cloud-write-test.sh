@@ -53,7 +53,7 @@ for n in $N1 $N2 $N3 $N4; do cw "$H1" get "$n" | val value > "$W/orig-$n.json"; 
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 
 # a. one edit, one sync, one commit
-notes_json "OpenDives write test a $STAMP" a
+notes_json "Benthic write test a $STAMP" a
 cw "$H1" edit "$N1" "$W/a.json" sync > "$W/a.out"
 echo "a: $(val text < "$W/a.out") -> $(val status < "$W/a.out")"
 grep -q '"status":"pushed"' "$W/a.out" || fail "a: not pushed: $(cat "$W/a.out")"
@@ -65,7 +65,7 @@ fresh; [ "$(cw "$H3" get "$N1" | val value)" = "$(cat "$W/a.json")" ] || fail "a
 
 # b. two clones, two dives
 cw "$H2" numbers > /dev/null
-notes_json "OpenDives write test b1 $STAMP" b1; notes_json "OpenDives write test b2 $STAMP" b2
+notes_json "Benthic write test b1 $STAMP" b1; notes_json "Benthic write test b2 $STAMP" b2
 cw "$H1" edit "$N2" "$W/b1.json" sync > "$W/b1.out"
 cw "$H2" edit-cached "$N3" "$W/b2.json" sync > "$W/b2.out"
 echo "b: clone 1 -> $(val status < "$W/b1.out"), clone 2 -> $(val status < "$W/b2.out")"
@@ -77,7 +77,7 @@ fresh
 
 # c. two clones, same field of the same dive
 cw "$H1" numbers > /dev/null; cw "$H2" numbers > /dev/null
-notes_json "OpenDives write test c1 $STAMP" c1; notes_json "OpenDives write test c2 $STAMP" c2
+notes_json "Benthic write test c1 $STAMP" c1; notes_json "Benthic write test c2 $STAMP" c2
 cw "$H1" edit-cached "$N4" "$W/c1.json" sync > "$W/c1.out"
 cw "$H2" edit-cached "$N4" "$W/c2.json" sync > "$W/c2.out"
 echo "c: clone 1 -> $(val status < "$W/c1.out"), clone 2 -> $(val status < "$W/c2.out")$(val error < "$W/c2.out")"
@@ -94,7 +94,7 @@ OTHERS=$(git -C "$C3" diff --name-only "$SB" "$SC" | grep -v '/Dive-'"$N4"'$' | 
 echo "c: files changed by the two edits: $(echo $(git -C "$C3" diff --name-only "$SB" "$SC"))"
 
 # d. offline, then back online
-notes_json "OpenDives write test d $STAMP" d
+notes_json "Benthic write test d $STAMP" d
 cw "$H1" numbers > /dev/null
 HOME=$H1 unshare -rn "$CW" edit-cached "$N1" "$W/d.json" sync > "$W/d1.out"
 echo "d: offline -> $(val status < "$W/d1.out")$(val error < "$W/d1.out"), pending $(cw "$H1" pending | val pending)"

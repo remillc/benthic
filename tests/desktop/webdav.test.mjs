@@ -31,7 +31,7 @@ const fields = (over = {}) => ({ server: server.address, username: server.user, 
 const descriptor = (name = 'Mon carnet', folder = 'OpenDives') => logbooks.cloudDescriptor({ provider: 'webdav', folder, name });
 
 before(() => {
-  root = mkdtempSync(path.join(tmpdir(), 'od-webdav-'));
+  root = mkdtempSync(path.join(tmpdir(), 'bc-webdav-'));
 });
 beforeEach(async () => {
   userData = path.join(root, `u${Math.random().toString(16).slice(2)}`);

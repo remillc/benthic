@@ -318,7 +318,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* As Settings (spec, section 4, layout): titles on the page background,
        groups as rounded white surfaces, no dividers, 48 dp rows. The first
        group title follows the top bar directly. */

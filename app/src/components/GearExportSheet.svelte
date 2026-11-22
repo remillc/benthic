@@ -49,7 +49,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.sheet-modal.bc-gear-sheet) {
       --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;

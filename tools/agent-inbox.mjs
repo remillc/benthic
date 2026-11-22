@@ -21,7 +21,7 @@ const inboxPath = join(root, 'docs', 'agent-inbox.md');
 const seenPath = join(root, '.claude', 'inbox-seen.json');
 const watchPidPath = join(root, '.claude', 'inbox-watch.pid');
 const mode = ['prompt', 'tool', 'watch'].includes(process.argv[2]) ? process.argv[2] : 'start';
-const POLL_MS = Number(process.env.OD_INBOX_POLL_MS) || 2000;
+const POLL_MS = Number(process.env.BC_INBOX_POLL_MS) || 2000;
 
 /** @typedef {{ mtime?: number, tasks: Record<string, string|null> }} Seen */
 

@@ -104,7 +104,7 @@
 </EditorialPage>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-sign-in--fields {
       margin: 6px 0 0;
 

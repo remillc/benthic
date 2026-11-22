@@ -66,7 +66,7 @@
 </script>
 
 <Panel
-  id="od-menu"
+  id="bc-menu"
   class="bc-nav-menu bc-menu"
   left
   cover
@@ -137,7 +137,7 @@
 </Panel>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.panel.bc-menu) {
       --f7-panel-width: 300px;
       --f7-panel-bg-color: var(--bc-drawer);

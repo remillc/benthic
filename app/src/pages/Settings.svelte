@@ -212,7 +212,7 @@
   }
 
   /**
-   * The cylinder added to a rebreather dive (OpenDives device settings).
+   * The cylinder added to a rebreather dive (Benthic device settings).
    * @param {'defaultDiluent'|'defaultOxygen'} key @param {string} label @returns {Row}
    */
   function rebreatherRow(key, label) {
@@ -1436,7 +1436,7 @@
         </header>
       {/if}
       <div class="bc-desktop-settings--columns">
-        <nav class="bc-desktop-settings--categories" data-od-scroll aria-label={t('settings.title')}>
+        <nav class="bc-desktop-settings--categories" data-bc-scroll aria-label={t('settings.title')}>
           {#if windowed}{@render deskSearchField()}{/if}
           <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
           <ul role="list" onkeydown={categoryKey}>
@@ -1459,7 +1459,7 @@
             {/each}
           </ul>
         </nav>
-        <main class="bc-desktop-settings--pane" data-od-scroll aria-label={searching ? t('desktopSettings.results', { n: found.count, text: search.trim() }) : t(`desktopSettings.categories.${deskState.category}`)}>
+        <main class="bc-desktop-settings--pane" data-bc-scroll aria-label={searching ? t('desktopSettings.results', { n: found.count, text: search.trim() }) : t(`desktopSettings.categories.${deskState.category}`)}>
           <div class="bc-desktop-settings--content">
             {#if searching}
               <h2 class="bc-desktop-settings--pane-title">{t('desktopSettings.results', { n: found.count, text: search.trim() })}</h2>
@@ -1506,7 +1506,7 @@
 {#if desk}
   {@render deskView()}
 {:else}
-<Page data-od-scroll class="bc-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
+<Page data-bc-scroll class="bc-settings" onPageAfterIn={openFirstSubpage} onPageBeforeIn={() => (navigation.page = 'settings')} onPageBeforeOut={() => (navigation.page = '')}>
   <Navbar large={ios && !section && !layout.split} title={section ? t(`settings.sections.${section}`) : t('settings.title')}>
     {#snippet left()}
       {#if section && layout.split}
@@ -1710,7 +1710,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Spec, section 4, "Settings: what each row does", layout: titles on the
        page background, groups as rounded surfaces, no dividers, 48 px rows. */
     :global(.bc-settings) {

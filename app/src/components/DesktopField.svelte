@@ -22,19 +22,19 @@
    */
   let { label, value = $bindable(), unit = '', helper = '', invalid = false, warning = false, options, inputmode = 'decimal', ariaLabel, oninput, onchange } = $props();
   const uid = $props.id();
-  const helperId = `od-desktop-field-${uid}-help`;
+  const helperId = `bc-desktop-field-${uid}-help`;
 </script>
 
 <div class="bc-desktop-field">
-  <label class="bc-desktop-field--label" for="od-desktop-field-{uid}">{label}</label>
+  <label class="bc-desktop-field--label" for="bc-desktop-field-{uid}">{label}</label>
   <div class="bc-desktop-field--box" class:bc-desktop-field--invalid={invalid}>
     {#if options}
-      <select id="od-desktop-field-{uid}" class="bc-desktop-field--input" bind:value aria-label={ariaLabel} aria-invalid={invalid} aria-describedby={helper ? helperId : undefined} onchange={() => onchange?.(value)}>
+      <select id="bc-desktop-field-{uid}" class="bc-desktop-field--input" bind:value aria-label={ariaLabel} aria-invalid={invalid} aria-describedby={helper ? helperId : undefined} onchange={() => onchange?.(value)}>
         {#each options as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
       </select>
       <svg class="bc-desktop-field--arrow" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
     {:else}
-      <input id="od-desktop-field-{uid}" class="bc-desktop-field--input" type="text" {inputmode} autocomplete="off" spellcheck="false" bind:value aria-label={ariaLabel} aria-invalid={invalid} aria-describedby={helper ? helperId : undefined} oninput={() => oninput?.()} />
+      <input id="bc-desktop-field-{uid}" class="bc-desktop-field--input" type="text" {inputmode} autocomplete="off" spellcheck="false" bind:value aria-label={ariaLabel} aria-invalid={invalid} aria-describedby={helper ? helperId : undefined} oninput={() => oninput?.()} />
       {#if unit}<span class="bc-desktop-field--unit" aria-hidden="true">{unit}</span>{/if}
     {/if}
   </div>
@@ -46,7 +46,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-field {
       min-width: 0;
     }

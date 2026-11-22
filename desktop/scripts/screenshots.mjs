@@ -2,7 +2,7 @@
 // Starts the desktop app (as staged by prepare.cjs), sets up the sample logbook without an
 // account, and takes screenshots of the Carnet: the window, a hovered profile, two dives with
 // the right-click menu. Used by the `desktop` workflow on a macOS runner, where nobody can look
-// at the app. With OD_DUMP_MENU, main.cjs also writes the menu bar's items to menu.json.
+// at the app. With BC_DUMP_MENU, main.cjs also writes the menu bar's items to menu.json.
 //   node scripts/screenshots.mjs <output folder>
 import { spawn, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -18,7 +18,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const electron = path.join(desktop, 'node_modules', '.bin', process.platform === 'win32' ? 'electron.cmd' : 'electron');
 // Never as plain Node: VS Code's terminals set ELECTRON_RUN_AS_NODE, and even empty it counts.
-const env = { ...process.env, OD_DUMP_MENU: path.join(out, 'menu.json'), OD_USER_DATA: path.join(out, 'user-data') };
+const env = { ...process.env, BC_DUMP_MENU: path.join(out, 'menu.json'), BC_USER_DATA: path.join(out, 'user-data') };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = spawn(electron, ['.', `--remote-debugging-port=${PORT}`], {
   cwd: desktop,

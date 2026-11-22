@@ -3,7 +3,7 @@
 // navigation bar is never reported, the top is 52 px or 0 from one launch to the next), so the
 // native side (MainActivity, SafeAreaInsets.java) reads the window insets and hands them over:
 // once at boot through the BenthicInsets interface, then on every change through
-// window.__odSetInsets. They become --bc-safe-top/right/bottom/left on <html>, and theme.css
+// window.__bcSetInsets. They become --bc-safe-top/right/bottom/left on <html>, and theme.css
 // points Framework7's --f7-safe-area-* at them. Elsewhere (iOS, desktop, browser) nothing is
 // set and env() keeps working.
 //
@@ -93,9 +93,9 @@ export function installSafeArea(win = window) {
   const apply = (/** @type {unknown} */ raw) => {
     const applied = applyInsets(raw, win.document.documentElement);
     if (applied) gestureZone = parseGestureZone(raw);
-    if (applied) win.dispatchEvent(new CustomEvent('od-insets', { detail: applied }));
+    if (applied) win.dispatchEvent(new CustomEvent('bc-insets', { detail: applied }));
   };
-  win.__odSetInsets = apply;
+  win.__bcSetInsets = apply;
   if (!bridge || typeof bridge.get !== 'function') return false;
   apply(bridge.get());
   return true;

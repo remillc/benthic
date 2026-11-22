@@ -4,7 +4,7 @@
 // synced. The undo history survives a sync that only sends this device's
 // changes; when a sync brings changes from the cloud, the logbook is read
 // again and the history is gone: the logbook says so with the
-// "od-undo-cleared" event, and every message still open closes at once, so
+// "bc-undo-cleared" event, and every message still open closes at once, so
 // that none offers an undo that would do nothing.
 import { f7 } from 'framework7-svelte';
 import { showSnackbar } from './snackbar.js';
@@ -43,7 +43,7 @@ export async function offerUndo(text, after, timeout = 6000, steps = 1) {
 }
 
 if (typeof window !== 'undefined') {
-  window.addEventListener('od-undo-cleared', () => {
+  window.addEventListener('bc-undo-cleared', () => {
     for (const el of document.querySelectorAll('.toast.bc-undo-toast')) f7.toast.close(/** @type {HTMLElement} */ (el));
   });
 }

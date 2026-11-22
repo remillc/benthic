@@ -1,6 +1,6 @@
 // @ts-check
 // When to ask for the store's in-app review (task 2026-11-13-104). The system dialog
-// is the only one: OpenDives never asks "do you like the app?" first, and never
+// is the only one: Benthic never asks "do you like the app?" first, and never
 // chooses who is asked. Pure decision here; the dates live in the device's storage.
 import { deviceStore } from './device-store.js';
 import { BenthicCore } from 'benthic-core';
@@ -13,8 +13,8 @@ export const MIN_AGE_DAYS = 7;
 export const MIN_INTERVAL_DAYS = 120;
 
 const DAY = 86400000;
-const FIRST_OPEN_KEY = 'od.firstOpen';
-const LAST_REVIEW_KEY = 'od.lastReviewRequest';
+const FIRST_OPEN_KEY = 'bc.firstOpen';
+const LAST_REVIEW_KEY = 'bc.lastReviewRequest';
 
 /**
  * @typedef {Object} ReviewState

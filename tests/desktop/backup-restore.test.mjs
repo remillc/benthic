@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Backup and restore of an Benthic+ logbook (task 2026-11-19-290) against the development server stack: the app's own
+// Backup and restore of a Benthic+ logbook (task 2026-11-19-290) against the development server stack: the app's own
 // version engine (app/src/lib/backup-history.js) on the core's `history` calls (benthic-host over stdio), with a real
 // account, a real repository on the dev Forgejo and real pushes. Three syncs with changes, the middle version restored, the
 // newest still listed and restorable back; a dive deleted, synced and restored from the deleted ones; a version opened
@@ -9,7 +9,7 @@
 //   BENTHIC_DEV_API=http://127.0.0.1:8080  BENTHIC_DEV_MAILPIT=http://127.0.0.1:8025
 //   BENTHIC_DEV_CA=<ca.pem, as the host sees it>  BENTHIC_TEST_DIR=<a directory, as the host sees it>
 //
-// The account is `<random>@opendives.test` and is deleted at the end (DELETE /v1/account).
+// The account is `<random>@benthic.test` and is deleted at the end (DELETE /v1/account).
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -78,7 +78,7 @@ async function codeFor(email) {
 }
 
 describe('backup and restore against the dev server', { skip }, () => {
-  const email = `backup-${randomBytes(4).toString('hex')}@opendives.test`;
+  const email = `backup-${randomBytes(4).toString('hex')}@benthic.test`;
   let host;
   let core;
   let session;

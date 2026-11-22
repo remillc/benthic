@@ -152,7 +152,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* The map card (bc-dives-without-site-map): 16 dp corners, 170 dp map, a note under it. */
     .bc-dives-without-site-map {
       margin: 14px 16px 0;

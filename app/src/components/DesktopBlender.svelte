@@ -246,10 +246,10 @@
       <div class="bc-desktop-blender--card">
         <svg class="bc-desktop-blender--cylinder" viewBox="0 0 120 270" width="110" role="img" aria-label={drawingLabel}>
           <defs>
-            <clipPath id="od-desktop-blender-clip"><path d="M60 26 C 98 26 104 44 104 66 L 104 236 C 104 252 98 262 84 262 L 36 262 C 22 262 16 252 16 236 L 16 66 C 16 44 22 26 60 26 Z" /></clipPath>
+            <clipPath id="bc-desktop-blender-clip"><path d="M60 26 C 98 26 104 44 104 66 L 104 236 C 104 252 98 262 84 262 L 36 262 C 22 262 16 252 16 236 L 16 66 C 16 44 22 26 60 26 Z" /></clipPath>
           </defs>
           <rect x="46" y="8" width="28" height="20" rx="4" class="bc-desktop-blender--valve" />
-          <g clip-path="url(#od-desktop-blender-clip)">
+          <g clip-path="url(#bc-desktop-blender-clip)">
             <rect x="0" y="0" width="120" height="270" class="bc-desktop-blender--empty" />
             {#each drawn as layer (layer.gas)}
               <rect x="0" y={layer.y} width="120" height={layer.h} style:fill={LAYER_FILL[layer.gas]} />
@@ -281,7 +281,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-blender {
       display: grid;
       grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
@@ -289,7 +289,7 @@
       align-items: start;
     }
     /* Fluid layout: in a narrow pane the results go under the inputs. */
-    @container od-tool (max-width: 799px) {
+    @container bc-tool (max-width: 799px) {
       .bc-desktop-blender {
         grid-template-columns: minmax(0, 1fr);
         gap: 20px;

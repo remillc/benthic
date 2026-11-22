@@ -46,7 +46,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-plan-title-dialog--field {
       --bc-field-margin: 24px;
     }

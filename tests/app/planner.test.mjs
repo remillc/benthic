@@ -2,7 +2,7 @@
 // to the core, what the core answers becomes what is shown, and the two alarms
 // of the result. Node's built-in test runner, no dependency:
 //   node --import ./tests/app/register.mjs --test tests/app/
-// OD_JS_MUTATE=<name> loads a wrong version of the source (see loader.mjs): the
+// BC_JS_MUTATE=<name> loads a wrong version of the source (see loader.mjs): the
 // tests must then fail.
 import test from 'node:test';
 import assert from 'node:assert/strict';

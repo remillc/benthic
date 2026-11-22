@@ -70,7 +70,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gas-card {
       padding: 16px 8px 12px;
       border-radius: 16px;

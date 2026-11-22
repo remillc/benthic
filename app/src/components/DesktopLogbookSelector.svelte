@@ -128,7 +128,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-logbook-selector {
       position: relative;
       display: inline-flex;

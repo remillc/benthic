@@ -1,6 +1,6 @@
 // @ts-check
 // The one Back dispatcher (spec, section 3: the system back works everywhere; docs/architecture.md, section 13).
-// The Android Back key and gesture (Capacitor's `backButton`), the keyboard's Escape and the tests' « od:back » all
+// The Android Back key and gesture (Capacitor's `backButton`), the keyboard's Escape and the tests' « bc:back » all
 // come here. Framework7 does not use the browser history and neither does the app: without this bridge, Back would
 // close the application.
 //
@@ -20,8 +20,8 @@ import { trace } from './nav-trace.js';
 /** @typedef {'system'|'escape'|'test'} BackSource */
 
 export function enableBackButton() {
-  // The same handler answers the page event « od:back » (tests/e2e/navigation.mjs sends the Android Back key that way).
-  window.addEventListener('od:back', () => goBack('test'));
+  // The same handler answers the page event « bc:back » (tests/e2e/navigation.mjs sends the Android Back key that way).
+  window.addEventListener('bc:back', () => goBack('test'));
   CapacitorApp.addListener('backButton', () => goBack('system'));
   enableEscape();
 }
@@ -51,9 +51,9 @@ function minimize() {
   return 'exit';
 }
 
-/** Sends « od-cancel » to an element that closes itself. @param {Element} el @param {string} name */
+/** Sends « bc-cancel » to an element that closes itself. @param {Element} el @param {string} name */
 function cancel(el, name) {
-  el.dispatchEvent(new CustomEvent('od-cancel'));
+  el.dispatchEvent(new CustomEvent('bc-cancel'));
   return name;
 }
 
@@ -81,12 +81,12 @@ function dispatch(layersOnly) {
   const dropdown = document.querySelector('.bc-select-field--open');
   if (dropdown) return cancel(dropdown, 'dropdown');
   // 0c. An open suggestion list (lib/float-menu.js, in the browser's top layer) closes: its field loses the focus.
-  const suggestions = document.querySelector('[data-od-float-menu]');
+  const suggestions = document.querySelector('[data-bc-float-menu]');
   if (suggestions) {
     const field = suggestions.parentElement;
     const active = /** @type {HTMLElement|null} */ (document.activeElement);
     if (active && field?.contains(active)) active.blur();
-    suggestions.dispatchEvent(new CustomEvent('od-cancel'));
+    suggestions.dispatchEvent(new CustomEvent('bc-cancel'));
     return 'suggestions';
   }
   // 1. The side menu closes.
@@ -126,8 +126,8 @@ function dispatch(layersOnly) {
   if ((modal ? modal.classList.contains('popup') : !layersOnly) && backThroughGuard(modal)) return 'leave-guard';
   if (modal) {
     const el = /** @type {HTMLElement} */ (modal);
-    // OpenDives' own dialogs (components/Md3Dialog.svelte) cancel themselves.
-    if (modal.classList.contains('bc-md3-dialog') || modal.classList.contains('bc-cylinder-sheet') || modal.classList.contains('bc-gauge-sheet')) return cancel(modal, 'od-dialog');
+    // Benthic's own dialogs (components/Md3Dialog.svelte) cancel themselves.
+    if (modal.classList.contains('bc-md3-dialog') || modal.classList.contains('bc-cylinder-sheet') || modal.classList.contains('bc-gauge-sheet')) return cancel(modal, 'bc-dialog');
     if (modal.classList.contains('actions-modal')) f7.actions.close(el);
     else if (modal.classList.contains('dialog')) f7.dialog.close(el);
     else if (modal.classList.contains('sheet-modal')) f7.sheet.close(el);
@@ -179,7 +179,7 @@ function dispatch(layersOnly) {
  */
 function enableEscape() {
   /** What is on top when the key goes down, before anyone answers it. */
-  const top = () => document.querySelector('.bc-row-menu, .bc-select-field--open, [data-od-float-menu], .panel.panel-in, .bc-fab-menu--open, .fab-opened') ?? topModal();
+  const top = () => document.querySelector('.bc-row-menu, .bc-select-field--open, [data-bc-float-menu], .panel.panel-in, .bc-fab-menu--open, .fab-opened') ?? topModal();
   window.addEventListener(
     'keydown',
     (e) => {

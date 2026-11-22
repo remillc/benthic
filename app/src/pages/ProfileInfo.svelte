@@ -4,7 +4,7 @@
   // and profil-infos-sans-accord-android.dc.html): « Vous » (date of birth), « Contact d’urgence » (name and relationship,
   // phone with its country code) and « Santé » (blood group, « Vous seul »). The pencil edits in place (todo #119): the
   // sections turn into fields and the bar offers « Enregistrer »; the system Back leaves the editing without saving
-  // (lib/back-button.js sends od-cancel). `?edit=1` opens the page already editing (the emergency sheet uses it).
+  // (lib/back-button.js sends bc-cancel). `?edit=1` opens the page already editing (the emergency sheet uses it).
   import BackLink from '../components/BackLink.svelte';
   import { onMount } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
@@ -61,8 +61,8 @@
 
   /** The system Back (lib/back-button.js) asks the page to stop editing. @param {HTMLElement} node */
   function cancelable(node) {
-    node.addEventListener('od-cancel', cancelEdit);
-    return { destroy: () => node.removeEventListener('od-cancel', cancelEdit) };
+    node.addEventListener('bc-cancel', cancelEdit);
+    return { destroy: () => node.removeEventListener('bc-cancel', cancelEdit) };
   }
 
   // The number formats itself for the chosen country as it is typed.
@@ -213,7 +213,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-profile-info .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }

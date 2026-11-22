@@ -1,7 +1,7 @@
 // @ts-check
 // « Mon profil de plongeur » (Benthic+, task 2026-11-18-272): the Informations (date of birth, emergency contact,
 // blood group) and the certification cards, in the same local store as the equipment (lib/file-store.js), in the
-// layout of the OpenDives logbook (docs/architecture.md, section 11.3):
+// layout of the Benthic logbook (docs/architecture.md, section 11.3):
 //   profile/diver.json          plain: dateOfBirth; sealed block `enc`: emergencyContact, bloodGroup
 //   certifications/<uuid>.json  the whole payload sealed: agency, level, number, issuedOn, instructor, photos
 //   documents/<hash>.json       one sealed card photo, named by the hash of its ciphertext (section 11.6)

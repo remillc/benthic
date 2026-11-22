@@ -115,7 +115,7 @@ export function summaryText(dive, prefs) {
   return [title, formatFullDate(dive.date), facts].filter(Boolean).join('\n');
 }
 
-/** File names: OpenDives-plongee-5-2014-04-02.pdf. @param {DiveDetail} dive @param {string} ext */
+/** File names: Benthic-plongee-5-2014-04-02.pdf. @param {DiveDetail} dive @param {string} ext */
 function fileName(dive, ext) {
   const day = dive.date.slice(0, 10);
   return `${t('share.filePrefix')}${dive.number ? `-${dive.number}` : ''}-${day}.${ext}`;
@@ -353,7 +353,7 @@ export async function exportDives(ids, format, anonymize, prefs, whole = false, 
   const ext = format === 'csvProfiles' ? 'csv' : format;
   const name =
     whole && format === 'ssrf'
-      ? logbookExportName(deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName'), day, t('desktop.export.fileLogbook'))
+      ? logbookExportName(deviceStore.getItem('bc.logbookName') || t('welcomeSteps.defaultName'), day, t('desktop.export.fileLogbook'))
       : `${t('share.exportPrefix', { n: String(ids.length) })}-${day}.${ext}`;
   const { uri, mime } = await exportFile(ids, format, anonymize, prefs, name, showName);
   await BenthicCore.grantShareFile({ uri, mime });

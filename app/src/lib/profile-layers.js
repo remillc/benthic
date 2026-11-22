@@ -2,10 +2,10 @@
 // The curve chips under the desktop profile (task 2026-11-15-183): which curves are on, in the order
 // they were turned on (the last right-hand scale turned on is the one drawn). The choice is kept
 // between dives and sessions in the settings of this computer (device-store.js, key
-// `od.profileLayers`), never in the logbook. Without a choice yet, no curve is on (todo 124: the temperature used to be).
+// `bc.profileLayers`), never in the logbook. Without a choice yet, no curve is on (todo 124: the temperature used to be).
 import { writable } from 'svelte/store';
 
-export const LAYER_KEY = 'od.profileLayers';
+export const LAYER_KEY = 'bc.profileLayers';
 /** The chips, in their order. */
 export const LAYERS = /** @type {const} */ (['temperature', 'gas', 'ppo2', 'ceiling', 'tissues']);
 /** @typedef {typeof LAYERS[number]} Layer */

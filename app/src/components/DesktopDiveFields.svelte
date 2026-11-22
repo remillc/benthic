@@ -348,8 +348,8 @@
   let root = $state(/** @type {HTMLElement|undefined} */ (undefined));
   $effect(() => {
     const focusFirst = () => /** @type {HTMLElement|null|undefined} */ (root?.querySelector('.bc-desktop-edit-field--rest'))?.focus();
-    window.addEventListener('od-detail-focus-first', focusFirst);
-    return () => window.removeEventListener('od-detail-focus-first', focusFirst);
+    window.addEventListener('bc-detail-focus-first', focusFirst);
+    return () => window.removeEventListener('bc-detail-focus-first', focusFirst);
   });
 </script>
 
@@ -405,8 +405,8 @@
     </div>
     {#if dive.weights?.some((w) => w.grams > 0)}
       <div class="bc-desktop-dive-fields--row">
-        <span class="bc-desktop-dive-fields--row-label" id="od-df-feedback">{t('weightFeedback.title')}</span>
-        <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="od-df-feedback" clearable rail />
+        <span class="bc-desktop-dive-fields--row-label" id="bc-df-feedback">{t('weightFeedback.title')}</span>
+        <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="bc-df-feedback" clearable rail />
       </div>
     {/if}
 
@@ -415,7 +415,7 @@
       <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
       <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
     {:else if equipment}
-      <!-- Without an Benthic+ account the list shows, with the chip, and cannot change. -->
+      <!-- Without a Benthic+ account the list shows, with the chip, and cannot change. -->
       <DesktopOtherGear items={otherItems} locked />
     {:else}
       <!-- Alpha edition: the list is not stored anywhere. -->
@@ -467,7 +467,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-dive-fields {
       display: flex;
       flex-direction: column;

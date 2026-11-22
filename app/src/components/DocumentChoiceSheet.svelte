@@ -41,7 +41,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.sheet-modal.bc-doc-choice) {
       --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;

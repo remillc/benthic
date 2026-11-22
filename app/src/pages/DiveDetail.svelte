@@ -774,7 +774,7 @@
    * @param {'export'|'share'|'delete'} command
    */
   function deskCommand(command) {
-    window.dispatchEvent(new CustomEvent('od-desktop-command', { detail: command }));
+    window.dispatchEvent(new CustomEvent('bc-desktop-command', { detail: command }));
   }
   $effect(() => {
     if (!desk || preview) return;
@@ -835,7 +835,7 @@
 </script>
 
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
-<Page data-od-scroll onPageInit={watchSwipes} class="bc-dive-detail no-swipeback {desk ? 'bc-dive-detail--desk' : ''} {imageShown && !scrolled ? 'bc-dive-detail--on-image' : ''} {slide ? `bc-slide-${slide}` : ''}">
+<Page data-bc-scroll onPageInit={watchSwipes} class="bc-dive-detail no-swipeback {desk ? 'bc-dive-detail--desk' : ''} {imageShown && !scrolled ? 'bc-dive-detail--on-image' : ''} {slide ? `bc-slide-${slide}` : ''}">
   <Navbar>
     <!-- The site's name, shown once the page's own title has scrolled under the bar. -->
     {#snippet title()}
@@ -1259,7 +1259,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Error state: a centred column under the bar, the title in the title font. */
     .bc-dive-detail--error {
       max-width: 440px;
@@ -1734,7 +1734,7 @@
     --f7-navbar-bg-color: transparent;
   }
 
-  @layer od.components {
+  @layer bc.components {
     .bc-dive-detail--bar-title {
       display: block;
       overflow: hidden;

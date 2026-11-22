@@ -48,32 +48,32 @@ function setup({ session = null, subscribed } = {}) {
     account: (a) => accounts.push(a),
     reload: () => events.push('reload'),
     server: () => 'http://127.0.0.1:8080',
-    email: () => 'essai-test@opendives.test',
+    email: () => 'essai-test@benthic.test',
   });
   return { tools, calls, reads, events, mem, server, accounts };
 }
 
 test('state: no session is free; a session is subscribed unless marked otherwise', async () => {
   assert.equal((await setup().tools.state()).kind, 'free');
-  const s = await setup({ session: { email: 'essai-a@opendives.test', token: 't' } }).tools.state();
-  assert.deepEqual([s.kind, s.temporary, s.email], ['subscribed', true, 'essai-a@opendives.test']);
+  const s = await setup({ session: { email: 'essai-a@benthic.test', token: 't' } }).tools.state();
+  assert.deepEqual([s.kind, s.temporary, s.email], ['subscribed', true, 'essai-a@benthic.test']);
   assert.equal((await setup({ session: { email: 'a@b.c', token: 't' }, subscribed: '0' }).tools.state()).kind, 'free');
 });
 
 test('free, default: sign out keeping the device logbook, open it, reload; no server call', async () => {
-  const t = setup({ session: { email: 'essai-a@opendives.test', token: 't' } });
+  const t = setup({ session: { email: 'essai-a@benthic.test', token: 't' } });
   await t.tools.toFree();
   assert.deepEqual(t.events, ['signOut', 'clear', 'free', 'reload']);
   assert.deepEqual(t.calls, []);
 });
 
 test('free, keeping the session: dev-unsubscribe with the token, the account state follows, no restart', async () => {
-  const t = setup({ session: { email: 'essai-a@opendives.test', token: 'tok' } });
+  const t = setup({ session: { email: 'essai-a@benthic.test', token: 'tok' } });
   await t.tools.toFree('unsubscribe');
   assert.deepEqual(t.calls, ['/v1/account/dev-unsubscribe Bearer tok']);
   assert.equal(t.mem.get(SUBSCRIBED_KEY), '0');
   assert.deepEqual(t.events, []);
-  assert.deepEqual(t.accounts, [{ signedIn: true, email: 'essai-a@opendives.test', subscribed: false }]);
+  assert.deepEqual(t.accounts, [{ signedIn: true, email: 'essai-a@benthic.test', subscribed: false }]);
 });
 
 test('free, keeping the session, from no session: a temporary account is signed in and left not subscribed', async () => {
@@ -86,14 +86,14 @@ test('free, keeping the session, from no session: a temporary account is signed 
 });
 
 test('free, keeping the session, from a subscribed session: dev-unsubscribe, still signed in', async () => {
-  const t = setup({ session: { email: 'a@opendives.test', token: 'tok' } });
+  const t = setup({ session: { email: 'a@benthic.test', token: 'tok' } });
   await t.tools.toFree('unsubscribe');
   const s = await t.tools.state();
   assert.deepEqual([s.signedIn, s.kind], [true, 'free']);
 });
 
 test('free signed out and subscribed work from every starting state, with or without a session', async () => {
-  for (const make of [() => setup(), () => setup({ session: { email: 'a@opendives.test', token: 't' }, subscribed: '0' }), () => setup({ session: { email: 'a@opendives.test', token: 't' } })]) {
+  for (const make of [() => setup(), () => setup({ session: { email: 'a@benthic.test', token: 't' }, subscribed: '0' }), () => setup({ session: { email: 'a@benthic.test', token: 't' } })]) {
     const a = make();
     await a.tools.toFree('signOut');
     assert.equal((await a.tools.state()).signedIn, false);
@@ -123,19 +123,19 @@ test('subscribed without a session: dev-google, dev-subscribe, session kept, the
   await t.tools.toSubscribed();
   assert.deepEqual(t.calls, ['/v1/auth/dev-google', '/v1/account/dev-subscribe Bearer tok-new']);
   assert.deepEqual(t.events, ['save']);
-  assert.deepEqual(t.accounts, [{ signedIn: true, email: 'essai-test@opendives.test', subscribed: true }]);
+  assert.deepEqual(t.accounts, [{ signedIn: true, email: 'essai-test@benthic.test', subscribed: true }]);
   assert.equal(t.mem.get(SUBSCRIBED_KEY), '1');
 });
 
 test('subscribed with a session: only dev-subscribe', async () => {
-  const t = setup({ session: { email: 'a@opendives.test', token: 'tok' }, subscribed: '0' });
+  const t = setup({ session: { email: 'a@benthic.test', token: 'tok' }, subscribed: '0' });
   await t.tools.toSubscribed();
   assert.deepEqual(t.calls, ['/v1/account/dev-subscribe Bearer tok']);
   assert.equal(t.mem.get(SUBSCRIBED_KEY), '1');
 });
 
 test('new account: a fresh not-subscribed account replaces the session', async () => {
-  const t = setup({ session: { email: 'old@opendives.test', token: 'old' } });
+  const t = setup({ session: { email: 'old@benthic.test', token: 'old' } });
   await t.tools.newAccount();
   assert.deepEqual(t.calls, ['/v1/auth/dev-google']);
   assert.deepEqual(t.events, ['signOut', 'clear', 'save', 'reload']);
@@ -143,7 +143,7 @@ test('new account: a fresh not-subscribed account replaces the session', async (
 });
 
 test('delete: dev-reset with the token, then sign out with the copy; refuses a real address', async () => {
-  const t = setup({ session: { email: 'essai-a@opendives.test', token: 'tok' } });
+  const t = setup({ session: { email: 'essai-a@benthic.test', token: 'tok' } });
   await t.tools.deleteAccount();
   assert.deepEqual(t.calls, ['/v1/account/dev-reset Bearer tok']);
   assert.deepEqual(t.events, ['signOut:copy', 'clear', 'reload']);
@@ -153,7 +153,7 @@ test('delete: dev-reset with the token, then sign out with the copy; refuses a r
 });
 
 test('replay the first launch: only the beta key, then reload', () => {
-  const t = setup({ session: { email: 'a@opendives.test', token: 't' } });
+  const t = setup({ session: { email: 'a@benthic.test', token: 't' } });
   t.tools.replayFirstLaunch();
   assert.equal(t.mem.get(WELCOME_KEY), 'show');
   assert.deepEqual(t.events, ['reload']);
@@ -161,7 +161,7 @@ test('replay the first launch: only the beta key, then reload', () => {
 });
 
 test('import the previous version’s logbook: the done mark is cleared, the first launch replays, nothing else changes', async () => {
-  const t = setup({ session: { email: 'a@opendives.test', token: 't' } });
+  const t = setup({ session: { email: 'a@benthic.test', token: 't' } });
   t.mem.set(ALPHA_IMPORT_KEY, '1');
   await t.tools.importAlphaLogbook();
   assert.equal(t.mem.has(ALPHA_IMPORT_KEY), false);
@@ -188,7 +188,7 @@ test('the menu is absent without the switch: every entry is behind devAccounts a
 });
 
 test('state: with a session the server decides, whatever the device flag says; the flag only stands in when it is down', async () => {
-  const t = setup({ session: { email: 'a@opendives.test', token: 'tok' }, subscribed: '1' });
+  const t = setup({ session: { email: 'a@benthic.test', token: 'tok' }, subscribed: '1' });
   t.server.subscribed = false; // the flag still says subscribed
   const s = await t.tools.state();
   assert.deepEqual([s.kind, s.fromServer], ['free', true]);
@@ -201,7 +201,7 @@ test('state: with a session the server decides, whatever the device flag says; t
 
 test('free signed out, from a session the logbook never connected: the session is forgotten anyway', async () => {
   // app.signOut only clears the session of a logbook opened through it: the dev tool clears it itself.
-  const t = setup({ session: { email: 'essai-a@opendives.test', token: 'tok' } });
+  const t = setup({ session: { email: 'essai-a@benthic.test', token: 'tok' } });
   await t.tools.toFree('signOut');
   assert.equal((await t.tools.state()).signedIn, false);
 });
@@ -209,8 +209,8 @@ test('free signed out, from a session the logbook never connected: the session i
 test('selector: the current segment is the only one disabled, whatever the starting state', async () => {
   const states = {
     none: setup(),
-    free: setup({ session: { email: 'a@opendives.test', token: 't' }, subscribed: '0' }),
-    subscribed: setup({ session: { email: 'a@opendives.test', token: 't' } }),
+    free: setup({ session: { email: 'a@benthic.test', token: 't' }, subscribed: '0' }),
+    subscribed: setup({ session: { email: 'a@benthic.test', token: 't' } }),
   };
   const expected = { none: 0, free: 1, subscribed: 2 };
   for (const [name, t] of Object.entries(states)) {
@@ -229,8 +229,8 @@ test('selector: the current segment is the only one disabled, whatever the start
 test('selector: each segment calls the right action from each starting state, and ends on its own state', async () => {
   const starts = {
     none: () => setup(),
-    free: () => setup({ session: { email: 'a@opendives.test', token: 't' }, subscribed: '0' }),
-    subscribed: () => setup({ session: { email: 'a@opendives.test', token: 't' } }),
+    free: () => setup({ session: { email: 'a@benthic.test', token: 't' }, subscribed: '0' }),
+    subscribed: () => setup({ session: { email: 'a@benthic.test', token: 't' } }),
   };
   const target = { out: 0, keep: 1, sub: 2 };
   for (const [name, make] of Object.entries(starts)) {

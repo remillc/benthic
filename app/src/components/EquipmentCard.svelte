@@ -99,8 +99,8 @@
   {/if}
   {#if spread && weightTotal && onfeedback}
     <div class="bc-equipment-card--feedback">
-      <p class="bc-equipment-card--feedback-title" id="od-weight-feedback-title">{t('weightFeedback.title')}</p>
-      <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => onfeedback(v)} ariaLabelledby="od-weight-feedback-title" clearable rail />
+      <p class="bc-equipment-card--feedback-title" id="bc-weight-feedback-title">{t('weightFeedback.title')}</p>
+      <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => onfeedback(v)} ariaLabelledby="bc-weight-feedback-title" clearable rail />
     </div>
   {/if}
   {#if spread && computer && !computerInSummary && !several}
@@ -127,7 +127,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-equipment-card--computers {
       display: block;
       width: 100%;

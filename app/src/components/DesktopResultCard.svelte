@@ -13,7 +13,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-result-card {
       display: flex;
       flex-direction: column;

@@ -13,7 +13,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.page.bc-pane-empty) {
       --f7-page-bg-color: var(--bc-surface);
     }

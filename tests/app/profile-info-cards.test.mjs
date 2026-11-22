@@ -435,7 +435,7 @@ test('the information page is edited in place: no edit route, and Back stops the
   assert.doesNotMatch(read('App.svelte'), /profile\/info\/edit|ProfileInfoEdit/);
   const page = read('pages/ProfileInfo.svelte');
   assert.match(page, /bc-profile-info--editing/);
-  assert.match(page, /od-cancel/);
+  assert.match(page, /bc-cancel/);
   assert.match(read('lib/back-button.js'), /\.page-current \.bc-profile-info--editing/);
   assert.match(read('pages/EmergencySheet.svelte'), /href="\/profile\/info\?edit=1"/);
 });

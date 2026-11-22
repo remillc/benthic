@@ -42,7 +42,7 @@
     });
   });
 
-  const menuId = `od-site-menu-${Math.random().toString(36).slice(2, 9)}`;
+  const menuId = `bc-site-menu-${Math.random().toString(36).slice(2, 9)}`;
   /** The "Merge with another site" choice is open; `others`: the sites it offers. */
   let choosingOther = $state(false);
   let others = $state(/** @type {{ uuid: number, name: string, dives: number }[]} */ ([]));
@@ -263,7 +263,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-site-sheet--head {
       padding: 0 20px;
 

@@ -25,7 +25,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-filter-criterion--heading {
       margin: 20px 16px 8px;
       font-size: 14px;

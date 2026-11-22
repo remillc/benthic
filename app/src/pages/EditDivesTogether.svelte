@@ -211,7 +211,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-multi-edit--content {
       padding: 8px 0 32px;
     }

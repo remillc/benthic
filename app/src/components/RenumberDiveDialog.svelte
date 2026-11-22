@@ -63,7 +63,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-renumber-dive-dialog--field {
       --bc-field-margin: 24px;
     }

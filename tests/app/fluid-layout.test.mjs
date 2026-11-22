@@ -13,7 +13,7 @@ test('the overflow audit exists, refuses the developer window and documents its 
   const script = read('desktop/scripts/overflow-audit.mjs');
   assert.match(script, /port === 9333/);
   for (const option of ['--size', '--reload', '--pre', '--shot', '--json', '--root']) assert.ok(script.includes(option), option);
-  assert.match(script, /data-od-scroll/);
+  assert.match(script, /data-bc-scroll/);
   assert.match(read('desktop/README.md'), /overflow-audit\.mjs/);
   assert.match(read('docs/system-design.md'), /Fluid layout \(decided on 16 November 2026\)/);
 });
@@ -49,9 +49,9 @@ test('backup history shows loading skeletons and keeps restore beside the dive d
 });
 
 test('the tools, the site sheet and the clean-up lay out by their pane, not the window', () => {
-  assert.match(read('app/src/pages/DesktopTools.svelte'), /container: od-tool \/ inline-size/);
+  assert.match(read('app/src/pages/DesktopTools.svelte'), /container: bc-tool \/ inline-size/);
   for (const file of ['DesktopBestMix', 'DesktopBlender', 'DesktopEadMod', 'DesktopPlanner']) {
-    assert.match(read(`app/src/components/${file}.svelte`), /@container od-tool \(max-width: \d+px\)/, file);
+    assert.match(read(`app/src/components/${file}.svelte`), /@container bc-tool \(max-width: \d+px\)/, file);
   }
   for (const file of ['DesktopSiteSheet', 'DesktopSiteNew', 'DesktopSitesCleanup']) {
     const source = read(`app/src/components/${file}.svelte`);
@@ -78,12 +78,12 @@ test('short windows: the first launch, the tools and the new-logbook dialog give
 
 test('panes that scroll as lists are marked for the audit', () => {
   for (const [file, mark] of [
-    ['app/src/pages/DesktopLogbook.svelte', 'bc-desktop-logbook--scroll" data-od-scroll'],
-    ['app/src/pages/DesktopSites.svelte', 'bc-desktop-sites--scroll" data-od-scroll'],
-    ['app/src/pages/DesktopStatistics.svelte', 'bc-desktop-statistics--list" data-od-scroll'],
-    ['app/src/pages/DesktopTools.svelte', 'bc-desktop-tools--pane" data-od-scroll'],
-    ['app/src/pages/Settings.svelte', 'bc-desktop-settings--pane" data-od-scroll'],
-    ['app/src/components/Md3Dialog.svelte', 'bc-md3-dialog--content" data-od-scroll'],
+    ['app/src/pages/DesktopLogbook.svelte', 'bc-desktop-logbook--scroll" data-bc-scroll'],
+    ['app/src/pages/DesktopSites.svelte', 'bc-desktop-sites--scroll" data-bc-scroll'],
+    ['app/src/pages/DesktopStatistics.svelte', 'bc-desktop-statistics--list" data-bc-scroll'],
+    ['app/src/pages/DesktopTools.svelte', 'bc-desktop-tools--pane" data-bc-scroll'],
+    ['app/src/pages/Settings.svelte', 'bc-desktop-settings--pane" data-bc-scroll'],
+    ['app/src/components/Md3Dialog.svelte', 'bc-md3-dialog--content" data-bc-scroll'],
   ]) {
     assert.ok(read(file).includes(mark), `${file}: ${mark}`);
   }

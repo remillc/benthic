@@ -142,7 +142,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<section class="bc-site-form" data-od-scroll aria-label={t('sites.newSite')} onkeydown={keydown}>
+<section class="bc-site-form" data-bc-scroll aria-label={t('sites.newSite')} onkeydown={keydown}>
   <h2 class="bc-site-form--title">{t('sites.newSite')}</h2>
   <div class="bc-site-form--body">
     <div class="bc-site-form--left">
@@ -151,23 +151,23 @@
     </div>
     <div class="bc-site-form--right">
       <div class="bc-site-form--fields">
-        <label for="od-new-name">{t('sites.name')}</label>
-        <DesktopSiteField id="od-new-name" form bind:this={nameField} value={name} oninput={(v) => (name = v)} onkeep={(v) => (name = v)} />
+        <label for="bc-new-name">{t('sites.name')}</label>
+        <DesktopSiteField id="bc-new-name" form bind:this={nameField} value={name} oninput={(v) => (name = v)} onkeep={(v) => (name = v)} />
 
-        <label for="od-new-coords">{t('sites.coordinates')}</label>
-        <DesktopSiteField id="od-new-coords" form value={coordsText} note={t('desktopSites.coordinatesExample')} error={coordsError} oninput={(text) => (preview = parseCoordinates(text))} onkeep={typedCoordinates} oncancel={() => (preview = null)} />
+        <label for="bc-new-coords">{t('sites.coordinates')}</label>
+        <DesktopSiteField id="bc-new-coords" form value={coordsText} note={t('desktopSites.coordinatesExample')} error={coordsError} oninput={(text) => (preview = parseCoordinates(text))} onkeep={typedCoordinates} oncancel={() => (preview = null)} />
 
-        <label for="od-new-country">{t('sites.country')}</label>
-        <DesktopSiteField id="od-new-country" form value={country} note={country && country === autoCountry ? t('sites.fromPosition') : ''} complete={completeCountry} countText={siteCount} oninput={(v) => (country = v)} onkeep={(v) => (country = v)} />
+        <label for="bc-new-country">{t('sites.country')}</label>
+        <DesktopSiteField id="bc-new-country" form value={country} note={country && country === autoCountry ? t('sites.fromPosition') : ''} complete={completeCountry} countText={siteCount} oninput={(v) => (country = v)} onkeep={(v) => (country = v)} />
 
-        <label for="od-new-region">{t('sites.region')}</label>
-        <DesktopSiteField id="od-new-region" form value={region} note={region && region === autoRegion ? t('sites.fromPosition') : ''} complete={completeRegion} countText={siteCount} oninput={(v) => (region = v)} onkeep={(v) => (region = v)} />
+        <label for="bc-new-region">{t('sites.region')}</label>
+        <DesktopSiteField id="bc-new-region" form value={region} note={region && region === autoRegion ? t('sites.fromPosition') : ''} complete={completeRegion} countText={siteCount} oninput={(v) => (region = v)} onkeep={(v) => (region = v)} />
 
-        <label for="od-new-description">{t('sites.description')}</label>
-        <DesktopSiteField id="od-new-description" form multiline value={description} oninput={(v) => (description = v)} onkeep={(v) => (description = v)} />
+        <label for="bc-new-description">{t('sites.description')}</label>
+        <DesktopSiteField id="bc-new-description" form multiline value={description} oninput={(v) => (description = v)} onkeep={(v) => (description = v)} />
 
-        <label for="od-new-notes">{t('sites.notes')}</label>
-        <DesktopSiteField id="od-new-notes" form multiline value={notes} oninput={(v) => (notes = v)} onkeep={(v) => (notes = v)} />
+        <label for="bc-new-notes">{t('sites.notes')}</label>
+        <DesktopSiteField id="bc-new-notes" form multiline value={notes} oninput={(v) => (notes = v)} onkeep={(v) => (notes = v)} />
       </div>
 
       {#if nearby}
@@ -187,7 +187,7 @@
 </section>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-site-form {
       box-sizing: border-box;
       height: 100%;

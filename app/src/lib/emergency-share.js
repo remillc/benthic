@@ -1,7 +1,7 @@
 // @ts-check
 // « Partager la fiche d’urgence » (task 2026-11-19-311, docs/mockups/urgence-partager-android.dc.html): the sheet goes out as
 // an image or as a PDF, made on the device with the paths of the dive sheet and of the documents (HTML to PDF in the core;
-// the system's share sheet, or the save dialog on the desktop). Nothing is sent to the OpenDives server.
+// the system's share sheet, or the save dialog on the desktop). Nothing is sent to the Benthic server.
 import { Share } from '@capacitor/share';
 import { BenthicCore } from 'benthic-core';
 import { letterPaper } from './share.js';

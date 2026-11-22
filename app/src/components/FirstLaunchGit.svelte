@@ -30,7 +30,7 @@
    * }}
    * `create`: the repository must be empty (a new logbook); otherwise it must hold a logbook. `afterConnect`
    * runs once the logbook is open (the imported dives, the label). `onswitch`: the link to the other path
-   * (« Ouvrir mon carnet OpenDives » when creating, « Créer un carnet » when opening). `onconnect` replaces the
+   * (« Ouvrir mon carnet Benthic » when creating, « Créer un carnet » when opening). `onconnect` replaces the
    * connection and what follows it (the desktop app's window without a logbook, whose main process creates the
    * logbook from the address, the branch and the token: task 2026-11-16-228); what it throws is told as below.
    */
@@ -165,7 +165,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-launch-git {
       display: flex;
       flex-direction: column;

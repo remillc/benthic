@@ -53,7 +53,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* From the top of the screen to just under the header. */
     .bc-site-header-image--image {
       position: absolute;

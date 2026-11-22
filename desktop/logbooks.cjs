@@ -71,7 +71,7 @@ function validId(value) {
 }
 
 /**
- * A cloud logbook: a remote file in `folder` (a path inside the app's folder, or the folder OpenDives
+ * A cloud logbook: a remote file in `folder` (a path inside the app's folder, or the folder Benthic
  * created on Google Drive), `fileName` its name there.
  * @param {{ provider: string, folder?: string, name: string, fileName?: string }} options
  */

@@ -98,7 +98,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-download-failed--content {
       margin: 16px 24px 0;
     }

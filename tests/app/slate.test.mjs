@@ -137,7 +137,7 @@ const card = {
   note: 'Fin en minutes depuis la mise à l’eau.',
   gasNeeded: 'Gaz nécessaire : EAN32 2 000 L',
   oxygen: 'CNS 22 % · 52 OTU',
-  footer: 'Créé avec OpenDives.',
+  footer: 'Créé avec Benthic.',
 };
 
 test('the text aligns the table and keeps every line of the card', () => {

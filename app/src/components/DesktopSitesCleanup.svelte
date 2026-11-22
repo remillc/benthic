@@ -113,7 +113,7 @@
   }
 </script>
 
-<section class="bc-cleanup" data-od-scroll aria-label={t('sites.cleanupTitle')}>
+<section class="bc-cleanup" data-bc-scroll aria-label={t('sites.cleanupTitle')}>
   <h2 class="bc-cleanup--title">{t('sites.cleanupTitle')}</h2>
   <p class="bc-cleanup--intro">{t('desktopSites.cleanupIntro', { shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z' })}</p>
 
@@ -184,7 +184,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-cleanup {
       box-sizing: border-box;
       height: 100%;

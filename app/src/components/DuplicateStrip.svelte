@@ -115,7 +115,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-duplicate-strip {
       position: relative;
       height: 110px;

@@ -97,7 +97,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dc-tile {
       flex: none;
       position: relative;

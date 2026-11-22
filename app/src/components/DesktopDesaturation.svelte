@@ -4,7 +4,7 @@
   // before flying and the time since the last dive side by side, the 16 tissues, the dives the
   // calculation used. The data and the figures are the phone's (Desaturation.svelte): the core's
   // tissues, lib/tools.js for the wait, lib/desaturation.js for the surface interval. No figure
-  // of OpenDives' own is added (the mock-up's « Désaturation restante » is left out).
+  // of Benthic's own is added (the mock-up's « Désaturation restante » is left out).
   import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -183,7 +183,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-desaturation {
       display: flex;
       flex-direction: column;

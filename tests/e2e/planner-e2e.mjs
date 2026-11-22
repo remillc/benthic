@@ -53,14 +53,14 @@ if (!accountText.includes('roger.bourdieu')) {
 async function inject() {
   await p.eval(`(() => {
     const cap = window.Capacitor;
-    window.__odCalls = window.__odCalls || [];
-    if (!cap.__odHooked) {
+    window.__bcCalls = window.__bcCalls || [];
+    if (!cap.__bcHooked) {
       const orig = cap.toNative;
       cap.toNative = function (plugin, method, options) {
-        if (plugin === 'BenthicCore') window.__odCalls.push({ method, options });
+        if (plugin === 'BenthicCore') window.__bcCalls.push({ method, options });
         return orig.apply(this, arguments);
       };
-      cap.__odHooked = true;
+      cap.__bcHooked = true;
     }
     window.__od = {
       root() { const all = [...document.querySelectorAll('.bc-planner')].filter((e) => e.offsetParent !== null); return all[all.length - 1] || null; },
@@ -97,8 +97,8 @@ const core = async (method, options = {}) => {
   return json ? JSON.parse(json) : null;
 };
 const planCore = (request) => core('planDive', { request });
-const planCalls = () => p.eval(`window.__odCalls.filter((c) => c.method === 'planDive').length`);
-const lastRequest = () => p.eval(`(() => { const c = window.__odCalls.filter((c) => c.method === 'planDive'); return c.length ? c[c.length - 1].options.request : null; })()`);
+const planCalls = () => p.eval(`window.__bcCalls.filter((c) => c.method === 'planDive').length`);
+const lastRequest = () => p.eval(`(() => { const c = window.__bcCalls.filter((c) => c.method === 'planDive'); return c.length ? c[c.length - 1].options.request : null; })()`);
 const go = async (path) => {
   await p.eval(`(document.querySelector('.view-main').f7View.router.navigate(${q(path)}), 0)`);
   await sleep(400);
@@ -288,7 +288,7 @@ async function openNew() {
 // --- state to restore ----------------------------------------------------------------
 const startPlans = (await core('listPlans')).map((x) => x.id);
 // The record the app keeps of the settings changed, in the system's preferences (lib/device-store.js).
-const startLocal = await p.eval(`window.Capacitor.Plugins.Preferences.get({ key: 'od.corePrefs' }).then((r) => r.value)`);
+const startLocal = await p.eval(`window.Capacitor.Plugins.Preferences.get({ key: 'bc.corePrefs' }).then((r) => r.value)`);
 const startPrefs = await core('getPrefs');
 const startSetup = await core('plannerSetup');
 console.log(`start: ${startPlans.length} plans, units ${startPrefs.length}/${startPrefs.pressure}/${startPrefs.volume}`);
@@ -600,7 +600,7 @@ try {
     // screen writes both; it has no way to choose back a personalised set in one tap).
     const units = Object.fromEntries(['length', 'pressure', 'volume', 'weight', 'temperature', 'unitSystem'].map((k) => [k, startPrefs[k]]));
     await core('setPrefs', { changes: units });
-    if (startLocal !== null) await p.eval(`window.Capacitor.Plugins.Preferences.set({ key: 'od.corePrefs', value: ${q(startLocal)} }).then(() => 1)`);
+    if (startLocal !== null) await p.eval(`window.Capacitor.Plugins.Preferences.set({ key: 'bc.corePrefs', value: ${q(startLocal)} }).then(() => 1)`);
     const end = await core('getPrefs');
     record('cleanup: the units are back', ['length', 'pressure', 'volume', 'weight', 'temperature'].every((k) => end[k] === startPrefs[k]), JSON.stringify(end));
     await go('/');

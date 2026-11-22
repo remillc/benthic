@@ -27,7 +27,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gas-results--title {
       margin: 0;
       padding: 20px 20px 8px;

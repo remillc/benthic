@@ -65,7 +65,7 @@
     onchange?.(value);
   }
 
-  const id = `od-select-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-select-${Math.random().toString(36).slice(2, 9)}`;
 
   let open = $state(false);
   /** Where the menu is drawn: fixed on the screen, outside every card that could clip it. */
@@ -210,8 +210,8 @@
     const el = root;
     if (!el) return;
     const cancel = () => close();
-    el.addEventListener('od-cancel', cancel);
-    return () => el.removeEventListener('od-cancel', cancel);
+    el.addEventListener('bc-cancel', cancel);
+    return () => el.removeEventListener('bc-cancel', cancel);
   });
 </script>
 
@@ -327,7 +327,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-select-field--field {
       margin: 18px var(--bc-field-margin, 16px) 0;
 

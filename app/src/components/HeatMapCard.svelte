@@ -95,7 +95,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-stats-heatmap {
       margin: 0 16px;
       padding: 16px;

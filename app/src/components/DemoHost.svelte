@@ -66,7 +66,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-demo-banner {
       position: fixed;
       top: calc(var(--f7-safe-area-top, 0px) + 4px);

@@ -7,7 +7,7 @@
 // the app's cache (a staged file: only its path comes back, never the contents: a big logbook is about 100 MB), which
 // the first launch then imports like any other file. Nothing here writes into the alpha's folder.
 /** The device-store key that says the alpha's logbook was imported; the row of « Importer un carnet » is gone from then on. */
-export const ALPHA_IMPORT_KEY = 'od.alphaImportDone';
+export const ALPHA_IMPORT_KEY = 'bc.alphaImportDone';
 
 /** @param {{ getItem: (key: string) => string|null }} store */
 export function alphaImportDone(store) {

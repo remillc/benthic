@@ -76,7 +76,7 @@
 
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-logbook-computers--intro {
       margin: 8px 20px 0;
       font-size: 14px;

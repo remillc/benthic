@@ -180,7 +180,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-card-photo--body {
       padding: 0 24px;
     }

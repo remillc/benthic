@@ -2,7 +2,7 @@
   // @ts-check
   // The blue panel of the first launch on Android tablets (task 2026-11-16-237; mock-ups
   // docs/mockups/android-tablette-premier-lancement-paysage.dc.html and -portrait.dc.html): the same blue
-  // as the phone's band (hatching, sheen), the round logo, « OpenDives » at 48 sp, the « Alpha » badge, the
+  // as the phone's band (hatching, sheen), the round logo, « Benthic » at 48 sp, the « Alpha » badge, the
   // title, the paragraph and the dive profile with its animation. Landscape: 700 dp wide, the full height,
   // on the left. Portrait: 640 dp tall (540 on the steps), across the top. The status bar is part of the panel.
   import ProfileHero from './ProfileHero.svelte';
@@ -35,7 +35,7 @@
 </header>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-launch-panel {
       --bc-first-panel-top: max(var(--f7-safe-area-top), 24px);
       box-sizing: border-box;

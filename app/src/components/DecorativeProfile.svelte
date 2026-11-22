@@ -17,7 +17,7 @@
   // The dive of the mock-ups as a smooth curve through every point (task 2026-11-15-214).
   const line = decorativeProfilePath(WIDTH, 8, 174);
   // Several profiles can be in the page at once (first launch over a section).
-  const gradient = `od-decorative-profile-${Math.random().toString(36).slice(2, 9)}`;
+  const gradient = `bc-decorative-profile-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
 <svg class="bc-decorative-profile {extraClass}" viewBox="0 0 {WIDTH} {HEIGHT}" preserveAspectRatio="none" aria-hidden="true">
@@ -32,7 +32,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-decorative-profile {
       display: block;
       width: 100%;

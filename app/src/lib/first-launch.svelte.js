@@ -45,7 +45,7 @@ export const flow = $state({
   /** The WebDAV or Nextcloud form; `error` is `'unreachable'`, `'denied'` or empty. Nothing is kept: the password is cleared when used. */
   webdav: { url: '', user: '', password: '', error: '' },
   /**
-   * The OpenDives server sign-in (release edition, tasks 2026-11-16-259 and 260). Only the address and the code live
+   * The Benthic server sign-in (release edition, tasks 2026-11-16-259 and 260). Only the address and the code live
    * here, and only while the screens are open; the session itself goes to the platform's secure storage.
    * `error` is what the code screen tells; `resendAt` and `lockedUntil` are times (ms) of the countdown and the lock.
    */
@@ -58,7 +58,7 @@ export const flow = $state({
     lockedUntil: 0,
   },
   /**
-   * Creating a logbook on the OpenDives server (task 2026-11-17-266). `source` is what is sent: the logbook already on
+   * Creating a logbook on the Benthic server (task 2026-11-17-266). `source` is what is sent: the logbook already on
    * the device, or a Subsurface file (read by the core, then sent from it); `done` of `total` dives are on the server;
    * `deviceLogbook` is the logbook on the device (its name and dives), null when none.
    * @type {{

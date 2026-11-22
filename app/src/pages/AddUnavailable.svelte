@@ -27,7 +27,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-add-unavailable--icon {
       margin-top: 24px;
       color: var(--bc-text-2);

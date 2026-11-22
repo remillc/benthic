@@ -24,7 +24,7 @@
   /** @typedef {import('benthic-core').PlannedDive} PlannedDive */
 
   const uid = $props.id();
-  const menuId = `od-plans-menu-${uid}`;
+  const menuId = `bc-plans-menu-${uid}`;
   const prefs = $derived(logbook.prefs);
 
   let plans = $state(/** @type {PlannedDive[]|null} */ (null));
@@ -216,7 +216,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-plans--intro {
       margin: 8px 16px;
       font-size: 14px;

@@ -363,7 +363,7 @@
 
   /** Task 172: the detail pane is the editor; its first editable field gets the cursor. Several dives: the dialog. */
   function editSelected() {
-    if (desk.selection.ids.length === 1) window.dispatchEvent(new Event('od-detail-focus-first'));
+    if (desk.selection.ids.length === 1) window.dispatchEvent(new Event('bc-detail-focus-first'));
     else if (desk.selection.ids.length > 1) editingTogether = true;
   }
 
@@ -897,12 +897,12 @@
     // The detail pane's ⋮ (DiveDetail.svelte) acts through the same commands, on the dive it shows.
     /** @param {Event} e */
     const fromDetail = (e) => command(/** @type {CustomEvent<string>} */ (e).detail);
-    window.addEventListener('od-desktop-command', fromDetail);
+    window.addEventListener('bc-desktop-command', fromDetail);
     const off = /** @type {any} */ (window).benthicDesktop?.onMenu?.((/** @type {string} */ c) => inUse() && command(c));
     return () => {
       window.removeEventListener('keydown', keydown);
       window.removeEventListener('paste', paste);
-      window.removeEventListener('od-desktop-command', fromDetail);
+      window.removeEventListener('bc-desktop-command', fromDetail);
       off?.();
     };
   });
@@ -1016,7 +1016,7 @@
         <p class="bc-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
       </div>
     {:else}
-      <div class="bc-desktop-logbook--scroll" data-od-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
+      <div class="bc-desktop-logbook--scroll" data-bc-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
         <table class="bc-desktop-logbook--table" style={tableStyle} aria-multiselectable="true" aria-rowcount={rows.length + 1}>
           <thead>
             <tr aria-rowindex="1">
@@ -1193,7 +1193,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-logbook--frame {
       position: relative;
       display: flex;

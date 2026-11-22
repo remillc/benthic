@@ -297,7 +297,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-trip--head {
       padding: 16px 20px 0;
 

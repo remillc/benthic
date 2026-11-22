@@ -49,7 +49,7 @@ export const deviceLanguage = pickLanguage(typeof navigator !== 'undefined' ? na
  */
 export const language = (() => {
   try {
-    const chosen = JSON.parse(deviceStore.getItem('od.appSettings') ?? '{}').language;
+    const chosen = JSON.parse(deviceStore.getItem('bc.appSettings') ?? '{}').language;
     if (chosen in loaders) return chosen;
   } catch {
     // The device's language.

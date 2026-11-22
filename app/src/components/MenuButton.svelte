@@ -16,7 +16,7 @@
     href="#menu"
     class="link icon-only external bc-menu-button"
     role="button"
-    aria-controls="od-menu"
+    aria-controls="bc-menu"
     aria-expanded={navigation.menuOpen}
     onclick={(e) => {
       e.preventDefault();

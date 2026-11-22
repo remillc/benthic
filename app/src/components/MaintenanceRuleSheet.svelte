@@ -74,10 +74,10 @@
         <div class="bc-rule-sheet--row">
           <span class="bc-rule-sheet--icon"><Icon name="calendar" size={22} /></span>
           <span class="bc-rule-sheet--texts">
-            <span class="bc-rule-sheet--label" id="od-rule-time">{t('maintenance.ruleSheet.time')}</span>
+            <span class="bc-rule-sheet--label" id="bc-rule-time">{t('maintenance.ruleSheet.time')}</span>
             <span class="bc-rule-sheet--help">{t('maintenance.ruleSheet.timeHelp')}</span>
           </span>
-          <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="od-rule-time" bind:checked={timeOn} /><span class="toggle-icon"></span></label>
+          <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="bc-rule-time" bind:checked={timeOn} /><span class="toggle-icon"></span></label>
         </div>
         {#if timeOn}
           <div class="bc-rule-sheet--stepper">
@@ -102,10 +102,10 @@
         <div class="bc-rule-sheet--row">
           <span class="bc-rule-sheet--icon"><Icon name="logbook" size={22} /></span>
           <span class="bc-rule-sheet--texts">
-            <span class="bc-rule-sheet--label" id="od-rule-dives">{t('maintenance.ruleSheet.dives')}</span>
+            <span class="bc-rule-sheet--label" id="bc-rule-dives">{t('maintenance.ruleSheet.dives')}</span>
             <span class="bc-rule-sheet--help">{t('maintenance.ruleSheet.divesHelp')}</span>
           </span>
-          <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="od-rule-dives" bind:checked={divesOn} /><span class="toggle-icon"></span></label>
+          <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="bc-rule-dives" bind:checked={divesOn} /><span class="toggle-icon"></span></label>
         </div>
         {#if divesOn}
           <div class="bc-rule-sheet--stepper">
@@ -122,8 +122,8 @@
         {problems.criteria ? t('maintenance.ruleSheet.none') : t('maintenance.ruleSheet.both')}
       </p>
 
-      <h3 class="bc-rule-sheet--group" id="od-rule-notify">{t('maintenance.ruleSheet.notify')}</h3>
-      <div class="bc-rule-sheet--chips" role="radiogroup" aria-labelledby="od-rule-notify">
+      <h3 class="bc-rule-sheet--group" id="bc-rule-notify">{t('maintenance.ruleSheet.notify')}</h3>
+      <div class="bc-rule-sheet--chips" role="radiogroup" aria-labelledby="bc-rule-notify">
         {#each NOTIFY_CHOICES as n (n)}
           <button type="button" role="radio" aria-checked={notifyDays === n} class="bc-rule-sheet--chip" class:bc-rule-sheet--chip-on={notifyDays === n} onclick={() => (notifyDays = n)}>
             {#if notifyDays === n}<Icon name="check" size={18} />{/if}{t('maintenance.ruleSheet.days', { n })}
@@ -133,10 +133,10 @@
 
       <div class="bc-rule-sheet--row bc-rule-sheet--warn">
         <span class="bc-rule-sheet--texts">
-          <span class="bc-rule-sheet--label" id="od-rule-warn">{t('maintenance.ruleSheet.warn')}</span>
+          <span class="bc-rule-sheet--label" id="bc-rule-warn">{t('maintenance.ruleSheet.warn')}</span>
           <span class="bc-rule-sheet--help">{t('maintenance.ruleSheet.warnHelp')}</span>
         </span>
-        <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="od-rule-warn" bind:checked={warn} /><span class="toggle-icon"></span></label>
+        <label class="toggle"><input type="checkbox" role="switch" aria-labelledby="bc-rule-warn" bind:checked={warn} /><span class="toggle-icon"></span></label>
       </div>
     </div>
 
@@ -152,7 +152,7 @@
 </Sheet>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.sheet-modal.bc-rule-sheet) {
       --f7-sheet-bg-color: var(--bc-drawer);
       height: auto;

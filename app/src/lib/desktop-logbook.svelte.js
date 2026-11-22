@@ -8,12 +8,12 @@ import { deviceStore } from './device-store.js';
 import { DEFAULT_COLUMNS, DEFAULT_SORT, EMPTY_SELECTION, cleanColumnWidths } from './desktop-table.js';
 import { logbookKey } from './window-logbook.js';
 
-const SORT_KEY = 'od.desktopSort';
+const SORT_KEY = 'bc.desktopSort';
 // The columns and their widths belong to the logbook the window holds (task 2026-11-15-181): the main logbook keeps
 // the plain keys, any other has its id after them (window-logbook.js, logbookKey). Never written in the logbook file.
-const COLUMNS_KEY = 'od.desktopColumns';
-const COLUMN_WIDTHS_KEY = 'od.desktopColumnWidths';
-const WIDTH_KEY = 'od.desktopTableWidth';
+const COLUMNS_KEY = 'bc.desktopColumns';
+const COLUMN_WIDTHS_KEY = 'bc.desktopColumnWidths';
+const WIDTH_KEY = 'bc.desktopTableWidth';
 
 /** @template T @param {string} key @param {T} fallback @returns {T} */
 function remembered(key, fallback) {

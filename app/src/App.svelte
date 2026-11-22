@@ -196,7 +196,7 @@
     { path: '/account/import', ...lazy(() => import('./pages/BringLogbook.svelte')), beforeEnter: accountGuard },
     { path: '/account/importing', ...lazy(() => import('./pages/ImportProgress.svelte')) },
     // The logbook in the user's own git repository (Modifier le dépôt) is the alpha's: the beta never offers to open a
-    // logbook in a personal git repository (nor, on its first launch, in a cloud drive); the OpenDives server does not
+    // logbook in a personal git repository (nor, on its first launch, in a cloud drive); the Benthic server does not
     // use these pages.
     ...(isRelease
       ? []
@@ -375,7 +375,7 @@
     // anywhere on it (not only from the edge); the page follows the finger.
     // Not where the swipe already means something: the dive detail (previous
     // dive), the map, the profile, the wheels (class no-swipeback).
-    // That swipe is OpenDives' own (lib/swipe-back.js), under the router guard: Framework7's is off (it never
+    // That swipe is Benthic's own (lib/swipe-back.js), under the router guard: Framework7's is off (it never
     // ends when the system takes the touch away; docs/architecture.md, section 13). The page under the current
     // one is still kept in the document, as Framework7 does for its own swipe.
     view: {
@@ -544,7 +544,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Tablet: the views leave room for the sidebar or the rail (NavRail.svelte). */
     :global(.views.bc-tablet) {
       /* The rail or sidebar takes the left safe area (camera cut-out in

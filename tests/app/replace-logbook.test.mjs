@@ -215,12 +215,12 @@ test('an archive of several logbooks: only the main one is taken, and the dialog
   assert.equal(log.staging.files.size, 0, 'the archive and the extracted logbook are gone');
 });
 
-test('OpenDives’ own export keeps its main logbook; a plain file or an archive without a logbook is not an archive of logbooks', async () => {
+test('Benthic’ own export keeps its main logbook; a plain file or an archive without a logbook is not an archive of logbooks', async () => {
   const own = zip([
-    { name: 'opendives/settings.json', data: enc('{}') },
+    { name: 'benthic/settings.json', data: enc('{}') },
     { name: 'logbook/logbook.ssrf', data: enc(DIVES) },
   ]);
-  const inside = await logbooksInFile('opendives-data-2026-11-18.zip', own);
+  const inside = await logbooksInFile('benthic-data-2026-11-18.zip', own);
   assert.equal(inside.count, 1);
   assert.equal(inside.main.name, 'logbook.ssrf');
   assert.equal(await logbooksInFile('Autre.ssrf', enc(DIVES)), null);

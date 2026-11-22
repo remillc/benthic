@@ -78,7 +78,7 @@ test('the queue keeps a fault once, at most MAX_PENDING, and drops what was answ
   assert.equal(pendingReports(store).length, MAX_PENDING - 1);
   for (const r of pendingReports(store)) dropReport(store, r);
   assert.equal(store.map.size, 0);
-  store.setItem('od.errorReports', 'not json');
+  store.setItem('bc.errorReports', 'not json');
   assert.deepEqual(pendingReports(store), []);
   assert.equal(reportKey(make('x')), reportKey(make('x')));
 });

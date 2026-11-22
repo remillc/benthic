@@ -33,11 +33,11 @@ const DEFAULT_FOLDER = { googleDrive: 'OpenDives', oneDrive: '', dropbox: '', we
 const CLIENT_KEY = { googleDrive: 'google', oneDrive: 'microsoft', dropbox: 'dropbox' };
 
 /**
- * What OpenDives asks each service for: one constant per service, so that the choice between the app's
+ * What Benthic asks each service for: one constant per service, so that the choice between the app's
  * own folder and the whole drive is made here and nowhere else.
  *   scope  the OAuth scopes
  *   root   where the files live (Microsoft Graph: the app folder, or '/me/drive/root' for full access)
- * Google: drive.file, the files OpenDives creates or the diver opens with it. Dropbox: an app-folder app,
+ * Google: drive.file, the files Benthic creates or the diver opens with it. Dropbox: an app-folder app,
  * with the scopes below (the folder is chosen when the app is registered).
  */
 const ACCESS = {

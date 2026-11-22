@@ -1,4 +1,4 @@
-// Creating a logbook on the OpenDives server and the Benthic+ screens (tasks 2026-11-17-265 and 266): the format
+// Creating a logbook on the Benthic server and the Benthic+ screens (tasks 2026-11-17-265 and 266): the format
 // writer, the upload and its resume after a cut connection, the choices, where an account goes after the code, the
 // inert billing seams, the steps and their order, and the texts. The screens are read from their source.
 import test from 'node:test';
@@ -115,7 +115,7 @@ test('every text of the new screens is in fr and en, and the price is the one of
     for (const s of ['', 'Phone', 'Iphone', 'Desktop']) assert.ok(`lead${s}` in c.benthicPlus.ready, `${lang}: ready lead${s}`);
     for (const key of ['sendHelp', 'sendingName']) assert.equal(typeof c.serverCreate[key], 'object', `${lang}: ${key} is a plural`);
     assert.ok(c.serverSteps.backHome);
-    assert.ok(!('title' in c.serverSteps), 'no « Serveur OpenDives » overline text');
+    assert.ok(!('title' in c.serverSteps), 'no « Serveur Benthic » overline text');
   }
   assert.equal(langs.fr.benthicPlus.offer.price, '14,99 $ US');
   assert.equal(langs.fr.benthicPlus.offer.per, 'par an');
@@ -128,7 +128,7 @@ test('every text of the new screens is in fr and en, and the price is the one of
   assert.equal(langs.fr.serverSteps.backHome, 'Revenir à l’accueil');
 });
 
-test('the server screens no longer draw the « Serveur OpenDives » overline, and the offline icon is centred', () => {
+test('the server screens no longer draw the « Serveur Benthic » overline, and the offline icon is centred', () => {
   const source = read('components/FirstLaunchServer.svelte');
   assert.doesNotMatch(source, /overline/);
   assert.match(source, /bc-first-launch-server--tile \{[^}]*align-self: center/s);

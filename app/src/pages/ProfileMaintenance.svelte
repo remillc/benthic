@@ -85,7 +85,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Fluid layout: the content keeps a readable width on a tablet. */
     :global(.bc-maintenance-page .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));

@@ -74,7 +74,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-button-group {
       display: flex;
       gap: 2px;

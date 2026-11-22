@@ -77,7 +77,7 @@
 </nav>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* Android: Material 3 navigation rail. */
     .bc-nav-rail--rail {
       position: fixed;

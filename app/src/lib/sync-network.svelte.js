@@ -8,7 +8,7 @@
 import { deviceStore } from './device-store.js';
 import { syncAllowed } from './sync-network.js';
 
-const KEY = 'od.syncUnmeteredOnly';
+const KEY = 'bc.syncUnmeteredOnly';
 
 function read() {
   try {

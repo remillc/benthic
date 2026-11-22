@@ -35,7 +35,7 @@
 </button>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-release-row {
       box-sizing: border-box;
       width: 100%;

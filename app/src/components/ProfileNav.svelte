@@ -76,7 +76,7 @@
 </nav>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-profile-nav {
       flex: none;
       width: var(--bc-pf-nav);

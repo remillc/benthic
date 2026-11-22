@@ -21,7 +21,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-plus-panel {
       position: relative;
       flex: 1;

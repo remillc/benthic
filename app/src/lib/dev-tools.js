@@ -10,7 +10,7 @@ import { BENTHIC_PLUS_SUBSCRIBED_KEY } from './benthic-plus-state.js';
 /** The remembered « subscribed » answer of the app (lib/benthic-plus-state.js): the fallback when the server cannot be asked (GET /v1/account). */
 export const SUBSCRIBED_KEY = BENTHIC_PLUS_SUBSCRIBED_KEY;
 /** The beta's first-launch key (logbook.svelte.js): « show » replays it; the logbooks are not touched. */
-export const WELCOME_KEY = 'od.welcomeBeta';
+export const WELCOME_KEY = 'bc.welcomeBeta';
 
 /**
  * @typedef {Object} DevToolsDeps

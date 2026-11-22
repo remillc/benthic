@@ -1,5 +1,5 @@
 // @ts-check
-// A file another app shares with OpenDives (« Open with », « Share to »), the pure part: what the file is,
+// A file another app shares with Benthic (« Open with », « Share to »), the pure part: what the file is,
 // what is done with it, and the two files of Subsurface-mobile's export.
 //
 // Subsurface-mobile shares its log as two files (qmlmanager.cpp, writeExportFile):
@@ -450,7 +450,7 @@ async function handleStaged(deps, staged, replaced, keep, wait) {
   /** @type {{ count: number, main: string }|null} */
   let several = null;
   let current = { ...staged, name };
-  // An archive of logbooks (OpenDives' own export, or several .ssrf): one logbook is taken, the main one. An archive is
+  // An archive of logbooks (Benthic's own export, or several .ssrf): one logbook is taken, the main one. An archive is
   // small next to what it holds (it is read whole, up to 64 MB); the logbook inside goes back to the cache in pieces.
   if (isZipName(name) && staged.size <= MAX_ZIP_BYTES) {
     const inside = await logbooksInFile(name, await readAllBytes(core, staged.path, staged.size));

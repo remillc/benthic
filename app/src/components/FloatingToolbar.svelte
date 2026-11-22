@@ -248,7 +248,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* 64 dp high, 24 dp above the bottom edge; fixed to the page, centred. */
     .bc-floating-toolbar {
       position: absolute;

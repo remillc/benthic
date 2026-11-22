@@ -1,7 +1,7 @@
 #!/bin/bash
 # Builds a stage folder for the production start-up measure: the main checkout's helper files (read only) and a Vite build as web/.
 # usage: tools/perf/make-stage.sh <dist folder> <stage name>     (result: build/perf/<stage name>)
-MAIN=${MAIN:-/f/projets/OpenDives}
+MAIN=${MAIN:-/f/projets/benthic}
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 STAGE=$ROOT/build/perf/$2
 rm -rf "$STAGE"; mkdir -p "$STAGE"

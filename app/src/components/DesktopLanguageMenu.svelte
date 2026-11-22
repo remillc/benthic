@@ -49,7 +49,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-language--divider {
       flex: none;
       width: 1px;

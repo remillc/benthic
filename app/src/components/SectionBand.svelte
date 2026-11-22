@@ -43,7 +43,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-section-band--band {
       --bc-band-h: calc(var(--f7-safe-area-top) + 120px);
       position: relative;
@@ -124,7 +124,7 @@
       }
     }
 
-    @keyframes od-summary-in {
+    @keyframes bc-summary-in {
       from {
         opacity: 0;
       }
@@ -144,7 +144,7 @@
 
     .bc-section-band--summary {
       position: relative;
-      animation: od-summary-in 150ms linear;
+      animation: bc-summary-in 150ms linear;
       margin: 0;
       font-size: 14px;
       line-height: 20px;

@@ -36,7 +36,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-flight-banner {
       position: relative;
       overflow: hidden;

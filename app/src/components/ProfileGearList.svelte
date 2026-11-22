@@ -160,7 +160,7 @@
 <GearExportSheet opened={exporting} pieces={gear.pieces} onclose={() => (exporting = false)} />
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gear-list {
       position: relative;
       flex: none;

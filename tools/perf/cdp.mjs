@@ -47,7 +47,7 @@ export class Page {
   close() { this.ws.close(); }
 }
 
-/** Attaches to the page that shows the logbook window (the one holding .od-desktop-logbook), waiting for it. */
+/** Attaches to the page that shows the logbook window (the one holding .bc-desktop-logbook), waiting for it. */
 export async function attachLogbook(ms = 300000) {
   const start = Date.now();
   while (Date.now() - start < ms) {
@@ -55,7 +55,7 @@ export async function attachLogbook(ms = 300000) {
       const list = await pages();
       for (let i = 0; i < list.length; i++) {
         const p = await Page.attach(i);
-        try { if (await p.eval(`!!document.querySelector('.od-desktop-logbook--row')`)) return p; } catch { /* not ready */ }
+        try { if (await p.eval(`!!document.querySelector('.bc-desktop-logbook--row')`)) return p; } catch { /* not ready */ }
         p.close();
       }
     } catch { /* not up yet */ }

@@ -81,8 +81,8 @@
   $effect(() => {
     const node = stage;
     if (!node) return;
-    node.addEventListener('od-cancel', chooseAgain);
-    return () => node.removeEventListener('od-cancel', chooseAgain);
+    node.addEventListener('bc-cancel', chooseAgain);
+    return () => node.removeEventListener('bc-cancel', chooseAgain);
   });
 
   /** @param {HTMLElement} node @param {{ kind: 'in'|'out' }} options */
@@ -193,7 +193,7 @@
     choosingType = false;
     await tick();
     /** @type {HTMLElement|null|undefined} */ (steps ? dialogTitle : stage?.querySelector('.bc-piece-edit--form-title'))?.focus({ preventScroll: true });
-    const scroller = stage?.closest('[data-od-scroll], .bc-pf--box, .page-content');
+    const scroller = stage?.closest('[data-bc-scroll], .bc-pf--box, .page-content');
     if (scroller) scroller.scrollTop = 0;
   }
 
@@ -202,7 +202,7 @@
     choosingType = true;
     await tick();
     /** @type {HTMLElement|null|undefined} */ (steps ? dialogTitle : stage?.querySelector('.bc-piece-edit--type-heading'))?.focus({ preventScroll: true });
-    const scroller = stage?.closest('[data-od-scroll], .bc-pf--box, .page-content');
+    const scroller = stage?.closest('[data-bc-scroll], .bc-pf--box, .page-content');
     if (scroller) scroller.scrollTop = 0;
   }
 
@@ -326,9 +326,9 @@
     />
   {:else if f.kind === 'segments'}
     <div class="bc-piece-edit--segments">
-      <span class="bc-piece-edit--segments-label" id={`od-piece-${f.key}`}>{t(`gear.field.${f.key}`)}</span>
+      <span class="bc-piece-edit--segments-label" id={`bc-piece-${f.key}`}>{t(`gear.field.${f.key}`)}</span>
       <ButtonGroup
-        ariaLabelledby={`od-piece-${f.key}`}
+        ariaLabelledby={`bc-piece-${f.key}`}
         value={details[f.key] ?? ''}
         onchange={(v) => setDetail(f.key, v)}
         clearable
@@ -368,8 +368,8 @@
 {/snippet}
 
 {#snippet typeGrid()}
-  {#if !steps}<h2 class="bc-piece-edit--title bc-piece-edit--type-heading" id="od-piece-type" tabindex="-1">{t('gear.pieceNew.typeTitle')}</h2>{/if}
-    <div class="bc-piece-edit--tiles" class:bc-piece-edit--compact={profileWide()} class:bc-piece-edit--four={steps} role="radiogroup" aria-labelledby={steps ? 'od-piece-dialog-title' : 'od-piece-type'}>
+  {#if !steps}<h2 class="bc-piece-edit--title bc-piece-edit--type-heading" id="bc-piece-type" tabindex="-1">{t('gear.pieceNew.typeTitle')}</h2>{/if}
+    <div class="bc-piece-edit--tiles" class:bc-piece-edit--compact={profileWide()} class:bc-piece-edit--four={steps} role="radiogroup" aria-labelledby={steps ? 'bc-piece-dialog-title' : 'bc-piece-type'}>
       {#each GEAR_TYPES as value (value)}
         {@const on = type === value}
         <button
@@ -516,12 +516,12 @@
         <button type="button" class="bc-piece-edit--steps-icon bc-piece-edit--back" aria-label={t('gear.pieceNew.backToTypes')} onclick={chooseAgain}><Icon name="arrowBack" /></button>
       {/if}
       <div class="bc-piece-edit--steps-texts">
-        <h2 class="bc-piece-edit--steps-title" id="od-piece-dialog-title" tabindex="-1" bind:this={dialogTitle}>{choosingType ? t('gear.pieceEdit.addTitle') : t('gear.pieceNew.titleWithType', { type: typeLabel })}</h2>
+        <h2 class="bc-piece-edit--steps-title" id="bc-piece-dialog-title" tabindex="-1" bind:this={dialogTitle}>{choosingType ? t('gear.pieceEdit.addTitle') : t('gear.pieceNew.titleWithType', { type: typeLabel })}</h2>
         {#if choosingType}<p class="bc-piece-edit--steps-subtitle">{t('gear.pieceNew.step1')}</p>{/if}
       </div>
       <button type="button" class="bc-piece-edit--steps-icon bc-piece-edit--close" aria-label={t('gear.pieceEdit.close')} onclick={() => f7router.back()}><Icon name="close" /></button>
     </header>
-    <div class="bc-piece-edit--steps-body" data-od-scroll>{@render body()}</div>
+    <div class="bc-piece-edit--steps-body" data-bc-scroll>{@render body()}</div>
     <footer class="bc-piece-edit--steps-footer">
       {#if choosingType}
         <button type="button" class="bc-piece-edit--cancel" onclick={() => f7router.back()}>{t('dialog.cancel')}</button>
@@ -578,7 +578,7 @@
 />
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-piece-edit--change-type {
       display: inline-flex;
       align-items: center;
@@ -601,29 +601,29 @@
       min-width: 0;
       align-self: start;
     }
-    @keyframes -global-od-piece-in-forward { from { translate: 30px 0; } to { translate: 0 0; } }
-    @keyframes -global-od-piece-in-back { from { translate: -30px 0; } to { translate: 0 0; } }
-    @keyframes -global-od-piece-out-forward { to { translate: -30px 0; } }
-    @keyframes -global-od-piece-out-back { to { translate: 30px 0; } }
-    @keyframes -global-od-piece-fade-in { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes -global-od-piece-fade-out { to { opacity: 0; } }
+    @keyframes -global-bc-piece-in-forward { from { translate: 30px 0; } to { translate: 0 0; } }
+    @keyframes -global-bc-piece-in-back { from { translate: -30px 0; } to { translate: 0 0; } }
+    @keyframes -global-bc-piece-out-forward { to { translate: -30px 0; } }
+    @keyframes -global-bc-piece-out-back { to { translate: 30px 0; } }
+    @keyframes -global-bc-piece-fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes -global-bc-piece-fade-out { to { opacity: 0; } }
     .bc-piece-edit--stage :global(.bc-piece-edit--in-forward),
     .bc-piece-edit--stage :global(.bc-piece-edit--in-back) {
       animation:
         var(--bc-piece-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
-        od-piece-fade-in var(--bc-motion-effects-default-ms, 200ms) var(--bc-motion-effects-default, ease-out) calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) both;
+        bc-piece-fade-in var(--bc-motion-effects-default-ms, 200ms) var(--bc-motion-effects-default, ease-out) calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) both;
     }
-    .bc-piece-edit--stage :global(.bc-piece-edit--in-forward) { --bc-piece-slide: od-piece-in-forward; }
-    .bc-piece-edit--stage :global(.bc-piece-edit--in-back) { --bc-piece-slide: od-piece-in-back; }
+    .bc-piece-edit--stage :global(.bc-piece-edit--in-forward) { --bc-piece-slide: bc-piece-in-forward; }
+    .bc-piece-edit--stage :global(.bc-piece-edit--in-back) { --bc-piece-slide: bc-piece-in-back; }
     .bc-piece-edit--stage :global(.bc-piece-edit--out-forward),
     .bc-piece-edit--stage :global(.bc-piece-edit--out-back) {
       pointer-events: none;
       animation:
         var(--bc-piece-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
-        od-piece-fade-out calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) var(--bc-motion-effects-default, ease-out) both;
+        bc-piece-fade-out calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) var(--bc-motion-effects-default, ease-out) both;
     }
-    .bc-piece-edit--stage :global(.bc-piece-edit--out-forward) { --bc-piece-slide: od-piece-out-forward; }
-    .bc-piece-edit--stage :global(.bc-piece-edit--out-back) { --bc-piece-slide: od-piece-out-back; }
+    .bc-piece-edit--stage :global(.bc-piece-edit--out-forward) { --bc-piece-slide: bc-piece-out-forward; }
+    .bc-piece-edit--stage :global(.bc-piece-edit--out-back) { --bc-piece-slide: bc-piece-out-back; }
     @media (prefers-reduced-motion: reduce) {
       .bc-piece-edit--stage :global(.bc-piece-edit--in-forward),
       .bc-piece-edit--stage :global(.bc-piece-edit--in-back),

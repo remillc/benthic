@@ -31,7 +31,7 @@
   <p class="bc-sites-merge--lead">{t('desktopFollowups.siteMerge.which')}</p>
   <div class="bc-sites-merge--choices" role="radiogroup" aria-label={t('desktopFollowups.siteMerge.which')}>
     {#each [sides.first, sides.second] as s (s.uuid)}
-      <ChoiceRow name="od-sites-merge-keep" selected={sides.keep === s} onselect={() => (kept = s.uuid)}>
+      <ChoiceRow name="bc-sites-merge-keep" selected={sides.keep === s} onselect={() => (kept = s.uuid)}>
         <span class="bc-sites-merge--label">{name(s)}</span>
         <span class="bc-sites-merge--line">{describe(s)}</span>
       </ChoiceRow>
@@ -46,7 +46,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-sites-merge--lead,
     .bc-sites-merge--effect {
       margin: 0;

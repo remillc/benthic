@@ -44,7 +44,7 @@ const run = async (expression) => {
 
 // In the page: marks the candidates and gives the snapshot function.
 await run(`(() => {
-  window.__odHover = {
+  window.__bcHover = {
     props: ['backgroundColor', 'backgroundImage', 'color', 'boxShadow', 'borderTopColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'opacity', 'textDecorationLine', 'outlineStyle', 'outlineColor', 'filter', 'transform', 'fill', 'stroke'],
     snapshot(el) {
       const out = [];
@@ -68,7 +68,7 @@ await run(`(() => {
     },
   };
   let n = 0;
-  document.querySelectorAll('[data-od-audit]').forEach((e) => e.removeAttribute('data-od-audit'));
+  document.querySelectorAll('[data-bc-audit]').forEach((e) => e.removeAttribute('data-bc-audit'));
   const found = [];
   for (const el of document.querySelectorAll('body *')) {
     if (!el.getClientRects().length) continue;
@@ -78,17 +78,17 @@ await run(`(() => {
     if (cs.visibility !== 'visible' || cs.pointerEvents === 'none' || cs.cursor !== 'pointer') continue;
     // Children inherit the hand: only the outermost element of a clickable area is audited.
     if (el.parentElement && getComputedStyle(el.parentElement).cursor === 'pointer') continue;
-    el.setAttribute('data-od-audit', String(n));
-    found.push({ n: n++, path: window.__odHover.path(el), text: (el.getAttribute('aria-label') || el.textContent || el.getAttribute('title') || '').trim().replace(/\\s+/g, ' ').slice(0, 40) });
+    el.setAttribute('data-bc-audit', String(n));
+    found.push({ n: n++, path: window.__bcHover.path(el), text: (el.getAttribute('aria-label') || el.textContent || el.getAttribute('title') || '').trim().replace(/\\s+/g, ' ').slice(0, 40) });
   }
-  window.__odFound = found;
+  window.__bcFound = found;
   return found.length;
 })()`);
-const found = await run('window.__odFound');
+const found = await run('window.__bcFound');
 
 // A window that is hidden or in the background does not advance transitions: the computed values
 // would stay at their start. Transitions are turned off for the audit; only the end state counts.
-await run(`(() => { const s = document.createElement('style'); s.id = '__odHoverAuditStyle'; s.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }'; document.head.append(s); })()`);
+await run(`(() => { const s = document.createElement('style'); s.id = '__bcHoverAuditStyle'; s.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }'; document.head.append(s); })()`);
 // The real pointer must not rest on an element: it would hover before the check. Park it in the corner.
 await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: (await run('innerWidth')) - 1, y: (await run('innerHeight')) - 1 });
 await send('DOM.enable');
@@ -99,15 +99,15 @@ for (const item of found) {
   let nodeId = 0;
   try {
     const doc = (await send('DOM.getDocument', { depth: 0 })).root.nodeId;
-    nodeId = (await send('DOM.querySelector', { nodeId: doc, selector: `[data-od-audit="${item.n}"]` })).nodeId;
+    nodeId = (await send('DOM.querySelector', { nodeId: doc, selector: `[data-bc-audit="${item.n}"]` })).nodeId;
   } catch {
     continue;
   }
   if (!nodeId) continue;
-  const before = await run(`window.__odHover.snapshot(document.querySelector('[data-od-audit="${item.n}"]'))`);
+  const before = await run(`window.__bcHover.snapshot(document.querySelector('[data-bc-audit="${item.n}"]'))`);
   await send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['hover'] });
   await wait(60);
-  const after = await run(`window.__odHover.snapshot(document.querySelector('[data-od-audit="${item.n}"]'))`);
+  const after = await run(`window.__bcHover.snapshot(document.querySelector('[data-bc-audit="${item.n}"]'))`);
   await send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: [] });
   const changed = before.length !== after.length || before.some((v, i) => v !== after[i]);
   if (changed) {
@@ -116,7 +116,7 @@ for (const item of found) {
     missing.push(item);
   }
 }
-await run(`document.querySelectorAll('[data-od-audit]').forEach((e) => e.removeAttribute('data-od-audit')); document.getElementById('__odHoverAuditStyle')?.remove()`);
+await run(`document.querySelectorAll('[data-bc-audit]').forEach((e) => e.removeAttribute('data-bc-audit')); document.getElementById('__bcHoverAuditStyle')?.remove()`);
 ws.close();
 
 // The same path many times (table rows, list rows) is one line with a count.

@@ -261,7 +261,7 @@
   /** The name is kept as the logbook's label on this device (see report: the file itself is not renamed). */
   function rememberName() {
     try {
-      deviceStore.setItem('od.logbookName', sanitiseLogbookName(flow.name));
+      deviceStore.setItem('bc.logbookName', sanitiseLogbookName(flow.name));
     } catch {
       // Not fatal.
     }
@@ -963,7 +963,7 @@
         {:else if step === 'open'}
           <p class="bc-first-launch--lead">{t('welcomeSteps.openWhere')}</p>
           <nav class="bc-first-launch--rows" aria-label={t('welcomeSteps.openWhere')}>
-            <!-- The OpenDives server only: the beta never opens a logbook in a cloud drive or a personal git repository. -->
+            <!-- The Benthic server only: the beta never opens a logbook in a cloud drive or a personal git repository. -->
             {#each entryRows('open') as row (row.key)}
               <ReleaseChoiceRow main={row.main} icon="server" title={t('serverSteps.rowTitle')} help={t('serverSteps.openHelp')} onclick={() => go('server')} />
             {/each}
@@ -1032,7 +1032,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-launch {
       position: relative;
       box-sizing: border-box;
@@ -1064,25 +1064,25 @@
     }
 
     /* Shared axis X: 30 dp, the outgoing fades out in the first 30 %, the incoming fades in over the rest. */
-    @keyframes -global-od-first-launch-in-forward {
+    @keyframes -global-bc-first-launch-in-forward {
       from { translate: 30px 0; }
       to { translate: 0 0; }
     }
-    @keyframes -global-od-first-launch-in-back {
+    @keyframes -global-bc-first-launch-in-back {
       from { translate: -30px 0; }
       to { translate: 0 0; }
     }
-    @keyframes -global-od-first-launch-out-forward {
+    @keyframes -global-bc-first-launch-out-forward {
       to { translate: -30px 0; }
     }
-    @keyframes -global-od-first-launch-out-back {
+    @keyframes -global-bc-first-launch-out-back {
       to { translate: 30px 0; }
     }
-    @keyframes -global-od-first-launch-fade-in {
+    @keyframes -global-bc-first-launch-fade-in {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    @keyframes -global-od-first-launch-fade-out {
+    @keyframes -global-bc-first-launch-fade-out {
       to { opacity: 0; }
     }
 
@@ -1090,23 +1090,23 @@
     .bc-first-launch--stage :global(.bc-first-launch--in-back) {
       animation:
         var(--bc-first-launch-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
-        od-first-launch-fade-in calc(var(--bc-motion-effects-default-ms, 200ms) * 1) var(--bc-motion-effects-default, ease-out)
+        bc-first-launch-fade-in calc(var(--bc-motion-effects-default-ms, 200ms) * 1) var(--bc-motion-effects-default, ease-out)
           calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) both;
     }
 
-    .bc-first-launch--stage :global(.bc-first-launch--in-forward) { --bc-first-launch-slide: od-first-launch-in-forward; }
-    .bc-first-launch--stage :global(.bc-first-launch--in-back) { --bc-first-launch-slide: od-first-launch-in-back; }
+    .bc-first-launch--stage :global(.bc-first-launch--in-forward) { --bc-first-launch-slide: bc-first-launch-in-forward; }
+    .bc-first-launch--stage :global(.bc-first-launch--in-back) { --bc-first-launch-slide: bc-first-launch-in-back; }
 
     .bc-first-launch--stage :global(.bc-first-launch--out-forward),
     .bc-first-launch--stage :global(.bc-first-launch--out-back) {
       pointer-events: none;
       animation:
         var(--bc-first-launch-slide) var(--bc-motion-spatial-default-ms, 350ms) var(--bc-motion-spatial-default, cubic-bezier(0.2, 0, 0, 1)) both,
-        od-first-launch-fade-out calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) var(--bc-motion-effects-default, ease-out) both;
+        bc-first-launch-fade-out calc(var(--bc-motion-spatial-default-ms, 350ms) * 0.3) var(--bc-motion-effects-default, ease-out) both;
     }
 
-    .bc-first-launch--stage :global(.bc-first-launch--out-forward) { --bc-first-launch-slide: od-first-launch-out-forward; }
-    .bc-first-launch--stage :global(.bc-first-launch--out-back) { --bc-first-launch-slide: od-first-launch-out-back; }
+    .bc-first-launch--stage :global(.bc-first-launch--out-forward) { --bc-first-launch-slide: bc-first-launch-out-forward; }
+    .bc-first-launch--stage :global(.bc-first-launch--out-back) { --bc-first-launch-slide: bc-first-launch-out-back; }
 
     @media (prefers-reduced-motion: reduce) {
       .bc-first-launch--stage :global(.bc-first-launch--in-forward),
@@ -1370,7 +1370,7 @@
       color: var(--bc-text-2);
     }
 
-    /* The link between OpenDives and the service. */
+    /* The link between Benthic and the service. */
     .bc-first-launch--hero {
       margin-top: 14px;
       padding: 22px 64px 18px;
@@ -1475,7 +1475,7 @@
     }
 
     /* The wait for the provider's page: a ring turning on the link. */
-    @keyframes od-first-launch-spin {
+    @keyframes bc-first-launch-spin {
       to { rotate: 360deg; }
     }
 
@@ -1486,7 +1486,7 @@
       border: 2px solid var(--bc-release-track);
       border-top-color: var(--bc-release-row-main);
       border-radius: 50%;
-      animation: od-first-launch-spin 0.9s linear infinite;
+      animation: bc-first-launch-spin 0.9s linear infinite;
 
       @media (prefers-reduced-motion: reduce) {
         animation: none;
@@ -1895,7 +1895,7 @@
     }
 
     /* Desktop app (task 2026-11-16-228; mock-ups docs/mockups/bureau-premier-lancement-production-*.dc.html): the
-       link between OpenDives and the service is compact and centred (80 dp tiles under 104 dp names, a 120 dp
+       link between Benthic and the service is compact and centred (80 dp tiles under 104 dp names, a 120 dp
        line), and the words under it are a little larger. */
     .bc-first-launch--desktop {
       /* A step taller than the window scrolls from its top: auto margins centre it only when there is room. */

@@ -123,7 +123,7 @@
 </EditorialPage>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-create-account--fields {
       margin: 6px 0 0;
 

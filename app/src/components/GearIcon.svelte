@@ -58,7 +58,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gear-icon {
       flex: none;
       fill: none;

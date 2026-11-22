@@ -250,7 +250,7 @@
 </Popup>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-statistic-new--note {
       margin: 8px 20px 0;
       font-size: 13px;

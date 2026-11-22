@@ -135,7 +135,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-filter-criterion-body--hint {
       margin: 8px 16px;
       font-size: 13px;

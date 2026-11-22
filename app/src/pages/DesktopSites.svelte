@@ -269,7 +269,7 @@
       { key: 'redo', label: '', text: undoEntryText('redo'), icon: 'redo', shortcut: desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z', disabled: !logbook.redoText },
       { key: 'separator' },
       { key: 'cleanup', label: '', text: t('sites.cleanupTitle'), icon: 'delete' },
-      // Task 2026-11-15-202: « À propos d'OpenDives » ends the ⋮ menus on Windows and Linux.
+      // Task 2026-11-15-202: « À propos d'Benthic » ends the ⋮ menus on Windows and Linux.
       ...(desktopMac ? [] : [{ key: 'separator' }, { key: 'about', label: '', text: t('desktopSettings.about'), icon: 'info' }]),
     ]),
   );
@@ -472,7 +472,7 @@
           </div>
         {:else}
           <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-          <div class="bc-desktop-sites--scroll" data-od-scroll bind:this={scrollEl} onclick={emptyAreaClick}>
+          <div class="bc-desktop-sites--scroll" data-bc-scroll bind:this={scrollEl} onclick={emptyAreaClick}>
             <table class="bc-desktop-sites--table" aria-rowcount={rows.length} aria-label={t('sites.listLabel')}>
               <thead>
                 <tr>
@@ -573,7 +573,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-sites--frame {
       display: flex;
       flex-direction: column;

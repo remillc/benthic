@@ -28,8 +28,8 @@
 
   const shape = $derived(scaledProfile(portrait ? 'portrait' : 'landscape', width, height));
   const id = Math.random().toString(36).slice(2, 9);
-  const gradient = `od-profile-hero-water-${id}`;
-  const glow = `od-profile-hero-glow-${id}`;
+  const gradient = `bc-profile-hero-water-${id}`;
+  const glow = `bc-profile-hero-glow-${id}`;
 </script>
 
 <div class="bc-profile-hero" class:bc-profile-hero--portrait={portrait} class:bc-profile-hero--still={still} bind:clientWidth={width} bind:clientHeight={height}>
@@ -58,7 +58,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-profile-hero {
       position: relative;
       /* Fills the box its page gives it; the curve is scaled to it. */
@@ -92,7 +92,7 @@
       stroke-width: 6;
       stroke-opacity: 0.55;
       stroke-dasharray: 1;
-      animation: od-profile-hero-draw 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+      animation: bc-profile-hero-draw 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
 
     .bc-profile-hero--line {
@@ -102,7 +102,7 @@
       stroke-linejoin: round;
       stroke-linecap: round;
       stroke-dasharray: 1;
-      animation: od-profile-hero-draw 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+      animation: bc-profile-hero-draw 2.2s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
 
     /* The deepest point of the curve (its centre is where the page puts left and top). */
@@ -114,7 +114,7 @@
       border-radius: 6px;
       background: var(--bc-first-band-trace);
       box-shadow: 0 0 0 5px var(--bc-first-band-dot-ring);
-      animation: od-profile-hero-pop 0.3s 0.7s cubic-bezier(0.2, 0, 0, 1) both;
+      animation: bc-profile-hero-pop 0.3s 0.7s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
     .bc-profile-hero--label {
@@ -128,7 +128,7 @@
       display: flex;
       flex-direction: column;
       white-space: nowrap;
-      animation: od-profile-hero-in 0.5s 2.1s cubic-bezier(0.2, 0, 0, 1) both;
+      animation: bc-profile-hero-in 0.5s 2.1s cubic-bezier(0.2, 0, 0, 1) both;
     }
 
     .bc-profile-hero--value {
@@ -174,7 +174,7 @@
       }
     }
 
-    @keyframes od-profile-hero-draw {
+    @keyframes bc-profile-hero-draw {
       from {
         stroke-dashoffset: 1;
       }
@@ -183,7 +183,7 @@
       }
     }
 
-    @keyframes od-profile-hero-pop {
+    @keyframes bc-profile-hero-pop {
       from {
         opacity: 0;
         transform: scale(0.4);
@@ -194,7 +194,7 @@
       }
     }
 
-    @keyframes od-profile-hero-in {
+    @keyframes bc-profile-hero-in {
       from {
         opacity: 0;
         transform: translateY(8px);

@@ -113,7 +113,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-choice-field--field {
       min-width: 0;
     }

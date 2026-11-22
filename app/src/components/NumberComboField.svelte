@@ -30,7 +30,7 @@
    */
   let { label, value, presets, parse, toText, presetText, unit, ariaLabel, helper = '', openLabel, onchange } = $props();
 
-  const id = `od-number-combo-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-number-combo-${Math.random().toString(36).slice(2, 9)}`;
   let open = $state(false);
   let focused = $state(false);
   let text = $state('');
@@ -159,8 +159,8 @@
     const el = root;
     if (!el) return;
     const cancel = () => close();
-    el.addEventListener('od-cancel', cancel);
-    return () => el.removeEventListener('od-cancel', cancel);
+    el.addEventListener('bc-cancel', cancel);
+    return () => el.removeEventListener('bc-cancel', cancel);
   });
 </script>
 
@@ -229,7 +229,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-number-combo--field {
       margin: 18px var(--bc-field-margin, 16px) 0;
       min-width: 0;

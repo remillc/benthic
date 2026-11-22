@@ -53,7 +53,7 @@
   let focused = $state(false);
   /** @type {HTMLInputElement|HTMLTextAreaElement|undefined} */
   let input = $state();
-  const id = `od-field-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-field-${Math.random().toString(36).slice(2, 9)}`;
   const floated = $derived(focused || !!value);
 </script>
 
@@ -98,7 +98,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-text-field--field {
       margin: 18px var(--bc-field-margin, 16px) 0;
     }

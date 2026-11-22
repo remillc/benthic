@@ -1,5 +1,5 @@
 // @ts-check
-// Dive validations on screen (inbox task 2026-11-19-309, point 2): the records read from the OpenDives data store
+// Dive validations on screen (inbox task 2026-11-19-309, point 2): the records read from the Benthic data store
 // (lib/validation.js, `dive-validations/`), the validation by signature, the QR code made by the server, the signer's side
 // of a scan (confirm now, or queue the confirmation until the phone is online) and the refresh of the pending ones.
 import { BenthicCore } from 'benthic-core';
@@ -127,7 +127,7 @@ export async function refreshPending() {
 
 // --- The signer's side -----------------------------------------------------------------------------------------------
 
-const QUEUE_KEY = 'od.validationQueue';
+const QUEUE_KEY = 'bc.validationQueue';
 
 /**
  * Who confirms: the diver's full name from his profile (task 2026-11-19-312; empty until he fills it in), the role and the

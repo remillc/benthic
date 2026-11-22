@@ -87,7 +87,7 @@ test('step machine: forward order of every path', () => {
   assert.deepEqual(last(['import', 'file', 'git']), ['start', 'import', 'importNew', 'git']);
   assert.deepEqual(last(['open', 'cloud', 'service', 'connected', 'list']), ['start', 'open', 'openCloudService', 'openCloudConnect', 'openCloudConnected', 'openChoose']);
   assert.deepEqual(last(['open', 'git']), ['start', 'open', 'openGit']);
-  // « Ouvrir mon carnet OpenDives » in the git note goes to step 5 and « Retour » comes back to the git step.
+  // « Ouvrir mon carnet Benthic » in the git note goes to step 5 and « Retour » comes back to the git step.
   assert.deepEqual(last(['create', 'git', 'openLink']), ['start', 'new', 'git', 'open']);
   assert.deepEqual(last(['create', 'git', 'openLink', 'back']), ['start', 'new', 'git']);
 });
@@ -219,9 +219,9 @@ test('every text of the release screens is in fr and en, none is unused', () => 
   assert.equal(read('i18n/fr-CA.json').includes('welcomeSteps'), false);
 });
 
-test('the removed line « Aucune plongée n’est envoyée à OpenDives. » is nowhere', () => {
+test('the removed line « Aucune plongée n’est envoyée à Benthic. » is nowhere', () => {
   const all = [JSON.stringify(langs.fr), JSON.stringify(langs.en), ...Object.values(sources)].join('\n');
-  assert.doesNotMatch(all, /envoyée à OpenDives|sent to OpenDives|welcomeRelease\.privacy|od-welcome-release--privacy/);
+  assert.doesNotMatch(all, /envoyée à Benthic|sent to Benthic|welcomeRelease\.privacy|bc-welcome-release--privacy/);
   assert.equal(langs.fr.welcomeRelease.privacy, undefined);
   assert.equal(langs.en.welcomeRelease.privacy, undefined);
 });
@@ -376,7 +376,7 @@ test('git: create needs an empty repository, open a repository with a logbook; b
 });
 
 test('the name is kept as the logbook’s label on the device through the device store', () => {
-  assert.match(sources.steps, /deviceStore\.setItem\('od\.logbookName'/);
+  assert.match(sources.steps, /deviceStore\.setItem\('bc.logbookName'/);
   assert.doesNotMatch(sources.steps, /localStorage/);
 });
 

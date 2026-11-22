@@ -22,7 +22,7 @@ let nextId = 900;
 const texts = { desktopLogbooks: { mainName: 'Main', main: { missingTitle: '{name}', missingText: 'x', ok: 'OK', openTitle: 'o', fileFilter: 'f', newFileTitle: 'n', copyTitle: 'c', copySuffix: 'copy', folderTitle: 'p' } } };
 
 before(() => {
-  root = mkdtempSync(path.join(tmpdir(), 'od-startup-'));
+  root = mkdtempSync(path.join(tmpdir(), 'bc-startup-'));
 });
 after(() => rmSync(root, { recursive: true, force: true }));
 

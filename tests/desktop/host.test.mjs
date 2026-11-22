@@ -106,7 +106,7 @@ describe('benthic-host', { skip }, () => {
     if (process.env.BENTHIC_TEST_DIR) {
       dir = process.env.BENTHIC_TEST_DIR;
     } else {
-      dir = mkdtempSync(path.join(tmpdir(), 'od-host-'));
+      dir = mkdtempSync(path.join(tmpdir(), 'bc-host-'));
       ownsDir = true;
     }
     repo = `${dir.replace(/\\/g, '/')}/carnet[main]`;

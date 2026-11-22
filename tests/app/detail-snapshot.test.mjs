@@ -12,7 +12,7 @@ globalThis.localStorage = {
 };
 
 const snap = await import('../../app/src/lib/detail-snapshot.js');
-const KEY = 'od.detailSnapshotBeta';
+const KEY = 'bc.detailSnapshotBeta';
 const src = (p) => readFileSync(new URL(`../../app/src/${p}`, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 
 /** A detail with `n` samples; tissues as the core gives them (16 per sample). */
@@ -146,10 +146,10 @@ test('remembering keeps the dive read now, only when it is the first of the list
 });
 
 test('the detail snapshot is a cache outside the device settings, forgotten with the list snapshot', () => {
-  assert.match(src('lib/detail-snapshot.js'), /isRelease \? 'od\.detailSnapshotBeta' : 'od\.detailSnapshot'/);
+  assert.match(src('lib/detail-snapshot.js'), /isRelease \? 'bc.detailSnapshotBeta' : 'bc.detailSnapshot'/);
   const line = src('lib/device-store.js').match(/NOT_SETTINGS = new Set\(\[(.*)\]\)/)?.[1] ?? '';
-  assert.match(line, /'od\.detailSnapshot'/);
-  assert.match(line, /'od\.detailSnapshotBeta'/);
+  assert.match(line, /'bc.detailSnapshot'/);
+  assert.match(line, /'bc.detailSnapshotBeta'/);
   const lb = src('lib/logbook.svelte.js');
   assert.equal(lb.match(/saveSnapshot\(null\);\s*clearDetailSnapshot\(\);/g)?.length, 2);
 });

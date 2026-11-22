@@ -43,7 +43,7 @@ const logbooksOf = (cloud) => ({
 
 before(async () => {
   fake = await startFakeCloud();
-  root = mkdtempSync(path.join(tmpdir(), 'od-first-launch-'));
+  root = mkdtempSync(path.join(tmpdir(), 'bc-first-launch-'));
 });
 beforeEach(() => {
   userData = path.join(root, `u${Math.random().toString(16).slice(2)}`);

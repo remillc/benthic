@@ -156,7 +156,7 @@
 <DocumentChoiceSheet opened={choosing} title={t('docs.choose.title')} {options} onchoose={choose} onclose={() => (choosing = false)} />
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-docs .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }

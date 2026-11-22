@@ -184,7 +184,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-shared-site--head {
       padding: 0 24px;
       & h1 {

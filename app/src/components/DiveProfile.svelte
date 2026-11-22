@@ -579,7 +579,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* On the phone the profile is a band from edge to edge (white in the light
        themes); a tablet pane keeps the rounded card (spec, "Profile chart full
        width on the phone"). */

@@ -97,7 +97,7 @@ export const logbook = $state({
   mode: /** @type {'cloud'|'git'} */ ('cloud'),
   /** The git repository, "host/owner/name"; empty for the cloud. */
   repository: '',
-  /** The git repository is the signed-in OpenDives server account's (release edition): shown as « Serveur OpenDives ». */
+  /** The git repository is the signed-in Benthic server account's (release edition): shown as « Serveur Benthic ». */
   benthicPlus: false,
   /** Cloud server host in use, e.g. ssrf-cloud-eu.subsurface-divelog.org. */
   server: '',
@@ -129,7 +129,7 @@ export const logbook = $state({
   /** First launch is shown (first start, or after signing out): nothing is loaded until a choice is made. */
   welcome: readWelcome(),
   /**
-   * Release edition: the first launch stays on screen over the logbook while a logbook is being sent to the OpenDives
+   * Release edition: the first launch stays on screen over the logbook while a logbook is being sent to the Benthic
    * server (task 2026-11-17-266); the logbook is already open under it.
    */
   welcomeHold: false,
@@ -563,7 +563,7 @@ export async function importReceived(xml) {
   let binary = '';
   for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   const before = logbook.dives.length;
-  const result = await BenthicCore.importDives({ name: 'opendives-qr.ssrf', data: btoa(binary) });
+  const result = await BenthicCore.importDives({ name: 'benthic-qr.ssrf', data: btoa(binary) });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await BenthicCore.listLoadedDives();
@@ -772,7 +772,7 @@ export async function closeVersion() {
 function undoCleared() {
   logbook.undoText = '';
   logbook.redoText = '';
-  if (typeof window !== 'undefined') window.dispatchEvent(new Event('od-undo-cleared'));
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('bc-undo-cleared'));
 }
 
 /**
@@ -830,13 +830,13 @@ async function syncEdits() {
 }
 
 /**
- * "od.welcome" (the beta: "od.welcomeBeta"): "show" after signing out, "done" once a way to start was
+ * "bc.welcome" (the beta: "bc.welcomeBeta"): "show" after signing out, "done" once a way to start was
  * chosen, absent before the first start.
  * @returns {string|null}
  */
 // The beta has its own key: after the alpha it starts from its first launch, whatever the alpha chose (the alpha's
 // files and settings stay as they were).
-const WELCOME_KEY = isRelease ? 'od.welcomeBeta' : 'od.welcome';
+const WELCOME_KEY = isRelease ? 'bc.welcomeBeta' : 'bc.welcome';
 
 function readWelcomeState() {
   // A window that holds a logbook of its own (a file or a git repository) or none has no first launch:
@@ -879,7 +879,7 @@ let early = null;
 
 /** Set when an account was found: lets the next start send the probe at once. */
 // The beta has its own key: the alpha's hint says a Subsurface-cloud account, which the beta ignores (no probe at start).
-const ACCOUNT_HINT = isRelease ? 'od.repositoryAccount' : 'od.cloudAccount';
+const ACCOUNT_HINT = isRelease ? 'bc.repositoryAccount' : 'bc.cloudAccount';
 
 /** @param {boolean} has */
 function rememberAccount(has) {
@@ -962,7 +962,7 @@ export async function startApp() {
  */
 export async function signOut({ deleteCopy = false } = {}) {
   await BenthicCore.signOut({ deleteCopy });
-  // The OpenDives server's session goes with the logbook that was connected through it (the tokens are erased).
+  // The Benthic server's session goes with the logbook that was connected through it (the tokens are erased).
   if (logbook.benthicPlus || benthicPlusAccount.signedIn) await BenthicCore.serverSessionClear();
   setBenthicPlusAccount({ signedIn: false });
   forgetAccount(true);
@@ -1033,7 +1033,7 @@ export async function replaceDeviceLogbook(name, data, fileName) {
   logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   try {
-    deviceStore.setItem('od.logbookName', name);
+    deviceStore.setItem('bc.logbookName', name);
   } catch {
     // Not fatal.
   }
@@ -1070,7 +1070,7 @@ function forgetAccount(showWelcome) {
   logbook.lastSync = null;
   logbook.welcome = showWelcome;
   try {
-    deviceStore.removeItem('od.lastSync');
+    deviceStore.removeItem('bc.lastSync');
   } catch {
     // Not fatal.
   }
@@ -1135,7 +1135,7 @@ export function repositoryChanged() {
   clearFailure();
   logbook.lastSync = null;
   try {
-    deviceStore.removeItem('od.lastSync');
+    deviceStore.removeItem('bc.lastSync');
   } catch {
     // Not fatal.
   }
@@ -1144,7 +1144,7 @@ export function repositoryChanged() {
 
 function readAutoSync() {
   try {
-    return deviceStore.getItem('od.autoSync') !== 'false';
+    return deviceStore.getItem('bc.autoSync') !== 'false';
   } catch {
     return true;
   }
@@ -1158,7 +1158,7 @@ function readAutoSync() {
 export function setAutoSync(value) {
   logbook.autoSync = value;
   try {
-    deviceStore.setItem('od.autoSync', String(value));
+    deviceStore.setItem('bc.autoSync', String(value));
   } catch {
     // Not fatal: the setting only lasts until the app closes.
   }
@@ -1288,7 +1288,7 @@ if (typeof window !== 'undefined') {
 
 function readLastSync() {
   try {
-    return deviceStore.getItem('od.lastSync');
+    return deviceStore.getItem('bc.lastSync');
   } catch {
     return null;
   }
@@ -1326,7 +1326,7 @@ function markSynced() {
   const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
   logbook.lastSync = local;
   try {
-    deviceStore.setItem('od.lastSync', local);
+    deviceStore.setItem('bc.lastSync', local);
   } catch {
     // Not fatal: only the Account screen shows it.
   }
@@ -1334,14 +1334,14 @@ function markSynced() {
 
 /**
  * The suffix of the texts that name where the sync goes: '' (Subsurface cloud), 'Git' (the diver's own repository) or
- * 'Server' (the OpenDives server account's repository, release edition).
+ * 'Server' (the Benthic server account's repository, release edition).
  * @returns {''|'Git'|'Server'}
  */
 export function syncFlavour() {
   return logbook.mode === 'git' ? (logbook.benthicPlus ? 'Server' : 'Git') : '';
 }
 
-/** Whether the connected repository is the signed-in OpenDives server account's (the release edition's sign-in). @param {string} repository */
+/** Whether the connected repository is the signed-in Benthic server account's (the release edition's sign-in). @param {string} repository */
 async function onBenthicServer(repository) {
   if (!isRelease) return false;
   try {
@@ -1510,7 +1510,7 @@ export async function loadLogbook({ force = false } = {}) {
 if (import.meta.env?.DEV && typeof window !== 'undefined') /** @type {any} */ (window).__logbook = logbook;
 
 /**
- * Whether the diver has an Benthic+ account (the server's logbook): the equipment of a dive is theirs to change only then;
+ * Whether the diver has a Benthic+ account (the server's logbook): the equipment of a dive is theirs to change only then;
  * for everyone else « Autre équipement » shows with the Benthic+ chip and stays inert.
  */
 export const isSubscriber = () => sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email }) === 'subscriber';

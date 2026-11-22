@@ -19,7 +19,7 @@
   let { label, values, index = $bindable(), defaultText = '', inline = false } = $props();
 
   const ITEM = 40;
-  const id = `od-wheel-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-wheel-${Math.random().toString(36).slice(2, 9)}`;
   /** @type {HTMLDivElement|undefined} */
   let scroller = $state();
   // svelte-ignore state_referenced_locally
@@ -99,7 +99,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-wheel-picker--wheel {
       flex: 1;
       min-width: 0;

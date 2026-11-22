@@ -15,7 +15,7 @@ import { groupByMonth } from './carnet-months.js';
 /** @typedef {import('benthic-core').DiveDetail} DiveDetail */
 /** @typedef {{ v: 1, date: string, number: number, order: string, detail: DiveDetail }} DetailSnapshot */
 
-const KEY = logbookKey(isRelease ? 'od.detailSnapshotBeta' : 'od.detailSnapshot');
+const KEY = logbookKey(isRelease ? 'bc.detailSnapshotBeta' : 'bc.detailSnapshot');
 const VERSION = 1;
 /** Samples kept at most: a longer profile is thinned (the real detail replaces it within a second). */
 const MAX_SAMPLES = 1200;

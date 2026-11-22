@@ -67,7 +67,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-rename-logbook--field {
       --bc-field-margin: 24px;
     }

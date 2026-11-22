@@ -532,7 +532,7 @@
 
   /** @param {number} key @param {'start'|'end'} field */
   function focusPressure(key, field) {
-    tick().then(() => /** @type {HTMLInputElement|null} */ (document.querySelector(`[data-od-pressure="${key}:${field}"] input`))?.focus());
+    tick().then(() => /** @type {HTMLInputElement|null} */ (document.querySelector(`[data-bc-pressure="${key}:${field}"] input`))?.focus());
   }
 
   /**
@@ -659,8 +659,8 @@
   /** The system Back button closes the Gas page (lib/back-button.js). @param {HTMLElement} node */
   function backClosesGas(node) {
     const cancel = () => closeGas();
-    node.addEventListener('od-cancel', cancel);
-    return { destroy: () => node.removeEventListener('od-cancel', cancel) };
+    node.addEventListener('bc-cancel', cancel);
+    return { destroy: () => node.removeEventListener('bc-cancel', cancel) };
   }
 
   /** What the delete dialog says about a cylinder: the type and size line, the gas changes that use it. @param {EditedCylinder} c */
@@ -1059,12 +1059,12 @@
     </div>
   </div>
   <div class="bc-edit-dive--row bc-edit-dive--card-row">
-    <div class="bc-edit-dive--grow" data-od-pressure="{c.key}:start">
+    <div class="bc-edit-dive--grow" data-bc-pressure="{c.key}:start">
       <TextField label={t('edit.start')} bind:value={c.f.start} inputmode="decimal" invalid={cb.start}>
         {#snippet trailing()}{@render pressureTrailing(c, 'start')}{/snippet}
       </TextField>
     </div>
-    <div class="bc-edit-dive--grow" data-od-pressure="{c.key}:end">
+    <div class="bc-edit-dive--grow" data-bc-pressure="{c.key}:end">
       <TextField
         label={t('edit.end')}
         bind:value={c.f.end}
@@ -1255,13 +1255,13 @@
         <Icon name="plus" />{t('edit.addWeight')}
       </button>
 
-      <p class="bc-edit-dive--feedback-title" id="od-edit-weight-feedback">{t('weightFeedback.title')}</p>
+      <p class="bc-edit-dive--feedback-title" id="bc-edit-weight-feedback">{t('weightFeedback.title')}</p>
       <div class="bc-edit-dive--feedback">
         <ButtonGroup
           options={FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) }))}
           value={feedback}
           onchange={(v) => (feedback = toggleFeedback(feedback, /** @type {any} */ (v)))}
-          ariaLabelledby="od-edit-weight-feedback"
+          ariaLabelledby="bc-edit-weight-feedback"
           clearable
           rail
         />
@@ -1272,7 +1272,7 @@
         <div class="bc-edit-dive--computers" role="radiogroup" aria-label={t('edit.computersGroup')}>
           {#each dive.diveComputers as computer, i (i)}
             <div class="bc-edit-dive--computer-line">
-              <ChoiceRow class="bc-edit-dive--computer" name="od-main-computer" selected={i === mainComputer} onselect={() => (mainComputer = i)}>
+              <ChoiceRow class="bc-edit-dive--computer" name="bc-main-computer" selected={i === mainComputer} onselect={() => (mainComputer = i)}>
                 <span class="bc-edit-dive--texts">
                   <span>{computer.nickname || computer.model || t('edit.unnamedComputer')}</span>
                   {#if i === mainComputer}<span class="bc-edit-dive--role">{t('edit.mainComputer')}</span>{/if}
@@ -1480,7 +1480,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-edit-dive .page-content) {
       padding-bottom: 32px;
     }

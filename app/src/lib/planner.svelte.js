@@ -191,7 +191,7 @@ export async function adoptUnitDefaults(prefs) {
   }
 }
 
-/** Subsurface reads four ascent rates, by depth band: OpenDives sets them all at once. */
+/** Subsurface reads four ascent rates, by depth band: Benthic sets them all at once. */
 export const ASCENT_KEYS = /** @type {const} */ (['ascent75MmMin', 'ascent50MmMin', 'ascentStopsMmMin', 'ascentLast6mMmMin']);
 
 /** The single ascent rate (spec, "Planner settings"), 9 m/min by default. */
@@ -308,7 +308,7 @@ export function startNewDive(prefs) {
 }
 
 /**
- * The request of a saved plan: as OpenDives saved it, or rebuilt from the
+ * The request of a saved plan: as Benthic saved it, or rebuilt from the
  * planned dive when it was made elsewhere or changed since.
  * @param {PlannedDive} plan
  * @param {Parameters<typeof decoOfSettings>[0]} prefs

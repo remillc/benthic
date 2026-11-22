@@ -1,6 +1,6 @@
 // @ts-check
 // The title of a saved plan (task 37): kept with the planned dive as extra data
-// "OpenDives title" (core: save_plan, list_plans). Pure rules, no Framework7.
+// "Benthic title" (core: save_plan, list_plans). Pure rules, no Framework7.
 
 /** Longest title kept, in characters. */
 export const PLAN_TITLE_MAX = 100;

@@ -26,7 +26,7 @@ export function replaceEligibility(open) {
  * - a `.ssrf` file or a Subsurface `.xml` file holds one logbook (the dives of the file; Subsurface's format has no
  *   notion of several);
  * - a `.zip` archive may hold several `.ssrf` logbook files: the main one is `logbook/logbook.ssrf` (the layout of
- *   OpenDives' own export), otherwise the first by name.
+ *   Benthic's own export), otherwise the first by name.
  * @param {string} name the file's name
  * @param {Uint8Array} bytes
  * @returns {Promise<{ count: number, main: { name: string, data: Uint8Array }, names: string[] }|null>} null when the file

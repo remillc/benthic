@@ -36,7 +36,7 @@ export const ACTIVATED = /** @type {const} */ (['sync', 'backup', 'gearCertifica
 
 /**
  * The counts of the summary card of « Votre carnet est prêt ». The dives and the sites are always there; gear and
- * certifications are OpenDives-only data (the `opendives` branch, docs/architecture.md, section 11.3): their rows show
+ * certifications are Benthic-only data (the `benthic` branch, docs/architecture.md, section 11.3): their rows show
  * once something is stored. `known: false` (the desktop window downloads when it opens the logbook): no card.
  * @param {{ dives: number, sites: number, gear: number, certifications: number, known?: boolean }} c
  * @returns {{ key: 'dives'|'sites'|'gear'|'certifications', n: number }[]}

@@ -93,8 +93,8 @@ function run(file, args, timeout = 8000) {
 
 /** The real detection, one call. @param {string} platform @param {typeof run} [exec] @returns {Promise<Cost>} */
 async function detect(platform, exec = run) {
-  // A test switch (checks in the real app without a tethered phone): OD_NETWORK_COST=metered|unmetered|unknown.
-  const forced = process.env.OD_NETWORK_COST;
+  // A test switch (checks in the real app without a tethered phone): BC_NETWORK_COST=metered|unmetered|unknown.
+  const forced = process.env.BC_NETWORK_COST;
   if (forced === 'metered' || forced === 'unmetered' || forced === 'unknown') return forced;
   try {
     if (platform === 'win32') {

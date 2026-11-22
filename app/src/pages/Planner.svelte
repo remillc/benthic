@@ -52,7 +52,7 @@
   let { f7route, f7router, reopen = false } = $props();
 
   const uid = $props.id();
-  const menuId = `od-plan-menu-${uid}`;
+  const menuId = `bc-plan-menu-${uid}`;
   const prefs = $derived(logbook.prefs);
   const feet = $derived(prefs.length === 'ft');
   const cuft = $derived(prefs.volume === 'cuft');
@@ -667,7 +667,7 @@
   }
 </script>
 
-<Page data-od-scroll class="bc-planner" onPageReinit={refresh}>
+<Page data-bc-scroll class="bc-planner" onPageReinit={refresh}>
   <Navbar title={t('plan.title')}>
     {#snippet left()}
       <Link iconOnly={!theme.ios} onClick={() => guard?.attempt()}>
@@ -1087,7 +1087,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* One column in the order of the spec; a wide pane puts the data on the
        left, the profile and the result on the right. */
     .bc-planner,

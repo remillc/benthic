@@ -147,7 +147,7 @@
   });
 </script>
 
-<Page data-od-scroll class="bc-statistics" onPageInit={keepInSvelteRange}>
+<Page data-bc-scroll class="bc-statistics" onPageInit={keepInSvelteRange}>
   <Navbar large={theme.ios} class={theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-titled'} title={t('stats.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
@@ -269,7 +269,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* The section titles (mock-up android-stats). */
     .block-title {
       margin: 22px 16px 8px;

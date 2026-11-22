@@ -38,7 +38,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-progress-line {
       display: flex;
       justify-content: space-between;

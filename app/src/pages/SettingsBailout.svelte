@@ -84,7 +84,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-settings-bailout--intro,
     .bc-settings-bailout--note {
       margin: 8px 20px;

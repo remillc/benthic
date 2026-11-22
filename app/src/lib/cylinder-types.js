@@ -4,7 +4,7 @@ import { t } from './i18n.js';
 
 /**
  * What Subsurface itself calls a cylinder whose type is not known (it writes this description for the
- * default cylinder of a dive without one). OpenDives keeps a cylinder under this name when the type it
+ * default cylinder of a dive without one). Benthic keeps a cylinder under this name when the type it
  * had is deleted and the dive depends on the cylinder (core/libbenthic/edit.cpp).
  */
 export const UNKNOWN_CYLINDER_TYPE = 'unknown';

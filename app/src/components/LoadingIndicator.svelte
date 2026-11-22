@@ -46,17 +46,17 @@
 <span class="bc-loading-indicator {extraClass}" role={label ? 'status' : undefined} aria-label={label || undefined} aria-hidden={label ? undefined : 'true'} style:width="{size}px" style:height="{size}px">
   <svg viewBox="-1 -1 2 2" width={size} height={size} aria-hidden="true">
     <defs>
-      <linearGradient id="od-loading-{uid}" x1="0" y1="-1" x2="0" y2="1" gradientUnits="userSpaceOnUse">
+      <linearGradient id="bc-loading-{uid}" x1="0" y1="-1" x2="0" y2="1" gradientUnits="userSpaceOnUse">
         <stop offset="0" stop-color="var(--bc-loading-indicator-top)" />
         <stop offset="1" stop-color="var(--bc-loading-indicator-bottom)" />
       </linearGradient>
     </defs>
-    <path {d} fill="url(#od-loading-{uid})" />
+    <path {d} fill="url(#bc-loading-{uid})" />
   </svg>
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-loading-indicator {
       display: inline-flex;
       flex: none;

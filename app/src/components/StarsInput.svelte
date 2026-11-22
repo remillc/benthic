@@ -24,7 +24,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-stars-input {
       display: inline-flex;
       gap: 0;

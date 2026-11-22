@@ -44,7 +44,7 @@
   }
 </script>
 
-<Page data-od-scroll class="bc-about-text">
+<Page data-bc-scroll class="bc-about-text">
   <Navbar title={which === 'notes' ? t('about.notes') : which === 'privacy' ? t('about.privacyPolicy') : t('about.licence')}>
     {#snippet left()}
       <Link back iconOnly>
@@ -75,7 +75,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-about-text--text {
       padding: 8px 24px 32px;
       font-size: 16px;

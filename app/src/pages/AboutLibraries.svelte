@@ -39,7 +39,7 @@
   ];
 </script>
 
-<Page data-od-scroll class="bc-about-libraries">
+<Page data-bc-scroll class="bc-about-libraries">
   <Navbar title={t('about.libraries')}>
     {#snippet left()}
       <BackLink label={t('about.title')} name={t('detail.back')} />
@@ -71,7 +71,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-about-libraries--intro {
       margin: 8px 16px 0;
       font-size: 14px;

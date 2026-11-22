@@ -89,11 +89,11 @@
     setOpen(false);
   }
 
-  // The Android Back key (lib/back-button.js) asks for the close with od-cancel.
+  // The Android Back key (lib/back-button.js) asks for the close with bc-cancel.
   $effect(() => {
     const el = root;
-    el?.addEventListener('od-cancel', close);
-    return () => el?.removeEventListener('od-cancel', close);
+    el?.addEventListener('bc-cancel', close);
+    return () => el?.removeEventListener('bc-cancel', close);
   });
 </script>
 
@@ -110,7 +110,7 @@
 >
   <!-- A tap outside closes the menu; the keyboard has the close button and Escape. -->
   <div class="bc-fab-menu--scrim" onclick={() => setOpen(false)} role="presentation"></div>
-  <div class="bc-fab-menu--items" id="od-fab-menu-items" role="menu" aria-label={t('logbook.add')}>
+  <div class="bc-fab-menu--items" id="bc-fab-menu-items" role="menu" aria-label={t('logbook.add')}>
     {#each choices as choice, i (choice.key)}
       <button
         type="button"
@@ -140,7 +140,7 @@
     class="bc-fab-menu--button"
     aria-haspopup="menu"
     aria-expanded={open}
-    aria-controls="od-fab-menu-items"
+    aria-controls="bc-fab-menu-items"
     bind:this={button}
     onclick={() => setOpen(!open)}
   >
@@ -150,7 +150,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-fab-menu {
       /* 24 dp from the screen's edges; from the bottom, 16 dp above the bottom navigation bar when
          it shows (task 2026-11-14-120). The bar only moves it up, never away from the right edge. */

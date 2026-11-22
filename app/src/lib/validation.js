@@ -3,7 +3,7 @@
 // the records, the fingerprint of a dive that detects « modifiée après la validation », the QR text and the clock of a code.
 //
 // Where it is kept. A validation belongs to the dive, but the Subsurface core has no generic door for a dive's extra data
-// (the façade writes only the keys of plans and titles), and the dive's equipment already lives in the OpenDives data store
+// (the façade writes only the keys of plans and titles), and the dive's equipment already lives in the Benthic data store
 // keyed by the start time (lib/inventory.js, diveKeyOf). A validation follows the same rule: one file
 // `dive-validations/<id>.json` in the store, so nothing is written into the Subsurface logbook, desktop Subsurface reads
 // and writes the log as before, and the signature image (a small PNG) stays next to it. When dives get their own UUID
@@ -231,7 +231,7 @@ export function summaryOf(dives, diverName = '') {
  * transfer of the app's own QR format (lib/qr-transfer.js), kind « d »: the native scanner accepts that kind only.
  * @param {string} token @param {Summary} summary
  */
-export const qrText = (token, summary) => JSON.stringify({ odValidation: 1, token, summary });
+export const qrText = (token, summary) => JSON.stringify({ bcValidation: 1, token, summary });
 
 /**
  * Reads what a scan decoded; null when it is not a validation code.
@@ -239,7 +239,7 @@ export const qrText = (token, summary) => JSON.stringify({ odValidation: 1, toke
  * @returns {{ token: string, summary: Summary }|null}
  */
 export function parseQrText(text) {
-  if (!text.startsWith('{"odValidation":1')) return null;
+  if (!text.startsWith('{"bcValidation":1')) return null;
   try {
     const v = JSON.parse(text);
     if (typeof v.token !== 'string' || !/^[0-9a-f]{32}$/.test(v.token) || !Array.isArray(v.summary?.dives) || !v.summary.dives.length) return null;

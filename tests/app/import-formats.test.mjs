@@ -83,16 +83,16 @@ test('the link opens the dialog; « Fermer », the scrim and Back all end in the
 
   const c = src('components/ImportFormats.svelte');
   assert.match(c, /class="bc-import-formats--link" onclick=\{\(\) => openFormats\(state\)\}/);
-  // A basic dialog: Md3Dialog (scrim tap, Escape, system Back through od-cancel) with oncancel, a « Fermer » text button, no ✕.
+  // A basic dialog: Md3Dialog (scrim tap, Escape, system Back through bc-cancel) with oncancel, a « Fermer » text button, no ✕.
   assert.match(c, /<Md3Dialog[^>]*oncancel=\{\(\) => closeFormats\(state\)\}/);
   assert.match(c, /onclick=\{\(\) => closeFormats\(state\)\}>\{t\('dialog\.close'\)\}/);
   assert.doesNotMatch(c, /name="close"|✕/);
   const dialog = src('components/Md3Dialog.svelte');
   assert.match(dialog, /bc-md3-dialog--scrim" onclick=\{oncancel\}/);
-  assert.match(dialog, /addEventListener\('od-cancel'/);
-  // The Back dispatcher sends « od-cancel » to the dialog through its `cancel` helper.
-  assert.match(src('lib/back-button.js'), /classList\.contains\('bc-md3-dialog'\)[^\n]*return cancel\(modal, 'od-dialog'\)/);
-  assert.match(src('lib/back-button.js'), /function cancel\(el, name\) \{\s*el\.dispatchEvent\(new CustomEvent\('od-cancel'\)\);/);
+  assert.match(dialog, /addEventListener\('bc-cancel'/);
+  // The Back dispatcher sends « bc-cancel » to the dialog through its `cancel` helper.
+  assert.match(src('lib/back-button.js'), /classList\.contains\('bc-md3-dialog'\)[^\n]*return cancel\(modal, 'bc-dialog'\)/);
+  assert.match(src('lib/back-button.js'), /function cancel\(el, name\) \{\s*el\.dispatchEvent\(new CustomEvent\('bc-cancel'\)\);/);
   assert.equal(json('fr').dialog.close, 'Fermer');
 });
 

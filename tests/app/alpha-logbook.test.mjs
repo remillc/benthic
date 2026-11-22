@@ -79,7 +79,7 @@ test('the row appears only once: after the import it is remembered in the device
   assert.equal((await findAlphaLogbooks(core().api, s, true)).length, 1);
   markAlphaImportDone(s);
   assert.equal(s.items.get(ALPHA_IMPORT_KEY), '1');
-  assert.match(ALPHA_IMPORT_KEY, /^od\./);
+  assert.match(ALPHA_IMPORT_KEY, /^bc./);
   assert.equal(alphaImportDone(s), true);
   const c = core();
   assert.deepEqual(await findAlphaLogbooks(c.api, s, true), []);

@@ -19,7 +19,7 @@ export const ITEMS = /** @type {const} */ (['birth', 'blood', 'contact', 'insura
 export const DEFAULT_INCLUDE = { birth: true, blood: true, contact: true, insurance: true, medical: true, certificate: false };
 
 /** The device-store key of the switches (lib/device-store.js). */
-export const INCLUDE_KEY = 'od.emergencyInclude';
+export const INCLUDE_KEY = 'bc.emergencyInclude';
 
 /**
  * The switches kept on this device, completed with the defaults.

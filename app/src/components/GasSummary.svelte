@@ -88,7 +88,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gas-summary {
       position: relative;
       margin: 16px 16px 16px;

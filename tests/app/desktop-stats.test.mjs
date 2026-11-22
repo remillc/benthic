@@ -104,5 +104,5 @@ test('the axis takes round steps up to the top value', () => {
 });
 
 test('the exported image is named after the statistic', () => {
-  assert.equal(chartFileName('OpenDives-statistique', "Temps sous l'eau", '2026-11-15'), 'OpenDives-statistique-Temps-sous-l-eau-2026-11-15.png');
+  assert.equal(chartFileName('Benthic-statistique', "Temps sous l'eau", '2026-11-15'), 'Benthic-statistique-Temps-sous-l-eau-2026-11-15.png');
 });

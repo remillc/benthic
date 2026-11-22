@@ -1,6 +1,6 @@
 // @ts-check
 // Tools section (docs/ui-specification.md, section 1, "Tools"). Every value
-// comes from the core; only the wait before flying is OpenDives' own rule.
+// comes from the core; only the wait before flying is Benthic's own rule.
 
 import { t } from './i18n.js';
 import { formatNumber } from './format.js';
@@ -23,7 +23,7 @@ export function flightWaitName(mode) {
 }
 
 /**
- * OpenDives' recommendation (not computed by the core), counted from the end (surfacing)
+ * Benthic's recommendation (not computed by the core), counted from the end (surfacing)
  * of the last dive. "Selon les plongées" (`mode` "auto"): 18 hours when the day of that
  * dive had several dives, else 12 hours. "The same day" means the same calendar day of
  * the dives' start (local wall-clock date): the dives that start the same day as the last

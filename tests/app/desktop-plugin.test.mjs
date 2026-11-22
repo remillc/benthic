@@ -5,7 +5,7 @@ import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { BenthicCoreDesktop, fileUrl, flatRules, joinPath, parseEnv } from '../../plugins/benthic-core/desktop.js';
 
-const paths = { userData: '/data/OpenDives', temp: '/tmp/opendives', resourcesDir: '/app/resources', xsltDir: '/app/resources/xslt', caFile: '/data/OpenDives/cacerts.pem' };
+const paths = { userData: '/data/Benthic', temp: '/tmp/benthic', resourcesDir: '/app/resources', xsltDir: '/app/resources/xslt', caFile: '/data/Benthic/cacerts.pem' };
 
 /** A bridge that records the core calls and answers from `answers` (a value, or a function of the args). */
 function fakeBridge(answers = {}) {
@@ -133,7 +133,7 @@ test('a core error rejects with its message and the code CORE_ERROR', async () =
 test('importSample imports the bundled sample into <userData>/carnet[main]', async () => {
   install({ importFile: 12 });
   assert.deepEqual(await plugin.importSample(), { count: 12 });
-  assert.deepEqual(lastCall(), { method: 'importFile', args: { source: '/app/resources/SampleDivesV2.ssrf', repo: '/data/OpenDives/carnet[main]' } });
+  assert.deepEqual(lastCall(), { method: 'importFile', args: { source: '/app/resources/SampleDivesV2.ssrf', repo: '/data/Benthic/carnet[main]' } });
 });
 
 test('listDives gives the dives as JSON text, or an empty list without a log', async () => {
@@ -274,7 +274,7 @@ test('createLog: the device log, and only our own staged files', async () => {
   install({ setCloudTestEmail: null, cloudConfigure: null, logExists: true, cloudCreateLog: '{}' });
   plugin.pendingAccount = { email: 'a@b.c', password: 'pw' };
   await plugin.createLog({ source: 'device' });
-  assert.equal(lastCall().args.importPath, '/data/OpenDives/carnet[main]');
+  assert.equal(lastCall().args.importPath, '/data/Benthic/carnet[main]');
   plugin.pendingAccount = { email: 'a@b.c', password: 'pw' };
   assert.equal((await rejection(plugin.createLog({ source: 'import', path: '/etc/passwd' }))).code, 'BAD_REQUEST');
   assert.equal((await rejection(plugin.createLog({ source: 'nope' }))).code, 'BAD_REQUEST');
@@ -283,9 +283,9 @@ test('createLog: the device log, and only our own staged files', async () => {
 test('stageImport, importCount and discardImport work on files of the import folder only', async () => {
   install({ importCount: '{"dives":3}' });
   const { path } = await plugin.stageImport({ name: 'C:\\dir\\my log.xml', data: 'QQ==' });
-  assert.match(path, /^\/tmp\/opendives\/import\/import-\d+-my_log\.xml$/);
+  assert.match(path, /^\/tmp\/benthic\/import\/import-\d+-my_log\.xml$/);
   assert.deepEqual(await plugin.importCount({ path }), { dives: 3 });
-  assert.equal((await rejection(plugin.importCount({ path: '/tmp/opendives/share/x' }))).code, 'BAD_REQUEST');
+  assert.equal((await rejection(plugin.importCount({ path: '/tmp/benthic/share/x' }))).code, 'BAD_REQUEST');
   await plugin.discardImport({ path });
   assert.equal(bridge.files.has(path), false);
   assert.equal((await rejection(plugin.stageImport({ name: 'a' }))).code, 'BAD_REQUEST');
@@ -317,7 +317,7 @@ test('importDives stages the file under its name, imports it, then deletes it', 
   assert.deepEqual(await plugin.importDives({ name: 'dir/trip.ssrf', data: 'QQ==' }), { json: '{"dive":{}}' });
   // The staged file has a name of its own (a prefix) and keeps the extension; the source is the diver's name.
   const { file, source } = lastCall().args;
-  assert.ok(file.startsWith('/tmp/opendives/import/') && file.endsWith('-trip.ssrf') && file.length > '/tmp/opendives/import/-trip.ssrf'.length);
+  assert.ok(file.startsWith('/tmp/benthic/import/') && file.endsWith('-trip.ssrf') && file.length > '/tmp/benthic/import/-trip.ssrf'.length);
   assert.equal(source, 'trip.ssrf');
   assert.equal(bridge.files.size, 0);
 });
@@ -339,7 +339,7 @@ test('deviceLog counts or imports the log of this device', async () => {
   assert.equal(lastCall().method, 'logExists');
   assert.deepEqual(await plugin.deviceLog({ action: 'count' }), { count: 7 });
   await plugin.deviceLog({ action: 'import' });
-  assert.deepEqual(lastCall().args, { file: '/data/OpenDives/carnet[main]', source: 'this device' });
+  assert.deepEqual(lastCall().args, { file: '/data/Benthic/carnet[main]', source: 'this device' });
   install({ logExists: false });
   assert.deepEqual(await plugin.deviceLog({ action: 'exists' }), { exists: false });
   assert.deepEqual(await plugin.deviceLog({ action: 'count' }), { count: 0 });
@@ -360,22 +360,22 @@ test('signOut forgets every credential and the development file', async () => {
 
 test('deleteAccount keeps the dives as the new logbook once the server confirms', async () => {
   // The core writes the kept copy while it deletes the account.
-  install({ cloudDeleteAccount: () => (bridge.files.set('/data/OpenDives/carnet.new', 'new'), '{"deleted":true}') });
-  bridge.files.set('/data/OpenDives/carnet', 'old');
+  install({ cloudDeleteAccount: () => (bridge.files.set('/data/Benthic/carnet.new', 'new'), '{"deleted":true}') });
+  bridge.files.set('/data/Benthic/carnet', 'old');
   bridge.secrets.cloud = { email: 'a', password: 'b' };
   assert.deepEqual(await plugin.deleteAccount({ password: 'pw' }), { json: '{"deleted":true}' });
-  assert.equal(lastCall().args.keepDivesIn, '/data/OpenDives/carnet.new[main]');
-  assert.equal(bridge.files.get('/data/OpenDives/carnet'), 'new');
+  assert.equal(lastCall().args.keepDivesIn, '/data/Benthic/carnet.new[main]');
+  assert.equal(bridge.files.get('/data/Benthic/carnet'), 'new');
   assert.ok([...bridge.files.keys()].some((k) => k.includes('carnet.before-')));
   assert.equal(bridge.secrets.cloud, undefined);
 });
 
 test('deleteAccount refused: the copy is dropped and nothing moves', async () => {
   install({ cloudDeleteAccount: '{"deleted":false}' });
-  bridge.files.set('/data/OpenDives/carnet', 'old');
+  bridge.files.set('/data/Benthic/carnet', 'old');
   await plugin.deleteAccount({ password: 'pw', keepDives: false });
   assert.equal(lastCall().args.keepDivesIn, '');
-  assert.equal(bridge.files.get('/data/OpenDives/carnet'), 'old');
+  assert.equal(bridge.files.get('/data/Benthic/carnet'), 'old');
 });
 
 test('gitCheck: BAD_ADDRESS comes out as the code; the stored token is used when asked', async () => {
@@ -407,28 +407,28 @@ test('gitConnect stores the repository on success; on failure it restores and re
 
 test('exportDives writes to the share folder and gives its address, or the text', async () => {
   install({ exportDives: null });
-  assert.deepEqual(await plugin.exportDives({ ids: [1], format: 'ssrf', name: 'dive.ssrf' }), { uri: 'file:///tmp/opendives/share/dive.ssrf' });
-  assert.deepEqual(lastCall().args, { ids: [1], format: 'ssrf', anonymize: false, path: '/tmp/opendives/share/dive.ssrf' });
-  bridge.files.set('/tmp/opendives/share/q.xml', Buffer.from('plong\u00e9e').toString('base64'));
+  assert.deepEqual(await plugin.exportDives({ ids: [1], format: 'ssrf', name: 'dive.ssrf' }), { uri: 'file:///tmp/benthic/share/dive.ssrf' });
+  assert.deepEqual(lastCall().args, { ids: [1], format: 'ssrf', anonymize: false, path: '/tmp/benthic/share/dive.ssrf' });
+  bridge.files.set('/tmp/benthic/share/q.xml', Buffer.from('plong\u00e9e').toString('base64'));
   assert.deepEqual(await plugin.exportDives({ ids: [1], format: 'ssrf', name: 'q.xml', text: true }), { uri: '', text: 'plong\u00e9e' });
-  assert.equal(bridge.files.has('/tmp/opendives/share/q.xml'), false);
+  assert.equal(bridge.files.has('/tmp/benthic/share/q.xml'), false);
   // A big export is never returned as one string: TOO_BIG above 8 MB (the Android heap ran out of memory on it).
-  bridge.files.set('/tmp/opendives/share/big.xml', Buffer.alloc(9 * 1024 * 1024, 65).toString('base64'));
+  bridge.files.set('/tmp/benthic/share/big.xml', Buffer.alloc(9 * 1024 * 1024, 65).toString('base64'));
   assert.equal((await rejection(plugin.exportDives({ ids: [1], format: 'ssrf', name: 'big.xml', text: true }))).code, 'TOO_BIG');
-  assert.equal(bridge.files.has('/tmp/opendives/share/big.xml'), false);
+  assert.equal(bridge.files.has('/tmp/benthic/share/big.xml'), false);
   // `stage`: the core writes a staged file of the import folder; only its path and size come back.
-  bridge.files.set('/tmp/opendives/import/x', Buffer.from('abc').toString('base64'));
+  bridge.files.set('/tmp/benthic/import/x', Buffer.from('abc').toString('base64'));
   const staged = await plugin.exportDives({ ids: [1], format: 'ssrf', name: 'logbook.ssrf', stage: true });
   assert.equal(staged.uri, '');
-  assert.match(staged.path, /^\/tmp\/opendives\/import\/import-\d+-logbook\.ssrf$/);
+  assert.match(staged.path, /^\/tmp\/benthic\/import\/import-\d+-logbook\.ssrf$/);
   assert.equal(lastCall().args.path, staged.path);
   assert.equal((await rejection(plugin.exportDives({ ids: [], format: 'ssrf', name: 'x' }))).code, 'BAD_ARGUMENT');
 });
 
 test('share helpers: files to share, PDF, nothing to grant', async () => {
   const { uri } = await plugin.writeShareFile({ name: 'a b.png', base64: 'QQ==' });
-  assert.equal(uri, 'file:///tmp/opendives/share/a%20b.png');
-  assert.deepEqual(await plugin.htmlToPdf({ html: '<p>x</p>', name: 'f.pdf' }), { uri: 'file:///tmp/opendives/share/f.pdf' });
+  assert.equal(uri, 'file:///tmp/benthic/share/a%20b.png');
+  assert.deepEqual(await plugin.htmlToPdf({ html: '<p>x</p>', name: 'f.pdf' }), { uri: 'file:///tmp/benthic/share/f.pdf' });
   assert.equal((await rejection(plugin.htmlToPdf({ html: 'x' }))).code, 'BAD_ARGUMENT');
   assert.deepEqual(await plugin.grantShareFile({ uri }), { apps: 0 });
 });

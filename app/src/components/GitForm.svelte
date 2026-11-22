@@ -96,7 +96,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-git-form {
       --bc-outlined-gap: 16px;
       display: flex;

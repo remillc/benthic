@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   // DEVELOPMENT ONLY: « Supprimer ce compte d'essai », on the account page of a temporary account (address ending in
-  // @opendives.test) made with the simulated Google sign-in. Loaded through `import()` behind the development switch.
+  // @benthic.test) made with the simulated Google sign-in. Loaded through `import()` behind the development switch.
   import { f7 } from 'framework7-svelte';
   import { deleteSignedInAccount, isTempEmail } from '../lib/dev-accounts.js';
   import { signOut } from '../lib/logbook.svelte.js';
@@ -41,7 +41,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dev-delete-account {
       display: flex;
       flex-direction: column;

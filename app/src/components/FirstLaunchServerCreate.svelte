@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // Creating a logbook on the OpenDives server (task 2026-11-17-266; mock-ups docs/mockups-release/
+  // Creating a logbook on the Benthic server (task 2026-11-17-266; mock-ups docs/mockups-release/
   // android-serveur-creer-*, android-tablette-serveur-creer-*, bureau-serveur-creer-*): « Aucun carnet sur votre
   // compte » and its three choices, the name of a new logbook, the upload with its progress, and the two stops
   // (« Serveur injoignable », « Envoi interrompu »). The title above the choices, the name and the upload is drawn
@@ -67,7 +67,7 @@
     try {
       const listed = await BenthicCore.listDives();
       if (!listed.exists) return void (c.deviceLogbook = null);
-      const name = deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName');
+      const name = deviceStore.getItem('bc.logbookName') || t('welcomeSteps.defaultName');
       c.deviceLogbook = { name, dives: listed.dives.length };
     } catch {
       c.deviceLogbook = null;
@@ -145,7 +145,7 @@
     busy = true;
     try {
       const access = await BenthicCore.serverSessionAccess();
-      deviceStore.setItem('od.logbookName', sanitiseLogbookName(c.name));
+      deviceStore.setItem('bc.logbookName', sanitiseLogbookName(c.name));
       if (windowTakes) {
         await openInWindow(null);
         return;
@@ -186,7 +186,7 @@
         if (m && Number(m[2]) > 0) objects = { n: Math.min(Number(m[1]), Number(m[2])), total: Number(m[2]) };
       });
       const name = sanitiseLogbookName(c.name);
-      deviceStore.setItem('od.logbookName', name);
+      deviceStore.setItem('bc.logbookName', name);
       if (c.deviceReady) {
         // The logbook is made and saved here: pushing again sends what the server does not have yet.
         await pushToServer(BenthicCore);
@@ -326,7 +326,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-server-create--lead {
       margin: 0 0 20px;
       font-size: 15px;

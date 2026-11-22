@@ -290,7 +290,7 @@ export function selectionOfBar(bar) {
 }
 
 /**
- * The name of an image file for a chart: « OpenDives-<statistic>-2026-11-15.png ».
+ * The name of an image file for a chart: « Benthic-<statistic>-2026-11-15.png ».
  * @param {string} prefix
  * @param {string} title
  * @param {string} day

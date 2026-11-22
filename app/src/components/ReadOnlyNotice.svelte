@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // The warning of the equipment inventory once an Benthic+ subscription has ended (task 2026-11-17-267):
+  // The warning of the equipment inventory once a Benthic+ subscription has ended (task 2026-11-17-267):
   // the inventory is read only for 30 days, then the diver loses it unless they subscribe again or export it.
   // Shown only while the flag of the store (lib/inventory.svelte.js) is set.
   import Icon from './Icon.svelte';
@@ -26,7 +26,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-read-only-notice {
       margin: 8px 16px 0;
       padding: 12px 16px;

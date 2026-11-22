@@ -71,8 +71,8 @@ static int selftest()
 	expect(!git_mode(), "a refused configuration leaves git mode off");
 	// Accepted: the address has a trailing slash dropped, never credentials.
 	const std::string token = "ghp_FAKE0123456789tokenvalue";
-	bool ok = !git_configure("https://github.com/remillc/opendives-test/", "remillc", token, "main", address, error);
-	expect(ok && address == "https://github.com/remillc/opendives-test[main]", "address without credentials");
+	bool ok = !git_configure("https://github.com/remillc/benthic-test/", "remillc", token, "main", address, error);
+	expect(ok && address == "https://github.com/remillc/benthic-test[main]", "address without credentials");
 	expect(address.find(token) == std::string::npos && address.find('@') == std::string::npos, "no token, no user in the address");
 	expect(git_mode(), "git mode on");
 	// git_check refuses what git_configure refuses; its answers never hold the token.

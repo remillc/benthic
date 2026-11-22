@@ -11,7 +11,7 @@
 import { cloudErrorKey } from './desktop-logbooks.js';
 
 /** Where the dives to import are parked while the window reloads on its new logbook. */
-export const PENDING_IMPORT_KEY = 'od.pendingImport';
+export const PENDING_IMPORT_KEY = 'bc.pendingImport';
 
 /**
  * What the new logbook still has to import: the staged files (the import folder of the app's temp folder), read

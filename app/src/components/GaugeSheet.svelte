@@ -28,7 +28,7 @@
    */
   let { field, readings, thumbnail, cylinders, firstTarget, unit, onuse, onretry, oncancel } = $props();
 
-  const id = `od-gauge-sheet-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-gauge-sheet-${Math.random().toString(36).slice(2, 9)}`;
   const two = readings.length > 1;
   const label = t(field === 'start' ? 'edit.start' : 'edit.end');
   let rows = $state(
@@ -49,11 +49,11 @@
       e.stopPropagation();
       oncancel();
     };
-    node.addEventListener('od-cancel', cancel);
+    node.addEventListener('bc-cancel', cancel);
     queueMicrotask(() => /** @type {HTMLElement|null} */ (node.querySelector('[role="dialog"]'))?.focus({ preventScroll: true }));
     return {
       destroy() {
-        node.removeEventListener('od-cancel', cancel);
+        node.removeEventListener('bc-cancel', cancel);
         node.remove();
         previous?.focus?.();
       },
@@ -112,7 +112,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gauge-sheet {
       position: fixed;
       inset: 0;
@@ -145,10 +145,10 @@
     }
 
     :global(.md) .bc-gauge-sheet--surface {
-      animation: od-gauge-sheet-rise var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards;
+      animation: bc-gauge-sheet-rise var(--bc-motion-spatial-default-ms) var(--bc-motion-spatial-default) backwards;
     }
 
-    @keyframes od-gauge-sheet-rise {
+    @keyframes bc-gauge-sheet-rise {
       from {
         transform: translateY(100%);
       }

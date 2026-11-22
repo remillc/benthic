@@ -39,7 +39,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-consumption {
       margin-top: 12px;
       padding: 16px;

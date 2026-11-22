@@ -2,7 +2,7 @@
 // "Ce lest était": how the weight of a dive felt (task 2026-11-13-99). Stored
 // as a tag of the dive, always in English whatever the app language, so that
 // Subsurface shows it as an ordinary tag. At most one of the three at a time;
-// OpenDives shows them as buttons, never as tag chips, suggestions or filter
+// Benthic shows them as buttons, never as tag chips, suggestions or filter
 // values.
 
 /** The choice, and its tag. */
@@ -37,7 +37,7 @@ export function feedbackOf(tags) {
 }
 
 /**
- * The tags OpenDives lists: without the three.
+ * The tags Benthic lists: without the three.
  * @param {string[]} tags
  */
 export const visibleTags = (tags) => tags.filter((tag) => !isFeedbackTag(tag));

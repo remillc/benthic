@@ -67,7 +67,7 @@ export function finishAccount(router, welcome, { offerDeviceDives = false } = {}
 
 /** @param {string} email */
 async function offerDeviceDivesOnce(email) {
-  const key = `od.deviceDivesOffered:${email}`;
+  const key = `bc.deviceDivesOffered:${email}`;
   try {
     if (!email || deviceStore.getItem(key)) return;
   } catch {

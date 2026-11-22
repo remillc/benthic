@@ -1,5 +1,5 @@
 #!/bin/bash
-# OpenDives POC — round-trip test over Subsurface sample logs.
+# Benthic POC — round-trip test over Subsurface sample logs.
 #
 # For each sample:
 #   1. sample -> git repo A                  (first import, Subsurface normalises)

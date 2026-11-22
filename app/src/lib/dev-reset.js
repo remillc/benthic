@@ -11,7 +11,7 @@ export const RESET_STEPS = /** @type {const} */ ([
   'notifications', // pending local notifications
   'native', // the core's open log, the device logbook, working copies, session and git tokens, data key, staged files
   'indexedDb', // equipment, profile, certifications, maintenance stores
-  'deviceStore', // every od.* setting (device-store.js), the first-launch state and the dev flags with them
+  'deviceStore', // every bc.* setting (device-store.js), the first-launch state and the dev flags with them
   'localStorage', // the logbook snapshot and anything the web view kept
 ]);
 
@@ -69,7 +69,7 @@ export function createDevReset(deps) {
 /** Deletes every IndexedDB database of the app. @param {IDBFactory} [factory] */
 export async function deleteAllDatabases(factory = globalThis.indexedDB) {
   if (!factory) return;
-  const names = typeof factory.databases === 'function' ? (await factory.databases()).map((d) => d.name ?? '') : ['opendives-files'];
+  const names = typeof factory.databases === 'function' ? (await factory.databases()).map((d) => d.name ?? '') : ['benthic-files'];
   await Promise.all(
     names.filter(Boolean).map(
       (name) =>

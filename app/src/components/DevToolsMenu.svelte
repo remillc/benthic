@@ -309,9 +309,9 @@
           {/if}
         </section>
 
-        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-account">
-          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-account">{text.account}</h3>
-          <div class="bc-dev-tools-menu--segments" role="radiogroup" aria-labelledby="od-dev-s-account" style:--bc-dev-segment-index={Math.max(pillIndex, 0)}>
+        <section class="bc-dev-tools-menu--section" aria-labelledby="bc-dev-s-account">
+          <h3 class="bc-dev-tools-menu--heading" id="bc-dev-s-account">{text.account}</h3>
+          <div class="bc-dev-tools-menu--segments" role="radiogroup" aria-labelledby="bc-dev-s-account" style:--bc-dev-segment-index={Math.max(pillIndex, 0)}>
             {#if pillIndex >= 0}<span class="bc-dev-tools-menu--segments-pill" class:bc-dev-tools-menu--segments-pill-slide={slide} aria-hidden="true"></span>{/if}
             {@render segment('out', 0, 'phone', text.toFreeOut, text.toFreeOutTag)}
             {@render segment('keep', 1, 'lock', text.toFreeKeep, text.toFreeKeepTag)}
@@ -322,8 +322,8 @@
           {/if}
         </section>
 
-        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-trial">
-          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-trial">{text.trial}</h3>
+        <section class="bc-dev-tools-menu--section" aria-labelledby="bc-dev-s-trial">
+          <h3 class="bc-dev-tools-menu--heading" id="bc-dev-s-trial">{text.trial}</h3>
           <div class="bc-dev-tools-menu--group">
             {@render row('new', 'personAdd', text.fresh, text.freshHint, () => run('new', () => tools?.newAccount()))}
             {#if confirming}
@@ -338,8 +338,8 @@
           </div>
         </section>
 
-        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-first">
-          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-first">{text.first}</h3>
+        <section class="bc-dev-tools-menu--section" aria-labelledby="bc-dev-s-first">
+          <h3 class="bc-dev-tools-menu--heading" id="bc-dev-s-first">{text.first}</h3>
           <div class="bc-dev-tools-menu--group">
             {#if resetOpen}
               <div class="bc-dev-tools-menu--reset" role="alertdialog" aria-label={text.resetTitle}>
@@ -366,8 +366,8 @@
           </div>
         </section>
 
-        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-nav">
-          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-nav">{text.nav}</h3>
+        <section class="bc-dev-tools-menu--section" aria-labelledby="bc-dev-s-nav">
+          <h3 class="bc-dev-tools-menu--heading" id="bc-dev-s-nav">{text.nav}</h3>
           <div class="bc-dev-tools-menu--group">
             {#if navOpen}
               <div class="bc-dev-tools-menu--reset" role="group" aria-label={text.navLog}>
@@ -391,8 +391,8 @@
           </div>
         </section>
 
-        <section class="bc-dev-tools-menu--section" aria-labelledby="od-dev-s-alpha">
-          <h3 class="bc-dev-tools-menu--heading" id="od-dev-s-alpha">{text.alphaSection}</h3>
+        <section class="bc-dev-tools-menu--section" aria-labelledby="bc-dev-s-alpha">
+          <h3 class="bc-dev-tools-menu--heading" id="bc-dev-s-alpha">{text.alphaSection}</h3>
           <div class="bc-dev-tools-menu--group">
             {@render row('alpha', 'logbook', text.alpha, current?.alphaFolders === 0 ? text.noAlpha : text.alphaHint, () => run('alpha', () => tools?.importAlphaLogbook()), current?.alphaFolders === 0)}
           </div>
@@ -404,7 +404,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dev-tools-menu {
       position: fixed;
       inset: 0;
@@ -428,7 +428,7 @@
       background: var(--bc-surface);
       color: var(--bc-text);
       box-shadow: 0 -2px 24px rgb(0 0 0 / 0.25);
-      animation: od-dev-tools-menu-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      animation: bc-dev-tools-menu-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1);
     }
     @media (min-width: 768px) {
       .bc-dev-tools-menu {
@@ -442,7 +442,7 @@
         display: none;
       }
     }
-    @keyframes od-dev-tools-menu-in {
+    @keyframes bc-dev-tools-menu-in {
       from {
         transform: translateY(24px);
         opacity: 0;
@@ -755,7 +755,7 @@
       border: 2.5px solid var(--bc-dev-tint);
       border-top-color: var(--bc-dev);
       border-radius: 50%;
-      animation: od-dev-tools-menu-spin 0.8s linear infinite;
+      animation: bc-dev-tools-menu-spin 0.8s linear infinite;
     }
     @media (prefers-reduced-motion: reduce) {
       .bc-dev-tools-menu--segments-pill-slide,
@@ -767,7 +767,7 @@
       border-color: rgb(255 255 255 / 0.35);
       border-top-color: var(--bc-on-dev);
     }
-    @keyframes od-dev-tools-menu-spin {
+    @keyframes bc-dev-tools-menu-spin {
       to {
         transform: rotate(360deg);
       }

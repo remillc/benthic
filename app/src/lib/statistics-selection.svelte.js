@@ -5,7 +5,7 @@
 // desktop statistic (`byYear`, `maxDepth`, ...) or `saved:<id>` for one the diver created.
 import { deviceStore } from './device-store.js';
 
-export const SELECTED_KEY = 'od.desktopStatistic';
+export const SELECTED_KEY = 'bc.desktopStatistic';
 
 /** @returns {string} */
 function read() {

@@ -102,7 +102,7 @@ function folderSink(dir) {
   };
 }
 
-const tempDir = () => mkdtempSync(path.join(tmpdir(), 'od-export-'));
+const tempDir = () => mkdtempSync(path.join(tmpdir(), 'bc-export-'));
 
 /** A device with equipment, a profile with legacy consent, two certifications with photos. */
 async function fixture({ media } = {}) {
@@ -136,7 +136,7 @@ async function fixture({ media } = {}) {
     appVersion: '0.3.0',
     now: () => FIXED,
     logbook: { diveCount: async () => 1, read: async () => ssrf },
-    settings: async () => ({ app: { 'od.theme': 'dark' }, logbook: { unitSystem: 'metric' } }),
+    settings: async () => ({ app: { 'bc.theme': 'dark' }, logbook: { unitSystem: 'metric' } }),
     media,
     openFile: null,
   };
@@ -184,7 +184,7 @@ test('crc32 and the incremental sha256 give the standard values, whatever the ch
   assert.equal(createSha256().digest(), createHash('sha256').update('').digest('hex'));
 });
 
-test('the archive holds the logbook, the OpenDives data, a README and a manifest that matches', async () => {
+test('the archive holds the logbook, the Benthic data, a README and a manifest that matches', async () => {
   const dir = tempDir();
   try {
     const { deps, front, back, ssrf, cert, cert2 } = await fixture();
@@ -201,31 +201,31 @@ test('the archive holds the logbook, the OpenDives data, a README and a manifest
         'README.txt',
         'logbook/logbook.ssrf',
         'manifest.json',
-        `opendives/certifications/${cert.id}.json`,
-        `opendives/certifications/${cert2.id}.json`,
-        `opendives/certifications/photos/${cert.id}-back.jpg`,
-        `opendives/certifications/photos/${cert.id}-front.jpg`,
-        'opendives/gear/g1.json',
-        'opendives/dive-equipment/e1.json',
-        'opendives/kits/k1.json',
-        'opendives/maintenance/m1.json',
-        'opendives/media/p1.jpg',
-        'opendives/profile/diver.json',
-        'opendives/settings.json',
+        `benthic/certifications/${cert.id}.json`,
+        `benthic/certifications/${cert2.id}.json`,
+        `benthic/certifications/photos/${cert.id}-back.jpg`,
+        `benthic/certifications/photos/${cert.id}-front.jpg`,
+        'benthic/gear/g1.json',
+        'benthic/dive-equipment/e1.json',
+        'benthic/kits/k1.json',
+        'benthic/maintenance/m1.json',
+        'benthic/media/p1.jpg',
+        'benthic/profile/diver.json',
+        'benthic/settings.json',
       ].sort(),
     );
     assert.deepEqual(zip.get('logbook/logbook.ssrf').data, Buffer.from(ssrf));
-    assert.deepEqual(zip.get(`opendives/certifications/photos/${cert.id}-front.jpg`).data, Buffer.from(front));
-    assert.deepEqual(zip.get(`opendives/certifications/photos/${cert.id}-back.jpg`).data, Buffer.from(back));
-    assert.deepEqual(zip.get('opendives/media/p1.jpg').data, Buffer.from(jpeg(300, 1)));
+    assert.deepEqual(zip.get(`benthic/certifications/photos/${cert.id}-front.jpg`).data, Buffer.from(front));
+    assert.deepEqual(zip.get(`benthic/certifications/photos/${cert.id}-back.jpg`).data, Buffer.from(back));
+    assert.deepEqual(zip.get('benthic/media/p1.jpg').data, Buffer.from(jpeg(300, 1)));
     // Stored as they are, unknown fields kept.
-    assert.equal(JSON.parse(zip.get('opendives/gear/g1.json').data).futureField.keep, true);
-    assert.deepEqual(JSON.parse(zip.get('opendives/settings.json').data), { format: 1, app: { 'od.theme': 'dark' }, logbook: { unitSystem: 'metric' } });
+    assert.equal(JSON.parse(zip.get('benthic/gear/g1.json').data).futureField.keep, true);
+    assert.deepEqual(JSON.parse(zip.get('benthic/settings.json').data), { format: 1, app: { 'bc.theme': 'dark' }, logbook: { unitSystem: 'metric' } });
 
     // The device's key and bookkeeping never leave.
     for (const [name, e] of zip) {
       assert.ok(!e.data.includes('SECRET-KEY'), name);
-      assert.ok(!name.startsWith('opendives/meta/'), name);
+      assert.ok(!name.startsWith('benthic/meta/'), name);
     }
 
     // The manifest lists every other file with the real size and SHA-256.
@@ -264,14 +264,14 @@ test('the sealed items come out decrypted, and read back the same as in the app'
     deps.openFile = folderSink(dir);
     const { file } = await buildExport({}, deps);
     const zip = readZip(readFileSync(file.path));
-    const diver = JSON.parse(zip.get('opendives/profile/diver.json').data);
+    const diver = JSON.parse(zip.get('benthic/profile/diver.json').data);
     const info = await deps.profile.readInfo();
     assert.equal(diver.bloodGroup, 'O+');
     assert.equal(diver.dateOfBirth, '1980-05-17');
     assert.deepEqual(diver.emergencyContact, info.emergency);
     assert.equal(diver.emergencyContact.name, 'Alex Martin');
     assert.deepEqual(diver.healthConsent, { consent: true, at: '2026-11-01T00:00:00Z' });
-    const card = JSON.parse(zip.get(`opendives/certifications/${cert.id}.json`).data);
+    const card = JSON.parse(zip.get(`benthic/certifications/${cert.id}.json`).data);
     assert.equal(card.number, 'A123456');
     assert.equal(card.agency, 'padi');
     assert.equal(card.instructor, 'Sam');
@@ -290,7 +290,7 @@ test('the blood group is exported even when legacy consent is off', async () => 
     await deps.store.write('meta/health-consent.json', { format: 1, consent: false, at: '', synced: true });
     deps.openFile = folderSink(dir);
     const { file } = await buildExport({}, deps);
-    const diver = JSON.parse(readZip(readFileSync(file.path)).get('opendives/profile/diver.json').data);
+    const diver = JSON.parse(readZip(readFileSync(file.path)).get('benthic/profile/diver.json').data);
     assert.equal(diver.bloodGroup, 'O+');
     assert.deepEqual(diver.healthConsent, { consent: false, at: '' });
   } finally {
@@ -619,7 +619,7 @@ test('the archive written for a named logbook is a .benthic ZIP with the layout 
     const entries = readZip(readFileSync(file.path));
     assert.ok(entries.has('manifest.json'));
     assert.ok(entries.has('logbook/logbook.ssrf'));
-    assert.ok(entries.has('opendives/settings.json'));
+    assert.ok(entries.has('benthic/settings.json'));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

@@ -15,7 +15,7 @@ async function invoke(channel, ...args) {
 }
 
 const listeners = new Map(); // event name -> Set of callbacks
-ipcRenderer.on('od:core-event', (_event, name, data) => {
+ipcRenderer.on('bc:core-event', (_event, name, data) => {
   for (const callback of listeners.get(name) || []) {
     try {
       callback(data);
@@ -26,13 +26,13 @@ ipcRenderer.on('od:core-event', (_event, name, data) => {
 });
 
 // `logbook`: what this window holds (bridge.cjs, logbooks.cjs); null: the start screen.
-const { platform, logbook, ...paths } = ipcRenderer.sendSync('od:paths');
+const { platform, logbook, ...paths } = ipcRenderer.sendSync('bc:paths');
 
 contextBridge.exposeInMainWorld('benthicDesktop', {
   platform,
   paths,
   logbook,
-  core: (method, args) => invoke('od:core', method, args),
+  core: (method, args) => invoke('bc:core', method, args),
   onCoreEvent(name, callback) {
     if (typeof callback !== 'function') return () => {};
     if (!listeners.has(name)) listeners.set(name, new Set());
@@ -40,99 +40,99 @@ contextBridge.exposeInMainWorld('benthicDesktop', {
     return () => listeners.get(name)?.delete(callback);
   },
   credentials: {
-    get: (kind) => invoke('od:credentials', 'get', kind),
-    set: (kind, value) => invoke('od:credentials', 'set', kind, value),
-    clear: (kind) => invoke('od:credentials', 'clear', kind),
+    get: (kind) => invoke('bc:credentials', 'get', kind),
+    set: (kind, value) => invoke('bc:credentials', 'set', kind, value),
+    clear: (kind) => invoke('bc:credentials', 'clear', kind),
   },
-  /** Release edition: a call to the OpenDives server (main process, no CORS): resolves { status, text }. */
-  server: { request: (options) => invoke('od:server', options) },
+  /** Release edition: a call to the Benthic server (main process, no CORS): resolves { status, text }. */
+  server: { request: (options) => invoke('bc:server', options) },
   fs: {
-    writeFile: (options) => invoke('od:fs', 'writeFile', options),
-    appendFile: (options) => invoke('od:fs', 'appendFile', options),
-    readFile: (options) => invoke('od:fs', 'readFile', options),
-    readChunk: (options) => invoke('od:fs', 'readChunk', options),
-    assemble: (options) => invoke('od:fs', 'assemble', options),
-    remove: (options) => invoke('od:fs', 'remove', options),
-    exists: (options) => invoke('od:fs', 'exists', options),
-    removeTree: (options) => invoke('od:fs', 'removeTree', options),
-    rename: (options) => invoke('od:fs', 'rename', options),
-    readDevEnv: (options) => invoke('od:fs', 'readDevEnv', options),
-    deleteDevEnv: (options) => invoke('od:fs', 'deleteDevEnv', options),
+    writeFile: (options) => invoke('bc:fs', 'writeFile', options),
+    appendFile: (options) => invoke('bc:fs', 'appendFile', options),
+    readFile: (options) => invoke('bc:fs', 'readFile', options),
+    readChunk: (options) => invoke('bc:fs', 'readChunk', options),
+    assemble: (options) => invoke('bc:fs', 'assemble', options),
+    remove: (options) => invoke('bc:fs', 'remove', options),
+    exists: (options) => invoke('bc:fs', 'exists', options),
+    removeTree: (options) => invoke('bc:fs', 'removeTree', options),
+    rename: (options) => invoke('bc:fs', 'rename', options),
+    readDevEnv: (options) => invoke('bc:fs', 'readDevEnv', options),
+    deleteDevEnv: (options) => invoke('bc:fs', 'deleteDevEnv', options),
   },
-  htmlToPdf: (options) => invoke('od:htmlToPdf', options),
+  htmlToPdf: (options) => invoke('bc:htmlToPdf', options),
   /** « Taille du texte » (task 2026-11-15-202): the window's zoom factor, 1 = normal. */
   setZoom: (factor) => webFrame.setZoomFactor(Number(factor) || 1),
   /** « Afficher dans le dossier »: the logbook's folder in the system's file manager. */
-  showInFolder: (options) => invoke('od:showInFolder', options),
+  showInFolder: (options) => invoke('bc:showInFolder', options),
   /** The Mac's Réglages window (desktop/main.cjs): opens it, or brings it forward. */
-  openSettingsWindow: () => invoke('od:settingsWindow'),
+  openSettingsWindow: () => invoke('bc:settingsWindow'),
   /** The Mac's « Mon profil de plongeur » window, and the menu item's availability (the diver has Benthic+). */
-  openProfileWindow: () => invoke('od:profileWindow'),
-  setProfileAvailable: (on) => invoke('od:profileAvailable', !!on),
-  saveAs: (options) => invoke('od:saveAs', options),
-  /** Copy and paste of dives (task 2026-11-15-178): text plus the private type application/x-opendives-dives. */
+  openProfileWindow: () => invoke('bc:profileWindow'),
+  setProfileAvailable: (on) => invoke('bc:profileAvailable', !!on),
+  saveAs: (options) => invoke('bc:saveAs', options),
+  /** Copy and paste of dives (task 2026-11-15-178): text plus the private type application/x-benthic-dives. */
   clipboard: {
-    write: (options) => invoke('od:clipboard', 'write', options),
-    read: () => invoke('od:clipboard', 'read'),
+    write: (options) => invoke('bc:clipboard', 'write', options),
+    read: () => invoke('bc:clipboard', 'read'),
   },
   /** The Mac's menu bar (menu.cjs): each item's command, e.g. 'undo', 'find'. Returns an unsubscribe. */
   onMenu(callback) {
     if (typeof callback !== 'function') return () => {};
     const listener = (_event, command) => callback(command);
-    ipcRenderer.on('od:menu', listener);
-    return () => ipcRenderer.removeListener('od:menu', listener);
+    ipcRenderer.on('bc:menu', listener);
+    return () => ipcRenderer.removeListener('bc:menu', listener);
   },
   /** The connection type (network.cjs): 'metered', 'unmetered' or 'unknown' (cached; asked again when the network changes). */
   network: {
-    status: () => invoke('od:network', 'status'),
-    refresh: () => invoke('od:network', 'refresh'),
-    watch: () => invoke('od:network', 'watch'),
+    status: () => invoke('bc:network', 'status'),
+    refresh: () => invoke('bc:network', 'refresh'),
+    watch: () => invoke('bc:network', 'watch'),
     onChange(callback) {
       if (typeof callback !== 'function') return () => {};
       const listener = (_event, cost) => callback(cost);
-      ipcRenderer.on('od:network', listener);
-      return () => ipcRenderer.removeListener('od:network', listener);
+      ipcRenderer.on('bc:network', listener);
+      return () => ipcRenderer.removeListener('bc:network', listener);
     },
   },
   /** The maintenance notifications (notifications.cjs): `schedule({ notifications })` replaces this window's list
    *  ({ id, title, body, at (ms), extra }); `onClick(cb)` gives a clicked notification's `extra` back. */
   notifications: {
-    schedule: (options) => invoke('od:notifications', options),
+    schedule: (options) => invoke('bc:notifications', options),
     onClick(callback) {
       if (typeof callback !== 'function') return () => {};
       const listener = (_event, extra) => callback(extra);
-      ipcRenderer.on('od:notification-click', listener);
-      return () => ipcRenderer.removeListener('od:notification-click', listener);
+      ipcRenderer.on('bc:notification-click', listener);
+      return () => ipcRenderer.removeListener('bc:notification-click', listener);
     },
   },
   /** Error reports (crash-reports.cjs): the crash saved before the app died, as JSON text ('' when none); nothing is sent from here. */
   crash: {
-    pending: () => invoke('od:crash', 'pending'),
-    clear: () => invoke('od:crash', 'clear'),
+    pending: () => invoke('bc:crash', 'pending'),
+    clear: () => invoke('bc:crash', 'clear'),
   },
-  placesSearch: (options) => invoke('od:placesSearch', options),
+  placesSearch: (options) => invoke('bc:placesSearch', options),
   /** Several logbooks (task 2026-11-15-173): one window per logbook; windows.cjs answers. */
   logbooks: {
-    recent: () => invoke('od:logbooks', 'recent'),
-    open: (options) => invoke('od:logbooks', 'open', options),
-    pickAndOpen: () => invoke('od:logbooks', 'pickAndOpen'),
-    openPath: (options) => invoke('od:logbooks', 'openPath', options),
-    close: () => invoke('od:logbooks', 'close'),
-    rename: (options) => invoke('od:logbooks', 'rename', options),
-    clearRecent: () => invoke('od:logbooks', 'clearRecent'),
-    forget: (options) => invoke('od:logbooks', 'forget', options),
-    exists: () => invoke('od:logbooks', 'exists'),
-    relocate: (options) => invoke('od:logbooks', 'relocate', options),
+    recent: () => invoke('bc:logbooks', 'recent'),
+    open: (options) => invoke('bc:logbooks', 'open', options),
+    pickAndOpen: () => invoke('bc:logbooks', 'pickAndOpen'),
+    openPath: (options) => invoke('bc:logbooks', 'openPath', options),
+    close: () => invoke('bc:logbooks', 'close'),
+    rename: (options) => invoke('bc:logbooks', 'rename', options),
+    clearRecent: () => invoke('bc:logbooks', 'clearRecent'),
+    forget: (options) => invoke('bc:logbooks', 'forget', options),
+    exists: () => invoke('bc:logbooks', 'exists'),
+    relocate: (options) => invoke('bc:logbooks', 'relocate', options),
     /** The personal clouds: { provider, available, connected, account } for each, never a token. */
-    cloudStatus: () => invoke('od:logbooks', 'cloudStatus'),
-    cloudSignIn: (options) => invoke('od:logbooks', 'cloudSignIn', options),
-    cloudSignOut: (options) => invoke('od:logbooks', 'cloudSignOut', options),
-    cloudCancelSignIn: (options) => invoke('od:logbooks', 'cloudCancelSignIn', options),
-    cloudReopenSignIn: (options) => invoke('od:logbooks', 'cloudReopenSignIn', options),
+    cloudStatus: () => invoke('bc:logbooks', 'cloudStatus'),
+    cloudSignIn: (options) => invoke('bc:logbooks', 'cloudSignIn', options),
+    cloudSignOut: (options) => invoke('bc:logbooks', 'cloudSignOut', options),
+    cloudCancelSignIn: (options) => invoke('bc:logbooks', 'cloudCancelSignIn', options),
+    cloudReopenSignIn: (options) => invoke('bc:logbooks', 'cloudReopenSignIn', options),
     /** « Ouvrir au démarrage »: { mode: 'last' | 'ask' }, kept in the main process. */
-    startup: () => invoke('od:logbooks', 'startup'),
-    setStartup: (options) => invoke('od:logbooks', 'setStartup', options),
-    create: (options) => invoke('od:logbooks', 'create', options),
+    startup: () => invoke('bc:logbooks', 'startup'),
+    setStartup: (options) => invoke('bc:logbooks', 'setStartup', options),
+    create: (options) => invoke('bc:logbooks', 'create', options),
     /** The path of a file dropped on the window (the renderer cannot read it). */
     pathForFile: (file) => {
       try {

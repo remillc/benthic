@@ -19,7 +19,7 @@
   let { equipment = $bindable() } = $props();
 
   let adding = $state(false);
-  /** Only an Benthic+ account changes the equipment of a dive; without one the block shows and stays inert. */
+  /** Only a Benthic+ account changes the equipment of a dive; without one the block shows and stays inert. */
   const plus = $derived(isSubscriber());
   const locked = $derived(gear.readOnly || !plus);
 
@@ -81,7 +81,7 @@
 <AddEquipmentSheet opened={adding} {equipment} onclose={() => (adding = false)} onadd={(next) => (equipment = next)} />
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dive-gear--sub {
       margin: 20px 16px 4px;
       font-size: 14px;

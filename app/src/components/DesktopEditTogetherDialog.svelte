@@ -181,7 +181,7 @@
 {#snippet chips(/** @type {'guides'|'buddies'|'tags'} */ key, /** @type {string} */ label)}
   {@const proposed = proposals(key)}
   <div class="bc-edit-together--field">
-    <label class="bc-edit-together--label" for="od-et-{uid}-{key}">{label}</label>
+    <label class="bc-edit-together--label" for="bc-et-{uid}-{key}">{label}</label>
     <div class="bc-edit-together--chips">
       {#each listOf(key) as name (name)}
         {@const note = noteOf(key, name)}
@@ -190,7 +190,7 @@
           <button type="button" class="bc-edit-together--chip-x" aria-label={t('desktopDetail.removeItem', { name })} onclick={() => removeChip(key, name)}><Icon name="close" size={14} /></button>
         </span>
       {/each}
-      <input id="od-et-{uid}-{key}" class="bc-edit-together--chip-input" type="text" autocomplete="off" bind:value={typed[key]} onkeydown={(e) => chipKey(e, key)} />
+      <input id="bc-et-{uid}-{key}" class="bc-edit-together--chip-input" type="text" autocomplete="off" bind:value={typed[key]} onkeydown={(e) => chipKey(e, key)} />
     </div>
     {#if proposed.length && typed[key].trim()}
       <ul class="bc-edit-together--suggestions">
@@ -208,19 +208,19 @@
   {:else if state}
     <div class="bc-edit-together--form">
       <div class="bc-edit-together--field">
-        <label class="bc-edit-together--label" for="od-et-{uid}-site">{t('edit.site')}</label>
+        <label class="bc-edit-together--label" for="bc-et-{uid}-site">{t('edit.site')}</label>
         <input
-          id="od-et-{uid}-site"
+          id="bc-et-{uid}-site"
           class="bc-edit-together--input"
           class:bc-edit-together--many={state.site.mixed && !siteTouched}
           type="text"
           autocomplete="off"
-          list="od-et-{uid}-sites"
+          list="bc-et-{uid}-sites"
           placeholder={state.site.mixed && !siteTouched ? many : t('edit.noSite')}
           bind:value={siteText}
           oninput={() => (siteTouched = true)}
         />
-        <datalist id="od-et-{uid}-sites">{#each sites as site (site.uuid)}<option value={site.name}></option>{/each}</datalist>
+        <datalist id="bc-et-{uid}-sites">{#each sites as site (site.uuid)}<option value={site.name}></option>{/each}</datalist>
       </div>
 
       {@render chips('guides', t('edit.guides'))}
@@ -228,24 +228,24 @@
       {@render chips('tags', t('edit.tags'))}
 
       <div class="bc-edit-together--field">
-        <label class="bc-edit-together--label" for="od-et-{uid}-suit">{t('edit.suit')}</label>
+        <label class="bc-edit-together--label" for="bc-et-{uid}-suit">{t('edit.suit')}</label>
         <input
-          id="od-et-{uid}-suit"
+          id="bc-et-{uid}-suit"
           class="bc-edit-together--input"
           type="text"
           autocomplete="off"
-          list="od-et-{uid}-suits"
+          list="bc-et-{uid}-suits"
           placeholder={state.suit.mixed && !suitTouched ? many : ''}
           bind:value={suit}
           oninput={() => (suitTouched = true)}
         />
-        <datalist id="od-et-{uid}-suits">{#each known.suit as name (name)}<option value={name}></option>{/each}</datalist>
+        <datalist id="bc-et-{uid}-suits">{#each known.suit as name (name)}<option value={name}></option>{/each}</datalist>
       </div>
 
       <div class="bc-edit-together--field">
-        <label class="bc-edit-together--label" for="od-et-{uid}-water">{t('edit.waterType')}</label>
+        <label class="bc-edit-together--label" for="bc-et-{uid}-water">{t('edit.waterType')}</label>
         <select
-          id="od-et-{uid}-water"
+          id="bc-et-{uid}-water"
           class="bc-edit-together--input"
           class:bc-edit-together--many={state.salinity.mixed && !waterTouched}
           value={state.salinity.mixed && !waterTouched ? '__many' : waterType}
@@ -256,9 +256,9 @@
       </div>
 
       <div class="bc-edit-together--field">
-        <label class="bc-edit-together--label" for="od-et-{uid}-notes">{t('edit.notes')}</label>
+        <label class="bc-edit-together--label" for="bc-et-{uid}-notes">{t('edit.notes')}</label>
         <textarea
-          id="od-et-{uid}-notes"
+          id="bc-et-{uid}-notes"
           class="bc-edit-together--input bc-edit-together--textarea"
           class:bc-edit-together--many={state.notes.mixed && !notesTouched}
           rows="4"
@@ -277,7 +277,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-edit-together--form {
       display: flex;
       flex-direction: column;

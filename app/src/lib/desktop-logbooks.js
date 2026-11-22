@@ -54,7 +54,7 @@ export function stepCount(step, where) {
 
 /**
  * The state of step 3 for a service with a browser sign-in: not signed in yet, the browser is open and we wait, or
- * signed in (also when OpenDives already had access to the service). A switch of account waits like a first sign-in.
+ * signed in (also when Benthic already had access to the service). A switch of account waits like a first sign-in.
  * @param {{ connected: boolean, signingIn: boolean }} state
  * @returns {'notConnected'|'waiting'|'connected'}
  */

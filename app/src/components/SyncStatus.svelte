@@ -70,7 +70,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-sync-status {
       position: relative;
       padding: 8px 16px;

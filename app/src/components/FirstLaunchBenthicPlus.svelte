@@ -347,7 +347,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-plus--title {
       margin: 0 0 8px;
       font-size: 28px;

@@ -112,7 +112,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gas-ead-mod--pair {
       display: flex;
       gap: 12px;

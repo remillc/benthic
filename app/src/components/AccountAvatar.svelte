@@ -47,7 +47,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-account-avatar {
       position: relative;
       flex: none;

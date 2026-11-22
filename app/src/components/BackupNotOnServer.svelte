@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   // « Sauvegarde et restauration » of a subscriber whose logbook is still on the device: the versions live in the logbook's
-  // repository on the OpenDives server, so there is nothing to list yet. The one button starts the first launch's step that
+  // repository on the Benthic server, so there is nothing to list yet. The one button starts the first launch's step that
   // sends the logbook of this device (« Aucun carnet sur votre compte »).
   import './backup.css';
   import Icon from './Icon.svelte';
@@ -29,7 +29,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-backup-not-on-server--action {
       margin: 16px 16px 0;
       display: flex;

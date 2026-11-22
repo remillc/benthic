@@ -55,7 +55,7 @@ const planXml = `<divelog program='subsurface' version='3'>
   <cylinder size='11.1 l' workpressure='207.0 bar' description='AL80' o2='32.0%' />
   <divecomputer model='planned dive'>
   <depth max='30.0 m' mean='20.0 m' />
-  <extradata key='OpenDives title' value='Wreck trip' />
+  <extradata key='Benthic title' value='Wreck trip' />
   <sample time='0:00 min' depth='0.0 m' />
   <sample time='2:00 min' depth='30.0 m' />
   <sample time='25:00 min' depth='30.0 m' />
@@ -154,7 +154,7 @@ test('a code from another transfer is reported, then restarts the count when the
   assert.equal(receiver.kind, 'p');
 });
 
-test('a foreign code is not an OpenDives code', () => {
+test('a foreign code is not a Benthic code', () => {
   for (const text of ['https://example.org', 'WIFI:S:home;T:WPA;P:secret;;', '', 'OD1~d~abc', 'OD1~x~abcdef~1~1~00000000~eA~eA', 'OD1~d~ABCDEF~1~1~00000000~eA~eA', 'OD1~d~abcdef~2~1~00000000~eA~eA', 'OD1~d~abcdef~1~1~00000000~e$~eA']) {
     assert.deepEqual(parseChunk(text), { ok: false, reason: 'foreign' }, text);
   }

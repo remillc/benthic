@@ -12,7 +12,7 @@ const seconds = [23 * H + 59 * 60, 24 * H, 24 * H + 59 * 60, 80 * 24 * H + 16 * 
 function run(lang) {
   const script = `
     const { deviceStore } = await import('../../app/src/lib/device-store.js');
-    deviceStore.setItem('od.appSettings', JSON.stringify({ language: '${lang}' }));
+    deviceStore.setItem('bc.appSettings', JSON.stringify({ language: '${lang}' }));
     const { formatTotalTime } = await import('../../app/src/lib/format.js');
     console.log(JSON.stringify(${JSON.stringify(seconds)}.map((s) => formatTotalTime(s).replace(/\\u00a0/g, ' '))));`;
   const out = execFileSync(process.execPath, ['--import', './register.mjs', '--input-type=module', '-e', script], {

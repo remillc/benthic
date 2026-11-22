@@ -2,7 +2,7 @@
 'use strict';
 // Error reports (task #102), desktop side: what the main process, the renderer and the core's helper cannot report themselves
 // (a main-process exception, a renderer or helper process that died) is written to one file in the app's data folder.
-// At the next launch the interface reads it (od:crash), shows it to the user and sends it only if they tap « Envoyer »;
+// At the next launch the interface reads it (bc:crash), shows it to the user and sends it only if they tap « Envoyer »;
 // clearing deletes the file. Nothing leaves the device from here. Counterpart of CrashReporter.kt / CrashReporter.swift.
 const fs = require('node:fs');
 const path = require('node:path');

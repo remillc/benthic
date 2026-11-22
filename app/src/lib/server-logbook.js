@@ -1,5 +1,5 @@
 // @ts-check
-// The logbook kept on the OpenDives server (release edition; docs/architecture.md, section 11.3): the dives are in
+// The logbook kept on the Benthic server (release edition; docs/architecture.md, section 11.3): the dives are in
 // Subsurface's git format on branch `main` of the diver's repository, read and written by the core's git code exactly
 // like a personal git repository (« Utiliser mon propre dépôt git »). This file holds what is JavaScript around it:
 // opening the repository the sign-in gave, creating the first logbook in it, and recognising it afterwards. Pure apart
@@ -32,8 +32,8 @@ export function repositoryKey(url) {
 }
 
 /**
- * Whether the connected repository is the one of the signed-in OpenDives account: the logbook then shows as « Serveur
- * OpenDives » where the sync location is named.
+ * Whether the connected repository is the one of the signed-in Benthic account: the logbook then shows as « Serveur
+ * Benthic » where the sync location is named.
  * @param {string} connected the `repository` of configureCloud
  * @param {{ signedIn: boolean, repositoryUrl: string }} session serverSessionInfo
  */

@@ -129,7 +129,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-md3-dialog--actions) .bc-leave-guard--discard {
       color: var(--bc-alarm);
     }

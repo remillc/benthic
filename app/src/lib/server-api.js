@@ -1,5 +1,5 @@
 // @ts-check
-// The OpenDives server's sign-in API (docs/architecture.md, section 11.2): an e-mail code, no password. Pure apart
+// The Benthic server's sign-in API (docs/architecture.md, section 11.2): an e-mail code, no password. Pure apart
 // from the transport it is given, so that node:test can drive it. The `message` of an error is for logs only; the
 // screens show their own translated text for each `code`.
 

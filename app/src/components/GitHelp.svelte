@@ -29,7 +29,7 @@
   /** @param {number} index @param {boolean} [focus] */
   function choose(index, focus = false) {
     selected = (index + providers.length) % providers.length;
-    if (focus) document.getElementById(`od-git-help-tab-${kind}-${providers[selected].id}`)?.focus();
+    if (focus) document.getElementById(`bc-git-help-tab-${kind}-${providers[selected].id}`)?.focus();
   }
 
   /** Arrow keys, Home and End move between the tabs (WAI-ARIA tabs). @param {KeyboardEvent} e */
@@ -64,10 +64,10 @@
       <button
         type="button"
         role="tab"
-        id="od-git-help-tab-{kind}-{p.id}"
+        id="bc-git-help-tab-{kind}-{p.id}"
         class="bc-git-help--tab"
         aria-selected={i === selected}
-        aria-controls="od-git-help-panel-{kind}"
+        aria-controls="bc-git-help-panel-{kind}"
         tabindex={i === selected ? 0 : -1}
         onclick={() => choose(i)}
         onkeydown={keydown}
@@ -81,10 +81,10 @@
 
   <div
     class="bc-git-help--surface"
-    id="od-git-help-panel-{kind}"
+    id="bc-git-help-panel-{kind}"
     role="tabpanel"
     tabindex="0"
-    aria-labelledby="od-git-help-tab-{kind}-{provider.id}"
+    aria-labelledby="bc-git-help-tab-{kind}-{provider.id}"
     ontouchstart={touchstart}
     ontouchend={touchend}
   >
@@ -102,7 +102,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-git-help--intro {
       margin: 16px 24px 0;
       font-size: 14px;

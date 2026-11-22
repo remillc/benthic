@@ -67,7 +67,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-renumber-dialog--field {
       --bc-field-margin: 24px;
     }

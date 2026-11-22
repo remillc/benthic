@@ -9,10 +9,10 @@ import { killMine } from './kill-mine.mjs';
 
 const [ssrf, label = 'run'] = process.argv.slice(2);
 const root = path.resolve(import.meta.dirname, '../..');
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
+const env = { ...process.env, BC_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: `${MAIN}/build/desktop/stage`, BC_USER_DATA: path.join(root, 'build/perf', `ud-${label}`) };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
@@ -32,10 +32,10 @@ const r = await p.eval(`(async()=>{
   out.jsonParse_listBytes = JSON.stringify(raw).length;
   out.jsonParse_ms = time(() => JSON.parse(JSON.stringify(raw)), 3);
   // Selection restyle: toggle a class on one row of the table and force a style+layout.
-  const rows = document.querySelectorAll('.od-desktop-logbook--row');
+  const rows = document.querySelectorAll('.bc-desktop-logbook--row');
   out.rowsInDom = rows.length;
-  out.toggleClassOnOneRow_styleAndLayout_ms = time(() => { rows[5].classList.toggle('od-desktop-logbook--selected'); void document.body.offsetHeight; }, 10);
-  out.forceFullLayout_ms = time(() => { document.querySelector('.od-desktop-logbook table').style.width = (Math.random() > 0.5 ? '99%' : '100%'); void document.body.offsetHeight; }, 5);
+  out.toggleClassOnOneRow_styleAndLayout_ms = time(() => { rows[5].classList.toggle('bc-desktop-logbook--selected'); void document.body.offsetHeight; }, 10);
+  out.forceFullLayout_ms = time(() => { document.querySelector('.bc-desktop-logbook table').style.width = (Math.random() > 0.5 ? '99%' : '100%'); void document.body.offsetHeight; }, 5);
   return out;
 })()`);
 console.log(JSON.stringify(r, null, 1));

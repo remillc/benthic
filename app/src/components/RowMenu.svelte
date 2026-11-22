@@ -9,7 +9,7 @@
   // docs/mockups/reglages-choix-android.dc.html): one value chosen in a short list.
   // Anchored to the touched row, which takes the selected tint while the menu is open.
   // No title, no intro, no Annuler/OK: a tap picks and closes, a tap outside, Escape or
-  // the system Back key (lib/back-button.js sends "od-cancel") closes without change.
+  // the system Back key (lib/back-button.js sends "bc-cancel") closes without change.
   // The menu is drawn in the page's root (position: fixed), so no card clips it.
   // iOS: same anchored menu in the look of a UIMenu (13 px corners, check at the start).
 
@@ -35,7 +35,7 @@
   let active = $state(Math.max(0, options.findIndex((o) => o.value === value)));
   /** @type {HTMLDivElement|undefined} */
   let menu = $state();
-  const id = `od-row-menu-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-row-menu-${Math.random().toString(36).slice(2, 9)}`;
   let closed = false;
 
   function position() {
@@ -102,13 +102,13 @@
     });
     const cancel = () => close();
     const el = menu;
-    el?.addEventListener('od-cancel', cancel);
+    el?.addEventListener('bc-cancel', cancel);
     const moved = () => position();
     window.addEventListener('resize', moved);
     return () => {
       target.classList.remove('bc-row-menu--anchored');
       target.removeAttribute('aria-expanded');
-      el?.removeEventListener('od-cancel', cancel);
+      el?.removeEventListener('bc-cancel', cancel);
       window.removeEventListener('resize', moved);
     };
   });
@@ -155,7 +155,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* The touched row while its menu is open: selected tint, 12 dp corners. */
     :global(.bc-row-menu--anchored) {
       background: var(--bc-surface-container-highest) !important;

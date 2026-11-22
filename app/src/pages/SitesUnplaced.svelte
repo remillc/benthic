@@ -44,7 +44,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-sites-unplaced--intro {
       margin: 12px 16px;
       font-size: 14px;

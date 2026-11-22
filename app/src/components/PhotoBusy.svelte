@@ -23,7 +23,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-photo-busy {
       position: absolute;
       inset: 0;
@@ -39,10 +39,10 @@
       border: 3px solid var(--bc-text-2);
       border-right-color: transparent;
       border-radius: 50%;
-      animation: od-photo-busy-spin 0.9s linear infinite;
+      animation: bc-photo-busy-spin 0.9s linear infinite;
     }
 
-    @keyframes od-photo-busy-spin {
+    @keyframes bc-photo-busy-spin {
       to {
         transform: rotate(360deg);
       }

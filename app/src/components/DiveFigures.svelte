@@ -26,7 +26,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-dive-figures {
       padding: 14px 20px 0;
       display: grid;

@@ -34,7 +34,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* No height: the bar lies over the first pixels of the list. */
     .bc-pull-progress {
       position: relative;
@@ -70,10 +70,10 @@
     .bc-pull-progress--indeterminate .bc-pull-progress--fill {
       position: absolute;
       width: 40%;
-      animation: od-pull-progress-slide 1.4s ease-in-out infinite;
+      animation: bc-pull-progress-slide 1.4s ease-in-out infinite;
     }
 
-    @keyframes od-pull-progress-slide {
+    @keyframes bc-pull-progress-slide {
       from {
         left: -40%;
       }

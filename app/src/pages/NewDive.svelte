@@ -318,19 +318,19 @@
     <p class="bc-new-dive--note">{gasBad ? t('newDive.gasInvalid') : t('newDive.gasHint')}</p>
   </div>
 
-  <h2 class="bc-new-dive--group-title" id="od-new-site">{t('newDive.site')}</h2>
+  <h2 class="bc-new-dive--group-title" id="bc-new-site">{t('newDive.site')}</h2>
   <div class="bc-form-surface">
     {#if sites.length > 6}
       <TextField label={t('newDive.searchSite')} bind:value={siteSearch}>
         {#snippet trailing()}{#if siteSearch}<SearchClear onclear={() => (siteSearch = '')} />{/if}{/snippet}
       </TextField>
     {/if}
-    <div class="bc-new-dive--sites" role="radiogroup" aria-labelledby="od-new-site">
-      <ChoiceRow class="bc-new-dive--site" name="od-new-site" selected={site === 0} onselect={() => (site = 0)}>
+    <div class="bc-new-dive--sites" role="radiogroup" aria-labelledby="bc-new-site">
+      <ChoiceRow class="bc-new-dive--site" name="bc-new-site" selected={site === 0} onselect={() => (site = 0)}>
         <span class="bc-new-dive--site-text"><span>{t('newDive.noSite')}</span></span>
       </ChoiceRow>
       {#each shownSites as s (s.uuid)}
-        <ChoiceRow class="bc-new-dive--site" name="od-new-site" selected={site === s.uuid} onselect={() => (site = s.uuid)}>
+        <ChoiceRow class="bc-new-dive--site" name="bc-new-site" selected={site === s.uuid} onselect={() => (site = s.uuid)}>
           <span class="bc-new-dive--site-text">
             <span>{s.name}</span>
             {#if s.lastDate}<span class="bc-new-dive--hint">{t('newDive.lastDive', { date: formatDate(s.lastDate) })}</span>{/if}
@@ -414,7 +414,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-new-dive .page-content) {
       padding-bottom: 32px;
     }

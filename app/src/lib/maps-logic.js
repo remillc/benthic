@@ -9,7 +9,7 @@ export const GB = 1_000_000_000;
 const DAY_MS = 24 * 3600 * 1000;
 
 /**
- * Free space OpenDives always leaves on the device: 1 Go, or 10 % of the storage if more. It is the
+ * Free space Benthic always leaves on the device: 1 Go, or 10 % of the storage if more. It is the
  * only guard: the maps have no space limit of their own (task 2026-11-14-137, removing « Espace
  * maximum pour les cartes »).
  */

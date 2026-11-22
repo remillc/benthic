@@ -72,7 +72,7 @@ export async function geocodeSite(uuid) {
   }
 }
 
-const MARKS_KEY = 'od.notDuplicates';
+const MARKS_KEY = 'bc.notDuplicates';
 
 /** "These are not duplicates": kept on this device (see site-dismissed.js). */
 function storedMarks() {
@@ -139,7 +139,7 @@ export function restorePair(a, b) {
 
 /**
  * GPS coordinates in the format chosen in Settings (spec, settings table,
- * "Coordonnées GPS"), formatted by OpenDives (the core knows only seconds and
+ * "Coordonnées GPS"), formatted by Benthic (the core knows only seconds and
  * decimal):
  *   decimal (default) "-35.4485, 174.7317": a point, as maps and GPS write it;
  *   minutes           "35° 26,9′ S  174° 43,9′ E", in the device's number format;

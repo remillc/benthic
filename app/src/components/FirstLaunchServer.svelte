@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // The OpenDives server steps of the release edition's first launch (tasks 2026-11-16-259 and 260; mock-ups
+  // The Benthic server steps of the release edition's first launch (tasks 2026-11-16-259 and 260; mock-ups
   // docs/mockups/android-serveur-*.dc.html, android-tablette-serveur-*.dc.html, bureau-serveur-*.dc.html): the address,
   // the 6-digit code, « Le serveur ne répond pas » and the download. The title above each step and « Retour » are drawn
   // by FirstLaunchSteps.svelte. Sign-in is an e-mail code, no password (docs/architecture.md, section 11.2); the
@@ -348,7 +348,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-first-launch-server--heading {
       margin: 0 0 6px;
       font-size: 28px;

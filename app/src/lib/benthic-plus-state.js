@@ -4,7 +4,7 @@
 // Pure so that node:test can check it; the reactive copy is lib/benthic-plus-state.svelte.js.
 
 /** The remembered « subscribed » answer: the fallback when the server cannot be asked; `'0'` or `'1'`. */
-export const BENTHIC_PLUS_SUBSCRIBED_KEY = 'od.odplusSubscribed';
+export const BENTHIC_PLUS_SUBSCRIBED_KEY = 'bc.benthicPlusSubscribed';
 
 /** @typedef {{ signedIn: boolean, email: string, subscribed: boolean }} BenthicPlusAccount */
 

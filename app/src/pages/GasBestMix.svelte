@@ -140,7 +140,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-gas-best-mix--pair {
       display: flex;
       gap: 12px;

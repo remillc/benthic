@@ -197,11 +197,11 @@
 <!-- iPhone and iPad: grouped lists, label on the left, the value typed on the right (docs/mockups/ios-profil-piece-modifier.dc.html). -->
 {#snippet iosFields()}
   <div class="bc-computer-edit--group" role="list">
-    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.brand')}</span><input list="od-computer-edit-brands" bind:value={brand} autocomplete="off" autocapitalize="words" /></label>
-    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.model')}</span><input list="od-computer-edit-models" bind:value={model} autocomplete="off" autocapitalize="words" /></label>
+    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.brand')}</span><input list="bc-computer-edit-brands" bind:value={brand} autocomplete="off" autocapitalize="words" /></label>
+    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.model')}</span><input list="bc-computer-edit-models" bind:value={model} autocomplete="off" autocapitalize="words" /></label>
   </div>
-  <datalist id="od-computer-edit-brands">{#each lists.vendors as v (v)}<option value={v}></option>{/each}</datalist>
-  <datalist id="od-computer-edit-models">{#each lists.modelsOf(brand) as m (m)}<option value={m}></option>{/each}</datalist>
+  <datalist id="bc-computer-edit-brands">{#each lists.vendors as v (v)}<option value={v}></option>{/each}</datalist>
+  <datalist id="bc-computer-edit-models">{#each lists.modelsOf(brand) as m (m)}<option value={m}></option>{/each}</datalist>
   <p class="bc-computer-edit--ios-footer">{t('gear.computerEdit.suggestHint')}</p>
   <div class="bc-computer-edit--group" role="list">
     <label class="bc-computer-edit--ios-row"><span>{t('gear.computerEdit.serialShort')}</span><input bind:value={serial} disabled={tied} /></label>
@@ -277,7 +277,7 @@
 {/if}
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-computer-edit .page-content) {
       padding-inline: max(0px, calc((100% - 720px) / 2));
     }

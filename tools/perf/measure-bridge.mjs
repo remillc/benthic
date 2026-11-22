@@ -13,10 +13,10 @@ import { killMine } from './kill-mine.mjs';
 const [ssrf, label = 'run'] = process.argv.slice(2);
 const root = path.resolve(import.meta.dirname, '../..');
 const ud = path.join(root, 'build/perf', `ud-${label}`);
-const MAIN = process.env.MAIN || 'F:/projets/OpenDives';
+const MAIN = process.env.MAIN || 'F:/projets/benthic';
 killMine();
 await sleep(1500);
-const env = { ...process.env, OD_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, OD_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, OD_STAGE: `${MAIN}/build/desktop/stage`, OD_USER_DATA: ud };
+const env = { ...process.env, BC_DEV_URL: `http://localhost:${process.env.VITE_PORT || 5241}`, BC_HOST: `${MAIN}/build/desktop/win-x64/bin/benthic-host.exe`, BC_STAGE: `${MAIN}/build/desktop/stage`, BC_USER_DATA: ud };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
@@ -58,16 +58,16 @@ const click = (js) => p.eval(`(async()=>{${js};await window.__frames(2)})()`);
 // so this step runs the loading functions again instead).
 await p.eval(`(async()=>{const m=await import('/src/lib/logbook.svelte.js');await m.loadLogbook({force:true})})()`);
 await summarise('loadLogbookForce');
-await click(`document.querySelectorAll('.od-desktop-logbook--row')[3].click()`); await sleep(1500);
+await click(`document.querySelectorAll('.bc-desktop-logbook--row')[3].click()`); await sleep(1500);
 await summarise('selectDive');
 // The same click with nothing kept (after a change the app could not see): the lists are read again, once.
 await p.eval(`import('/src/lib/core-cache.js').then((m) => m.invalidateCoreCache && m.invalidateCoreCache())`);
-await click(`document.querySelectorAll('.od-desktop-logbook--row')[5].click()`); await sleep(1500);
+await click(`document.querySelectorAll('.bc-desktop-logbook--row')[5].click()`); await sleep(1500);
 await summarise('selectDiveCold');
-await click(`document.querySelectorAll('.od-desktop-logbook--row')[6].click()`); await sleep(1500);
+await click(`document.querySelectorAll('.bc-desktop-logbook--row')[6].click()`); await sleep(1500);
 await summarise('selectDiveNext');
 for (const name of ['sites', 'statistics', 'tools', 'logbook']) {
-  await click(`[...document.querySelectorAll('.od-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()`);
+  await click(`[...document.querySelectorAll('.bc-nav-rail--item')].find(x=>x.getAttribute('href')==='#${name}')?.click()`);
   await sleep(2500);
   await summarise('section_' + name);
 }
@@ -83,9 +83,9 @@ R.regions = await p.eval(`(async()=>{
   return { sites: sites.length, sequentialMs, loadRegionsMs: Math.round(performance.now() - b) };
 })()`);
 await p.eval('window.__calls=[]');
-await click(`document.querySelectorAll('.od-desktop-logbook--row')[2].click()`); await sleep(800);
+await click(`document.querySelectorAll('.bc-desktop-logbook--row')[2].click()`); await sleep(800);
 await p.eval('window.__calls=[]');
-const id = await p.eval(`Number(document.querySelector('.od-desktop-logbook--row.od-desktop-logbook--selected')?.dataset.dive)`);
+const id = await p.eval(`Number(document.querySelector('.bc-desktop-logbook--row.bc-desktop-logbook--selected')?.dataset.dive)`);
 R.editDiveId = id;
 R.editTimings = await p.eval(`(async()=>{try{const m=await import('/src/lib/logbook.svelte.js');const a=performance.now();await m.saveDiveChanges(${id},{notes:'perf audit note'});const b=performance.now()-a;await window.__frames(2);return {saveDiveChangesMs:Math.round(b),totalMs:Math.round(performance.now()-a)}}catch(e){return {error:String(e)}}})()`);
 await summarise('editNotes');

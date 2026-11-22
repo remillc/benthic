@@ -185,13 +185,13 @@
           value={text}
           placeholder={pattern}
           aria-invalid={invalid && touched}
-          aria-describedby="od-date-picker-help"
+          aria-describedby="bc-date-picker-help"
           oninput={typed}
           onkeydown={(e) => e.key === 'Enter' && confirm()}
           autofocus
         />
       </label>
-      <p id="od-date-picker-help" class="bc-date-picker--help" class:bc-date-picker--invalid={invalid && touched}>
+      <p id="bc-date-picker-help" class="bc-date-picker--help" class:bc-date-picker--invalid={invalid && touched}>
         {invalid && touched ? t('datePicker.invalid') : pattern}
       </p>
     </div>
@@ -255,7 +255,7 @@
 </Md3Dialog>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-date-picker .bc-md3-dialog--surface) {
       width: min(360px, calc(100% - 48px));
       padding-top: 16px;

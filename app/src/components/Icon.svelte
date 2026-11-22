@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // OpenDives icons, drawn for the project (simple strokes on 24 × 24).
+  // Benthic icons, drawn for the project (simple strokes on 24 × 24).
   // The Material Icons and Material Symbols sets are under Apache-2.0, which the
   // architecture rules out because of the GPLv2.
   // Decorative by default: the neighboring text carries the meaning.
@@ -180,7 +180,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-icon {
       display: block;
       flex-shrink: 0;

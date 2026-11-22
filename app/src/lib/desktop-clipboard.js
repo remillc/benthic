@@ -2,7 +2,7 @@
 // Copy and paste of dives in the desktop Carnet (task 2026-11-15-178, part 3). Ctrl/⌘+C writes two
 // forms: plain text (the selected rows as the table shows them, a header line, tab-separated, one
 // dive per line: it pastes into a spreadsheet as columns) and the dives in Subsurface XML from the
-// core's export (the private type `application/x-opendives-dives`'s content). Ctrl/⌘+V adds the dives
+// core's export (the private type `application/x-benthic-dives`'s content). Ctrl/⌘+V adds the dives
 // of the clipboard, or of a plain text that is a Subsurface `<divelog>`, through the import's
 // duplicate check. Electron cannot put a custom type beside the text (every write replaces the
 // others), so the main process (desktop/bridge.cjs, `benthicDesktop.clipboard`) writes the plain text and
@@ -11,7 +11,7 @@
 import { BenthicCore } from 'benthic-core';
 
 /** The private clipboard type holding the dives as Subsurface XML. */
-export const DIVES_TYPE = 'application/x-opendives-dives';
+export const DIVES_TYPE = 'application/x-benthic-dives';
 
 /**
  * The plain-text form of the selected rows: a header line, then one line per dive, cells

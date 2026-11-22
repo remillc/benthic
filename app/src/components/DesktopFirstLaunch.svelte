@@ -82,7 +82,7 @@
 </main>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-desktop-first-launch {
       position: fixed;
       inset: 0;

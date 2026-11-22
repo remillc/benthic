@@ -35,7 +35,7 @@
 </span>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-adaptive-label--label {
       position: relative;
       display: block;

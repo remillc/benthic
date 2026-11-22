@@ -22,7 +22,7 @@
   /** @type {{ diluent?: Fill|null, oxygen?: Fill|null, others?: Fill[], marks: { diluent: string, oxygen: string, bailout: string } }} */
   let { diluent = null, oxygen = null, others = [], marks } = $props();
 
-  const id = `od-rebreather-drawing-${Math.random().toString(36).slice(2, 9)}`;
+  const id = `bc-rebreather-drawing-${Math.random().toString(36).slice(2, 9)}`;
   const HEIGHT = 140;
   // Cylinders in the unit: tall, valve at the bottom.
   const UNIT = { top: 6, height: 164, width: 36, rx: 17.3 };
@@ -170,7 +170,7 @@
 </svg>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     /* As wide as its box, which the card keeps at most the drawing's own width
        (140 tall, task 2026-11-13-84), so that the text columns line up with it. */
     .bc-rebreather-drawing {

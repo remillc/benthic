@@ -3,10 +3,10 @@
 // stack, run by tests/e2e/navigation.mjs after its fixed flows (docs/architecture.md, section 13).
 //
 //   node tests/e2e/navigation.mjs --monkey-only
-//   OD_MONKEY_SEEDS=7,8,9 OD_MONKEY_STEPS=400 node tests/e2e/navigation.mjs --monkey-only     (a long run)
-//   OD_MONKEY_FULL=1 node tests/e2e/navigation.mjs --monkey-only                                (the five seeds, before a release)
-//   OD_MONKEY_SEED=1234 OD_MONKEY_CONFIG=phone-md node tests/e2e/navigation.mjs --monkey-only  (replays one failure)
-// OD_MONKEY_VERBOSE=1 prints each action; OD_MONKEY_MAX_MIN stops the run after that many minutes.
+//   BC_MONKEY_SEEDS=7,8,9 BC_MONKEY_STEPS=400 node tests/e2e/navigation.mjs --monkey-only     (a long run)
+//   BC_MONKEY_FULL=1 node tests/e2e/navigation.mjs --monkey-only                                (the five seeds, before a release)
+//   BC_MONKEY_SEED=1234 BC_MONKEY_CONFIG=phone-md node tests/e2e/navigation.mjs --monkey-only  (replays one failure)
+// BC_MONKEY_VERBOSE=1 prints each action; BC_MONKEY_MAX_MIN stops the run after that many minutes.
 //
 // Each step is one action picked by the seed: a tap on something of the top layer, the navbar's arrow, the system
 // Back, a swipe back from the edge, the system's own back gesture (the touch starts in the page, the system takes it
@@ -170,27 +170,27 @@ async function readTrace() {
  */
 export async function monkeyFlows(h) {
   const { sleep } = h;
-  const steps = Number(process.env.OD_MONKEY_STEPS || 45);
-  const only = h.only ?? process.env.OD_MONKEY_CONFIG;
-  const one = process.env.OD_MONKEY_SEED;
-  /** Three seeds by default, one for each configuration and one for each way of running (a slow processor, « Remove animations », neither); OD_MONKEY_FULL=1 runs the five of the release check. */
-  const defaultPlan = process.env.OD_MONKEY_FULL
+  const steps = Number(process.env.BC_MONKEY_STEPS || 45);
+  const only = h.only ?? process.env.BC_MONKEY_CONFIG;
+  const one = process.env.BC_MONKEY_SEED;
+  /** Three seeds by default, one for each configuration and one for each way of running (a slow processor, « Remove animations », neither); BC_MONKEY_FULL=1 runs the five of the release check. */
+  const defaultPlan = process.env.BC_MONKEY_FULL
     ? { 'phone-md': [101, 102, 103], 'phone-ios': [201], 'tablet-md': [301] }
     : { 'phone-md': [101], 'phone-ios': [201], 'tablet-md': [301] };
   /** @type {Record<string, number[]>} */
   const plan = one
     ? { [only || 'phone-md']: [Number(one)] }
-    : process.env.OD_MONKEY_SEEDS
-      ? Object.fromEntries(Object.keys(CONFIGS).filter((c) => !only || c === only).map((c) => [c, process.env.OD_MONKEY_SEEDS.split(',').map(Number)]))
+    : process.env.BC_MONKEY_SEEDS
+      ? Object.fromEntries(Object.keys(CONFIGS).filter((c) => !only || c === only).map((c) => [c, process.env.BC_MONKEY_SEEDS.split(',').map(Number)]))
       : defaultPlan;
   const summary = [];
-  /** OD_MONKEY_IGNORE: problems that are not counted (a regular expression), to compare with an older code that has them by design. */
-  const ignore = process.env.OD_MONKEY_IGNORE ? new RegExp(process.env.OD_MONKEY_IGNORE) : null;
+  /** BC_MONKEY_IGNORE: problems that are not counted (a regular expression), to compare with an older code that has them by design. */
+  const ignore = process.env.BC_MONKEY_IGNORE ? new RegExp(process.env.BC_MONKEY_IGNORE) : null;
   const counted = (/** @type {string[]} */ list) => (ignore ? list.filter((p) => !ignore.test(p)) : list);
   const blank = await h.blankTab();
   const started = Date.now();
-  /** OD_MONKEY_MAX_MIN: the run stops by itself after this many minutes (the seeds left are not run). */
-  const maxMs = Number(process.env.OD_MONKEY_MAX_MIN || 0) * 60000;
+  /** BC_MONKEY_MAX_MIN: the run stops by itself after this many minutes (the seeds left are not run). */
+  const maxMs = Number(process.env.BC_MONKEY_MAX_MIN || 0) * 60000;
 
   for (const [name, seeds] of Object.entries(plan).filter(([name]) => !only || name === only)) {
     const config = CONFIGS[name];
@@ -210,7 +210,7 @@ export async function monkeyFlows(h) {
       let brokenSeen = 0;
       const note = (/** @type {string} */ text) => {
         actions.push(text);
-        if (process.env.OD_MONKEY_VERBOSE) console.log(`    ${text}`);
+        if (process.env.BC_MONKEY_VERBOSE) console.log(`    ${text}`);
       };
       /** A call to the page that cannot wait for ever (a page that stopped answering is a finding, not a hang). */
       const limit = (/** @type {Promise<any>} */ p, /** @type {string} */ what) =>
@@ -235,7 +235,7 @@ export async function monkeyFlows(h) {
         }
         return touch('touchEnd');
       };
-      const systemBack = () => run(() => window.dispatchEvent(new Event('od:back'))).catch(() => {});
+      const systemBack = () => run(() => window.dispatchEvent(new Event('bc:back'))).catch(() => {});
 
       /** The actions, by weight. Each returns false when it had nothing to do. */
       const moves = {
@@ -364,8 +364,8 @@ export async function monkeyFlows(h) {
         }
         const health = await settle();
         h.count();
-        // OD_MONKEY_DUMP=1: the pages of the section on screen after each step (to find where a fault starts).
-        if (process.env.OD_MONKEY_DUMP) console.log(`      [${step}] ${await run(readPages).catch(() => '')}`);
+        // BC_MONKEY_DUMP=1: the pages of the section on screen after each step (to find where a fault starts).
+        if (process.env.BC_MONKEY_DUMP) console.log(`      [${step}] ${await run(readPages).catch(() => '')}`);
         if (!health) {
           await report(step, ['the page did not answer']);
           continue;

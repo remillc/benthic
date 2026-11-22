@@ -104,7 +104,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-cylinder-types--intro {
       margin: 8px 20px 0;
       font-size: 14px;

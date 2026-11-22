@@ -379,7 +379,7 @@
 </Page>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     :global(.bc-settings-maps-area .page-content) {
       padding: 0;
       overflow: hidden;
