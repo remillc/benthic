@@ -726,7 +726,7 @@
   {/if}
   {@render overlay?.(full)}
   <!-- Credits asked by OpenStreetMap's licence and the tile provider. -->
-  {#if credits}<p class="bc-site-map--credits">{t('sites.mapCredits')}</p>{/if}
+  {#if credits}<p class="bc-site-map--credits">{#if base}{t('sharedSites.mapCredits')}<br />{/if}{t('sites.mapCredits')}</p>{/if}
   <button type="button" class="bc-map-fullscreen-button" bind:this={fullButton} onclick={() => setFull(!full)}>
     <Icon name={full ? 'exitFullscreen' : 'fullscreen'} size={22} weight={2} />
     <span class="bc-sr-only">{full ? t('sites.exitFullscreen') : fullscreenLabel || t('sites.fullscreen')}</span>

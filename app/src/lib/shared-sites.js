@@ -23,7 +23,7 @@ export const CHOOSE_RADIUS_M = 50000;
  * A site of the base, as the server sends it (lists and card).
  * @typedef {{ id: string, name: string, lat: number, lon: number, country: string, region: string,
  *   waterType: ''|'fresh'|'salt'|'brackish', closed: boolean, dives: number|null, fewDives: boolean,
- *   distanceM?: number, redirectedFrom?: string,
+ *   distanceM?: number, redirectedFrom?: string, commonsSources?: string[],
  *   carnets?: { waterType: string, depthMm: number|null, depthRangeMm: [number, number]|null,
  *     divesLast12Months: number|null, fewDivesLast12Months: boolean } }} BaseSite
  */
@@ -71,6 +71,7 @@ export function baseSiteOf(r) {
   };
   if (num(r.distanceM) !== null) site.distanceM = /** @type {number} */ (num(r.distanceM));
   if (r.redirectedFrom !== undefined && r.redirectedFrom !== null) site.redirectedFrom = String(r.redirectedFrom);
+  if (Array.isArray(r.commonsSources)) site.commonsSources = r.commonsSources.filter((v) => typeof v === 'string');
   const c = r.carnets;
   if (c && typeof c === 'object') {
     const range = Array.isArray(c.depthRangeMm) && c.depthRangeMm.length === 2 && c.depthRangeMm.every((/** @type {unknown} */ x) => num(x) !== null) ? /** @type {[number, number]} */ ([c.depthRangeMm[0], c.depthRangeMm[1]]) : null;

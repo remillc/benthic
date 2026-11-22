@@ -152,6 +152,9 @@
       </ul>
     {/if}
     <p class="bc-shared-site--note">{t('sharedSites.card.note')}</p>
+    {#if site.commonsSources?.length}
+      <p class="bc-shared-site--note">{t('sharedSites.card.commonsCredits')} <a class="external" href="https://github.com/opendiving/opendiving-commons#sources" target="_blank" rel="noopener">OpenDiving Commons</a></p>
+    {/if}
 
     <div class="bc-shared-site--actions">
       {#if mine !== null}

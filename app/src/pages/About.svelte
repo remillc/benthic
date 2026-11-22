@@ -41,6 +41,7 @@
     source: 'https://github.com/remillc/benthic',
     osm: 'https://www.openstreetmap.org/copyright',
     geonames: 'https://www.geonames.org/about.html',
+    diveSites: 'https://github.com/opendiving/opendiving-commons#sources',
   };
 
   /** « Exporter mon carnet »: the whole logbook as a Subsurface file, the same export as elsewhere. */
@@ -141,6 +142,7 @@
         { key: 'licence', text: t('about.licence'), sub: t('about.licenceText'), href: '/about/licence' },
         { key: 'libraries', text: t('about.libraries'), sub: t('about.librariesText'), href: '/about/libraries' },
         { key: 'maps', text: t('about.maps'), sub: t('about.mapsText'), href: LINKS.osm, external: true },
+        { key: 'diveSites', text: t('about.diveSites'), sub: t('about.diveSitesText'), href: LINKS.diveSites, external: true },
         { key: 'regions', text: t('about.regions'), sub: t('about.regionsText'), href: LINKS.geonames, external: true },
       ],
     },
