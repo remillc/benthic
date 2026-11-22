@@ -244,3 +244,11 @@ test('a hand-over that times out is tried again at the next two starts, then giv
   assert.equal(legacy.hasLegacyOriginData(userData), false, 'given up after three tries');
   assert.equal(JSON.parse(fs.readFileSync(path.join(userData, legacy.MARKER), 'utf8')).attempts, 3);
 });
+
+test('main.cjs: the app does not quit when the hidden hand-over windows close, and the old origin is only served the hand-over page', () => {
+  const main = fs.readFileSync(new URL('../../desktop/main.cjs', import.meta.url), 'utf8');
+  assert.match(main, /let handingOver = false;\napp\.on\('window-all-closed', \(\) => \{\n  if \(process\.platform !== 'darwin' && !handingOver\) app\.quit\(\);/);
+  assert.match(main, /handingOver = true;\n\s+const handOver = await legacy\.handOverLegacyOrigin/);
+  assert.match(main, /if \(host !== legacy\.NEW_HOST\) return new Response\('', \{ status: 404 \}\);/);
+  assert.match(main, /migrateGitFolder\(app\.getPath\('userData'\)\)/);
+});
