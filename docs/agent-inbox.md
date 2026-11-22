@@ -6558,3 +6558,19 @@ Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and 
 In the detail pane of the desktop logbook (`/dives/:id`), the map of the dive's site fills the whole width of the pane's header, from the divider to the window's right edge, behind the title « N° 5 · Lake Coleridge », its subtitle and the action buttons: 170 px high, cropped to fill (never letterboxed or stretched), centred on the site's pin, with a fade to the page colour toward the bottom (#F4F4F2 at 45 % at the top, 70 % at 60 %, opaque at the bottom; dark mode: the same on the dark page colour) so that the title and the buttons keep their contrast. The profile card starts over the faded bottom. Without a site position, no map: the header is the plain page colour.
 
 Mock-up: `bureau-carnet-profil-droite` and the other desktop boards with the detail pane (already in `docs/mockups/`).
+
+## [ ] 2026-11-22-332 Desktop dive detail, Équipement tab: kit, undersuit, « Ce lest était » in Benthic+, and a new Benthic+ badge
+
+Christian approved this on 22 November 2026. Work in `main`. Mock-up: `bureau-carnet-onglet-equipement` (updated in `docs/mockups/`). The computers section already matches the app (the model's tile before the name): keep it.
+
+**1. Kit selector at the top of the tab** (Benthic+). Under the line « Les champs gris se modifient d’un clic… », a row « Kit » with the Benthic+ badge (point 5) and a dropdown field: the kit applied to this dive (« Eau froide »), its count at the right (« 6 pièces »), a downward chevron. Note under it: « Remplit l’ordinateur, la combinaison, le sous-vêtement, le lest et l’autre équipement. Chaque champ reste modifiable. » The list holds the diver's kits (« Eau froide · 6 », « Voyage tropical · 5 ») then « Gérer les kits »; choosing one fills the fields below like the phone's « Remplir avec un kit » (`gear.diveGear.applyKit`) and shows the snackbar « Kit « {name} » appliqué ». Empty when no kit was applied (invitation « Appliquer un kit »). Without Benthic+: the row shows with its badge and cannot be opened.
+
+**2. Sous-vêtement** (Benthic+). In « Protection et lest », a row « Sous-vêtement » under « Combinaison », with the badge under its label: the undersuit of the dive (`undersuitGearId`, a piece of type `undersuit` from the inventory), chosen in a dropdown of the diver's undersuits. The data already exists; the desktop tab does not show it yet.
+
+**3. « Ce lest était » becomes Benthic+, on every platform.** The rail (Trop léger, Juste, Trop lourd) keeps its look (48 px rail on #EBEAE5, #114477 pill, white label on the chosen one) and shows the badge under its label on the desktop. Without Benthic+ it is shown, disabled, with the badge; the tag already written on a dive (`weight-too-light`, `weight-ok`, `weight-too-heavy`) is kept and still read by Subsurface. The weight suggestion's correction that uses it is Benthic+ too.
+
+**4. Autre équipement**: the section title takes the new badge instead of the blue chip.
+
+**5. New Benthic+ badge** (replaces the blue `BenthicPlusChip` with its star, which looked like a button). A label, not a control: 20 px high, 7 px side padding, fully rounded, #FBE3B2 background (tertiary container), « Benthic+ » in #3D2200, 11 px bold, letter-spacing 0.3 px, no icon, never blue, no hover or click. Tooltip and accessible name « Réservé à l’abonnement Benthic+ » (en « Benthic+ subscription only »). Dark mode: tertiary container #4A3216 with #FBE3B2 text. Use it wherever `BenthicPlusChip` marks a feature as Benthic+ (list them in the done note); where the chip is a link to the offer, ask Christian.
+
+**Test:** applying a kit fills computer, suit, undersuit, weights and other gear; without Benthic+ the kit, the undersuit, « Ce lest était » and the other gear are visible with the badge and cannot change; the badge has 4.5:1 contrast.
