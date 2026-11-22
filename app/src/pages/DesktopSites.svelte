@@ -768,9 +768,10 @@
       border-bottom: 1px solid var(--bc-separator);
       color: var(--bc-text);
       text-decoration: none;
-    }
-    .bc-desktop-sites--shared-row:hover {
-      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      }
     }
     .bc-desktop-sites--table {
       width: 100%;
@@ -802,9 +803,10 @@
         text-align: inherit;
         white-space: nowrap;
         cursor: pointer;
-      }
-      & button:hover {
-        color: var(--bc-text);
+
+        &:hover {
+          color: var(--bc-text);
+        }
       }
       &:nth-child(2) {
         width: 27%;
@@ -897,9 +899,10 @@
     .bc-desktop-sites--pane {
       position: absolute;
       inset: 0 16px 16px 8px;
-    }
-    .bc-desktop-sites--pane[hidden] {
-      display: none;
+
+      &[hidden] {
+        display: none;
+      }
     }
     .bc-desktop-sites--mode {
       position: absolute;
@@ -911,22 +914,24 @@
       background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
       overflow: hidden;
-    }
-    .bc-desktop-sites--mode button {
-      width: auto;
-      min-height: 40px;
-      padding: 0 16px;
-      border: 0;
-      background: transparent;
-      color: var(--bc-text);
-      font: inherit;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .bc-desktop-sites--mode button[aria-pressed='true'] {
-      background: var(--bc-secondary-container);
-      color: var(--bc-on-secondary-container);
-      font-weight: 600;
+
+      button {
+        width: auto;
+        min-height: 40px;
+        padding: 0 16px;
+        border: 0;
+        background: transparent;
+        color: var(--bc-text);
+        font: inherit;
+        white-space: nowrap;
+        cursor: pointer;
+
+        &[aria-pressed='true'] {
+          background: var(--bc-secondary-container);
+          color: var(--bc-on-secondary-container);
+          font-weight: 600;
+        }
+      }
     }
     /* The selected site's card at the bottom of the map: white, 16 dp corners. */
     .bc-desktop-sites--card {

@@ -448,14 +448,14 @@
         color: var(--bc-text);
         font: inherit;
         text-align: start;
-      }
 
-      > input:disabled {
-        color: var(--bc-text-2);
-      }
+        &:disabled {
+          color: var(--bc-text-2);
+        }
 
-      > input::placeholder {
-        color: var(--bc-text-3, #C7C7CC);
+        &::placeholder {
+          color: var(--bc-text-3, #C7C7CC);
+        }
       }
 
       + .bc-computer-edit--ios-row {
@@ -569,10 +569,10 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-      }
 
-      button:disabled {
-        opacity: 0.38;
+        &:disabled {
+          opacity: 0.38;
+        }
       }
     }
 

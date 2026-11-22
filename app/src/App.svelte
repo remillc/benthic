@@ -635,10 +635,11 @@
     /* The kept detail is a whole page (its own bar): no room to leave for the navigation bar. */
     .bc-pane-opening--snapshot {
       padding-top: 0;
-    }
-    /* Beside the list the real page has no Back (Framework7 hides it on the detail root): the kept one neither. */
-    .bc-pane-opening--snapshot :global(.navbar .left) {
-      display: none;
+
+      /* Beside the list the real page has no Back (Framework7 hides it on the detail root): the kept one neither. */
+      & :global(.navbar .left) {
+        display: none;
+      }
     }
     .bc-pane-opening--desk {
       padding-top: 0;

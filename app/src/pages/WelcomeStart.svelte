@@ -371,13 +371,13 @@
       line-height: 18px;
       color: var(--bc-text-2);
       text-decoration: underline;
-    }
 
-    /* Phone: the link is 18 dp of text with 6 dp of touch padding, 12 dp (6 + 6) above the help link. */
-    :global(.bc-welcome-start--phone) .bc-welcome-start--git-link {
-      min-height: 0;
-      padding: 6px 12px;
-      margin-bottom: 6px;
+      /* Phone: the link is 18 dp of text with 6 dp of touch padding, 12 dp (6 + 6) above the help link. */
+      :global(.bc-welcome-start--phone) & {
+        min-height: 0;
+        padding: 6px 12px;
+        margin-bottom: 6px;
+      }
     }
 
     /* A low phone window: every choice stays in view (to-do #31). */
@@ -415,10 +415,8 @@
         flex-direction: column;
         justify-content: center;
         padding: 24px 64px 56px;
-      }
 
-      @media (orientation: portrait) {
-        .bc-welcome-start--actions {
+        @media (orientation: portrait) {
           padding: 0 120px 64px;
         }
       }
@@ -468,15 +466,15 @@
           font-weight: 600;
         }
       }
-    }
 
-    /* The desktop app (task 2026-11-16-242): always the panel on the left and the choices beside it, in a window of
-       any shape; the column keeps its room in a narrow window. */
-    :global(html.bc-desktop-app) .bc-welcome-start--with-panel {
-      flex-direction: row;
+      /* The desktop app (task 2026-11-16-242): always the panel on the left and the choices beside it, in a window of
+         any shape; the column keeps its room in a narrow window. */
+      :global(html.bc-desktop-app) & {
+        flex-direction: row;
 
-      .bc-welcome-start--actions {
-        padding: 24px clamp(24px, 4.4vw, 64px) 56px;
+        .bc-welcome-start--actions {
+          padding: 24px clamp(24px, 4.4vw, 64px) 56px;
+        }
       }
     }
 

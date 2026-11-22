@@ -339,12 +339,12 @@
       box-sizing: border-box;
       gap: 8px;
       padding-inline: 16px;
-    }
 
-    :global(.md) .bc-docs--fab > a i {
-      position: static;
-      transform: none;
-      display: flex;
+      i {
+        position: static;
+        transform: none;
+        display: flex;
+      }
     }
 
     :global(.md) .bc-docs--fab .fab-text {

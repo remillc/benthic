@@ -664,9 +664,10 @@
       align-items: center;
       gap: 8px;
       padding: 20px 16px 8px 24px;
-    }
-    .bc-piece-edit--steps-header:has(.bc-piece-edit--back) {
-      padding-inline-start: 12px;
+
+      &:has(.bc-piece-edit--back) {
+        padding-inline-start: 12px;
+      }
     }
     .bc-piece-edit--steps-texts {
       flex: 1;
@@ -898,14 +899,14 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-    }
 
-    :global(.ios) .bc-piece-edit--change {
-      height: 44px;
-      padding: 0 12px;
-      border: none;
-      font-size: 17px;
-      font-weight: 400;
+      :global(.ios) & {
+        height: 44px;
+        padding: 0 12px;
+        border: none;
+        font-size: 17px;
+        font-weight: 400;
+      }
     }
 
     .bc-piece-edit--photo-note {

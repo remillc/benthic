@@ -77,13 +77,13 @@
       font-size: 14px;
       line-height: 20px;
       color: var(--bc-text-2);
-    }
 
-    /* iPhone (docs/mockups/ios-apropos): inset groups with 10 px corners, titles in small capitals. */
-    :global(.ios) .bc-about-libraries--intro {
-      margin: 8px 32px 0;
-      font-size: 13px;
-      line-height: 18px;
+      /* iPhone (docs/mockups/ios-apropos): inset groups with 10 px corners, titles in small capitals. */
+      :global(.ios) & {
+        margin: 8px 32px 0;
+        font-size: 13px;
+        line-height: 18px;
+      }
     }
 
     :global(.ios .bc-about-libraries .block-title) {

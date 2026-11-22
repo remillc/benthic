@@ -121,12 +121,12 @@
       align-items: center;
       justify-content: center;
       background: var(--bc-release-tile);
-    }
 
-    :global(.ios) .bc-retired-page--tile {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      :global(.ios) & {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+      }
     }
 
     .bc-retired-page--texts {

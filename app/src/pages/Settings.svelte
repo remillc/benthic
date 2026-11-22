@@ -2346,9 +2346,10 @@
       align-items: center;
       justify-content: flex-end;
       max-width: 55%;
-    }
-    .bc-desktop-settings--control :global(.bc-button-group--button) {
-      white-space: nowrap;
+
+      & :global(.bc-button-group--button) {
+        white-space: nowrap;
+      }
     }
     .bc-desktop-settings--value {
       font-size: 14px;

@@ -396,13 +396,13 @@
       justify-content: center;
       background: var(--bc-release-tile);
       color: var(--bc-text);
-    }
 
-    /* iPhone: 36 pt tiles with 8 pt corners (task 2026-11-19-306). */
-    :global(.ios) .bc-gear-page--tile {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      /* iPhone: 36 pt tiles with 8 pt corners (task 2026-11-19-306). */
+      :global(.ios) & {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+      }
     }
 
     .bc-gear-page--texts {

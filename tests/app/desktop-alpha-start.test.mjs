@@ -187,7 +187,7 @@ test('the first launch in the desktop app: the tablet screen, a row in any windo
   const welcome = read('pages/WelcomeStart.svelte');
   assert.match(welcome, /<p class="bc-welcome-start--drop"[^>]*>\{dragging \? t\('desktopLogbooks\.start\.dropHere'\) : t\('desktopLogbooks\.start\.drop'\)\}<\/p>/);
   assert.match(welcome, /\{#if desktopApp\}\s*<p class="bc-welcome-start--drop"/);
-  assert.match(welcome, /html\.bc-desktop-app\) \.bc-welcome-start--with-panel \{\s*flex-direction: row;/);
+  assert.match(welcome, /html\.bc-desktop-app\) & \{\s*flex-direction: row;/);
   assert.match(read('components/FirstLaunchPanel.svelte'), /html\.bc-desktop-app\) \.bc-first-launch-panel \{\s*width: min\(700px, 48\.6%\);/);
   assert.match(read('components/EditorialPage.svelte'), /html\.bc-desktop-app \.bc-editorial-page--panelled \.page-content\) \{\s*flex-direction: row;/);
   assert.match(read('lib/layout.svelte.js'), /if \(desktopApp\) document\.documentElement\.classList\.add\('bc-desktop-app'\)/);

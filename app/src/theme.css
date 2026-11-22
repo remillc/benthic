@@ -1004,10 +1004,10 @@ html.ios {
 @layer od.base {
   html.bc-desktop-app {
     scrollbar-color: color-mix(in srgb, var(--bc-text) 30%, transparent) transparent;
-  }
 
-  html.bc-desktop-app * {
-    scrollbar-width: thin;
+    & * {
+      scrollbar-width: thin;
+    }
   }
 
   /* The page itself never shows a bar (Framework7 hides the body's). */
@@ -1210,19 +1210,19 @@ html.ios {
     .item-link.no-chevron .item-title-row::before {
       display: none;
     }
-  }
 
-  /*
-   * Android section titles on the page background, as in Settings, Tools and
-   * the gas results: 18/24, bold, ink, 20 dp from the sides (About).
-   */
-  .md .bc-section-title {
-    margin: 0;
-    padding: 22px calc(20px + var(--f7-safe-area-right)) 8px calc(20px + var(--f7-safe-area-left));
-    font-size: 18px;
-    line-height: 24px;
-    font-weight: 700;
-    color: var(--bc-text);
+    /*
+     * Android section titles on the page background, as in Settings, Tools and
+     * the gas results: 18/24, bold, ink, 20 dp from the sides (About).
+     */
+    & .bc-section-title {
+      margin: 0;
+      padding: 22px calc(20px + var(--f7-safe-area-right)) 8px calc(20px + var(--f7-safe-area-left));
+      font-size: 18px;
+      line-height: 24px;
+      font-weight: 700;
+      color: var(--bc-text);
+    }
   }
 
   /* Intro paragraph at the top of a screen (Account, Dives without a site, Clean up the sites). */
@@ -1613,13 +1613,15 @@ html.ios {
       max-height: calc(100% - 48px);
       border-radius: 28px;
       translate: -50% 50%;
-    }
-    /* iPad: the system's form sheet corners. */
-    .ios .sheet-modal.bc-sheet-dialog {
-      border-radius: 14px;
-    }
-    .sheet-modal.bc-sheet-dialog [class*='--handle'] {
-      display: none;
+
+      /* iPad: the system's form sheet corners. */
+      .ios & {
+        border-radius: 14px;
+      }
+
+      & [class*='--handle'] {
+        display: none;
+      }
     }
   }
 }
@@ -1741,13 +1743,13 @@ html.ios {
     .bc-menu .bc-menu-item--disabled {
       pointer-events: none;
       opacity: 0.38;
-    }
 
-    .bc-menu .bc-menu-item--disabled .item-text {
-      white-space: normal;
-      font-size: 12px;
-      line-height: 16px;
-      color: var(--bc-text-2);
+      & .item-text {
+        white-space: normal;
+        font-size: 12px;
+        line-height: 16px;
+        color: var(--bc-text-2);
+      }
     }
 }
 
@@ -1938,36 +1940,36 @@ html.md {
   --f7-navbar-title-font-size: 22px;
   --f7-navbar-title-font-weight: 500;
   --bc-band-h: calc(var(--f7-safe-area-top) + 120px);
-}
 
-.navbar.bc-band-bar.bc-band-tall {
-  --bc-band-h: calc(var(--f7-safe-area-top) + 190px);
-}
+  &.bc-band-tall {
+    --bc-band-h: calc(var(--f7-safe-area-top) + 190px);
+  }
 
-/* A sync pill (40 dp and its margin) between the summary and the search bar. */
-.navbar.bc-band-bar.bc-band-pill {
-  --bc-band-h: calc(var(--f7-safe-area-top) + 242px);
-}
+  /* A sync pill (40 dp and its margin) between the summary and the search bar. */
+  &.bc-band-pill {
+    --bc-band-h: calc(var(--f7-safe-area-top) + 242px);
+  }
 
-.navbar.bc-band-bar .navbar-bg {
-  background-image: var(--bc-band-grain), var(--bc-band-gradient);
-  background-size: 256px 256px, 100% var(--bc-band-h);
-  background-repeat: repeat, no-repeat;
-  background-color: transparent;
-}
+  & .navbar-bg {
+    background-image: var(--bc-band-grain), var(--bc-band-gradient);
+    background-size: 256px 256px, 100% var(--bc-band-h);
+    background-repeat: repeat, no-repeat;
+    background-color: transparent;
 
-.navbar.bc-band-bar .navbar-bg::after {
-  display: none;
-}
+    &::after {
+      display: none;
+    }
+  }
 
-/* The Logbook's search bar in its band: MD3, 56 dp, translucent white. */
-/* The page title sits on the ☰ row (task 2026-11-14-117): MD3 top app bar title, 22/28,
-   weight 500, white, one line with an ellipsis; the band under it holds the summary. */
-.navbar.bc-band-bar .title {
-  line-height: 28px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* The Logbook's search bar in its band: MD3, 56 dp, translucent white. */
+  /* The page title sits on the ☰ row (task 2026-11-14-117): MD3 top app bar title, 22/28,
+     weight 500, white, one line with an ellipsis; the band under it holds the summary. */
+  & .title {
+    line-height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .searchbar.bc-band-search {
@@ -1987,10 +1989,10 @@ html.md {
   margin: 8px 0 0;
   background: none;
   box-shadow: none;
-}
 
-.searchbar.bc-band-search .searchbar-inner {
-  padding: 0;
+  & .searchbar-inner {
+    padding: 0;
+  }
 }
 
 /* iPhone (task 289, ios-carnet.dc.html): the large title without a band; the search field is the system's grey one. */
@@ -2004,10 +2006,10 @@ html.md {
   margin: 0;
   background: none;
   box-shadow: none;
-}
 
-.ios .searchbar.bc-ios-search .searchbar-inner {
-  padding: 0;
+  & .searchbar-inner {
+    padding: 0;
+  }
 }
 
 /*
@@ -2095,11 +2097,11 @@ html.md {
   --f7-navbar-bg-color: var(--bc-background);
   --f7-navbar-hairline-color: transparent;
   --f7-navbar-shadow-image: none;
-}
 
-.md :where(.navbar:not(.bc-band-bar)) .navbar-bg {
-  box-shadow: none;
-  transition: background-color 150ms linear;
+  & .navbar-bg {
+    box-shadow: none;
+    transition: background-color 150ms linear;
+  }
 }
 
 .md :where(.navbar.bc-navbar-scrolled:not(.bc-band-bar)) {

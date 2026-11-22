@@ -53,7 +53,7 @@ test('Android phone: the link ends the page, 12 dp under the git link and 20 dp 
   assert.match(welcome, /:global\(\.bc-welcome-start--phone\) \{\s*--bc-help-link-bottom: 20px;[\s\S]*?padding-bottom: 0;/);
   assert.match(link, /margin: 0 auto calc\(var\(--f7-safe-area-bottom\) \+ var\(--bc-help-link-bottom, 28px\)\)/);
   // 12 dp between the git link's text and the help link: 6 dp of padding + 6 dp of margin under an 18 dp line.
-  assert.match(welcome, /:global\(\.bc-welcome-start--phone\) \.bc-welcome-start--git-link \{\s*min-height: 0;\s*padding: 6px 12px;\s*margin-bottom: 6px;/);
+  assert.match(welcome, /:global\(\.bc-welcome-start--phone\) & \{\s*min-height: 0;\s*padding: 6px 12px;\s*margin-bottom: 6px;/);
 });
 
 test('tablet: the link stays pinned 28 dp above the bottom edge, iOS keeps its placement', () => {

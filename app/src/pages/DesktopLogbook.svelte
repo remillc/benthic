@@ -1368,9 +1368,10 @@
       text-align: inherit;
       white-space: nowrap;
       cursor: pointer;
-    }
-    .bc-desktop-logbook--head button:hover {
-      color: var(--bc-text);
+
+      &:hover {
+        color: var(--bc-text);
+      }
     }
     /* The edge to drag (task 181): 8 px wide on the header's right side, a thin line on hover and focus. */
     .bc-desktop-logbook--edge {
@@ -1435,18 +1436,22 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-      & td:first-child {
-        border-radius: 12px 0 0 12px;
-      }
-      & td:last-child {
-        border-radius: 0 12px 12px 0;
-      }
-      & td[data-col='number'] {
-        font-weight: 600;
-      }
-      & td[data-col='site'] {
-        font-weight: 500;
+
+        &:first-child {
+          border-radius: 12px 0 0 12px;
+        }
+
+        &:last-child {
+          border-radius: 0 12px 12px 0;
+        }
+
+        &[data-col='number'] {
+          font-weight: 600;
+        }
+
+        &[data-col='site'] {
+          font-weight: 500;
+        }
       }
     }
     .bc-desktop-logbook--time {
@@ -1506,12 +1511,14 @@
     }
     .bc-desktop-logbook--trip-end td {
       box-shadow: none;
-    }
-    .bc-desktop-logbook--trip-end td:first-child {
-      border-radius: 0 0 0 20px;
-    }
-    .bc-desktop-logbook--trip-end td:last-child {
-      border-radius: 0 0 20px 0;
+
+      &:first-child {
+        border-radius: 0 0 0 20px;
+      }
+
+      &:last-child {
+        border-radius: 0 0 20px 0;
+      }
     }
     .bc-desktop-logbook--in-trip:not(.bc-desktop-logbook--selected):hover td {
       background: color-mix(in srgb, var(--bc-text) 4%, var(--bc-surface));
@@ -1710,9 +1717,10 @@
     @media (hover: hover) and (pointer: fine) {
       .bc-desktop-logbook--trip button {
         transition: box-shadow 120ms linear;
-      }
-      .bc-desktop-logbook--trip button:not(:disabled):hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+
+        &:not(:disabled):hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {
