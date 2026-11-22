@@ -58,7 +58,6 @@ Next number: 176
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes, les détendeurs, les recycleurs et les combinaisons étanches (drysuit)
 - #149 [code] remplacer les uuid par des id plus courts
 - #151 [code] compléter l'écriture en cascade css des fichiers
-- #152 [design] est-ce que la fonction signer est pertinente sur desktop?
 - #153 [design] desktop, sur /dives/:id, afficher la carte en bg sur toute la largeur de l'en-tête
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
