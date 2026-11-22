@@ -648,7 +648,7 @@ export { waterTypeOf };
  * @property {(options: {id: string}) => Promise<{id: number}[]>} alphaCacheOpen
  *   Reads that folder's logbook into the core, without address (exportable, not editable), and returns its dives.
  * @property {() => Promise<{id: string, summary: string, message: string}[]>} pendingChanges
- * @property {(action: string, args?: string[]) => Promise<any>} history The versions of the configured logbook (opendives.h, history_call): `info`, `log` [skip, limit, changes], `stats` [commit...], `diff` [from, to], `read` [commit, path], `files` [commit, prefix], `restore` [commit, message, path...], `open` [commit] (read only), `close`.
+ * @property {(action: string, args?: string[]) => Promise<any>} history The versions of the configured logbook (opendives.h, history_call): `info`, `log` [skip, limit, changes], `stats` [commit...], `diff` [from, to], `read` [commit, path], `files` [commit, prefix], `restore` [commit, message, path...], `open` [commit] (read only), `close`, `adopt` (no argument: brings in the history of this device's own logbook from before the account, `{result: 'adopted'|'unchanged'|'none'}`; `log` then lists those commits after the logbook's own).
  *   Local commits of the loaded cloud log not yet on the server, newest first;
  *   empty for a log without account.
  * @property {(options?: {deleteCopy?: boolean}) => Promise<void>} signOut

@@ -210,6 +210,44 @@ test('the versions of one dive say what each sync changed; restoring changes tha
   }
 });
 
+test('a deleted dive carries what identifies it: duration, depth, mode and computer', async () => {
+  const lb = new GitLogbook();
+  try {
+    const dir = '2026/09/13-Sun-09=15=48';
+    lb.commit({ [`${dir}/Dive`]: 'duration 1:45 min\nnotrip\n', [`${dir}/Divecomputer`]: 'model "Shearwater Petrel 3"\ndctype CCR\nmaxdepth 2.377m\n' });
+    lb.commit({ [dir]: null });
+    const [d] = await deletedDives(lb);
+    assert.equal(d.number, null);
+    assert.equal(d.durationSeconds, 105);
+    assert.equal(d.maxDepthMm, 2377);
+    assert.equal(d.mode, 'CCR');
+    assert.equal(d.computer, 'Shearwater Petrel 3');
+  } finally {
+    lb.dispose();
+  }
+});
+
+test('a restored dive fills a missing number without shifting, or shifts every later dive when needed', () => {
+  const restored = { id: 20, date: '2030-01-02T10:00:00', number: 0 };
+  const before = { id: 19, date: '2030-01-01T10:00:00', number: 100 };
+  const gapAfter = { id: 21, date: '2030-01-03T10:00:00', number: 102 };
+  const later = { id: 22, date: '2030-01-04T10:00:00', number: 110 };
+  assert.deepEqual(restoredDiveNumberPlan('2030-01-02 10:00:00', [later, gapAfter, restored, before]), {
+    ids: [20],
+    numbers: [101],
+    number: 101,
+    shifted: false,
+  });
+
+  const noGapAfter = { ...gapAfter, number: 101 };
+  assert.deepEqual(restoredDiveNumberPlan('2030-01-02 10:00:00', [later, noGapAfter, restored, before]), {
+    ids: [20, 21, 22],
+    numbers: [101, 102, 111],
+    number: 101,
+    shifted: true,
+  });
+});
+
 test('a deleted dive is listed from the history and restored alone', async () => {
   const { lb, v2, v3, v4 } = makeLogbook();
   try {

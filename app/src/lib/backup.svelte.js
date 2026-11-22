@@ -27,14 +27,37 @@ export const backup = $state({
   /** @type {import('./backup-history.js').DeletedDive[]|null} null: not searched yet */
   deleted: null,
   deletedLoading: false,
+  /** The search for deleted dives failed (not the same as finding none). */
+  deletedFailed: false,
   /** What the detail pane shows (tablet, desktop). @type {Choice|null} */
   choice: null,
   /** A restore is running. */
   busy: false,
 });
 
+/** @type {Promise<unknown>|null} */
+let adopted = null;
+
+/**
+ * Brings the history of this device's own logbook (from before the account) into the account's repository, once per
+ * reading; a failure is tried again at the next call. The history screens read it with the rest.
+ * @returns {Promise<unknown>}
+ */
+function adoptDeviceHistory() {
+  adopted ??= OpenDivesCore.history('adopt', []).catch((e) => {
+    adopted = null;
+    console.warn('Reading the history of the device logbook', e);
+  });
+  return adopted;
+}
+
 /** The calls of the core the history needs. */
-const core = { history: (/** @type {string} */ action, /** @type {string[]} */ args) => OpenDivesCore.history(action, args) };
+const core = {
+  history: async (/** @type {string} */ action, /** @type {string[]} */ args) => {
+    await adoptDeviceHistory();
+    return OpenDivesCore.history(action, args);
+  },
+};
 
 let reading = 0;
 
@@ -77,11 +100,13 @@ export async function moreVersions() {
 /** Looks for the deleted dives in the whole history. */
 export async function loadDeleted() {
   backup.deletedLoading = true;
+  backup.deletedFailed = false;
   try {
     backup.deleted = await deletedDives(core);
   } catch (e) {
     console.error('Looking for the deleted dives', e);
     backup.deleted = [];
+    backup.deletedFailed = true;
   } finally {
     backup.deletedLoading = false;
   }
@@ -90,12 +115,14 @@ export async function loadDeleted() {
 /** Forgets what was read: the account or the logbook changed. */
 export function resetBackup() {
   reading++;
+  adopted = null;
   backup.versions = [];
   backup.more = false;
   backup.head = null;
   backup.loaded = false;
   backup.failed = false;
   backup.deleted = null;
+  backup.deletedFailed = false;
   backup.choice = null;
 }
 

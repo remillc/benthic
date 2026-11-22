@@ -410,7 +410,24 @@ export async function diveVersions(core, key, { limit = 30, pageSize = 100 } = {
  * @property {string} commit the last version that still had the dive: restoring from it brings the dive back
  * @property {string} dir the dive's folder in that version
  * @property {string} site the site's name in that version, '' when none
+ * @property {number|null} durationSeconds
+ * @property {number|null} maxDepthMm
+ * @property {string} mode the dive computer's type (`OC`, `CCR`, `PSCR`), '' when not written
+ * @property {string} computer the dive computer's model, '' when none or manually added
  */
+
+/** Seconds of a `duration` line (`52:00 min`, `1:05:00`), null when absent. @param {string|undefined} value */
+export function durationSecondsOf(value) {
+  const m = /^(\d+):(\d{2})(?::(\d{2}))?/.exec(value ?? '');
+  if (!m) return null;
+  return m[3] !== undefined ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3]) : Number(m[1]) * 60 + Number(m[2]);
+}
+
+/** Millimetres of a `maxdepth` line (`2.377m`), null when absent. @param {string|undefined} value */
+export function maxDepthMmOf(value) {
+  const n = parseFloat(value ?? '');
+  return Number.isFinite(n) ? Math.round(n * 1000) : null;
+}
 
 /**
  * The dives that were deleted and are not in the logbook now, newest deletion first. The whole history is read (no limit
@@ -436,7 +453,20 @@ export async function deletedDives(core, { pageSize = 200 } = {}) {
         if (d.kind !== 'removed' || present.has(d.key) || found.has(d.key)) continue;
         const files = await diveFilesAt(core, parent, d.oldDir);
         const id = siteIdOf(files.dive);
-        found.set(d.key, { key: d.key, number: d.number, deletedAt: c.time, commit: parent, dir: /** @type {string} */ (d.oldDir), site: id ? await site(parent, id) : '' });
+        const own = files.dive ? parseDiveFile(files.dive) : {};
+        const computer = files.computer ? parseDiveFile(files.computer.split('\n').slice(0, 40).join('\n')) : {};
+        found.set(d.key, {
+          key: d.key,
+          number: d.number,
+          deletedAt: c.time,
+          commit: parent,
+          dir: /** @type {string} */ (d.oldDir),
+          site: id ? await site(parent, id) : '',
+          durationSeconds: durationSecondsOf(own.duration),
+          maxDepthMm: maxDepthMmOf(computer.maxdepth),
+          mode: computer.dctype ?? '',
+          computer: computerModel(files.computer),
+        });
       }
     }
     if (!page.more) break;

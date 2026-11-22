@@ -1276,6 +1276,7 @@
         "other": "{n} plongées, toujours récupérables"
       },
       "deletedNone": "Aucune plongée supprimée",
+      "deletedFailed": "L’historique n’a pas pu être lu",
       "deletedSearching": "Recherche dans l’historique"
     },
     "pane": {
@@ -1415,7 +1416,14 @@
     "deleted": {
       "title": "Plongées supprimées",
       "empty": "Aucune plongée supprimée",
+      "failed": "L’historique n’a pas pu être lu : les plongées supprimées ne peuvent pas être listées.",
       "row": "Supprimée {when}",
+      "fields": {
+        "depth": "Profondeur max",
+        "duration": "Durée",
+        "mode": "Mode",
+        "computer": "Ordinateur de plongée"
+      },
       "restore": "Restaurer",
       "note": "Une plongée supprimée reste récupérable sans limite de temps. Ses photos et vidéos sont gardées 90 jours après la suppression, puis effacées.",
       "restored": "Plongée rétablie",
@@ -2733,6 +2741,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Sauvegarde et restauration : les plongées supprimées sont présentées dans des fiches lisibles, avec les caractéristiques alignées d’une plongée à l’autre. Les listes affichent des placeholders pendant leur chargement.",
+      "Sauvegarde et restauration : les plongées supprimées avant la création du compte et les versions antérieures du carnet sont listées et peuvent être restaurées. Une recherche des plongées supprimées qui échoue le dit maintenant, avec un bouton Réessayer. Chaque plongée supprimée montre sa date et son heure, sa profondeur, sa durée, son mode, son ordinateur et son site. Les listes défilantes affichent leur barre de défilement.",
       "Carnet sur mobile et tablette : renommez le carnet depuis le menu ⋮.",
       "Carnet sur ordinateur : l’attente avant l’avion s’affiche au-dessus des plongées.",
       "Recherche : une croix permet d’effacer le texte sans quitter le champ.",

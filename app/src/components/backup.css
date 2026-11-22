@@ -308,14 +308,62 @@
   .bc-backup-panes--list {
     flex: none;
     width: 380px;
-    overflow-y: auto;
+    overflow: hidden;
     border-inline-end: 1px solid var(--bc-separator);
+  }
+
+  /* The list pane shares its height between the versions and « Restaurer seulement »; each list scrolls on its own. */
+  .bc-backup-panes--list .bc-backup-main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--status {
+    flex: none;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--versions {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--only {
+    flex: 0 1 auto;
+    max-height: 50%;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   .bc-backup-panes--detail {
     flex: 1;
     min-width: 0;
     overflow-y: auto;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--versions,
+  .bc-backup-panes--list .bc-backup-main--only,
+  .bc-backup-panes--detail {
+    scrollbar-color: color-mix(in srgb, var(--bc-text) 45%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--versions::-webkit-scrollbar,
+  .bc-backup-panes--list .bc-backup-main--only::-webkit-scrollbar,
+  .bc-backup-panes--detail::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .bc-backup-panes--list .bc-backup-main--versions::-webkit-scrollbar-thumb,
+  .bc-backup-panes--list .bc-backup-main--only::-webkit-scrollbar-thumb,
+  .bc-backup-panes--detail::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bc-text) 45%, transparent);
+    background-clip: padding-box;
   }
 
   .bc-backup-panes--empty {
@@ -328,4 +376,292 @@
     color: var(--bc-text-2);
     font-size: 15px;
   }
+
+  .bc-backup-deleted--heading {
+    margin: 20px 32px 0;
+  }
+
+  .bc-backup-deleted--title {
+    margin: 0;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 500;
+    color: var(--bc-text);
+  }
+
+  .bc-backup-deleted--summary {
+    margin: 2px 0 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--bc-text-2);
+  }
+
+  .bc-backup-deleted--note {
+    margin: 12px 32px 0;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--bc-surface-container);
+    color: var(--bc-text-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .bc-backup-deleted--list,
+  .bc-backup-deleted--loading {
+    margin: 16px 24px 24px;
+  }
+
+  .bc-backup-deleted--item {
+    padding: 20px 24px;
+  }
+
+  .bc-backup-deleted--item + .bc-backup-deleted--item {
+    border-top: 1px solid var(--bc-separator);
+  }
+
+  .bc-backup-deleted--top {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .bc-backup-deleted--identity {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .bc-backup-deleted--name {
+    margin: 0;
+    font-size: 19px;
+    line-height: 26px;
+    font-weight: 600;
+    color: var(--bc-text);
+    overflow-wrap: anywhere;
+  }
+
+  .bc-backup-deleted--date {
+    margin: 2px 0 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--bc-text-2);
+  }
+
+  .bc-backup-deleted--restore {
+    min-width: 120px;
+    height: 48px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 24px;
+    background: var(--bc-text);
+    color: var(--bc-surface);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .bc-backup-deleted--facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px 24px;
+    margin: 18px 0 0;
+    padding: 16px 0;
+    border-block: 1px solid var(--bc-separator);
+  }
+
+  .bc-backup-deleted--fact-depth {
+    grid-column: 1;
+  }
+
+  .bc-backup-deleted--fact-duration {
+    grid-column: 2;
+  }
+
+  .bc-backup-deleted--fact-mode {
+    grid-column: 3;
+  }
+
+  .bc-backup-deleted--fact-computer {
+    grid-column: 4;
+  }
+
+  .bc-backup-deleted--facts dt {
+    margin: 0;
+    color: var(--bc-text-2);
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .bc-backup-deleted--facts dd {
+    margin: 2px 0 0;
+    color: var(--bc-text);
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .bc-backup-deleted--removed {
+    margin: 12px 0 0;
+    color: var(--bc-text-2);
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  .bc-backup-deleted--state,
+  .bc-backup-deleted--empty {
+    margin: 16px 24px 24px;
+    padding: 28px 24px;
+    border-radius: 20px;
+    background: var(--bc-surface);
+    text-align: center;
+    color: var(--bc-text-2);
+  }
+
+  .bc-backup-deleted--state p,
+  .bc-backup-deleted--empty p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .bc-backup-deleted--state button {
+    margin-top: 16px;
+  }
+
+  .bc-backup-deleted--empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bc-backup-deleted--empty .bc-backup--tile {
+    width: 48px;
+    height: 48px;
+  }
+
+  .bc-backup-deleted--loading .bc-backup-deleted--item {
+    min-height: 154px;
+  }
+
+  .bc-backup-deleted--skeleton-title,
+  .bc-backup-deleted--skeleton-line,
+  .bc-backup-deleted--skeleton-action,
+  .bc-backup-deleted--skeleton-facts .skeleton-block,
+  .bc-backup-main--skeleton-title,
+  .bc-backup-main--skeleton-line,
+  .bc-backup-main--skeleton-chip,
+  .bc-backup-main--deleted-skeleton {
+    display: block;
+    border-radius: 4px;
+  }
+
+  .bc-backup-deleted--skeleton-title {
+    width: min(60%, 320px);
+    height: 24px;
+  }
+
+  .bc-backup-deleted--skeleton-line {
+    width: min(40%, 220px);
+    height: 16px;
+    margin-top: 8px;
+  }
+
+  .bc-backup-deleted--skeleton-action {
+    width: 120px;
+    height: 48px;
+    border-radius: 24px;
+  }
+
+  .bc-backup-deleted--skeleton-facts {
+    display: flex;
+    gap: 24px;
+    margin-top: 18px;
+  }
+
+  .bc-backup-deleted--skeleton-facts .skeleton-block {
+    width: 96px;
+    height: 36px;
+  }
+
+  .bc-backup-main--skeleton-row {
+    box-sizing: border-box;
+    min-height: 64px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--bc-separator);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .bc-backup-main--skeleton-row:last-child {
+    border-bottom: 0;
+  }
+
+  .bc-backup-main--skeleton-title {
+    width: 62%;
+    height: 16px;
+  }
+
+  .bc-backup-main--skeleton-line {
+    width: 42%;
+    height: 12px;
+    margin-top: 6px;
+  }
+
+  .bc-backup-main--skeleton-chip {
+    width: 64px;
+    height: 24px;
+    border-radius: 12px;
+  }
+
+  .bc-backup-main--deleted-skeleton {
+    width: min(70%, 180px);
+    height: 13px;
+  }
+
+  @media (max-width: 600px) {
+    .bc-backup-deleted--heading,
+    .bc-backup-deleted--note {
+      margin-inline: 16px;
+    }
+
+    .bc-backup-deleted--list,
+    .bc-backup-deleted--loading,
+    .bc-backup-deleted--state,
+    .bc-backup-deleted--empty {
+      margin-inline: 16px;
+    }
+
+    .bc-backup-deleted--item {
+      padding: 16px;
+    }
+
+    .bc-backup-deleted--top {
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .bc-backup-deleted--restore {
+      min-width: 0;
+      padding-inline: 16px;
+    }
+
+    .bc-backup-deleted--facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bc-backup-deleted--fact-mode {
+      grid-column: 1;
+    }
+
+    .bc-backup-deleted--fact-computer {
+      grid-column: 2;
+    }
+  }
+}
+
+/* Framework7's unlayered button rule sets width: 100%; the restore action belongs beside the dive identity. */
+.bc-backup-deleted--restore,
+.bc-backup-deleted--state button {
+  width: auto;
 }

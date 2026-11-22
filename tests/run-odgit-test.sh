@@ -117,4 +117,29 @@ has "$(T hborrow "$H" $V2 "$W/borrow")" '"branch":"v"'; ok $? "history: borrow a
 git clone -q --bare "$H" "$W/bare.git"
 has "$(T hrestore "$W/bare.git" main $V1 "Restore in a bare cache")" '"commit":"'; ok $? "history: restore in a bare repository"
 
+# the device's own logbook from before the account: its history joins the account's, nothing is sent anywhere
+A=$W/account; git init -q -b main "$A"; git -C "$A" config user.email t@t; git -C "$A" config user.name T
+mkdir -p "$A/2022/05/15-Sun-09=00=00"; echo "duration 42:00 min" > "$A/2022/05/15-Sun-09=00=00/Dive-4"
+git -C "$A" add -A; git -C "$A" commit -q -m "account v1" --date="2026-11-10T10:00:00"
+D=$W/device; git init -q -b main "$D"; git -C "$D" config user.email t@t; git -C "$D" config user.name T
+mkdir -p "$D/2022/05/01-Sun-09=00=00" "$D/2022/05/15-Sun-09=00=00"
+echo "duration 40:00 min" > "$D/2022/05/01-Sun-09=00=00/Dive-2"; echo "duration 42:00 min" > "$D/2022/05/15-Sun-09=00=00/Dive-4"
+git -C "$D" add -A; git -C "$D" commit -q -m "device v1" --date="2026-11-04T10:00:00"; DV1=$(git -C "$D" rev-parse HEAD)
+git -C "$D" rm -q -r 2022/05/01-Sun-09=00=00; git -C "$D" commit -q -m "device delete" --date="2026-11-05T10:00:00"
+DV2=$(git -C "$D" rev-parse HEAD)
+r=$(T hadopt "$A" "$D" main); has "$r" '"result":"adopted"' && has "$r" "\"head\":\"$DV2\""; ok $? "adopt: the device history comes in"
+[ "$(git -C "$A" rev-parse main)" != "$DV2" ] && [ "$(git -C "$A" symbolic-ref --short HEAD)" = main ]; ok $? "adopt: the account's branch is left alone"
+r=$(T hlog "$A" main 0 10 0); has "$r" '"summary":"account v1"' && has "$r" '"summary":"device delete"' && has "$r" '"summary":"device v1"'; ok $? "adopt: the log lists both histories"
+[ "$(T hlog "$A" main 0 10 0 | grep -o '"id":"[0-9a-f]*"' | head -1)" = "\"id\":\"$(git -C "$A" rev-parse main)\"" ]; ok $? "adopt: the account's own commit is the newest"
+has "$(T hadopt "$A" "$D" main)" '"result":"unchanged"'; ok $? "adopt: the same head twice does nothing"
+echo "duration 43:00 min" > "$D/2022/05/15-Sun-09=00=00/Dive-4"; git -C "$D" commit -q -a -m "device later" --date="2026-11-06T10:00:00"
+has "$(T hadopt "$A" "$D" main)" '"result":"adopted"'; ok $? "adopt: a later head is brought in too"
+git -C "$A" cat-file -e $DV2 2>/dev/null && [ "$(git -C "$A" for-each-ref refs/opendives/device | wc -l)" = 2 ]; ok $? "adopt: each head keeps its own reference"
+r=$(T hrestore "$A" main $DV1 "Restore a device dive" 2022/05/01-Sun-09=00=00); has "$r" '"commit":"'; ok $? "adopt: a dive deleted before the account is restored from it"
+[ "$(git -C "$A" show main:2022/05/01-Sun-09=00=00/Dive-2)" = "duration 40:00 min" ]; ok $? "adopt: the restored dive has its content"
+has "$(T hadopt "$A" "$W/nothing-here" main)" '"result":"none"'; ok $? "adopt: no device logbook is not an error"
+has "$(T hadopt "$A" "$D" nobranch)" '"result":"none"'; ok $? "adopt: a branch the device logbook does not have is not an error"
+git clone -q --bare "$A" "$W/account-bare.git"
+has "$(T hadopt "$W/account-bare.git" "$D" main)" '"result":"adopted"'; ok $? "adopt: into a bare cache"
+
 echo "$pass passed, $fail failed"; [ "$fail" = 0 ]
