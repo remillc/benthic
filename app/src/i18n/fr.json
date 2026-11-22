@@ -2724,6 +2724,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Ordinateur : la carte commune se charge lorsque la vue mondiale traverse la ligne de changement de date.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
       "Sites : les noms apparaissent en zoomant sur les deux cartes ; sur tablette, le déplacement et le zoom fonctionnent dans la page et la carte est dégagée de la zone de navigation système.",
       "Carte commune : les boutons de sélection sont plus faciles à toucher.",

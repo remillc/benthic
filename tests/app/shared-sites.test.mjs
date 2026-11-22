@@ -87,6 +87,23 @@ test('reading: box, nearby, card with « Ce que disent les carnets », redirect 
   assert.deepEqual(diveCountOf(card), { key: 'count', n: 214 });
 });
 
+test('map requests wrap world and antimeridian views before reaching the server', async () => {
+  const { calls, transport } = fakeTransport({
+    'GET /v1/sites/base': ok({ mode: 'clusters', total: 0, sites: [], clusters: [] }),
+    'GET /v1/sites/base/nearby': ok({ sites: [] }),
+  });
+  const api = createSharedSitesApi({ baseUrl: 'https://api.test', transport });
+  await api.inBox('t', { bbox: [-220, -80, 220, 80], zoom: 2 });
+  await api.inBox('t', { bbox: [170, -10, 190, 10], zoom: 5 });
+  await api.nearby('t', { lat: 0, lon: 190, radiusM: 50000 });
+  await api.nearby('t', { lat: 0, lon: -190, radiusM: 50000 });
+  const queries = calls.map((call) => new URL(call.url).searchParams);
+  assert.equal(queries[0].get('bbox'), '-180,-80,180,80');
+  assert.equal(queries[1].get('bbox'), '170,-10,-170,10');
+  assert.equal(queries[2].get('lon'), '-170.000000');
+  assert.equal(queries[3].get('lon'), '170.000000');
+});
+
 test('link and report send what the contract says', async () => {
   const { calls, transport } = fakeTransport({
     'POST /v1/sites/base/123/link': ok({ baseSiteId: '124', site: { name: 'Poor Knights', lat: -35.46, lon: 174.74, country: 'NZ', region: 'Northland', waterType: 'salt' } }),

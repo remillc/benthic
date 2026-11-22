@@ -2724,6 +2724,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop: the shared map loads when the world view crosses the date line.",
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
       "Sites: names appear when zooming in on either map; on tablets, the embedded map can be panned and zoomed and clears the system navigation area.",
       "Shared map: the mode buttons are easier to tap.",
