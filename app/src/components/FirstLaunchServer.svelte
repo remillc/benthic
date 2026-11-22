@@ -290,12 +290,14 @@
     <button type="button" class="bc-first-launch-server--action" disabled={view.primaryDisabled} aria-busy={busy} onclick={sendAgain}>{t('serverSteps.newCode')}</button>
   {/if}
 {:else if step === 'serverOffline'}
-  <span class="bc-first-launch-server--tile" aria-hidden="true"><Icon name="offline" size={28} weight={1.8} /></span>
-  <h2 class="bc-first-launch-server--heading">{t('serverSteps.offlineTitle')}</h2>
-  <p class="bc-first-launch-server--lead">{t(deviceKey('serverSteps.offlineHelp', kind))}</p>
-  <div class="bc-first-launch-server--space"></div>
-  <button type="button" class="bc-first-launch-server--action" onclick={again}>{t('serverSteps.retry')}</button>
-  <button type="button" class="bc-first-launch-server--quiet bc-first-launch-server--home" onclick={home}>{t('serverSteps.backHome')}</button>
+  <div class="bc-first-launch-server--offline">
+    <span class="bc-first-launch-server--tile" aria-hidden="true"><Icon name="offline" size={28} weight={1.8} /></span>
+    <h2 class="bc-first-launch-server--heading">{t('serverSteps.offlineTitle')}</h2>
+    <p class="bc-first-launch-server--lead">{t(deviceKey('serverSteps.offlineHelp', kind))}</p>
+    <div class="bc-first-launch-server--space"></div>
+    <button type="button" class="bc-first-launch-server--action" onclick={again}>{t('serverSteps.retry')}</button>
+    <button type="button" class="bc-first-launch-server--quiet bc-first-launch-server--home" onclick={home}>{t('serverSteps.backHome')}</button>
+  </div>
 {:else if step === 'serverDownload'}
   <div class="bc-first-launch-server--chip"><BenthicPlusChip onLight /></div>
   <h2 class="bc-first-launch-server--heading">{t('serverSteps.progressDownload')}</h2>
@@ -386,6 +388,26 @@
       justify-content: center;
       background: var(--bc-error-container);
       color: var(--bc-error);
+    }
+
+    /* « Le serveur ne répond pas » (task 2026-11-22-322): the tile, the title, the text and the two buttons are one block,
+       centred in the step's room (the stage centres it vertically), the texts and the buttons centred horizontally. */
+    .bc-first-launch-server--offline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      .bc-first-launch-server--action,
+      .bc-first-launch-server--quiet {
+        align-self: center;
+      }
+
+      @media (max-width: 767.98px) {
+        .bc-first-launch-server--action {
+          align-self: stretch;
+        }
+      }
     }
 
     /* « Renvoyer le code dans 0:42 »: not a button, the link comes back when the countdown ends. */

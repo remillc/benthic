@@ -6428,7 +6428,7 @@ Replace the caption under the tissue-saturation charts of `/tools/desaturation` 
 
 Keep the non-breaking space before « % ». The gradient factors are those of the planner, as now. Mock-ups: `outils-desaturation-android`, `outils-desaturation-rappel-android`, `outils-desaturation-terminee-android`, the tablet `android-tablette-desaturation-*` and `bureau-outils-desaturation` on the canvases; update `docs/mockups/` the same way.
 
-## [ ] 2026-11-22-322 « Le serveur ne répond pas » (first launch): content centred
+## [x] 2026-11-22-322 « Le serveur ne répond pas » (first launch): content centred
 
 Christian approved this on 22 November 2026. Work in `main`.
 

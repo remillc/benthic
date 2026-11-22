@@ -2743,6 +2743,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch: « The server does not respond » is centred, buttons included.",
       "Tools, decompression: the caption under the tissue charts is shorter.",
       "First launch: light rays from the top right corner replace the stripes of the blue band.",
       "First launch: the name Benthic has its own typeface, with « DIVE LOG » under it, and a larger logo.",

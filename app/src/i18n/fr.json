@@ -2743,6 +2743,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Premier lancement : « Le serveur ne répond pas » est centré, boutons compris.",
       "Outils, désaturation : la légende sous les graphiques des tissus est plus courte.",
       "Premier lancement : des rayons de lumière venus du coin supérieur droit remplacent les bandes du bandeau bleu.",
       "Premier lancement : le nom Benthic prend sa propre police, avec « DIVE LOG » en dessous, et un logo plus grand.",
