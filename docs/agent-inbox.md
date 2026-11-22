@@ -6500,3 +6500,15 @@ Christian approved this on 22 November 2026. Work in `main`.
 In the « Retirer … ? » dialog of a piece of gear (phone, tablet, desktop), the optional reason gets a fourth chip after « Hors d’usage »: « Autre » (en « Other »), next to the existing reasons « Vendue », « Perdue », « Hors d’usage » (i18n keys beside `worn`). Same filter chip, single choice, still optional. On the phone the chips wrap onto two lines. The retired piece shows « Autre » as its reason in « Pièces retirées ». No text field.
 
 Mock-ups: `android-tablette-profil-piece-retirer-paysage`, `bureau-profil-piece-retirer`, `profil-piece-supprimer-android` (updated in `docs/mockups/`).
+
+## [ ] 2026-11-22-327 Desktop: the divider between the panes, and the list's scrollbar (#174)
+
+Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS, every desktop page with two panes (Carnet, Sites, Statistiques, Outils, Réglages, Compte, Profil, Sauvegarde, Téléchargement…).
+
+1. **No grip on the divider.** The divider between the panes is only its 1 px line (#DCDAD3) in a 9 px hit area; the small grey grip (4 × 32 px, #B8B6AF) in the middle is removed everywhere.
+2. **Hover and drag.** When the pointer is over the divider (and while dragging it), the pointer is the column-resize cursor (`cursor: col-resize`, arrows left and right), and the divider is highlighted in the tertiary colour: its 9 px area on the tertiary container (#FBE3B2, dark #4A3216) with a 3 px line in rust (#B4530F, dark #F0A66B) in place of the grey line. Back to the grey line when the pointer leaves.
+3. **The list's scrollbar stays apart from the divider.** The scrollbar of the list pane is a thin bar (6 px thumb, #B8B6AF, fully rounded, no track) inside the list's right padding, from under the column headers to the bottom, never merged with the divider. Hide the system scrollbar of that list so that only this one shows.
+
+Mock-ups: `bureau-carnet-profil-droite` (17 dives, the scrollbar), `bureau-carnets-selecteur`, `bureau-carnets-rail-survol` (divider hovered), and every `bureau-*` board, all updated in `docs/mockups/`.
+
+**Test:** no grip on any desktop page; hovering the divider shows the resize cursor and the rust highlight; a logbook longer than the window shows the thin scrollbar next to the list, separate from the divider.

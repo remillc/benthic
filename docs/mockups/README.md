@@ -231,3 +231,4 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `android-tablette-profil-piece-nouvelle-type-paysage.dc.html` | Mon profil de plongeur, nouvelle pièce, étape 1 : type · tablette Android, paysage |
 | `bureau-profil-piece-nouvelle-type.dc.html` | Mon profil de plongeur, nouvelle pièce, étape 1 : type · bureau |
 | `profil-piece-nouvelle-recycleur-android.dc.html` | Mon profil de plongeur, nouvelle pièce, type Recycleur · Android |
+| `bureau-carnets-rail-survol.dc.html` | Carnet · bureau (Windows, Linux), rail entre les volets survolé |
