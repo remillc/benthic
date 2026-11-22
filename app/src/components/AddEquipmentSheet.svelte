@@ -7,6 +7,7 @@
   import { Sheet } from 'framework7-svelte';
   import GearPicker from './GearPicker.svelte';
   import Icon from './Icon.svelte';
+  import SearchClear from './SearchClear.svelte';
   import TextField from './TextField.svelte';
   import { gear, visibleGear, evaluations } from '../lib/inventory.svelte.js';
   import { taskLabel } from '../lib/maintenance-text.js';
@@ -73,6 +74,7 @@
     <div class="bc-add-equipment--search">
       <Icon name="search" size={20} />
       <input type="search" bind:value={query} placeholder={t('gear.addSheet.search')} aria-label={t('gear.addSheet.search')} />
+      {#if query}<SearchClear onclear={() => (query = '')} />{/if}
     </div>
 
     <div class="bc-add-equipment--scroll">

@@ -11,6 +11,7 @@
   import { OpenDivesCore } from 'opendives-core';
   import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
+  import SearchClear from '../components/SearchClear.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
   import DesktopSiteMap from '../components/DesktopSiteMap.svelte';
   import DesktopSiteSheet from '../components/DesktopSiteSheet.svelte';
@@ -361,7 +362,7 @@
       <label class="bc-desktop-sites--search">
         <Icon name="search" size={20} />
         <input type="search" bind:this={searchField} bind:value={query} placeholder={t('sites.search')} spellcheck="false" aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} autocomplete="off" />
-        {#if !query}<kbd class="bc-desktop-sites--hint">{mod}F</kbd>{/if}
+        {#if query}<SearchClear onclear={() => (query = '')} />{:else}<kbd class="bc-desktop-sites--hint">{mod}F</kbd>{/if}
       </label>
       <button type="button" class="bc-desktop-sites--outlined" aria-keyshortcuts={desktopMac ? 'Meta+N' : 'Control+N'} onclick={() => newSite()}>
         <Icon name="plus" size={20} />{t('sites.newSite')}

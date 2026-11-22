@@ -1347,7 +1347,7 @@
       aria-label={t('desktopSettings.search')}
       onkeydown={(e) => e.key === 'Escape' && search && ((search = ''), e.stopPropagation())}
     />
-    {#if !windowed && !search}<kbd class="bc-desktop-settings--kbd">{desktopMac ? '⌘F' : 'Ctrl+F'}</kbd>{/if}
+    {#if search}<SearchClear onclear={() => (search = '')} />{:else if !windowed}<kbd class="bc-desktop-settings--kbd">{desktopMac ? '⌘F' : 'Ctrl+F'}</kbd>{/if}
   </div>
 {/snippet}
 

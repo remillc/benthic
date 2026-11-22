@@ -7,6 +7,7 @@
   import { onMount } from 'svelte';
   import { f7 } from 'framework7-svelte';
   import Icon from './Icon.svelte';
+  import SearchClear from './SearchClear.svelte';
   import GearIcon from './GearIcon.svelte';
   import ReadOnlyNotice from './ReadOnlyNotice.svelte';
   import GearExportSheet from './GearExportSheet.svelte';
@@ -86,7 +87,10 @@
 <section class="bc-gear-list" aria-label={t('gear.inventory.title')}>
   <header class="bc-gear-list--head">
     {#if searching}
-      <input bind:this={field} class="bc-gear-list--search" type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
+      <div class="bc-gear-list--search">
+        <input bind:this={field} type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
+        {#if query}<SearchClear onclear={() => (query = '')} />{/if}
+      </div>
       <button type="button" class="bc-gear-list--icon" aria-label={t('gear.inventory.searchClose')} onclick={closeSearch}><Icon name="close" size={22} /></button>
     {:else}
       <h1 class="bc-gear-list--title">{t('gear.inventory.title')}</h1>
@@ -191,6 +195,17 @@
       border-radius: 20px;
       background: var(--bc-background);
       color: var(--bc-text);
+      font: inherit;
+      display: flex;
+      align-items: center;
+    }
+    .bc-gear-list--search input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: none;
+      background: none;
+      color: inherit;
       font: inherit;
     }
     .bc-gear-list--icon {

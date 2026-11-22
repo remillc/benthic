@@ -31,9 +31,17 @@ function nameTitles() {
  * for TalkBack and VoiceOver (task 2026-11-13-113), named at start and when a page shows.
  */
 function nameClearButtons() {
-  document.querySelectorAll('.searchbar .input-clear-button:not([aria-label])').forEach((button) => {
+  document.querySelectorAll('.searchbar .input-clear-button:not([aria-label])').forEach((element) => {
+    const button = /** @type {HTMLElement} */ (element);
     button.setAttribute('role', 'button');
     button.setAttribute('aria-label', t('searchField.clear'));
+    button.setAttribute('tabindex', '0');
+    button.addEventListener('pointerdown', (event) => event.preventDefault());
+    button.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      button.click();
+    });
   });
 }
 
@@ -42,7 +50,7 @@ export function enableAccessibility() {
     f7.on('pageAfterIn', update);
     f7.on('pageAfterOut', update);
     f7.on('pageBeforeIn', update);
-    f7.on(/** @type {any} */ ('searchbarInit'), nameClearButtons);
+    f7.on('searchbarEnable', nameClearButtons);
     nameClearButtons();
     nameTitles();
   });

@@ -253,9 +253,21 @@
     border: var(--bc-outline-width, 1px) solid var(--bc-outline);
     border-radius: 24px;
     background: var(--bc-surface);
+    display: flex;
+    align-items: center;
     color: var(--bc-text);
     font: inherit;
     font-size: 16px;
+  }
+
+  .bc-backup--search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: none;
+    color: inherit;
+    font: inherit;
   }
 
   .bc-backup--restore {

@@ -1267,6 +1267,12 @@ html.ios {
     right: 0;
   }
 
+  .searchbar input:not(:placeholder-shown) ~ .input-clear-button {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
   input[type='search']::-webkit-search-cancel-button {
     -webkit-appearance: none;
     appearance: none;

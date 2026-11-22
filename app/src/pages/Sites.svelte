@@ -725,7 +725,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
           onkeydown={(e) => e.key === 'Enter' && searchInput?.blur()}
         />
         {#if query}
-          <button type="button" class="bc-sites--search-clear" onclick={clearSearch}>
+          <button type="button" class="bc-sites--search-clear" onpointerdown={(e) => e.preventDefault()} onclick={clearSearch}>
             <Icon name="close" /><span class="bc-sr-only">{t('sites.clearSearch')}</span>
           </button>
         {/if}
@@ -987,8 +987,8 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
     .bc-sites--search-clear {
       flex: none;
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       padding: 0;
       border: none;
       border-radius: 50%;

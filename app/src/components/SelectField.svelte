@@ -3,6 +3,7 @@
   import { tick } from 'svelte';
   import DropdownArrow from './DropdownArrow.svelte';
   import Icon from './Icon.svelte';
+  import SearchClear from './SearchClear.svelte';
   import { ios } from '../lib/layout.svelte.js';
   import { menuOptions, filterOptions, moveActive, opensUp } from '../lib/select-menu.js';
   // One value chosen in a short list: the MD3 filled field with a downward chevron at the end
@@ -162,6 +163,7 @@
   /** @param {KeyboardEvent} e */
   function keydown(e) {
     const inSearch = e.target === search;
+    if (e.target instanceof HTMLButtonElement && e.target.classList.contains('bc-search-clear') && e.key !== 'Escape' && e.key !== 'Tab') return;
     if (!open) {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
@@ -173,6 +175,8 @@
       e.preventDefault();
       e.stopPropagation();
       close();
+    } else if (e.key === 'Tab' && query && ((inSearch && !e.shiftKey) || (e.target instanceof HTMLButtonElement && e.target.classList.contains('bc-search-clear') && e.shiftKey))) {
+      return;
     } else if (e.key === 'Tab') {
       close(false);
     } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || (!inSearch && (e.key === 'Home' || e.key === 'End'))) {
@@ -285,6 +289,7 @@
               autocomplete="off"
               enterkeyhint="search"
             />
+            {#if query}<SearchClear onclear={() => ((query = ''), searched())} />{/if}
           </div>
         {/if}
         <ul class="bc-select-field--options" id="{id}-list" role="listbox" aria-label={ariaLabel ?? label}>

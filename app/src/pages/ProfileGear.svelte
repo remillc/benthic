@@ -9,6 +9,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import SearchClear from '../components/SearchClear.svelte';
   import GearIcon from '../components/GearIcon.svelte';
   import DcTile from '../components/DcTile.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
@@ -193,6 +194,7 @@
       {#if searching}
         <div class="bc-gear-page--search">
           <input bind:this={field} type="search" bind:value={query} placeholder={t('gear.inventory.search')} aria-label={t('gear.inventory.search')} />
+          {#if query}<SearchClear onclear={() => (query = '')} />{/if}
           <button type="button" aria-label={t('gear.inventory.searchClose')} onclick={closeSearch}><Icon name="close" size={22} /></button>
         </div>
       {:else}
@@ -264,6 +266,10 @@
       display: flex;
       align-items: center;
       gap: 4px;
+
+      :global(.bc-search-clear) {
+        margin: 0;
+      }
 
       input {
         flex: 1;

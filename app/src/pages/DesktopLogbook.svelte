@@ -10,6 +10,7 @@
   import { tick, untrack } from 'svelte';
   import { Page, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
+  import SearchClear from '../components/SearchClear.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
@@ -945,7 +946,7 @@
       <label class="bc-desktop-logbook--search">
         <Icon name="search" size={20} />
         <input type="search" bind:this={searchField} bind:value={query} placeholder={t('logbook.search')} aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} />
-        {#if !query}<kbd class="bc-desktop-logbook--hint">{mod}F</kbd>{/if}
+        {#if query}<SearchClear onclear={() => (query = '')} />{:else}<kbd class="bc-desktop-logbook--hint">{mod}F</kbd>{/if}
       </label>
       <div class="bc-desktop-logbook--columns-anchor">
         <button type="button" class="bc-desktop-logbook--icon-button" aria-label={t('desktop.columnsShown')} title={t('desktop.columnsShown')} aria-expanded={columnsOpen} onclick={() => (columnsOpen = !columnsOpen)}>

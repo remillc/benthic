@@ -5,6 +5,7 @@
   // as a new commit. Reached from « Restaurer seulement » and from the dive's menu, « Versions de cette plongée ».
   import './backup.css';
   import Icon from './Icon.svelte';
+  import SearchClear from './SearchClear.svelte';
   import { backup, restoreOne, historyCore } from '../lib/backup.svelte.js';
   import { diveVersions, keyOfDate } from '../lib/backup-history.js';
   import { diveVersionLine, versionWhen, versionDay } from '../lib/backup-text.js';
@@ -90,7 +91,10 @@
 
 <div class="bc-backup bc-backup-dive">
   {#if picking}
-    <input class="bc-backup--search" type="search" bind:value={search} placeholder={t('backup.dive.search')} aria-label={t('backup.dive.search')} />
+    <div class="bc-backup--search">
+      <input type="search" bind:value={search} placeholder={t('backup.dive.search')} aria-label={t('backup.dive.search')} />
+      {#if search}<SearchClear onclear={() => (search = '')} />{/if}
+    </div>
     <div class="bc-backup--list" style="margin-top: 12px">
       {#each choices as d (d.id)}
         <button type="button" class="bc-backup--row" onclick={() => choose(d)}>

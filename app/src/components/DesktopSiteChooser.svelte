@@ -6,6 +6,7 @@
   // « Nouveau site « {texte} » à la position de la plongée ». ↑ ↓ and Entrée choose, Échap closes.
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
+  import SearchClear from './SearchClear.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { deskSites } from '../lib/desktop-sites.svelte.js';
   import { filterChoice } from '../lib/desktop-sites.js';
@@ -66,6 +67,8 @@
 
   /** @param {KeyboardEvent} e */
   function keydown(e) {
+    const inClear = e.target instanceof HTMLButtonElement && e.target.classList.contains('bc-search-clear');
+    if (inClear && e.key !== 'Escape' && e.key !== 'Tab') return;
     if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
@@ -79,8 +82,9 @@
     } else if (e.key === 'Enter') {
       e.preventDefault();
       pick(active);
-    } else if (e.key === 'Tab') {
+    } else if (e.key === 'Tab' && !(query && ((e.target === input && !e.shiftKey) || (inClear && e.shiftKey)))) {
       e.preventDefault();
+      input?.focus();
     }
   }
 
@@ -97,6 +101,7 @@
     <label class="bc-site-chooser--search">
       <Icon name="search" size={20} />
       <input type="search" bind:this={input} bind:value={query} placeholder={t('sites.searchSitePlaceholder')} aria-label={t('sites.searchSitePlaceholder')} autocomplete="off" />
+      {#if query}<SearchClear onclear={() => (query = '')} />{/if}
     </label>
     <p class="bc-site-chooser--heading">{position ? t('desktopSites.nearestToDive') : t('desktopSites.mostRecent')}</p>
     <ul class="bc-site-chooser--list" role="listbox">

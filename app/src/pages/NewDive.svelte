@@ -14,6 +14,7 @@
   import Icon from '../components/Icon.svelte';
   import ChoiceRow from '../components/ChoiceRow.svelte';
   import TextField from '../components/TextField.svelte';
+  import SearchClear from '../components/SearchClear.svelte';
   import ChipsField from '../components/ChipsField.svelte';
   import { logbookValues } from '../lib/people.js';
   import StarsInput from '../components/StarsInput.svelte';
@@ -319,7 +320,11 @@
 
   <h2 class="bc-new-dive--group-title" id="od-new-site">{t('newDive.site')}</h2>
   <div class="bc-form-surface">
-    {#if sites.length > 6}<TextField label={t('newDive.searchSite')} bind:value={siteSearch} />{/if}
+    {#if sites.length > 6}
+      <TextField label={t('newDive.searchSite')} bind:value={siteSearch}>
+        {#snippet trailing()}{#if siteSearch}<SearchClear onclear={() => (siteSearch = '')} />{/if}{/snippet}
+      </TextField>
+    {/if}
     <div class="bc-new-dive--sites" role="radiogroup" aria-labelledby="od-new-site">
       <ChoiceRow class="bc-new-dive--site" name="od-new-site" selected={site === 0} onselect={() => (site = 0)}>
         <span class="bc-new-dive--site-text"><span>{t('newDive.noSite')}</span></span>
