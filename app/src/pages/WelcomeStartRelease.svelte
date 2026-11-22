@@ -12,6 +12,7 @@
   import BenthicPlusChip from '../components/BenthicPlusChip.svelte';
   import BenthicPlusPanel from '../components/BenthicPlusPanel.svelte';
   import { flow, currentStep } from '../lib/first-launch.svelte.js';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
@@ -59,7 +60,8 @@
       {@render panelContent()}
     </section>
 
-    <FirstLaunchSteps {f7router} />
+    <!-- This page is built with the first-launch popup at every start: the steps only ask the core once it is open. -->
+    <FirstLaunchSteps {f7router} shown={logbook.welcome || logbook.welcomeHold} />
   </div>
 </Page>
 

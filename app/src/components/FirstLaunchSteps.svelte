@@ -57,9 +57,9 @@
   /**
    * `recents`: the desktop window without a logbook, after first use (task 2026-11-16-241): the first step shows the
    * recent logbooks above the three choices, which are compact and neutral, and no demo link.
-   * @type {{ f7router: any, recents?: boolean }}
+   * @type {{ f7router: any, recents?: boolean, shown?: boolean }}
    */
-  let { f7router, recents = false } = $props();
+  let { f7router, recents = false, shown = true } = $props();
 
   const step = $derived(currentStep());
   /** « Retour » of the tablet's offer (task 2026-11-18-282), except right after a sign-in where the code is spent. */
@@ -468,7 +468,18 @@
 
   /** « Essayer avec un carnet d’exemple »: only on a device without a logbook (lib/demo.svelte.js). */
   let demoOffered = $state(false);
-  onMount(() => void canTryDemo().then((yes) => (demoOffered = yes)));
+  // Asked when the steps are on screen, not when they are built: the first-launch popup is built at every start, and the
+  // question counts the device logbook's dives in the core (about 1.4 s on a tablet), which delayed the logbook's first dive.
+  let demoAsked = false;
+  $effect(() => {
+    if (!shown) {
+      demoAsked = false;
+      return;
+    }
+    if (demoAsked) return;
+    demoAsked = true;
+    void canTryDemo().then((yes) => (demoOffered = yes));
+  });
 
   /** A file is being dragged over the window, on a step that takes it (the drop line lights up). */
   let dragging = $state(false);
