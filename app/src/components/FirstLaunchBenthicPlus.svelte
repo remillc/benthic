@@ -1245,11 +1245,9 @@
       .bc-plus--price {
         margin: 0 0 24px;
       }
-    }
 
-    /* A tablet: the footer is horizontal, the price on the left and the button on the right. */
-    @media (min-width: 768px) {
-      .bc-plus-all--footer {
+      /* A tablet: the footer is horizontal, the price on the left and the button on the right. */
+      @media (min-width: 768px) {
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;

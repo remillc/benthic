@@ -247,10 +247,8 @@
       &.bc-cylinder-sheet--dragging {
         transition: none;
       }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      .bc-cylinder-sheet--surface {
+      @media (prefers-reduced-motion: reduce) {
         transition: none;
       }
     }

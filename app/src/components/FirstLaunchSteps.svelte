@@ -1487,10 +1487,8 @@
       border-top-color: var(--bc-release-row-main);
       border-radius: 50%;
       animation: od-first-launch-spin 0.9s linear infinite;
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      .bc-first-launch--spinner {
+      @media (prefers-reduced-motion: reduce) {
         animation: none;
       }
     }
@@ -1936,10 +1934,10 @@
 
       .bc-first-launch--action {
         align-self: flex-end;
-      }
 
-      .bc-first-launch--action.bc-first-launch--action-centre {
-        align-self: center;
+        &.bc-first-launch--action-centre {
+          align-self: center;
+        }
       }
 
       .bc-first-launch--status {

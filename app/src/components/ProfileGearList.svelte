@@ -198,15 +198,16 @@
       font: inherit;
       display: flex;
       align-items: center;
-    }
-    .bc-gear-list--search input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      outline: none;
-      background: none;
-      color: inherit;
-      font: inherit;
+
+      input {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        outline: none;
+        background: none;
+        color: inherit;
+        font: inherit;
+      }
     }
     .bc-gear-list--icon {
       flex: none;

@@ -175,29 +175,29 @@
     :global(.bc-demo-dialog) :global(.bc-md3-dialog--actions) {
       margin: 20px 24px 0;
       gap: 12px;
-    }
 
-    :global(.bc-demo-dialog) :global(.bc-md3-dialog--actions) .bc-demo-dialog--cancel {
-      color: var(--bc-release-link);
-      font-size: 15px;
-    }
-
-    :global(.bc-demo-dialog) :global(.bc-md3-dialog--actions) .bc-demo-dialog--confirm {
-      height: 44px;
-      padding: 0 24px;
-      border-radius: 22px;
-      background: var(--bc-text);
-      color: var(--bc-background);
-      font-size: 15px;
-
-      &:disabled {
-        opacity: 0.38;
-        cursor: default;
+      .bc-demo-dialog--cancel {
+        color: var(--bc-release-link);
+        font-size: 15px;
       }
 
-      @media (hover: hover) {
-        &:hover:not(:disabled) {
-          opacity: 0.88;
+      .bc-demo-dialog--confirm {
+        height: 44px;
+        padding: 0 24px;
+        border-radius: 22px;
+        background: var(--bc-text);
+        color: var(--bc-background);
+        font-size: 15px;
+
+        &:disabled {
+          opacity: 0.38;
+          cursor: default;
+        }
+
+        @media (hover: hover) {
+          &:hover:not(:disabled) {
+            opacity: 0.88;
+          }
         }
       }
     }

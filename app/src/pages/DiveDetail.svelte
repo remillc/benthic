@@ -1397,24 +1397,27 @@
       font-weight: 400;
       color: var(--bc-text-2);
       cursor: pointer;
-    }
-    .bc-dive-detail--desk-tabs button:hover {
-      color: var(--bc-text);
-      background: color-mix(in srgb, var(--bc-text) 4%, transparent);
-    }
-    .bc-dive-detail--desk-tabs button[aria-selected='true'] {
-      font-weight: 600;
-      color: var(--bc-on-table-selected);
-    }
-    .bc-dive-detail--desk-tabs button[aria-selected='true']::after {
-      content: '';
-      position: absolute;
-      left: 8px;
-      right: 8px;
-      bottom: -1px;
-      height: 3px;
-      border-radius: 3px 3px 0 0;
-      background: var(--bc-on-table-selected);
+
+      &:hover {
+        color: var(--bc-text);
+        background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      }
+
+      &[aria-selected='true'] {
+        font-weight: 600;
+        color: var(--bc-on-table-selected);
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 8px;
+          right: 8px;
+          bottom: -1px;
+          height: 3px;
+          border-radius: 3px 3px 0 0;
+          background: var(--bc-on-table-selected);
+        }
+      }
     }
     .bc-dive-detail--hero {
       position: relative;

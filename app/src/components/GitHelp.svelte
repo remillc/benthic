@@ -222,10 +222,10 @@
       .bc-git-help--intro {
         margin-left: 0;
         margin-right: 0;
-      }
 
-      .bc-git-help--intro.bc-git-help--afterwards {
-        margin-bottom: 0;
+        &.bc-git-help--afterwards {
+          margin-bottom: 0;
+        }
       }
 
       .bc-git-help--surface {

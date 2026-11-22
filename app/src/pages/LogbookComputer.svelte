@@ -436,13 +436,13 @@
       font-weight: 500;
       text-wrap: balance;
       color: var(--bc-text);
-    }
 
-    :global(.ios) .bc-logbook-computer--title {
-      margin-top: 12px;
-      line-height: 34px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
+      :global(.ios) & {
+        margin-top: 12px;
+        line-height: 34px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
     }
 
     /* The image: a white 160 box with 28 dp corners around the 136 photo (Android phone); iPhone, the 160 photo alone. */
@@ -452,10 +452,10 @@
       flex-direction: column;
       align-items: center;
       gap: 12px;
-    }
 
-    :global(.ios) .bc-logbook-computer--image {
-      gap: 4px;
+      :global(.ios) & {
+        gap: 4px;
+      }
     }
 
     .bc-logbook-computer--picture {
@@ -517,10 +517,10 @@
       margin: 24px 16px 0;
       display: flex;
       flex-direction: column;
-    }
 
-    :global(.ios) .bc-logbook-computer--column {
-      margin-top: 4px;
+      :global(.ios) & {
+        margin-top: 4px;
+      }
     }
 
     .bc-logbook-computer--facts {
@@ -528,13 +528,13 @@
       padding: 4px 0;
       border-radius: 20px;
       background: var(--bc-surface);
-    }
 
-    :global(.ios) .bc-logbook-computer--facts {
-      margin-top: 16px;
-      padding: 0;
-      border-radius: 10px;
-      overflow: hidden;
+      :global(.ios) & {
+        margin-top: 16px;
+        padding: 0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
     }
 
     .bc-logbook-computer--fact {
@@ -553,16 +553,16 @@
         text-align: right;
         overflow-wrap: anywhere;
       }
-    }
 
-    :global(.ios) .bc-logbook-computer--fact {
-      min-height: 44px;
-      font-size: 17px;
+      :global(.ios) & {
+        min-height: 44px;
+        font-size: 17px;
 
-      + .bc-logbook-computer--fact {
-        border-top: 0.5px solid var(--bc-row-divider);
-        margin-inline-start: 16px;
-        padding-inline-start: 0;
+        + .bc-logbook-computer--fact {
+          border-top: 0.5px solid var(--bc-row-divider);
+          margin-inline-start: 16px;
+          padding-inline-start: 0;
+        }
       }
     }
 
@@ -703,10 +703,10 @@
         background: transparent;
         color: var(--bc-text);
         font: inherit;
-      }
 
-      > input:disabled {
-        color: var(--bc-text-2);
+        &:disabled {
+          color: var(--bc-text-2);
+        }
       }
     }
 

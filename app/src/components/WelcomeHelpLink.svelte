@@ -76,14 +76,14 @@
         transform: translateX(-50%);
         white-space: nowrap;
       }
-    }
 
-    /* The last item of the step's column: in the flow, 24 dp under the content, 28 dp above the foot. */
-    .bc-welcome-help-link.bc-welcome-help-link--column {
-      position: static;
-      flex: none;
-      margin: 24px auto 0;
-      transform: none;
+      /* The last item of the step's column: in the flow, 24 dp under the content, 28 dp above the foot. */
+      &.bc-welcome-help-link--column {
+        position: static;
+        flex: none;
+        margin: 24px auto 0;
+        transform: none;
+      }
     }
 
     /* Beside the blue panel of the tablet's first launch (task 2026-11-16-237): in the middle of the choices' side. */

@@ -12,6 +12,6 @@ test('the search box is 8 px under the summary', () => {
 });
 
 test('the band gives the 8 px back under the search box: 40 px of blue before the wave', () => {
-  assert.match(band, /&\.bc-section-band--tall:has\(:global\(\.bc-band-search\)\) \{\s*padding-bottom: 40px;/);
+  assert.match(band, /&:has\(:global\(\.bc-band-search\)\) \{\s*padding-bottom: 40px;/);
   assert.match(band, /padding: 0 16px 32px;/, 'other bands keep 32 px');
 });

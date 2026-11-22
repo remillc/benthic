@@ -594,11 +594,11 @@
         margin: 16px 12px 24px;
         padding-bottom: 20px;
         border-radius: 28px;
-      }
 
-      :global(.ios) .bc-settings-maps--add-pane {
-        border-radius: 10px;
-        border-left: none;
+        :global(.ios) & {
+          border-radius: 10px;
+          border-left: none;
+        }
       }
     }
 
@@ -613,16 +613,16 @@
       border-radius: 28px 0 0 28px;
       padding-top: 8px;
       --bc-field-margin: 12px;
-    }
 
-    :global(.ios) .bc-settings-maps--add-pane {
-      background: var(--bc-background);
-      border-radius: 0;
-      border-left: 1px solid var(--bc-separator);
-    }
+      :global(.ios) & {
+        background: var(--bc-background);
+        border-radius: 0;
+        border-left: 1px solid var(--bc-separator);
+      }
 
-    .bc-settings-maps--add-pane .bc-settings-maps--filled {
-      margin: 16px 20px 0;
+      & .bc-settings-maps--filled {
+        margin: 16px 20px 0;
+      }
     }
 
     .bc-settings-maps--add-title {

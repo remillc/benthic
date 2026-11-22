@@ -304,14 +304,14 @@
         flex: 1;
         min-height: 56px;
         margin: 16px 4px 24px;
-      }
 
-      /* Its height is the flex item's, which a percentage cannot reach: the profile fills it by position. */
-      .bc-welcome-release--profile :global(.bc-release-profile) {
-        position: absolute;
-        inset: 0;
-        width: auto;
-        height: auto;
+        /* Its height is the flex item's, which a percentage cannot reach: the profile fills it by position. */
+        & :global(.bc-release-profile) {
+          position: absolute;
+          inset: 0;
+          width: auto;
+          height: auto;
+        }
       }
     }
   }

@@ -71,15 +71,15 @@
       padding: 24px;
       display: flex;
       flex-direction: column;
-    }
 
-    /* Wider than the column (task 224): 724 dp in landscape, 624 dp in portrait, never closer than 48 dp to the
-       edges of the pane (it is 844 dp wide in landscape on a 1 280 dp screen: 60 dp on each side). */
-    .bc-release-empty--column :global(.bc-release-empty--profile) {
-      align-self: center;
-      height: 172px;
-      width: min(724px, calc(100vw - var(--bc-nav-width, 96px) - var(--f7-page-master-width, 340px) - 96px));
-      margin-bottom: 32px;
+      /* Wider than the column (task 224): 724 dp in landscape, 624 dp in portrait, never closer than 48 dp to the
+         edges of the pane (it is 844 dp wide in landscape on a 1 280 dp screen: 60 dp on each side). */
+      & :global(.bc-release-empty--profile) {
+        align-self: center;
+        height: 172px;
+        width: min(724px, calc(100vw - var(--bc-nav-width, 96px) - var(--f7-page-master-width, 340px) - 96px));
+        margin-bottom: 32px;
+      }
     }
 
     .bc-release-empty--title {

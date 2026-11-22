@@ -394,9 +394,10 @@
         font-size: 14px;
         text-align: start;
         cursor: pointer;
-      }
-      & button:hover {
-        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+
+        &:hover {
+          background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+        }
       }
     }
   }

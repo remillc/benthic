@@ -31,13 +31,13 @@
       display: inline-flex;
       gap: 2px;
       flex: none;
-    }
 
-    .bc-stars {
-      --bc-stars-ink: var(--bc-text);
+      & {
+        --bc-stars-ink: var(--bc-text);
 
-      &.bc-stars--summary {
-        --bc-stars-ink: var(--bc-star-summary);
+        &.bc-stars--summary {
+          --bc-stars-ink: var(--bc-star-summary);
+        }
       }
     }
 

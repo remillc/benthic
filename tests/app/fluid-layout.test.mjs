@@ -20,7 +20,7 @@ test('the overflow audit exists, refuses the developer window and documents its 
 
 test('scrollbars: thin in the desktop app, never on the page itself', () => {
   const css = read('app/src/theme.css');
-  assert.match(css, /html\.bc-desktop-app \* \{\s*scrollbar-width: thin;/);
+  assert.match(css, /& \* \{\s*scrollbar-width: thin;/);
   assert.match(css, /html\.bc-desktop-app body \{\s*scrollbar-width: none;/);
 });
 

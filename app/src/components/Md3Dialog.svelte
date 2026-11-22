@@ -204,28 +204,28 @@
       align-items: center;
       justify-content: flex-end;
       gap: 8px;
-    }
 
-    .bc-md3-dialog--actions :global(button) {
-      /* Framework7 stretches buttons: text buttons keep their own width. */
-      width: auto;
-      flex: none;
-      height: 40px;
-      padding: 0 12px;
-      border: none;
-      border-radius: 20px;
-      background: none;
-      color: var(--bc-action);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.1px;
-      white-space: nowrap;
-      cursor: pointer;
-    }
+      & :global(button) {
+        /* Framework7 stretches buttons: text buttons keep their own width. */
+        width: auto;
+        flex: none;
+        height: 40px;
+        padding: 0 12px;
+        border: none;
+        border-radius: 20px;
+        background: none;
+        color: var(--bc-action);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+        white-space: nowrap;
+        cursor: pointer;
+      }
 
-    .bc-md3-dialog--actions :global(.bc-md3-dialog--start) {
-      margin-right: auto;
+      & :global(.bc-md3-dialog--start) {
+        margin-right: auto;
+      }
     }
 
     /* Not on one line: one per line, aligned to the end, the main action (the last) on top. */

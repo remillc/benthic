@@ -797,11 +797,9 @@
         top: calc(var(--f7-safe-area-top, var(--bc-safe-top)) + 8px);
         right: 16px;
       }
-    }
 
-    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
-    @media (hover: hover) and (pointer: fine) {
-      .bc-map-fullscreen-button {
+      /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
+      @media (hover: hover) and (pointer: fine) {
         transition: box-shadow 120ms linear;
         &:not(:disabled):hover {
           box-shadow:
@@ -809,9 +807,8 @@
           0 1px 3px rgb(0 0 0 / 0.2);
         }
       }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .bc-map-fullscreen-button {
+
+      @media (prefers-reduced-motion: reduce) {
         transition: none;
       }
     }

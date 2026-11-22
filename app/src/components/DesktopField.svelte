@@ -116,14 +116,14 @@
       color: var(--bc-alarm-on-field);
     }
 
-
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
       select.bc-desktop-field--input {
         transition: background-color 120ms linear;
-      }
-      select.bc-desktop-field--input:hover {
-        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+
+        &:hover {
+          background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+        }
       }
     }
   }

@@ -99,11 +99,9 @@
       & > :not(.bc-nav-rail--spacer) {
         flex-shrink: 0;
       }
-    }
 
-    /* A low window (the desktop app's smallest is 560 dp, less its title bar): closer items keep the account button in view. */
-    @media (max-height: 520px) {
-      .bc-nav-rail--rail {
+      /* A low window (the desktop app's smallest is 560 dp, less its title bar): closer items keep the account button in view. */
+      @media (max-height: 520px) {
         gap: 4px;
         padding-top: calc(var(--f7-safe-area-top) + 12px);
       }
@@ -151,13 +149,11 @@
           border-radius: 24px;
         }
       }
-    }
 
-    /* Mouse (the desktop app, task 2026-11-15-180): the Material 3 hover layer on the pill, ink
-       for the icon and label; the active pill keeps its colours under the layer. An action: the hand pointer
-       (docs/system-design.md, « Pointer »). */
-    @media (hover: hover) and (pointer: fine) {
-      .bc-nav-rail--item {
+      /* Mouse (the desktop app, task 2026-11-15-180): the Material 3 hover layer on the pill, ink
+         for the icon and label; the active pill keeps its colours under the layer. An action: the hand pointer
+         (docs/system-design.md, « Pointer »). */
+      @media (hover: hover) and (pointer: fine) {
         cursor: pointer;
 
         .bc-nav-rail--icon {
@@ -179,19 +175,21 @@
           color: var(--bc-text);
         }
       }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .bc-nav-rail--item .bc-nav-rail--icon::after {
-        transition: none;
-      }
-    }
-    /* Keyboard focus: the Material 3 focus ring, 2 dp outside the pill. */
-    .bc-nav-rail--item:focus-visible {
-      outline: none;
 
-      .bc-nav-rail--icon {
-        outline: 2px solid var(--bc-on-table-selected);
-        outline-offset: 2px;
+      @media (prefers-reduced-motion: reduce) {
+        .bc-nav-rail--icon::after {
+          transition: none;
+        }
+      }
+
+      /* Keyboard focus: the Material 3 focus ring, 2 dp outside the pill. */
+      &:focus-visible {
+        outline: none;
+
+        .bc-nav-rail--icon {
+          outline: 2px solid var(--bc-on-table-selected);
+          outline-offset: 2px;
+        }
       }
     }
 

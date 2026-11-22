@@ -107,17 +107,13 @@
         outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
-    }
 
-/* Phone (task 2026-11-16-227): the button takes the width of the column. */
-    @media (max-width: 767.98px) {
-      .bc-first-launch-webdav--action {
+      /* Phone (task 2026-11-16-227): the button takes the width of the column. */
+      @media (max-width: 767.98px) {
         align-self: stretch;
       }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      .bc-first-launch-webdav--action {
+      @media (prefers-reduced-motion: reduce) {
         transition: none;
       }
     }

@@ -98,11 +98,11 @@
         box-shadow: 0 4px 16px rgb(0 0 0 / 0.24);
         pointer-events: none;
       }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      .bc-cylinder-card.bc-cylinder-card--shifted {
-        transition: none;
+      @media (prefers-reduced-motion: reduce) {
+        &.bc-cylinder-card--shifted {
+          transition: none;
+        }
       }
     }
 

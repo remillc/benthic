@@ -531,9 +531,10 @@
     .bc-desktop-account--row-line {
       font-size: 13px;
       color: var(--bc-text-2);
-    }
-    .bc-desktop-account--row-line.bc-desktop-account--late-line {
-      color: var(--bc-late-text);
+
+      &.bc-desktop-account--late-line {
+        color: var(--bc-late-text);
+      }
     }
     .bc-desktop-account--late-badge {
       flex: none;
@@ -635,14 +636,16 @@
       justify-content: space-between;
       gap: 12px;
       padding: 12px 16px;
-    }
-    .bc-desktop-account--syncline :global(.bc-sync-button) {
-      flex: none;
-      white-space: nowrap;
-    }
-    .bc-desktop-account--syncline :global(.bc-sync-status) {
-      flex: 1;
-      min-width: 0;
+
+      :global(.bc-sync-button) {
+        flex: none;
+        white-space: nowrap;
+      }
+
+      :global(.bc-sync-status) {
+        flex: 1;
+        min-width: 0;
+      }
     }
     .bc-desktop-account--entry {
       display: flex;

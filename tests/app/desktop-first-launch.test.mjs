@@ -113,7 +113,7 @@ test('the sign-in hint reads on two lines, centred, on the desktop too (task 230
   assert.match(steps, /\.bc-first-launch--hint \{\s+align-self: center;[\s\S]*?white-space: pre-line;/);
   assert.match(steps, /\.bc-first-launch--action\.bc-first-launch--action-centre \{\s+align-self: center;/);
   // The desktop keeps the button centred where a narrow window would match the phone rules.
-  assert.match(steps, /\.bc-first-launch--desktop \{[\s\S]*?\.bc-first-launch--action\.bc-first-launch--action-centre \{\s+align-self: center;/);
+  assert.match(steps, /\.bc-first-launch--desktop \{[\s\S]*?(?:\.bc-first-launch--action\.|&\.)bc-first-launch--action-centre \{\s+align-self: center;/);
 });
 
 // --- The drop --------------------------------------------------------------------------------------------

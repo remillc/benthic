@@ -50,9 +50,8 @@
       inset: var(--bc-safe-top) 0 var(--bc-safe-bottom);
       display: flex;
       background: var(--bc-surface);
-    }
-    @media (min-width: 1200px) {
-      .bc-pf {
+
+      @media (min-width: 1200px) {
         --bc-pf-nav: var(--bc-pf-nav-width, 330px);
         --bc-pf-list: 440px;
       }

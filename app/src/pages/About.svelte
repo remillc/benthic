@@ -325,10 +325,8 @@
           font-size: 17px;
         }
       }
-    }
 
-    @media (min-width: 768px) {
-      .bc-about--free-actions {
+      @media (min-width: 768px) {
         flex-direction: row;
         flex-wrap: wrap;
       }

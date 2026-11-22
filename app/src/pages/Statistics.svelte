@@ -274,15 +274,15 @@
     .block-title {
       margin: 22px 16px 8px;
       color: var(--bc-text-2);
-    }
 
-    /* iPhone (docs/mockups/ios-stats-tableau): small-capitals titles. */
-    :global(.ios) .block-title {
-      margin: 22px 32px 6px;
-      font-size: 13px;
-      line-height: 18px;
-      font-weight: 400;
-      text-transform: uppercase;
+      /* iPhone (docs/mockups/ios-stats-tableau): small-capitals titles. */
+      :global(.ios) & {
+        margin: 22px 32px 6px;
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
     }
 
     :global(.ios) .bc-statistics--toggle-text {
@@ -428,19 +428,19 @@
       scroll-snap-type: x mandatory;
       scroll-padding: 0 16px;
       scrollbar-width: none;
-    }
 
-    /* The desktop app (a mouse has no swipe, fluid layout): the cards wrap in the pane's width instead of scrolling sideways. */
-    :global(html.bc-desktop-app) .bc-statistics--charts {
-      flex-wrap: wrap;
-      overflow-x: visible;
-      scroll-snap-type: none;
+      /* The desktop app (a mouse has no swipe, fluid layout): the cards wrap in the pane's width instead of scrolling sideways. */
+      :global(html.bc-desktop-app) & {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        scroll-snap-type: none;
 
-      .bc-statistics--chart-card {
-        flex: 1 1 272px;
-        width: auto;
-        min-width: 0;
-        max-width: 100%;
+        .bc-statistics--chart-card {
+          flex: 1 1 272px;
+          width: auto;
+          min-width: 0;
+          max-width: 100%;
+        }
       }
     }
 

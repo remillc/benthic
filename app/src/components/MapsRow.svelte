@@ -99,92 +99,92 @@
       gap: 2px;
       font-size: 16px;
       line-height: 24px;
-    }
 
-    /* The lines the screens put in the body. */
-    .bc-maps-row--body :global(.bc-maps-row--supporting) {
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--bc-text-2);
-      font-variant-numeric: tabular-nums;
-    }
+      /* The lines the screens put in the body. */
+      & :global(.bc-maps-row--supporting) {
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--bc-text-2);
+        font-variant-numeric: tabular-nums;
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--note) {
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--bc-text-2);
-    }
+      & :global(.bc-maps-row--note) {
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--bc-text-2);
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--status) {
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: 600;
-      color: var(--bc-secondary);
-    }
+      & :global(.bc-maps-row--status) {
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600;
+        color: var(--bc-secondary);
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--status svg) {
-      flex: none;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
+      & :global(.bc-maps-row--status svg) {
+        flex: none;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--status.bc-maps-row--error) {
-      color: var(--bc-error);
-    }
+      & :global(.bc-maps-row--status.bc-maps-row--error) {
+        color: var(--bc-error);
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--status.bc-maps-row--muted) {
-      font-weight: 500;
-      color: var(--bc-text-2);
-    }
+      & :global(.bc-maps-row--status.bc-maps-row--muted) {
+        font-weight: 500;
+        color: var(--bc-text-2);
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--progress) {
-      margin-top: 8px;
-      height: 4px;
-      border-radius: 2px;
-      background: var(--bc-primary-container);
-      overflow: hidden;
-    }
+      & :global(.bc-maps-row--progress) {
+        margin-top: 8px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--bc-primary-container);
+        overflow: hidden;
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--wavy) {
-      margin-top: 4px;
-    }
+      & :global(.bc-maps-row--wavy) {
+        margin-top: 4px;
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--progress > span) {
-      display: block;
-      height: 100%;
-      border-radius: 2px;
-      background: var(--bc-text);
-    }
+      & :global(.bc-maps-row--progress > span) {
+        display: block;
+        height: 100%;
+        border-radius: 2px;
+        background: var(--bc-text);
+      }
 
-    /* Text buttons under the texts: Framework7 stretches buttons, these keep their width. */
-    .bc-maps-row--body :global(.bc-maps-row--actions) {
-      margin: 4px 0 -8px -12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0;
-    }
+      /* Text buttons under the texts: Framework7 stretches buttons, these keep their width. */
+      & :global(.bc-maps-row--actions) {
+        margin: 4px 0 -8px -12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+      }
 
-    .bc-maps-row--body :global(.bc-maps-row--actions button) {
-      width: auto;
-      flex: none;
-      height: 40px;
-      padding: 0 12px;
-      border: none;
-      border-radius: 20px;
-      background: none;
-      color: var(--bc-text);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.1px;
-      cursor: pointer;
+      & :global(.bc-maps-row--actions button) {
+        width: auto;
+        flex: none;
+        height: 40px;
+        padding: 0 12px;
+        border: none;
+        border-radius: 20px;
+        background: none;
+        color: var(--bc-text);
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.1px;
+        cursor: pointer;
+      }
     }
 
     /* A 48 dp icon button at the end of the row (the ⋮ menu, the download icon, ✕). */
