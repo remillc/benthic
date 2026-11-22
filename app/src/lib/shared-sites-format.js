@@ -1,7 +1,5 @@
 // @ts-check
-// The words of the shared map (task 2026-11-19-315), the same on every screen: « 214 plongées » or « Moins de 5
-// plongées », « à 1,1 mi », a row of the list (« 214 plongées · à 1,1 mi », « Dans vos sites · 31 plongées ») and the
-// line of the map's card (« Nouvelle-Zélande · carte commune · 214 plongées »).
+// The words of the shared map and site sheet (task 2026-11-19-315).
 import { t } from './i18n.js';
 import { formatNumber } from './format.js';
 import { distanceParts } from './site-distance.js';
@@ -33,11 +31,11 @@ export const distanceText = (metres, prefs) => t('sites.chooseAway', { distance:
  * @param {{ length?: string }} prefs
  */
 export function baseRowText(site, links, prefs) {
-  if (inYourSites(site.id, links)) return [t('sharedSites.inYourSites'), baseDivesText(site)].join(' · ');
-  return [baseDivesText(site), site.distanceM !== undefined ? distanceText(site.distanceM, prefs) : ''].filter(Boolean).join(' · ');
+  if (inYourSites(site.id, links)) return t('sharedSites.inYourSites');
+  return site.distanceM !== undefined ? distanceText(site.distanceM, prefs) : '';
 }
 
-/** « Nouvelle-Zélande · carte commune · 214 plongées ». @param {import('./shared-sites.js').BaseSite} site */
-export function baseCardLine(site) {
-  return [site.country, t('sharedSites.commonMap'), baseDivesText(site)].filter(Boolean).join(' · ');
+/** @param {import('./shared-sites.js').BaseSite} site @param {boolean} [includeDives] */
+export function baseCardLine(site, includeDives = true) {
+  return [site.country, t('sharedSites.commonMap'), includeDives ? baseDivesText(site) : ''].filter(Boolean).join(' · ');
 }

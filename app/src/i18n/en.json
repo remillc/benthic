@@ -2268,6 +2268,7 @@
     "mapFullscreen": "Map of the sites, full screen",
     "mapWithSites": "{map}: {list}",
     "mapSite": "{name} {place}, {dives}",
+    "mapSiteWithoutDives": "{name} {place}",
     "mapPin": "{name}, {dives}",
     "openSiteSheet": "Open the site sheet",
     "stackTitle": {
@@ -2724,6 +2725,7 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
+      "Shared map: dive counts are hidden and site names appear when zooming in.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
       "Desktop: the account menu no longer shows a plus sign on the initial.",

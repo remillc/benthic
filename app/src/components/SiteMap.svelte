@@ -38,7 +38,9 @@
    *   points?: { n: number, latUdeg: number, lonUdeg: number }[],
    *   muted?: boolean,
    *   label?: string,
-   *   names?: 'always'|'fewInFullScreen'|'never',
+   *   names?: 'always'|'fewInFullScreen'|'never'|'atZoom',
+   *   namesFromZoom?: number,
+   *   hideDiveCounts?: boolean,
    *   selected?: number|null,
    *   onstack?: (uuids: number[], at: { latUdeg: number, lonUdeg: number }) => void,
    *   onmapclick?: () => void,
@@ -69,6 +71,8 @@
    * closerInFullScreen: full screen opens on the same area, slightly closer.
    * names: « fewInFullScreen » (Sites, task 2026-11-14-150): the names show only in full
    *   screen, with 8 pins or fewer in view and no two names overlapping.
+   *   « atZoom » shows site names from namesFromZoom, including shared sites.
+   * hideDiveCounts: omit dive counts from pins and the map's accessible name.
    * selected: the site whose pin is selected (1.3×, a halo in the secondary colour, in front).
    * onstack: a tap that touches several pins (within the 48 dp target) gives them all.
    * onmapclick: a tap on the map, not on a pin.
@@ -96,6 +100,8 @@
     muted = false,
     label: givenLabel,
     names = 'always',
+    namesFromZoom = 13,
+    hideDiveCounts = false,
     selected = null,
     onstack,
     onmapclick,
@@ -133,7 +139,9 @@
       {
         map: mapName,
         withSites: (list) => t('sites.mapWithSites', { map: mapName, list }),
-        item: (name, place, dives) => t('sites.mapSite', { name, place: t('sites.mapPlace' + PLACE[place]), dives: divesText(dives) }),
+        item: (name, place, dives) => hideDiveCounts
+          ? t('sites.mapSiteWithoutDives', { name, place: t('sites.mapPlace' + PLACE[place]) })
+          : t('sites.mapSite', { name, place: t('sites.mapPlace' + PLACE[place]), dives: divesText(dives) }),
         join: '. ',
       },
     ),
@@ -243,7 +251,7 @@
   let pointMarkers = [];
   /** @type {import('maplibre-gl').Marker|undefined} */
   let stackMarker;
-  /** Whether the names show (names « fewInFullScreen »). */
+  /** Whether names controlled by the map's display mode are shown. */
   let namesOn = $state(false);
 
   const numbers = new Intl.NumberFormat(typeof document === 'undefined' ? undefined : document.documentElement.lang || undefined);
@@ -265,7 +273,7 @@
       if (muted) el.setAttribute('aria-hidden', 'true');
       else {
         /** @type {HTMLButtonElement} */ (el).type = 'button';
-        el.setAttribute('aria-label', site.dives ? t('sites.mapPin', { name, dives: divesText(site.dives) }) : name);
+        el.setAttribute('aria-label', !hideDiveCounts && site.dives ? t('sites.mapPin', { name, dives: divesText(site.dives) }) : name);
       }
       el.className = muted ? 'bc-site-map--site-marker bc-site-map--muted' : 'bc-site-map--site-marker';
       const svg = 'http://www.w3.org/2000/svg';
@@ -283,7 +291,7 @@
         dot.setAttribute('cy', '-24');
         dot.setAttribute('r', '5');
         drawing.append(dot);
-      } else if (site.dives) {
+      } else if (!hideDiveCounts && site.dives) {
         const count = document.createElementNS(svg, 'text');
         count.setAttribute('x', '0');
         count.setAttribute('y', '-19.5');
@@ -363,13 +371,14 @@
   });
 
   /**
-   * Names in full screen only, with 8 pins or fewer in view and none overlapping
-   * another (names « fewInFullScreen »).
+   * Names follow the zoom in shared mode, or the full-screen overlap rule in personal mode.
    */
   function updateNames() {
     if (names === 'always' || !map) return;
     let on = false;
-    if (full && names !== 'never') {
+    if (names === 'atZoom') {
+      on = map.getZoom() >= namesFromZoom;
+    } else if (full && names !== 'never') {
       const b = map.getBounds();
       const inView = markers.filter((m) => b.contains(m.marker.getLngLat()));
       if (inView.length <= 8) {
@@ -386,6 +395,8 @@
 
   $effect(() => {
     full;
+    names;
+    namesFromZoom;
     if (map?.loaded()) tick().then(updateNames);
   });
 
@@ -432,6 +443,11 @@
       el.classList.toggle('bc-site-map--base-selected', s.id === baseSelected);
       el.dataset.baseId = s.id;
       el.setAttribute('aria-label', s.label);
+      const text = document.createElement('span');
+      text.className = 'bc-site-map--base-name';
+      text.setAttribute('aria-hidden', 'true');
+      text.textContent = s.name;
+      el.append(text);
       el.addEventListener('click', (e) => {
         e.stopPropagation();
         onbaseselect?.(s.id);
@@ -531,7 +547,10 @@
     });
     // The heat follows the map as it moves.
     m.on('move', scheduleHeat);
-    m.on('zoom', zoomLayers);
+    m.on('zoom', () => {
+      zoomLayers();
+      if (names === 'atZoom') updateNames();
+    });
     m.on('resize', scheduleHeat);
     // Where the map looks, for the offline hint (Sites).
     m.on('moveend', () => {
@@ -617,6 +636,7 @@
 
   $effect(() => {
     sites;
+    hideDiveCounts;
     if (map?.loaded()) {
       drawSites();
     }
@@ -848,6 +868,25 @@
     :global(.bc-site-map--base-site) {
       width: 16px;
       height: 16px;
+    }
+    :global(.bc-site-map--base-name) {
+      position: absolute;
+      left: 22px;
+      top: -3px;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      line-height: 18px;
+      font-weight: 500;
+      color: var(--bc-text);
+      -webkit-text-stroke: 4px var(--bc-surface);
+      paint-order: stroke fill;
+      pointer-events: none;
+    }
+    .bc-site-map:not(:global(.bc-site-map--names-on)) :global(.bc-site-map--base-name) {
+      display: none;
     }
     /* A 48 dp target around the 16 dp dot (the marker is positioned by MapLibre). */
     :global(.bc-site-map--base-site)::before {

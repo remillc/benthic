@@ -2268,6 +2268,7 @@
     "mapFullscreen": "Carte des sites en plein écran",
     "mapWithSites": "{map} : {list}",
     "mapSite": "{name} {place}, {dives}",
+    "mapSiteWithoutDives": "{name} {place}",
     "mapPin": "{name}, {dives}",
     "openSiteSheet": "Ouvrir la fiche du site",
     "stackTitle": {
@@ -2724,6 +2725,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
+      "Carte commune : les nombres de plongées sont masqués et les noms des sites apparaissent en zoomant.",
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",
       "Desktop : le signe « + » n’apparaît plus sur l’initiale dans le menu Compte.",
