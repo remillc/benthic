@@ -133,9 +133,6 @@ contextBridge.exposeInMainWorld('odDesktop', {
     startup: () => invoke('od:logbooks', 'startup'),
     setStartup: (options) => invoke('od:logbooks', 'setStartup', options),
     create: (options) => invoke('od:logbooks', 'create', options),
-    saveCopy: () => invoke('od:logbooks', 'saveCopy'),
-    openCopy: (options) => invoke('od:logbooks', 'openCopy', options),
-    revealCopy: (options) => invoke('od:logbooks', 'revealCopy', options),
     /** The path of a file dropped on the window (the renderer cannot read it). */
     pathForFile: (file) => {
       try {

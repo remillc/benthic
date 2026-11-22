@@ -6434,7 +6434,7 @@ Christian approved this on 22 November 2026. Work in `main`.
 
 In the `serverOffline` step of `FirstLaunchServer.svelte` (phone, iPhone, tablet portrait and landscape, desktop): « Retour » stays at the top left; the icon tile, the title, the help text and the two buttons form one block, centred vertically in the space between « Retour » and the « Une question ? » link, with the title and text centred horizontally. On tablet and desktop the two buttons are centred under the text (they were aligned to the right); on the phone « Réessayer » keeps the full width. Mock-ups: `android-serveur-hors-ligne`, `android-tablette-serveur-hors-ligne-portrait`, `android-tablette-serveur-hors-ligne-paysage`, `bureau-serveur-hors-ligne`; update `docs/mockups/` the same way.
 
-## [ ] 2026-11-22-323 Desktop menus cleaned up, and the .benthic export format (#163)
+## [x] 2026-11-22-323 Desktop menus cleaned up, and the .benthic export format (#163)
 
 Christian approved this on 22 November 2026. Work in `main`.
 
@@ -6454,3 +6454,5 @@ Christian approved this on 22 November 2026. Work in `main`.
 **Mock-ups:** `bureau-carnets-menu-fichier-macos`, `bureau-carnets-selecteur` on the tablet and desktop canvas; update `docs/mockups/` the same way. The export dialog with the .benthic row will be drawn with #140.
 
 **Test:** the desktop File menu and logbook selector no longer show « Enregistrer une copie » nor « Télécharger mes plongées »; exporting the whole logbook offers .benthic and writes a file that unzips to the layout of `full-export.js`; « Télécharger mes données » writes the same kind of file.
+
+Done on 22 November 2026: the menus, the export dialogs (desktop dialog, phone sheet), the `<logbook>.benthic` name in `full-export.js`, and the registration of `.benthic` / `application/vnd.benthic+zip` (electron-builder `fileAssociations`, Android intent filters, iOS `Info.plist` type declaration). Not done: the photos and videos choice (the « Télécharger mes données » screen is still to-do #57, the engine takes `withMedia`) and opening a .benthic (#113).

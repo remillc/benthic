@@ -2743,6 +2743,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop: « Save a copy » and « Download my dives » leave the menus, and « Export the logbook » leaves the ⋮ menu. To make a copy, export the logbook.",
+      "Export: « Benthic file (.benthic) » writes the whole logbook and your data (equipment, profile, certifications, settings). It is offered for the whole logbook only.",
       "First launch: « The server does not respond » is centred, buttons included.",
       "Tools, decompression: the caption under the tissue charts is shorter.",
       "First launch: light rays from the top right corner replace the stripes of the blue band.",
@@ -4037,6 +4039,7 @@
     },
     "text": "Choose a format. The file then opens in the phone’s share sheet.",
     "formats": {
+      "benthic": "Benthic file (.benthic)",
       "ssrf": "Logbook file (.ssrf)",
       "uddf": "UDDF (.uddf)",
       "csv": "CSV, list of dives",
@@ -4044,6 +4047,7 @@
       "pdf": "PDF sheets"
     },
     "formatTexts": {
+      "benthic": "The whole logbook and your Benthic data: equipment, profile, certifications, settings",
       "ssrf": "Subsurface format, also readable by Benthic",
       "uddf": "Exchange format between dive programs",
       "csv": "One line per dive, for a spreadsheet",
@@ -4661,7 +4665,6 @@
       "recentTitle": "Recent logbooks · each opens in its own window",
       "newLogbook": "New logbook…",
       "openLogbook": "Open a logbook…",
-      "saveCopy": "Save a copy…",
       "closeLogbook": "Close the logbook",
       "noRecent": "No recent logbook"
     },
@@ -4671,7 +4674,6 @@
       "recentLogbooks": "Recent Logbooks",
       "clearRecent": "Clear List",
       "closeLogbook": "Close Logbook",
-      "saveCopy": "Save a Copy…",
       "noRecent": "No Recent Logbook"
     },
     "main": {
@@ -4681,8 +4683,6 @@
       "openTitle": "Open a logbook",
       "fileFilter": "Logbook",
       "newFileTitle": "New logbook",
-      "copyTitle": "Save a copy",
-      "copySuffix": "copy",
       "folderTitle": "Choose the folder"
     },
     "start": {
@@ -4786,12 +4786,6 @@
       "manual": "Log a dive by hand",
       "manualHelp": "For a dive without a computer",
       "drop": "You can also drop a file on this window."
-    },
-    "copy": {
-      "saved": "Copy saved",
-      "open": "Open",
-      "failed": "The copy could not be saved.",
-      "sameFile": "Choose a different file than the open logbook's."
     }
   },
   "desktopCloud": {
@@ -5300,7 +5294,6 @@
       "file": "File",
       "newDive": "New Dive",
       "import": "Import…",
-      "download": "Download my dives…",
       "export": "Export…",
       "print": "Print…",
       "edit": "Edit",
@@ -5403,6 +5396,7 @@
         "one": "Dive exported",
         "other": "{n} dives exported"
       },
+      "savedLogbook": "Logbook exported",
       "fileDives": "dives",
       "fileLogbook": "logbook",
       "logbook": "Export the logbook…"

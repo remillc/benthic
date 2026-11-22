@@ -28,6 +28,7 @@ import { sortedJson } from './file-store.js';
 import { toBase64 } from './secret-box.js';
 import { createZipWriter } from './zip-stream.js';
 import { fileExtension } from './profile.js';
+import { benthicExportName } from './logbook-name.js';
 
 /** The archive's format, in `manifest.json`: raised when its layout changes in a way a reader must know. */
 export const EXPORT_FORMAT = 1;
@@ -267,11 +268,11 @@ certifications with their card photos are written in clear text. Keep it somewhe
 /** A file name that is safe in an archive: no folders, no control characters. @param {string} name */
 const safeName = (name) => name.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').replace(/^\.+/, '_') || 'file';
 
-/** @param {number} n */
-const pad = (n) => String(n).padStart(2, '0');
-
-/** The archive's file name: `opendives-data-YYYY-MM-DD.zip`. @param {Date} d */
-export const exportFileName = (d) => `opendives-data-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.zip`;
+/**
+ * The archive's file name: `<logbook>.benthic` (task 2026-11-22-323; the same ZIP as before, with its own extension).
+ * @param {string} [logbookName] the logbook's name as the app shows it
+ */
+export const exportFileName = (logbookName = '') => benthicExportName(logbookName);
 
 /**
  * @typedef {Object} ExportProgress
@@ -287,11 +288,11 @@ export const exportFileName = (d) => `opendives-data-${d.getFullYear()}-${pad(d.
  * Writes the archive. Progress is in bytes of content (`doneBytes` of `totalBytes`), so that the time-left
  * estimator (lib/time-left.js) can be fed with them. On cancel or failure the file is deleted and the error is
  * thrown (an `AbortError` for a cancel).
- * @param {{ withMedia?: boolean, onProgress?: (p: ExportProgress) => void, signal?: AbortSignal, zip64At?: number }} [options]
+ * @param {{ withMedia?: boolean, onProgress?: (p: ExportProgress) => void, signal?: AbortSignal, zip64At?: number, logbookName?: string }} [options] `logbookName` names the file
  * @param {ExportDeps} [deps] the real services when missing
  * @returns {Promise<{ file: ExportFile, manifest: any, skipped: { path: string, reason: string }[] }>}
  */
-export async function buildExport({ withMedia = false, onProgress, signal, zip64At } = {}, deps) {
+export async function buildExport({ withMedia = false, onProgress, signal, zip64At, logbookName = '' } = {}, deps) {
   deps ??= await defaultDeps();
   const now = (deps.now ?? (() => new Date()))();
   const aborted = () => signal?.aborted === true;
@@ -326,7 +327,7 @@ export async function buildExport({ withMedia = false, onProgress, signal, zip64
   /** @type {SinkFile} */
   let sink;
   try {
-    sink = await deps.openFile(exportFileName(now));
+    sink = await deps.openFile(exportFileName(logbookName));
   } catch (e) {
     await logbookFile?.dispose().catch(() => {});
     throw e;

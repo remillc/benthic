@@ -140,28 +140,11 @@ export async function clearRecent() {
   }
 }
 
-/** « Enregistrer une copie… »: then « Copie enregistrée · Ouvrir » (task 2026-11-15-188). */
-export async function saveCopy() {
-  try {
-    const result = await bridge().logbooks.saveCopy();
-    if (result.canceled) return;
-    showSnackbar(t('desktopLogbooks.copy.saved'), {
-      action: t('desktopLogbooks.copy.open'),
-      onAction: () => openPath(result.path),
-    });
-  } catch (e) {
-    const code = /** @type {any} */ (e)?.message;
-    console.error('Saving a copy', e);
-    showSnackbar(code === 'SAME_FILE' ? t('desktopLogbooks.copy.sameFile') : t('desktopLogbooks.copy.failed'));
-  }
-}
-
-/** @param {'newLogbook'|'openLogbook'|'saveCopy'|'closeLogbook'|'renameLogbook'} command */
+/** @param {'newLogbook'|'openLogbook'|'closeLogbook'|'renameLogbook'} command */
 export function runCommand(command) {
   if (command === 'newLogbook') logbooks.dialog = true;
   else if (command === 'renameLogbook' && windowLogbook()) logbooks.renameDialog = true;
   else if (command === 'openLogbook') openLogbookDialog();
-  else if (command === 'saveCopy') saveCopy();
   else if (command === 'closeLogbook') closeLogbook();
 }
 
@@ -171,7 +154,7 @@ export function runCommand(command) {
 export function enableLogbookCommands() {
   if (!desktopApp) return () => {};
   const offMenu = bridge().onMenu?.((/** @type {string} */ command) => {
-    if (command === 'newLogbook' || command === 'saveCopy' || command === 'renameLogbook') runCommand(command);
+    if (command === 'newLogbook' || command === 'renameLogbook') runCommand(command);
   });
   /** @param {KeyboardEvent} e */
   const keydown = (e) => {
