@@ -10,6 +10,12 @@
 /** The longest surface interval between two dives that can be merged, in seconds. */
 export const MERGE_MAX_GAP_SECONDS = 60 * 60;
 
+/** @param {string} code */
+export function mergeErrorKey(code) {
+  if (code.includes('NUMBERING_CONFLICT')) return 'multiDive.mergeNumberConflict';
+  return code.startsWith('WRITE_LOCKED') ? 'edit.writeLocked' : 'multiDive.mergeFailed';
+}
+
 /**
  * « 2012-11-05T10:15:00 » (local time of the dive) as seconds on a common scale.
  * @param {string} date

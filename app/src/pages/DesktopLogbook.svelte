@@ -25,7 +25,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, importData, undoLastChange, deleteDives, tripChange, mergeDives } from '../lib/logbook.svelte.js';
-  import { canMerge } from '../lib/multi-dive.js';
+  import { canMerge, mergeErrorKey } from '../lib/multi-dive.js';
   import { selectionText, copyDives, clipboardDives, textToBase64 } from '../lib/desktop-clipboard.js';
   import { filter } from '../lib/filter.svelte.js';
   import { navigation, openSettings, openAbout } from '../lib/navigation.svelte.js';
@@ -354,7 +354,7 @@
     } catch (e) {
       console.error('Merge dives', e);
       const code = String(/** @type {any} */ (e)?.message ?? '');
-      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('multiDive.mergeFailed'));
+      showSnackbar(t(mergeErrorKey(code)));
     }
   }
 
