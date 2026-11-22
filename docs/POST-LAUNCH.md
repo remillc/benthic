@@ -16,3 +16,4 @@ Rules:
 - #111 [design] Vérifier périodiquement s’il existe de nouveaux modèles d’ordinateurs de plongée à ajouter (photos et base de modèles).
 - #114 [code] Après le lancement, prévoir une tâche récurrente pour mettre à jour les listes d'agences de certification et leurs certifications.
 - #170 [code] prévoir mettre à jour régulièrement les données provenant de [OpenDiving Commons](https://github.com/opendiving/opendiving-commons) dans la carte commune des sites de plongée. The development server fetches the complete catalogue at startup and every 24 hours, validates it before applying changes, and retains the previous data if the download or validation fails. Activated on the development server; review this maintenance after launch.
+- #178 [design] Revisiter la liste des types d’équipement et leurs propriétés dans l’app Garmin (Garmin Dive), et évaluer si on ajuste la nôtre (`GEAR_TYPES`, `app/src/lib/inventory.js`, et leurs champs).
