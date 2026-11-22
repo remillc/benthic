@@ -13,6 +13,7 @@ import { ios } from './layout.svelte.js';
 import { isDismissed, parseMarks, withMark, withoutMark } from './site-dismissed.js';
 
 export { pairKey } from './site-dismissed.js';
+export { parseCoordinates } from './coordinates.js';
 
 /**
  * Second line of a dive in the Sites screens: "104 min · Buddy Diver ·
@@ -164,40 +165,6 @@ export function formatCoordinates(latUdeg, lonUdeg, format = /** @type {any} */ 
     return `${Math.floor(tenths / 600)}° ${tenth.format((tenths % 600) / 10)}′ ${hemisphere}`;
   };
   return `${part(latUdeg, 'N', 'S')}  ${part(lonUdeg, 'E', 'W')}`;
-}
-
-/**
- * Coordinates typed by the diver, in any of the three formats: decimal
- * degrees ("-35.4485, 174.732", "-35.4485,174.732", or with decimal commas
- * "-35,4485; 174,732"), degrees and minutes ("35°26.9'S 174°43.9'E") or
- * degrees, minutes and seconds. Null when not understood.
- * @param {string} text
- * @returns {{latUdeg: number, lonUdeg: number}|null}
- */
-export function parseCoordinates(text) {
-  const raw = text.trim();
-  // Decimal degrees with points: a comma, semicolon or space between them.
-  const points = raw.match(/^(-?\d+(?:\.\d+)?)\s*[;,\s]\s*(-?\d+(?:\.\d+)?)$/);
-  if (points) return check(Number(points[1]), Number(points[2]));
-  // From here a comma between digits is a decimal comma.
-  const t = raw.replace(/(\d),(?=\d)/g, '$1.');
-  const decimal = t.match(/^(-?\d+(?:\.\d+)?)\s*[;\s]\s*(-?\d+(?:\.\d+)?)$/);
-  if (decimal) return check(Number(decimal[1]), Number(decimal[2]));
-  const part = String.raw`(\d+(?:\.\d+)?)\s*°\s*(?:(\d+(?:\.\d+)?)\s*['′]\s*)?(?:(\d+(?:\.\d+)?)\s*["″]\s*)?([NSEWOnsewo])`;
-  const dm = t.match(new RegExp(`^${part}[\\s,;]*${part}$`));
-  if (!dm) return null;
-  /** @param {string} d @param {string} m @param {string} s @param {string} h */
-  const value = (d, m, s, h) => {
-    const v = Number(d) + Number(m ?? 0) / 60 + Number(s ?? 0) / 3600;
-    return /[SWOswo]/.test(h) ? -v : v;
-  };
-  return check(value(dm[1], dm[2], dm[3], dm[4]), value(dm[5], dm[6], dm[7], dm[8]));
-
-  /** @param {number} lat @param {number} lon */
-  function check(lat, lon) {
-    if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
-    return { latUdeg: Math.round(lat * 1e6), lonUdeg: Math.round(lon * 1e6) };
-  }
 }
 
 /** Maps app link for a position ("Open in Maps"): the system's geo: link on Android. */
