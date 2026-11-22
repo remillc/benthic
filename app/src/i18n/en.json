@@ -1426,6 +1426,9 @@
       "restore": "Restore",
       "note": "A deleted dive stays recoverable with no time limit. Its photos and videos are kept for 90 days after the deletion, then erased.",
       "restored": "Dive brought back",
+      "restoredWithNumber": "Dive restored as no. {number}",
+      "restoredAndShifted": "Dive restored as no. {number}. The following dives were shifted.",
+      "numberFailed": "Dive restored, but its number could not be assigned.",
       "restoreFailed": "The dive could not be brought back. The logbook did not change."
     },
     "browse": {

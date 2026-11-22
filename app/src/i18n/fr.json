@@ -1426,6 +1426,9 @@
       "restore": "Restaurer",
       "note": "Une plongée supprimée reste récupérable sans limite de temps. Ses photos et vidéos sont gardées 90 jours après la suppression, puis effacées.",
       "restored": "Plongée rétablie",
+      "restoredWithNumber": "Plongée rétablie sous le N° {number}",
+      "restoredAndShifted": "Plongée rétablie sous le N° {number}. Les plongées suivantes ont été décalées.",
+      "numberFailed": "Plongée rétablie, mais son numéro n’a pas pu être attribué.",
       "restoreFailed": "La plongée n’a pas pu être rétablie. Le carnet n’a pas changé."
     },
     "browse": {

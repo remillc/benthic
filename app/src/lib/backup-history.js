@@ -516,3 +516,35 @@ export function keyOfDate(date) {
   const m = /^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})(?::(\d{2}))?/.exec(String(date));
   return m ? `${m[1]} ${m[2]}:${m[3] ?? '00'}` : '';
 }
+
+/**
+ * Gives an unnumbered restored dive its chronological number. If that number is already taken by the next dive, shifts
+ * the numbered dives after it by one; an existing gap is filled without moving any other dive.
+ * @param {string} key
+ * @param {{ id: number, date: string, number: number }[]} dives
+ * @returns {{ ids: number[], numbers: number[], number: number, shifted: boolean }|null}
+ */
+export function restoredDiveNumberPlan(key, dives) {
+  const ordered = [...dives].sort((a, b) => keyOfDate(a.date).localeCompare(keyOfDate(b.date)));
+  const index = ordered.findIndex((d) => keyOfDate(d.date) === key);
+  if (index < 0 || ordered[index].number > 0) return null;
+
+  const dive = ordered[index];
+  const previous = ordered.slice(0, index).reverse().find((d) => d.number > 0);
+  const next = ordered.slice(index + 1).find((d) => d.number > 0);
+  const number = (previous?.number ?? 0) + 1;
+  const used = ordered.some((d) => d.id !== dive.id && d.number === number);
+  const gap = !used && (!next || next.number > number);
+  const ids = [dive.id];
+  const numbers = [number];
+
+  if (!gap) {
+    for (const later of ordered.slice(index + 1)) {
+      if (later.number > 0) {
+        ids.push(later.id);
+        numbers.push(later.number + 1);
+      }
+    }
+  }
+  return { ids, numbers, number, shifted: !gap };
+}
