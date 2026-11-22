@@ -2630,9 +2630,9 @@
       "one": "{n} compartment at 90 % or more.",
       "other": "{n} compartments at 90 % or more."
     },
-    "chartText": "The 16 compartments of the Bühlmann model, fastest to slowest. At rest, desaturated, they are all at 0 %.",
+    "chartText": "One bar per tissue, fastest to slowest. At 0 %, the nitrogen is gone.",
     "overlap": "Two dives overlap in the logbook ({date}): the tissue calculation stops before them. Correct their times or delete the duplicate.",
-    "modelGf": "Gradient factors {low}/{high}, the planner's.",
+    "modelGf": "Bühlmann model, gradient factors {low} / {high}.",
     "modelVpmb": "Planner model: VPM-B +{n}.",
     "usedDives": "Calculated from",
     "noDives": "No logbook dive counts in this calculation.",
@@ -2743,6 +2743,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Tools, decompression: the caption under the tissue charts is shorter.",
       "First launch: light rays from the top right corner replace the stripes of the blue band.",
       "First launch: the name Benthic has its own typeface, with « DIVE LOG » under it, and a larger logo.",
       "Backup and restore: deleted dives are shown in readable cards, with details aligned from one dive to the next. Lists show placeholders while they load.",

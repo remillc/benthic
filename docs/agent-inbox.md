@@ -6418,7 +6418,7 @@ Christian approved this on 22 November 2026. Work in `main`. Rules in `docs/syst
 
 **Test:** on the phone and on a wide desktop window the rays come from the top right, stay subtle (the text keeps its contrast), and disappear before the dive profile.
 
-## [ ] 2026-11-22-321 Decompression tool: shorter caption under the charts (#157)
+## [x] 2026-11-22-321 Decompression tool: shorter caption under the charts (#157)
 
 Christian approved this on 22 November 2026. Work in `main`.
 

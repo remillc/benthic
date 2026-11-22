@@ -2630,9 +2630,9 @@
       "one": "{n} compartiment à 90 % ou plus.",
       "other": "{n} compartiments à 90 % ou plus."
     },
-    "chartText": "Les 16 compartiments du modèle Bühlmann, des plus rapides aux plus lents. Au repos, désaturés, ils sont tous à 0 %.",
+    "chartText": "Une barre par tissu, des plus rapides aux plus lents. À 0 %, l’azote est éliminé.",
     "overlap": "Deux plongées se chevauchent dans le carnet ({date}) : le calcul des tissus s’arrête avant elles. Corrigez leurs heures ou supprimez le doublon.",
-    "modelGf": "Facteurs de gradient {low} / {high}, ceux du planificateur.",
+    "modelGf": "Modèle Bühlmann, facteurs de gradient {low} / {high}.",
     "modelVpmb": "Modèle du planificateur : VPM-B +{n}.",
     "usedDives": "Calculé à partir de",
     "noDives": "Aucune plongée du carnet ne compte dans ce calcul.",
@@ -2743,6 +2743,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Outils, désaturation : la légende sous les graphiques des tissus est plus courte.",
       "Premier lancement : des rayons de lumière venus du coin supérieur droit remplacent les bandes du bandeau bleu.",
       "Premier lancement : le nom Benthic prend sa propre police, avec « DIVE LOG » en dessous, et un logo plus grand.",
       "Sauvegarde et restauration : les plongées supprimées sont présentées dans des fiches lisibles, avec les caractéristiques alignées d’une plongée à l’autre. Les listes affichent des placeholders pendant leur chargement.",
