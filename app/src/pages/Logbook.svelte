@@ -1506,7 +1506,7 @@
         <li class="bc-menu-label">{emptyBand.split('\n')[0]}</li>
         <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={() => (renaming = true)} />
         <li class="bc-menu-divider" role="separator"></li>
-        <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
+        <MenuItem icon="notebook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
         <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />
         <li class="bc-menu-divider" role="separator"></li>
         <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={t('welcomeSteps.menuExportNone')} disabled />
@@ -1537,7 +1537,7 @@
       {/if}
       {#if tabletMenu && !selecting}
         <li class="bc-menu-divider" role="separator"></li>
-        <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
+        <MenuItem icon="notebook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
         <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />
         <li class="bc-menu-divider" role="separator"></li>
         <MenuItem

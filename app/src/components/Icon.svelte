@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'pinOff'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe'|'trip'|'export'|'columns'|'idCard'|'briefcase'|'phone'|'cloudDownload'|'plusMark'|'bell'|'history'|'trash'|'book'|'cloudCheck'|'archive',
+   *   name: 'logbook'|'sites'|'pinOff'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe'|'trip'|'export'|'columns'|'idCard'|'briefcase'|'phone'|'cloudDownload'|'plusMark'|'bell'|'history'|'trash'|'book'|'cloudCheck'|'archive'|'wrench'|'notebook',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -34,10 +34,10 @@
     chevron: 'M9 5l7 7-7 7',
     // An aeroplane seen from above, nose up (the wait before flying).
     plane: 'M12 2.8c1 0 1.6.8 1.6 1.8v4.6l7.4 4.4v2.1l-7.4-2.1v4.3l1.8 1.4v1.5L12 19.6l-3.4.9V19l1.8-1.4v-4.3L3 15.4v-2.1l7.4-4.4V4.6c0-1 .6-1.8 1.6-1.8z',
-    calendar: 'M5 5.5h14v14H5zM5 10h14M8.5 3.5v4M15.5 3.5v4',
+    calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
     keyboard: 'M3.5 6.5h17v11h-17zM7 10h.01M10 10h.01M14 10h.01M17 10h.01M7 14h.01M17 14h.01M9.5 14h5',
     clock: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M12 7.5V12l3 2',
-    bluetooth: 'M7 7l10 10-5 4V3l5 4L7 17',
+    bluetooth: 'M7 7l10 10-5 5V2l5 5L7 17',
     // A wrist dive computer with a dive profile on its screen (task 2026-11-15-220): straps, case, profile, button.
     diveComputer: 'M9 5.5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2.5M9 18.5V21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.5M9 5.5h6a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-5a4 4 0 0 1 4-4zM7.5 9.5h1l1.8 4.5h2.4l1.3-2h1.2l1.3-2.5M19 10.5h1.5',
     // The same, crossed out: no Bluetooth connection (download failed).
@@ -63,7 +63,12 @@
     // OpenDives+ (task 2026-11-17-265): a card with a portrait (certifications), a briefcase (gear), a phone, a cloud
     // with a down arrow (backup), a four-pointed mark (the OpenDives+ chip).
     idCard: 'M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM8.5 11.5a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2zM6 15.5c.4-1.5 1.4-2.2 2.5-2.2s2.1.7 2.5 2.2M14 10h4M14 13.5h3',
-    briefcase: 'M9 7V5h6v2M4 7h16v12H4zM4 12.5h16M11 12.5v2h2v-2',
+    // The briefcase of « Équipement » and the kits: a bag with its handle (docs/mockups/android-carnet-liste-v2.dc.html).
+    briefcase: 'M4 8h16v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19zM9 8V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V8',
+    // A spanner: « Entretien » (docs/mockups/android-tablette-profil-brevet-nouveau-paysage.dc.html).
+    wrench: 'M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5zM14.5 6.5a4 4 0 0 1 4.6-3.3l-2.6 2.6.4 2.2 2.2.4 2.6-2.6a4 4 0 0 1-3.3 4.6',
+    // An open notebook: « Ouvrir un autre carnet » (docs/mockups/android-tablette-carnet-menu-paysage.dc.html).
+    notebook: 'M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3',
     phone: 'M8 2.5h8a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 20V4A1.5 1.5 0 0 1 8 2.5zM11 18.5h2',
     cloudDownload: 'M7 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17 8.5a4.75 4.75 0 0 1 .5 9.5M12 11v8M9 16l3 3 3-3',
     bell: 'M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0',
@@ -75,7 +80,7 @@
     plusMark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
     computer: 'M9 3h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zM10 7h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zM10 17h4',
     tripRemove: 'M4 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM5.5 7V4.5h5V7M6 11v8M10 11v8M17 13h5',
-    renumber: 'M10 6h10M10 12h10M10 18h10M4 4.5h1.5V9M3.5 11h2.5l-2.5 3h2.5M3.5 16h2.5v4.5h-2.5M4 18.2h2',
+    renumber: 'M9 4L7 20M17 4l-2 16M4 9h16M3 15h16',
     menu: 'M4 7h16M4 12h16M4 17h16',
     account: 'M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM5 20c1-3.6 3.8-5.5 7-5.5s6 1.9 7 5.5',
     // Account without an account (task 2026-11-14-135): create an account, sign in.
@@ -86,7 +91,7 @@
     wristComputer: 'M9.5 6.5h5a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4h-5a4 4 0 0 1-4-4v-3a4 4 0 0 1 4-4zM8.5 6.5 9.3 3h5.4l.8 3.5M8.5 17.5l.8 3.5h5.4l.8-3.5M18.5 10.5h1.5',
     warning: 'M12 4l9 16H3zM12 10v4M12 17h.01',
     // « Retirer de l'équipement » (task 2026-11-19-308): a box with a lid.
-    archive: 'M4 4h16v4H4zM5 8v12h14V8M10 12h4',
+    archive: 'M4.5 4h15A1.5 1.5 0 0 1 21 5.5v2A1.5 1.5 0 0 1 19.5 9h-15A1.5 1.5 0 0 1 3 7.5v-2A1.5 1.5 0 0 1 4.5 4zM5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4',
     lock: 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5zM12 15v2',
     // First launch of the release edition (task 2026-11-15-213): a cloud with an upward arrow, a tablet,
     // a folder with a downward arrow, and a server (WebDAV): generic shapes, never a brand logo.
@@ -95,7 +100,7 @@
     folderDownload: 'M3 7.5V18a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V9.5A1.5 1.5 0 0 0 19.5 8H12l-2-2.5H4.5A1.5 1.5 0 0 0 3 7zM12 11v5m-2.2-2.2L12 16l2.2-2.2',
     server: 'M6 4h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 13h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM8 7.5h.01M8 16.5h.01',
     // An upload tray and a globe (« Importer un carnet », divelogs.de).
-    upload: 'M12 15V4m-4 4l4-4 4 4M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5',
+    upload: 'M12 15V4m-4 4l4-4 4 4M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4',
     globe: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9',
     blank: '',
     cloud: 'M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.25 4.25 0 0 0 7 18z',
@@ -136,7 +141,7 @@
     // A folded map: "Open in Maps".
     map: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14',
     image: 'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4',
-    camera: 'M4 8h3l1.5-2h7L17 8h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+    camera: 'M5.5 6h13A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-9A2.5 2.5 0 0 1 5.5 6zM8.5 13a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0M8 6l1.5-2.5h5L16 6',
     // A page with lines of text: the PDF sheet.
     document: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6',
     // Two sliders: the planner's settings.

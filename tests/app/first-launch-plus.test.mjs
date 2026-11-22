@@ -83,7 +83,7 @@ test('the offer has a full-width « Service reminders » tile under the four til
   const offer = plus.slice(plus.indexOf("{:else if step === 'odplusOffer'}"), plus.indexOf("{:else if step === 'odplusReady'}"));
   assert.ok(offer.indexOf('bc-plus--cards') < offer.indexOf('bc-plus--card-maintenance'));
   assert.ok(offer.indexOf('bc-plus--card-maintenance') < offer.indexOf('priceBlock'));
-  assert.match(offer, /name="bell"/);
+  assert.match(offer, /name="wrench"/);
   assert.match(plus, /\.bc-plus--card-maintenance \{\s*background: var\(--bc-maintenance\);/);
   assert.equal(langs.fr.odplus.offer.maintenance, 'Rappels d’entretien');
   assert.equal(langs.fr.odplus.offer.maintenanceText, 'Détendeur, bouteille, veste : prévenu 30 jours avant l’échéance.');

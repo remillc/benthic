@@ -39,7 +39,7 @@
   });
   const entries = /** @type {const} */ ([
     { id: 'gear', icon: 'briefcase', tone: 'blue', label: 'gear.profile.equipment' },
-    { id: 'maintenance', icon: 'bell', tone: 'amber', label: 'maintenance.entry' },
+    { id: 'maintenance', icon: 'wrench', tone: 'amber', label: 'maintenance.entry' },
     { id: 'certs', icon: 'idCard', tone: 'violet', label: 'gear.profile.certifications' },
     { id: 'info', icon: 'account', tone: 'red', label: 'gear.profile.information' },
   ]);
