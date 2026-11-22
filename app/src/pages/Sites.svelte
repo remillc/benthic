@@ -396,7 +396,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     common && baseBox
       ? {
           sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x, false)}` })),
-          clusters: [],
+          clusters: baseBox.clusters,
         }
       : null,
   );
@@ -448,8 +448,9 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       <SiteMap
         bind:this={siteMap}
         sites={located}
-        names={common ? 'atZoom' : 'fewInFullScreen'}
+        names={common ? 'atZoom' : 'atZoomOrFewInFullScreen'}
         hideDiveCounts={common}
+        groupSites
         selected={selectedUuid}
         onselect={(uuid) => ((stack = null), (baseSelectedId = null), (selectedUuid = uuid))}
         onstack={showStack}
@@ -767,9 +768,9 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       min-width: 0;
     }
 
-    /* Android: the map is a rounded pane, 16 px from the edges. */
+    /* Android: the rounded map pane stays 16 dp clear of the safe area. */
     .bc-sites--split:not(.ios) .bc-sites--map-pane {
-      margin: 16px 16px 16px 0;
+      margin: 16px 16px calc(16px + var(--bc-safe-bottom)) 0;
       border-radius: 28px;
       overflow: hidden;
     }

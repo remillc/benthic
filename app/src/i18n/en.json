@@ -2725,9 +2725,9 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
-      "Sites on tablets: the embedded map can be panned and zoomed.",
+      "Sites: names appear when zooming in on either map; on tablets, the embedded map can be panned and zoomed and clears the system navigation area.",
       "Shared map: the mode buttons are easier to tap.",
-      "Shared map: dive counts and cluster badges are hidden; site names appear when zooming in.",
+      "Sites: nearby sites are grouped on phones and tablets; the shared map is available on desktop.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
       "Desktop: the account menu no longer shows a plus sign on the initial.",
