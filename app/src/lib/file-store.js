@@ -14,6 +14,8 @@
 //  - applyTracked(writes, removes): apply changes and add their paths to meta/pending.json in the same transaction.
 //  - applyTrackedIfUnchanged(expected, writes, removes): the same, only if all files still match expected.
 //  - snapshotPending() / acknowledgePending(snapshot): capture and acknowledge unchanged pending files atomically.
+//  - applySyncedIfUnchanged(expected, writes, removes, acknowledged): apply a confirmed server state and acknowledge
+//    the sent versions in one transaction, without overwriting a newer or unsent local change.
 
 /**
  * @typedef {Object} FileBackend
@@ -24,6 +26,7 @@
  * @property {(expected: [string, string|null][], writes: [string, string][], removes: string[]) => Promise<boolean>} applyTrackedIfUnchanged
  * @property {() => Promise<[string, string|null][]>} snapshotPending
  * @property {(snapshot: [string, string|null][]) => Promise<void>} acknowledgePending
+ * @property {(expected: [string, string|null][], writes: [string, string][], removes: string[], acknowledged: [string, string|null][]) => Promise<boolean>} applySyncedIfUnchanged
  */
 
 const PENDING = 'meta/pending.json';
@@ -42,6 +45,38 @@ function parsePending(text) {
 function addPending(text, changed) {
   const pending = parsePending(text);
   return sortedJson({ ...pending, paths: [...new Set([...pending.paths, ...changed])].sort() });
+}
+
+/** @param {[string, string|null][]} expected @param {[string, string][]} writes @param {string[]} removes @param {[string, string|null][]} acknowledged */
+function validateSyncBatch(expected, writes, removes, acknowledged) {
+  const expectedPaths = new Set(expected.map(([path]) => path));
+  const acknowledgedPaths = new Set(acknowledged.map(([path]) => path));
+  const changedPaths = [...writes.map(([path]) => path), ...removes];
+  if (expectedPaths.size !== expected.length || acknowledgedPaths.size !== acknowledged.length ||
+      new Set(changedPaths).size !== changedPaths.length || expectedPaths.has(PENDING) || acknowledgedPaths.has(PENDING) ||
+      changedPaths.some((path) => path === PENDING || !expectedPaths.has(path))) {
+    throw new Error('INVALID_SYNC_BATCH');
+  }
+}
+
+/**
+ * @param {string|null|undefined} pendingText
+ * @param {[string, string][]} writes @param {string[]} removes
+ * @param {Map<string, string|null>} current @param {[string, string|null][]} acknowledged
+ * @returns {string|null} null when a changed path has an unacknowledged local edit
+ */
+function syncPending(pendingText, writes, removes, current, acknowledged) {
+  const pending = parsePending(pendingText);
+  const acknowledgedMap = new Map(acknowledged);
+  const pendingPaths = new Set(/** @type {string[]} */ (pending.paths));
+  for (const path of [...writes.map(([p]) => p), ...removes]) {
+    if (pendingPaths.has(path) && (!acknowledgedMap.has(path) || current.get(path) !== acknowledgedMap.get(path))) return null;
+  }
+  return sortedJson({
+    ...pending,
+    paths: pending.paths.filter((/** @type {string} */ path) =>
+      !acknowledgedMap.has(path) || current.get(path) !== acknowledgedMap.get(path)),
+  });
 }
 
 /**
@@ -104,6 +139,17 @@ export function memoryBackend() {
       const pending = parsePending(files.get(PENDING));
       const acknowledged = new Set(snapshot.filter(([path, text]) => (files.get(path) ?? null) === text).map(([path]) => path));
       files.set(PENDING, sortedJson({ ...pending, paths: pending.paths.filter((/** @type {string} */ path) => !acknowledged.has(path)) }));
+    },
+    async applySyncedIfUnchanged(expected, writes, removes, acknowledged) {
+      validateSyncBatch(expected, writes, removes, acknowledged);
+      const current = new Map([...expected, ...acknowledged].map(([path]) => [path, files.get(path) ?? null]));
+      if (expected.some(([path, text]) => current.get(path) !== text)) return false;
+      const pending = syncPending(files.get(PENDING), writes, removes, current, acknowledged);
+      if (pending === null) return false;
+      for (const [path, text] of writes) files.set(path, text);
+      for (const path of removes) files.delete(path);
+      files.set(PENDING, pending);
+      return true;
     },
   };
 }
@@ -331,6 +377,40 @@ export function indexedDbBackend(factory = globalThis.indexedDB) {
         tx.onabort = () => reject(failure ?? tx.error);
       });
     },
+    async applySyncedIfUnchanged(expected, writes, removes, acknowledged) {
+      validateSyncBatch(expected, writes, removes, acknowledged);
+      const db = await open();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        const store = tx.objectStore(STORE);
+        const current = new Map();
+        let changed = false;
+        /** @type {unknown} */
+        let failure;
+        for (const path of new Set([...expected, ...acknowledged].map(([p]) => p))) {
+          const entry = store.get(path);
+          entry.onsuccess = () => current.set(path, entry.result ?? null);
+        }
+        const marker = store.get(PENDING);
+        marker.onsuccess = () => {
+          try {
+            if (expected.some(([path, text]) => current.get(path) !== text)) return;
+            const pending = syncPending(marker.result, writes, removes, current, acknowledged);
+            if (pending === null) return;
+            for (const [path, text] of writes) store.put(text, path);
+            for (const path of removes) store.delete(path);
+            store.put(pending, PENDING);
+            changed = true;
+          } catch (error) {
+            failure = error;
+            tx.abort();
+          }
+        };
+        tx.oncomplete = () => resolve(changed);
+        tx.onerror = () => reject(failure ?? tx.error);
+        tx.onabort = () => reject(failure ?? tx.error);
+      });
+    },
   };
 }
 
@@ -385,6 +465,9 @@ export function createFileStore(backend) {
     snapshotPending: () => backend.snapshotPending(),
     /** @param {[string, string|null][]} snapshot */
     acknowledgePending: (snapshot) => backend.acknowledgePending(snapshot),
+    /** @param {[string, string|null][]} expected @param {{ writes?: [string, unknown][], removes?: string[] }} changes @param {[string, string|null][]} acknowledged */
+    applySyncedIfUnchanged: (expected, { writes = [], removes = [] }, acknowledged) =>
+      backend.applySyncedIfUnchanged(expected, writes.map(([p, v]) => [p, sortedJson(v)]), removes, acknowledged),
   };
 }
 

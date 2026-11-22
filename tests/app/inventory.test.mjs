@@ -99,6 +99,36 @@ test('acknowledging a snapshot keeps files changed during synchronization pendin
   assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/a.json', 'kits/deleted.json', 'profile/diver.json']);
 });
 
+async function exerciseSyncedApply(store) {
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 1 }], ['gear/b.json', { version: 1 }]], removes: ['kits/deleted.json'] });
+  const sent = await store.snapshotPending();
+  await store.trackedBatch({ writes: [['gear/b.json', { version: 2 }], ['kits/deleted.json', { restored: true }], ['gear/c.json', { version: 1 }]] });
+  const a = sent.find(([path]) => path === 'gear/a.json');
+  const b = sent.find(([path]) => path === 'gear/b.json');
+  const deleted = sent.find(([path]) => path === 'kits/deleted.json');
+  assert.equal(await store.applySyncedIfUnchanged([a, b], { writes: [['gear/a.json', { version: 3 }], ['gear/b.json', { version: 3 }]] }, sent), false);
+  assert.equal((await store.read('gear/a.json')).version, 1);
+  assert.equal(await store.applySyncedIfUnchanged([['gear/b.json', sortedJson({ version: 2 })]], { removes: ['gear/b.json'] }, sent), false);
+  assert.equal(await store.applySyncedIfUnchanged([deleted], { removes: ['kits/deleted.json'] }, sent), false);
+  assert.equal(await store.applySyncedIfUnchanged([a, ['meta/account-base.json', null]], {
+    writes: [['gear/a.json', { version: 3 }], ['meta/account-base.json', { head: 'confirmed' }]],
+  }, sent), true);
+  assert.deepEqual(await store.read('gear/a.json'), { version: 3 });
+  assert.deepEqual(await store.read('meta/account-base.json'), { head: 'confirmed' });
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/b.json', 'gear/c.json', 'kits/deleted.json']);
+  await assert.rejects(store.applySyncedIfUnchanged([], { removes: ['gear/b.json'] }, []), /INVALID_SYNC_BATCH/);
+}
+
+test('a confirmed server state is applied and acknowledged atomically without overwriting newer edits', async () => {
+  await exerciseSyncedApply(setup().store);
+});
+
+test('IndexedDB applies a confirmed server state with the same concurrent-edit protection', async (t) => {
+  if (!globalThis.indexedDB) return t.skip('no IndexedDB in this Node');
+  const store = createFileStore(indexedDbBackend());
+  await exerciseSyncedApply(store);
+});
+
 test('a piece gets a UUID v4, is written under gear/<id>.json and keeps unknown fields', async () => {
   const { inventory, store } = setup();
   const g = await inventory.saveGear(piece('regulator', '  Apeks XTX50 ', { brand: 'Apeks', note: '' }));
