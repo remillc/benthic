@@ -85,7 +85,7 @@ test("the welcome hero is the alpha's hatched dark blue; the steps band takes th
   assert.match(phone, /bc-welcome-release--panel-bands \{\s+background: var\(--bc-first-band-hatch\)/);
   // The steps band: gradient, no sheen, the faint profile (10 % area, 30 % line, 1.5 dp) and the 18 dp wave in the page colour.
   assert.match(phone, /bc-welcome-release--compact \{\s+height: auto;\s+min-height: calc\(140px[^;]*;\s+background: var\(--bc-first-step-band\)/);
-  assert.match(phone, /bc-welcome-release--compact \.bc-welcome-release--panel-light \{\s+display: none/);
+  assert.match(phone, /bc-welcome-release--compact \{[^}]*& \.bc-welcome-release--panel-light \{\s+display: none/);
   assert.match(phone, /fill: var\(--bc-band-profile-area\)/);
   assert.match(phone, /stroke: var\(--bc-band-profile-line\);\s+stroke-width: 1\.5/);
   assert.match(phone, /bc-welcome-release--panel-wave \{\s+display: block;[^}]*height: 18px/);
