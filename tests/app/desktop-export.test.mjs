@@ -1,7 +1,7 @@
 // The desktop export dialog's defaults and proposed file names (task 2026-11-15-189).
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { defaultScope, exportFileName, exportFormats, usableFormat } from '../../app/src/lib/desktop-export.js';
+import { defaultScope, exportFileName, exportFormats, isUpload, rememberable, usableFormat } from '../../app/src/lib/desktop-export.js';
 
 const fr = { dives: 'plongées', logbook: 'carnet' };
 
@@ -23,11 +23,16 @@ test('the proposed file names', () => {
 });
 
 test('« Fichier Benthic (.benthic) » is offered first, and only when the whole logbook is exported (task 323)', () => {
-  assert.deepEqual(exportFormats(true), ['benthic', 'ssrf', 'uddf', 'csv', 'csvProfiles', 'pdf']);
-  assert.deepEqual(exportFormats(false), ['ssrf', 'uddf', 'csv', 'csvProfiles', 'pdf']);
+  // Task 2026-11-22-324: UDDF before SSRF, the divelogs.de upload last.
+  assert.deepEqual(exportFormats(true), ['benthic', 'uddf', 'ssrf', 'csv', 'csvProfiles', 'pdf', 'divelogs']);
+  assert.deepEqual(exportFormats(false), ['uddf', 'ssrf', 'csv', 'csvProfiles', 'pdf', 'divelogs']);
   assert.equal(usableFormat('benthic', true), 'benthic');
   assert.equal(usableFormat('benthic', false), 'ssrf', 'a remembered .benthic falls back for a selection');
   assert.equal(usableFormat('pdf', false), 'pdf');
+  assert.equal(usableFormat('', true), 'benthic', 'nothing remembered: .benthic for the whole logbook');
+  assert.equal(usableFormat('', false), 'ssrf');
+  assert.ok(isUpload('divelogs') && !isUpload('pdf'));
+  assert.ok(!rememberable('divelogs') && rememberable('uddf'), 'the upload is never remembered');
 });
 
 test('the .benthic file is named after the logbook', () => {

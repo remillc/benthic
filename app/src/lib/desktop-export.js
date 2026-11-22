@@ -13,25 +13,39 @@ export function defaultScope(selected, filtered) {
   return selected > 0 ? 'selection' : filtered ? 'filtered' : 'all';
 }
 
-/** The formats of a selection of dives, in the order the dialogs list them. */
-export const DIVE_FORMATS = /** @type {const} */ (['ssrf', 'uddf', 'csv', 'csvProfiles', 'pdf']);
+/**
+ * The formats of a selection of dives, in the order the dialogs list them (task 2026-11-22-324): UDDF comes before SSRF,
+ * and « Envoyer vers divelogs.de » (an upload, not a file) is last.
+ */
+export const DIVE_FORMATS = /** @type {const} */ (['uddf', 'ssrf', 'csv', 'csvProfiles', 'pdf', 'divelogs']);
+
+/** The format that writes no file: the rows of the dialogs that send the dives somewhere. @param {string} format */
+export const isUpload = (format) => format === 'divelogs';
 
 /**
  * The formats a dialog offers (task 2026-11-22-323): « Fichier Benthic (.benthic) », the archive of
  * the whole logbook and the diver's Benthic data, comes first and only when the whole logbook is exported,
  * never for a selection or the filtered dives.
  * @param {boolean} whole the whole logbook is being exported
- * @returns {('benthic'|'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf')[]}
+ * @returns {('benthic'|'uddf'|'ssrf'|'csv'|'csvProfiles'|'pdf'|'divelogs')[]}
  */
 export function exportFormats(whole) {
   return whole ? ['benthic', ...DIVE_FORMATS] : [...DIVE_FORMATS];
 }
 
-/** The format that will be written: the remembered one, or the first dive format when it is not offered. @param {string} format @param {boolean} whole */
+/**
+ * The format that will be chosen: the remembered one; when it is not offered, .benthic for the whole logbook, else
+ * SSRF. The divelogs.de upload is never remembered (see `rememberable`).
+ * @param {string} format @param {boolean} whole
+ */
 export function usableFormat(format, whole) {
   const offered = exportFormats(whole);
-  return /** @type {any} */ (offered.includes(/** @type {any} */ (format)) ? format : 'ssrf');
+  if (offered.includes(/** @type {any} */ (format))) return /** @type {any} */ (format);
+  return /** @type {any} */ (whole ? 'benthic' : 'ssrf');
 }
+
+/** A format worth remembering for the next export: the ones that write a file. @param {string} format */
+export const rememberable = (format) => !isUpload(format);
 
 /** The file extension of an export format. @param {string} format */
 export const exportExtension = (format) => (format === 'csvProfiles' ? 'csv' : format);

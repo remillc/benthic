@@ -6457,7 +6457,7 @@ Christian approved this on 22 November 2026. Work in `main`.
 
 Done on 22 November 2026: the menus, the export dialogs (desktop dialog, phone sheet), the `<logbook>.benthic` name in `full-export.js`, and the registration of `.benthic` / `application/vnd.benthic+zip` (electron-builder `fileAssociations`, Android intent filters, iOS `Info.plist` type declaration). Not done: the photos and videos choice (the « Télécharger mes données » screen is still to-do #57, the engine takes `withMedia`) and opening a .benthic (#113).
 
-## [ ] 2026-11-22-324 Tablet ⋮ « Exporter le carnet », the export dialog, the Recycleur gear type, the new-piece dialog in two steps, and a review of every icon (#140)
+## [x] 2026-11-22-324 Tablet ⋮ « Exporter le carnet », the export dialog, the Recycleur gear type, the new-piece dialog in two steps, and a review of every icon (#140)
 
 Christian approved this on 22 November 2026. Work in `main`. The design canvases are the reference; the boards named below are copied in `docs/mockups/`.
 
@@ -6484,7 +6484,14 @@ The phone keeps its full-screen form with the type menu.
 
 **Test:** the tablet ⋮ opens the export dialog with the formats in the order above; the .benthic switch is on and only in its row; a Recycleur can be added with its two dates and gets its two reminders; on tablet and desktop the type grid leads to the form and the back arrow returns to the grid; the gear icons match the mock-ups.
 
-## [ ] 2026-11-22-325 /profile/gear/new, step 2: the type in the title, no type row
+Done on 22 November 2026.
+1. The tablet logbook ⋮ (not the desktop, not the phone): the header « <name> · sur cette tablette », Renommer, Ouvrir un autre carnet, Nouveau carnet, Exporter le carnet with « Les N plongées » under it; the usual items (Filtrer, Renuméroter, Ordinateurs du carnet) follow below a divider.
+2. One export dialog content, `ExportFormats.svelte` (rows with icon, name, extension, description; the `.benthic` row alone carries « Inclure les photos et vidéos », on by default), in three frames: the phone sheet and the tablet dialog (`ExportSheet.svelte`, title « Exporter le carnet », subtitle, footnote phone or tablet) and the desktop dialog (`DesktopExportDialog.svelte`, which keeps its « Quelles plongées » block). Order: Fichier Benthic (whole logbook only), UDDF, Fichier de carnet, Liste des plongées, Profils, Fiches, Envoyer vers divelogs.de. « Anonymiser » and « Mon nom dans l’en-tête » stay under the list for the file formats (the tablet board does not draw them). The media choice is passed to `buildExport({ withMedia })`. **Not built:** « Envoyer vers divelogs.de » has no upload engine, no sign-in screen and no progress screen: the row is there, « Exporter » on it shows « L’envoi vers divelogs.de n’est pas encore disponible. » and keeps the dialog open; nothing is stored. The sign-in and progress screens, and the core function that uploads (none exists), are for Christian to decide.
+3. Recycleur (`rebreather`, right after Bouteille): brand, model, serial (« Sur la plaque du boîtier »), Date d’achat, « Cellules O₂ installées le », « Dernière révision », Notes (the two dates sit after Date d’achat: `late` fields in `gear-fields.js`). A new Recycleur always gets two reminders (new task `o2Cells` « Cellules O₂ », and `service`, 12 months each) and each date enters the history of its reminder, so the due dates count from the dates. In UDDF: not done, no gear is written to UDDF today (#175).
+4. /profile/gear/new on tablet and desktop: a two-step dialog (`bc-piece-edit--steps`): step 1 « Nouvelle pièce » with « Étape 1 sur 2 · Choisissez le type de pièce », a 4-column grid of the 19 types, ✕, only « Annuler »; step 2 per task 325 « Nouvelle pièce · <type> », back arrow, ✕, only « Enregistrer », no subtitle, no type row, no « Changer » button. The phone is unchanged (grid, then its full-screen form with « Changer de type »). The fields of step 2 are still one column (the mock-up draws the photo beside two columns of fields): not redrawn.
+5. Icons. The 19 gear types are the drawings of the type board (`GearIcon.svelte`; the board's rectangles and circles are written as paths; stroke 1.8 as the board, not 2). New or redrawn: Recycleur, Masque, Palmes, Scooter (and every other type: Ordinateur, Détendeur, Combinaison, Sous-vêtement, Bouteille, Veste, Lampe, Ceinture de lest, Caméra, Parachute de palier, Bouée de surface, Coupe-ligne, Couteau, Boussole, Autre as three dots). Reviewed in `Icon.svelte` against the canvases (a scan of every `<path>` of `docs/mockups/`): changed to the mock-up's drawing: `briefcase` (Équipement, kits), `archive` (Retirer), `renumber` (a hash), `bluetooth`, `calendar`, `upload` (the tray), `camera` (photo); added `wrench` (« Entretien », used by the profile list, the profile page and the Benthic+ offer instead of the bell) and `notebook` (« Ouvrir un autre carnet »). 40 other icons match a mock-up path exactly. **Not sure, left as they are:** `settings` (the app draws rays; 114 mock-ups draw a cog, 12 tablet mock-ups the rays), the chevrons (the mock-ups use four different ones), `search`, `more`/`moreCircle`, `share`, `tune`, `document`, `tools`, `sites`, `clock`, `globe`, `idCard`, `phone`, `account`, `plane`, `keyboard`, `mail`, `server`, `git`, `sync`, `merge`, `split`, `history`, `plusMark`, `logout`, `cloudDownload`; and the inline drawings of `NavIcon`, `CylinderIcon`, `DesktopStatIcon`, the dive-detail pieces and the stars (the stars match). A reviewer with the canvases open should look at those.
+
+## [x] 2026-11-22-325 /profile/gear/new, step 2: the type in the title, no type row
 
 Christian approved this on 22 November 2026. Work in `main`. Amends step 2 of task 324 (tablet and desktop):
 - The title becomes « Nouvelle pièce · <type> » (for example « Nouvelle pièce · Détendeur »), 24 px as before. The subtitle « Étape 2 sur 2 · <type> » is removed.
@@ -6493,13 +6500,17 @@ Christian approved this on 22 November 2026. Work in `main`. Amends step 2 of ta
 
 Mock-ups: `android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle` (updated in `docs/mockups/`).
 
-## [ ] 2026-11-22-326 Retiring a piece of gear: the reason « Autre »
+Done on 22 November 2026, with part 4 of task 324 (commit 33155c69): the step 2 title is « Nouvelle pièce · <type> » (24 px), the subtitle and the « Type de pièce » row are removed, and the form starts with the photo and the fields.
+
+## [x] 2026-11-22-326 Retiring a piece of gear: the reason « Autre »
 
 Christian approved this on 22 November 2026. Work in `main`.
 
 In the « Retirer … ? » dialog of a piece of gear (phone, tablet, desktop), the optional reason gets a fourth chip after « Hors d’usage »: « Autre » (en « Other »), next to the existing reasons « Vendue », « Perdue », « Hors d’usage » (i18n keys beside `worn`). Same filter chip, single choice, still optional. On the phone the chips wrap onto two lines. The retired piece shows « Autre » as its reason in « Pièces retirées ». No text field.
 
 Mock-ups: `android-tablette-profil-piece-retirer-paysage`, `bureau-profil-piece-retirer`, `profil-piece-supprimer-android` (updated in `docs/mockups/`).
+
+Done on 22 November 2026: `RETIRE_REASONS` gets `other` (« Autre » / « Other », `gear.retire.reason.other`), the chip follows « Hors d’usage » in the dialog (the chips already wrap onto two lines on a phone), the iPhone action sheet gets « Retirer · autre », and « Pièces retirées » and the piece sheet show it through the same key. No text field.
 
 ## [ ] 2026-11-22-327 Desktop: the divider between the panes, and the list's scrollbar (#174)
 

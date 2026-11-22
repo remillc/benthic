@@ -39,11 +39,11 @@
 /**
  * `battery` and `travelCheck` are no longer offered (task 2026-11-19-308: a dive computer has no reminder, and a check
  * before a trip is noted by hand as an inspection); files that already hold them stay readable.
- * @typedef {'service'|'inspection'|'hydrostatic'|'battery'|'seals'|'travelCheck'|'custom'} Task
+ * @typedef {'service'|'inspection'|'hydrostatic'|'o2Cells'|'battery'|'seals'|'travelCheck'|'custom'} Task
  */
 
 /** @type {Task[]} */
-export const TASKS = ['service', 'inspection', 'hydrostatic', 'seals', 'custom']
+export const TASKS = ['service', 'inspection', 'hydrostatic', 'o2Cells', 'seals', 'custom']
 
 /** The lead times of « Me prévenir avant » and of the default: 2 weeks, 30 days, 60 days. @type {(14|30|60)[]} */
 export const NOTIFY_CHOICES = [14, 30, 60]
@@ -83,6 +83,11 @@ export const SUGGESTIONS = {
     { task: 'hydrostatic', months: 60 },
   ],
   bcd: [{ task: 'service', months: 12 }],
+  // Task 2026-11-22-324: the O₂ cells every 12 months from the day they were installed, a service every year.
+  rebreather: [
+    { task: 'o2Cells', months: 12 },
+    { task: 'service', months: 12 },
+  ],
 }
 
 /**

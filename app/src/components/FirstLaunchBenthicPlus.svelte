@@ -250,7 +250,7 @@
       {/each}
     </div>
     <div class="bc-plus--card bc-plus--card-maintenance bc-plus--card-wide">
-      <span class="bc-plus--card-icon"><Icon name="bell" size={24} weight={1.9} /></span>
+      <span class="bc-plus--card-icon"><Icon name="wrench" size={24} weight={1.9} /></span>
       <span class="bc-plus--card-body">
         <span class="bc-plus--card-title">{t('odplus.offer.maintenance')}</span>
         <span class="bc-plus--card-text">{t('odplus.offer.maintenanceText')}</span>

@@ -31,7 +31,7 @@
   const piece = $derived(gear.pieces.find((g) => g.id === id));
   const all = $derived(evaluations().filter((e) => e.item.gearId === id));
   /** The cards in the order of the tasks: a bottle shows its inspection, then its hydrostatic test. */
-  const withRule = $derived(all.filter((e) => e.active).sort((a, b) => ['service', 'inspection', 'hydrostatic', 'seals'].indexOf(a.item.task) - ['service', 'inspection', 'hydrostatic', 'seals'].indexOf(b.item.task)));
+  const withRule = $derived(all.filter((e) => e.active).sort((a, b) => ['o2Cells', 'service', 'inspection', 'hydrostatic', 'seals'].indexOf(a.item.task) - ['o2Cells', 'service', 'inspection', 'hydrostatic', 'seals'].indexOf(b.item.task)));
   const figures = $derived(piece ? figuresOf(piece) : { dives: 0, seconds: 0 });
   const isCylinder = $derived(piece?.type === 'cylinder');
 

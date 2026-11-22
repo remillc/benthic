@@ -41,7 +41,7 @@ test('retiring keeps the piece, its history, its kits and its dives, and records
 });
 
 test('a reason is optional and must be one of the three; a form that does not send a retired piece keeps it in the kit', async () => {
-  assert.deepEqual([...RETIRE_REASONS], ['sold', 'lost', 'worn']);
+  assert.deepEqual([...RETIRE_REASONS], ['sold', 'lost', 'worn', 'other']);
   const { inventory } = setup();
   const a = await inventory.saveGear({ type: 'regulator', name: 'A' });
   const b = await inventory.saveGear({ type: 'regulator', name: 'B' });

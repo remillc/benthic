@@ -104,7 +104,7 @@
     }
   }
 
-  /** « Retirer de l'équipement » (task 2026-11-19-308): history and dives stay. @param {'sold'|'lost'|'worn'|undefined} reason */
+  /** « Retirer de l'équipement » (task 2026-11-19-308): history and dives stay. @param {'sold'|'lost'|'worn'|'other'|undefined} reason */
   async function retire(reason) {
     confirmRetire = false;
     try {

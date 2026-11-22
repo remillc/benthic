@@ -41,7 +41,7 @@
   import { reducedMotion } from '../lib/reduced-motion.js';
 
   /** The colour of a type's icon square on a wide screen, the inventory's: blue, green, beige, purple, else grey. @type {Record<string, string>} */
-  const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet', mask: 'green', fins: 'green', scooter: 'blue', camera: 'blue', dsmb: 'beige', floatBuoy: 'beige', knife: 'violet', diveKnife: 'violet', compass: 'blue' };
+  const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet', rebreather: 'violet', mask: 'green', fins: 'green', scooter: 'blue', camera: 'blue', dsmb: 'beige', floatBuoy: 'beige', knife: 'violet', diveKnife: 'violet', compass: 'blue' };
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -120,6 +120,10 @@
     }
   });
 
+  /** A new piece on a wide screen: a dialog in two steps (task 2026-11-22-324 and 325), drawn with its own header and footer. */
+  const steps = $derived(!id && profileWide());
+  /** @type {HTMLElement|undefined} */
+  let dialogTitle = $state();
   const piece = $derived(gear.pieces.find((x) => x.id === id));
   const computer = $derived(type === 'computer');
   const spec = $derived(SPECS[/** @type {import('../lib/inventory.js').GearType} */ (type)] ?? SPECS.other);
@@ -140,6 +144,8 @@
   /** The message of a wrong field, shown once the diver has paused or left it (lib/live-validation.svelte.js). */
   const detailLive = {
     lastInspection: liveError(() => details.lastInspection ?? '', () => (detailWrong.lastInspection ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
+    o2CellsOn: liveError(() => details.o2CellsOn ?? '', () => (detailWrong.o2CellsOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
+    lastService: liveError(() => details.lastService ?? '', () => (detailWrong.lastService ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
     lastHydro: liveError(() => stampTyped, () => (detailWrong.lastHydro ? t('gear.fieldError.stamp') : '')),
     secondStages: liveError(() => details.secondStages ?? '', () => (detailWrong.secondStages ? t('gear.fieldError.number') : '')),
     lumens: liveError(() => details.lumens ?? '', () => (detailWrong.lumens ? t('gear.fieldError.number') : '')),
@@ -154,19 +160,21 @@
   const suggestedRule = $derived(suggestion ? { intervalMonths: suggestion.months ?? null, intervalDives: suggestion.dives ?? null } : null);
   /** Every field of the type has a text to bind to. */
   $effect.pre(() => {
-    for (const f of [...fields.before, ...fields.after]) if (details[f.key] === undefined) details[f.key] = '';
+    for (const f of [...fields.before, ...fields.after, ...fields.late]) if (details[f.key] === undefined) details[f.key] = '';
   });
   /** The line of the reminders card: the type's own wording for a cylinder and a drysuit, else the generic one with the rule. */
   const suggestionLine = $derived(
     type === 'cylinder'
       ? t('maintenance.reminderCard.suggestCylinder')
-      : type === 'suit' && details.suitType === 'dry'
+      : type === 'rebreather'
+        ? t('maintenance.reminderCard.suggestRebreather')
+        : type === 'suit' && details.suitType === 'dry'
         ? t('maintenance.reminderCard.suggestDrysuit')
         : suggestedRule
           ? t(`maintenance.reminderCard.suggest.${type}`, { rule: ruleText(suggestedRule).replace(/^./, (c) => c.toLocaleLowerCase()) })
           : t('maintenance.reminderCard.noSuggestion'),
   );
-  const showReminderCard = $derived(!id && (type === 'regulator' || type === 'cylinder'));
+  const showReminderCard = $derived(!id && (type === 'regulator' || type === 'cylinder' || type === 'rebreather'));
   /** @param {string} key @param {string} value */
   const setDetail = (key, value) => {
     if (key === 'suitType' && details[key] !== value) reminder = null;
@@ -184,8 +192,8 @@
     direction = 'forward';
     choosingType = false;
     await tick();
-    /** @type {HTMLElement|null|undefined} */ (stage?.querySelector('.bc-piece-edit--form-title'))?.focus({ preventScroll: true });
-    const scroller = stage?.closest('.bc-pf--box, .page-content');
+    /** @type {HTMLElement|null|undefined} */ (steps ? dialogTitle : stage?.querySelector('.bc-piece-edit--form-title'))?.focus({ preventScroll: true });
+    const scroller = stage?.closest('[data-od-scroll], .bc-pf--box, .page-content');
     if (scroller) scroller.scrollTop = 0;
   }
 
@@ -193,8 +201,8 @@
     direction = 'back';
     choosingType = true;
     await tick();
-    /** @type {HTMLElement|null|undefined} */ (stage?.querySelector('.bc-piece-edit--type-heading'))?.focus({ preventScroll: true });
-    const scroller = stage?.closest('.bc-pf--box, .page-content');
+    /** @type {HTMLElement|null|undefined} */ (steps ? dialogTitle : stage?.querySelector('.bc-piece-edit--type-heading'))?.focus({ preventScroll: true });
+    const scroller = stage?.closest('[data-od-scroll], .bc-pf--box, .page-content');
     if (scroller) scroller.scrollTop = 0;
   }
 
@@ -224,7 +232,7 @@
     ruleOpen = false;
   }
 
-  /** « Retirer de l'équipement » (task 2026-11-19-308): the piece keeps its history and its dives. @param {'sold'|'lost'|'worn'|undefined} reason */
+  /** « Retirer de l'équipement » (task 2026-11-19-308): the piece keeps its history and its dives. @param {'sold'|'lost'|'worn'|'other'|undefined} reason */
   async function retire(reason) {
     confirmRetire = false;
     try {
@@ -257,7 +265,14 @@
           details: kept,
           photoId: nextPhoto || undefined,
         });
-        if (!id && reminder && (type === 'regulator' || type === 'cylinder')) {
+        if (!id && type === 'rebreather') {
+          // A rebreather always gets its two reminders (cells and service); the one the diver set in the card replaces the first rule.
+          const own = reminder ?? null;
+          for (const [n, s] of suggestions.entries()) {
+            const rule = n === 0 && own ? own : null;
+            await inv.saveMaintenance({ gearId: g.id, task: s.task, intervalMonths: rule ? rule.months : (s.months ?? null), intervalDives: rule ? rule.dives : (s.dives ?? null), notifyDays: ownLeadDays(rule?.notifyDays ?? settings.maintenanceLeadDays, settings.maintenanceLeadDays), warnInDive: rule?.warnInDive ?? true });
+          }
+        } else if (!id && reminder && (type === 'regulator' || type === 'cylinder')) {
           // The first reminder is the one the diver set; the type's other suggestions (a cylinder's hydrostatic test) follow with their usual rule.
           const [first, ...rest] = suggestions;
           await inv.saveMaintenance({ gearId: g.id, task: reminder.task, intervalMonths: reminder.months, intervalDives: reminder.dives, notifyDays: ownLeadDays(reminder.notifyDays, settings.maintenanceLeadDays), warnInDive: reminder.warnInDive });
@@ -266,9 +281,10 @@
             await inv.saveMaintenance({ gearId: g.id, task: s.task, intervalMonths: s.months ?? null, intervalDives: s.dives ?? null, notifyDays: ownLeadDays(reminder.notifyDays, settings.maintenanceLeadDays), warnInDive: reminder.warnInDive });
           }
         }
-        // A cylinder's last visual inspection and hydrostatic test enter the maintenance history, from which the next due dates count.
-        if (type === 'cylinder') {
-          for (const [task, kind, date] of /** @type {const} */ ([['inspection', 'inspection', kept.lastInspection], ['hydrostatic', 'other', kept.lastHydro]])) {
+        // A cylinder's last visual inspection and hydrostatic test, a rebreather's O₂ cells and last service enter the maintenance history, from which the next due dates count.
+        if (type === 'cylinder' || type === 'rebreather') {
+          const dated = type === 'cylinder' ? [['inspection', 'inspection', kept.lastInspection], ['hydrostatic', 'other', kept.lastHydro]] : [['o2Cells', 'other', kept.o2CellsOn], ['service', 'service', kept.lastService]];
+          for (const [task, kind, date] of /** @type {[any, any, string][]} */ (dated)) {
             if (!date) continue;
             const known = (await inv.listMaintenance()).find((m) => m.gearId === g.id && m.task === task);
             if (known?.history?.some((h) => h.doneOn === date)) continue;
@@ -279,7 +295,7 @@
       });
       showSnackbar(t('gear.pieceEdit.saved'));
       f7router.back();
-      if (!id && reminder && (type === 'regulator' || type === 'cylinder') && saved) afterReminderSaved();
+      if (!id && (reminder || type === 'rebreather') && (type === 'regulator' || type === 'cylinder' || type === 'rebreather') && saved) afterReminderSaved();
     } catch (e) {
       showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
     } finally {
@@ -330,7 +346,7 @@
   {:else if f.kind === 'switch'}
     <SwitchField label={t(`gear.field.${f.key}`)} checked={details[f.key] === 'yes'} onchange={(v) => setDetail(f.key, v ? 'yes' : '')} supporting={f.hint ? t(`gear.fieldHint.${f.key}`) : ''} />
   {:else if f.kind === 'date'}
-    <DateField label={t(`gear.field.${f.key}`)} bind:value={details[f.key]} maxYear={new Date().getFullYear()} supporting={detailLive.lastInspection.error} />
+    <DateField label={t(`gear.field.${f.key}`)} bind:value={details[f.key]} maxYear={new Date().getFullYear()} supporting={detailLive[/** @type {'lastInspection'|'o2CellsOn'|'lastService'} */ (f.key)]?.error} />
   {:else if f.kind === 'stamp'}
     <TextField
       label={t(`gear.field.${f.key}`)}
@@ -352,8 +368,8 @@
 {/snippet}
 
 {#snippet typeGrid()}
-  <h2 class="bc-piece-edit--title bc-piece-edit--type-heading" id="od-piece-type" tabindex="-1">{t('gear.pieceNew.typeTitle')}</h2>
-    <div class="bc-piece-edit--tiles" class:bc-piece-edit--compact={profileWide()} role="radiogroup" aria-labelledby="od-piece-type">
+  {#if !steps}<h2 class="bc-piece-edit--title bc-piece-edit--type-heading" id="od-piece-type" tabindex="-1">{t('gear.pieceNew.typeTitle')}</h2>{/if}
+    <div class="bc-piece-edit--tiles" class:bc-piece-edit--compact={profileWide()} class:bc-piece-edit--four={steps} role="radiogroup" aria-labelledby={steps ? 'od-piece-dialog-title' : 'od-piece-type'}>
       {#each GEAR_TYPES as value (value)}
         {@const on = type === value}
         <button
@@ -374,7 +390,7 @@
 {/snippet}
 
 {#snippet form()}
-  {#if !id}
+  {#if !id && !steps}
     <button type="button" class="bc-piece-edit--change-type" onclick={chooseAgain}><Icon name="arrowBack" size={20} />{t('gear.pieceNew.changeType')}</button>
     <h2 class="bc-piece-edit--title bc-piece-edit--form-title" tabindex="-1">{typeLabel}</h2>
   {/if}
@@ -382,6 +398,7 @@
 
   <div class="bc-piece-edit--fields">
     <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
+    {#each fields.late as f (f.key)}{@render detail(f)}{/each}
     <TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={computer ? t('gear.computerEdit.noteHint') : t('gear.pieceEdit.noteHint')} />
     {#if showReminderCard}
       <div class="bc-piece-edit--reminder">
@@ -492,7 +509,31 @@
   </div>
 {/snippet}
 
+{#snippet stepsDialog()}
+  <div class="bc-piece-edit--steps">
+    <header class="bc-piece-edit--steps-header">
+      {#if !choosingType}
+        <button type="button" class="bc-piece-edit--steps-icon bc-piece-edit--back" aria-label={t('gear.pieceNew.backToTypes')} onclick={chooseAgain}><Icon name="arrowBack" /></button>
+      {/if}
+      <div class="bc-piece-edit--steps-texts">
+        <h2 class="bc-piece-edit--steps-title" id="od-piece-dialog-title" tabindex="-1" bind:this={dialogTitle}>{choosingType ? t('gear.pieceEdit.addTitle') : t('gear.pieceNew.titleWithType', { type: typeLabel })}</h2>
+        {#if choosingType}<p class="bc-piece-edit--steps-subtitle">{t('gear.pieceNew.step1')}</p>{/if}
+      </div>
+      <button type="button" class="bc-piece-edit--steps-icon bc-piece-edit--close" aria-label={t('gear.pieceEdit.close')} onclick={() => f7router.back()}><Icon name="close" /></button>
+    </header>
+    <div class="bc-piece-edit--steps-body" data-od-scroll>{@render body()}</div>
+    <footer class="bc-piece-edit--steps-footer">
+      {#if choosingType}
+        <button type="button" class="bc-piece-edit--cancel" onclick={() => f7router.back()}>{t('dialog.cancel')}</button>
+      {:else}
+        <button type="button" class="bc-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>
+      {/if}
+    </footer>
+  </div>
+{/snippet}
+
 <Page class="bc-piece-edit">
+  {#if !steps}
   <Navbar>
     {#snippet left()}
       <a href="#close" class="link icon-only external" role="button" onclick={(e) => (e.preventDefault(), f7router.back())}>
@@ -504,7 +545,10 @@
       {#if id || !choosingType}<button type="button" class="bc-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>{/if}
     {/snippet}
   </Navbar>
-  {#if profileWide()}
+  {/if}
+  {#if steps}
+    <ProfileFrame section="gear" list="gear" selected={id} bar="steps">{@render stepsDialog()}</ProfileFrame>
+  {:else if profileWide()}
     <ProfileFrame section="gear" list="gear" selected={id} bar="dialog" size="l">{@render body()}</ProfileFrame>
   {:else}
     {@render body()}
@@ -605,6 +649,92 @@
       &:disabled {
         opacity: 0.38;
       }
+    }
+
+    /* The two-step dialog of a new piece (tablet and desktop): header, scrolling body, footer. */
+    .bc-piece-edit--steps {
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+      min-height: 0;
+    }
+    .bc-piece-edit--steps-header {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 20px 16px 8px 24px;
+    }
+    .bc-piece-edit--steps-header:has(.bc-piece-edit--back) {
+      padding-inline-start: 12px;
+    }
+    .bc-piece-edit--steps-texts {
+      flex: 1;
+      min-width: 0;
+    }
+    .bc-piece-edit--steps-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 400;
+      color: var(--bc-text);
+      outline: none;
+    }
+    .bc-piece-edit--steps-subtitle {
+      margin: 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--bc-text-2);
+    }
+    .bc-piece-edit--steps-icon {
+      flex: none;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: none;
+      border-radius: 24px;
+      background: none;
+      color: var(--bc-text);
+      cursor: pointer;
+    }
+    .bc-piece-edit--steps-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-bottom: 8px;
+    }
+    .bc-piece-edit--steps-footer {
+      flex: none;
+      display: flex;
+      justify-content: flex-end;
+      padding: 12px 24px 20px;
+    }
+    .bc-piece-edit--cancel {
+      height: 40px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: none;
+      color: var(--bc-action);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .bc-piece-edit--tiles.bc-piece-edit--four {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .bc-piece-edit--four .bc-piece-edit--tile {
+      padding-inline: 10px;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .bc-piece-edit--steps-footer button {
+      width: auto;
+      flex: none;
     }
 
     .bc-piece-edit--title {

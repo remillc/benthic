@@ -24,7 +24,7 @@ const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt
 /**
  * iPhone: « Retirer le Shearwater Perdix 2 ? » as an action sheet (task 2026-11-19-308, ios-profil-piece-retirer): the explanation in
  * grey, one button for each reason, one without a reason, then « Annuler » apart.
- * @param {{ title: string, text: string, reasons: { reason: 'sold'|'lost'|'worn', label: string }[], none: string, onPick: (reason: 'sold'|'lost'|'worn'|undefined) => void, cancel?: string }} o
+ * @param {{ title: string, text: string, reasons: { reason: 'sold'|'lost'|'worn'|'other', label: string }[], none: string, onPick: (reason: 'sold'|'lost'|'worn'|'other'|undefined) => void, cancel?: string }} o
  * @returns {object[][]}
  */
 export function retireSheetButtons({ title, text, reasons, none, onPick, cancel }) {

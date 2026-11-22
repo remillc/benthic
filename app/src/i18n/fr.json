@@ -1848,6 +1848,10 @@
     "menuNew": "Nouveau carnet",
     "menuExport": "Exporter le carnet",
     "menuExportNone": "Aucune plongée à exporter",
+    "menuExportCount": {
+      "one": "La plongée du carnet",
+      "other": "Les {n} plongées"
+    },
     "cloudSoon": "Le nuage arrive dans une prochaine version.",
     "signInTitle": "Se connecter",
     "signInHelp": "Ou créer un compte.",
@@ -2788,6 +2792,12 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Tablette et bureau : la plongée à côté du carnet s’affiche dès le lancement, comme le carnet ; les données des statistiques, des sites et des outils se lisent une fois la première plongée affichée.",
+      "Équipement : retirer une pièce propose une quatrième raison, « Autre », à côté de Vendue, Perdue et Hors d’usage. Elle s’affiche dans « Pièces retirées ».",
+      "Icônes : les 19 types d’équipement reprennent les dessins des maquettes, avec de nouveaux dessins pour Recycleur, Masque, Palmes et Scooter. L’entretien prend une clé à molette, « Ouvrir un autre carnet » un carnet ouvert, et l’équipement, l’archive, la renumérotation, le Bluetooth, le calendrier, l’envoi et l’appareil photo celui de leur maquette.",
+      "Équipement : nouveau type « Recycleur », après Bouteille, avec la date d’installation des cellules O₂ et la dernière révision. Il reçoit deux rappels, cellules O₂ aux 12 mois et révision chaque année, comptés à partir de ces dates.",
+      "Équipement, tablette et ordinateur : « Nouvelle pièce » se fait en deux étapes dans une fenêtre. La première choisit le type dans une grille de 19, la seconde affiche « Nouvelle pièce · type » avec une flèche de retour, la croix et le seul bouton Enregistrer. La ligne « Type de pièce » et le bouton « Changer de type » disparaissent de ces écrans.",
+      "Tablette : le menu ⋮ du carnet affiche le nom du carnet et propose Renommer, Ouvrir un autre carnet, Nouveau carnet et Exporter le carnet, avec le nombre de plongées.",
+      "Export : une fenêtre à lignes simples, une par format, avec l’extension et une phrase de description, sur téléphone, tablette et ordinateur. UDDF passe avant SSRF. « Fichier Benthic » a son interrupteur « Inclure les photos et vidéos », activé par défaut. « Envoyer vers divelogs.de » est ajouté.",
       "Ordinateur : « Enregistrer une copie » et « Télécharger mes plongées » quittent les menus, et « Exporter le carnet » le menu ⋮. Pour faire une copie, exportez le carnet.",
       "Export : « Fichier Benthic (.benthic) » écrit tout le carnet et vos données (équipement, profil, brevets, réglages). Il n’est proposé que pour tout le carnet.",
       "Premier lancement : « Le serveur ne répond pas » est centré, boutons compris.",
@@ -4083,29 +4093,42 @@
       "one": "Exporter {n} plongée",
       "other": "Exporter {n} plongées"
     },
-    "text": "Choisissez un format. Le fichier s’ouvre ensuite dans le partage du téléphone.",
     "formats": {
-      "benthic": "Fichier Benthic (.benthic)",
-      "ssrf": "Fichier de carnet (.ssrf)",
-      "uddf": "UDDF (.uddf)",
-      "csv": "CSV, liste des plongées",
-      "csvProfiles": "CSV, profils",
-      "pdf": "Fiches PDF"
+      "benthic": "Fichier Benthic",
+      "uddf": "UDDF",
+      "ssrf": "Fichier de carnet",
+      "csv": "Liste des plongées",
+      "csvProfiles": "Profils",
+      "pdf": "Fiches",
+      "divelogs": "Envoyer vers divelogs.de"
     },
     "formatTexts": {
-      "benthic": "Tout le carnet et vos données Benthic : équipement, profil, brevets, réglages",
-      "ssrf": "Format Subsurface, lisible aussi par Benthic",
-      "uddf": "Format d’échange entre logiciels de plongée",
+      "benthic": "Tout le carnet, avec l’équipement, le profil et les réglages",
+      "uddf": "Échange avec d’autres logiciels de plongée",
+      "ssrf": "Pour Subsurface, sans l’équipement ni le profil",
       "csv": "Une ligne par plongée, pour un tableur",
       "csvProfiles": "Temps, profondeur et température, point par point",
-      "pdf": "Une page par plongée"
+      "pdf": "Une page par plongée, à imprimer",
+      "divelogs": "Ajoute les plongées à votre compte divelogs.de"
     },
     "anonymize": "Anonymiser",
     "anonymizeText": "Retire les noms des personnes, les notes et les positions GPS",
     "showName": "Mon nom dans l’en-tête",
     "showNameText": "PDF : « {name} » en haut de chaque page",
     "action": "Exporter",
-    "failed": "L’export n’a pas pu être fait."
+    "failed": "L’export n’a pas pu être fait.",
+    "titleLogbook": "Exporter le carnet",
+    "formatsLabel": "Format",
+    "textLogbook": {
+      "one": "{name} · {n} plongée. Choisissez un format.",
+      "other": "{name} · {n} plongées. Choisissez un format."
+    },
+    "textSelection": "Choisissez un format.",
+    "footnotePhone": "Le fichier s’ouvre ensuite dans le partage du téléphone.",
+    "footnoteTablet": "Le fichier s’ouvre ensuite dans le partage de la tablette.",
+    "withMedia": "Inclure les photos et vidéos",
+    "withMediaText": "Le fichier peut devenir beaucoup plus gros",
+    "divelogsSoon": "L’envoi vers divelogs.de n’est pas encore disponible."
   },
   "plans": {
     "title": "Plongées planifiées",
@@ -5806,6 +5829,8 @@
       "valve": "Robinet",
       "o2Clean": "Propre O₂",
       "lastInspection": "Dernière inspection visuelle",
+      "o2CellsOn": "Cellules O₂ installées le",
+      "lastService": "Dernière révision",
       "lastHydro": "Dernier test hydrostatique"
     },
     "fieldHint": {
@@ -5884,7 +5909,8 @@
       "reason": {
         "sold": "Vendue",
         "lost": "Perdue",
-        "worn": "Hors d’usage"
+        "worn": "Hors d’usage",
+        "other": "Autre"
       },
       "sheet": "Retirer · {reason}",
       "sheetNone": "Retirer sans raison",
@@ -5960,6 +5986,7 @@
         "suit": "Combinaisons",
         "undersuit": "Sous-vêtements",
         "cylinder": "Bouteilles",
+        "rebreather": "Recycleurs",
         "light": "Lampes",
         "other": "Autres",
         "bcd": "Vestes",
@@ -5980,6 +6007,7 @@
         "suit": "Combinaison",
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
+        "rebreather": "Recycleur",
         "light": "Lampe",
         "other": "Autre",
         "bcd": "Veste",
@@ -6176,6 +6204,10 @@
       "changeType": "Changer de type",
       "serialHint_suit": "Sur l’étiquette des combinaisons étanches",
       "serialHint_cylinder": "Numéro gravé sur la bouteille",
+      "serialHint_rebreather": "Sur la plaque du boîtier",
+      "step1": "Étape 1 sur 2 · Choisissez le type de pièce",
+      "titleWithType": "Nouvelle pièce · {type}",
+      "backToTypes": "Revenir au choix du type",
       "cylinderNameHint": "Par exemple, AL80 jaune",
       "typeTitle": "Type de pièce",
       "tile": {
@@ -6193,6 +6225,7 @@
         "suit": "Combinaison",
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
+        "rebreather": "Recycleur",
         "bcd": "Veste",
         "light": "Lampe",
         "weights": "Ceinture de lest",
@@ -6357,6 +6390,7 @@
       "service": "Révision",
       "inspection": "Inspection visuelle",
       "hydrostatic": "Requalification",
+      "o2Cells": "Cellules O₂",
       "battery": "Pile",
       "seals": "Joints et fermeture",
       "travelCheck": "Contrôle avant voyage"
@@ -6427,13 +6461,15 @@
     "reminderCard": {
       "title": "Rappels d’entretien",
       "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
+      "suggestRebreather": "Suggéré : cellules O₂ aux 12 mois, révision chaque année",
       "suggestDrysuit": "Suggéré pour une combinaison étanche : entretien annuel, y compris des valves",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",
         "regulator": "Suggéré pour un détendeur : {rule}",
         "suit": "Suggéré pour une combinaison : {rule}",
         "cylinder": "Suggéré pour une bouteille : {rule}",
-        "bcd": "Suggéré pour une veste : {rule}"
+        "bcd": "Suggéré pour une veste : {rule}",
+        "rebreather": "Suggéré pour un recycleur : {rule}"
       },
       "noSuggestion": "Aucun rappel suggéré pour ce type de pièce",
       "add": "Ajouter",

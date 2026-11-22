@@ -72,7 +72,7 @@ export const INCLUDED = /** @type {{ key: string, rows: IncludedRow[] }[]} */ ([
     key: 'profile',
     rows: [
       { key: 'gear', icon: 'briefcase', tone: 'amber', built: true },
-      { key: 'maintenance', icon: 'bell', tone: 'red', built: true },
+      { key: 'maintenance', icon: 'wrench', tone: 'red', built: true },
       { key: 'certifications', icon: 'idCard', tone: 'violet', built: true },
       { key: 'info', icon: 'account', tone: 'blue', built: true },
       { key: 'gasAnalysis', icon: 'blender', tone: 'green', built: false },

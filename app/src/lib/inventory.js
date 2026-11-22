@@ -46,20 +46,20 @@ import { rekey as rekeyValidations } from './validation.js';
  * @property {boolean} retired retired from the equipment (task 2026-11-19-308): out of the lists, the kits and the reminders; its
  *   maintenance history and its dives stay, and it shows in « Pièces retirées »
  * @property {string} [retiredOn] YYYY-MM-DD, the day it was retired
- * @property {'sold'|'lost'|'worn'} [retiredReason] « Vendue », « Perdue », « Hors d'usage »
+ * @property {'sold'|'lost'|'worn'|'other'} [retiredReason] « Vendue », « Perdue », « Hors d'usage », « Autre »
  */
 
-/** The reasons offered when a piece is retired. @type {readonly ('sold'|'lost'|'worn')[]} */
-export const RETIRE_REASONS = ['sold', 'lost', 'worn'];
+/** The reasons offered when a piece is retired. @type {readonly ('sold'|'lost'|'worn'|'other')[]} */
+export const RETIRE_REASONS = ['sold', 'lost', 'worn', 'other'];
 
 /**
- * The types of « Nouvelle pièce »: `bcd` is « Veste », `dsmb` « Parachute de palier »,
+ * The types of « Nouvelle pièce »: `rebreather` is « Recycleur », `bcd` is « Veste », `dsmb` « Parachute de palier »,
  * `floatBuoy` « Bouée de surface ».
- * @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'bcd'|'light'|'weights'|'mask'|'fins'|'scooter'|'camera'|'dsmb'|'floatBuoy'|'knife'|'diveKnife'|'compass'|'other'} GearType
+ * @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'rebreather'|'bcd'|'light'|'weights'|'mask'|'fins'|'scooter'|'camera'|'dsmb'|'floatBuoy'|'knife'|'diveKnife'|'compass'|'other'} GearType
  */
 
 /** The types, in the order of the type grid. @type {GearType[]} */
-export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other'];
+export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'rebreather', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other'];
 
 /** The groups of the inventory page and of the kit editor. @type {('computer'|'regulator'|'suit'|'cylinder'|'other')[]} */
 export const GROUPS = ['computer', 'regulator', 'suit', 'cylinder', 'other'];
@@ -458,7 +458,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
 
     /**
      * « Retirer de l'équipement »: the piece leaves the lists, the kits and the reminders; its history and its dives stay.
-     * @param {string} gearId @param {'sold'|'lost'|'worn'} [reason]
+     * @param {string} gearId @param {'sold'|'lost'|'worn'|'other'} [reason]
      */
     async retireGear(gearId, reason) {
       const piece = await store.read(`gear/${gearId}.json`);

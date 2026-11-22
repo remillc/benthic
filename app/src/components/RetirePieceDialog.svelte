@@ -13,10 +13,10 @@
   import { retireSheetButtons } from '../lib/action-sheet.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ name: string, computer?: boolean, onconfirm: (reason: 'sold'|'lost'|'worn'|undefined) => void, oncancel: () => void }} */
+  /** @type {{ name: string, computer?: boolean, onconfirm: (reason: 'sold'|'lost'|'worn'|'other'|undefined) => void, oncancel: () => void }} */
   let { name, computer = false, onconfirm, oncancel } = $props();
 
-  /** @type {'sold'|'lost'|'worn'|undefined} */
+  /** @type {'sold'|'lost'|'worn'|'other'|undefined} */
   let reason = $state();
   const suffix = $derived(computer ? '' : 'Other');
   const title = $derived(t(`gear.retire.title${suffix}`, { name }));

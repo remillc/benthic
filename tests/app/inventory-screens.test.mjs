@@ -79,11 +79,13 @@ test('the release notes mention the profile and the equipment', () => {
   for (const lang of [fr, en]) assert.ok(lang.about.releaseNotes.some((n) => /profil|profile/i.test(n) && /(quipment|quipement)/.test(n)));
 });
 
-test('the BCD has the vest icon, the buoy the flat-top icon, and « Nouvelle pièce » a large model picture', async () => {
+test('the BCD has the vest icon, the buoy the board tapered icon, and « Nouvelle pièce » a large model picture', async () => {
   const { readFileSync } = await import('node:fs');
   const icon = readFileSync(new URL('../../app/src/components/GearIcon.svelte', import.meta.url), 'utf8');
   assert.match(icon, /bcd: 'M8\.5 3L5 5\.5V19/, 'vest: collar, centre opening, straps');
-  assert.match(icon, /buoy: 'M9\.5 17V3\.5a\.5\.5 0 0 1 \.5-\.5h4/, 'buoy: flat top');
+  // Task 2026-11-22-324: the icons are the type board's (android-tablette-profil-piece-nouvelle-type-paysage); a buoy is drawn as « Parachute de palier ».
+  assert.match(icon, /dsmb: 'M7 3h10l-2 14H9zM12 17v4'/, 'buoy: the board tapered tube');
+  assert.match(icon, /floatBuoy: 'M10 3h4v13a2 2 0 0 1-4 0zM12 18v4'/, 'float buoy: the board flat-top tube');
   const edit = readFileSync(new URL('../../app/src/pages/ProfilePieceEdit.svelte', import.meta.url), 'utf8');
   assert.match(edit, /<DcTile model=\{computer \? catalogModel : ''\}[^>]*photo=\{photoUrl\} fallback=\{pictureIcon\}/, 'the photo');
   assert.match(edit, /snippet pictureIcon\(\)\}[\s\S]*?<GearIcon \{type\} \{name\} size=\{96\}/, 'else the type icon');

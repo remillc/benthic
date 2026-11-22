@@ -62,7 +62,7 @@
     </a>
     {#if hasActiveMaintenance()}
       <a href="/profile/maintenance/" class="bc-profile--row">
-        <span class="bc-profile--tile bc-profile--tile-amber"><Icon name="bell" size={22} weight={1.8} /></span>
+        <span class="bc-profile--tile bc-profile--tile-amber"><Icon name="wrench" size={22} weight={1.8} /></span>
         <span class="bc-profile--texts">
           <span class="bc-profile--label">{t('maintenance.entry')}</span>
         </span>
