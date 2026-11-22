@@ -22,9 +22,9 @@ Benthic is a full dive log app for mobile. It improves on Subsurface-mobile, but
 - **App:** Capacitor (hybrid).
 - **Web layer:** Svelte 5 + Framework7 v9, in **JavaScript with JSDoc**. No TypeScript.
 - **Business logic:** Subsurface's C++ core, reused as is, plus libdivecomputer. It is exposed to the web layer by a native Capacitor plugin (Swift / Kotlin + JNI).
-- **JavaScript first (decided on 14 November 2026):** Benthic's own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libopendives`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
+- **JavaScript first (decided on 14 November 2026):** Benthic's own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libbenthic`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
 - **Offline maps:** self-hosted PMTiles built from OpenStreetMap data.
-- **Desktop (decided on 15 November 2026):** a desktop version for Windows, macOS and Linux, built with **Electron**, sold through the stores (Microsoft Store, Mac App Store, Linux stores). The same Svelte 5 + Framework7 web layer; the core runs in a helper process (`desktop/host`, JSON lines over stdio) reached from Electron's main process, and `plugins/opendives-core/desktop.js` implements the plugin's JSDoc contract on it, so the app's code does not depend on the platform (docs/architecture.md, section 10). Dive computers: Bluetooth only in the first desktop version, through Chromium's Web Bluetooth in JavaScript. Its look is decided in the design sessions on claude.ai.
+- **Desktop (decided on 15 November 2026):** a desktop version for Windows, macOS and Linux, built with **Electron**, sold through the stores (Microsoft Store, Mac App Store, Linux stores). The same Svelte 5 + Framework7 web layer; the core runs in a helper process (`desktop/host`, JSON lines over stdio) reached from Electron's main process, and `plugins/benthic-core/desktop.js` implements the plugin's JSDoc contract on it, so the app's code does not depend on the platform (docs/architecture.md, section 10). Dive computers: Bluetooth only in the first desktop version, through Chromium's Web Bluetooth in JavaScript. Its look is decided in the design sessions on claude.ai.
 
 ## Golden rule: Subsurface is never modified
 
@@ -68,10 +68,10 @@ Benthic is a full dive log app for mobile. It improves on Subsurface-mobile, but
 ```
 AGENTS.md                 this file
 app/                      Capacitor app (Svelte 5, Framework7) + report (README.md)
-plugins/opendives-core/   local Capacitor plugin: JSDoc contract, Kotlin, JNI, Swift (ios/); desktop.js (desktop)
+plugins/benthic-core/   local Capacitor plugin: JSDoc contract, Kotlin, JNI, Swift (ios/); desktop.js (desktop)
 desktop/                  Electron app (Windows, macOS, Linux): main process, bridge, the core's helper (host/)
 core/compat/              Benthic additions to build Subsurface's core without Qt
-core/libopendives/        C++ facade over the core
+core/libbenthic/        C++ facade over the core
 native/                   Android build of the core and its dependencies; ios/: the iOS build
 poc/                      proof of concept: build.sh + report (README.md)
 tests/                    roundtrip.cpp, run-roundtrip.sh, facade.cpp, plan_test.cpp, plan_oracle.cpp,
@@ -101,7 +101,7 @@ The native code is built under WSL with the Linux NDK; `cmake`, `ninja-build` an
 
 ```sh
 native/install-ndk.sh             # once: installs the NDK under ~
-native/build-android.sh           # dependencies + libopendives.so (arm64-v8a and x86_64)
+native/build-android.sh           # dependencies + libbenthic.so (arm64-v8a and x86_64)
 ```
 
 The APK is then built on Windows, in PowerShell, with **JDK 21** (not Android Studio's) and SDK API 35:
@@ -121,7 +121,7 @@ Gradle does not rebuild the native code: rerun `native/build-android.sh` when th
 
 ### iOS app
 
-There is no Mac for now: the iOS build runs in the `iOS` workflow on a GitHub macOS runner (`.github/workflows/ios.yml`), on `main` when the native side changes, else by hand. The Swift side of the plugin is in `plugins/opendives-core/ios/`, the Xcode project in `app/ios/`, the scripts in `native/ios/` and `tests/ios/`; see `native/ios/README.md`. A plugin method added or changed on Android is added or changed in Swift too.
+There is no Mac for now: the iOS build runs in the `iOS` workflow on a GitHub macOS runner (`.github/workflows/ios.yml`), on `main` when the native side changes, else by hand. The Swift side of the plugin is in `plugins/benthic-core/ios/`, the Xcode project in `app/ios/`, the scripts in `native/ios/` and `tests/ios/`; see `native/ios/README.md`. A plugin method added or changed on Android is added or changed in Swift too.
 
 ## Conventions
 
@@ -131,7 +131,7 @@ There is no Mac for now: the iOS build runs in the `iOS` workflow on a GitHub ma
 - **Release lock (planner calculations): no tag without a green report for that commit.** On the commit to release, with the working tree clean, run `tests/release-check.sh` (about 7 minutes with the builds warm, much longer from a clean tree; needs the emulator `emulator-5554` on the test account, the NDK, JDK 21, and the app's `npm ci`). It checks: the 17 cases of Subsurface's `testplan.cpp` through the façade (the ones the façade cannot express are listed in its output), an independent ZH-L16C checker over 360 plans, the app chain (units, request, displayed values, alarms), the Tools section (`tests/app/gas-tools.test.mjs`: the gas calculator in JavaScript by hand, the compressibility factor against Subsurface's own values, the gas blender against an exact real-gas reference; `tests/tools_test.cpp`, through the façade: the desaturation against a replay of the logged dives through an independent ZH-L16C), that wrong inputs make each of them fail, the same programs compiled with the NDK and run on the emulator, and the planner scenarios in the real app. It writes `build/release-check/report-<commit>.json`, tied to the commit and to the pinned Subsurface commit. Before tagging, `tests/release-check.sh --verify` must print GREEN; attach the report to the GitHub release. Changing the Subsurface pin or any planner or Tools code means a new report.
 - **Navigation has one contract** (decided on 19 November 2026): `docs/architecture.md`, section 13. Framework7's routers own the history (nothing is written to the browser's); every page change goes through the router guard (`app/src/lib/router-guard.js`); the Android Back, Escape and the tests go through one dispatcher (`app/src/lib/back-button.js`); a gesture that moves pages is built on `horizontalSwipe`, holds the router and gives a `cancel`. `tests/app/navigation-contract.test.mjs` checks the sources; after a change to navigation code, run `node tests/e2e/navigation.mjs` (fixed flows, the touches the system takes away, the seeded random sequences; `node tests/e2e/navigation-parallel.mjs` runs the same blocks in three processes, about 4 minutes instead of 15), and a longer random run (`OD_MONKEY_FULL=1`, or `OD_MONKEY_SEEDS` and `OD_MONKEY_STEPS`) before a release.
 - **Tests follow the interface.** A change to the interface (structure, CSS classes, a field that becomes a menu, a text the tests read) updates, in the same commit, the tests that read the screen: `tests/e2e/planner-e2e.mjs` (what it reads, `type`, `choose`) and `tests/app/`. When the planner's screen changes, run `tests/e2e/run.sh` before delivering. Updating how a test reads the screen never changes what it expects.
-- **Navigation e2e:** `node tests/e2e/navigation.mjs` (add `--phone-only` or `--tablet-only`) runs the app in headless Chrome at 390x844 (Android look) and 1280x800 with the sample logbook, and checks the page stack after each step (one current page, its route is the router's, no transform, no stuck transition). Run it when a change touches routes, pages, `AdaptivePage`, the dive page's swipe or the Back handling. It needs Chrome (`CHROME`) and the core host (`OPENDIVES_HOST`, desktop build); without them it exits with code 2. Every router call of a view goes through `app/src/lib/router-guard.js` (Back ignored while a page change or a hand-made history change runs, a navigation waits for it).
+- **Navigation e2e:** `node tests/e2e/navigation.mjs` (add `--phone-only` or `--tablet-only`) runs the app in headless Chrome at 390x844 (Android look) and 1280x800 with the sample logbook, and checks the page stack after each step (one current page, its route is the router's, no transform, no stuck transition). Run it when a change touches routes, pages, `AdaptivePage`, the dive page's swipe or the Back handling. It needs Chrome (`CHROME`) and the core host (`BENTHIC_HOST`, desktop build); without them it exits with code 2. Every router call of a view goes through `app/src/lib/router-guard.js` (Back ignored while a page change or a hand-made history change runs, a navigation waits for it).
 - **Changing a reference value** in these tests (`tests/plan_test.cpp`, `tests/plan_oracle.cpp`, `tests/app/`, `tests/e2e/`) needs a commit that says why: what moved, by how much, and what justifies the new value. A value or a tolerance is never changed to make a test pass; a test that fails is a discrepancy to explain.
 - Release notes (About → Nouveautés, `about.releaseNotes` in `app/src/i18n/fr.json` and `en.json`) describe the current version. Every change a user can see adds or updates a line there in the same commit; a new version starts a new list.
 - Addresses, in the app's routes and on the public site: a resource has no trailing slash (`/about`, `/dive/42`, `/site/7/edit`; on the site, `/fr/privacy`); a collection has one (`/sites/`, `/tools/`, `/settings/`, `/statistics/`; on the site, each language: `/fr/`, `/en/`); the home page is `/`.

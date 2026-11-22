@@ -23,7 +23,7 @@ The stack listens on `127.0.0.1` only: the API on 8080 and the git front (https,
 tools/dev-phone.sh <adb-serial>      # starts the stack, runs adb reverse for 8080 and 3443, copies the authority, prints the env lines
 ```
 
-The script takes the stack from `OPENDIVES_SERVER_DIR` (default: the `opendives-server` folder next to this repository). Then:
+The script takes the stack from `BENTHIC_SERVER_DIR` (default: the `benthic-server` folder next to this repository). Then:
 
 1. Put in `app/.env.local`: `VITE_SERVER_URL=http://127.0.0.1:8080` and `VITE_DEV_ACCOUNTS=1`.
 2. Build and install a **debug** build (`cd app && npm run android:sync`, then `gradlew assembleDebug` and `adb install -r`, see AGENTS.md). The certificate authority is `app/android/app/src/debug/assets/dev-ca.pem` (git-ignored); only debug builds read it, and the debug build allows clear text to the loopback only.

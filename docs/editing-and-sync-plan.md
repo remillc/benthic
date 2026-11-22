@@ -23,7 +23,7 @@ Not in this increment: adding or deleting a dive, dates and times, depth and dur
 - **Editing a dive:** `commands/command_edit.cpp`, `EditDive::exchangeDives()`: copy the dive, change the copy, then swap the contents. Around the swap: `fulltext_unregister` / `fulltext_register`, unregister and re-register the dive with its dive site, `invalidate_cache()`, and re-sort dives and trips if the time changed. The command texts (for example "Edit notes", "Edit buddies") are in the `Edit*` classes of `commands/command_edit.h`.
 - **Do not compile `commands/`:** it depends heavily on Qt (`QUndoCommand`, signals, about 110 Qt uses in `command_edit.cpp`). Port the logic into the facade instead, in standard C++, without modifying Subsurface.
 
-## 3. Facade API to add (`libopendives`)
+## 3. Facade API to add (`libbenthic`)
 
 All functions run on the core's thread and return JSON or an error code, like the existing ones.
 
@@ -46,7 +46,7 @@ All functions run on the core's thread and return JSON or an error code, like th
 
 ## 4. Write lock until the gates pass
 
-- Writing to a cloud account is disabled by default. It is enabled only when the account email matches the one in the test credentials file (`OPENDIVES_CLOUD_TEST_EMAIL`, in a file outside the repository, like `cloud-dev.env`), or when Christian turns on a developer setting after step 6 below.
+- Writing to a cloud account is disabled by default. It is enabled only when the account email matches the one in the test credentials file (`BENTHIC_CLOUD_TEST_EMAIL`, in a file outside the repository, like `cloud-dev.env`), or when Christian turns on a developer setting after step 6 below.
 - Local-only logs (no account) can be edited and saved from the start, since they cannot affect the cloud.
 - The credentials files are never committed and never printed.
 

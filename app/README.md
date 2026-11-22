@@ -8,7 +8,7 @@
 
 - **Application:** Capacitor 7, Svelte 5, Framework7 v9 and Vite, in JavaScript with JSDoc. The automatic theme gives the Material look on Android. A single screen: the logbook, grouped by trip.
 - **Core:** the 69 files of the POC, built for `arm64-v8a` and `x86_64`. The Subsurface submodule has no modifications.
-- **`OpenDivesCore` plugin (Kotlin + JNI):**
+- **`BenthicCore` plugin (Kotlin + JNI):**
   - `importSample()` saves the sample as a git repository with `parse_file` then `save_dives("<path>[main]")`.
   - `listDives()` reads this repository back with `parse_file` and returns the JSON.
   - The core runs on a single dedicated thread.
@@ -32,8 +32,8 @@ The `x86_64` application was built and bundled, but not launched on an emulator.
 | --- | --- |
 | Debug APK, two architectures | 12.9 MB (12,949,731 bytes) |
 | Debug APK, `arm64-v8a` only | 8.8 MB (8,808,203 bytes) |
-| `libopendives.so`, `arm64-v8a` | 4.1 MB (4,103,240 bytes) |
-| `libopendives.so`, `x86_64` | 4.1 MB (4,137,944 bytes) |
+| `libbenthic.so`, `arm64-v8a` | 4.1 MB (4,103,240 bytes) |
+| `libbenthic.so`, `x86_64` | 4.1 MB (4,137,944 bytes) |
 | JavaScript, then CSS (uncompressed) | 897 KB, then 505 KB |
 | Bundled sample log (uncompressed) | 1.7 MB |
 
@@ -184,7 +184,7 @@ The screenshots come from the Subsurface sample log, never from a personal log.
 - Virtual list: the 1,353 dives are rendered in one block.
 - `svelte-check` in continuous integration: a `jsconfig.json` was added for the editor, but it still reports typing errors in the framework7-svelte components.
 
-**Sizes:** debug APK of 27.7 MB (two architectures). `libopendives.so` is 9.3 MB on arm64 and 9.6 MB on x86_64, OpenSSL included.
+**Sizes:** debug APK of 27.7 MB (two architectures). `libbenthic.so` is 9.3 MB on arm64 and 9.6 MB on x86_64, OpenSSL included.
 
 ## Colour themes, compared on the phone (5 November 2026)
 

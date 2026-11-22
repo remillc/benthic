@@ -38,7 +38,7 @@ These two differences were found by reading Subsurface's code. They were not com
 
 ## Edit round trip (6 November 2026)
 
-Test 1 of `docs/editing-and-sync-plan.md`, without network: `tests/run-edit-roundtrip.sh` with `build/poc/edit-roundtrip` (`tests/edit_roundtrip.cpp`), through the façade's `edit_dive`, `undo`, `save_local` and `save_as` (`core/libopendives/edit.cpp`).
+Test 1 of `docs/editing-and-sync-plan.md`, without network: `tests/run-edit-roundtrip.sh` with `build/poc/edit-roundtrip` (`tests/edit_roundtrip.cpp`), through the façade's `edit_dive`, `undo`, `save_local` and `save_as` (`core/libbenthic/edit.cpp`).
 
 - **Baseline:** each sample is imported, then loaded as the app loads a log (`list_dives`, hence `process_loaded_dives()`) and saved into a fresh repository. Subsurface desktop and mobile also call `process_loaded_dives()` after a load: with automatic grouping on, the first save writes the automatic trips as real trips (`00-Trip` files, dives moved into the trip folders). The baseline is taken after that, and must be stable on a second save.
 - **Checks, for notes, suit, rating, visibility, buddies, dive guide and tags:** the first dive is edited, saved and reloaded with the new value; exactly one file changed, that dive's `Dive` (or `Dive-<number>`) file; one commit, whose message is "Changes made:" and the command text ("Edit notes [#2]"). Then edit, save, undo, save: the tree is the original one, and the message is "(undo) Edit notes [#2]". Finally, saving into an unrelated repository is refused with `SAVE_REPLACEMENT` and writes nothing.
@@ -53,7 +53,7 @@ The work directory must be on a Linux file system (not `/mnt/*`), as for the clo
 ## Local log and cloud writes (6 November 2026)
 
 - **Test 2, log without account:** `edit-roundtrip local <dive-file> <new-folder>` creates the log as the app does (`import_file`), edits the notes of the first dive, saves and reopens it: passed. As noted for the skeleton, `HEAD` stays on an unborn `master` while the data is on `main` (Subsurface's `git_create_local_repo`).
-- **Test 3, cloud writes:** `tests/run-cloud-write-test.sh` with `build/poc/cloud-write` (`tests/cloud_write.cpp`), on the development account only: the tool and the script refuse any account other than `OPENDIVES_CLOUD_TEST_EMAIL` (file outside the repository). Each clone is a separate `$HOME`; the offline scenario runs the process without network (`unshare -rn`). Passed:
+- **Test 3, cloud writes:** `tests/run-cloud-write-test.sh` with `build/poc/cloud-write` (`tests/cloud_write.cpp`), on the development account only: the tool and the script refuse any account other than `BENTHIC_CLOUD_TEST_EMAIL` (file outside the repository). Each clone is a separate `$HOME`; the offline scenario runs the process without network (`unshare -rn`). Passed:
   - lock: with another test address set, `save_local` and `sync` return `WRITE_LOCKED` and the server head does not move;
   - one edit then sync: one commit on the server, seen by a fresh clone;
   - two clones at the same head edit two dives: the second sync makes an "Automatic merge" commit, both changes are on the server;
@@ -68,7 +68,7 @@ tests/run-cloud-write-test.sh build/poc/cloud-write ~/.opendives/cloud-dev.env ~
 
 ## Dive planner (6 November 2026)
 
-`build/poc/edit-roundtrip plans <dive-file> <new-folder>` checks planned dives: saved, left out of the dive list and of the numbering, reloaded with their levels and request, replaced, undone, duplicated. `build/poc/plan` (`tests/plan_test.cpp`) also checks the levels, the gradient factors of a plan and the reserve as a volume. It runs the façade's read-only `plan_dive` (`core/libopendives/plan.cpp`, Subsurface's `plan()` set up as `DivePlannerPointsModel` does) on the cases of Subsurface's own `tests/testplan.cpp`, with the same settings: `testMetric` (minimum gas 148 bar, EAN36 at 33 m, oxygen at 6 m, run time 109 min exactly), `testVpmbMetric45m30minTx` (minimum gas 108 bar) and `testVpmbMetric60m30minAir` (minimum gas 180 bar, run time 139 min 20 s, Subsurface's known value). It then checks that no dive was added and that the preferences are restored, and plans the mock-up dive (28 m, 30 min, EAN33 12 L 195 bar, SAC 10.3 L/min, GF 30/70): 38 min, stops at 6 and 3 m, CNS 16 %, 44 OTU. Result: 0 failed.
+`build/poc/edit-roundtrip plans <dive-file> <new-folder>` checks planned dives: saved, left out of the dive list and of the numbering, reloaded with their levels and request, replaced, undone, duplicated. `build/poc/plan` (`tests/plan_test.cpp`) also checks the levels, the gradient factors of a plan and the reserve as a volume. It runs the façade's read-only `plan_dive` (`core/libbenthic/plan.cpp`, Subsurface's `plan()` set up as `DivePlannerPointsModel` does) on the cases of Subsurface's own `tests/testplan.cpp`, with the same settings: `testMetric` (minimum gas 148 bar, EAN36 at 33 m, oxygen at 6 m, run time 109 min exactly), `testVpmbMetric45m30minTx` (minimum gas 108 bar) and `testVpmbMetric60m30minAir` (minimum gas 180 bar, run time 139 min 20 s, Subsurface's known value). It then checks that no dive was added and that the preferences are restored, and plans the mock-up dive (28 m, 30 min, EAN33 12 L 195 bar, SAC 10.3 L/min, GF 30/70): 38 min, stops at 6 and 3 m, CNS 16 %, 44 OTU. Result: 0 failed.
 
 `tests/plan_test.cpp` now runs all the cases of `testplan.cpp` that the façade can express (13 of 17, the known Subsurface runtimes required exactly) and lists the others; `tests/plan_oracle.cpp` is the independent ZH-L16C checker; `tests/release-check.sh` runs them all, with the app and device checks (see AGENTS.md, release lock).
 
@@ -118,7 +118,7 @@ The repositories `A[main]`, `B[main]`, etc. are local git repositories: this tes
 - **Certificates:** `certificate_check_cb()` accepts any X.509 certificate for the cloud servers. Subsurface relies on `canReachCloudServer()` having validated TLS just before. Our port does validate the certificate, but the git connection itself remains without validation, as in Subsurface.
 - **WSL:** libgit2 cannot `mmap` on a Windows drive (`/mnt/c`, `/mnt/f`): "failed to mmap. Could not write data". The test's working directory must be on the WSL file system.
 
-**Reproduce.** The credentials are in a file outside the repository, with `OPENDIVES_CLOUD_EMAIL=` and `OPENDIVES_CLOUD_PASSWORD=`. The password is never displayed.
+**Reproduce.** The credentials are in a file outside the repository, with `BENTHIC_CLOUD_EMAIL=` and `BENTHIC_CLOUD_PASSWORD=`. The password is never displayed.
 
 ```sh
 tests/run-cloud-readonly.sh build/poc/cloud build/poc/roundtrip /mnt/c/Users/<you>/.opendives/cloud-dev.env ~/opendives-cloud-rt

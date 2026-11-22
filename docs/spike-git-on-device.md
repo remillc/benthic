@@ -156,6 +156,6 @@ On a conflict with `abortOnConflict: true` the working copy is left as it was (c
 
 ## Third round: libgit2 (façade built, not yet measured)
 
-Decision of 18 November 2026: git on the device is libgit2, already linked in the core, behind a few generic façade calls (`core/libopendives/odgit.h`: clone, pull, commit, push, status, unpushed, head, listFiles, remove, cancel), exposed on Android, the desktop host and (written, not built) iOS. `tests/run-odgit-test.sh` drives them against a local git http server: clone of an empty repository, commit, push, fast-forward, clean merge, conflict and its resolution, a rejected push, a wrong token, 300 files. 35 checks pass.
+Decision of 18 November 2026: git on the device is libgit2, already linked in the core, behind a few generic façade calls (`core/libbenthic/odgit.h`: clone, pull, commit, push, status, unpushed, head, listFiles, remove, cancel), exposed on Android, the desktop host and (written, not built) iOS. `tests/run-odgit-test.sh` drives them against a local git http server: clone of an empty repository, commit, push, fast-forward, clean merge, conflict and its resolution, a rejected push, a wrong token, 300 files. 35 checks pass.
 
 Not done: the app's git layer still uses isomorphic-git, and there are no timings on the emulator or the desktop yet (the logbook format is being reconsidered).

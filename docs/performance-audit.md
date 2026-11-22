@@ -35,7 +35,7 @@ checkout's `build/desktop` and `desktop/node_modules`. Nothing touched the main 
 - CDP used: `Performance.getMetrics`, `Memory.getDOMCounters` (after two forced GCs), `HeapProfiler.collectGarbage`,
   `Profiler` (CPU sampling), `PerformanceObserver` long tasks (>50 ms), `Emulation.setDeviceMetricsOverride` (390x844, DPR 3, touch)
   and `setCPUThrottlingRate` (4x) for the phone layout.
-- Bridge: `OpenDivesCoreDesktop.prototype.core` is wrapped in the renderer to log every call (method, result size, duration). Durations include
+- Bridge: `BenthicCoreDesktop.prototype.core` is wrapped in the renderer to log every call (method, result size, duration). Durations include
   main-thread waits in the renderer, so they overstate the core time when the page is busy.
 - Timings of interactions are "sync" (the handler) and "total" (until two animation frames later), in ms.
 

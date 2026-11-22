@@ -8,19 +8,19 @@ core (Subsurface's C++ code through the facade) runs in a helper process.
 ```
 renderer (app/)                      main process                        helper process
 core-api.js                          desktop/bridge.cjs                  desktop/host/host.cpp
-  -> plugins/opendives-core/           ipc 'od:*' handlers   <-- stdio -->  benthic-host
-     desktop.js  -> window.odDesktop   + HostProcess (restarts it)          (the facade)
+  -> plugins/benthic-core/           ipc 'od:*' handlers   <-- stdio -->  benthic-host
+     desktop.js  -> window.benthicDesktop   + HostProcess (restarts it)          (the facade)
                     (desktop/preload.cjs)
 ```
 
-- **`plugins/opendives-core/desktop.js`** is the desktop twin of `OpenDivesCorePlugin.kt`: the same
+- **`plugins/benthic-core/desktop.js`** is the desktop twin of `BenthicCorePlugin.kt`: the same
   methods, option names, resolved shapes and rejection codes. `core-api.js` registers it as the
-  plugin's `web` implementation; without `window.odDesktop` (a plain browser) its methods reject with
+  plugin's `web` implementation; without `window.benthicDesktop` (a plain browser) its methods reject with
   `UNAVAILABLE`.
-- **`desktop/preload.cjs`** exposes `window.odDesktop`; **`desktop/bridge.cjs`** (`setupBridge`) answers
+- **`desktop/preload.cjs`** exposes `window.benthicDesktop`; **`desktop/bridge.cjs`** (`setupBridge`) answers
   it. The full list of the preload API, the checks on paths and the ipc channels is at the top of
   `bridge.cjs`.
-- **`desktop/host/host.cpp`** is the desktop twin of `opendives_jni.cpp`: one handler per `NativeCore`
+- **`desktop/host/host.cpp`** is the desktop twin of `benthic_jni.cpp`: one handler per `NativeCore`
   function, the same names, arguments, results and errors.
 
 Wiring in `desktop/main.cjs`:
@@ -68,7 +68,7 @@ Left out of the host: `downloadDives` (Bluetooth will come from the web layer, W
 ```sh
 poc/build.sh                                   # Linux or WSL: the core objects
 desktop/host/build-linux-test.sh               # build/desktop/benthic-host
-OPENDIVES_HOST=build/desktop/benthic-host node --test tests/desktop/host.test.mjs
+BENTHIC_HOST=build/desktop/benthic-host node --test tests/desktop/host.test.mjs
 node --test tests/desktop/bridge.test.mjs      # the bridge, with a fake host: no native build needed
 node --import ./tests/app/register.mjs --test tests/app/desktop-plugin.test.mjs
 ```
