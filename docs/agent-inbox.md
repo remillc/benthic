@@ -6539,3 +6539,11 @@ Christian approved this on 22 November 2026. Work in `main`. Validation (a signa
 Benthic+ only, as on the phone. Mock-ups updated in `docs/mockups/`.
 
 **Test:** on the tablet the ⋮ of the detail and on the desktop the header button open the validation flow; a validation added there shows in the detail's Validations group.
+
+## [ ] 2026-11-22-331 Desktop dive detail: the map across the whole header (#153)
+
+Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS.
+
+In the detail pane of the desktop logbook (`/dives/:id`), the map of the dive's site fills the whole width of the pane's header, from the divider to the window's right edge, behind the title « N° 5 · Lake Coleridge », its subtitle and the action buttons: 170 px high, cropped to fill (never letterboxed or stretched), centred on the site's pin, with a fade to the page colour toward the bottom (#F4F4F2 at 45 % at the top, 70 % at 60 %, opaque at the bottom; dark mode: the same on the dark page colour) so that the title and the buttons keep their contrast. The profile card starts over the faded bottom. Without a site position, no map: the header is the plain page colour.
+
+Mock-up: `bureau-carnet-profil-droite` and the other desktop boards with the detail pane (already in `docs/mockups/`).
