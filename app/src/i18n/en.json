@@ -2724,7 +2724,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Shared map: dive counts are hidden and site names appear when zooming in.",
+      "Shared map: dive counts and cluster badges are hidden; site names appear when zooming in.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
       "Desktop: the account menu no longer shows a plus sign on the initial.",
