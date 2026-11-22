@@ -180,6 +180,7 @@
         baseState = 'ready';
       } catch (error) {
         if (ask !== baseAsk) return;
+        console.error('Shared site area', error);
         baseState = /** @type {any} */ (error)?.code === 'SUBSCRIPTION_REQUIRED' ? 'offer' : 'failed';
       }
     }, 350);

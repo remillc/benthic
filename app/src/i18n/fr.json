@@ -2742,6 +2742,7 @@
       "Carte commune : un message indique quand les sites ne sont pas disponibles hors ligne.",
       "Carte commune : ajout de sites d’OpenDiving Commons.",
       "Sites : les modifications reçues par synchronisation apparaissent sans rouvrir l’application.",
+      "Ordinateur : la carte commune se charge lorsque la vue mondiale traverse la ligne de changement de date.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
       "Sites : les noms apparaissent en zoomant sur les deux cartes ; sur tablette, le déplacement et le zoom fonctionnent dans la page et la carte est dégagée de la zone de navigation système.",
       "Carte commune : les boutons de sélection sont plus faciles à toucher.",

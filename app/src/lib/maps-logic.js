@@ -195,6 +195,9 @@ function tileY(lat, z) {
   return Math.floor(((1 - Math.asinh(Math.tan(rad)) / Math.PI) / 2) * 2 ** z);
 }
 
+/** @param {number} lng */
+export const normalizeLongitude = (lng) => ((((lng + 180) % 360) + 360) % 360) - 180;
+
 /**
  * Longitudes brought into [-180, 180] (a map dragged past the antimeridian
  * gives 190). A box whose west is then east of its east crosses the antimeridian.
@@ -203,9 +206,8 @@ function tileY(lat, z) {
  */
 export function normalizeBbox([w, s, e, n]) {
   if (e - w >= 360) return [-180, s, 180, n];
-  const wrap = (/** @type {number} */ lng) => ((((lng + 180) % 360) + 360) % 360) - 180;
-  const east = e === 180 ? 180 : wrap(e);
-  return [wrap(w), s, east, n];
+  const east = e === 180 ? 180 : normalizeLongitude(e);
+  return [normalizeLongitude(w), s, east, n];
 }
 
 /**
