@@ -730,6 +730,14 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       display: flex;
     }
 
+    /* Framework7's otherwise empty page content sits above the tablet panes. */
+    :global(.bc-sites--tablet > .page-content) {
+      pointer-events: none;
+    }
+    :global(.bc-sites--tablet > .page-content > *) {
+      pointer-events: auto;
+    }
+
     /* The top bar and the open search or selection belong to the list pane only:
        the map runs up to the top, beside them. */
     :global(.bc-sites--tablet .navbar.bc-sites--bar),
@@ -986,24 +994,45 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       bottom: 32px;
       display: flex;
       height: 40px;
+      max-width: calc(100% - 88px);
       border-radius: 20px;
       background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
-      overflow: hidden;
     }
     .bc-sites--mode-button {
+      position: relative;
       display: flex;
+      flex: none;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      width: auto;
+      min-width: 48px;
       height: 40px;
-      padding: 0 16px;
+      padding: 0 12px;
       border: none;
       background: transparent;
       font: inherit;
       font-size: 14px;
+      line-height: 20px;
       font-weight: 500;
+      white-space: nowrap;
       color: var(--bc-text);
       cursor: pointer;
+      &:first-child {
+        border-radius: 20px 0 0 20px;
+      }
+      &:last-child {
+        border-radius: 0 20px 20px 0;
+      }
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -4px 0;
+      }
+      :global(.bc-icon) {
+        flex: none;
+      }
       &[aria-pressed='true'] {
         padding-left: 12px;
         font-weight: 600;
