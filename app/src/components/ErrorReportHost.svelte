@@ -45,10 +45,8 @@
       border-radius: 28px 28px 0 0;
       background: var(--bc-dialog);
       overflow: hidden;
-    }
 
-    @media (min-width: 768px) {
-      :global(.bc-error-report--sheet) {
+      @media (min-width: 768px) {
         left: calc(50% - 280px);
         width: 560px;
       }
@@ -120,11 +118,11 @@
         font-size: 14px;
         letter-spacing: 0.1px;
         cursor: pointer;
-      }
 
-      button:disabled {
-        opacity: 0.6;
-        cursor: default;
+        &:disabled {
+          opacity: 0.6;
+          cursor: default;
+        }
       }
     }
 

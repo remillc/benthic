@@ -278,9 +278,10 @@
         background: none;
         color: var(--bc-on-table-selected);
         cursor: pointer;
-      }
-      & button + button {
-        border-top: 1px solid var(--bc-separator);
+
+        + button {
+          border-top: 1px solid var(--bc-separator);
+        }
       }
     }
     .bc-desktop-pos-map--credits {
@@ -294,14 +295,14 @@
       pointer-events: none;
     }
 
-
     /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
     @media (hover: hover) and (pointer: fine) {
       .bc-desktop-pos-map--zoom button {
         transition: box-shadow 120ms linear;
-      }
-      .bc-desktop-pos-map--zoom button:not(:disabled):hover {
-        box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+
+        &:not(:disabled):hover {
+          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
+        }
       }
     }
     @media (prefers-reduced-motion: reduce) {

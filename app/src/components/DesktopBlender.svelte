@@ -300,9 +300,10 @@
       flex-direction: column;
       gap: 14px;
       align-items: stretch;
-    }
-    .bc-desktop-blender--inputs > :global(.bc-desktop-segments) {
-      align-self: flex-start;
+
+      > :global(.bc-desktop-segments) {
+        align-self: flex-start;
+      }
     }
     .bc-desktop-blender--label {
       margin: 6px 0 0;
@@ -378,9 +379,10 @@
         gap: 12px;
         padding: 12px 0;
         border-top: 1px solid var(--bc-separator);
-      }
-      & li:first-child {
-        border-top: 0;
+
+        &:first-child {
+          border-top: 0;
+        }
       }
     }
     .bc-desktop-blender--number {

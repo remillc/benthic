@@ -635,14 +635,16 @@
       justify-content: space-between;
       gap: 12px;
       padding: 12px 16px;
-    }
-    .bc-desktop-account--syncline :global(.bc-sync-button) {
-      flex: none;
-      white-space: nowrap;
-    }
-    .bc-desktop-account--syncline :global(.bc-sync-status) {
-      flex: 1;
-      min-width: 0;
+
+      :global(.bc-sync-button) {
+        flex: none;
+        white-space: nowrap;
+      }
+
+      :global(.bc-sync-status) {
+        flex: 1;
+        min-width: 0;
+      }
     }
     .bc-desktop-account--entry {
       display: flex;

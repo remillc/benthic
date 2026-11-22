@@ -176,10 +176,10 @@
         line-height: 20px;
         color: var(--bc-alarm);
         background: var(--bc-alarm-tint);
-      }
 
-      li + li {
-        margin-top: 4px;
+        + li {
+          margin-top: 4px;
+        }
       }
     }
 

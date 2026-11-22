@@ -668,10 +668,10 @@
       gap: 16px;
       margin-top: 14px;
       align-items: flex-start;
-    }
 
-    .bc-csv-import--options :global(.bc-csv-import--date) {
-      width: 260px;
+      :global(.bc-csv-import--date) {
+        width: 260px;
+      }
     }
 
     /* Step 3: what was read. */

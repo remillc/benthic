@@ -863,16 +863,16 @@
       &:not(.bc-dive-profile--chip-outline) {
         padding-left: 8px;
       }
-    }
 
-    /* Selected curve button: text, check and border in the colour of its curve. */
-    .bc-dive-profile--chip:not(.bc-dive-profile--chip-outline) {
-      background: var(--bc-curve-chip-bg);
-      color: var(--bc-curve);
-      box-shadow: inset 0 0 0 var(--bc-curve-chip-border-width) var(--bc-curve);
-
-      .chip-label {
+      /* Selected curve button: text, check and border in the colour of its curve. */
+      &:not(.bc-dive-profile--chip-outline) {
+        background: var(--bc-curve-chip-bg);
         color: var(--bc-curve);
+        box-shadow: inset 0 0 0 var(--bc-curve-chip-border-width) var(--bc-curve);
+
+        .chip-label {
+          color: var(--bc-curve);
+        }
       }
     }
 

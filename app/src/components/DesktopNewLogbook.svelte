@@ -790,10 +790,11 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--bc-text-2);
-    }
-    .bc-new-logbook--privacy :global(svg) {
-      flex: none;
-      margin-top: 1px;
+
+      :global(svg) {
+        flex: none;
+        margin-top: 1px;
+      }
     }
     .bc-new-logbook--note {
       display: flex;

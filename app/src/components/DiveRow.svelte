@@ -444,11 +444,11 @@
     :global(.ios) .bc-dive-row--number {
       font-weight: 400;
       color: var(--bc-text-2);
-    }
 
-    :global(.ios) .bc-dive-row--number + .bc-dive-row--time::before {
-      content: '·';
-      margin: 0 6px;
+      + .bc-dive-row--time::before {
+        content: '·';
+        margin: 0 6px;
+      }
     }
 
     :global(.ios) .bc-dive-row--meta {
