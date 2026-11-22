@@ -32,6 +32,13 @@ test('the list: weekday in the date, one sticky year line, no Profile column by 
   assert.match(read('app/src/lib/desktop-table.js'), /key: 'profile'[^}]*defaultShown: false/);
 });
 
+test('the desktop logbook selector shows the current name instead of a separate logbook label', () => {
+  const selector = read('app/src/components/DesktopLogbookSelector.svelte');
+  const pill = selector.match(/class="bc-logbook-selector--pill"[\s\S]*?<\/button>/)?.[0] ?? '';
+  assert.match(pill, /current \? displayName\(current, t\) : t\('desktopLogbooks\.selector\.label'\)/);
+  assert.doesNotMatch(pill, /bc-logbook-selector--name/);
+});
+
 test('« Saucisse » gets the buoy icon wherever the app shows a piece, desktop included', () => {
   assert.ok(isBuoyName('Saucisse'));
   assert.ok(isBuoyName('Parachute de palier'));

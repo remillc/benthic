@@ -2723,6 +2723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Ordinateur : le sélecteur affiche le nom du carnet sans libellé superflu.",
       "Carte commune : le déplacement de la carte et le défilement restent plus fluides lorsque beaucoup de sites sont affichés.",
       "Carte commune : la liste suit la zone affichée, y compris les sites regroupés sur la carte.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
