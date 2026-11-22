@@ -5,7 +5,7 @@
   // chosen tool on the right. The calculations are the phone's; only the layout is new. Below
   // 1200 dp the tablet's Tools.svelte shows instead (App.svelte).
   import { Page } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import DesktopEadMod from '../components/DesktopEadMod.svelte';
   import DesktopBestMix from '../components/DesktopBestMix.svelte';
@@ -65,7 +65,7 @@
     do {
       again = false;
       try {
-        plans = (await OpenDivesCore.listPlans()).length;
+        plans = (await BenthicCore.listPlans()).length;
       } catch {
         plans = null;
       }

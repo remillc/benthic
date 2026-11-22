@@ -8,7 +8,7 @@
   // The screen stays on and at full brightness while it is open.
   import { onDestroy, onMount } from 'svelte';
   import { Popup, Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
   import { qrPath } from '../lib/qr-draw.js';
@@ -40,7 +40,7 @@
   const several = $derived(codes.length > 1);
 
   onMount(async () => {
-    OpenDivesCore.keepScreenAwake({ on: true }).catch((e) => console.error('Keep the screen awake', e));
+    BenthicCore.keepScreenAwake({ on: true }).catch((e) => console.error('Keep the screen awake', e));
     try {
       const texts = await transferOf(id, kind);
       codes = texts.map(qrPath);
@@ -53,7 +53,7 @@
 
   onDestroy(() => {
     clearInterval(timer);
-    OpenDivesCore.keepScreenAwake({ on: false }).catch((e) => console.error('Release the screen', e));
+    BenthicCore.keepScreenAwake({ on: false }).catch((e) => console.error('Release the screen', e));
   });
 </script>
 

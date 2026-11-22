@@ -14,7 +14,7 @@
   import { deviceSuffix } from '../lib/first-launch.js';
   import SectionBand from '../components/SectionBand.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { showSection, navigation } from '../lib/navigation.svelte.js';
 
@@ -36,11 +36,11 @@
   /** The logbook lives in the user's own git repository, not in the Subsurface cloud. */
   const git = $derived(logbook.mode === 'git');
   /** The git repository is the OpenDives server account's (release edition): named « Serveur OpenDives », not edited. */
-  const server = $derived(git && logbook.odplus);
+  const server = $derived(git && logbook.benthicPlus);
   let serverEmail = $state('');
   $effect(() => {
     if (!server) return;
-    OpenDivesCore.serverSessionInfo().then(
+    BenthicCore.serverSessionInfo().then(
       (info) => (serverEmail = info.email),
       (e) => console.error('Reading the OpenDives session', e),
     );
@@ -50,7 +50,7 @@
   let gitBranch = $state('');
   $effect(() => {
     if (!git) return;
-    OpenDivesCore.gitConfig().then(
+    BenthicCore.gitConfig().then(
       (saved) => (gitBranch = saved.branch),
       (e) => console.error('Reading the connected repository', e),
     );
@@ -361,7 +361,7 @@
         <span class="bc-account--status">{t('account.deviceDives', { n: count })}</span>
       </span>
     </div>
-    <!-- The beta has none of these: no Subsurface cloud, no personal git repository (the OpenDives+ server is signed in to from the first launch). -->
+    <!-- The beta has none of these: no Subsurface cloud, no personal git repository (the Benthic+ server is signed in to from the first launch). -->
     {#if !isRelease}
     <p class="bc-account--pitch">{t('account.pitch')}</p>
     <!-- Three choices, each with its consequence and a decorative icon (task 2026-11-14-135,

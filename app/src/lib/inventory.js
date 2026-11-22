@@ -1,5 +1,5 @@
 // @ts-check
-// The equipment inventory of « Mon profil de plongeur » (OpenDives+, task 2026-11-17-267): the diver's pieces
+// The equipment inventory of « Mon profil de plongeur » (Benthic+, task 2026-11-17-267): the diver's pieces
 // (dive computers, regulators, suits, cylinders, lamps…), the kits they make up, and what each dive used.
 //
 // Subsurface does not store any of it. The data follows the OpenDives logbook format (docs/architecture.md,

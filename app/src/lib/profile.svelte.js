@@ -2,7 +2,7 @@
 // « Mon profil de plongeur » on screen (task 2026-11-18-272): the information and the cards read from the
 // local store (lib/profile.js over lib/file-store.js, the same IndexedDB as the equipment) into one reactive object
 // that the screens share. The data key of the sensitive items is kept by the plugin's secure storage.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { createFileStore, indexedDbBackend, memoryBackend } from './file-store.js';
 import { createSecretBox } from './secret-box.js';
 import { createProfile, emptyInfo } from './profile.js';
@@ -33,7 +33,7 @@ function keeper(store) {
   return {
     async read() {
       try {
-        return (await OpenDivesCore.dataKeyRead()).key;
+        return (await BenthicCore.dataKeyRead()).key;
       } catch (e) {
         if (!missing(e)) throw e;
         return (await store.read('meta/dev-data-key.json'))?.key ?? '';
@@ -41,7 +41,7 @@ function keeper(store) {
     },
     async write(key) {
       try {
-        await OpenDivesCore.dataKeyWrite({ key });
+        await BenthicCore.dataKeyWrite({ key });
       } catch (e) {
         if (!missing(e)) throw e;
         await store.write('meta/dev-data-key.json', { format: 1, key });

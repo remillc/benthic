@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 // JSON for the desktop host's protocol: a small recursive reader (null,
 // booleans, numbers, strings, arrays, objects) and the writer's helpers. It is
-// separate from core/libopendives/json.h, which reads only flat objects for the
+// separate from core/libbenthic/json.h, which reads only flat objects for the
 // facade and stays as it is.
-#ifndef OPENDIVES_HOST_JSON_VALUE_H
-#define OPENDIVES_HOST_JSON_VALUE_H
+#ifndef BENTHIC_HOST_JSON_VALUE_H
+#define BENTHIC_HOST_JSON_VALUE_H
 
 #include <cstdint>
 #include <cstdio>

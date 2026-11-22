@@ -1,5 +1,5 @@
 // @ts-check
-// OpenDives+ in the release edition (task 2026-11-17-265): where an account goes after the code, the benefits the
+// Benthic+ in the release edition (task 2026-11-17-265): where an account goes after the code, the benefits the
 // offer lists and the texts' keys. Pure, so that node:test can check the order. There is no free account: an account
 // exists only for a diver who subscribed; « Continuer sans compte » and « Continuer sans abonnement » create nothing.
 

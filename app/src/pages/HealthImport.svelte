@@ -6,7 +6,7 @@
   // (lib/health-dives.js) imported like any file: one undoable step, saved and synced. The diver
   // completes the rest (site, gas, buddy) by hand: Health only has time, depth and temperature.
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { onMount } from 'svelte';
   import { logbook, importData } from '../lib/logbook.svelte.js';
   import { splitDives, divesToSsrf } from '../lib/health-dives.js';
@@ -44,7 +44,7 @@
   onMount(async () => {
     try {
       const now = Date.now();
-      const health = await OpenDivesCore.healthDives({ from: now - YEAR_MS, to: now });
+      const health = await BenthicCore.healthDives({ from: now - YEAR_MS, to: now });
       if (!health.available) {
         state = 'unavailable';
         return;

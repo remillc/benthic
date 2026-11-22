@@ -5,10 +5,10 @@
 // core's export (the private type `application/x-opendives-dives`'s content). Ctrl/⌘+V adds the dives
 // of the clipboard, or of a plain text that is a Subsurface `<divelog>`, through the import's
 // duplicate check. Electron cannot put a custom type beside the text (every write replaces the
-// others), so the main process (desktop/bridge.cjs, `odDesktop.clipboard`) writes the plain text and
+// others), so the main process (desktop/bridge.cjs, `benthicDesktop.clipboard`) writes the plain text and
 // keeps the XML tied to it; the dives are offered while the clipboard still holds that text. A
 // pasted `<divelog>` text works everywhere.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 
 /** The private clipboard type holding the dives as Subsurface XML. */
 export const DIVES_TYPE = 'application/x-opendives-dives';
@@ -56,7 +56,7 @@ export function textToBase64(text) {
 }
 
 /** @returns {any} the desktop bridge's clipboard, when there is one */
-const bridge = () => /** @type {any} */ (globalThis).window?.odDesktop?.clipboard ?? null;
+const bridge = () => /** @type {any} */ (globalThis).window?.benthicDesktop?.clipboard ?? null;
 
 /**
  * Writes the selected dives on the clipboard: the plain text and, through the bridge, the dives'
@@ -73,7 +73,7 @@ export async function copyDives(ids, text) {
   /** @type {string} */
   let dives = '';
   try {
-    ({ text: dives = '' } = await OpenDivesCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'clipboard.ssrf', text: true }));
+    ({ text: dives = '' } = await BenthicCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'clipboard.ssrf', text: true }));
   } catch (e) {
     // The text alone still copies.
     console.error('Copy dives', e);

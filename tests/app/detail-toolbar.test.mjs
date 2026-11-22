@@ -13,8 +13,8 @@ test('the dive detail toolbar: edit, plan, share, more, in that order, and no ma
   assert.match(block, /\/plan\/\$\{diveId\}/);
 });
 
-test('the overflow menu names its items in the menu order, validation only with OpenDives+', () => {
-  assert.match(src, /odplusSubscriber\(\) \? t\('detail\.moreItemValidate'\)/);
+test('the overflow menu names its items in the menu order, validation only with Benthic+', () => {
+  assert.match(src, /benthicPlusSubscriber\(\) \? t\('detail\.moreItemValidate'\)/);
   assert.match(src, /removableFromTrip \? t\('detail\.moreItemTrip'\)/);
   const order = ['moreItemValidate', 'moreItemRenumber', 'moreItemTrip', 'moreItemDelete'].map((k) => src.indexOf(`detail.${k}`));
   assert.deepEqual([...order].sort((a, b) => a - b), order);

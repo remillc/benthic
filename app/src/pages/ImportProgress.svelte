@@ -15,7 +15,7 @@
   // of the mock-up.
   import { onDestroy } from 'svelte';
   import { f7 } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
   import LoadingIndicator from '../components/LoadingIndicator.svelte';
@@ -56,7 +56,7 @@
   });
 
   function discard() {
-    if (path) OpenDivesCore.discardImport({ path }).catch(() => {});
+    if (path) BenthicCore.discardImport({ path }).catch(() => {});
     path = '';
   }
 
@@ -88,14 +88,14 @@
     let current = fromFile ? 'read' : 'download';
     try {
       if (!fromFile) {
-        const downloaded = await OpenDivesCore.divelogsDownload(credentials);
+        const downloaded = await BenthicCore.divelogsDownload(credentials);
         path = downloaded.path;
         if (cancelled) return stop();
         set('download', 'done', t('importProgress.received', { n: downloaded.dives }));
         current = 'read';
         set('read', 'running');
       }
-      const read = path ? await OpenDivesCore.importCount({ path }) : { dives: 0 };
+      const read = path ? await BenthicCore.importCount({ path }) : { dives: 0 };
       if (cancelled) return stop();
       set('read', 'done', t('importProgress.read', { n: read.dives }));
 
@@ -103,8 +103,8 @@
       saving = true;
       set('save', 'running');
       const result = path
-        ? await OpenDivesCore.createLog({ source: 'import', path })
-        : await OpenDivesCore.createLog({ source: 'empty' });
+        ? await BenthicCore.createLog({ source: 'import', path })
+        : await BenthicCore.createLog({ source: 'empty' });
       path = '';
       set('save', 'done');
       console.info('First logbook created, dives imported:', result.imported);
@@ -137,7 +137,7 @@
   async function emptyLogbook() {
     busy = true;
     try {
-      await OpenDivesCore.createLog({ source: 'empty' });
+      await BenthicCore.createLog({ source: 'empty' });
       finishAccount(f7router, welcome);
     } catch (e) {
       showFailure(errorCode(e));

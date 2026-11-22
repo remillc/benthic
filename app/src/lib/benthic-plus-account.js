@@ -7,7 +7,7 @@
 //   - downloadMyData: the full export of the logbook, the equipment and the certifications in an open format (to-do #57)
 //     is not built: it answers « unavailable ».
 // Nothing here stores a secret: the session token is read when needed and not kept.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { createServerApi } from './server-api.js';
 import { serverTransport } from './server-transport.js';
 import { serverUrl } from './server-url.js';
@@ -40,7 +40,7 @@ function server() {
 async function sessionToken() {
   if (token) return token();
   try {
-    return (await OpenDivesCore.serverSessionAccess()).sessionToken || '';
+    return (await BenthicCore.serverSessionAccess()).sessionToken || '';
   } catch {
     return '';
   }

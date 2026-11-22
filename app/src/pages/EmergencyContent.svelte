@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // « Contenu de la fiche » (OpenDives+, task 2026-11-19-311, docs/mockups/urgence-contenu-android.dc.html): one switch for
+  // « Contenu de la fiche » (Benthic+, task 2026-11-19-311, docs/mockups/urgence-contenu-android.dc.html): one switch for
   // each item of the emergency sheet; the name is always shown. The choices stay on this device (lib/device-store.js).
   import BackLink from '../components/BackLink.svelte';
   import { onMount } from 'svelte';

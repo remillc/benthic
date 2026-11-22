@@ -57,7 +57,7 @@ async function inject() {
     if (!cap.__odHooked) {
       const orig = cap.toNative;
       cap.toNative = function (plugin, method, options) {
-        if (plugin === 'OpenDivesCore') window.__odCalls.push({ method, options });
+        if (plugin === 'BenthicCore') window.__odCalls.push({ method, options });
         return orig.apply(this, arguments);
       };
       cap.__odHooked = true;
@@ -93,7 +93,7 @@ async function inject() {
 await inject();
 
 const core = async (method, options = {}) => {
-  const json = await p.eval(`Capacitor.Plugins.OpenDivesCore.${method}(${q(options)}).then((r) => (r && r.json) || null)`);
+  const json = await p.eval(`Capacitor.Plugins.BenthicCore.${method}(${q(options)}).then((r) => (r && r.json) || null)`);
   return json ? JSON.parse(json) : null;
 };
 const planCore = (request) => core('planDive', { request });

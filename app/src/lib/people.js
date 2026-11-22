@@ -2,7 +2,7 @@
 // The people and tags already in the logbook, proposed by the chips fields
 // (spec, section 4, "People and tags in dive editing"), the most used first.
 import { withoutFeedbackTags } from './weight-feedback.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 
 /**
  * @param {'buddy'|'guide'|'tag'|'suit'} field
@@ -11,7 +11,7 @@ import { OpenDivesCore } from 'opendives-core';
 export async function logbookValues(field) {
   try {
     /** @type {{key: string, dives: number}[]} */
-    const values = await OpenDivesCore.statsQuery({ kind: 'values', field });
+    const values = await BenthicCore.statsQuery({ kind: 'values', field });
     return withoutFeedbackTags(values.filter((v) => v.key)).sort((a, b) => b.dives - a.dives).map((v) => v.key);
   } catch (e) {
     console.error('Logbook values', field, e);

@@ -3,7 +3,7 @@
 // store (lib/inventory.js over lib/file-store.js), kept in one reactive object that the screens share. Every change
 // goes through the functions here: write, then read again, so the screens never show what is not saved.
 // The server is not wired yet (it waits for the project owner): `pending` counts the files changed on this device.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { createFileStore, indexedDbBackend, memoryBackend, requestPersistence } from './file-store.js';
 import { sameComputer } from './dc-model.js';
 import { deviceStore } from './device-store.js';
@@ -30,7 +30,7 @@ export const gear = $state({
   records: [],
   /** @type {import('./maintenance.js').MaintenanceItem[]} every reminder */
   maintenance: [],
-  /** The inventory is read only (the OpenDives+ subscription ended). */
+  /** The inventory is read only (the Benthic+ subscription ended). */
   readOnly: false,
   daysLeft: 30,
   until: '',
@@ -154,7 +154,7 @@ export function figuresOf(g, computerDives) {
 /** The dives each dive computer of the logbook recorded, by `model|serial`: « Ordinateurs du carnet ». @returns {Promise<Map<string, number>>} */
 export async function computerDiveCounts() {
   try {
-    const list = await OpenDivesCore.diveComputers();
+    const list = await BenthicCore.diveComputers();
     return new Map(list.map((c) => [`${c.model}|${c.serial}`, c.dives]));
   } catch {
     return new Map();
@@ -169,13 +169,13 @@ export async function computerDiveCounts() {
  */
 export async function computerFigures(g) {
   try {
-    const options = await OpenDivesCore.filterQuery({ kind: 'options' });
+    const options = await BenthicCore.filterQuery({ kind: 'options' });
     const model = (g.computerModel ?? g.name).toLowerCase();
     const names = /** @type {string[]} */ (options.computers ?? []).filter((n) => n.toLowerCase().includes(model));
     if (!names.length) return null;
     // One value per line, as the filter screen sends them.
     const data = names.map((n) => `${n}\n`).join('');
-    const ids = new Set(/** @type {number[]} */ (await OpenDivesCore.filterQuery({ kind: 'dives', rules: [{ type: 'dive_computer', stringMode: 'exact', data }] })));
+    const ids = new Set(/** @type {number[]} */ (await BenthicCore.filterQuery({ kind: 'dives', rules: [{ type: 'dive_computer', stringMode: 'exact', data }] })));
     let seconds = 0;
     let deepestMm = 0;
     let last = '';
@@ -193,14 +193,14 @@ export async function computerFigures(g) {
   }
 }
 
-/** Sets or lifts the read-only state: what the end of an OpenDives+ subscription will do (no billing exists yet). @param {boolean} on */
+/** Sets or lifts the read-only state: what the end of an Benthic+ subscription will do (no billing exists yet). @param {boolean} on */
 export const setReadOnly = (on) => change((inv) => inv.setReadOnly(on));
 
 /**
  * After a download: the computer it came from enters the inventory the first time, with its serial number and
  * its firmware. The logbook's entry for it gives the serial as « Ordinateurs du carnet » writes it.
- * @param {import('opendives-core').DownloadResult} result
- * @param {boolean} [subscriber] an OpenDives+ account: the end of the download offers to add the computer
+ * @param {import('benthic-core').DownloadResult} result
+ * @param {boolean} [subscriber] an Benthic+ account: the end of the download offers to add the computer
  */
 export async function noteDownloadedComputer(result, subscriber = false) {
   computerOffer.computer = null;
@@ -212,7 +212,7 @@ export async function noteDownloadedComputer(result, subscriber = false) {
       return v === hex.replace(/^0+/, '') || v === plain;
     };
     const product = (result.product || '').toLowerCase();
-    const list = await OpenDivesCore.diveComputers().catch(() => []);
+    const list = await BenthicCore.diveComputers().catch(() => []);
     const entry = list.find((c) => (!product || c.model.toLowerCase().includes(product)) && c.serial && same(c.serial));
     const model = entry?.model || [result.vendor, result.product].filter(Boolean).join(' ') || result.product;
     if (!model) return;
@@ -220,7 +220,7 @@ export async function noteDownloadedComputer(result, subscriber = false) {
     const firmware = entry?.firmware || (result.firmware ? String(result.firmware) : '');
     const computer = { vendor: result.vendor, model, serial, firmware };
     // A computer already in the equipment (brand, model and serial number) gets its firmware refreshed. One that is not
-    // is offered at the end of the download (OpenDives+ only); « Plus tard » hides the offer for that computer.
+    // is offered at the end of the download (Benthic+ only); « Plus tard » hides the offer for that computer.
     const known = await change((inv) => inv.recordDownloadedComputer(computer, { add: false }));
     const key = offerKey(computer);
     if (!known?.gear && subscriber && !hiddenOffers().includes(key)) computerOffer.computer = computer;

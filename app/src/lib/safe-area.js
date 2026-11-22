@@ -2,7 +2,7 @@
 // The safe area on Android. The WebView's env(safe-area-inset-*) is not reliable there (the
 // navigation bar is never reported, the top is 52 px or 0 from one launch to the next), so the
 // native side (MainActivity, SafeAreaInsets.java) reads the window insets and hands them over:
-// once at boot through the OpenDivesInsets interface, then on every change through
+// once at boot through the BenthicInsets interface, then on every change through
 // window.__odSetInsets. They become --bc-safe-top/right/bottom/left on <html>, and theme.css
 // points Framework7's --f7-safe-area-* at them. Elsewhere (iOS, desktop, browser) nothing is
 // set and env() keeps working.
@@ -89,7 +89,7 @@ export function applyInsets(raw, root = document.documentElement) {
  * @returns {boolean} whether the native interface is there
  */
 export function installSafeArea(win = window) {
-  const bridge = win.OpenDivesInsets;
+  const bridge = win.BenthicInsets;
   const apply = (/** @type {unknown} */ raw) => {
     const applied = applyInsets(raw, win.document.documentElement);
     if (applied) gestureZone = parseGestureZone(raw);

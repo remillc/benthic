@@ -4,7 +4,7 @@
 // serial number, purchase date, dive count and next maintenance, a table Date, Type, Fait par, Coût, Notes, then the invoices
 // that were attached, one per page. Made on the device, with the same HTML-to-PDF path as the dive sheet.
 import { Share } from '@capacitor/share';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { formatDate, formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { taskLabel } from './maintenance-text.js';
@@ -113,11 +113,11 @@ export async function exportHistory(input, { letter, readPhoto, desktop }) {
   const day = localDay();
   const html = historyHtml({ ...input, invoices, exportedOn: formatDate(day), letter });
   const name = historyFileName(input.name, day);
-  const { uri } = await OpenDivesCore.htmlToPdf({ html, name, letter });
+  const { uri } = await BenthicCore.htmlToPdf({ html, name, letter });
   if (desktop) {
-    await /** @type {any} */ (window).odDesktop.saveAs({ path: uri, name });
+    await /** @type {any} */ (window).benthicDesktop.saveAs({ path: uri, name });
     return;
   }
-  await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
+  await BenthicCore.grantShareFile({ uri, mime: 'application/pdf' });
   await Share.share({ title: name, files: [uri], dialogTitle: t('maintenance.export.share') });
 }

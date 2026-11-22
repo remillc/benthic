@@ -316,7 +316,7 @@ test('files: only logbook folders of userData are removed or renamed', async () 
 
 test('files: the development env files, read and deleted by name only', async () => {
   assert.equal(await invoke('od:fs', 'readDevEnv', { name: 'cloud-test.env' }), '');
-  writeFileSync(path.join(userData, 'cloud-test.env'), 'OPENDIVES_CLOUD_TEST_EMAIL=t@t.t\n');
+  writeFileSync(path.join(userData, 'cloud-test.env'), 'BENTHIC_CLOUD_TEST_EMAIL=t@t.t\n');
   assert.match(await invoke('od:fs', 'readDevEnv', { name: 'cloud-test.env' }), /t@t\.t/);
   assert.match((await rejection(invoke('od:fs', 'readDevEnv', { name: 'cloud-account.bin' }))).message, /unknown file/);
   assert.match((await rejection(invoke('od:fs', 'deleteDevEnv', { name: 'cloud-test.env' }))).message, /unknown file/);

@@ -1,6 +1,6 @@
 import UIKit
 import Capacitor
-import OpendivesCore
+import BenthicCore
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

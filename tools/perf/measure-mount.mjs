@@ -23,7 +23,7 @@ await sleep(3000);
 
 const hook = 'async core(method, args) {';
 const logging = `${hook} (window.__calls ||= []).push({ method, bytes: JSON.stringify(args ?? {}).length, t: Math.round(performance.now()) });`;
-await p.send('Fetch.enable', { patterns: [{ urlPattern: '*opendives-core/desktop.js*', requestStage: 'Response' }] });
+await p.send('Fetch.enable', { patterns: [{ urlPattern: '*benthic-core/desktop.js*', requestStage: 'Response' }] });
 p.on(async (m) => {
   if (m.method !== 'Fetch.requestPaused') return;
   const { requestId, responseStatusCode } = m.params;

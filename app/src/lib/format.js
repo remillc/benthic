@@ -8,7 +8,7 @@ import { t, locale } from './i18n.js';
 import { settings } from './settings.svelte.js';
 import { dateInputPattern, formatDateInput, parseDateInput } from './date-time-picker.js';
 
-/** Units only: the full preferences (logbook.prefs) can be passed. @typedef {import('opendives-core').Units} Prefs */
+/** Units only: the full preferences (logbook.prefs) can be passed. @typedef {import('benthic-core').Units} Prefs */
 
 /** Locale of the formats (lib/i18n.js): the device's, or fr-CA when the interface is fr-CA. */
 export { locale };

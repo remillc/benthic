@@ -71,7 +71,7 @@ try {
   // « Commencer sans compte », then the sample logbook (the empty logbook's own start).
   await run(`[...document.querySelectorAll('a[href="#no-account"]')].find((e) => e.offsetParent)?.click()`);
   await wait(5000);
-  await run(`window.Capacitor.Plugins.OpenDivesCore.importSample()`);
+  await run(`window.Capacitor.Plugins.BenthicCore.importSample()`);
   await run('location.reload()');
   ws.close();
   await wait(4000);

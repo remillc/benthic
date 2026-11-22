@@ -18,8 +18,8 @@
 
 /** The plugin's scanner, loaded when first used. @type {NativeScanner} */
 const nativeScanner = async () => {
-  const { OpenDivesCore } = await import('opendives-core');
-  return OpenDivesCore.scanDocument();
+  const { BenthicCore } = await import('benthic-core');
+  return BenthicCore.scanDocument();
 };
 
 /** @param {string} base64 @returns {Blob} */

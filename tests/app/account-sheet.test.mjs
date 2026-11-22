@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { resolveOdplusAccount, isSubscribed } from '../../app/src/lib/benthic-plus-state.js';
+import { resolveBenthicPlusAccount, isSubscribed } from '../../app/src/lib/benthic-plus-state.js';
 import { accountEmail, sheetVariant, profileRow, storeSubscriptionsUrl, subscriptionStore, spaceUse, SPACE_LIMIT_BYTES } from '../../app/src/lib/account-sheet.js';
 import { forward, menuEntry, enterOffer, back, hasBack, leavesFirstLaunch, offerShowsSignIn } from '../../app/src/lib/first-launch-steps.js';
 import { evaluate, overdueCount, todayIso } from '../../app/src/lib/maintenance.js';
@@ -25,14 +25,14 @@ const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i1
 // --- Which sheet ---
 
 test('the account sheet uses the subscriber email instead of the server git username', () => {
-  const serverLog = { email: 'od123', odplus: true };
+  const serverLog = { email: 'od123', benthicPlus: true };
   assert.equal(accountEmail({ signedIn: true, email: 'diver@example.test' }, serverLog), 'diver@example.test');
   assert.equal(accountEmail({ signedIn: false, email: '' }, serverLog), '', 'do not expose the username while the session loads');
-  assert.equal(accountEmail({ signedIn: false, email: '' }, { email: 'diver@example.test', odplus: false }), 'diver@example.test');
-  assert.equal(accountEmail({ signedIn: true, email: 'diver@example.test' }, { email: 'git-user', odplus: false }), 'diver@example.test');
-  assert.match(sheet, /emailOfAccount\(odplusAccount, logbook\)/);
-  assert.match(desktopSheet, /emailOfAccount\(odplusAccount, logbook\)/);
-  assert.match(avatar, /accountEmail\(odplusAccount, logbook\)/);
+  assert.equal(accountEmail({ signedIn: false, email: '' }, { email: 'diver@example.test', benthicPlus: false }), 'diver@example.test');
+  assert.equal(accountEmail({ signedIn: true, email: 'diver@example.test' }, { email: 'git-user', benthicPlus: false }), 'diver@example.test');
+  assert.match(sheet, /emailOfAccount\(benthicPlusAccount, logbook\)/);
+  assert.match(desktopSheet, /emailOfAccount\(benthicPlusAccount, logbook\)/);
+  assert.match(avatar, /accountEmail\(benthicPlusAccount, logbook\)/);
 });
 
 test('the profile uses the account identity on narrow and wide layouts, including the separate profile window', () => {
@@ -40,10 +40,10 @@ test('the profile uses the account identity on narrow and wide layouts, includin
   const nav = read('components/ProfileNav.svelte');
   const frame = read('lib/profile-frame.js');
   const app = read('App.svelte');
-  assert.match(profile, /diver\.info\.fullName \|\| accountEmail\(odplusAccount, logbook\)/);
+  assert.match(profile, /diver\.info\.fullName \|\| accountEmail\(benthicPlusAccount, logbook\)/);
   assert.match(frame, /name: accountEmail\(account, book\)/);
-  assert.match(nav, /profileWindow \? readHero\(\) : heroOf\(logbook, odplusAccount\)/);
-  assert.match(app, /rememberHero\(heroOf\(logbook, odplusAccount\)\)/);
+  assert.match(nav, /profileWindow \? readHero\(\) : heroOf\(logbook, benthicPlusAccount\)/);
+  assert.match(app, /rememberHero\(heroOf\(logbook, benthicPlusAccount\)\)/);
 });
 
 test('the account overview refreshes a renamed email and subscription in one request', async () => {
@@ -95,36 +95,36 @@ test('free sheet: « S’abonner » opens the offer, « Se connecter » opens th
   assert.equal([...free.matchAll(/<BenthicPlusChip onSheet \/>/g)].length, 2, 'the chip is above each title');
   assert.ok(!/@/.test(free.replace(/<!--[\s\S]*?-->/g, '').replace(/\{[^}]*\}/g, '')), 'no e-mail, no sync line');
   assert.ok(!free.includes('SyncStatus') && !free.includes('SyncButton'));
-  assert.match(sheet, /import \{ openOdPlus \} from '..\/lib\/open-offer.svelte.js'/);
+  assert.match(sheet, /import \{ openBenthicPlus \} from '..\/lib\/open-offer.svelte.js'/);
 });
 
 test('the offer and the sign-in screen are the first launch entered from the menu, and leave it where they came from', () => {
-  assert.deepEqual(menuEntry('offer'), ['start', 'odplusOffer']);
-  assert.deepEqual(menuEntry('signIn'), ['start', 'odplusConnect']);
+  assert.deepEqual(menuEntry('offer'), ['start', 'benthicPlusOffer']);
+  assert.deepEqual(menuEntry('signIn'), ['start', 'benthicPlusConnect']);
   assert.deepEqual(menuEntry('open'), ['start', 'open'], 'the other entries are unchanged');
-  assert.equal(hasBack('odplusConnect', true), true);
+  assert.equal(hasBack('benthicPlusConnect', true), true);
   assert.equal(leavesFirstLaunch(menuEntry('signIn'), true), true, 'Retour on the sign-in screen leaves');
   assert.equal(leavesFirstLaunch(menuEntry('offer'), true), true);
-  assert.equal(leavesFirstLaunch(['start', 'odplusOffer', 'odplusConnect'], true), false, 'from the offer, Retour returns to the offer');
-  assert.equal(leavesFirstLaunch(['start', 'odplusConnect'], false), false, 'never outside the menu entry');
+  assert.equal(leavesFirstLaunch(['start', 'benthicPlusOffer', 'benthicPlusConnect'], true), false, 'from the offer, Retour returns to the offer');
+  assert.equal(leavesFirstLaunch(['start', 'benthicPlusConnect'], false), false, 'never outside the menu entry');
   assert.deepEqual(menuEntry('move'), ['start', 'createChoice'], 'sending the logbook of the device to the server');
   assert.equal(leavesFirstLaunch(['start', 'createChoice'], true), true);
-  assert.deepEqual(back(['start', 'odplusOffer', 'odplusConnect']), ['start', 'odplusOffer']);
+  assert.deepEqual(back(['start', 'benthicPlusOffer', 'benthicPlusConnect']), ['start', 'benthicPlusOffer']);
   const steps = read('components/FirstLaunchSteps.svelte');
   assert.match(steps, /if \(flow\.origin === 'menu'\) leave\(\);\n\s+else goBackTo\('start'\)/, '« Continuer sans compte » closes the first launch');
 });
 
 test('the offer’s « Déjà abonné ? Se connecter » opens « Se connecter ou créer un compte », and is hidden right after signing in', () => {
-  assert.deepEqual(forward(['start', 'odplusOffer'], 'signIn'), ['start', 'odplusOffer', 'odplusConnect']);
-  assert.equal(offerShowsSignIn(['start', 'odplusOffer']), true, 'the offer reached from « Découvrir Benthic+ »');
-  assert.equal(offerShowsSignIn(['start', 'odplusConnect', 'server', 'serverCode', 'odplusOffer']), false);
-  assert.equal(offerShowsSignIn(enterOffer(['start', 'odplusConnect', 'server', 'serverCode'])), false, 'after the sign-in of an account that has not subscribed');
+  assert.deepEqual(forward(['start', 'benthicPlusOffer'], 'signIn'), ['start', 'benthicPlusOffer', 'benthicPlusConnect']);
+  assert.equal(offerShowsSignIn(['start', 'benthicPlusOffer']), true, 'the offer reached from « Découvrir Benthic+ »');
+  assert.equal(offerShowsSignIn(['start', 'benthicPlusConnect', 'server', 'serverCode', 'benthicPlusOffer']), false);
+  assert.equal(offerShowsSignIn(enterOffer(['start', 'benthicPlusConnect', 'server', 'serverCode'])), false, 'after the sign-in of an account that has not subscribed');
   assert.match(offer, /\{#if offerShowsSignIn\(flow\.stack\)\}/);
   assert.match(offer, /bc-plus--link" onclick=\{\(\) => go\('signIn'\)\}/);
-  assert.equal(langs.fr.odplus.offer.already, 'Déjà abonné ?');
-  assert.equal(langs.fr.odplus.offer.signIn, 'Se connecter');
+  assert.equal(langs.fr.benthicPlus.offer.already, 'Déjà abonné ?');
+  assert.equal(langs.fr.benthicPlus.offer.signIn, 'Se connecter');
   // The offer's order: « Aucun compte n’est créé. » then the line.
-  assert.ok(offer.indexOf("odplus.offer.noAccount") < offer.indexOf('offerShowsSignIn(flow.stack)'));
+  assert.ok(offer.indexOf("benthicPlus.offer.noAccount") < offer.indexOf('offerShowsSignIn(flow.stack)'));
 });
 
 test('tablet and desktop: « Continuer sans compte » is centred across the 440 px of the three buttons', () => {
@@ -305,7 +305,7 @@ test('every new text exists in French and in English, and the release notes name
     assert.deepEqual(keys(langs.en.account[group]).sort(), keys(langs.fr.account[group]).sort(), group);
   }
   for (const lang of ['fr', 'en']) {
-    for (const key of ['nav.accountLabelFree', 'odplus.offer.already', 'odplus.offer.signIn']) {
+    for (const key of ['nav.accountLabelFree', 'benthicPlus.offer.already', 'benthicPlus.offer.signIn']) {
       assert.ok(key.split('.').reduce((o, k) => o?.[k], langs[lang]), `${lang} ${key}`);
     }
   }
@@ -319,22 +319,22 @@ test('every new text exists in French and in English, and the release notes name
 // --- Task 2026-11-18-282: the « + » chip after the name, and the tablet's offer ---
 
 test('the subscriber sheet shows the round « + » chip after the name, read « Benthic Plus »; the free sheet does not', () => {
-  assert.match(sheet, /\{#if subscriber\}\s*<span class="bc-account-sheet--title"><span aria-hidden="true">\{t\('menu\.title'\)\}<span class="bc-account-sheet--plus-dot">\+<\/span><\/span><span class="bc-sr-only">\{t\('odplus\.chipName'\)\}<\/span>/);
+  assert.match(sheet, /\{#if subscriber\}\s*<span class="bc-account-sheet--title"><span aria-hidden="true">\{t\('menu\.title'\)\}<span class="bc-account-sheet--plus-dot">\+<\/span><\/span><span class="bc-sr-only">\{t\('benthicPlus\.chipName'\)\}<\/span>/);
   assert.match(sheet, /\.bc-account-sheet--plus-dot \{[^}]*width: 18px;[^}]*height: 18px;[^}]*margin-left: 3px;[^}]*var\(--bc-account-chip\)[^}]*var\(--bc-account-chip-ink\)[^}]*font-weight: 700/);
-  assert.equal(langs.fr.odplus.chipName, 'Benthic Plus');
-  assert.equal(langs.en.odplus.chipName, 'Benthic Plus');
+  assert.equal(langs.fr.benthicPlus.chipName, 'Benthic Plus');
+  assert.equal(langs.en.benthicPlus.chipName, 'Benthic Plus');
 });
 
 test('the tablet offer: the blue panel carries the chip, title and lead; the phone hero stays on phones; Retour except right after a sign-in', () => {
   const release = read('pages/WelcomeStartRelease.svelte');
   const steps = read('components/FirstLaunchSteps.svelte');
-  assert.match(release, /offerPanel\b[\s\S]*<BenthicPlusChip label=\{t\('odplus\.offer\.pill'\)\} \/>[\s\S]*t\('odplus\.offer\.title'\)[\s\S]*t\('odplus\.offer\.lead'\)/);
+  assert.match(release, /offerPanel\b[\s\S]*<BenthicPlusChip label=\{t\('benthicPlus\.offer\.pill'\)\} \/>[\s\S]*t\('benthicPlus\.offer\.title'\)[\s\S]*t\('benthicPlus\.offer\.lead'\)/);
   assert.match(offer, /\{#if layout\.phone \|\| desktopApp\}\{@render hero\('offer'\)\}\{\/if\}/);
-  assert.match(steps, /tabletOfferBack = \$derived\(step === 'odplusOffer' && !layout\.phone && !desktopApp && offerShowsSignIn\(flow\.stack\)\)/);
-  assert.equal(hasBack('odplusOffer', true), false, 'the phone offer keeps no Retour');
-  assert.deepEqual(menuEntry('offer'), ['start', 'odplusOffer']);
+  assert.match(steps, /tabletOfferBack = \$derived\(step === 'benthicPlusOffer' && !layout\.phone && !desktopApp && offerShowsSignIn\(flow\.stack\)\)/);
+  assert.equal(hasBack('benthicPlusOffer', true), false, 'the phone offer keeps no Retour');
+  assert.deepEqual(menuEntry('offer'), ['start', 'benthicPlusOffer']);
   assert.equal(offerShowsSignIn(menuEntry('offer')), true);
-  assert.equal(offerShowsSignIn(enterOffer(['start', 'odplusConnect', 'email', 'server'])), false);
+  assert.equal(offerShowsSignIn(enterOffer(['start', 'benthicPlusConnect', 'email', 'server'])), false);
 });
 
 // --- The subscriber's rows: « Sauvegarde et synchronisation » and « Mon profil de plongeur » open their own sections ---
@@ -402,7 +402,7 @@ test('the subscriber sheet lists « Mon profil de plongeur » first, then « Sau
 });
 
 test('the account variant, across every state: free, signed in not subscribed, subscribed with a device or a server logbook, alpha', () => {
-  const state = (signedIn, subscribed) => resolveOdplusAccount({ info: { signedIn, email: signedIn ? 'a@b.c' : '' }, cached: null, remote: signedIn ? subscribed : null });
+  const state = (signedIn, subscribed) => resolveBenthicPlusAccount({ info: { signedIn, email: signedIn ? 'a@b.c' : '' }, cached: null, remote: signedIn ? subscribed : null });
   const variant = (account, over = {}) => sheetVariant({ release: true, subscriber: isSubscribed(account), email: '', ...over });
   assert.equal(variant(state(false, false)), 'free');
   assert.equal(variant(state(true, false)), 'free', 'signed in, not subscribed: the offer');
@@ -415,9 +415,9 @@ test('the account variant, across every state: free, signed in not subscribed, s
 
 test('the Benthic+ account: the session says who, the server says subscribed, else the remembered answer', () => {
   const info = { signedIn: true, email: 'a@b.c' };
-  assert.deepEqual(resolveOdplusAccount({ info: { signedIn: false, email: '' }, cached: '1', remote: true }), { signedIn: false, email: '', subscribed: false });
-  assert.equal(resolveOdplusAccount({ info, cached: '0', remote: true }).subscribed, true, 'the server wins');
-  assert.equal(resolveOdplusAccount({ info, cached: '1', remote: false }).subscribed, false);
-  assert.equal(resolveOdplusAccount({ info, cached: '0', remote: null }).subscribed, false, 'offline: the remembered answer');
-  assert.equal(resolveOdplusAccount({ info, cached: null, remote: null }).subscribed, true, 'a kept session is a subscribed one');
+  assert.deepEqual(resolveBenthicPlusAccount({ info: { signedIn: false, email: '' }, cached: '1', remote: true }), { signedIn: false, email: '', subscribed: false });
+  assert.equal(resolveBenthicPlusAccount({ info, cached: '0', remote: true }).subscribed, true, 'the server wins');
+  assert.equal(resolveBenthicPlusAccount({ info, cached: '1', remote: false }).subscribed, false);
+  assert.equal(resolveBenthicPlusAccount({ info, cached: '0', remote: null }).subscribed, false, 'offline: the remembered answer');
+  assert.equal(resolveBenthicPlusAccount({ info, cached: null, remote: null }).subscribed, true, 'a kept session is a subscribed one');
 });

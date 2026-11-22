@@ -5,7 +5,7 @@
   import { formatDepth, formatDuration, formatTemperature } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ dive: import('opendives-core').DiveDetail, prefs: import('opendives-core').Prefs }} */
+  /** @type {{ dive: import('benthic-core').DiveDetail, prefs: import('benthic-core').Prefs }} */
   let { dive, prefs } = $props();
 
   const figures = $derived.by(() => {

@@ -129,7 +129,7 @@ export function readView(viewEl) {
     modalRoute: !!router.currentRoute?.modal || MODAL_ROUTES.some((kind) => !!router.currentRoute?.route?.[kind]),
     history: [...router.history],
     allow: router.allowPageChange !== false,
-    locks: router.odLocks ?? 0,
+    locks: router.bcLocks ?? 0,
     swiping: !!router.swipeBackActive,
     pages,
   };

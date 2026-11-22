@@ -8,7 +8,7 @@
   // site and the clean-up. App.svelte picks this page for the Sites view when layout.desktop.
   import { tick, untrack } from 'svelte';
   import { Page } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import SearchClear from '../components/SearchClear.svelte';
@@ -42,30 +42,30 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { setDiveSite } from '../lib/dive-site.js';
   import { t } from '../lib/i18n.js';
-  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { inYourSites } from '../lib/shared-sites.js';
   import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
   import { distanceKm } from '../lib/maps-logic.js';
-  import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 
   loadSitesChoices();
 
   const mod = desktopMac ? '⌘' : 'Ctrl+';
 
   // --- The data: the sites, the dives without a site, the possible duplicates. ---------------
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
   /** @type {{id: number, number: number, date: string, durationSeconds: number, suggestedSite: number, latUdeg?: number, lonUdeg?: number}[]} */
   let without = $state([]);
-  /** @type {{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]} */
+  /** @type {{a: import('benthic-core').SiteSummary, b: import('benthic-core').SiteSummary, distanceM: number}[]} */
   let pairs = $state([]);
   let loaded = $state(false);
 
   async function load() {
     try {
       sites = await cachedSites();
-      without = await OpenDivesCore.siteQuery({ kind: 'without' });
+      without = await BenthicCore.siteQuery({ kind: 'without' });
       pairs = await possibleDuplicates();
       loaded = true;
     } catch (e) {
@@ -146,7 +146,7 @@
 
   const selectedSite = $derived(sites.find((s) => s.uuid === sel.selected) ?? null);
 
-  const canCommon = $derived(odplusAccount.signedIn);
+  const canCommon = $derived(benthicPlusAccount.signedIn);
   const common = $derived(canCommon && sharedSites.mode === 'common');
   let mapView = $state.raw(/** @type {{ center: [number, number], bounds: [number, number, number, number], zoom: number }|null} */ (null));
   let baseBox = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
@@ -233,7 +233,7 @@
     await tick();
     select({ type: 'pin' }, site.uuid);
   }
-  /** @param {import('opendives-core').SiteSummary} site */
+  /** @param {import('benthic-core').SiteSummary} site */
   async function useExisting(site) {
     const dive = newFor;
     newFor = null;
@@ -359,7 +359,7 @@
       if (cmd && command(cmd)) e.preventDefault();
     };
     window.addEventListener('keydown', keydown);
-    const off = /** @type {any} */ (window).odDesktop?.onMenu?.((/** @type {string} */ c) => inUse() && command(c));
+    const off = /** @type {any} */ (window).benthicDesktop?.onMenu?.((/** @type {string} */ c) => inUse() && command(c));
     return () => {
       window.removeEventListener('keydown', keydown);
       off?.();
@@ -397,7 +397,7 @@
     setSitesWidth(clampTableWidth(deskSites.width + (e.key === 'ArrowRight' ? 16 : -16), available, { minTable: 360, minDetail: 460 }));
   }
 
-  /** « Nouvelle-Zélande · 1 plongée · 60,4 m au plus profond » @param {import('opendives-core').SiteSummary} s */
+  /** « Nouvelle-Zélande · 1 plongée · 60,4 m au plus profond » @param {import('benthic-core').SiteSummary} s */
   function cardLine(s) {
     return [s.country, common ? '' : t('sites.diveCount', { n: s.dives }), s.maxDepthMm ? t('desktopSites.deepestAt', { depth: formatDepth(s.maxDepthMm, logbook.prefs) }) : ''].filter(Boolean).join(' · ');
   }
@@ -446,7 +446,7 @@
           {#if !connection.online}
             <p class="bc-desktop-sites--state" role="status">{t('sharedSites.offline')}</p>
           {:else if baseState === 'offer'}
-            <div class="bc-desktop-sites--state"><p>{t('sharedSites.offerText')}</p><button type="button" class="bc-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button></div>
+            <div class="bc-desktop-sites--state"><p>{t('sharedSites.offerText')}</p><button type="button" class="bc-tonal-button" onclick={() => openBenthicPlus('offer')}>{t('sharedSites.offerButton')}</button></div>
           {:else if baseState === 'failed'}
             <p class="bc-desktop-sites--state" role="status">{t('sharedSites.failed')}</p>
           {:else if baseState !== 'ready'}

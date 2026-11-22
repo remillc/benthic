@@ -30,9 +30,9 @@ app/android/app/src/debug/assets/dev-ca.pem
 .claude/worktrees/
 
 # iOS: put in place by native/ios/prepare-app.sh
-plugins/opendives-core/ios/OpenDivesCore.xcframework/
-plugins/opendives-core/ios/include/
-plugins/opendives-core/ios/Resources/
+plugins/benthic-core/ios/BenthicCore.xcframework/
+plugins/benthic-core/ios/include/
+plugins/benthic-core/ios/Resources/
 
 # Cloudflare wrangler local state (site deployment)
 .wrangler/

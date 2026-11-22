@@ -1,6 +1,6 @@
 // @ts-check
 // Importing a CSV file (task 2026-11-16-224, part 8): reading the file, guessing what its columns are, and
-// the column mapping the core's import takes (`importCsv` of the plugin, import_csv in opendives.h). The
+// the column mapping the core's import takes (`importCsv` of the plugin, import_csv in benthic.h). The
 // dialog (components/CsvImportDialog.svelte) only draws it. Pure, so that node:test can run it.
 //
 // The core reads a .csv only through the column mapping Subsurface's desktop asks for
@@ -442,12 +442,12 @@ export function diveDateParams(local) {
  * The mapping the core's import takes. A key the dive needs and the file does not give is -1. The dive's own
  * date and time (`date`, `time`) come first, as the stylesheets need, and only when no column holds the date.
  * @param {CsvChoices} choices
- * @returns {import('opendives-core').CsvParams}
+ * @returns {import('benthic-core').CsvParams}
  */
 export function buildParams(choices) {
   const { kind, known, mapping } = choices;
   const columnOf = (/** @type {string} */ key) => mapping.indexOf(key);
-  /** @type {import('opendives-core').CsvParams} */
+  /** @type {import('benthic-core').CsvParams} */
   const params = { format: known === 'poseidon' ? 'poseidon' : known === 'seabear' ? 'seabear' : kind };
   if (known === 'poseidon') return params;
   if (known === 'sensus') {
@@ -526,14 +526,14 @@ export function profilePath(profile, width, height) {
  * @typedef {{
  *   stage: (file: File) => Promise<string>,
  *   discard: (path: string) => Promise<unknown>,
- *   importCsv: (o: { path: string, companionPath?: string, name: string, params: import('opendives-core').CsvParams, dryRun: boolean }) => Promise<any>,
+ *   importCsv: (o: { path: string, companionPath?: string, name: string, params: import('benthic-core').CsvParams, dryRun: boolean }) => Promise<any>,
  * }} CsvCalls
  */
 
 /**
  * Runs the core's import on the file with the mapping, once, staging and discarding the files around it.
  * @param {CsvCalls} calls
- * @param {{ file: File, companion: File|null, params: import('opendives-core').CsvParams, dryRun: boolean }} request
+ * @param {{ file: File, companion: File|null, params: import('benthic-core').CsvParams, dryRun: boolean }} request
  * @returns {Promise<any>} the preview, or the import's result
  * @throws {Error} the plugin's error (IMPORT_FAILED, NO_DIVES…)
  */

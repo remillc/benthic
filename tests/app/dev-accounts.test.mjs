@@ -21,7 +21,7 @@ test('the switch is off by default (no constant defined outside a build made wit
 
 test('without the switch the Google button keeps its not-available answer and the dev files are only reached behind the switch', () => {
   const plus = read('components/FirstLaunchBenthicPlus.svelte');
-  assert.match(plus, /odplus\.providerUnavailable/);
+  assert.match(plus, /benthicPlus\.providerUnavailable/);
   assert.match(plus, /if \(devAccounts && provider === 'google'\)/);
   for (const m of plus.matchAll(/import\('\.\.\/lib\/dev-accounts\.js'\)/g)) {
     const before = plus.slice(Math.max(0, m.index - 400), m.index);
@@ -79,9 +79,9 @@ test('a local server: the sign-in, the simulated purchase and the deletion call 
 });
 
 test('the download step of the simulated sign-in sits over the address step, so that Retour leaves for it', () => {
-  assert.deepEqual(enterDownload(['start', 'odplusConnect']), ['start', 'odplusConnect', 'server', 'serverDownload']);
-  assert.deepEqual(enterDownload(['start', 'odplusConnect', 'odplusOffer', 'odplusWelcome']), ['start', 'odplusConnect', 'server', 'serverDownload']);
-  assert.deepEqual(forward(['start', 'odplusConnect'], 'email'), ['start', 'odplusConnect', 'server']);
+  assert.deepEqual(enterDownload(['start', 'benthicPlusConnect']), ['start', 'benthicPlusConnect', 'server', 'serverDownload']);
+  assert.deepEqual(enterDownload(['start', 'benthicPlusConnect', 'benthicPlusOffer', 'benthicPlusWelcome']), ['start', 'benthicPlusConnect', 'server', 'serverDownload']);
+  assert.deepEqual(forward(['start', 'benthicPlusConnect'], 'email'), ['start', 'benthicPlusConnect', 'server']);
 });
 
 /** The text of every file of a build. */

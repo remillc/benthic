@@ -7,7 +7,7 @@
   // git_connect. The form has no user name: the token is sent with the first segment of the address as its user
   // name (GitHub, GitLab and Gitea accept any name with a token). The token stays in this field, passed to the
   // plugin and cleared; nothing is stored here.
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import ReleaseField from './ReleaseField.svelte';
   import Icon from './Icon.svelte';
   import { errorCode } from '../lib/account.js';
@@ -69,7 +69,7 @@
     try {
       const address = url.trim();
       const username = gitUserName(address, validGitUsername);
-      const found = await OpenDivesCore.gitCheck({ url: address, username, token: token.trim() });
+      const found = await BenthicCore.gitCheck({ url: address, username, token: token.trim() });
       if (found.status === 'denied') {
         formError = t('gitRepo.tokenDenied');
         return;
@@ -95,7 +95,7 @@
         token = '';
         return;
       }
-      await OpenDivesCore.gitConnect({ url: address, username, token: token.trim(), branch: branch.trim(), empty: !!found.empty });
+      await BenthicCore.gitConnect({ url: address, username, token: token.trim(), branch: branch.trim(), empty: !!found.empty });
       token = '';
       await accountReady();
       await afterConnect?.();

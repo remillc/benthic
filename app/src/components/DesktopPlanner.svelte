@@ -6,7 +6,7 @@
   // (pages/Planner.svelte) with a new layout: the same state (lib/planner.svelte.js), the same
   // plan request to the core, the same rows (lib/plan-rows.js), the same saving and sharing.
   import { untrack } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import DesktopField from './DesktopField.svelte';
   import DesktopContextMenu from './DesktopContextMenu.svelte';
   import PlanTitleDialog from './PlanTitleDialog.svelte';
@@ -38,7 +38,7 @@
   const feet = $derived(prefs.length === 'ft');
   const cuft = $derived(prefs.volume === 'cuft');
 
-  let result = $state(/** @type {import('opendives-core').PlanResult|null} */ (null));
+  let result = $state(/** @type {import('benthic-core').PlanResult|null} */ (null));
   let failed = $state(false);
   let ready = $state(false);
   let started = $state(false);
@@ -47,9 +47,9 @@
   let sharing = $state(false);
   let slating = $state(false);
   let qrSharing = $state(false);
-  let slateRequest = $state(/** @type {import('opendives-core').PlanRequest|null} */ (null));
+  let slateRequest = $state(/** @type {import('benthic-core').PlanRequest|null} */ (null));
   /** The saved plans, while the choice is open. */
-  let savedPlans = $state(/** @type {import('opendives-core').PlannedDive[]|null} */ (null));
+  let savedPlans = $state(/** @type {import('benthic-core').PlannedDive[]|null} */ (null));
   let moreAt = $state(/** @type {{ x: number, y: number }|null} */ (null));
 
   /** Reads the shared settings again (they may have changed in Settings), then plans. */
@@ -68,7 +68,7 @@
   /** The card of the dive a plan starts from. @param {number} id */
   async function sourceOf(id) {
     const summary = logbook.dives.find((d) => d.id === id);
-    const dive = await OpenDivesCore.getDive({ id });
+    const dive = await BenthicCore.getDive({ id });
     return {
       dive,
       source: { id, number: dive.number, durationSeconds: dive.durationSeconds, date: dive.date, site: dive.site, maxDepthMm: dive.maxDepthMm, profile: summary?.profile ?? [] },
@@ -89,7 +89,7 @@
   /** @param {number} id */
   async function reopenPlan(id) {
     try {
-      const plans = await OpenDivesCore.listPlans();
+      const plans = await BenthicCore.listPlans();
       const plan = plans.find((p) => p.id === id);
       if (!plan) throw new Error('No such plan');
       const request = requestOfPlan(plan, prefs);
@@ -135,7 +135,7 @@
     if (!ready || !started) return;
     const request = planRequest();
     const mine = ++run;
-    OpenDivesCore.planDive(request)
+    BenthicCore.planDive(request)
       .then((r) => {
         if (mine !== run) return;
         result = r;
@@ -409,7 +409,7 @@
   async function openSaved() {
     try {
       // The side panel shows an empty list too (« Nouveau plan » is in it).
-      savedPlans = await OpenDivesCore.listPlans();
+      savedPlans = await BenthicCore.listPlans();
     } catch (e) {
       console.error('Planned dives', e);
       showSnackbar(t('plans.failed'));

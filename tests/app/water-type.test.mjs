@@ -1,9 +1,9 @@
-// The water type named from the core's salinity (plugins/opendives-core/water-type.js), with
+// The water type named from the core's salinity (plugins/benthic-core/water-type.js), with
 // the thresholds of Subsurface's get_water_type_string(), as the façade applied them before
 // 14 November 2026.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { waterTypeOf } from '../../plugins/opendives-core/water-type.js';
+import { waterTypeOf } from '../../plugins/benthic-core/water-type.js';
 
 test('unknown salinity: no type', () => {
   assert.equal(waterTypeOf(0), '');

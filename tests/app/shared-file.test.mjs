@@ -274,7 +274,7 @@ test('the wiring: manifest filters, plugin event, first launch and the two langu
   assert.match(manifest, /android\.intent\.action\.SEND_MULTIPLE/);
   for (const mime of ['application/octet-stream', 'application/xml', 'text/xml', 'text/plain', 'application/x-subsurface']) assert.ok(manifest.includes(`mimeType="${mime}"`), mime);
   for (const ext of ['ssrf', 'xml', 'uddf', 'fit', 'dld', 'sde', 'jlb']) assert.ok(manifest.includes(`\\\\.${ext}"`), ext);
-  assert.match(read('plugins/opendives-core/android/src/main/java/org/opendives/core/OpenDivesCorePlugin.kt'), /notifyListeners\("sharedFile"/);
+  assert.match(read('plugins/benthic-core/android/src/main/java/app/benthicdivelog/core/BenthicCorePlugin.kt'), /notifyListeners\("sharedFile"/);
   assert.match(read('app/src/lib/open-link.js'), /addListener\('sharedFile'/);
   assert.match(read('app/src/components/FirstLaunchSteps.svelte'), /sharedFile\.staged/);
   assert.match(read('app/src/lib/open-link.js'), /stageSharedFile/);

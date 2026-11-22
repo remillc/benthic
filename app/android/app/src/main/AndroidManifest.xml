@@ -181,7 +181,7 @@
             </intent-filter>
 
             <!-- "Share to OpenDives" (ACTION_SEND and SEND_MULTIPLE): the file is in EXTRA_STREAM; the plugin hands
-                 it to the web layer as the "sharedFile" event (OpenDivesCorePlugin.offerSharedFiles). A share of
+                 it to the web layer as the "sharedFile" event (BenthicCorePlugin.offerSharedFiles). A share of
                  plain text without a file does nothing. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

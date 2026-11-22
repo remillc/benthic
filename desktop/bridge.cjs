@@ -3,10 +3,10 @@
 // The bridge of the desktop app, main-process side. It starts the core's helper
 // process (benthic-host, desktop/host/host.cpp), keeps it alive, and gives
 // the renderer a small, checked API through the preload (desktop/preload.cjs).
-// The renderer side of the plugin is plugins/opendives-core/desktop.js.
+// The renderer side of the plugin is plugins/benthic-core/desktop.js.
 //
 // ---------------------------------------------------------------------------
-// Preload API: window.odDesktop (everything returns a Promise unless noted)
+// Preload API: window.benthicDesktop (everything returns a Promise unless noted)
 //
 //   platform                 'win32' | 'darwin' | 'linux'                   (value)
 //   paths                    { userData, temp, resourcesDir, xsltDir, caFile }   (values)
@@ -722,12 +722,12 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   function writeCaFile() {
     // Node's root certificates, as Android's store is exported for the core (libgit2 needs a file).
     let pem = require('node:tls').rootCertificates.join('\n');
-    // Running from the sources only: the authority of a development server (OPENDIVES_DEV_CA, a PEM file) is trusted too.
-    if (!app.isPackaged && process.env.OPENDIVES_DEV_CA) {
+    // Running from the sources only: the authority of a development server (BENTHIC_DEV_CA, a PEM file) is trusted too.
+    if (!app.isPackaged && process.env.BENTHIC_DEV_CA) {
       try {
-        pem += `\n${fs.readFileSync(process.env.OPENDIVES_DEV_CA, 'utf8')}`;
+        pem += `\n${fs.readFileSync(process.env.BENTHIC_DEV_CA, 'utf8')}`;
       } catch (e) {
-        log(`Cannot read OPENDIVES_DEV_CA: ${e.message}`);
+        log(`Cannot read BENTHIC_DEV_CA: ${e.message}`);
       }
     }
     let current = '';

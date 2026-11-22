@@ -9,7 +9,7 @@
   import { placeLevelLabels } from '../lib/chart-labels.js';
   import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
@@ -57,7 +57,7 @@
   const feet = $derived(prefs.length === 'ft');
   const cuft = $derived(prefs.volume === 'cuft');
 
-  let result = $state(/** @type {import('opendives-core').PlanResult|null} */ (null));
+  let result = $state(/** @type {import('benthic-core').PlanResult|null} */ (null));
   let failed = $state(false);
   let ready = $state(false);
   let started = $state(false);
@@ -65,7 +65,7 @@
   let sharing = $state(false);
   let slating = $state(false);
   let qrSharing = $state(false);
-  let slateRequest = $state(/** @type {import('opendives-core').PlanRequest|null} */ (null));
+  let slateRequest = $state(/** @type {import('benthic-core').PlanRequest|null} */ (null));
   let saving = $state(false);
   let titling = $state(false);
   let decoOpen = $state(false);
@@ -87,7 +87,7 @@
   /** The card of the dive a plan starts from. @param {number} id */
   async function sourceOf(id) {
     const summary = logbook.dives.find((d) => d.id === id);
-    const dive = await OpenDivesCore.getDive({ id });
+    const dive = await BenthicCore.getDive({ id });
     return {
       dive,
       source: {
@@ -115,7 +115,7 @@
 
   async function reopenPlan(/** @type {number} */ id) {
     try {
-      const plans = await OpenDivesCore.listPlans();
+      const plans = await BenthicCore.listPlans();
       const plan = plans.find((p) => p.id === id);
       if (!plan) throw new Error('No such plan');
       const request = requestOfPlan(plan, prefs);
@@ -159,7 +159,7 @@
     if (!ready || !started) return;
     const request = planRequest();
     const mine = ++run;
-    OpenDivesCore.planDive(request)
+    BenthicCore.planDive(request)
       .then((r) => {
         if (mine !== run) return;
         result = r;
@@ -182,7 +182,7 @@
     const source = planner.source;
     if (!source || planner.simplified) return;
     try {
-      const dive = await OpenDivesCore.getDive({ id: source.id });
+      const dive = await BenthicCore.getDive({ id: source.id });
       let levels = simplifyProfile(dive.samples);
       if (!levels.length) levels = [{ depthMm: source.maxDepthMm, durationSeconds: Math.max(60, Math.round(source.durationSeconds / 60) * 60) }];
       if (planner.source?.id !== source.id) return;

@@ -22,15 +22,15 @@
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
-  /** The OpenDives+ screens draw their own blue hero: on a phone it takes the place of the panel (task 2026-11-17-265). */
-  const plusHero = $derived(['odplusOffer', 'odplusAll', 'odplusReady', 'odplusWelcome'].includes(currentStep()));
+  /** The Benthic+ screens draw their own blue hero: on a phone it takes the place of the panel (task 2026-11-17-265). */
+  const plusHero = $derived(['benthicPlusOffer', 'benthicPlusAll', 'benthicPlusReady', 'benthicPlusWelcome'].includes(currentStep()));
 
-  /** « OpenDives+, l'offre » on a tablet (task 2026-11-18-282): the panel carries the offer's chip, title and lead. */
-  const offerPanel = $derived(currentStep() === 'odplusOffer' || currentStep() === 'odplusAll');
-  const plusPanel = $derived(currentStep() === 'odplusReady');
+  /** « Benthic+, l'offre » on a tablet (task 2026-11-18-282): the panel carries the offer's chip, title and lead. */
+  const offerPanel = $derived(currentStep() === 'benthicPlusOffer' || currentStep() === 'benthicPlusAll');
+  const plusPanel = $derived(currentStep() === 'benthicPlusReady');
 
   /** The lockup: large on a tablet, the phone's on the first step, the Benthic+ sign-in and offer, the name alone on the other steps. */
-  const lockup = $derived(lockupSize(layout, flow.stack.length <= 1, currentStep() === 'odplusConnect' || offerPanel));
+  const lockup = $derived(lockupSize(layout, flow.stack.length <= 1, currentStep() === 'benthicPlusConnect' || offerPanel));
 
   // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
   const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
@@ -41,9 +41,9 @@
   {#if plusPanel}
     <BenthicPlusPanel />
   {:else if offerPanel}
-    <div class="bc-welcome-release--chip"><BenthicPlusChip label={t('odplus.offer.pill')} /></div>
-    <h1 class="bc-welcome-release--headline bc-welcome-release--headline-offer">{t('odplus.offer.title')}</h1>
-    <p class="bc-welcome-release--intro">{t('odplus.offer.lead')}</p>
+    <div class="bc-welcome-release--chip"><BenthicPlusChip label={t('benthicPlus.offer.pill')} /></div>
+    <h1 class="bc-welcome-release--headline bc-welcome-release--headline-offer">{t('benthicPlus.offer.title')}</h1>
+    <p class="bc-welcome-release--intro">{t('benthicPlus.offer.lead')}</p>
   {:else}
     <h1 class="bc-welcome-release--headline">{t('welcomeRelease.headline')}</h1>
     <p class="bc-welcome-release--intro">{t('welcomeRelease.intro')}</p>

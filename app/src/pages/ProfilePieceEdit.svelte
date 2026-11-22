@@ -16,7 +16,7 @@
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import SwitchField from '../components/SwitchField.svelte';
   import DcTile from '../components/DcTile.svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { getCatalog } from '../lib/dc-images.js';
   import { brandModels } from '../lib/dc-model.js';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
@@ -97,7 +97,7 @@
   /** Brands and models for a dive computer (libdivecomputer's names; any other text can be typed). */
   let lists = $state(brandModels([], []));
   onMount(async () => {
-    Promise.all([OpenDivesCore.bluetoothModels().catch(() => []), getCatalog().catch(() => [])]).then(([bluetooth, catalog]) => (lists = brandModels(bluetooth, catalog)));
+    Promise.all([BenthicCore.bluetoothModels().catch(() => []), getCatalog().catch(() => [])]).then(([bluetooth, catalog]) => (lists = brandModels(bluetooth, catalog)));
     cylinderChoices(logbook.prefs, false)
       .then((choices) => (cylinderOptions = choices.map((c) => ({ value: c.value, label: [c.label, c.example].filter(Boolean).join(' · ') }))))
       .catch(() => {});

@@ -52,7 +52,7 @@ export function cylinderSpan(samples, index) {
 /**
  * One card per cylinder of the Gaz tab: the gas, the type and size, the pressure from start to end, and the
  * levels drawn in the cylinder (the pale start band, the water gradient up to the end level).
- * @param {import('opendives-core').Cylinder[]} cylinders
+ * @param {import('benthic-core').Cylinder[]} cylinders
  * @param {{ pressure: string, volume: string }} prefs
  */
 export function gasCards(cylinders, prefs) {
@@ -84,7 +84,7 @@ export const pressureNumber = (mbar, prefs) => formatNumber(mbar / (prefs.pressu
  * the cylinders), and for the selected cylinder the pressure used and the bar with the reserve mark.
  * A figure that is not known is empty. The bar runs from 0 to the start pressure; the coloured part is what
  * was used (from the end pressure to the start), the red mark is the reserve.
- * @param {import('opendives-core').DiveDetail} dive
+ * @param {import('benthic-core').DiveDetail} dive
  * @param {number} index the selected cylinder
  * @param {{ pressure: string, volume: string }} prefs
  * @param {number} reserveMbar the reserve of the planner's settings (0: none)

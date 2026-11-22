@@ -3,9 +3,9 @@
 # iOS. Same sources and flags as OpenDives' native/CMakeLists.txt, without the
 # JNI bridge. Run by native/ios/build-ios.sh.
 cmake_minimum_required(VERSION 3.22)
-project(opendives_ios LANGUAGES C CXX)
+project(benthic_ios LANGUAGES C CXX)
 
-option(OPENDIVES_TESTS "Also build the test programs" OFF)
+option(BENTHIC_TESTS "Also build the test programs" OFF)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
 set(SS "${ROOT}/third_party/subsurface")
@@ -22,16 +22,16 @@ list(APPEND SOURCES
   "${COMPAT}/cloud_compat.cpp"
   "${COMPAT}/https_mbedtls.cpp"
   "${COMPAT}/bluetooth_compat.cpp"
-  "${ROOT}/core/libopendives/opendives.cpp"
-  "${ROOT}/core/libopendives/edit.cpp"
-  "${ROOT}/core/libopendives/tools.cpp"
-  "${ROOT}/core/libopendives/settings.cpp"
-  "${ROOT}/core/libopendives/plan.cpp"
-  "${ROOT}/core/libopendives/filter.cpp"
-  "${ROOT}/core/libopendives/account.cpp"
-  "${ROOT}/core/libopendives/stats.cpp"
-  "${ROOT}/core/libopendives/download.cpp"
-  "${ROOT}/core/libopendives/odgit.cpp")
+  "${ROOT}/core/libbenthic/benthic.cpp"
+  "${ROOT}/core/libbenthic/edit.cpp"
+  "${ROOT}/core/libbenthic/tools.cpp"
+  "${ROOT}/core/libbenthic/settings.cpp"
+  "${ROOT}/core/libbenthic/plan.cpp"
+  "${ROOT}/core/libbenthic/filter.cpp"
+  "${ROOT}/core/libbenthic/account.cpp"
+  "${ROOT}/core/libbenthic/stats.cpp"
+  "${ROOT}/core/libbenthic/download.cpp"
+  "${ROOT}/core/libbenthic/odgit.cpp")
 
 # Written once: a new time stamp at each configuration would rebuild the whole core.
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/build-defs.h")
@@ -46,7 +46,7 @@ set(COMMON_INCLUDES
   "${ROOT}" "${SS}" "${SS}/libdivecomputer/include"
   "${DEPS}/include" "${DEPS}/include/libxml2")
 
-function(opendives_setup target)
+function(benthic_setup target)
   target_compile_features(${target} PRIVATE cxx_std_20)
   target_compile_definitions(${target} PRIVATE BT_SUPPORT BLE_SUPPORT)
   target_compile_options(${target} PRIVATE ${COMMON_OPTIONS})
@@ -54,15 +54,15 @@ function(opendives_setup target)
 endfunction()
 
 add_library(core_objs OBJECT ${SOURCES})
-opendives_setup(core_objs)
+benthic_setup(core_objs)
 
-add_library(opendives STATIC $<TARGET_OBJECTS:core_objs>)
+add_library(benthic STATIC $<TARGET_OBJECTS:core_objs>)
 
 # The programs of OpenDives' tests, unchanged, to be run in the simulator.
-if(OPENDIVES_TESTS)
+if(BENTHIC_TESTS)
   foreach(test roundtrip plan_test plan_oracle)
     add_executable(${test} "${ROOT}/tests/${test}.cpp" $<TARGET_OBJECTS:core_objs>)
-    opendives_setup(${test})
+    benthic_setup(${test})
     # A plain executable: on iOS, CMake would otherwise make an .app of it.
     set_target_properties(${test} PROPERTIES MACOSX_BUNDLE OFF)
     target_link_directories(${test} PRIVATE "${DEPS}/lib")

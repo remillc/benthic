@@ -21,7 +21,7 @@
   /**
    * @type {{
    *   dives: WithoutDive[],
-   *   sites: import('opendives-core').SiteSummary[],
+   *   sites: import('benthic-core').SiteSummary[],
    *   onnew: (dive: WithoutDive) => void,
    * }}
    */
@@ -98,7 +98,7 @@
     }
   }
 
-  /** @param {{ id: number, location: string }|null} trip @param {import('opendives-core').Dive[]} all */
+  /** @param {{ id: number, location: string }|null} trip @param {import('benthic-core').Dive[]} all */
   function tripTitle(trip, all) {
     const dated = all.filter((d) => d.trip?.id === trip?.id);
     const start = dated.reduce((a, d) => (d.date < a ? d.date : a), dated[0]?.date ?? '');

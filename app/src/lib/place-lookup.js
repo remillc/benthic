@@ -11,7 +11,7 @@
 // User-Agent: a WebView cannot. The one-second spacing is shared with the
 // other Nominatim requests of the app (area-search.js).
 
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { takeSlot, NOMINATIM_REVERSE_URL } from './area-search.js';
 import { offlineRegion } from './offline-region.js';
 
@@ -30,7 +30,7 @@ import { offlineRegion } from './offline-region.js';
 const cache = new Map();
 
 /** @type {HttpGet} */
-const nativeGet = (url) => OpenDivesCore.placesSearch({ url });
+const nativeGet = (url) => BenthicCore.placesSearch({ url });
 
 /**
  * The first of these keys of Nominatim's "address" object that has a value.

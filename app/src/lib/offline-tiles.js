@@ -7,7 +7,7 @@
 // MapLibre asks for `odtiles://<channel>/{z}/{x}/{y}`. The channel names the
 // map asking (the visible map, or the off-screen drawer of site-image.js), so
 // that each can follow its own tiles.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { offlineMaps } from './offline-maps.svelte.js';
 import { regionHasTile, inBbox, MAX_ZOOM_FULL } from './maps-logic.js';
 import { readTileSource } from './tilejson.js';
@@ -145,7 +145,7 @@ function bytesOfBase64(b64) {
  */
 async function fetchTile(channel, z, x, y, signal) {
   const regions = regionsOfTile(z, x, y);
-  const core = /** @type {any} */ (OpenDivesCore);
+  const core = /** @type {any} */ (BenthicCore);
   for (const region of regions) {
     try {
       const { base64 } = await core.mapsReadTile({ id: region.id, z, x, y });

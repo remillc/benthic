@@ -6,7 +6,7 @@
   // by FirstLaunchSteps.svelte. Sign-in is an e-mail code, no password (docs/architecture.md, section 11.2); the
   // session is kept in the platform's secure storage, never in the device store. The rules are in lib/server-signin.js.
   import { onDestroy } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import ReleaseField from './ReleaseField.svelte';
   import CodeField from './CodeField.svelte';
@@ -131,7 +131,7 @@
         return;
       }
       flow.plus.email = session.user.email;
-      await OpenDivesCore.serverSessionSave({
+      await BenthicCore.serverSessionSave({
         email: session.user.email,
         sessionToken: session.sessionToken,
         repositoryUrl: session.repository.url,
@@ -203,7 +203,7 @@
   const d = $state({ done: 0, total: 0, phase: /** @type {'listing'|'download'|'refused'} */ ('listing'), fraction: 0 });
   let cancelled = false;
   /** The desktop window without a logbook downloads when it opens the logbook: here the repository is only looked at. */
-  const windowTakes = desktopApp && /** @type {any} */ (globalThis).odDesktop?.logbook === null;
+  const windowTakes = desktopApp && /** @type {any} */ (globalThis).benthicDesktop?.logbook === null;
 
   async function download() {
     cancelled = false;
@@ -211,18 +211,18 @@
     /** @type {{ remove: () => Promise<void> }|null} */
     let listener = null;
     try {
-      const access = await OpenDivesCore.serverSessionAccess();
+      const access = await BenthicCore.serverSessionAccess();
       // The core's git messages say how far the download is (« Transfer from storage (30/80) »).
       /** @type {import('../lib/sync-progress.js').SyncProgress|null} */
       let progress = null;
-      listener = await OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
+      listener = await BenthicCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
         progress = nextProgress(message, progress);
         d.phase = 'download';
         d.fraction = progress?.fraction ?? d.fraction;
         const count = transferCount(message);
         if (count) Object.assign(d, { done: count.n, total: count.total });
       });
-      const opened = await openServerLogbook(OpenDivesCore, { repositoryUrl: access.repositoryUrl, branch: access.branch, username: access.username, token: access.token }, { download: !windowTakes });
+      const opened = await openServerLogbook(BenthicCore, { repositoryUrl: access.repositoryUrl, branch: access.branch, username: access.username, token: access.token }, { download: !windowTakes });
       if (cancelled) return;
       if (opened.state === 'none') {
         // No logbook on the account: the choices that create one (task 2026-11-17-266).

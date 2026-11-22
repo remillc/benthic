@@ -13,10 +13,10 @@ trap 'rm -rf "$W"' EXIT
 if [ $# -ge 3 ]; then
   set -a; source <(tr -d '\r' < "$2"); source <(tr -d '\r' < "$3"); set +a
   lc() { tr '[:upper:]' '[:lower:]' <<< "$1"; }
-  [ -n "${OPENDIVES_CLOUD_TEST_EMAIL:-}" ] && [ "$(lc "$OPENDIVES_CLOUD_EMAIL")" = "$(lc "$OPENDIVES_CLOUD_TEST_EMAIL")" ] ||
+  [ -n "${BENTHIC_CLOUD_TEST_EMAIL:-}" ] && [ "$(lc "$BENTHIC_CLOUD_EMAIL")" = "$(lc "$BENTHIC_CLOUD_TEST_EMAIL")" ] ||
     { echo "REFUSED: the account is not the test account"; exit 2; }
 else
-  unset OPENDIVES_CLOUD_EMAIL OPENDIVES_CLOUD_PASSWORD OPENDIVES_CLOUD_TEST_EMAIL
+  unset BENTHIC_CLOUD_EMAIL BENTHIC_CLOUD_PASSWORD BENTHIC_CLOUD_TEST_EMAIL
 fi
 # A fresh $HOME: no local copy of the account's log.
 HOME=$W "$ACC" "$ROOT/tests/data/divelogs-available-dives.xml" "$ROOT/third_party/subsurface/dives/SampleDivesV2.ssrf"

@@ -1,8 +1,8 @@
 <script>
   // @ts-check
-  // The OpenDives+ screens of the release edition (task 2026-11-17-265; mock-ups docs/mockups-release/
+  // The Benthic+ screens of the release edition (task 2026-11-17-265; mock-ups docs/mockups-release/
   // android-odplus-connexion, -offre, -pret and -abonne): « Se connecter ou créer un compte », the offer, « Votre carnet
-  // est prêt » and « Bienvenue dans OpenDives+ ! ». There is no free account: an account exists only for a diver who
+  // est prêt » and « Bienvenue dans Benthic+ ! ». There is no free account: an account exists only for a diver who
   // subscribed. The sign-in with Google or Apple and the purchase need native parts that are not wired yet: their
   // buttons call the one function each of lib/benthic-plus-billing.js, which answers « unavailable » for now.
   import { onMount } from 'svelte';
@@ -29,7 +29,7 @@
   /**
    * `onwithout`: « Continuer sans compte » and « Continuer sans abonnement » (back to the first step, nothing created).
    * `onopen`: « Ouvrir mon carnet ».
-   * @type {{ step: 'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome', onwithout: () => void, onopen: () => void }}
+   * @type {{ step: 'benthicPlusConnect'|'benthicPlusOffer'|'benthicPlusAll'|'benthicPlusReady'|'benthicPlusWelcome', onwithout: () => void, onopen: () => void }}
    */
   let { step, onwithout, onopen } = $props();
 
@@ -43,7 +43,7 @@
   const motion = readyMotion;
   let motionStep = '';
   $effect.pre(() => {
-    if (step === 'odplusReady' && motionStep !== 'odplusReady') claimReady();
+    if (step === 'benthicPlusReady' && motionStep !== 'benthicPlusReady') claimReady();
     motionStep = step;
   });
 
@@ -68,7 +68,7 @@
       go('next');
     } catch (e) {
       console.error('Keeping the simulated account on this device', e);
-      showSnackbar(t('odplus.purchaseUnavailable'));
+      showSnackbar(t('benthicPlus.purchaseUnavailable'));
     } finally {
       continuing = false;
     }
@@ -83,7 +83,7 @@
       return;
     }
     const answer = await (provider === 'google' ? signInWithGoogle() : signInWithApple());
-    if (answer.status === 'unavailable') showSnackbar(t('odplus.providerUnavailable', { provider: provider === 'google' ? 'Google' : 'Apple' }));
+    if (answer.status === 'unavailable') showSnackbar(t('benthicPlus.providerUnavailable', { provider: provider === 'google' ? 'Google' : 'Apple' }));
     // To wire: a signed-in answer goes to the server's sign-in call, then to the download or the offer.
   }
 
@@ -129,29 +129,29 @@
           go('welcome');
         } catch (e) {
           console.error('Simulated purchase', e);
-          showSnackbar(t('odplus.purchaseUnavailable'));
+          showSnackbar(t('benthicPlus.purchaseUnavailable'));
         }
         return;
       }
     }
     const answer = await purchaseSubscription();
-    if (answer.status === 'unavailable') showSnackbar(t('odplus.purchaseUnavailable'));
+    if (answer.status === 'unavailable') showSnackbar(t('benthicPlus.purchaseUnavailable'));
     else if (answer.status === 'purchased') go('welcome');
   }
 
   /** « Restaurer les achats »: inert until StoreKit is wired (lib/benthic-plus-billing.js). */
   async function restore() {
     const answer = await restorePurchases();
-    if (answer.status === 'unavailable') showSnackbar(t('odplus.purchaseUnavailable'));
+    if (answer.status === 'unavailable') showSnackbar(t('benthicPlus.purchaseUnavailable'));
     else if (answer.status === 'purchased') go('welcome');
   }
 
-  // Development builds only: the purchase is inert, so « Bienvenue dans OpenDives+ » is reached from the console with
-  // `__odplus.purchased()`. The branch is dropped from a production build (`import.meta.env.DEV` is a constant).
+  // Development builds only: the purchase is inert, so « Bienvenue dans Benthic+ » is reached from the console with
+  // `__benthicPlus.purchased()`. The branch is dropped from a production build (`import.meta.env.DEV` is a constant).
   onMount(() => {
-    if (!import.meta.env?.DEV || step !== 'odplusOffer') return;
-    /** @type {any} */ (window).__odplus = { purchased: () => go('welcome') };
-    return () => delete (/** @type {any} */ (window).__odplus);
+    if (!import.meta.env?.DEV || step !== 'benthicPlusOffer') return;
+    /** @type {any} */ (window).__benthicPlus = { purchased: () => go('welcome') };
+    return () => delete (/** @type {any} */ (window).__benthicPlus);
   });
 </script>
 
@@ -165,7 +165,7 @@
         {#each OFFER_BUBBLES as [cx, cy, r]}<circle {cx} {cy} {r} />{/each}
       </svg>
     {/if}
-    <!-- Every OpenDives+ header: the band of the dive profile above the bottom wave, as on « Se connecter ». -->
+    <!-- Every Benthic+ header: the band of the dive profile above the bottom wave, as on « Se connecter ». -->
     <svg class="bc-plus-hero--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{BAND_PROFILE} V140 H0 Z" class="bc-plus-hero--profile-area" />
       <path d={BAND_PROFILE} class="bc-plus-hero--profile-line" vector-effect="non-scaling-stroke" />
@@ -174,9 +174,9 @@
     <div class="bc-plus-hero--brand"><BrandLockup size={which === 'offer' ? 'compact' : 'step'} /></div>
     {#if which === 'offer'}
       <div class="bc-plus-hero--text">
-        <BenthicPlusChip label={t('odplus.offer.pill')} large />
-        <h2 class="bc-plus-hero--title">{t('odplus.offer.title')}</h2>
-        <p class="bc-plus-hero--lead">{t('odplus.offer.lead')}</p>
+        <BenthicPlusChip label={t('benthicPlus.offer.pill')} large />
+        <h2 class="bc-plus-hero--title">{t('benthicPlus.offer.title')}</h2>
+        <p class="bc-plus-hero--lead">{t('benthicPlus.offer.lead')}</p>
       </div>
     {:else}
       <div class="bc-plus-hero--centre">
@@ -186,8 +186,8 @@
           <span class="bc-plus-hero--check bc-plus-hero--check-big"><Icon name="check" size={44} weight={2.6} /></span>
         {/if}
         <BenthicPlusChip />
-        <h2 class="bc-plus-hero--title">{t(which === 'ready' ? 'odplus.ready.title' : 'odplus.welcome.title')}</h2>
-        <p class="bc-plus-hero--lead">{which === 'ready' ? t(deviceKey('odplus.ready.lead', kind)) : t('odplus.welcome.lead')}</p>
+        <h2 class="bc-plus-hero--title">{t(which === 'ready' ? 'benthicPlus.ready.title' : 'benthicPlus.welcome.title')}</h2>
+        <p class="bc-plus-hero--lead">{which === 'ready' ? t(deviceKey('benthicPlus.ready.lead', kind)) : t('benthicPlus.welcome.lead')}</p>
       </div>
     {/if}
   </header>
@@ -196,10 +196,10 @@
 {#snippet priceBlock()}
   <!-- Plain centred text, not a card (task 2026-11-19-295): the grey label is not tappable. -->
   <div class="bc-plus--price">
-    <span class="bc-plus--price-label">{t('odplus.offer.priceLabel')}</span>
-    <span class="bc-plus--price-amount">{t('odplus.offer.price')} <span class="bc-plus--price-per">{t('odplus.offer.per')}</span></span>
-    <span class="bc-plus--price-detail">{t('odplus.offer.priceDetail')}</span>
-    <span class="bc-plus--price-cancel"><Icon name="check" size={20} weight={2.4} />{t('odplus.offer.cancelAnytime')}</span>
+    <span class="bc-plus--price-label">{t('benthicPlus.offer.priceLabel')}</span>
+    <span class="bc-plus--price-amount">{t('benthicPlus.offer.price')} <span class="bc-plus--price-per">{t('benthicPlus.offer.per')}</span></span>
+    <span class="bc-plus--price-detail">{t('benthicPlus.offer.priceDetail')}</span>
+    <span class="bc-plus--price-cancel"><Icon name="check" size={20} weight={2.4} />{t('benthicPlus.offer.cancelAnytime')}</span>
   </div>
 {/snippet}
 
@@ -210,31 +210,31 @@
   {/await}
 {/if}
 
-{#if step === 'odplusConnect'}
-  <h2 class="bc-plus--title">{t('odplus.connect.title')}</h2>
-  <p class="bc-plus--lead">{t('odplus.connect.lead')}</p>
+{#if step === 'benthicPlusConnect'}
+  <h2 class="bc-plus--title">{t('benthicPlus.connect.title')}</h2>
+  <p class="bc-plus--lead">{t('benthicPlus.connect.lead')}</p>
   <div class="bc-plus--buttons">
     <!-- The official logos and rules of each provider (assets/brands/README.md): the logos are never altered. -->
     <!-- « Continuer avec Apple » first on iOS (task 2026-11-19-289, ios-odplus-connexion.dc.html). -->
     {#each providerOrder(ios) as which (which)}
       {#if which === 'google'}
         <button type="button" class="bc-plus--provider bc-plus--provider-google" onclick={() => provider('google')}>
-          <span class="bc-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('odplus.connect.google')}
+          <span class="bc-plus--google-logo" aria-hidden="true">{@html googleLogo}</span>{t('benthicPlus.connect.google')}
         </button>
       {:else if which === 'apple'}
         <button type="button" class="bc-plus--provider bc-plus--provider-apple" onclick={() => provider('apple')}>
-          <img class="bc-plus--apple-logo bc-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" /><img class="bc-plus--apple-logo bc-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('odplus.connect.apple')}
+          <img class="bc-plus--apple-logo bc-plus--apple-logo-light" src={appleLogoBlack} alt="" aria-hidden="true" /><img class="bc-plus--apple-logo bc-plus--apple-logo-dark" src={appleLogoWhite} alt="" aria-hidden="true" />{t('benthicPlus.connect.apple')}
         </button>
       {:else}
         <button type="button" class="bc-plus--provider bc-plus--provider-main" onclick={() => go('email')}>
-          <Icon name="mail" size={22} />{t('odplus.connect.email')}
+          <Icon name="mail" size={22} />{t('benthicPlus.connect.email')}
         </button>
       {/if}
     {/each}
   </div>
-  <p class="bc-plus--note">{t('odplus.connect.note')}</p>
-  <button type="button" class="bc-plus--text bc-plus--text-link" onclick={onwithout}>{t('odplus.connect.without')}</button>
-{:else if step === 'odplusOffer'}
+  <p class="bc-plus--note">{t('benthicPlus.connect.note')}</p>
+  <button type="button" class="bc-plus--text bc-plus--text-link" onclick={onwithout}>{t('benthicPlus.connect.without')}</button>
+{:else if step === 'benthicPlusOffer'}
   <div class="bc-plus--screen bc-plus--screen-offer" class:bc-plus--screen-ios={ios}>
     <!-- A tablet's blue panel (pages/WelcomeStartRelease.svelte) carries the chip, the title and the lead: the hero is the phone's. -->
     {#if layout.phone || desktopApp}{@render hero('offer')}{/if}
@@ -243,8 +243,8 @@
         <div class="bc-plus--card bc-plus--card-{b.tone}">
           <span class="bc-plus--card-icon"><Icon name={b.icon} size={24} weight={1.9} /></span>
           <span class="bc-plus--card-copy">
-            <span class="bc-plus--card-title">{t(`odplus.offer.${b.key}`)}</span>
-            <span class="bc-plus--card-text">{t(`odplus.offer.${b.key}Text`)}</span>
+            <span class="bc-plus--card-title">{t(`benthicPlus.offer.${b.key}`)}</span>
+            <span class="bc-plus--card-text">{t(`benthicPlus.offer.${b.key}Text`)}</span>
           </span>
         </div>
       {/each}
@@ -252,97 +252,97 @@
     <div class="bc-plus--card bc-plus--card-maintenance bc-plus--card-wide">
       <span class="bc-plus--card-icon"><Icon name="wrench" size={24} weight={1.9} /></span>
       <span class="bc-plus--card-body">
-        <span class="bc-plus--card-title">{t('odplus.offer.maintenance')}</span>
-        <span class="bc-plus--card-text">{t('odplus.offer.maintenanceText')}</span>
+        <span class="bc-plus--card-title">{t('benthicPlus.offer.maintenance')}</span>
+        <span class="bc-plus--card-text">{t('benthicPlus.offer.maintenanceText')}</span>
       </span>
     </div>
     <!-- « Voir tout ce qui est inclus » (task 2026-11-19-295): opens the list of everything the subscription includes. -->
-    <button type="button" class="bc-plus--see-all" onclick={() => go('all')}>{t('odplus.offer.seeAll')}<Icon name="chevron" size={22} weight={2.2} /></button>
+    <button type="button" class="bc-plus--see-all" onclick={() => go('all')}>{t('benthicPlus.offer.seeAll')}<Icon name="chevron" size={22} weight={2.2} /></button>
     {@render priceBlock()}
-    <button type="button" class="bc-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
+    <button type="button" class="bc-plus--primary" onclick={subscribe}>{t('benthicPlus.offer.subscribe')}</button>
     {#if ios}
       <!-- App Store requirements (task 289): restoring purchases, and the terms of the automatic renewal. -->
-      <button type="button" class="bc-plus--text bc-plus--text-centre" onclick={restore}>{t('odplus.offer.restore')}</button>
-      <p class="bc-plus--terms">{t('odplus.offer.terms', { price: t('odplus.offer.price') })}</p>
+      <button type="button" class="bc-plus--text bc-plus--text-centre" onclick={restore}>{t('benthicPlus.offer.restore')}</button>
+      <p class="bc-plus--terms">{t('benthicPlus.offer.terms', { price: t('benthicPlus.offer.price') })}</p>
     {/if}
-    <button type="button" class="bc-plus--text bc-plus--text-centre" onclick={onwithout}>{t('odplus.offer.without')}</button>
-    <p class="bc-plus--no-account">{t('odplus.offer.noAccount')}</p>
+    <button type="button" class="bc-plus--text bc-plus--text-centre" onclick={onwithout}>{t('benthicPlus.offer.without')}</button>
+    <p class="bc-plus--no-account">{t('benthicPlus.offer.noAccount')}</p>
     {#if offerShowsSignIn(flow.stack)}
       <!-- « Déjà abonné ? Se connecter » (task 2026-11-18-281): hidden right after a sign-in, where the diver is already in.
            On a tablet it sits at the top right, on the row of « Retour » (task 2026-11-19-295). -->
-      <p class="bc-plus--already" class:bc-plus--already-top={!layout.phone && !desktopApp}>{t('odplus.offer.already')} <button type="button" class="bc-plus--link" onclick={() => go('signIn')}>{t('odplus.offer.signIn')}</button></p>
+      <p class="bc-plus--already" class:bc-plus--already-top={!layout.phone && !desktopApp}>{t('benthicPlus.offer.already')} <button type="button" class="bc-plus--link" onclick={() => go('signIn')}>{t('benthicPlus.offer.signIn')}</button></p>
     {/if}
   </div>
-{:else if step === 'odplusAll'}
+{:else if step === 'benthicPlusAll'}
   <!-- « Tout ce qui est inclus » (task 2026-11-19-295; mock-ups android-odplus-complet, ios-odplus-complet and
        android-tablette-odplus-complet-paysage): the rows of each group, then the price footer that stays at the bottom. -->
   <div class="bc-plus-all" class:bc-plus-all--ios={kind === 'iphone'}>
     <div class="bc-plus-all--bar">
       <button type="button" class="bc-plus-all--back" aria-label={t('welcomeSteps.back')} onclick={goBack}>
         {#if kind === 'iphone'}
-          <span class="bc-plus-all--back-chevron"><Icon name="chevron" size={22} weight={2.4} /></span>{t('odplus.chip')}
+          <span class="bc-plus-all--back-chevron"><Icon name="chevron" size={22} weight={2.4} /></span>{t('benthicPlus.chip')}
         {:else}
           <Icon name="arrowBack" size={24} weight={2} />
         {/if}
       </button>
-      {#if kind !== 'iphone'}<h1 class="bc-plus-all--title">{t('odplus.all.title')}</h1>{/if}
+      {#if kind !== 'iphone'}<h1 class="bc-plus-all--title">{t('benthicPlus.all.title')}</h1>{/if}
     </div>
-    {#if kind === 'iphone'}<h1 class="bc-plus-all--title bc-plus-all--title-large">{t('odplus.all.title')}</h1>{/if}
+    {#if kind === 'iphone'}<h1 class="bc-plus-all--title bc-plus-all--title-large">{t('benthicPlus.all.title')}</h1>{/if}
     <div class="bc-plus-all--body">
       <BenthicPlusChip onSheet />
-      <p class="bc-plus-all--subtitle">{t('odplus.all.subtitle')}</p>
+      <p class="bc-plus-all--subtitle">{t('benthicPlus.all.subtitle')}</p>
       {#each includedGroups() as group (group.key)}
-        <h2 class="bc-plus-all--group">{t(`odplus.all.${group.key}`)}</h2>
+        <h2 class="bc-plus-all--group">{t(`benthicPlus.all.${group.key}`)}</h2>
         <ul class="bc-plus-all--rows">
           {#each group.rows as row (row.key)}
             <li class="bc-plus-all--row">
               <span class="bc-plus-all--tile bc-plus-all--tile-{row.tone}"><Icon name={row.icon} size={22} weight={2} /></span>
               <span class="bc-plus-all--texts">
-                <span class="bc-plus-all--row-title">{t(`odplus.all.${row.key}`)}</span>
-                <span class="bc-plus-all--row-text">{t(row.key === 'sync' ? deviceKey('odplus.all.syncText', kind) : `odplus.all.${row.key}Text`)}</span>
+                <span class="bc-plus-all--row-title">{t(`benthicPlus.all.${row.key}`)}</span>
+                <span class="bc-plus-all--row-text">{t(row.key === 'sync' ? deviceKey('benthicPlus.all.syncText', kind) : `benthicPlus.all.${row.key}Text`)}</span>
               </span>
             </li>
           {/each}
         </ul>
       {/each}
-      <p class="bc-plus-all--free">{t('odplus.all.free')}</p>
+      <p class="bc-plus-all--free">{t('benthicPlus.all.free')}</p>
     </div>
     <div class="bc-plus-all--footer">
       {@render priceBlock()}
-      <button type="button" class="bc-plus--primary" onclick={subscribe}>{t('odplus.offer.subscribe')}</button>
+      <button type="button" class="bc-plus--primary" onclick={subscribe}>{t('benthicPlus.offer.subscribe')}</button>
     </div>
   </div>
-{:else if step === 'odplusReady'}
+{:else if step === 'benthicPlusReady'}
   <div class="bc-plus--screen">
     {#if panelless}{@render hero('ready')}{/if}
     {#if summaryRows(flow.plus.counts).length}
     <dl class="bc-plus--summary">
       {#each summaryRows(flow.plus.counts) as row (row.key)}
         <div class="bc-plus--summary-row">
-          <dt>{t(`odplus.ready.${row.key}`)}</dt>
-          <dd>{row.key === 'gear' ? t('odplus.ready.articles', { n: row.n }) : row.n}</dd>
+          <dt>{t(`benthicPlus.ready.${row.key}`)}</dt>
+          <dd>{row.key === 'gear' ? t('benthicPlus.ready.articles', { n: row.n }) : row.n}</dd>
         </div>
       {/each}
     </dl>
     {/if}
-    <p class="bc-plus--account"><Icon name="check" size={16} weight={2.4} />{t('odplus.ready.account', { email: flow.plus.email })}</p>
-    <button type="button" class="bc-plus--primary" onclick={onopen}>{t('odplus.ready.open')}</button>
+    <p class="bc-plus--account"><Icon name="check" size={16} weight={2.4} />{t('benthicPlus.ready.account', { email: flow.plus.email })}</p>
+    <button type="button" class="bc-plus--primary" onclick={onopen}>{t('benthicPlus.ready.open')}</button>
   </div>
-{:else if step === 'odplusWelcome'}
+{:else if step === 'benthicPlusWelcome'}
   <div class="bc-plus--screen">
     {@render hero('welcome')}
-    <h3 class="bc-plus--label">{t('odplus.welcome.activated')}</h3>
+    <h3 class="bc-plus--label">{t('benthicPlus.welcome.activated')}</h3>
     <ul class="bc-plus--activated">
       {#each ACTIVATED as key, i (key)}
         <li class="bc-plus--activated-row bc-plus--card-{['blue', 'green', 'amber'][i]}">
           <span class="bc-plus--activated-icon"><Icon name={['sync', 'cloudDownload', 'briefcase'][i]} size={22} weight={1.9} /></span>
-          <span class="bc-plus--activated-text">{t(`odplus.welcome.${key}`)}</span>
+          <span class="bc-plus--activated-text">{t(`benthicPlus.welcome.${key}`)}</span>
           <Icon name="check" size={20} weight={2.4} />
         </li>
       {/each}
     </ul>
-    <p class="bc-plus--account bc-plus--account-plain">{t('odplus.welcome.account', { email: flow.plus.email })}</p>
-    <button type="button" class="bc-plus--primary" disabled={continuing} onclick={continueWelcome}>{t('odplus.welcome.next')}</button>
+    <p class="bc-plus--account bc-plus--account-plain">{t('benthicPlus.welcome.account', { email: flow.plus.email })}</p>
+    <button type="button" class="bc-plus--primary" disabled={continuing} onclick={continueWelcome}>{t('benthicPlus.welcome.next')}</button>
   </div>
 {/if}
 
@@ -1087,7 +1087,7 @@
       }
     }
 
-    /* The iPhone's navigation bar: « ‹ OpenDives+ » in the link colour, the large title under it. */
+    /* The iPhone's navigation bar: « ‹ Benthic+ » in the link colour, the large title under it. */
     .bc-plus-all--ios .bc-plus-all--back {
       padding: 0 8px 0 0;
       gap: 0;
@@ -1293,7 +1293,7 @@
         margin-bottom: 24px;
       }
 
-      /* The OpenDives+ headers: the section band's dive profile above a wave in the page colour, as on the other setup screens. */
+      /* The Benthic+ headers: the section band's dive profile above a wave in the page colour, as on the other setup screens. */
       .bc-plus-hero--offer,
       .bc-plus-hero--welcome,
       .bc-plus-hero--ready {

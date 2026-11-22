@@ -9,7 +9,7 @@
   import Md3Dialog from './Md3Dialog.svelte';
   import Icon from './Icon.svelte';
   import ReleaseField from './ReleaseField.svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { stageFile } from '../lib/staged-file.js';
   import {
     SEPARATORS,
@@ -45,7 +45,7 @@
    *   file: File,
    *   companion?: File|null,
    *   onclose: () => void,
-   *   onconfirm: (result: { params: import('opendives-core').CsvParams, companion: File|null, dives: number, minutes: number }) => void|Promise<void>,
+   *   onconfirm: (result: { params: import('benthic-core').CsvParams, companion: File|null, dives: number, minutes: number }) => void|Promise<void>,
    *   onfail: (error: unknown) => void,
    * }}
    */
@@ -59,9 +59,9 @@
 
   /** The calls of the plugin, with the staging of the files. */
   const calls = {
-    stage: async (/** @type {File} */ f) => (await stageFile(OpenDivesCore, f)).path,
-    discard: (/** @type {string} */ path) => OpenDivesCore.discardImport({ path }),
-    importCsv: (/** @type {any} */ o) => OpenDivesCore.importCsv(o),
+    stage: async (/** @type {File} */ f) => (await stageFile(BenthicCore, f)).path,
+    discard: (/** @type {string} */ path) => BenthicCore.discardImport({ path }),
+    importCsv: (/** @type {any} */ o) => BenthicCore.importCsv(o),
   };
 
   onMount(async () => {

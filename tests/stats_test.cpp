@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
-// Statistics of the façade (core/libopendives/stats.cpp) on Subsurface's
+// Statistics of the façade (core/libbenthic/stats.cpp) on Subsurface's
 // sample log, against figures read from the log's dives (durations, depths)
 // and Subsurface's own rules (invalid dives left out).
 // usage: stats <log, e.g. third_party/subsurface/dives/SampleDivesV2.ssrf>
-#include "../core/libopendives/opendives.h"
+#include "../core/libbenthic/benthic.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -37,15 +37,15 @@ int main(int argc, char **argv)
 		return 2;
 	}
 	std::string json, error;
-	if (opendives::init() || opendives::list_dives(argv[1], json, error)) {
+	if (benthic::init() || benthic::list_dives(argv[1], json, error)) {
 		fprintf(stderr, "cannot load %s: %s\n", argv[1], error.c_str());
 		return 2;
 	}
 	if (getenv("STATS_DUMP")) {
-		opendives::stats("{}", json, error);
+		benthic::stats("{}", json, error);
 		printf("%s\n", json.c_str());
 		for (const char *f: { "suit", "buddy", "mode", "year", "trip", "gas", "tag" }) {
-			opendives::stats_values(f, json, error);
+			benthic::stats_values(f, json, error);
 			printf("%s: %s\n", f, json.c_str());
 		}
 		return 0;
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	}
 
 	// All dives (the sample has no invalid dive).
-	check_true("stats {}", opendives::stats("{}", json, error) == 0);
+	check_true("stats {}", benthic::stats("{}", json, error) == 0);
 	check("dives", number(json, "dives", json.find("\"total\"")), 29);
 	check("dives = list", number(json, "dives", json.find("\"total\"")), count);
 	check("log dives", number(json, "logDives"), 29);
@@ -89,40 +89,40 @@ int main(int argc, char **argv)
 	check("no buddy dives", number(json, "dives", json.find("{\"value\":\"\"", json.find("\"byBuddy\""))), 1);
 
 	// One value; several values of a field (any); several fields (all).
-	opendives::stats("{\"suit\":[\"wet, 5mm\"]}", json, error);
+	benthic::stats("{\"suit\":[\"wet, 5mm\"]}", json, error);
 	check("suit wet 5mm", number(json, "dives", json.find("\"total\"")), 6);
 	check("suit wet 5mm time", number(json, "totalSeconds", json.find("\"total\"")), 20621);
 	check("log dives with criteria", number(json, "logDives"), 29);
-	opendives::stats("{\"suit\":[\"wet, 5mm\",\"wet, 3mm\"]}", json, error);
+	benthic::stats("{\"suit\":[\"wet, 5mm\",\"wet, 3mm\"]}", json, error);
 	check("suit 5mm or 3mm", number(json, "dives", json.find("\"total\"")), 18);
-	opendives::stats("{\"year\":[\"2011\"],\"buddy\":[\"Scott\"]}", json, error);
+	benthic::stats("{\"year\":[\"2011\"],\"buddy\":[\"Scott\"]}", json, error);
 	check("2011 and Scott", number(json, "dives", json.find("\"total\"")), 2);
-	opendives::stats("{\"buddy\":[\"\"]}", json, error);
+	benthic::stats("{\"buddy\":[\"\"]}", json, error);
 	check("without buddy", number(json, "dives", json.find("\"total\"")), 1);
-	opendives::stats("{\"gas\":[\"500/0\"]}", json, error);
+	benthic::stats("{\"gas\":[\"500/0\"]}", json, error);
 	check("EAN50 breathed", number(json, "dives", json.find("\"total\"")), 6);
-	opendives::stats("{\"id\":[\"" + std::to_string(first_id) + "\"]}", json, error);
+	benthic::stats("{\"id\":[\"" + std::to_string(first_id) + "\"]}", json, error);
 	check("one dive by id", number(json, "dives", json.find("\"total\"")), 1);
 	check_true("diveIds holds it", json.find("\"diveIds\":[" + std::to_string(first_id) + "]") != std::string::npos);
 
 	// The selection is put back: all dives again.
-	opendives::stats("{}", json, error);
+	benthic::stats("{}", json, error);
 	check("all dives again", number(json, "dives", json.find("\"total\"")), 29);
 
 	// Values of a field, with their number of dives.
-	check_true("values buddy", opendives::stats_values("buddy", json, error) == 0);
+	check_true("values buddy", benthic::stats_values("buddy", json, error) == 0);
 	check("buddy Linus", number(json, "dives", json.find("{\"key\":\"Linus\"")), 24);
 	check("no buddy", number(json, "dives", json.find("{\"key\":\"\"")), 1);
-	opendives::stats_values("year", json, error);
+	benthic::stats_values("year", json, error);
 	check("year 2013", number(json, "dives", json.find("{\"key\":\"2013\"")), 11);
-	opendives::stats_values("trip", json, error);
+	benthic::stats_values("trip", json, error);
 	check_true("trip key is its first dive's date",
 		   json.find("{\"key\":\"2013-06-01T10:15:23\",\"dives\":11,\"location\":\"Koror, Palau\"}") != std::string::npos);
 
 	// Refused: an unknown field (weight is never offered).
-	check_true("weight refused", opendives::stats("{\"weight\":[\"1\"]}", json, error) == -1);
-	check_true("weight values refused", opendives::stats_values("weight", json, error) == -1);
-	check_true("bad JSON refused", opendives::stats("[", json, error) == -1);
+	check_true("weight refused", benthic::stats("{\"weight\":[\"1\"]}", json, error) == -1);
+	check_true("weight values refused", benthic::stats_values("weight", json, error) == -1);
+	check_true("bad JSON refused", benthic::stats("[", json, error) == -1);
 
 	printf("%s\n", failed ? "FAILED" : "all passed");
 	return failed ? 1 : 0;

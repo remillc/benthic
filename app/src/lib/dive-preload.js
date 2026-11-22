@@ -3,10 +3,10 @@
 // swipe to the next or previous dive): their detail read from the core and
 // their site's map picture decoded, so that the next screen comes in whole
 // instead of filling in during the slide.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { currentStamp, sameStamp } from './core-cache.js';
 
-/** @typedef {import('opendives-core').DiveDetail} DiveDetail */
+/** @typedef {import('benthic-core').DiveDetail} DiveDetail */
 
 /** A few details: the one shown and its neighbours, with some margin. */
 const KEPT = 6;
@@ -56,7 +56,7 @@ function read(id) {
   let promise = reading.get(id);
   if (!promise) {
     const stamp = currentStamp();
-    promise = OpenDivesCore.getDive({ id })
+    promise = BenthicCore.getDive({ id })
       .then((dive) => {
         keepDive(id, dive, stamp);
         return dive;

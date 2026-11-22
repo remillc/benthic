@@ -2,19 +2,19 @@
 // Statistics section (docs/ui-specification.md, section 1 and 5, "Statistics").
 //
 // Every figure comes from the Subsurface core: the facade's `stats`
-// (core/libopendives/stats.cpp) runs calculate_stats_summary() and
+// (core/libbenthic/stats.cpp) runs calculate_stats_summary() and
 // calculate_stats_selected() on the dives that meet the criteria, invalid
 // dives left out as Subsurface does. Nothing is summed here. The free filter
 // applies too (spec: "Statistics apply to the filtered results"): its dives
 // are passed as an "id" criterion.
 import { deviceStore } from './device-store.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { t, tIfExists } from './i18n.js';
 import { formatGasLong, formatTotalTime, formatDate, locale } from './format.js';
 import { filter } from './filter.svelte.js';
 import { withoutFeedbackTags } from './weight-feedback.js';
 
-/** @typedef {import('opendives-core').Dive} Dive */
+/** @typedef {import('benthic-core').Dive} Dive */
 
 /**
  * Figures of a set of dives, as Subsurface's stats_t (statistics.h). Integer SI
@@ -75,7 +75,7 @@ export async function computeStatistics(criteria, options = {}) {
   for (const c of criteria) if (c.values.length) object[c.field] = [...c.values];
   if (filter.ids && !options.ignoreFilter) object.id = [...filter.ids].map(String);
   try {
-    return await OpenDivesCore.statsQuery({ kind: 'stats', criteria: object });
+    return await BenthicCore.statsQuery({ kind: 'stats', criteria: object });
   } catch (e) {
     console.error('Statistics', e);
     return null;
@@ -101,7 +101,7 @@ export function summaryLine(figures) {
  */
 export async function criterionValues(field, dives) {
   /** @type {{key: string, dives: number, location?: string}[]} */
-  const values = await OpenDivesCore.statsQuery({ kind: 'values', field });
+  const values = await BenthicCore.statsQuery({ kind: 'values', field });
   const descending = field === 'year' || field === 'month' || field === 'rating' || field === 'trip';
   return (field === 'tag' ? withoutFeedbackTags(values) : values)
     .map((v) => ({

@@ -6,7 +6,7 @@
   // and gets the nearest site within 500 m (lib/site-suggestion.js); one without
   // a position gets the site of the other dives of the same trip (task 2026-11-14-148).
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import SiteMap from '../components/SiteMap.svelte';
@@ -23,13 +23,13 @@
 
   /** @type {{id: number, number: number, date: string, durationSeconds: number, suggestedSite: number, latUdeg?: number, lonUdeg?: number}[]} */
   let dives = $state([]);
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
 
   async function load() {
     // The latest dive first, as in the logbook.
-    dives = (await OpenDivesCore.siteQuery({ kind: 'without' })).sort((/** @type {any} */ a, /** @type {any} */ b) => b.date.localeCompare(a.date));
-    sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+    dives = (await BenthicCore.siteQuery({ kind: 'without' })).sort((/** @type {any} */ a, /** @type {any} */ b) => b.date.localeCompare(a.date));
+    sites = await BenthicCore.siteQuery({ kind: 'list' });
     diveLines(dives, (l) => (lines = l), ', ');
   }
 

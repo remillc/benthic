@@ -39,7 +39,7 @@
   import { profilePng } from '../lib/share.js';
   import { depthUnit, depthValue, formatDepth, formatNumber, formatSac, formatDate, formatTotalTime } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { cachedSites } from '../lib/core-cache.js';
 
   /** @type {{ f7router?: any }} */
@@ -56,7 +56,7 @@
   let result = $state(/** @type {import('../lib/statistics.svelte.js').StatsResult|null} */ (null));
   /** The dives of each statistic the diver created, by its id. */
   let savedResults = $state(/** @type {Record<string, import('../lib/statistics.svelte.js').StatsResult|null>} */ ({}));
-  let sites = $state(/** @type {import('opendives-core').SiteSummary[]} */ ([]));
+  let sites = $state(/** @type {import('benthic-core').SiteSummary[]} */ ([]));
 
   $effect(() => {
     const dives = logbook.dives;
@@ -73,7 +73,7 @@
     logbook.sitesVersion;
     if (logbook.loading || !startup.ready) return;
     cachedSites().then(
-      (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
+      (/** @type {import('benthic-core').SiteSummary[]} */ list) => (sites = list),
       (/** @type {unknown} */ e) => console.error('Sites', e),
     );
   });
@@ -314,8 +314,8 @@
     try {
       const base64 = await profilePng(chartSvg);
       try {
-        const { uri } = await OpenDivesCore.writeShareFile({ name, base64 });
-        await OpenDivesCore.grantShareFile({ uri, mime: 'image/png' });
+        const { uri } = await BenthicCore.writeShareFile({ name, base64 });
+        await BenthicCore.grantShareFile({ uri, mime: 'image/png' });
         await Share.share({ title: name, files: [uri], dialogTitle: t('share.title') });
       } catch (e) {
         if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
@@ -389,7 +389,7 @@
       e.preventDefault();
     };
     window.addEventListener('keydown', keydown);
-    const off = /** @type {any} */ (window).odDesktop?.onMenu?.((/** @type {string} */ c) => {
+    const off = /** @type {any} */ (window).benthicDesktop?.onMenu?.((/** @type {string} */ c) => {
       if (layout.desktop && navigation.section === 'statistics' && (c === 'undo' || c === 'redo')) step(c);
     });
     return () => {

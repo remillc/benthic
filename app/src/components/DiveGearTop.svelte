@@ -16,7 +16,7 @@
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { equipmentOf } from '../lib/inventory.svelte.js';
   import { f7 } from 'framework7-svelte';
   import { t } from '../lib/i18n.js';
@@ -116,7 +116,7 @@
     let prevSuit = prevEquipment.suitGearId ? (gearMap().get(prevEquipment.suitGearId)?.name ?? '') : '';
     if (!prevSuit) {
       try {
-        prevSuit = (await OpenDivesCore.getDive({ id: previous.id })).suit ?? '';
+        prevSuit = (await BenthicCore.getDive({ id: previous.id })).suit ?? '';
       } catch {
         prevSuit = '';
       }

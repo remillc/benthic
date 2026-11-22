@@ -11,11 +11,11 @@
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
-  import { odplusAccount, odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
   import { navigation, openOver, openProfile, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
-  import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { accountEmail as emailOfAccount, profileRow, sheetVariant } from '../lib/account-sheet.js';
@@ -26,19 +26,19 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
 
-  const email = $derived(emailOfAccount(odplusAccount, logbook));
-  // An OpenDives+ account shows the diver's full name first and the e-mail under it (task 2026-11-19-312).
-  const fullName = $derived(odplusSubscriber() ? diver.info.fullName : '');
+  const email = $derived(emailOfAccount(benthicPlusAccount, logbook));
+  // An Benthic+ account shows the diver's full name first and the e-mail under it (task 2026-11-19-312).
+  const fullName = $derived(benthicPlusSubscriber() ? diver.info.fullName : '');
   const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(fullName || email || t('menu.noAccount'));
   const accountEmail = $derived(fullName ? email : '');
   const git = $derived(logbook.mode === 'git');
-  const server = $derived(git && logbook.odplus);
+  const server = $derived(git && logbook.benthicPlus);
 
   // The versions of the sheet (task 2026-11-18-281; bureau-compte-gratuit, bureau-profil-compte). The release edition
-  // without an OpenDives+ account has the free one; there is no tablet or desktop offer screen yet, so « S'abonner » opens
+  // without an Benthic+ account has the free one; there is no tablet or desktop offer screen yet, so « S'abonner » opens
   // the phone's offer content.
-  const variant = $derived(sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email, git, repository: logbook.repository }));
+  const variant = $derived(sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email, git, repository: logbook.repository }));
   const free = $derived(variant === 'free');
   const subscriber = $derived(variant === 'subscriber');
   const gitSheet = $derived(variant === 'git');
@@ -92,7 +92,7 @@
   /** @param {'offer'|'signIn'} screen */
   function plus(screen) {
     close();
-    openOdPlus(screen);
+    openBenthicPlus(screen);
   }
 
   /** @param {() => void} open */
@@ -122,14 +122,14 @@
 </script>
 
 {#if navigation.accountOpen && subscriber}
-  <!-- An OpenDives+ account (task 2026-11-19-292, docs/mockups/bureau-profil-compte.dc.html): the logo, the account group
+  <!-- An Benthic+ account (task 2026-11-19-292, docs/mockups/bureau-profil-compte.dc.html): the logo, the account group
        (the buttons beside what they act on), « Mon profil de plongeur » and the backup, then Réglages and À propos, each
        entry with its icon in a small blue tile. No close button: a click outside or Esc closes it. -->
   <div class="bc-desktop-account bc-desktop-account--plus" role="dialog" aria-label={t('desktopSettings.account.sheet')} bind:this={sheet}>
     <div class="bc-desktop-account--brand">
       <img class="bc-desktop-account--logo bc-desktop-account--light" src="/logo-light.svg" alt="" width="24" height="24" />
       <img class="bc-desktop-account--logo bc-desktop-account--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
-      <span class="bc-desktop-account--brand-name"><span aria-hidden="true">{t('menu.title')}<span class="bc-desktop-account--dot">+</span></span><span class="bc-sr-only">{t('odplus.chipName')}</span></span>
+      <span class="bc-desktop-account--brand-name"><span aria-hidden="true">{t('menu.title')}<span class="bc-desktop-account--dot">+</span></span><span class="bc-sr-only">{t('benthicPlus.chipName')}</span></span>
     </div>
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
@@ -189,7 +189,7 @@
 {:else if navigation.accountOpen && gitSheet}
   <!-- The one-off licence with git sync (task 2026-11-19-298, docs/mockups/bureau-profil-compte-git.dc.html): the
        repository card with « Changer de dépôt » and the sync row, the backup (the repository's own history), the
-       « Passer à OpenDives+ » card, then Réglages and À propos. No « Mon profil de plongeur ». -->
+       « Passer à Benthic+ » card, then Réglages and À propos. No « Mon profil de plongeur ». -->
   <div class="bc-desktop-account bc-desktop-account--plus bc-desktop-account--git" role="dialog" aria-label={t('desktopSettings.account.sheet')} bind:this={sheet}>
     <div class="bc-desktop-account--brand">
       <img class="bc-desktop-account--logo bc-desktop-account--light" src="/logo-light.svg" alt="" width="24" height="24" />
@@ -276,8 +276,8 @@
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if free}
       <div class="bc-desktop-account--offer">
-        <button type="button" class="bc-desktop-account--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
-        <span class="bc-desktop-account--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="bc-desktop-account--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+        <button type="button" class="bc-desktop-account--subscribe" onclick={() => plus('offer')}>{t('benthicPlus.offer.subscribe')}</button>
+        <span class="bc-desktop-account--already">{t('benthicPlus.offer.already')}&nbsp;<button type="button" class="bc-desktop-account--sign-in" onclick={() => plus('signIn')}>{t('benthicPlus.offer.signIn')}</button></span>
       </div>
       <div class="bc-desktop-account--divider"></div>
       <button type="button" class="bc-desktop-account--row bc-desktop-account--plus-row" onclick={() => plus('offer')}>
@@ -460,7 +460,7 @@
         outline-offset: -2px;
       }
     }
-    /* Free version and OpenDives+ rows (task 2026-11-18-281). */
+    /* Free version and Benthic+ rows (task 2026-11-18-281). */
     .bc-desktop-account--silhouette {
       background: var(--bc-surface-container-high);
       color: var(--bc-text-2);
@@ -557,7 +557,7 @@
       color: var(--bc-on-action);
     }
 
-    /* An OpenDives+ account (task 2026-11-19-292): the sheet's background, white rounded groups, a 36 px blue tile per entry. */
+    /* An Benthic+ account (task 2026-11-19-292): the sheet's background, white rounded groups, a 36 px blue tile per entry. */
     .bc-desktop-account--plus {
       padding: 12px;
       display: flex;

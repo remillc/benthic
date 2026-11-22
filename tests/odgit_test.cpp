@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Command-line driver of the git calls (core/libopendives/odgit.h), run by tests/run-odgit-test.sh against a local git
+// Command-line driver of the git calls (core/libbenthic/odgit.h), run by tests/run-odgit-test.sh against a local git
 // http server. Prints the call's JSON, or "ERROR <code>" with exit status 1.
 //
 // usage: odgit-test [--http] clone <url> <dir> <branch> <user> <token>
@@ -13,7 +13,7 @@
 //        odgit-test hfiles <dir> <commit> [prefix]
 //        odgit-test hrestore <dir> <branch> <commit> <message> [path...]   odgit-test hborrow <dir> <commit> <into>
 //        odgit-test hadopt <dir> <source-dir> <source-branch>
-#include "core/libopendives/odgit.h"
+#include "core/libbenthic/odgit.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 int main(int argc, char **argv)
 {

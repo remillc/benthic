@@ -12,7 +12,7 @@
   import { dropPreviousPage, heldBack, heldNavigate, lockRouter } from '../lib/router-guard.js';
   import { trace } from '../lib/nav-trace.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import DiveProfile from '../components/DiveProfile.svelte';
   import DiveFigures from '../components/DiveFigures.svelte';
   import Icon from '../components/Icon.svelte';
@@ -21,7 +21,7 @@
   import EquipmentCard from '../components/EquipmentCard.svelte';
   import DiveGearBlock from '../components/DiveGearBlock.svelte';
   import { isRelease } from '../lib/edition.js';
-  import { odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { loadValidations, refreshPending, removeValidation, validations, validationsOf } from '../lib/validation.svelte.js';
   import { loadInventory, equipmentOf, gearMap } from '../lib/inventory.svelte.js';
   import { equipmentIsEmpty } from '../lib/inventory.js';
@@ -80,7 +80,7 @@
   /**
    * `slide`: the dive was reached by a swipe from the next or previous one. `preview`: the detail kept at the last start
    * (lib/detail-snapshot.js), drawn in the pane while the core reads the logbook: nothing here reads or acts on data then.
-   * @type {{ f7route: { params: { id: string, trip?: string }, url: string }, f7router: any, slide?: 'next'|'previous', preview?: import('opendives-core').DiveDetail }}
+   * @type {{ f7route: { params: { id: string, trip?: string }, url: string }, f7router: any, slide?: 'next'|'previous', preview?: import('benthic-core').DiveDetail }}
    */
   let { f7route, f7router, slide = undefined, preview = undefined } = $props();
 
@@ -395,7 +395,7 @@
   // Prepared before the swipe that led here (dive-preload.js): shown from the
   // first frame, then read again from the core in case it changed.
   // svelte-ignore state_referenced_locally
-  let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (preview ?? readyDive(Number(f7route.params.id))));
+  let dive = $state(/** @type {import('benthic-core').DiveDetail|null} */ (preview ?? readyDive(Number(f7route.params.id))));
   let failed = $state(false);
   const prefs = $derived(logbook.prefs);
   const diveNumber = $derived(logbook.dives.find((d) => d.id === dive?.id)?.number ?? dive?.number ?? 0);
@@ -432,11 +432,11 @@
     failed = false;
     loadDive();
   }
-  // Validations (task 2026-11-19-309, point 2): OpenDives+ only. The pending ones are asked about when the page opens.
-  const validationItems = $derived(dive && odplusSubscriber() ? validationsOf(dive) : []);
+  // Validations (task 2026-11-19-309, point 2): Benthic+ only. The pending ones are asked about when the page opens.
+  const validationItems = $derived(dive && benthicPlusSubscriber() ? validationsOf(dive) : []);
   onMount(() => {
     if (preview) return;
-    if (odplusSubscriber()) (validations.ready ? Promise.resolve() : loadValidations()).then(refreshPending).catch((e) => console.error('Validations', e));
+    if (benthicPlusSubscriber()) (validations.ready ? Promise.resolve() : loadValidations()).then(refreshPending).catch((e) => console.error('Validations', e));
     if (isRelease) loadInventory();
     return loadDive();
   });
@@ -546,7 +546,7 @@
   const moreOptionsLabel = $derived(
     t('detail.moreOptionsList', {
       items: [
-        odplusSubscriber() ? t('detail.moreItemValidate') : '',
+        benthicPlusSubscriber() ? t('detail.moreItemValidate') : '',
         t('detail.moreItemRenumber'),
         t('renumberFrom.title'),
         removableFromTrip ? t('detail.moreItemTrip') : '',
@@ -902,7 +902,7 @@
       {#if theme.ios && !selectionMenuActive}
         <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)} />
       {/if}
-      {#if odplusSubscriber()}
+      {#if benthicPlusSubscriber()}
         <MenuItem
           icon="edit"
           text={t('validation.menuOne')}
@@ -931,8 +931,8 @@
       {#if removableFromTrip}
         <MenuItem icon="tripRemove" text={t('detail.removeFromTrip')} onclick={removeFromTrip} />
       {/if}
-      <!-- OpenDives+ (task 2026-11-19-290): the syncs that touched this dive, to restore one of them. -->
-      {#if logbook.odplus && dive}
+      <!-- Benthic+ (task 2026-11-19-290): the syncs that touched this dive, to restore one of them. -->
+      {#if logbook.benthicPlus && dive}
         <MenuItem
           icon="history"
           text={t('backup.dive.fromMenu')}
@@ -1057,8 +1057,8 @@
       </dl>
     {/if}
 
-    <!-- Validations by a buddy or an instructor (task 2026-11-19-309): OpenDives+ only. -->
-    {#if odplusSubscriber()}
+    <!-- Validations by a buddy or an instructor (task 2026-11-19-309): Benthic+ only. -->
+    {#if benthicPlusSubscriber()}
       <section class="bc-dive-detail--section bc-dive-validations">
         <h2 class="bc-dive-detail--section-title">{t('validation.section')}</h2>
         <div class="bc-dive-detail--group">

@@ -5,7 +5,7 @@
   // without an account) in a 48 dp target; it opens the account sheet. A small badge says that
   // something waits: changes not sent or a map update (tertiary), a sync error (alarm).
   import Icon from './Icon.svelte';
-  import { odplusAccount, odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { bottomNav, layout, ios, desktopApp } from '../lib/layout.svelte.js';
@@ -18,7 +18,7 @@
   import { isRelease } from '../lib/edition.js';
   import { accountEmail, sheetVariant } from '../lib/account-sheet.js';
 
-  const email = $derived(accountEmail(odplusAccount, logbook));
+  const email = $derived(accountEmail(benthicPlusAccount, logbook));
   const initial = $derived(email.trim().charAt(0).toLocaleUpperCase());
   /** '' when nothing waits; else the badge's role. */
   const badge = $derived(
@@ -31,7 +31,7 @@
       .join(', '),
   );
   // Free version (task 2026-11-18-281): the silhouette in the same disc, named by what the sheet holds.
-  const free = $derived(sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email }) === 'free');
+  const free = $derived(sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email }) === 'free');
   const label = $derived(
     free ? t('nav.accountLabelFree') + (waiting ? `. ${waiting}` : '') : t('nav.accountLabel', { name: email || t('menu.noAccount') }) + (waiting ? `. ${waiting}` : ''),
   );

@@ -17,7 +17,7 @@
   import { showSnackbar } from '../lib/snackbar.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { offerUndo } from '../lib/undo.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import SiteMap from '../components/SiteMap.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
@@ -30,13 +30,13 @@
   let { f7route, f7router } = $props();
   const uuid = Number(f7route.params.uuid);
 
-  let site = $state(/** @type {import('opendives-core').SiteDetail|null} */ (null));
+  let site = $state(/** @type {import('benthic-core').SiteDetail|null} */ (null));
   /** Second line of each dive, by dive id. */
   let lines = $state(/** @type {Record<number, string>} */ ({}));
 
   $effect(() => {
     logbook.sitesVersion;
-    OpenDivesCore.siteQuery({ kind: 'site', uuid }).then((s) => {
+    BenthicCore.siteQuery({ kind: 'site', uuid }).then((s) => {
       site = s;
       if (s?.diveList) diveLines(s.diveList, (l) => (lines = l));
     });
@@ -77,7 +77,7 @@
   // which is kept; one undoable step.
   async function chooseOtherSite() {
     f7.popover.close(`#${menuId}`);
-    const list = await OpenDivesCore.siteQuery({ kind: 'list' });
+    const list = await BenthicCore.siteQuery({ kind: 'list' });
     others = list
       .filter((/** @type {any} */ s) => s.uuid !== uuid)
       .sort((/** @type {any} */ a, /** @type {any} */ b) => (a.name || '').localeCompare(b.name || ''));

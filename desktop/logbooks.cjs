@@ -3,7 +3,7 @@
 // logbooks kept on this computer, and the pure helpers around them. Node only, no Electron: it is
 // tested on its own (tests/desktop/logbooks.test.mjs).
 //
-// A logbook is a source. Its descriptor, as the interface sees it (window.odDesktop.logbook):
+// A logbook is a source. Its descriptor, as the interface sees it (window.benthicDesktop.logbook):
 //   { id, kind, name, location, provider? , branch? }
 //   kind 'main'  the logbook of this computer: <userData>/carnet, local or the Subsurface cloud account,
 //                exactly as the app had before there were several (id 'main')

@@ -35,7 +35,7 @@
   import { chooseStatistic, statSelection } from '../lib/statistics-selection.svelte.js';
   import { keepInSvelteRange } from '../lib/master-detail.js';
   import HeatMapCard from '../components/HeatMapCard.svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { cachedSites } from '../lib/core-cache.js';
 
   /** @type {{ f7router?: any }} */
@@ -57,12 +57,12 @@
   });
 
   /** The sites, for « Où je plonge le plus » (their coordinates). */
-  let sites = $state(/** @type {import('opendives-core').SiteSummary[]} */ ([]));
+  let sites = $state(/** @type {import('benthic-core').SiteSummary[]} */ ([]));
   $effect(() => {
     logbook.sitesVersion;
     if (logbook.loading || !startup.ready) return;
     cachedSites().then(
-      (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
+      (/** @type {import('benthic-core').SiteSummary[]} */ list) => (sites = list),
       (/** @type {unknown} */ e) => console.error('Sites', e),
     );
   });

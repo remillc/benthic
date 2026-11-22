@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   // « Autre équipement » in the dive detail (task 2026-11-17-267, docs/mockups-release/detail-equipement-plus-android.dc.html):
-  // the pieces of the dive from the inventory, with the OpenDives+ chip, a piece outside the inventory saying
+  // the pieces of the dive from the inventory, with the Benthic+ chip, a piece outside the inventory saying
   // « Hors inventaire » in its sub-line, and at the end the kit used, « Kit « Eau froide » ». Nothing when the
   // dive has none of this.
   import GearIcon from './GearIcon.svelte';

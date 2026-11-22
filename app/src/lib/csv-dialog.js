@@ -248,7 +248,7 @@ export function back(state) {
 /**
  * The mapping the core's import takes for the state.
  * @param {CsvState} state
- * @returns {import('opendives-core').CsvParams}
+ * @returns {import('benthic-core').CsvParams}
  */
 export function paramsOf(state) {
   return buildParams({

@@ -5598,7 +5598,7 @@
       "s6": "Choose [kbd]HTTPS[/kbd] above the repository address, then copy it, for example [code]https://codeberg.org/you/carnet-plongee.git[/code]."
     }
   },
-  "odplus": {
+  "benthicPlus": {
     "chip": "Benthic+",
     "chipName": "Benthic Plus",
     "providerUnavailable": "Signing in with {provider} is not available yet. Use your e-mail address.",

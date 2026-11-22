@@ -11,7 +11,7 @@
 // with export_dives (every dive selected) loses the unused site and the nickname.
 // A trip left without dive is dropped by Subsurface's core itself (a trip lives through its dives).
 // Prints "PASS: ..." lines; exit status 0 when all pass, 1 otherwise.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

@@ -12,7 +12,7 @@
 //   to keep the saved one.
 // The token stays in this form: it is only passed to the plugin, never kept, stored or logged here.
 // Create it while a component initialises (it uses effects).
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { errorCode } from './account.js';
 import { normaliseGitUrl, validGitToken, validGitUsername } from './account-validation.js';
 import { liveError } from './live-validation.svelte.js';
@@ -86,7 +86,7 @@ export function createGitForm({ edit = false, onconnected = () => {}, pending } 
     }
     addressState = 'checking';
     try {
-      const found = await OpenDivesCore.gitCheck({ url: address });
+      const found = await BenthicCore.gitCheck({ url: address });
       if (mine !== ticket) return;
       addressState =
         found.status === 'public' ? (found.empty ? 'publicEmpty' : 'public') : found.status === 'auth' ? 'private' : 'none';
@@ -119,7 +119,7 @@ export function createGitForm({ edit = false, onconnected = () => {}, pending } 
     const mine = ++ticket;
     accessState = 'checking';
     try {
-      const found = await OpenDivesCore.gitCheck({ url: url.trim(), username: name, token: secret, useStored: edit && !secret });
+      const found = await BenthicCore.gitCheck({ url: url.trim(), username: name, token: secret, useStored: edit && !secret });
       if (mine !== ticket) return;
       if (found.status === 'ok') {
         emptyRepo = found.empty;
@@ -151,7 +151,7 @@ export function createGitForm({ edit = false, onconnected = () => {}, pending } 
     busy = true;
     formError = '';
     try {
-      await OpenDivesCore.gitConnect({ url: url.trim(), username: username.trim(), token: token.trim(), branch, empty: emptyRepo });
+      await BenthicCore.gitConnect({ url: url.trim(), username: username.trim(), token: token.trim(), branch, empty: emptyRepo });
       token = '';
     } catch (e) {
       busy = false;
@@ -175,7 +175,7 @@ export function createGitForm({ edit = false, onconnected = () => {}, pending } 
   async function load() {
     if (!edit) return;
     try {
-      const saved = await OpenDivesCore.gitConfig();
+      const saved = await BenthicCore.gitConfig();
       url = saved.url;
       username = saved.username;
       currentBranch = saved.branch;

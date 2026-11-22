@@ -40,14 +40,14 @@
   const dive = $derived(logbook.dives.find((d) => d.id === id));
   const unit = $derived(/** @type {'m'|'ft'} */ (logbook.prefs.length === 'ft' ? 'ft' : 'm'));
 
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
   let position = $state(/** @type {{ latUdeg: number, lonUdeg: number }|null} */ (null));
   let positionKnown = $state(false);
   /** The site chosen (uuid; 0: none), and a site picked elsewhere than in the three rows. */
   let chosen = $state(0);
   let touched = false;
-  let picked = $state(/** @type {import('opendives-core').SiteSummary|{ uuid: number, name: string }|null} */ (null));
+  let picked = $state(/** @type {import('benthic-core').SiteSummary|{ uuid: number, name: string }|null} */ (null));
   let buddies = $state(/** @type {string[]} */ ([]));
   let known = $state(/** @type {string[]} */ ([]));
   let rating = $state(0);
@@ -71,7 +71,7 @@
   });
 
   cachedSites().then(
-    (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
+    (/** @type {import('benthic-core').SiteSummary[]} */ list) => (sites = list),
     (/** @type {unknown} */ e) => console.error('Sites', e),
   );
   currentPosition().then((p) => {
@@ -91,7 +91,7 @@
     return t('sites.chooseAway', { distance: `${formatNumber(d.value, d.decimals)} ${names[d.unit]}` });
   }
 
-  /** « À 394 pi · dernière plongée le … », « À 1,1 mi · aucune plongée »; without a position, the last dive only. @param {{ site: import('opendives-core').SiteSummary, metres: number|null }} row */
+  /** « À 394 pi · dernière plongée le … », « À 1,1 mi · aucune plongée »; without a position, the last dive only. @param {{ site: import('benthic-core').SiteSummary, metres: number|null }} row */
   function line(row) {
     const last = row.site.dives && row.site.lastDate ? t('quickEntry.lastDive', { date: formatDate(row.site.lastDate) }) : t('quickEntry.noDive');
     const away = row.metres === null ? '' : distanceText(row.metres);

@@ -6,9 +6,9 @@
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 
-P=$ROOT/plugins/opendives-core/ios
-rm -rf "$P/OpenDivesCore.xcframework" "$P/include" "$P/Resources"
-cp -R "$OUT/OpenDivesCore.xcframework" "$P/"
+P=$ROOT/plugins/benthic-core/ios
+rm -rf "$P/BenthicCore.xcframework" "$P/include" "$P/Resources"
+cp -R "$OUT/BenthicCore.xcframework" "$P/"
 cp -R "$OUT/headers" "$P/include"
 cp -R "$OUT/assets" "$P/Resources"
 

@@ -9,7 +9,7 @@
   import { sharedFile } from '../lib/shared-file.svelte.js';
   import { f7 } from 'framework7-svelte';
   import { Capacitor } from '@capacitor/core';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import ReleaseChoiceRow from './ReleaseChoiceRow.svelte';
   import ReleaseField from './ReleaseField.svelte';
@@ -63,7 +63,7 @@
 
   const step = $derived(currentStep());
   /** « Retour » of the tablet's offer (task 2026-11-18-282), except right after a sign-in where the code is spent. */
-  const tabletOfferBack = $derived(step === 'odplusOffer' && !layout.phone && !desktopApp && offerShowsSignIn(flow.stack));
+  const tabletOfferBack = $derived(step === 'benthicPlusOffer' && !layout.phone && !desktopApp && offerShowsSignIn(flow.stack));
   /** The first step's rows are 12 dp high on an Android phone (mock-up android-premier-lancement-production). */
   const denseRows = $derived(layout.phone && !ios);
   /** The iPhone variant of the first launch (task 2026-11-16-261): iCloud Drive first, iOS rows and alert. */
@@ -135,7 +135,7 @@
     if (busy || nameInvalid) return;
     busy = true;
     try {
-      await OpenDivesCore.createIcloudLogbook({ name: fileName });
+      await BenthicCore.createIcloudLogbook({ name: fileName });
       cloud();
     } catch (e) {
       if (errorCode(e) === 'NOT_AVAILABLE') f7.dialog.create({ title: t('welcomeSteps.icloud'), text: t('welcomeSteps.icloudUnavailable'), buttons: [{ text: t('dialog.ok') }] }).open();
@@ -145,8 +145,8 @@
     }
   }
 
-  /** @returns {any} the desktop app's bridge (window.odDesktop) */
-  const bridge = () => /** @type {any} */ (globalThis).odDesktop;
+  /** @returns {any} the desktop app's bridge (window.benthicDesktop) */
+  const bridge = () => /** @type {any} */ (globalThis).benthicDesktop;
 
   /**
    * The cloud connection is real in the desktop app's window without a logbook, on the path that creates a logbook:
@@ -252,7 +252,7 @@
       for (const path of source.paths ?? [source.path]) {
         const file = await downloadedFile(path, (p) => Capacitor.convertFileSrc(p), (u) => fetch(u));
         added += await importFile(file);
-        await OpenDivesCore.discardImport({ path }).catch(() => {});
+        await BenthicCore.discardImport({ path }).catch(() => {});
       }
       return added;
     };
@@ -288,7 +288,7 @@
     let parked = false;
     try {
       if (flow.source) {
-        const pending = await pendingFromSource(flow.source, async (file) => (await stageFile(OpenDivesCore, file)).path);
+        const pending = await pendingFromSource(flow.source, async (file) => (await stageFile(BenthicCore, file)).path);
         parkPending(sessionStorage, pending);
         parked = true;
       }
@@ -358,7 +358,7 @@
       rememberName();
       await createDeviceLogbook(
         {
-          deviceLogExists: async () => (await OpenDivesCore.listDives()).exists,
+          deviceLogExists: async () => (await BenthicCore.listDives()).exists,
           start: startWithoutAccount,
           sampleIds: () => logbook.dives.map((d) => d.id),
           remove: deleteDives,
@@ -405,7 +405,7 @@
   /** The CSV file being mapped (task 2026-11-16-224): its column mapping waits for the new logbook. */
   let csv = $state(/** @type {{ file: File, companion: File|null }|null} */ (null));
 
-  /** @param {{ params: import('opendives-core').CsvParams, companion: File|null, dives: number }} result */
+  /** @param {{ params: import('benthic-core').CsvParams, companion: File|null, dives: number }} result */
   function csvConfirmed(result) {
     const chosen = csv;
     if (!chosen) return;
@@ -432,7 +432,7 @@
   $effect(() => {
     if (step !== 'import' || alphaLooked || windowTakes) return;
     alphaLooked = true;
-    void findAlphaLogbooks(OpenDivesCore, deviceStore, isRelease).then((found) => (alphaFound = found));
+    void findAlphaLogbooks(BenthicCore, deviceStore, isRelease).then((found) => (alphaFound = found));
   });
 
   /** « Carnet de la version précédente »: its dives become a file in memory, then « Nouveau carnet » as for any file. */
@@ -445,13 +445,13 @@
       // The core writes the alpha's dives to a file in the app's cache; only its path comes back.
       await importProgress.session(['read', 'check'], name, async () => {
         importProgress.phase('read');
-        const staged = await alphaLogbookFile(OpenDivesCore, found, name);
+        const staged = await alphaLogbookFile(BenthicCore, found, name);
         let scan;
         try {
           importProgress.phase('check', staged.size);
-          scan = await scanLogbook(OpenDivesCore, staged.path, staged.size, importProgress.reporter('check'));
+          scan = await scanLogbook(BenthicCore, staged.path, staged.size, importProgress.reporter('check'));
         } catch (e) {
-          await OpenDivesCore.discardImport({ path: staged.path }).catch(() => {});
+          await BenthicCore.discardImport({ path: staged.path }).catch(() => {});
           throw e;
         }
         flow.source = { kind: 'staged', path: staged.path, fileName: staged.name, name, summary: summariseScan(found.dives, scan), alpha: true };
@@ -551,14 +551,14 @@
     try {
       importProgress.begin(['read']);
       importProgress.phase('read');
-      const { dives } = await OpenDivesCore.importCount({ path: staged.path });
+      const { dives } = await BenthicCore.importCount({ path: staged.path });
       if (!dives) throw new Error('NO_DIVES');
       const summary = staged.summary ? { dives, sites: staged.summary.sites || null, firstYear: staged.summary.firstYear, lastYear: staged.summary.lastYear } : summariseImport(dives);
       flow.source = { kind: 'staged', path: staged.path, fileName: staged.name, name: nameFromFile(staged.name, t('welcomeSteps.defaultName')), summary };
       flow.name = flow.source.name;
       go('file');
     } catch (e) {
-      await OpenDivesCore.discardImport({ path: staged.path }).catch(() => {});
+      await BenthicCore.discardImport({ path: staged.path }).catch(() => {});
       failed(e, null);
     } finally {
       importProgress.end();
@@ -593,12 +593,12 @@
       importProgress.begin(['copy', 'read', 'check']);
       importProgress.phase('copy', file.size);
       const dives = await readImportFile(file, {
-        stage: (f) => stageFile(OpenDivesCore, f, undefined, importProgress.reporter('copy')),
+        stage: (f) => stageFile(BenthicCore, f, undefined, importProgress.reporter('copy')),
         count: (o) => {
           importProgress.phase('read');
-          return OpenDivesCore.importCount(o);
+          return BenthicCore.importCount(o);
         },
-        discard: (o) => OpenDivesCore.discardImport(o),
+        discard: (o) => BenthicCore.discardImport(o),
       });
       // The sites and years come from a streaming pass (a window of 2 MB at a time), not from the file as one text.
       const head = await file.slice(0, 2048).text();
@@ -651,8 +651,8 @@
     createSend: 'serverCreate.sendingTitle',
   });
 
-  /** The steps that draw their own heading (the server's, the OpenDives+ screens and the two stops of an upload). */
-  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'odplusConnect', 'odplusOffer', 'odplusAll', 'odplusReady', 'odplusWelcome'];
+  /** The steps that draw their own heading (the server's, the Benthic+ screens and the two stops of an upload). */
+  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'benthicPlusConnect', 'benthicPlusOffer', 'benthicPlusAll', 'benthicPlusReady', 'benthicPlusWelcome'];
 
   /**
    * « Ouvrir mon carnet » of « Votre carnet est prêt »: the core downloaded the logbook through the git sync (mobile), so
@@ -675,7 +675,7 @@
 
   /** The signed-in account's repository, for the main process of the desktop app (the token goes there, never back). */
   async function serverGitAccess() {
-    const access = await OpenDivesCore.serverSessionAccess();
+    const access = await BenthicCore.serverSessionAccess();
     return { url: access.repositoryUrl, username: access.username, branch: access.branch, token: access.token };
   }
 
@@ -761,7 +761,7 @@
 </script>
 
 {#snippet backButton()}
-  {#if (hasBack(step, flow.origin === 'menu') && step !== 'odplusAll') || tabletOfferBack}
+  {#if (hasBack(step, flow.origin === 'menu') && step !== 'benthicPlusAll') || tabletOfferBack}
     <button type="button" class="bc-first-launch--back" onclick={step === 'start' ? leave : back}>
       <span class="bc-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
     </button>
@@ -896,7 +896,7 @@
           {@render dropLine()}
         {:else if step === 'start'}
           <nav class="bc-first-launch--rows bc-first-launch--rows-start" aria-label={t('welcomeSteps.startTitle')}>
-            <!-- Task 2026-11-17-263: sign in (the OpenDives+ chip above its title), then a logbook on the device, then the import. -->
+            <!-- Task 2026-11-17-263: sign in (the Benthic+ chip above its title), then a logbook on the device, then the import. -->
             <ReleaseChoiceRow main prominent plus dense={denseRows} icon="login" title={t('welcomeSteps.signInTitle')} help={t('welcomeSteps.signInHelp')} onclick={() => go('signIn')} />
             <ReleaseChoiceRow dense={denseRows} icon={deviceIcon} title={t(deviceKey('welcomeSteps.localTitle', kind))} help={t('welcomeSteps.localHelp')} onclick={() => go('create')} />
             <ReleaseChoiceRow dense={denseRows} icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importStartHelp')} onclick={() => go('import')} />
@@ -1020,7 +1020,7 @@
           <FirstLaunchServer {step} />
         {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
           <FirstLaunchServerCreate {step} {openInWindow} onfinished={serverCreated} onlater={serverLater} />
-        {:else if step === 'odplusConnect' || step === 'odplusOffer' || step === 'odplusAll' || step === 'odplusReady' || step === 'odplusWelcome'}
+        {:else if step === 'benthicPlusConnect' || step === 'benthicPlusOffer' || step === 'benthicPlusAll' || step === 'benthicPlusReady' || step === 'benthicPlusWelcome'}
           <FirstLaunchBenthicPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}
       </section>
@@ -1659,7 +1659,7 @@
     }
 
     /* The two text buttons under the three choices of the first step (task 2026-11-17-263): « Essayer avec un carnet
-       d’exemple » and « Découvrir OpenDives+ », centred, Material 3 text buttons: 40 dp high, 12 dp side padding, 8 dp
+       d’exemple » and « Découvrir Benthic+ », centred, Material 3 text buttons: 40 dp high, 12 dp side padding, 8 dp
        apart, 16 dp above and below the group. */
     .bc-first-launch--text-buttons {
       align-self: center;

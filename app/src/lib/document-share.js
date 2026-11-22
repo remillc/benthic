@@ -4,7 +4,7 @@
 // the same share paths (the system's share sheet on a phone or tablet, the save dialog on the desktop). A PDF the diver
 // attached (an insurance policy) is shared as it is, with the images.
 import { Share } from '@capacitor/share';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { toBase64 } from './secret-box.js';
 import { letterPaper } from './share.js';
 import { desktopApp } from './layout.svelte.js';
@@ -53,28 +53,28 @@ export async function shareDocument({ title, images, pdfs }, how) {
     for (const f of images) {
       n++;
       const name = `${slug}-${n}.jpg`;
-      const { uri } = await OpenDivesCore.writeShareFile({ name, base64: toBase64(f.bytes) });
+      const { uri } = await BenthicCore.writeShareFile({ name, base64: toBase64(f.bytes) });
       out.push({ uri, mime: 'image/jpeg', name });
     }
   } else if (images.length) {
     const letter = letterPaper();
     const dataUrls = images.map((f) => `data:image/jpeg;base64,${toBase64(f.bytes)}`);
     const name = `${slug}.pdf`;
-    const { uri } = await OpenDivesCore.htmlToPdf({ html: pagesHtml(title, dataUrls, letter), name, letter });
+    const { uri } = await BenthicCore.htmlToPdf({ html: pagesHtml(title, dataUrls, letter), name, letter });
     out.push({ uri, mime: 'application/pdf', name });
   }
   let n = 0;
   for (const f of pdfs) {
     n++;
     const name = pdfs.length > 1 ? `${slug}-fichier-${n}.pdf` : `${slug}-fichier.pdf`;
-    const { uri } = await OpenDivesCore.writeShareFile({ name, base64: toBase64(f.bytes) });
+    const { uri } = await BenthicCore.writeShareFile({ name, base64: toBase64(f.bytes) });
     out.push({ uri, mime: 'application/pdf', name });
   }
   if (!out.length) throw new Error('NOTHING_TO_SHARE');
   if (desktopApp) {
-    for (const f of out) await /** @type {any} */ (window).odDesktop.saveAs({ path: f.uri, name: f.name });
+    for (const f of out) await /** @type {any} */ (window).benthicDesktop.saveAs({ path: f.uri, name: f.name });
     return;
   }
-  for (const f of out) await OpenDivesCore.grantShareFile({ uri: f.uri, mime: f.mime });
+  for (const f of out) await BenthicCore.grantShareFile({ uri: f.uri, mime: f.mime });
   await Share.share({ title, files: out.map((f) => f.uri), dialogTitle: t('docs.share.title') });
 }

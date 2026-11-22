@@ -14,7 +14,7 @@
   import { logbook, accountDeleted, syncNow } from '../lib/logbook.svelte.js';
   import { layout, deviceKind } from '../lib/layout.svelte.js';
   import { deviceSuffix } from '../lib/first-launch.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ f7router: any }} */
@@ -77,7 +77,7 @@
         showSnackbar(t('deleteAccount.notDeleted'));
         return;
       }
-      const result = await OpenDivesCore.deleteAccount({ password, keepDives });
+      const result = await BenthicCore.deleteAccount({ password, keepDives });
       // The server's replies are not documented: kept in the log for the report.
       console.info('Delete account: HTTP', result.status, JSON.stringify(result.reply));
       if (!result.deleted) {

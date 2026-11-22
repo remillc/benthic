@@ -12,7 +12,7 @@
   // it to the diver's sites (lib/shared-sites.svelte.js, addBaseSite) and gives it back like any site.
   import { onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import SearchClear from '../components/SearchClear.svelte';
@@ -23,7 +23,7 @@
   import { matchesSite } from '../lib/site-search.js';
   import { distanceParts, sitesInChoiceOrder } from '../lib/site-distance.js';
   import { currentPosition, deliverSite, forgetSiteChoice } from '../lib/site-choice.js';
-  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { addBaseSite, loadLinks, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { CHOOSE_RADIUS_M, inYourSites } from '../lib/shared-sites.js';
   import { baseDivesText, distanceText as awayText } from '../lib/shared-sites-format.js';
@@ -33,7 +33,7 @@
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
   let position = $state(/** @type {{ latUdeg: number, lonUdeg: number }|null} */ (null));
   let query = $state('');
@@ -42,7 +42,7 @@
   let handedOver = false;
 
   cachedSites().then(
-    (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list.filter((s) => s.name || s.dives)),
+    (/** @type {import('benthic-core').SiteSummary[]} */ list) => (sites = list.filter((s) => s.name || s.dives)),
     (/** @type {unknown} */ e) => console.error('Sites', e),
   );
   currentPosition().then((p) => (position = p));
@@ -57,13 +57,13 @@
     return t('sites.chooseAway', { distance: `${formatNumber(d.value, d.decimals)} ${names[d.unit]}` });
   }
 
-  /** @param {{ site: import('opendives-core').SiteSummary, metres: number|null }} row */
+  /** @param {{ site: import('benthic-core').SiteSummary, metres: number|null }} row */
   const line = (row) =>
     [row.site.country, row.metres === null ? '' : distanceText(row.metres), row.site.dives ? t('sites.diveCount', { n: row.site.dives }) : t('sites.noDive')]
       .filter(Boolean)
       .join(' · ');
 
-  /** @param {import('opendives-core').SiteSummary} site */
+  /** @param {import('benthic-core').SiteSummary} site */
   function choose(site) {
     handedOver = true;
     deliverSite({ uuid: site.uuid, name: site.name });
@@ -79,7 +79,7 @@
     const p = position;
     const q = query;
     clearTimeout(commonTimer);
-    if (!p || !odplusAccount.signedIn || !connection.online) {
+    if (!p || !benthicPlusAccount.signedIn || !connection.online) {
       commonRows = [];
       return;
     }

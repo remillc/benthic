@@ -179,9 +179,9 @@ test('tidying a view removes what a page change or a swipe left behind and reope
   const router = {
     el: { classList: classes(['view', 'router-transition-backward', 'router-transition', 'bc-pushing']), style: { removeProperty: (p) => props.push(p) }, children: [current, next, { classList: classes(['navbar']) }] },
     removePage: (el) => removed.push(el),
-    odLocks: 2,
+    bcLocks: 2,
     swipeBackActive: true,
-    odAnimating: true,
+    bcAnimating: true,
     allowPageChange: false,
   };
   tidyView(router);
@@ -189,7 +189,7 @@ test('tidying a view removes what a page change or a swipe left behind and reope
   assert.deepEqual([...current.classList.set], ['page', 'page-current']);
   assert.deepEqual(current.style, { transform: '', transition: '' });
   assert.deepEqual(removed, [next]);
-  assert.deepEqual([router.odLocks, router.swipeBackActive, router.odAnimating, router.allowPageChange], [0, false, false, true]);
+  assert.deepEqual([router.bcLocks, router.swipeBackActive, router.bcAnimating, router.allowPageChange], [0, false, false, true]);
   assert.equal(props.length, 3);
 });
 

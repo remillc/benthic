@@ -247,14 +247,14 @@ test('the Android debug build allows clear text to the development server only; 
 
 test('the session goes to the plugin\'s secure storage, never to the device store or localStorage', () => {
   const server = read('components/FirstLaunchServer.svelte');
-  assert.match(server, /OpenDivesCore\.serverSessionSave/);
+  assert.match(server, /BenthicCore\.serverSessionSave/);
   for (const file of ['components/FirstLaunchServer.svelte', 'lib/server-api.js', 'lib/server-logbook.js', 'lib/server-transport.js', 'lib/server-signin.js']) {
     assert.doesNotMatch(read(file), /localStorage|deviceStore|device-store|sessionStorage/, file);
   }
-  const kotlin = readFileSync(new URL('../../plugins/opendives-core/android/src/main/java/org/opendives/core/ServerSessionStore.kt', import.meta.url), 'utf8');
+  const kotlin = readFileSync(new URL('../../plugins/benthic-core/android/src/main/java/app/benthicdivelog/core/ServerSessionStore.kt', import.meta.url), 'utf8');
   assert.match(kotlin, /SealedFile/);
   assert.match(kotlin, /tokens=\*\*\*/);
-  const swift = readFileSync(new URL('../../plugins/opendives-core/ios/Plugin/CredentialStore.swift', import.meta.url), 'utf8');
+  const swift = readFileSync(new URL('../../plugins/benthic-core/ios/Plugin/CredentialStore.swift', import.meta.url), 'utf8');
   assert.match(swift, /ServerSessionStore/);
   const bridge = readFileSync(new URL('../../desktop/bridge.cjs', import.meta.url), 'utf8');
   assert.match(bridge, /server: 'server-session\.bin'/);
@@ -387,9 +387,9 @@ test('a cut push is unreachable and sending again is the same push (git sends wh
 test('the screens use the core git code and its progress', () => {
   const screen = read('components/FirstLaunchServer.svelte');
   assert.match(screen, /addListener\('syncProgress'/);
-  assert.match(screen, /openServerLogbook\(OpenDivesCore/);
+  assert.match(screen, /openServerLogbook\(BenthicCore/);
   assert.doesNotMatch(screen, /openable|unreadable/);
   const create = read('components/FirstLaunchServerCreate.svelte');
-  assert.match(create, /createServerLogbook\(OpenDivesCore/);
-  assert.match(create, /pushToServer\(OpenDivesCore\)/);
+  assert.match(create, /createServerLogbook\(BenthicCore/);
+  assert.match(create, /pushToServer\(BenthicCore\)/);
 });

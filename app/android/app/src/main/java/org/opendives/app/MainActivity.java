@@ -7,7 +7,7 @@ import android.os.SystemClock;
 import android.view.View;
 import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
-import org.opendives.core.SplashGate;
+import app.benthicdivelog.core.SplashGate;
 
 public class MainActivity extends BridgeActivity {
 

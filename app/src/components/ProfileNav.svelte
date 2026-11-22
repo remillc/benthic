@@ -1,12 +1,12 @@
 <script>
   // @ts-check
   // The left pane of « Mon profil de plongeur » on a wide screen (tasks 2026-11-18-275 and 277): the diver
-  // (avatar, name, OpenDives+ chip) and the four entries; the chosen one is lit.
+  // (avatar, name, Benthic+ chip) and the four entries; the chosen one is lit.
   import Icon from './Icon.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { gear, loadInventory, visibleGear, overdueBadge, hasActiveMaintenance } from '../lib/inventory.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { onMount } from 'svelte';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { PROFILE_SECTIONS, showProfilePath, heroOf, readHero } from '../lib/profile-frame.js';
@@ -23,7 +23,7 @@
   });
 
   // The Mac's profile window does not load the logbook: the main window left the diver's line.
-  const hero = $derived(profileWindow ? readHero() : heroOf(logbook, odplusAccount));
+  const hero = $derived(profileWindow ? readHero() : heroOf(logbook, benthicPlusAccount));
   const name = $derived(diver.info.fullName || hero.name || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
   const total = $derived(hero.total);

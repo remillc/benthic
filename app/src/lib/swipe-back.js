@@ -71,8 +71,8 @@ export function swipeBackPages({ target, viewEl, busy, split, swipeoutOpen }) {
  */
 export function attachSwipeBack(f7, router) {
   const viewEl = /** @type {HTMLElement|undefined} */ (router.el);
-  if (!viewEl || router.odSwipeBack) return;
-  router.odSwipeBack = true;
+  if (!viewEl || router.bcSwipeBack) return;
+  router.bcSwipeBack = true;
   const ios = f7.theme === 'ios';
   /** @type {Element|null} */
   let target = null;

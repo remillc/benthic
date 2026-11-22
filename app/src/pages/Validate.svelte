@@ -1,13 +1,13 @@
 <script>
   // @ts-check
-  // « Faire valider la plongée » (inbox task 2026-11-19-309, point 2; OpenDives+; docs/mockups/validation-choix-android,
+  // « Faire valider la plongée » (inbox task 2026-11-19-309, point 2; Benthic+; docs/mockups/validation-choix-android,
   // validation-signature-android and validation-qr-android): one screen for the dive (or the checked dives, `?ids=1,2,3`),
   // in three steps. The choice (« Signature sur cet écran » or « Code QR »); the signature (name, role, instructor number,
   // the frame, « Effacer », « Signer »); the QR code made by the server, valid 10 minutes, whose answer arrives through
   // the server. A full screen on every layout. The records and the server are in lib/validation.svelte.js.
   import { onDestroy, onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
@@ -117,7 +117,7 @@
       tick = setInterval(() => (secsLeft = secondsLeft(made.expiresAt, new Date())), 1000);
       poll = setInterval(check, 4000);
       if (drawings.length > 1) flip = setInterval(() => (shown = (shown + 1) % drawings.length), 1000 / RATE);
-      OpenDivesCore.keepScreenAwake({ on: true }).catch((e) => console.error('Keep the screen awake', e));
+      BenthicCore.keepScreenAwake({ on: true }).catch((e) => console.error('Keep the screen awake', e));
     } catch (e) {
       console.error('Validate: QR code', e);
       code = null;
@@ -155,7 +155,7 @@
   /** Leaves the QR step without « Terminé »: the code is dropped when nobody answered. */
   async function dropCode() {
     stopTimers();
-    OpenDivesCore.keepScreenAwake({ on: false }).catch(() => {});
+    BenthicCore.keepScreenAwake({ on: false }).catch(() => {});
     if (code && !kept) await removeValidation(code.id).catch((e) => console.error('Validate: drop the code', e));
     code = null;
     drawings = [];

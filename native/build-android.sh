@@ -1,6 +1,6 @@
 #!/bin/bash
-# Builds libopendives.so for Android and prepares what Gradle bundles:
-#   build/android/jniLibs/<abi>/libopendives.so
+# Builds libbenthic.so for Android and prepares what Gradle bundles:
+#   build/android/jniLibs/<abi>/libbenthic.so
 #   build/android/assets/SampleDivesV2.ssrf
 #   build/android/assets/xslt/ (Subsurface's stylesheets)
 # usage: native/build-android.sh [abi...]     (default: arm64-v8a x86_64)
@@ -11,7 +11,7 @@ ABIS=${*:-$ALL_ABIS}
 "$ROOT/native/build-deps.sh" $ABIS
 
 for ABI in $ABIS; do
-  echo "== $ABI : libopendives"
+  echo "== $ABI : libbenthic"
   B=$OUT/core/$ABI
   cmake -S "$ROOT/native" -B "$B" -G Ninja -Wno-dev \
     -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" -DANDROID_ABI="$ABI" -DANDROID_PLATFORM="android-$ANDROID_API" \
@@ -19,7 +19,7 @@ for ABI in $ABIS; do
   cmake --build "$B" -j"$JOBS"
   mkdir -p "$OUT/jniLibs/$ABI"
   "$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip" --strip-unneeded \
-    -o "$OUT/jniLibs/$ABI/libopendives.so" "$B/libopendives.so"
+    -o "$OUT/jniLibs/$ABI/libbenthic.so" "$B/libbenthic.so"
 done
 
 mkdir -p "$OUT/assets"
@@ -29,4 +29,4 @@ cp "$(dirname "$0")/../core/sample/SampleLogbook.ssrf" "$OUT/assets/SampleDivesV
 rm -rf "$OUT/assets/xslt"
 mkdir -p "$OUT/assets/xslt"
 cp "$SS"/xslt/*.xsl* "$OUT/assets/xslt/"
-ls -l "$OUT"/jniLibs/*/libopendives.so
+ls -l "$OUT"/jniLibs/*/libbenthic.so

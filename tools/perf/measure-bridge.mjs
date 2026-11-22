@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // Performance audit: the bridge between the web layer and the core (desktop: renderer -> main -> helper over stdio).
-// Patches OpenDivesCoreDesktop.prototype.core in the renderer to log every call (method, arguments size,
+// Patches BenthicCoreDesktop.prototype.core in the renderer to log every call (method, arguments size,
 // result size, duration), then drives the app: reload, select a dive, the four sections, one edit.
 // Reuses the user-data folder of measure-desktop.mjs for the same label.
 // usage: node tools/perf/measure-bridge.mjs <logbook.ssrf> <label>
@@ -22,13 +22,13 @@ const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [
 const p = await attachLogbook();
 await sleep(3000);
 
-// The plugin the app really imports (node_modules/opendives-core may be a link to another checkout).
-const pluginDir = realpathSync(path.join(root, 'app/node_modules/opendives-core')).split(path.sep).join('/');
+// The plugin the app really imports (node_modules/benthic-core may be a link to another checkout).
+const pluginDir = realpathSync(path.join(root, 'app/node_modules/benthic-core')).split(path.sep).join('/');
 const patch = `(async()=>{
   const mod = await import('/@fs/${pluginDir}/desktop.js');
   window.__calls = [];
-  window.__core = (await import('/@fs/${pluginDir}/core-api.js')).OpenDivesCore;
-  const proto = mod.OpenDivesCoreDesktop.prototype;
+  window.__core = (await import('/@fs/${pluginDir}/core-api.js')).BenthicCore;
+  const proto = mod.BenthicCoreDesktop.prototype;
   if (!proto.__orig) { proto.__orig = proto.core; }
   proto.core = async function (method, args) {
     const t = performance.now();

@@ -191,7 +191,7 @@ test('Autre équipement: a seam of three props, no storage of its own, inert in 
   const gear = read('app/src/components/DesktopOtherGear.svelte');
   assert.match(gear, /let \{ items = \[\], onadd, onremove, locked = false \} = \$props\(\)/);
   assert.match(gear, /disabled=\{!onadd\}/);
-  assert.doesNotMatch(gear, /deviceStore|OpenDivesCore|localStorage|saveDiveChanges/);
+  assert.doesNotMatch(gear, /deviceStore|BenthicCore|localStorage|saveDiveChanges/);
   const fields = read('app/src/components/DesktopDiveFields.svelte');
   assert.match(fields, /<DesktopOtherGear \/>/); // the alpha edition
   assert.match(fields, /<DesktopOtherGear items=\{otherItems\} onadd=\{[^}]*\} onremove=\{removeGear\} \/>/); // the release edition

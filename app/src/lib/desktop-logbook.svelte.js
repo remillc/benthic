@@ -3,7 +3,7 @@
 // and the detail pane, which sums several dives up), the sort, the shown columns, the
 // folded trips, the table's width, and the extra values of the columns. The sort, the
 // columns and the widths are remembered on the device (lib/device-store.js).
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { deviceStore } from './device-store.js';
 import { DEFAULT_COLUMNS, DEFAULT_SORT, EMPTY_SELECTION, cleanColumnWidths } from './desktop-table.js';
 import { logbookKey } from './window-logbook.js';
@@ -86,7 +86,7 @@ export function setTableWidth(width) {
  */
 export async function loadExtras() {
   try {
-    const list = /** @type {import('./desktop-table.js').DiveColumns[]} */ (await /** @type {any} */ (OpenDivesCore).diveColumns());
+    const list = /** @type {import('./desktop-table.js').DiveColumns[]} */ (await /** @type {any} */ (BenthicCore).diveColumns());
     desk.extras = new Map(list.map((x) => [x.id, x]));
   } catch (e) {
     console.error('Desktop columns', e);

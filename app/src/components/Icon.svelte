@@ -60,8 +60,8 @@
     trip: 'M9 7V5h6v2M4 7h16v12H4zM4 12h16',
     export: 'M12 15V4M7 9l5-5 5 5M5 15v5h14v-5',
     columns: 'M4 5h16v14H4zM9.5 5v14M14.5 5v14',
-    // OpenDives+ (task 2026-11-17-265): a card with a portrait (certifications), a briefcase (gear), a phone, a cloud
-    // with a down arrow (backup), a four-pointed mark (the OpenDives+ chip).
+    // Benthic+ (task 2026-11-17-265): a card with a portrait (certifications), a briefcase (gear), a phone, a cloud
+    // with a down arrow (backup), a four-pointed mark (the Benthic+ chip).
     idCard: 'M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM8.5 11.5a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2zM6 15.5c.4-1.5 1.4-2.2 2.5-2.2s2.1.7 2.5 2.2M14 10h4M14 13.5h3',
     // The briefcase of « Équipement » and the kits: a bag with its handle (docs/mockups/android-carnet-liste-v2.dc.html).
     briefcase: 'M4 8h16v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19zM9 8V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V8',

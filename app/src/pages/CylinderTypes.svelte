@@ -8,19 +8,19 @@
   import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { t } from '../lib/i18n.js';
   import { ios } from '../lib/layout.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import { formatCylinderSize, formatNumber, formatPressure } from '../lib/format.js';
 
-  /** @type {import('opendives-core').CylinderType[]} */
+  /** @type {import('benthic-core').CylinderType[]} */
   let types = $state([]);
 
   async function refresh() {
     try {
-      types = (await OpenDivesCore.cylinderTypes({ action: 'list' })).types;
+      types = (await BenthicCore.cylinderTypes({ action: 'list' })).types;
     } catch (e) {
       console.error('Reading the cylinder types', e);
     }
@@ -29,7 +29,7 @@
   const yours = $derived(types.filter((type) => !type.standard));
   const standard = $derived(types.filter((type) => type.standard));
 
-  /** "11,1 L · 207 bar", in the units of the settings. @param {import('opendives-core').CylinderType} type */
+  /** "11,1 L · 207 bar", in the units of the settings. @param {import('benthic-core').CylinderType} type */
   function size(type) {
     return [formatCylinderSize(type.ml, type.mbar, logbook.prefs), type.mbar ? formatPressure(type.mbar, logbook.prefs) : '']
       .filter(Boolean)
@@ -47,7 +47,7 @@
   }
 </script>
 
-{#snippet list(/** @type {import('opendives-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
+{#snippet list(/** @type {import('benthic-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
   <div class="bc-cylinder-types--surface" role="list">
     {#each items as type (type.name)}
       <div role="listitem">

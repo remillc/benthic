@@ -5,8 +5,8 @@
 // tapped); the real list replaces it as soon as the dives are loaded. Nothing
 // here is read back as data: the log stays the core's.
 
-/** @typedef {import('opendives-core').Dive} Dive */
-/** @typedef {import('opendives-core').Prefs} Prefs */
+/** @typedef {import('benthic-core').Dive} Dive */
+/** @typedef {import('benthic-core').Prefs} Prefs */
 /**
  * @typedef {{ type: 'dive', dive: Dive } | { type: 'trip', location: string, dives: Dive[] }} SnapshotEntry
  * @typedef {{ v: 1, total: number, prefs: Prefs, entries: SnapshotEntry[] }} Snapshot

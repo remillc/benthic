@@ -19,7 +19,7 @@ export function zoomDirection(e) {
 export function startDesktopShell() {
   if (!desktopApp) return;
   applyTextSize();
-  const bridge = /** @type {any} */ (window).odDesktop;
+  const bridge = /** @type {any} */ (window).benthicDesktop;
 
   window.addEventListener('keydown', (e) => {
     if (!(desktopMac ? e.metaKey : e.ctrlKey) || e.altKey) return;

@@ -309,7 +309,7 @@ test('the git and WebDAV forms hand the creation to the window, and tell what it
   const git = read('components/FirstLaunchGit.svelte');
   assert.match(git, /if \(onconnect\) \{\s*await onconnect\(\{ url: address, username, branch: branch\.trim\(\), token: token\.trim\(\) \}\);/);
   // The tablet’s path is the one it was.
-  assert.match(git, /await OpenDivesCore\.gitConnect\(\{ url: address, username, token: token\.trim\(\), branch: branch\.trim\(\), empty: !!found\.empty \}\);\s*token = '';\s*await accountReady\(\);/);
+  assert.match(git, /await BenthicCore\.gitConnect\(\{ url: address, username, token: token\.trim\(\), branch: branch\.trim\(\), empty: !!found\.empty \}\);\s*token = '';\s*await accountReady\(\);/);
   const webdav = read('components/FirstLaunchWebdav.svelte');
   assert.match(webdav, /if \(onsubmit\) await onsubmit\(\);\s*else await connectWebdav\(/);
   assert.match(webdav, /else if \(onfail\) onfail\(e\);/);

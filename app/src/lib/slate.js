@@ -72,7 +72,7 @@ export function slateSize(letter, id) {
  * @property {string} id 'plus5', 'plusDepth' or 'without-<cylinder index>'
  * @property {'plus5'|'plusDepth'|'without'} kind
  * @property {number} [cylinder] without: the cylinder lost
- * @property {import('opendives-core').PlanRequest} request the request for the core's planner
+ * @property {import('benthic-core').PlanRequest} request the request for the core's planner
  */
 
 /** The deco gases of a plan: every cylinder after the bottom gas. @param {unknown[]} cylinders @returns {number[]} */
@@ -82,7 +82,7 @@ export const decoGasIndexes = (cylinders) => cylinders.map((_, i) => i).slice(1)
  * The requests of the extra plans, in the order of the columns: "+5 min", "+10 ft",
  * then one "Sans <gas>" per deco gas. Each is the plan's own request with one change;
  * the core plans each of them again.
- * @param {import('opendives-core').PlanRequest} request the plan's request
+ * @param {import('benthic-core').PlanRequest} request the plan's request
  * @param {SlateLevel[]|null} levels the plan's levels (the request's, or those of a measured profile simplified); null: none, so no "plus" plan
  * @param {SlateOptions} options
  * @returns {SlateVariant[]}

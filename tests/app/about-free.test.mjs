@@ -41,7 +41,7 @@ test('the two buttons carry a 20 dp icon 8 dp from the text; the GitHub mark is 
 
 test('« Tout ce qui est inclus » has its subtitle, 16/24 grey', () => {
   const plus = read('components/FirstLaunchBenthicPlus.svelte');
-  assert.match(plus, /odplus\.all\.subtitle/);
+  assert.match(plus, /benthicPlus\.all\.subtitle/);
   assert.match(plus, /\.bc-plus-all--subtitle \{[^}]*font-size: 16px;\s*line-height: 24px;\s*color: var\(--bc-text-2\);/s);
-  assert.equal(langs.fr.odplus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
+  assert.equal(langs.fr.benthicPlus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
 });

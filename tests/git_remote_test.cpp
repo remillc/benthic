@@ -24,8 +24,8 @@
 //                                                 (history_call restore, then sync), open:<commit> (read only; tries to save),
 //                                                 close, dives (prints the number of dives in memory)
 // Prints KEY=VALUE lines; exit status 0 on success, 1 on failure.
-#include "core/libopendives/opendives.h"
-#include "core/libopendives/internal.h"
+#include "core/libbenthic/benthic.h"
+#include "core/libbenthic/internal.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

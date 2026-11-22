@@ -6,7 +6,7 @@
   // code" sits right under the field (outlined on Android, tinted grey on
   // iOS). From first launch, then "Reprendre votre carnet ?"; from Account,
   // the logbook of this device becomes the account's first logbook.
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import CodeField from '../components/CodeField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import Icon from '../components/Icon.svelte';
@@ -30,7 +30,7 @@
     codeError = '';
     try {
       if (!verified) {
-        const result = await OpenDivesCore.verifyPin({ pin: code });
+        const result = await BenthicCore.verifyPin({ pin: code });
         if (result.status !== 'verified') {
           codeError = t('confirmCode.wrong');
           return;
@@ -41,7 +41,7 @@
       if (look) {
         // The dives logged on this device without an account, if any, are the first of the new logbook.
         const onDevice = await deviceDiveCount();
-        await OpenDivesCore.createLog({ source: onDevice ? 'device' : 'empty' });
+        await BenthicCore.createLog({ source: onDevice ? 'device' : 'empty' });
         accountFlow.confirmedEmail = '';
         await accountReady();
         announceFirstLaunch('created');
@@ -49,7 +49,7 @@
         f7router.navigate('/welcome/import');
       } else {
         // From Account: the dives of this device are sent to the new account.
-        await OpenDivesCore.createLog({ source: 'device' });
+        await BenthicCore.createLog({ source: 'device' });
         finishAccount(f7router, false);
       }
     } catch (e) {
@@ -64,7 +64,7 @@
   async function resend() {
     busy = true;
     try {
-      await OpenDivesCore.resendCode();
+      await BenthicCore.resendCode();
       toast(t('confirmCode.resent', { email }));
     } catch (e) {
       showFailure(errorCode(e));

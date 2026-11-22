@@ -2,7 +2,7 @@
 // Dive sites (spec, section 4, "Sites"): changes through the core, saved and
 // synced like a dive edit; coordinates as Subsurface writes them.
 import { deviceStore } from './device-store.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { logbook, refreshAfterChange } from './logbook.svelte.js';
 import { language, tIfExists } from './i18n.js';
 import { placeAt } from './place-lookup.js';
@@ -31,7 +31,7 @@ export async function diveLines(dives, update, separator = ' · ') {
   update({ ...lines });
   for (const dive of dives) {
     try {
-      const d = await OpenDivesCore.getDive({ id: dive.id });
+      const d = await BenthicCore.getDive({ id: dive.id });
       const mode = d.divemode && d.divemode !== 'OC' ? (tIfExists(`detail.computerModes.${d.divemode}`) ?? d.divemode) : '';
       lines[dive.id] = [formatMinutes(dive.durationSeconds), d.buddies.join(', '), mode].filter(Boolean).join(separator);
     } catch {
@@ -43,10 +43,10 @@ export async function diveLines(dives, update, separator = ' · ') {
 
 /**
  * One site change (create, edit, geocode, merge, delete), one undoable step.
- * @param {Parameters<import('opendives-core').OpenDivesCorePlugin['siteAction']>[0]} options
+ * @param {Parameters<import('benthic-core').BenthicCorePlugin['siteAction']>[0]} options
  */
 export async function siteChange(options) {
-  const result = await OpenDivesCore.siteAction(options);
+  const result = await BenthicCore.siteAction(options);
   await refreshAfterChange(result.undo);
   return result;
 }
@@ -60,7 +60,7 @@ export async function siteChange(options) {
  */
 export async function geocodeSite(uuid) {
   try {
-    const site = await OpenDivesCore.siteQuery({ kind: 'site', uuid });
+    const site = await BenthicCore.siteQuery({ kind: 'site', uuid });
     if (!site || site.hasLocation === false) return false;
     const place = await placeAt(site.latUdeg, site.lonUdeg, language);
     if (!place) return false;
@@ -97,12 +97,12 @@ const SAME_PLACE_M = 50;
  * dismissed. A pair "same position, different names" is left out when a third
  * site shares that position: imports often give every site of an island or a
  * dive centre the same approximate position, and those sites are distinct.
- * @returns {Promise<{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]>}
+ * @returns {Promise<{a: import('benthic-core').SiteSummary, b: import('benthic-core').SiteSummary, distanceM: number}[]>}
  */
 export async function possibleDuplicates() {
   const marks = storedMarks();
-  /** @type {{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]} */
-  const pairs = await OpenDivesCore.siteQuery({ kind: 'duplicates', a: SAME_NAME_M, b: SAME_PLACE_M });
+  /** @type {{a: import('benthic-core').SiteSummary, b: import('benthic-core').SiteSummary, distanceM: number}[]} */
+  const pairs = await BenthicCore.siteQuery({ kind: 'duplicates', a: SAME_NAME_M, b: SAME_PLACE_M });
   const sameName = (/** @type {(typeof pairs)[number]} */ p) => p.a.name.toLocaleLowerCase() === p.b.name.toLocaleLowerCase();
   /** @type {Map<number, number>} */
   const placePartners = new Map();

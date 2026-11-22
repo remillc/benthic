@@ -10,7 +10,7 @@
 // usage: fit-import <subsurface-dives-folder> <new-folder>
 // Prints what the core read from each file; exit status 0 when every check
 // passes, 1 otherwise.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divecomputer.h"
@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

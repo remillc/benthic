@@ -7,7 +7,7 @@
 //  - Bühlmann's half-times and a/b coefficients, ZH-L16C, nitrogen and helium;
 //  - Baker's gradient factors, GF low anchored at the deepest ceiling met;
 //  - the NOAA oxygen exposure limits (CNS) and the oxygen toxicity units (OTU).
-// It reads the plans the façade (opendives::plan_dive, core/libopendives/plan.cpp)
+// It reads the plans the façade (benthic::plan_dive, core/libbenthic/plan.cpp)
 // gives over a grid of a few hundred plans and checks, on the profile the
 // planner returned:
 //   1. ceiling: at every waypoint the tissues allow the depth, at the gradient
@@ -29,7 +29,7 @@
 //
 // usage: plan-oracle           OD_MUTATE=<name> as for the plan test; OD_DUMP=1
 //        prints the statistics of each check
-#include "../core/libopendives/opendives.h"
+#include "../core/libbenthic/benthic.h"
 #include "zhl16c.h"
 
 #include "core/divelog.h"
@@ -592,7 +592,7 @@ void check(bool ok, const std::string &what)
 
 int main()
 {
-	opendives::init();
+	benthic::init();
 	prefs = default_prefs;
 	prefs.unit_system = METRIC;
 	prefs.units.length = units::METERS;
@@ -633,7 +633,7 @@ int main()
 		long ascent = next(3) == 0 ? 6000 : 9000;
 		std::string req = request(levels, gs, pr, last6, ascent);
 		std::string json, error;
-		if (opendives::plan_dive(mutate(req), json, error)) {
+		if (benthic::plan_dive(mutate(req), json, error)) {
 			bad++;
 			continue;
 		}
@@ -683,7 +683,7 @@ int main()
 		std::string json, error;
 		std::string req = request({ { 45000, 25 * 60 } }, gs, pr, false, 9000);
 		Plan plan;
-		bool ok = !opendives::plan_dive(req, json, error) && parse(json, plan) && plan.error.empty();
+		bool ok = !benthic::plan_dive(req, json, error) && parse(json, plan) && plan.error.empty();
 		check(ok, "self-test: reference plan 45 m 25 min, 21/35 + EAN50 + O2, GF 30/75");
 		if (ok) {
 			check(verify(plan, pr, false).empty(), "self-test: the reference plan passes the checker");

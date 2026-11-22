@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0
-// Backup and restore of an OpenDives+ logbook (task 2026-11-19-290) against the development server stack: the app's own
+// Backup and restore of an Benthic+ logbook (task 2026-11-19-290) against the development server stack: the app's own
 // version engine (app/src/lib/backup-history.js) on the core's `history` calls (benthic-host over stdio), with a real
 // account, a real repository on the dev Forgejo and real pushes. Three syncs with changes, the middle version restored, the
 // newest still listed and restorable back; a dive deleted, synced and restored from the deleted ones; a version opened
 // read only; the account deleted with its whole history. Skipped unless the stack is up and the host is given:
 //
-//   OPENDIVES_HOST=<host binary>  [OPENDIVES_HOST_ARGS='["-d","Ubuntu","-e","/home/me/benthic-host"]']
-//   OPENDIVES_DEV_API=http://127.0.0.1:8080  OPENDIVES_DEV_MAILPIT=http://127.0.0.1:8025
-//   OPENDIVES_DEV_CA=<ca.pem, as the host sees it>  OPENDIVES_TEST_DIR=<a directory, as the host sees it>
+//   BENTHIC_HOST=<host binary>  [BENTHIC_HOST_ARGS='["-d","Ubuntu","-e","/home/me/benthic-host"]']
+//   BENTHIC_DEV_API=http://127.0.0.1:8080  BENTHIC_DEV_MAILPIT=http://127.0.0.1:8025
+//   BENTHIC_DEV_CA=<ca.pem, as the host sees it>  BENTHIC_TEST_DIR=<a directory, as the host sees it>
 //
 // The account is `<random>@opendives.test` and is deleted at the end (DELETE /v1/account).
 import { test, describe, before, after } from 'node:test';
@@ -17,12 +17,12 @@ import { randomBytes } from 'node:crypto';
 import { createInterface } from 'node:readline';
 import { listVersions, versionDetail, restoreVersion, restoreDive, deletedDives, diveVersions, keyOfDate } from '../../app/src/lib/backup-history.js';
 
-const api = process.env.OPENDIVES_DEV_API || '';
-const mailpit = process.env.OPENDIVES_DEV_MAILPIT || '';
-const hostCommand = process.env.OPENDIVES_HOST || '';
-const hostArgs = process.env.OPENDIVES_HOST_ARGS ? JSON.parse(process.env.OPENDIVES_HOST_ARGS) : [];
-const ca = process.env.OPENDIVES_DEV_CA || '';
-const home = process.env.OPENDIVES_TEST_DIR || '';
+const api = process.env.BENTHIC_DEV_API || '';
+const mailpit = process.env.BENTHIC_DEV_MAILPIT || '';
+const hostCommand = process.env.BENTHIC_HOST || '';
+const hostArgs = process.env.BENTHIC_HOST_ARGS ? JSON.parse(process.env.BENTHIC_HOST_ARGS) : [];
+const ca = process.env.BENTHIC_DEV_CA || '';
+const home = process.env.BENTHIC_TEST_DIR || '';
 const skip = !api || !mailpit || !hostCommand || !ca || !home ? 'the dev stack, the host, the CA or the directory is not given' : false;
 
 function startHost() {
@@ -101,9 +101,9 @@ describe('backup and restore against the dev server', { skip }, () => {
     const verified = await json(`${api}/v1/auth/verify`, { method: 'POST', body: JSON.stringify({ email, code: await codeFor(email) }) });
     assert.equal(verified.status, 200);
     session = verified.body.sessionToken;
-    // A host built on an old system libgit2 cannot verify an IP address in the certificate: OPENDIVES_DEV_REPO_HOST names the
+    // A host built on an old system libgit2 cannot verify an IP address in the certificate: BENTHIC_DEV_REPO_HOST names the
     // address the certificate also has as a name (localhost).
-    const repoUrl = process.env.OPENDIVES_DEV_REPO_HOST ? verified.body.repository.url.replace('127.0.0.1', process.env.OPENDIVES_DEV_REPO_HOST) : verified.body.repository.url;
+    const repoUrl = process.env.BENTHIC_DEV_REPO_HOST ? verified.body.repository.url.replace('127.0.0.1', process.env.BENTHIC_DEV_REPO_HOST) : verified.body.repository.url;
     access = { url: repoUrl, branch: verified.body.repository.branch, username: verified.body.git.username, token: verified.body.git.token };
     const sub = await json(`${api}/v1/account/dev-subscribe`, { method: 'POST', headers: { Authorization: `Bearer ${session}` }, body: '{}' });
     assert.equal(sub.status, 200);

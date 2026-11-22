@@ -3,7 +3,7 @@
 // an image or as a PDF, made on the device with the paths of the dive sheet and of the documents (HTML to PDF in the core;
 // the system's share sheet, or the save dialog on the desktop). Nothing is sent to the OpenDives server.
 import { Share } from '@capacitor/share';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { letterPaper } from './share.js';
 import { shareSlug } from './document-share.js';
 import { desktopApp } from './layout.svelte.js';
@@ -119,15 +119,15 @@ export async function shareEmergency(text, how) {
   let uri;
   if (how === 'pdf') {
     const letter = letterPaper();
-    ({ uri } = await OpenDivesCore.htmlToPdf({ html: emergencyHtml(text, letter, diverWord), name, letter }));
+    ({ uri } = await BenthicCore.htmlToPdf({ html: emergencyHtml(text, letter, diverWord), name, letter }));
   } else {
-    ({ uri } = await OpenDivesCore.writeShareFile({ name, base64: emergencyPng(text, diverWord) }));
+    ({ uri } = await BenthicCore.writeShareFile({ name, base64: emergencyPng(text, diverWord) }));
   }
   if (desktopApp) {
-    await /** @type {any} */ (window).odDesktop.saveAs({ path: uri, name });
+    await /** @type {any} */ (window).benthicDesktop.saveAs({ path: uri, name });
     return;
   }
   const mime = how === 'pdf' ? 'application/pdf' : 'image/png';
-  await OpenDivesCore.grantShareFile({ uri, mime });
+  await BenthicCore.grantShareFile({ uri, mime });
   await Share.share({ title: t('emergency.title'), files: [uri], dialogTitle: t('emergency.share.title') });
 }

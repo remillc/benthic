@@ -1,14 +1,14 @@
 // @ts-check
 // DEVELOPMENT ONLY. The actions of the « Outils de développement » menu: switch between a free account and a paying
-// (OpenDives+) one while trying the app. Loaded only through `import()` behind `devAccounts` (lib/dev-switch.js), so a
+// (Benthic+) one while trying the app. Loaded only through `import()` behind `devAccounts` (lib/dev-switch.js), so a
 // build without VITE_DEV_ACCOUNTS=1 does not contain it. The dev routes refuse any server that is not local (dev-accounts.js).
 // Every dependency is given, so that node:test runs the actions with a fake transport and no device.
 import { createDevApi, randomTempEmail, isTempEmail } from './dev-accounts.js';
 import { ALPHA_IMPORT_KEY } from './alpha-logbook.js';
-import { ODPLUS_SUBSCRIBED_KEY } from './benthic-plus-state.js';
+import { BENTHIC_PLUS_SUBSCRIBED_KEY } from './benthic-plus-state.js';
 
 /** The remembered « subscribed » answer of the app (lib/benthic-plus-state.js): the fallback when the server cannot be asked (GET /v1/account). */
-export const SUBSCRIBED_KEY = ODPLUS_SUBSCRIBED_KEY;
+export const SUBSCRIBED_KEY = BENTHIC_PLUS_SUBSCRIBED_KEY;
 /** The beta's first-launch key (logbook.svelte.js): « show » replays it; the logbooks are not touched. */
 export const WELCOME_KEY = 'od.welcomeBeta';
 
@@ -18,7 +18,7 @@ export const WELCOME_KEY = 'od.welcomeBeta';
  * @property {{ info: () => Promise<{ signedIn: boolean, email: string }>, access: () => Promise<{ sessionToken: string }>, save: (session: any) => Promise<void>, clear?: () => Promise<void> }} session
  * @property {{ signOut: (options?: { deleteCopy?: boolean }) => Promise<void>, startWithoutAccount: () => Promise<any> }} app
  * @property {{ getItem: (key: string) => string|null, setItem: (key: string, value: string) => void, removeItem: (key: string) => void }} store
- * @property {(account: { signedIn: boolean, email: string, subscribed: boolean }) => void} [account] sets the app's OpenDives+ account at once (lib/benthic-plus-state.svelte.js): the whole app follows, with no restart
+ * @property {(account: { signedIn: boolean, email: string, subscribed: boolean }) => void} [account] sets the app's Benthic+ account at once (lib/benthic-plus-state.svelte.js): the whole app follows, with no restart
  * @property {() => void} reload the app starts again so that every screen reads the new state
  * @property {() => string} server the server's address
  * @property {() => string} [email] a fresh temporary address
@@ -73,7 +73,7 @@ export function createDevTools(deps) {
     state,
 
     /**
-     * « Passer en compte gratuit ». `signOut` (default): the session of OpenDives+ is forgotten, the logbook of the device
+     * « Passer en compte gratuit ». `signOut` (default): the session of Benthic+ is forgotten, the logbook of the device
      * stays and the app opens it. `unsubscribe`: the session stays and the server marks the account not subscribed.
      * @param {'signOut'|'unsubscribe'} [how]
      */
@@ -92,7 +92,7 @@ export function createDevTools(deps) {
           setAccount({ signedIn: true, email: created.user?.email ?? '', subscribed: false });
         }
         store.setItem(SUBSCRIBED_KEY, '0');
-        // No restart: the account sheet and every OpenDives+ feature follow the account state.
+        // No restart: the account sheet and every Benthic+ feature follow the account state.
         return;
       } else {
         if (s.signedIn) await app.signOut({ deleteCopy: false });
@@ -190,8 +190,8 @@ export function runSegment(tools, id) {
 
 /** The real dependencies, read when the menu opens (dynamic imports: the app's modules are not loaded by the tests). */
 export async function realDevTools() {
-  const [{ OpenDivesCore }, { deviceStore }, logbookModule, accounts, { serverUrl }, { setOdplusAccount }] = await Promise.all([
-    import('opendives-core'),
+  const [{ BenthicCore }, { deviceStore }, logbookModule, accounts, { serverUrl }, { setBenthicPlusAccount }] = await Promise.all([
+    import('benthic-core'),
     import('./device-store.js'),
     import('./logbook.svelte.js'),
     import('./dev-accounts.js'),
@@ -200,13 +200,13 @@ export async function realDevTools() {
   ]);
   return createDevTools({
     api: accounts.createDevApi(),
-    session: { info: () => OpenDivesCore.serverSessionInfo(), access: () => OpenDivesCore.serverSessionAccess(), save: accounts.saveSession, clear: () => OpenDivesCore.serverSessionClear() },
+    session: { info: () => BenthicCore.serverSessionInfo(), access: () => BenthicCore.serverSessionAccess(), save: accounts.saveSession, clear: () => BenthicCore.serverSessionClear() },
     app: { signOut: logbookModule.signOut, startWithoutAccount: logbookModule.startWithoutAccount },
     store: deviceStore,
-    account: setOdplusAccount,
+    account: setBenthicPlusAccount,
     // A moment later, so that the « done » message is seen before the app starts again.
     reload: () => void setTimeout(() => window.location.reload(), 900),
     server: serverUrl,
-    alphaFolders: async () => (await OpenDivesCore.alphaCacheList()).length,
+    alphaFolders: async () => (await BenthicCore.alphaCacheList()).length,
   });
 }

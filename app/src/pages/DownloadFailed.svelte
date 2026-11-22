@@ -12,7 +12,7 @@
   // dropped when this screen closes.
   import { onDestroy, onMount } from 'svelte';
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import { keepReceived } from '../lib/download.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -43,7 +43,7 @@
 
   onDestroy(() => {
     navigation.downloadPanes--;
-    if (received) OpenDivesCore.downloadPartial({ action: 'discard' }).catch(() => {});
+    if (received) BenthicCore.downloadPartial({ action: 'discard' }).catch(() => {});
   });
 
   /** The download screen again, in this one's place: the same attempt (retry) or the list. @param {boolean} retry */

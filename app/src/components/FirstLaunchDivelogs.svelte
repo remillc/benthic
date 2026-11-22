@@ -6,7 +6,7 @@
   // form's state only until the download starts, and are never stored. Nothing is added to a logbook here:
   // the dives are read, then « Nouveau carnet » asks where to keep them.
   import { onMount } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import ReleaseField from './ReleaseField.svelte';
   import Icon from './Icon.svelte';
   import LinearWavyProgress from './LinearWavyProgress.svelte';
@@ -26,16 +26,16 @@
   let account = $state(d.user.trim());
 
   const calls = {
-    check: (/** @type {any} */ o) => OpenDivesCore.divelogsCheck(o),
-    download: (/** @type {any} */ o) => OpenDivesCore.divelogsDownload(o),
-    count: (/** @type {any} */ o) => OpenDivesCore.importCount(o),
-    discard: (/** @type {any} */ o) => OpenDivesCore.discardImport(o),
+    check: (/** @type {any} */ o) => BenthicCore.divelogsCheck(o),
+    download: (/** @type {any} */ o) => BenthicCore.divelogsDownload(o),
+    count: (/** @type {any} */ o) => BenthicCore.importCount(o),
+    discard: (/** @type {any} */ o) => BenthicCore.discardImport(o),
     // The resumable download needs the plugin to list the account's dives and to download by ids; it has neither
-    // yet (plugins/opendives-core/core-api.js), so a lost connection keeps nothing and goes back to the form.
-    ...(typeof (/** @type {any} */ (OpenDivesCore).divelogsList) === 'function'
+    // yet (plugins/benthic-core/core-api.js), so a lost connection keeps nothing and goes back to the form.
+    ...(typeof (/** @type {any} */ (BenthicCore).divelogsList) === 'function'
       ? {
-          list: (/** @type {any} */ o) => /** @type {any} */ (OpenDivesCore).divelogsList(o),
-          downloadIds: (/** @type {any} */ o) => OpenDivesCore.divelogsDownload(o),
+          list: (/** @type {any} */ o) => /** @type {any} */ (BenthicCore).divelogsList(o),
+          downloadIds: (/** @type {any} */ o) => BenthicCore.divelogsDownload(o),
         }
       : {}),
   };

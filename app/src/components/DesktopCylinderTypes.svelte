@@ -5,7 +5,7 @@
   // a few standard types and « Et N autres types standard… », « Ajouter un type », then the switches
   // (the `children`). A row opens the 560 px dialog « Modifier le type » (DesktopCylinderTypeDialog).
   import { onMount } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import DesktopCylinderTypeDialog from './DesktopCylinderTypeDialog.svelte';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
@@ -19,15 +19,15 @@
   /** The standard types shown before « Et N autres types standard… ». */
   const FEW = 3;
 
-  /** @type {import('opendives-core').CylinderType[]} */
+  /** @type {import('benthic-core').CylinderType[]} */
   let types = $state([]);
   let allStandard = $state(false);
-  /** The dialog: a type to edit, or `{ type: null }` for a new one. @type {{ type: import('opendives-core').CylinderType|null }|null} */
+  /** The dialog: a type to edit, or `{ type: null }` for a new one. @type {{ type: import('benthic-core').CylinderType|null }|null} */
   let dialog = $state(null);
 
   async function refresh() {
     try {
-      types = (await OpenDivesCore.cylinderTypes({ action: 'list' })).types;
+      types = (await BenthicCore.cylinderTypes({ action: 'list' })).types;
     } catch (e) {
       console.error('Reading the cylinder types', e);
     }
@@ -44,7 +44,7 @@
   const standard = $derived(types.filter((type) => type.standard));
   const shownStandard = $derived(allStandard ? standard : standard.slice(0, FEW));
 
-  /** "11,1 L · 207 bar", in the units of the settings. @param {import('opendives-core').CylinderType} type */
+  /** "11,1 L · 207 bar", in the units of the settings. @param {import('benthic-core').CylinderType} type */
   function size(type) {
     return [formatCylinderSize(type.ml, type.mbar, logbook.prefs), type.mbar ? formatPressure(type.mbar, logbook.prefs) : ''].filter(Boolean).join(' · ');
   }
@@ -60,7 +60,7 @@
   }
 </script>
 
-{#snippet list(/** @type {import('opendives-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
+{#snippet list(/** @type {import('benthic-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
   {#each items as type (type.name)}
     <div role="listitem" class="bc-desktop-cylinder-types--item">
       <button type="button" class="bc-desktop-cylinder-types--row" aria-haspopup="dialog" onclick={() => (dialog = { type })}>

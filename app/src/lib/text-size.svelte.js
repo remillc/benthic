@@ -22,7 +22,7 @@ export const textSize = $state({ id: /** @type {'small'|'normal'|'large'} */ (re
 export function applyTextSize() {
   if (!desktopApp) return;
   try {
-    /** @type {any} */ (window).odDesktop.setZoom?.(zoomOf(textSize.id));
+    /** @type {any} */ (window).benthicDesktop.setZoom?.(zoomOf(textSize.id));
   } catch (e) {
     console.error('Text size', e);
   }

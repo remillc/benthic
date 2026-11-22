@@ -9,7 +9,7 @@
 // usage: cylinder-reorder <dive-file> <new-folder>
 // Prints one line per dive tested; exit status 0 when all checks pass, 1 when
 // one fails, 2 when no dive of the file has several cylinders and gas changes.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

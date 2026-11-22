@@ -2,7 +2,7 @@
 // Dive validations on screen (inbox task 2026-11-19-309, point 2): the records read from the OpenDives data store
 // (lib/validation.js, `dive-validations/`), the validation by signature, the QR code made by the server, the signer's side
 // of a scan (confirm now, or queue the confirmation until the phone is online) and the refresh of the pending ones.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { inventoryApi } from './inventory.svelte.js';
 import { diveKeyOf, newId } from './inventory.js';
 import { deviceStore } from './device-store.js';
@@ -43,7 +43,7 @@ export function isValidated(dive) {
 export const validationsOf = (dive) => itemsFor(validations.records, dive);
 
 const api = () => createServerApi({ baseUrl: serverUrl(), transport: serverTransport });
-const sessionToken = async () => (await OpenDivesCore.serverSessionAccess()).sessionToken;
+const sessionToken = async () => (await BenthicCore.serverSessionAccess()).sessionToken;
 
 /** Reads the records again. */
 export async function loadValidations() {

@@ -2,7 +2,7 @@
 // (lib/dive-preload.js): read once, shared by the panes that ask at the same time, read again after a change.
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, test } from 'node:test';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { cachedCylinderTypes, cachedPlannerSetup, cachedSites, cachedValues, currentStamp, invalidateCoreCache, sameStamp, setCacheVersions } from '../../app/src/lib/core-cache.js';
 import { readRegions } from '../../app/src/lib/desktop-sites.js';
 import { keepDive, loadDive, readyDive } from '../../app/src/lib/dive-preload.js';
@@ -21,7 +21,7 @@ beforeEach(() => {
   /** @param {string} name @param {(o: any) => any} answer */
   const count = (name, answer) => {
     // @ts-ignore the stub accepts any method
-    OpenDivesCore[name] = async (/** @type {any} */ o) => {
+    BenthicCore[name] = async (/** @type {any} */ o) => {
       calls[name] = (calls[name] ?? 0) + 1;
       return answer(o);
     };
@@ -33,7 +33,7 @@ beforeEach(() => {
   count('getDive', (o) => ({ id: o.id, site: 'Reef' }));
 });
 afterEach(() => {
-  for (const name of ['siteQuery', 'statsQuery', 'plannerSetup', 'toolQuery', 'getDive']) delete OpenDivesCore[name];
+  for (const name of ['siteQuery', 'statsQuery', 'plannerSetup', 'toolQuery', 'getDive']) delete BenthicCore[name];
 });
 
 test('the same question asked by several panes is one call', async () => {
@@ -69,7 +69,7 @@ test('a new dive list, a site change or an explicit invalidation read again', as
 
 test('a failed read is not kept', async () => {
   // @ts-ignore
-  OpenDivesCore.plannerSetup = async () => {
+  BenthicCore.plannerSetup = async () => {
     calls.plannerSetup = (calls.plannerSetup ?? 0) + 1;
     throw new Error('offline');
   };
@@ -116,7 +116,7 @@ test('a detail kept after an edit is shown at once and read again only when it i
 test('a read that started before a change is not kept as current', async () => {
   let release = () => {};
   // @ts-ignore
-  OpenDivesCore.getDive = (/** @type {any} */ o) => {
+  BenthicCore.getDive = (/** @type {any} */ o) => {
     calls.getDive = (calls.getDive ?? 0) + 1;
     return new Promise((resolve) => (release = () => resolve({ id: o.id, site: 'Old' })));
   };
@@ -125,7 +125,7 @@ test('a read that started before a change is not kept as current', async () => {
   release();
   await first;
   // @ts-ignore
-  OpenDivesCore.getDive = async (/** @type {any} */ o) => ((calls.getDive = (calls.getDive ?? 0) + 1), { id: o.id, site: 'New' });
+  BenthicCore.getDive = async (/** @type {any} */ o) => ((calls.getDive = (calls.getDive ?? 0) + 1), { id: o.id, site: 'New' });
   assert.equal((await loadDive(104)).site, 'New');
   assert.equal(calls.getDive, 2);
 });

@@ -460,8 +460,8 @@ export function capacitorSink({ Filesystem, Directory, folder = 'exports' }) {
 }
 
 /**
- * The desktop: <temp>/share through the bridge (`odDesktop.fs`).
- * @param {{ fs: { writeFile: Function, appendFile: Function, remove: Function } }} bridge `window.odDesktop`
+ * The desktop: <temp>/share through the bridge (`benthicDesktop.fs`).
+ * @param {{ fs: { writeFile: Function, appendFile: Function, remove: Function } }} bridge `window.benthicDesktop`
  * @returns {(name: string) => Promise<SinkFile>}
  */
 export function desktopSink(bridge) {
@@ -498,9 +498,9 @@ export function desktopSink(bridge) {
  * @returns {Promise<ExportDeps>}
  */
 export async function defaultDeps(overrides = {}) {
-  const [{ services }, { OpenDivesCore }, { deviceSettingsSnapshot }] = await Promise.all([import('./profile.svelte.js'), import('opendives-core'), import('./device-store.js')]);
+  const [{ services }, { BenthicCore }, { deviceSettingsSnapshot }] = await Promise.all([import('./profile.svelte.js'), import('benthic-core'), import('./device-store.js')]);
   const { store, profile } = services();
-  const bridge = /** @type {any} */ (globalThis).window?.odDesktop ?? null;
+  const bridge = /** @type {any} */ (globalThis).window?.benthicDesktop ?? null;
   /** @type {ExportDeps['openFile']} */
   let openFile;
   if (bridge) openFile = desktopSink(bridge);
@@ -514,21 +514,21 @@ export async function defaultDeps(overrides = {}) {
     appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '',
     logbook: {
       async diveCount() {
-        const { exists, dives } = await OpenDivesCore.listDives();
+        const { exists, dives } = await BenthicCore.listDives();
         return exists ? dives.length : 0;
       },
       // The core writes the .ssrf to a file of the cache; the archive reads it in pieces of 3 MB.
       async open() {
-        const { exists, dives } = await OpenDivesCore.listDives();
+        const { exists, dives } = await BenthicCore.listDives();
         if (!exists || !dives.length) return null;
-        const { path = '', size = 0 } = await OpenDivesCore.exportDives({ ids: dives.map((d) => d.id), format: 'ssrf', anonymize: false, name: 'logbook.ssrf', stage: true });
+        const { path = '', size = 0 } = await BenthicCore.exportDives({ ids: dives.map((d) => d.id), format: 'ssrf', anonymize: false, name: 'logbook.ssrf', stage: true });
         if (!path) return null;
         const { readChunks } = await import('./staged-file.js');
-        return { size, chunks: () => readChunks(OpenDivesCore, path, size), dispose: () => OpenDivesCore.discardImport({ path }) };
+        return { size, chunks: () => readChunks(BenthicCore, path, size), dispose: () => BenthicCore.discardImport({ path }) };
       },
     },
     async settings() {
-      return { app: deviceSettingsSnapshot(), logbook: await OpenDivesCore.getPrefs().catch(() => null) };
+      return { app: deviceSettingsSnapshot(), logbook: await BenthicCore.getPrefs().catch(() => null) };
     },
     media: overrides.media,
     openFile,
@@ -544,15 +544,15 @@ export async function defaultDeps(overrides = {}) {
  * @returns {Promise<{ saved: boolean, path?: string }>}
  */
 export async function deliverExport(file) {
-  const bridge = /** @type {any} */ (globalThis).window?.odDesktop ?? null;
+  const bridge = /** @type {any} */ (globalThis).window?.benthicDesktop ?? null;
   try {
     if (bridge) {
       const result = await bridge.saveAs({ path: file.path, name: file.name });
       return result?.saved ? { saved: true, path: result.path } : { saved: false };
     }
-    const [{ Share }, { OpenDivesCore }] = await Promise.all([import('@capacitor/share'), import('opendives-core')]);
+    const [{ Share }, { BenthicCore }] = await Promise.all([import('@capacitor/share'), import('benthic-core')]);
     const uri = file.uri ?? file.path;
-    await OpenDivesCore.grantShareFile({ uri, mime: 'application/zip' });
+    await BenthicCore.grantShareFile({ uri, mime: 'application/zip' });
     await Share.share({ title: file.name, files: [uri] });
     return { saved: true };
   } catch (e) {
@@ -566,7 +566,7 @@ export async function deliverExport(file) {
 
 /** Deletes the archive from the cache. Call it when the person leaves without delivering it. @param {ExportFile} file */
 export async function discardExport(file) {
-  const bridge = /** @type {any} */ (globalThis).window?.odDesktop ?? null;
+  const bridge = /** @type {any} */ (globalThis).window?.benthicDesktop ?? null;
   try {
     if (bridge) await bridge.fs.remove({ path: file.path });
     else {

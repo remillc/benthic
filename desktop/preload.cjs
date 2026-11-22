@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 'use strict';
-// Preload of the desktop app: window.odDesktop, the only door between the
+// Preload of the desktop app: window.benthicDesktop, the only door between the
 // renderer and the main process (the contract is documented at the top of
 // desktop/bridge.cjs). Sandbox-compatible: it uses only electron's modules.
 const { contextBridge, ipcRenderer, webUtils, webFrame } = require('electron');
@@ -28,7 +28,7 @@ ipcRenderer.on('od:core-event', (_event, name, data) => {
 // `logbook`: what this window holds (bridge.cjs, logbooks.cjs); null: the start screen.
 const { platform, logbook, ...paths } = ipcRenderer.sendSync('od:paths');
 
-contextBridge.exposeInMainWorld('odDesktop', {
+contextBridge.exposeInMainWorld('benthicDesktop', {
   platform,
   paths,
   logbook,
@@ -66,7 +66,7 @@ contextBridge.exposeInMainWorld('odDesktop', {
   showInFolder: (options) => invoke('od:showInFolder', options),
   /** The Mac's Réglages window (desktop/main.cjs): opens it, or brings it forward. */
   openSettingsWindow: () => invoke('od:settingsWindow'),
-  /** The Mac's « Mon profil de plongeur » window, and the menu item's availability (the diver has OpenDives+). */
+  /** The Mac's « Mon profil de plongeur » window, and the menu item's availability (the diver has Benthic+). */
   openProfileWindow: () => invoke('od:profileWindow'),
   setProfileAvailable: (on) => invoke('od:profileAvailable', !!on),
   saveAs: (options) => invoke('od:saveAs', options),

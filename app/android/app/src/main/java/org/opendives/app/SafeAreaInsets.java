@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
  * The WebView's own env(safe-area-inset-*) is not reliable here: it never reports the navigation
  * bar (bottom is always 0) and the top is 52 px on one launch and 0 on the next. So the insets are
  * read from the window, in CSS pixels, and:
- *  - the page reads them at boot through the OpenDivesInsets interface (synchronous, there before
+ *  - the page reads them at boot through the BenthicInsets interface (synchronous, there before
  *    the first script runs, so there is no race with the page load);
  *  - every change (rotation, gesture or 3-button navigation, multi-window, cutout) is pushed to the
  *    page by calling window.__odSetInsets (src/lib/safe-area.js).
@@ -27,7 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
  */
 final class SafeAreaInsets {
 
-    private static final String TAG = "OpenDivesInsets";
+    private static final String TAG = "BenthicInsets";
 
     private final WebView webView;
     private volatile String json = "{\"top\":0,\"right\":0,\"bottom\":0,\"left\":0,\"gestureLeft\":0,\"gestureRight\":0}";
@@ -38,7 +38,7 @@ final class SafeAreaInsets {
 
     SafeAreaInsets(WebView webView) {
         this.webView = webView;
-        webView.addJavascriptInterface(this, "OpenDivesInsets");
+        webView.addJavascriptInterface(this, "BenthicInsets");
         ViewCompat.setOnApplyWindowInsetsListener(webView, (view, windowInsets) -> {
             update(windowInsets);
             return windowInsets;

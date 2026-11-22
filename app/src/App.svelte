@@ -57,7 +57,7 @@
   import ValidationConfirm from './components/ValidationConfirm.svelte';
   import { connection } from './lib/online.svelte.js';
   import { flushQueue, loadValidations, refreshPending } from './lib/validation.svelte.js';
-  import { odplusAccount } from './lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount } from './lib/benthic-plus-state.svelte.js';
   import FileImportProgress from './components/FileImportProgress.svelte';
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
@@ -79,7 +79,7 @@
   import { TAP_SLOP } from './lib/tap.js';
   import { enableBackButton } from './lib/back-button.js';
   import { followContrast } from './lib/contrast.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { App as CapacitorApp } from '@capacitor/app';
   import { enableDialogFit } from './lib/dialog-fit.js';
   import { enableTopBarScroll } from './lib/top-bar.js';
@@ -90,7 +90,7 @@
   import { enableModalCleanup } from './lib/modal-cleanup.js';
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
   import { logbook, isSubscriber } from './lib/logbook.svelte.js';
-  import { loadOdplusAccount } from './lib/benthic-plus-state.svelte.js';
+  import { loadBenthicPlusAccount } from './lib/benthic-plus-state.svelte.js';
   import { rememberHero, heroOf } from './lib/profile-frame.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';
@@ -401,7 +401,7 @@
   // Dive validations (task 2026-11-19-309): read the records; once online and signed in, send the confirmations this phone
   // queued offline and ask the server about the validations still waiting.
   $effect(() => {
-    if (!odplusAccount.signedIn || !odplusAccount.subscribed) return;
+    if (!benthicPlusAccount.signedIn || !benthicPlusAccount.subscribed) return;
     const online = connection.online;
     void loadValidations().then(() => (online ? Promise.all([flushQueue(), refreshPending()]) : undefined)).catch((e) => console.error('Validations', e));
   });
@@ -412,19 +412,19 @@
     document.documentElement.classList.toggle('bc-bottom-nav', bottomNav());
   });
 
-  // The Mac's menu item « Mon profil de plongeur… » is on while the diver has OpenDives+; the separate profile window
+  // The Mac's menu item « Mon profil de plongeur… » is on while the diver has Benthic+; the separate profile window
   // reads the diver's line from the device's store (task 2026-11-18-277).
   $effect(() => {
     if (!desktopMac || sideWindow) return;
     const on = isSubscriber();
-    /** @type {any} */ (window).odDesktop.setProfileAvailable?.(on);
-    if (on) rememberHero(heroOf(logbook, odplusAccount));
+    /** @type {any} */ (window).benthicDesktop.setProfileAvailable?.(on);
+    if (on) rememberHero(heroOf(logbook, benthicPlusAccount));
   });
 
   onMount(() => {
     applyMotionTokens();
-    // The OpenDives+ account of the device (signed in, subscribed), whatever the place of the logbook.
-    void loadOdplusAccount();
+    // The Benthic+ account of the device (signed in, subscribed), whatever the place of the logbook.
+    void loadBenthicPlusAccount();
     // The desktop app's shortcuts and text size; the Mac's Réglages window stops there (task 2026-11-15-202).
     startDesktopShell();
     if (sideWindow) {
@@ -446,7 +446,7 @@
     enableBackButton();
     // High contrast when the system asks for more contrast (task 2026-11-14-149).
     followContrast({
-      readLevel: () => OpenDivesCore.contrastLevel().then((r) => r.level),
+      readLevel: () => BenthicCore.contrastLevel().then((r) => r.level),
       onResume: (listener) => void CapacitorApp.addListener('resume', listener),
     });
     enableTopBarScroll();

@@ -18,7 +18,7 @@
   import DecorativeProfile from '../components/DecorativeProfile.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import { scanQr } from '../lib/qr-receive.svelte.js';
-  import { odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import { enterFromMenu } from '../lib/first-launch.svelte.js';
@@ -64,9 +64,9 @@
   import { importProgress } from '../lib/import-progress.svelte.js';
   import { isCancelled } from '../lib/import-progress.js';
   import { Capacitor } from '@capacitor/core';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
 
-  /** @typedef {import('opendives-core').Dive} Dive */
+  /** @typedef {import('benthic-core').Dive} Dive */
   /**
    * @typedef {{ type: 'dive', key: string, dive: Dive }
    *   | { type: 'trip', key: string, location: string, dives: Dive[] }} Entry
@@ -889,7 +889,7 @@
     const timer = setTimeout(async () => {
       try {
         /** @type {number[]} */
-        const ids = await OpenDivesCore.filterQuery({ kind: 'search', fulltext: q });
+        const ids = await BenthicCore.filterQuery({ kind: 'search', fulltext: q });
         if (query.trim() === q) searchIds = new Set(ids);
       } catch (e) {
         console.error('Search', e);
@@ -970,7 +970,7 @@
   /** « Mon carnet · Dépôt git » then « Aucune plongée »: the logbook's name and where it is kept. */
   const emptyBand = $derived.by(() => {
     const name = logbookName || t('welcomeSteps.defaultName');
-    const where = logbook.email || logbook.repository ? (logbook.mode === 'git' ? t(logbook.odplus ? 'welcomeSteps.keptServer' : 'welcomeSteps.keptGit') : t('welcomeSteps.keptCloud')) : t('welcomeSteps.keptDevice');
+    const where = logbook.email || logbook.repository ? (logbook.mode === 'git' ? t(logbook.benthicPlus ? 'welcomeSteps.keptServer' : 'welcomeSteps.keptGit') : t('welcomeSteps.keptCloud')) : t('welcomeSteps.keptDevice');
     return `${name} · ${where}\n${t('welcomeSteps.bandNoDives')}`;
   });
 
@@ -1181,7 +1181,7 @@
   let csv = $state(/** @type {{ file: File, companion: File|null }|null} */ (null));
 
   /** « Importer un fichier » is a .csv: its column mapping first, then the core's CSV import. */
-  async function csvConfirmed(/** @type {{ params: import('opendives-core').CsvParams, companion: File|null }} */ result) {
+  async function csvConfirmed(/** @type {{ params: import('benthic-core').CsvParams, companion: File|null }} */ result) {
     const chosen = csv;
     if (!chosen) return;
     const n = await importCsvFile(chosen.file, result.params, result.companion);
@@ -1205,7 +1205,7 @@
   async function offerReplace(file) {
     let what;
     try {
-      what = await replacementFromFile(OpenDivesCore, file);
+      what = await replacementFromFile(BenthicCore, file);
     } catch {
       return false;
     }
@@ -1476,7 +1476,7 @@
     {#if releaseEmpty}
       <ReleaseEmptyLogbook downloadRoute={downloadRoute} choices={emptyChoices} {routes} onchoose={choose} />
     {:else}
-    {#if logbook.email}<p class="bc-logbook--count">{t(logbook.mode === 'git' ? (logbook.odplus ? 'logbook.emptyServer' : 'logbook.emptyGit') : 'logbook.emptyCloud')}</p>
+    {#if logbook.email}<p class="bc-logbook--count">{t(logbook.mode === 'git' ? (logbook.benthicPlus ? 'logbook.emptyServer' : 'logbook.emptyGit') : 'logbook.emptyCloud')}</p>
     {:else if !theme.ios}<!-- Without an account, on Android (tasks 2026-11-16-233 and 239): where the logbook is. -->
       <p class="bc-logbook--count">{t(deviceKey('logbook.emptyLocal', deviceKind()))}</p>{/if}
     <div class="bc-logbook--empty">
@@ -1577,7 +1577,7 @@
         />
       {/if}
       <!-- Validation by a buddy or an instructor (task 2026-11-19-309): one validation for the checked dives. -->
-      {#if selecting && checkedCount >= 1 && odplusSubscriber()}
+      {#if selecting && checkedCount >= 1 && benthicPlusSubscriber()}
         <MenuItem icon="edit" text={t('validation.menuMany')} disabled={checkedCount > 20} supporting={checkedCount > 20 ? t('validation.tooMany') : ''} onclick={validateChecked} />
       {/if}
       {#if !selecting}

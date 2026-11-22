@@ -6,7 +6,7 @@
   // layout shift); the photo replaces it with a short fade when it arrives from the network, directly when the device
   // already had it. A failed fetch is asked again when the device is back online, or at the next display after a pause.
   // A model the catalog does not list has no tile: the `fallback` (by default the generic icon, 24 px) as before.
-  // `photo`: the diver's own photo of this piece (OpenDives+ inventory, account data): it wins over the catalog.
+  // `photo`: the diver's own photo of this piece (Benthic+ inventory, account data): it wins over the catalog.
   import { untrack } from 'svelte';
   import Icon from './Icon.svelte';
   import { loadComputerImage, knownImageEntry, getCatalog, forgetFailures, sizeFor } from '../lib/dc-images.js';

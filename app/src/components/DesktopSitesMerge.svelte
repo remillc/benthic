@@ -8,7 +8,7 @@
   import { mergeSides } from '../lib/desktop-sites.js';
   import { t } from '../lib/i18n.js';
 
-  /** @typedef {import('opendives-core').SiteSummary} Site */
+  /** @typedef {import('benthic-core').SiteSummary} Site */
 
   /**
    * @type {{

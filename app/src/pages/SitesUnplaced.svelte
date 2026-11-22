@@ -3,16 +3,16 @@
   // Sites without coordinates (spec, section 4, "Sites"): the sites used by
   // dives that have no position; each opens the site editor to place it.
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { logbook } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
 
   $effect(() => {
     logbook.sitesVersion;
-    OpenDivesCore.siteQuery({ kind: 'list' }).then((all) => {
+    BenthicCore.siteQuery({ kind: 'list' }).then((all) => {
       sites = all.filter((/** @type {any} */ s) => s.dives > 0 && !s.hasLocation).sort((/** @type {any} */ a, /** @type {any} */ b) => b.lastDate.localeCompare(a.lastDate));
     });
   });

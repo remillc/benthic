@@ -73,7 +73,7 @@
   } from '../lib/desktop-table.js';
   import { formatDepth, formatDate, formatTemperature, formatSac, formatMinutes, depthValue, formatWeekdayDate, formatTimeOfDay } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
 
   let { f7router } = $props();
 
@@ -96,7 +96,7 @@
     const timer = setTimeout(async () => {
       try {
         /** @type {number[]} */
-        const ids = await OpenDivesCore.filterQuery({ kind: 'search', fulltext: q });
+        const ids = await BenthicCore.filterQuery({ kind: 'search', fulltext: q });
         searchIds = new Set(ids);
       } catch (e) {
         console.error('Search the logbook', e);
@@ -249,7 +249,7 @@
   // --- Cells. ----------------------------------------------------------------------------
   /**
    * @param {string} key
-   * @param {import('opendives-core').Dive} dive
+   * @param {import('benthic-core').Dive} dive
    * @returns {string}
    */
   function cell(key, dive) {
@@ -292,7 +292,7 @@
   }
 
   /** « Voyage du 2 février 2013 · 4 plongées, de 21 à 29 m » */
-  function tripText(/** @type {{location: string, dives: import('opendives-core').Dive[]}} */ row) {
+  function tripText(/** @type {{location: string, dives: import('benthic-core').Dive[]}} */ row) {
     const dives = row.dives;
     const title = row.location || t('trip.startingOn', { date: formatDate(dives.reduce((a, d) => (d.date < a ? d.date : a), dives[0].date)) });
     const depths = dives.map((d) => d.maxDepthMm).filter(Boolean);
@@ -451,7 +451,7 @@
   // « Ajouter à un voyage… »: the logbook's trips, newest first, or a new trip.
   let choosingTrip = $state(false);
   const tripOptions = $derived.by(() => {
-    /** @type {Map<number, {location: string, dives: import('opendives-core').Dive[]}>} */
+    /** @type {Map<number, {location: string, dives: import('benthic-core').Dive[]}>} */
     const trips = new Map();
     for (const d of logbook.dives) {
       if (!d.trip) continue;
@@ -898,7 +898,7 @@
     /** @param {Event} e */
     const fromDetail = (e) => command(/** @type {CustomEvent<string>} */ (e).detail);
     window.addEventListener('od-desktop-command', fromDetail);
-    const off = /** @type {any} */ (window).odDesktop?.onMenu?.((/** @type {string} */ c) => inUse() && command(c));
+    const off = /** @type {any} */ (window).benthicDesktop?.onMenu?.((/** @type {string} */ c) => inUse() && command(c));
     return () => {
       window.removeEventListener('keydown', keydown);
       window.removeEventListener('paste', paste);

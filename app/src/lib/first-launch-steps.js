@@ -13,12 +13,12 @@
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
 //   open → server → serverCode → serverDownload (the OpenDives server, tasks 2026-11-16-259 and 260; its
 //     e-mail step is `server`; « Le serveur ne répond pas » is `serverOffline`, over the step that failed)
-//   start → signIn → odplusConnect (« Se connecter ou créer un compte ») → email → server → serverCode → a subscribed
-//     account: serverDownload → odplusReady (« Votre carnet est prêt »), or createChoice when the account holds no
+//   start → signIn → benthicPlusConnect (« Se connecter ou créer un compte ») → email → server → serverCode → a subscribed
+//     account: serverDownload → benthicPlusReady (« Votre carnet est prêt »), or createChoice when the account holds no
 //     logbook (task 2026-11-17-266: createChoice → createName | createSend → createInterrupted | createOffline);
-//     any other account: odplusOffer
-//   start → discover → odplusOffer (« OpenDives+, l'offre ») → welcome → odplusWelcome (after a purchase) → odplusReady
-//   odplusOffer → odplusAll (« Tout ce qui est inclus », task 2026-11-19-295): « Retour » returns to the offer.
+//     any other account: benthicPlusOffer
+//   start → discover → benthicPlusOffer (« Benthic+, l'offre ») → welcome → benthicPlusWelcome (after a purchase) → benthicPlusReady
+//   benthicPlusOffer → benthicPlusAll (« Tout ce qui est inclus », task 2026-11-19-295): « Retour » returns to the offer.
 //   Both entries (`signIn`, `discover`) are the choices of the first step; « Continuer sans compte » and
 //   « Continuer sans abonnement » go back to it and create nothing (task 2026-11-17-265).
 //
@@ -30,7 +30,7 @@
  *   |'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
  *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
- *   |'odplusConnect'|'odplusOffer'|'odplusAll'|'odplusReady'|'odplusWelcome'
+ *   |'benthicPlusConnect'|'benthicPlusOffer'|'benthicPlusAll'|'benthicPlusReady'|'benthicPlusWelcome'
  *   |'createChoice'|'createName'|'createSend'|'createInterrupted'|'createOffline'} Step
  */
 
@@ -64,14 +64,14 @@ const FORWARD = {
   'serverCode:offline': 'serverOffline',
   'serverDownload:offline': 'serverOffline',
   'serverCode:session': 'serverDownload',
-  'start:signIn': 'odplusConnect',
-  'start:discover': 'odplusOffer',
-  'odplusConnect:email': 'server',
-  'odplusOffer:welcome': 'odplusWelcome',
-  'odplusOffer:all': 'odplusAll',
-  'odplusOffer:signIn': 'odplusConnect',
-  'odplusWelcome:next': 'odplusReady',
-  'serverDownload:ready': 'odplusReady',
+  'start:signIn': 'benthicPlusConnect',
+  'start:discover': 'benthicPlusOffer',
+  'benthicPlusConnect:email': 'server',
+  'benthicPlusOffer:welcome': 'benthicPlusWelcome',
+  'benthicPlusOffer:all': 'benthicPlusAll',
+  'benthicPlusOffer:signIn': 'benthicPlusConnect',
+  'benthicPlusWelcome:next': 'benthicPlusReady',
+  'serverDownload:ready': 'benthicPlusReady',
   'createChoice:blank': 'createName',
   'createChoice:send': 'createSend',
   'createName:offline': 'createOffline',
@@ -168,10 +168,10 @@ export function hasBack(step, leavable = false) {
 
 /**
  * The steps with no « Retour »: a running import or download (they have « Annuler »), the upload and its two stops
- * (« Annuler l'envoi », « Reprendre l'envoi », « Revenir à l'accueil »), and the end of the OpenDives+ screens, which
+ * (« Annuler l'envoi », « Reprendre l'envoi », « Revenir à l'accueil »), and the end of the Benthic+ screens, which
  * leave through their own buttons.
  */
-const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome']);
+const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'benthicPlusOffer', 'benthicPlusReady', 'benthicPlusWelcome']);
 
 /**
  * What the system Back (Android back key and gesture, predictive back; the iOS left-edge swipe) does on a step. It does
@@ -193,7 +193,7 @@ export function systemBack(stack, fromMenu) {
   if (step === 'start') return { kind: fromMenu && stack.length === 1 ? 'leave' : 'minimize' };
   if (leavesFirstLaunch(stack, fromMenu)) return { kind: 'leave' };
   if (CANCEL_BUTTON[step]) return { kind: 'cancel', selector: CANCEL_BUTTON[step] };
-  if (step === 'odplusOffer') return stack.length > 1 ? { kind: 'without' } : { kind: 'ignore' };
+  if (step === 'benthicPlusOffer') return stack.length > 1 ? { kind: 'without' } : { kind: 'ignore' };
   if (NO_BACK.includes(step)) return { kind: 'ignore' };
   return { kind: 'back' };
 }
@@ -221,7 +221,7 @@ export function enterCreate(stack) {
  * @returns {Step[]}
  */
 export function enterOffer(stack) {
-  return [...cutAtServer(stack), 'odplusOffer'];
+  return [...cutAtServer(stack), 'benthicPlusOffer'];
 }
 
 /** The stack up to and including its last address step; the whole stack when it has none. @param {Step[]} stack */
@@ -237,7 +237,7 @@ function cutAtServer(stack) {
  * @returns {Step[]}
  */
 export function enterDownload(stack) {
-  const at = stack.lastIndexOf('odplusConnect');
+  const at = stack.lastIndexOf('benthicPlusConnect');
   const base = at >= 0 ? stack.slice(0, at + 1) : cutAtServer(stack);
   return [...base, 'server', 'serverDownload'];
 }
@@ -261,8 +261,8 @@ export function replaceTop(stack, step) {
  */
 export function menuEntry(first) {
   if (first === 'move') return ['start', 'createChoice'];
-  if (first === 'offer') return ['start', 'odplusOffer'];
-  if (first === 'signIn') return ['start', 'odplusConnect'];
+  if (first === 'offer') return ['start', 'benthicPlusOffer'];
+  if (first === 'signIn') return ['start', 'benthicPlusConnect'];
   return ['start', first];
 }
 
@@ -277,12 +277,12 @@ export function offerShowsSignIn(stack) {
 
 /**
  * Whether « Retour » (or « Continuer sans compte ») on this stack leaves the first launch: it was entered from the
- * logbook's menu on one of the OpenDives+ screens, with nothing before it but the first screen.
+ * logbook's menu on one of the Benthic+ screens, with nothing before it but the first screen.
  * @param {Step[]} stack
  * @param {boolean} fromMenu
  */
 export function leavesFirstLaunch(stack, fromMenu) {
-  return fromMenu && stack.length <= 2 && stack[0] === 'start' && (stack[1] === 'odplusOffer' || stack[1] === 'odplusConnect' || stack[1] === 'createChoice');
+  return fromMenu && stack.length <= 2 && stack[0] === 'start' && (stack[1] === 'benthicPlusOffer' || stack[1] === 'benthicPlusConnect' || stack[1] === 'createChoice');
 }
 
 /**

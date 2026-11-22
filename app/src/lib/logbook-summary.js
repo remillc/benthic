@@ -7,7 +7,7 @@ import { formatTimeAgo, localNowIso } from './format.js';
 /**
  * « dernière plongée il y a 9 mois » is one unbreakable block, and a « · » never starts a
  * line: a long summary moves the whole block to the second row (docs/ui-writing.md, 8).
- * @param {import('opendives-core').Dive[]} dives
+ * @param {import('benthic-core').Dive[]} dives
  * @returns {string} empty for an empty logbook
  */
 export function logbookSummary(dives) {

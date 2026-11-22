@@ -62,7 +62,7 @@ static bool checkServer()
 		int status = 0;
 		std::string body;
 		std::string url = prefs.cloud_base_url + TEAPOT;
-		int ret = opendives_https_get(url, user_agent, prefs.cloud_timeout, status, body);
+		int ret = benthic_https_get(url, user_agent, prefs.cloud_timeout, status, body);
 		if (ret == 0 && status == HTTP_I_AM_A_TEAPOT && body == MILK) {
 			if (verbose)
 				report_info("Cloud storage: successfully checked connection to cloud server");

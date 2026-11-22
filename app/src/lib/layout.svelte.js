@@ -14,12 +14,12 @@ export const ios =
 
 /**
  * The desktop app (Electron, task 2026-11-15-169): its preload script gives the interface
- * `window.odDesktop`. Material 3 Expressive on every system (docs/system-design.md, section 7).
+ * `window.benthicDesktop`. Material 3 Expressive on every system (docs/system-design.md, section 7).
  */
-export const desktopApp = typeof window !== 'undefined' && !!(/** @type {any} */ (window).odDesktop);
+export const desktopApp = typeof window !== 'undefined' && !!(/** @type {any} */ (window).benthicDesktop);
 
 /** The Mac's desktop app: its menu bar, ⌘ in shortcuts, no Réglages in the rail. */
-export const desktopMac = desktopApp && /** @type {any} */ (window).odDesktop.platform === 'darwin';
+export const desktopMac = desktopApp && /** @type {any} */ (window).benthicDesktop.platform === 'darwin';
 
 /**
  * The Mac's separate Réglages window (task 2026-11-15-202, desktop/main.cjs): the same app, loaded at

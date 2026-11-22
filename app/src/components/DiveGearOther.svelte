@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   // « Autre équipement » in « Modifier une plongée » (task 2026-11-17-267,
-  // docs/mockups-release/edition-equipement-plus-android.dc.html): the pieces of this dive with the OpenDives+
+  // docs/mockups-release/edition-equipement-plus-android.dc.html): the pieces of this dive with the Benthic+
   // chip, a ✕ on each to remove it from this dive only, then « Ajouter de l'équipement ». A piece outside the
   // inventory says « Hors inventaire » in its sub-line.
   import { f7 } from 'framework7-svelte';
@@ -19,7 +19,7 @@
   let { equipment = $bindable() } = $props();
 
   let adding = $state(false);
-  /** Only an OpenDives+ account changes the equipment of a dive; without one the block shows and stays inert. */
+  /** Only an Benthic+ account changes the equipment of a dive; without one the block shows and stays inert. */
   const plus = $derived(isSubscriber());
   const locked = $derived(gear.readOnly || !plus);
 

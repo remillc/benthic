@@ -2,9 +2,9 @@
 // Test 3 of docs/editing-and-sync-plan.md: WRITES to a Subsurface cloud
 // account, through the façade. Driven by tests/run-cloud-write-test.sh.
 //
-// Runs only when OPENDIVES_CLOUD_EMAIL equals OPENDIVES_CLOUD_TEST_EMAIL (the
+// Runs only when BENTHIC_CLOUD_EMAIL equals BENTHIC_CLOUD_TEST_EMAIL (the
 // test account); the façade's write lock is set to that address. The password
-// (OPENDIVES_CLOUD_PASSWORD) is never printed. Each "clone" is a separate
+// (BENTHIC_CLOUD_PASSWORD) is never printed. Each "clone" is a separate
 // $HOME: the core keeps its cache under $HOME/.subsurface.
 //
 // usage: cloud-write head                       server head of the log branch
@@ -20,7 +20,7 @@
 //        cloud-write lockcheck                  with another test address set, save and sync
 //                                               must be refused (WRITE_LOCKED); writes nothing
 // Prints KEY=VALUE lines; exit status 0 on success, 1 on failure, 2 when refused.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -36,7 +36,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static std::string lower(std::string s)
 {
@@ -105,11 +105,11 @@ static bool load_cached()
 
 int main(int argc, char **argv)
 {
-	const char *e = getenv("OPENDIVES_CLOUD_EMAIL");
-	const char *p = getenv("OPENDIVES_CLOUD_PASSWORD");
-	const char *t = getenv("OPENDIVES_CLOUD_TEST_EMAIL");
+	const char *e = getenv("BENTHIC_CLOUD_EMAIL");
+	const char *p = getenv("BENTHIC_CLOUD_PASSWORD");
+	const char *t = getenv("BENTHIC_CLOUD_TEST_EMAIL");
 	if (!e || !*e || !p || !*p || !t || !*t) {
-		fprintf(stderr, "OPENDIVES_CLOUD_EMAIL, OPENDIVES_CLOUD_PASSWORD and OPENDIVES_CLOUD_TEST_EMAIL are required\n");
+		fprintf(stderr, "BENTHIC_CLOUD_EMAIL, BENTHIC_CLOUD_PASSWORD and BENTHIC_CLOUD_TEST_EMAIL are required\n");
 		return 2;
 	}
 	if (lower(e) != lower(t)) {

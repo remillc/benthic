@@ -280,7 +280,7 @@ function median(xs) {
 /**
  * The diver's sites as the base receives them. A site without a name, a position (or at 0/0) or a dive is left out:
  * the server would skip it anyway. Planned dives count like the others only if the core lists them in the site's dives.
- * @param {(import('opendives-core').SiteDetail & { waterType?: string })[]} details the logbook's sites, with their dives
+ * @param {(import('benthic-core').SiteDetail & { waterType?: string })[]} details the logbook's sites, with their dives
  * @param {Record<string, string>} links local id → base site id (sites added from the base, or linked by the server)
  * @param {number} now ms since 1970 (local time read as UTC, like the dive dates)
  * @returns {ContributionSite[]}

@@ -91,7 +91,7 @@ export async function runPending(pending, deps) {
 /**
  * Signs in to a cloud service through the main process, which opens the provider's page in the browser. A
  * service the diver is already signed in to answers at once, unless the diver wants another account.
- * @param {{ cloudStatus: () => Promise<any[]>, cloudSignIn: (o: { provider: string, switchAccount: boolean }) => Promise<any> }} logbooks `odDesktop.logbooks`
+ * @param {{ cloudStatus: () => Promise<any[]>, cloudSignIn: (o: { provider: string, switchAccount: boolean }) => Promise<any> }} logbooks `benthicDesktop.logbooks`
  * @param {string} provider
  * @param {boolean} [switchAccount]
  * @returns {Promise<{ provider: string, available: boolean, connected: boolean, account: string }>}

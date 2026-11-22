@@ -19,7 +19,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import RowMenu from '../components/RowMenu.svelte';
   import SearchClear from '../components/SearchClear.svelte';
   import AltitudeField from '../components/AltitudeField.svelte';
@@ -58,7 +58,7 @@
   import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
   import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
 
-  /** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
+  /** @typedef {import('benthic-core').CorePrefValues} CorePrefValues */
   /** @typedef {{ value: string, label: string, example?: string }} Option */
   /**
    * @typedef {{ kind: 'switch', id: string, label: string, text?: string, checked: boolean, set: (v: boolean) => unknown, dimmed?: boolean }
@@ -75,7 +75,7 @@
   onMount(async () => {
     if (desktopApp) {
       try {
-        startupMode = (await /** @type {any} */ (window).odDesktop.logbooks.startup()).mode;
+        startupMode = (await /** @type {any} */ (window).benthicDesktop.logbooks.startup()).mode;
       } catch (e) {
         console.error('Reading the start-up choice', e);
       }
@@ -83,7 +83,7 @@
     // Tablet: the overview opens with its first subpage beside it; a subpage marks its row.
     if (section) selected.id = section;
     try {
-      logbook.prefs = await OpenDivesCore.getPrefs();
+      logbook.prefs = await BenthicCore.getPrefs();
     } catch (e) {
       console.error('Reading the settings', e);
     }
@@ -545,7 +545,7 @@
           await setCore({ displayInvalidDives: v });
           // The core's list leaves invalid dives out unless this is on.
           try {
-            logbook.dives = await OpenDivesCore.listLoadedDives();
+            logbook.dives = await BenthicCore.listLoadedDives();
           } catch (e) {
             failed(e);
           }
@@ -1093,14 +1093,14 @@
 
   /** Where the logbook is kept on this computer: the folder the bridge calls userData, then carnet. */
   const logbookPath = (() => {
-    const base = /** @type {any} */ (typeof window === 'undefined' ? null : window).odDesktop?.paths?.userData ?? '';
+    const base = /** @type {any} */ (typeof window === 'undefined' ? null : window).benthicDesktop?.paths?.userData ?? '';
     return base ? `${base}${base.includes('\\') ? '\\' : '/'}carnet` : '';
   })();
 
   /** « Afficher dans le dossier »: the system's file manager, on the logbook's folder. */
   async function showLogbookFolder() {
     try {
-      await /** @type {any} */ (window).odDesktop.showInFolder({ path: logbookPath });
+      await /** @type {any} */ (window).benthicDesktop.showInFolder({ path: logbookPath });
     } catch (e) {
       failed(e);
     }
@@ -1138,7 +1138,7 @@
                   options: () => STARTUP_MODES.map((mode) => ({ value: mode, label: t(`desktopCloud.startup.${mode}`) })),
                   set: async (/** @type {string} */ v) => {
                     try {
-                      startupMode = (await /** @type {any} */ (window).odDesktop.logbooks.setStartup({ mode: v })).mode;
+                      startupMode = (await /** @type {any} */ (window).benthicDesktop.logbooks.setStartup({ mode: v })).mode;
                     } catch (e) {
                       failed(e);
                     }

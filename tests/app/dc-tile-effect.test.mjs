@@ -20,7 +20,7 @@ test('DcTile runs its state events untracked inside effects', () => {
 
 test('the start asks for the cached cloud log only when an account is remembered', () => {
   const src = read('app/src/lib/logbook.svelte.js');
-  assert.match(src, /deviceStore\.getItem\(ACCOUNT_HINT\) \? OpenDivesCore\.listCloudDives\(\{ cached: true \}\) : null/);
+  assert.match(src, /deviceStore\.getItem\(ACCOUNT_HINT\) \? BenthicCore\.listCloudDives\(\{ cached: true \}\) : null/);
 });
 
 test('expected core rejections are not offered as reports', async () => {
@@ -29,7 +29,7 @@ test('expected core rejections are not offered as reports', async () => {
 });
 
 test('a core failure that only says « account not configured » is not a report', async () => {
-  const { isExpectedCoreMessage } = await import('../../plugins/opendives-core/core-api.js');
+  const { isExpectedCoreMessage } = await import('../../plugins/benthic-core/core-api.js');
   assert.ok(isExpectedCoreMessage('Cloud account not configured'));
   assert.ok(isExpectedCoreMessage('Repository not configured'));
   assert.ok(!isExpectedCoreMessage('Out of memory'));
@@ -37,6 +37,6 @@ test('a core failure that only says « account not configured » is not a report
 });
 
 test('the report of a core failure carries the JS caller', () => {
-  assert.match(read('plugins/opendives-core/core-api.js'), /new Error\(\)\.stack/);
+  assert.match(read('plugins/benthic-core/core-api.js'), /new Error\(\)\.stack/);
   assert.match(read('app/src/lib/error-reports.svelte.js'), /called from/);
 });

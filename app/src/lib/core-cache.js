@@ -3,7 +3,7 @@
 // buddy, guide and tag fields, the planner's setup, the cylinder types), read once and kept
 // until something that can change them: the dive list is read again (an edit, a sync, an import),
 // the sites change, a setting is written. Several panes asking at the same time share one call.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 
 /** @type {() => unknown[]} */
 let versions = () => [];
@@ -56,20 +56,20 @@ function cached(key, load) {
 
 /** The list of the sites (a SiteSummary each). */
 export function cachedSites() {
-  return cached('sites', () => OpenDivesCore.siteQuery({ kind: 'list' }));
+  return cached('sites', () => BenthicCore.siteQuery({ kind: 'list' }));
 }
 
 /** The values of a field with their dive counts. @param {'buddy'|'guide'|'tag'} field */
 export function cachedValues(field) {
-  return cached('values:' + field, () => OpenDivesCore.statsQuery({ kind: 'values', field }));
+  return cached('values:' + field, () => BenthicCore.statsQuery({ kind: 'values', field }));
 }
 
 /** The planner's setup (the reserve and the rest of its settings). */
 export function cachedPlannerSetup() {
-  return cached('plannerSetup', () => OpenDivesCore.plannerSetup());
+  return cached('plannerSetup', () => BenthicCore.plannerSetup());
 }
 
 /** The cylinder types of the tools. */
 export function cachedCylinderTypes() {
-  return cached('cylinders', () => OpenDivesCore.toolQuery({ kind: 'cylinders' }));
+  return cached('cylinders', () => BenthicCore.toolQuery({ kind: 'cylinders' }));
 }

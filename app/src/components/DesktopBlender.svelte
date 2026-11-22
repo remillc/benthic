@@ -33,7 +33,7 @@
   $effect(() => {
     if (logbook.loading) return;
     cachedCylinderTypes()
-      .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => {
+      .then((/** @type {import('benthic-core').GasCylinderTypes} */ list) => {
         cylinders = list.types.filter((c) => c.ml > 0);
         const names = cylinders.map((c) => c.name);
         if (!b.cylinder || !names.includes(b.cylinder)) {

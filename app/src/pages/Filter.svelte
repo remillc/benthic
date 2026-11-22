@@ -172,7 +172,7 @@
     }
   }
 
-  /** @param {import('opendives-core').FilterPreset} p */
+  /** @param {import('benthic-core').FilterPreset} p */
   async function deleteNow(p) {
     try {
       await deletePreset(p.index);
@@ -183,7 +183,7 @@
     }
   }
 
-  /** Android: at once, with Undo. iOS: after a confirmation. @param {import('opendives-core').FilterPreset} p */
+  /** Android: at once, with Undo. iOS: after a confirmation. @param {import('benthic-core').FilterPreset} p */
   function removePreset(p) {
     if (!theme.ios) {
       deleteNow(p);
@@ -203,7 +203,7 @@
     return filter.presets.find((p) => JSON.stringify(presetCriteria(p, logbook.prefs)) === draft)?.name ?? null;
   });
 
-  /** @param {import('opendives-core').FilterPreset} p */
+  /** @param {import('benthic-core').FilterPreset} p */
   function applyPreset(p) {
     filter.draft = presetCriteria(p, logbook.prefs);
   }

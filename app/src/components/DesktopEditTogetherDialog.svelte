@@ -9,7 +9,7 @@
   // replaced. « Appliquer aux 3 plongées » is one undoable step. The rules are those of the
   // phone's sheet (pages/EditDivesTogether.svelte): lib/multi-dive.js, lib/logbook.svelte.js.
   import { onMount } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Md3Dialog from './Md3Dialog.svelte';
   import Icon from './Icon.svelte';
   import { cachedSites } from '../lib/core-cache.js';
@@ -33,7 +33,7 @@
   let state = $state(null);
   let failed = $state(false);
   let busy = $state(false);
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
   let known = $state({ guide: /** @type {string[]} */ ([]), buddy: /** @type {string[]} */ ([]), tag: /** @type {string[]} */ ([]), suit: /** @type {string[]} */ ([]) });
 
@@ -53,7 +53,7 @@
 
   onMount(async () => {
     try {
-      const details = await Promise.all(ids.map((id) => OpenDivesCore.getDive({ id })));
+      const details = await Promise.all(ids.map((id) => BenthicCore.getDive({ id })));
       const s = multiEditState(details);
       siteText = s.site.mixed ? '' : s.site.value;
       notes = s.notes.mixed ? '' : s.notes.value;

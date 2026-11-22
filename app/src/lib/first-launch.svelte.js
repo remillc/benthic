@@ -14,7 +14,7 @@ import { t } from './i18n.js';
  * What the diver brings: a picked file (`alpha`: the alpha's logbook, read from this device), a file already staged in the
  * app's cache (`staged`: a file shared with the app, or the alpha's logbook written by the core; only its path), or the
  * divelogs.de logbook downloaded into the app's cache.
- * @typedef {{ kind: 'file', file: File, name: string, summary: ImportSummary, csv?: { params: import('opendives-core').CsvParams, companion: File|null }, alpha?: boolean }
+ * @typedef {{ kind: 'file', file: File, name: string, summary: ImportSummary, csv?: { params: import('benthic-core').CsvParams, companion: File|null }, alpha?: boolean }
  *   | { kind: 'staged', path: string, fileName: string, name: string, summary: ImportSummary, alpha?: boolean }
  *   | { kind: 'divelogs', path: string, paths?: string[], name: string, summary: ImportSummary }} ImportSource
  * A resumable divelogs.de download is several files (`paths`); `path` is the first one.
@@ -73,7 +73,7 @@ export const flow = $state({
    * }}
    */
   create: { source: '', file: null, name: '', total: 0, done: 0, deviceLogbook: null, deviceReady: false, fresh: false },
-  /** The signed-in account of the OpenDives+ screens: the address shown on « Votre carnet est prêt » and the counts. */
+  /** The signed-in account of the Benthic+ screens: the address shown on « Votre carnet est prêt » and the counts. */
   plus: { email: '', counts: { dives: 0, sites: 0, gear: 0, certifications: 0, known: true } },
   /** The cloud account connected (idea #74: always empty until the cloud is built). */
   account: '',

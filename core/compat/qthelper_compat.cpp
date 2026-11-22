@@ -193,8 +193,8 @@ void uiNotification(const QString &msg)
 
 // Stylesheets are read from a directory instead of Qt resources: the
 // Subsurface tree of the build, or where the app copied them on the device
-// (opendives::set_xslt_dir).
-namespace opendives_compat {
+// (benthic::set_xslt_dir).
+namespace benthic_compat {
 std::string xslt_dir = SUBSURFACE_SOURCE "/xslt/";
 }
 
@@ -202,7 +202,7 @@ static xmlDocPtr get_stylesheet_doc(const xmlChar *uri, xmlDictPtr, int, void *,
 {
 	// A stylesheet's xsl:include comes resolved against its own path: absolute.
 	std::string name = (const char *)uri;
-	std::string filename = name.rfind('/', 0) == 0 ? name : opendives_compat::xslt_dir + name;
+	std::string filename = name.rfind('/', 0) == 0 ? name : benthic_compat::xslt_dir + name;
 	return xmlParseFile(filename.c_str());
 }
 
@@ -236,14 +236,14 @@ enum mediatype_t get_metadata(const char *, struct metadata *data)
 // --- import-suunto-json.cpp: compiled as it is (Qt JSON in qtshim/qtjson.h) ---
 
 // --- commands/command.cpp: undo stack lives in the app layer -------------
-namespace opendives_compat {
+namespace benthic_compat {
 std::string (*changes_made_hook)() = nullptr;
 }
 
 namespace Command {
 std::string changesMade()
 {
-	return opendives_compat::changes_made_hook ? opendives_compat::changes_made_hook() : std::string();
+	return benthic_compat::changes_made_hook ? benthic_compat::changes_made_hook() : std::string();
 }
 }
 

@@ -41,8 +41,8 @@ export function placeBeforeCurrent(pages, currentEl) {
  */
 export function keepPageOrder(router) {
   const load = router?.pageComponentLoader;
-  if (typeof load !== 'function' || router.odPageOrder) return;
-  router.odPageOrder = true;
+  if (typeof load !== 'function' || router.bcPageOrder) return;
+  router.bcPageOrder = true;
   // Framework7 hands over several pages at once when a row of the list replaces a detail pane that holds more than
   // one page (a tablet: a dive, then its planner opened in the pane, then another dive tapped in the list).
   // Framework7-Svelte's `removePage` only removes the first of them: the others stayed in the pane, under the new

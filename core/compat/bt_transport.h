@@ -4,20 +4,20 @@
 //
 // Subsurface drives the system Bluetooth through Qt; OpenDives drives it
 // through the platform's own API (Android: android.bluetooth, in Kotlin, see
-// plugins/opendives-core/android/.../BluetoothTransport.kt). The platform only
+// plugins/benthic-core/android/.../BluetoothTransport.kt). The platform only
 // provides the primitive operations below, each one synchronous and blocking
 // the calling thread (the core's thread) until it is done or its timeout
 // expires. Everything that Subsurface decides (which GATT service and
 // characteristics to use, notifications, credits of the Heinrichs Weikamp
 // modules, timeouts) is in bluetooth_compat.cpp, as in Subsurface.
-#ifndef OPENDIVES_BT_TRANSPORT_H
-#define OPENDIVES_BT_TRANSPORT_H
+#ifndef BENTHIC_BT_TRANSPORT_H
+#define BENTHIC_BT_TRANSPORT_H
 
 #include <cstddef>
 #include <string>
 #include <vector>
 
-namespace opendives_compat {
+namespace benthic_compat {
 
 // Characteristic properties, as Bluetooth defines them (the same bits in Qt's
 // QLowEnergyCharacteristic and Android's BluetoothGattCharacteristic).
@@ -107,12 +107,12 @@ extern void (*bt_io_hook)();
 // with "connecting" before.
 extern void (*bt_state_hook)(const char *state);
 
-// The Bluetooth log: logcat tag "OpenDives" on Android; stderr elsewhere when
-// the environment variable OPENDIVES_BT_LOG is set. A hook, if set, gets
+// The Bluetooth log: logcat tag "Benthic" on Android; stderr elsewhere when
+// the environment variable BENTHIC_BT_LOG is set. A hook, if set, gets
 // every line too (tests).
 void bt_log(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 extern void (*bt_log_hook)(const std::string &line);
 
-} // namespace opendives_compat
+} // namespace benthic_compat
 
 #endif

@@ -1,7 +1,7 @@
 // @ts-check
 // What the sending side of a QR share needs: the core's .ssrf text of one dive or plan, the
 // summary line of the screen, and the QR drawing of one code. The format is in qr-transfer.js.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { formatDepth, formatDate, formatMinutes } from './format.js';
 import { t } from './i18n.js';
 import { encodeTransfer } from './qr-transfer.js';
@@ -15,7 +15,7 @@ import { labelOf } from './qr-preview.js';
  * @returns {Promise<string[]>} one text per QR code
  */
 export async function transferOf(id, kind) {
-  const { text } = await OpenDivesCore.exportDives({ ids: [id], format: 'ssrf', anonymize: false, name: `qr-share-${id}.ssrf`, text: true });
+  const { text } = await BenthicCore.exportDives({ ids: [id], format: 'ssrf', anonymize: false, name: `qr-share-${id}.ssrf`, text: true });
   if (!text) throw new Error('EMPTY_EXPORT');
   const { chunks } = await encodeTransfer({ kind, label: labelOf(text), xml: text });
   return chunks;
@@ -24,7 +24,7 @@ export async function transferOf(id, kind) {
 /**
  * "Lake Coleridge · 2 avril 2014 · 128 pi · 78 min", the line under the title of the sending screen.
  * @param {{site: string, date: string, maxDepthMm: number, durationSeconds: number}} dive
- * @param {import('opendives-core').Prefs} prefs
+ * @param {import('benthic-core').Prefs} prefs
  */
 export function qrSummary(dive, prefs) {
   return [dive.site || t('qr.noSite'), formatDate(dive.date), formatDepth(dive.maxDepthMm, prefs), formatMinutes(dive.durationSeconds)].join(' · ');

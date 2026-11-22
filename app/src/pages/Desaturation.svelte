@@ -6,7 +6,7 @@
   // 'desaturation'); the wait before flying is OpenDives' own recommendation
   // (lib/tools.js), never a guarantee.
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -26,12 +26,12 @@
   import { ALARM_PERCENT, tissueColor as barColor } from '../lib/tissues.js';
   import { overlapStart, surfaceSeconds } from '../lib/desaturation.js';
 
-  let desat = $state(/** @type {import('opendives-core').Desaturation|null} */ (null));
+  let desat = $state(/** @type {import('benthic-core').Desaturation|null} */ (null));
   let failed = $state(false);
 
   async function load() {
     try {
-      desat = await OpenDivesCore.toolQuery({ kind: 'desaturation' });
+      desat = await BenthicCore.toolQuery({ kind: 'desaturation' });
       failed = false;
     } catch (e) {
       console.error('Desaturation', e);

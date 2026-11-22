@@ -1,8 +1,8 @@
-﻿// The cylinder types sorted for the screen (plugins/opendives-core/cylinder-sort.js): by name,
+﻿// The cylinder types sorted for the screen (plugins/benthic-core/cylinder-sort.js): by name,
 // A-Z case ignored, equal names kept in the core's order, as the façade sorted them before.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { sortCylinderTypes } from '../../plugins/opendives-core/cylinder-sort.js';
+import { sortCylinderTypes } from '../../plugins/benthic-core/cylinder-sort.js';
 
 test('by name, ignoring the case of A-Z', () => {
   const names = sortCylinderTypes([{ name: 'LP85' }, { name: 'al80' }, { name: 'AL40' }, { name: 'D12 232 bar' }, { name: 'hp100' }]).map((t) => t.name);

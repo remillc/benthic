@@ -9,7 +9,7 @@
   /**
    * @type {{
    *   figures: import('../lib/statistics.svelte.js').StatsFigures|null,
-   *   prefs: import('opendives-core').Prefs,
+   *   prefs: import('benthic-core').Prefs,
    *   href?: string,
    *   onclick?: (e: MouseEvent) => void,
    * }}

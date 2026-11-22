@@ -6,7 +6,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import DcTile from '../components/DcTile.svelte';
   import LogbookComputersList from '../components/LogbookComputersList.svelte';
@@ -26,7 +26,7 @@
   import { formatNumber } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
-  /** @typedef {import('opendives-core').LogbookComputer} LogbookComputer */
+  /** @typedef {import('benthic-core').LogbookComputer} LogbookComputer */
 
   /** @type {{ f7route: { query: { model?: string, serial?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -47,7 +47,7 @@
   let choosing = $state(false);
 
   // The computer's image (task 2026-11-19-306): the catalog photo of the model, or the diver's own, which belongs to the
-  // equipment piece with the same brand, model and serial number (OpenDives+ inventory, account data, never the shared
+  // equipment piece with the same brand, model and serial number (Benthic+ inventory, account data, never the shared
   // catalog). The button shows only where that inventory exists.
   const piece = $derived(computer ? gear.pieces.find((g) => g.type === 'computer' && sameComputer(g, computer)) : undefined);
   const canChangeImage = $derived(isSubscriber() && !gear.readOnly);
@@ -111,7 +111,7 @@
   onMount(async () => {
     try {
       if (isSubscriber()) loadInventory().catch(() => {});
-      all = await OpenDivesCore.diveComputers();
+      all = await BenthicCore.diveComputers();
       name = computer?.nickname || model;
       opened = name;
     } catch (e) {
@@ -178,7 +178,7 @@
   }
 </script>
 
-<!-- The image: the diver's own photo (OpenDives+ inventory) wins over the catalog photo of the model; a model without a
+<!-- The image: the diver's own photo (Benthic+ inventory) wins over the catalog photo of the model; a model without a
      photo keeps the generic drawing. Android phone: a white 160 box around the 136 photo; iPhone 160; a sheet 96. -->
 {#snippet generic()}
   <span class="bc-logbook-computer--generic" aria-hidden="true"><Icon name="wristComputer" size={64} weight={1.4} /></span>

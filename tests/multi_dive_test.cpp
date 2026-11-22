@@ -12,7 +12,7 @@
 //     undoable step; a buddy chip removed goes from every dive that had it
 //     and the other buddies stay; a second identical edit adds no step.
 // Prints "PASS: ..." lines; exit status 0 when all pass, 1 otherwise.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

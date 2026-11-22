@@ -1,9 +1,9 @@
 // @ts-check
 // The computers the logbook's dives come from (Settings, "Ordinateurs du carnet").
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { refreshAfterChange } from './logbook.svelte.js';
 
-/** @typedef {import('opendives-core').LogbookComputer} LogbookComputer */
+/** @typedef {import('benthic-core').LogbookComputer} LogbookComputer */
 
 /** A computer as the diver calls it. @param {LogbookComputer} c */
 export const computerName = (c) => c.nickname || c.model;
@@ -71,10 +71,10 @@ export const sameRecordings = (a, b) => sharedWith(a, b)?.same ?? 0;
 
 /**
  * One undoable change, saved and synced like an edit.
- * @param {Parameters<import('opendives-core').OpenDivesCorePlugin['diveComputerAction']>[0]} options
+ * @param {Parameters<import('benthic-core').BenthicCorePlugin['diveComputerAction']>[0]} options
  */
 export async function computerChange(options) {
-  const result = await OpenDivesCore.diveComputerAction(options);
+  const result = await BenthicCore.diveComputerAction(options);
   await refreshAfterChange(result.undo);
   return result;
 }

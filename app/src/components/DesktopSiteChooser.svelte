@@ -16,10 +16,10 @@
 
   /**
    * @type {{
-   *   sites: import('opendives-core').SiteSummary[],
+   *   sites: import('benthic-core').SiteSummary[],
    *   position: { latUdeg: number, lonUdeg: number }|null,
    *   x: number, y: number,
-   *   onchoose: (site: import('opendives-core').SiteSummary) => void,
+   *   onchoose: (site: import('benthic-core').SiteSummary) => void,
    *   oncreate: (name: string) => void,
    *   onclose: () => void,
    * }}

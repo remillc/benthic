@@ -152,7 +152,7 @@ function blobToBase64(blob) {
  * @returns {Promise<string|null>} null when the server does not have it
  */
 async function downloadBase64(url) {
-  const desktop = /** @type {any} */ (globalThis).odDesktop;
+  const desktop = /** @type {any} */ (globalThis).benthicDesktop;
   if (desktop?.server?.request) {
     const r = await desktop.server.request({ method: 'GET', url, binary: true });
     return r.status === 200 && r.base64 ? r.base64 : null;

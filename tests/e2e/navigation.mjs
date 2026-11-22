@@ -14,7 +14,7 @@
 // dive page's side-by-side swipe, Back after the account sheet, the Android Back key, Back right after a save.
 //
 // The core: the real one (benthic-host) holding Subsurface's sample log, reached through a stand-in of the
-// desktop bridge (the browser has no plugin). Set OPENDIVES_HOST to the host binary, or build it for the desktop
+// desktop bridge (the browser has no plugin). Set BENTHIC_HOST to the host binary, or build it for the desktop
 // (desktop/README.md); without it the suite stops with exit code 2 and says why. Chrome: set CHROME to its path
 // when it is not in a usual place. Never uses the ports 5180, 9333, 8080 and 3443.
 import { spawn, spawnSync } from 'node:child_process';
@@ -56,7 +56,7 @@ function findChrome() {
 function findHost() {
   const exe = process.platform === 'win32' ? '.exe' : '';
   return findFirst([
-    process.env.OPENDIVES_HOST,
+    process.env.BENTHIC_HOST,
     path.join(root, 'build/desktop/stage/bin', `benthic-host${exe}`),
     path.join(root, 'build/desktop/win-x64/bin', `benthic-host${exe}`),
     path.join(root, 'build/desktop/benthic-host'),
@@ -66,10 +66,10 @@ function findHost() {
 }
 const chromePath = findChrome();
 const hostPath = findHost();
-const stage = findFirst([process.env.OPENDIVES_STAGE, path.join(root, 'build/desktop/stage'), 'F:/projets/OpenDives/build/desktop/stage']);
+const stage = findFirst([process.env.BENTHIC_STAGE, path.join(root, 'build/desktop/stage'), 'F:/projets/OpenDives/build/desktop/stage']);
 const sample = findFirst([path.join(root, 'core/sample/SampleLogbook.ssrf'), path.join(stage || '', 'SampleDivesV2.ssrf')]);
 if (!chromePath || !hostPath || !sample) {
-  console.log(`navigation e2e skipped: ${!chromePath ? 'no Chrome (set CHROME)' : !hostPath ? 'no core host (set OPENDIVES_HOST)' : 'no sample log'}`);
+  console.log(`navigation e2e skipped: ${!chromePath ? 'no Chrome (set CHROME)' : !hostPath ? 'no core host (set BENTHIC_HOST)' : 'no sample log'}`);
   process.exit(2);
 }
 
@@ -287,7 +287,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         answers.set(token, (r) => (answers.delete(token), r.ok ? resolve(r.v) : reject(new Error(r.e))));
         window.__odCall(JSON.stringify({ token, kind, method, a }));
       });
-      window.odDesktop = {
+      window.benthicDesktop = {
         platform: 'win32',
         logbook: { id: 'main', kind: 'main', name: '', location: '' },
         paths: { userData: home, temp, resourcesDir: stage, xsltDir: `${stage}/xslt`, caFile: `${temp}/ca.pem` },
@@ -325,7 +325,7 @@ function readStack() {
     current: router?.currentRoute?.url ?? '',
     history: router?.history ?? [],
     allow: router?.allowPageChange,
-    locks: router?.odLocks ?? 0,
+    locks: router?.bcLocks ?? 0,
     pages,
   };
 }
@@ -483,7 +483,7 @@ async function phoneFlows() {
   await settled(tab, 'after Back during the opening');
   await toLogbook(tab, 'after Back during the opening');
 
-  // Dive validation by signature (task 2026-11-19-309, point 2; OpenDives+): « Faire signer » of the dive's Validations
+  // Dive validation by signature (task 2026-11-19-309, point 2; Benthic+): « Faire signer » of the dive's Validations
   // section, the choice, the signature drawn with the finger, « Signer »; the dive shows the validation, the logbook marks
   // the dive, and the validation can be removed. The stack stays sound at every step. The dive's own edit and save are
   // in the flow below (« change a field »).
@@ -491,7 +491,7 @@ async function phoneFlows() {
   await tapDive(tab);
   await settled(tab, 'validation: dive opened', { route: /^\/dives\/\d+$/, setup: true });
   const validated = (await tab.run(readStack)).current;
-  await tab.run(() => window.__odplusAccount({ signedIn: true, subscribed: true, email: 'diver@opendives.test' }));
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@opendives.test' }));
   await sleep(800);
   await tapText(tab, '^\\s*(Faire signer|Get it signed)\\s*$');
   await settled(tab, 'validation: choice opened', { route: /^\/validate(\?.*)?$/, setup: true });
@@ -551,7 +551,7 @@ async function phoneFlows() {
   for (let i = 0; i < 100 && (await tab.run(() => !!document.querySelector('.toast'))); i++) await sleep(100);
   await sleep(300);
   // Back to a free, signed-out account: the flows below test the account sheet and the offer of that case.
-  await tab.run(() => window.__odplusAccount({ signedIn: false, subscribed: false }));
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: false, subscribed: false }));
   await sleep(300);
 
   // The reported regression: a dive, Edit, a field changed, Save, then Back (arrow, Android Back key, edge swipe), with the
@@ -839,7 +839,7 @@ async function phoneFlows() {
   await tapBack(tab);
   await settled(tab, 'back after the sheet', { route: '/' });
 
-  console.log(' free account sheet > OpenDives+ offer > Back reopens the sheet');
+  console.log(' free account sheet > Benthic+ offer > Back reopens the sheet');
   const sheetState = () => tab.run(() => ({ hash: location.hash, sheet: !!document.querySelector('.bc-account-sheet.modal-in, .sheet-modal.modal-in .bc-account-sheet--row, .modal-in .bc-account-sheet--row'), welcome: !!document.querySelector('.bc-welcome.modal-in'), len: history.length }));
   const expectState = (label, want, got) => {
     checks++;
@@ -867,7 +867,7 @@ async function phoneFlows() {
 
   console.log(' subscriber with the logbook still on the device: the profile and the backup page open, never the offer');
   // What the development menu's « Abonné » does (lib/dev-tools.js): the account state, with no restart and the logbook untouched.
-  await tab.run(() => window.__odplusAccount({ signedIn: true, email: 'essai@opendives.test', subscribed: true }));
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, email: 'essai@opendives.test', subscribed: true }));
   for (const [row, route, page] of [['#profile', '/profile', '.bc-profile, .bc-profile-page, .page-current'], ['#backup', '/account/backup', '.bc-backup-not-on-server']]) {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
@@ -880,7 +880,7 @@ async function phoneFlows() {
     await tapBack(tab);
     await settled(tab, `subscriber ${row}: back`, { route: '/' });
   }
-  await tab.run(() => window.__odplusAccount({ signedIn: false }));
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: false }));
   await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
   await sleep(800);
   expectState('free again: the sheet offers again', { sheet: true }, { ...(await sheetState()), sheet: await tab.run(() => !!document.querySelector('a[href="#offer-profile"], [data-row="offer-profile"]')) });
@@ -937,7 +937,7 @@ async function welcomeFlows() {
   const cases = [
     ['Import a logbook / Importer un carnet', '^\s*(Import a logbook|Importer un carnet)', 'import'],
     ['New logbook / Commencer un carnet', '^\s*(Start a logbook|Commencer un carnet)', 'new'],
-    ['Sign in or create an account', '(Sign in|Se connecter)', 'odplusConnect'],
+    ['Sign in or create an account', '(Sign in|Se connecter)', 'benthicPlusConnect'],
   ];
   for (const [name, pattern, step] of cases) {
     await welcomeTap(pattern).catch(async (e) => { console.log(await tab.run(() => [...document.querySelectorAll('.bc-welcome.modal-in button, .bc-welcome.modal-in a')].map((b) => b.textContent.trim().slice(0, 30) + '@' + Math.round(b.getBoundingClientRect().y)).join(' | '))); throw e; });
@@ -1154,15 +1154,15 @@ async function exportFlows(expect) {
       const ids = logbook.dives.map((d) => d.id);
       filter.ids = new Set(ids.slice(0, 1));
       window.__exportCalls = [];
-      const core = window.odDesktop.core;
-      window.odDesktop.core = (method, args) => {
+      const core = window.benthicDesktop.core;
+      window.benthicDesktop.core = (method, args) => {
         if (method === 'exportDives') {
           window.__exportCalls.push(args);
           return Promise.resolve({});
         }
         return core(method, args);
       };
-      window.odDesktop.saveAs = async () => ({ saved: false });
+      window.benthicDesktop.saveAs = async () => ({ saved: false });
       Object.defineProperty(navigator, 'share', { configurable: true, value: async () => {} });
       return ids;
     });
@@ -1305,7 +1305,7 @@ async function unitsMenuFlows(expect) {
       expect('tablet: two rapid Back calls from Settings leave navigation sound', { problems: '', broken: '' }, state);
     }
     await tab.run(async (before) => {
-      await window.odDesktop.core('setPrefs', { changes: JSON.stringify(before.prefs) });
+      await window.benthicDesktop.core('setPrefs', { changes: JSON.stringify(before.prefs) });
       const { deviceStore } = await import('/src/lib/device-store.js');
       for (const [key, value] of [['od.corePrefs', before.core], ['od.appSettings', before.app]]) {
         if (value === null) deviceStore.removeItem(key);

@@ -6,7 +6,7 @@
   // list; both end back on the list.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import DiveFigures from '../components/DiveFigures.svelte';
   import DiveProfile from '../components/DiveProfile.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -19,14 +19,14 @@
   let { f7route, f7router } = $props();
   const diveId = Number(f7route.params.diveId);
 
-  let dive = $state(/** @type {import('opendives-core').DiveDetail|null} */ (null));
-  /** @type {import('opendives-core').SiteSummary[]} */
+  let dive = $state(/** @type {import('benthic-core').DiveDetail|null} */ (null));
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
 
   onMount(async () => {
     try {
-      dive = await OpenDivesCore.getDive({ id: diveId });
-      sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+      dive = await BenthicCore.getDive({ id: diveId });
+      sites = await BenthicCore.siteQuery({ kind: 'list' });
     } catch (e) {
       console.error('Dive without a site', e);
     }

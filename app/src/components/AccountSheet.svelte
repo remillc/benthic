@@ -11,7 +11,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncControl from './SyncControl.svelte';
   import SyncButton from './SyncButton.svelte';
-  import { odplusAccount, odplusSubscriber } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook, setAutoSync } from '../lib/logbook.svelte.js';
   import { showUnsent } from '../lib/filter.svelte.js';
   import { navigation, openOver, openSettings, openMapSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
@@ -22,26 +22,26 @@
   import { devAccounts } from '../lib/dev-switch.js';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { openManageAccount } from '../lib/navigation.svelte.js';
-  import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   import { openBackup } from '../lib/navigation.svelte.js';
   import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { accountEmail as emailOfAccount, profileRow, sheetVariant } from '../lib/account-sheet.js';
 
-  const email = $derived(emailOfAccount(odplusAccount, logbook));
-  // An OpenDives+ account shows the diver's full name first and the e-mail under it, in smaller grey text (task 2026-11-19-312).
-  const fullName = $derived(odplusSubscriber() ? diver.info.fullName : '');
+  const email = $derived(emailOfAccount(benthicPlusAccount, logbook));
+  // An Benthic+ account shows the diver's full name first and the e-mail under it, in smaller grey text (task 2026-11-19-312).
+  const fullName = $derived(benthicPlusSubscriber() ? diver.info.fullName : '');
   const initial = $derived((fullName || email) ? (fullName || email).trim().charAt(0).toLocaleUpperCase() : '');
   const accountName = $derived(fullName || email || t('menu.noAccount'));
   const accountEmail = $derived(fullName ? email : '');
   const accountLine = $derived(
-    t(logbook.email ? (logbook.mode === 'git' ? (logbook.odplus ? 'menu.serverDives' : 'menu.gitDives') : 'menu.cloudDives') : 'menu.localDives', { n: logbook.dives.length }),
+    t(logbook.email ? (logbook.mode === 'git' ? (logbook.benthicPlus ? 'menu.serverDives' : 'menu.gitDives') : 'menu.cloudDives') : 'menu.localDives', { n: logbook.dives.length }),
   );
   const mapUpdates = $derived(updatesCount());
 
-  // The three versions of the sheet (task 2026-11-18-281): without an OpenDives+ account (the release edition's free
+  // The three versions of the sheet (task 2026-11-18-281): without an Benthic+ account (the release edition's free
   // version), with one, and the alpha's or a cloud account's, which keeps what it had.
-  const variant = $derived(sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email }));
+  const variant = $derived(sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email }));
   const free = $derived(variant === 'free');
   const subscriber = $derived(variant === 'subscriber');
   /** The overdue pieces: the badge and the red line of « Mon profil de plongeur » (the count of the Entretien row). */
@@ -56,17 +56,17 @@
   // sheet used to add « #compte » to the browser's history (task 2026-11-18-281, point 5); the routers own the history
   // and nothing is written to the browser's any more (docs/architecture.md, section 13).
 
-  /** « Gérer le compte »: the new screen for an OpenDives+ account, the account page for the others. */
+  /** « Gérer le compte »: the new screen for an Benthic+ account, the account page for the others. */
   function manage() {
     navigation.accountOpen = false;
     if (subscriber) openManageAccount();
     else openOver('/account');
   }
 
-  /** The free sheet's doors into the OpenDives+ screens. @param {'offer'|'signIn'} screen */
+  /** The free sheet's doors into the Benthic+ screens. @param {'offer'|'signIn'} screen */
   function plus(screen) {
     navigation.accountOpen = false;
-    openOdPlus(screen, 'account');
+    openBenthicPlus(screen, 'account');
   }
 
   /** Manual sync with an account: the changes waiting, a filled « Synchroniser », and its other options under ⋮. */
@@ -156,7 +156,7 @@
     </div>
     {#if free}
       <!-- Free version (ios-compte-gratuit.dc.html, task 289): the logbook on this iPhone, « S'abonner », « Déjà abonné ? »,
-           then the two OpenDives+ rows that open the offer. -->
+           then the two Benthic+ rows that open the offer. -->
       <div class="bc-account-sheet--ios-group bc-account-sheet--ios-free">
         <div class="bc-account-sheet--ios-row bc-account-sheet--ios-identity">
           <span class="bc-account-sheet--initial bc-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
@@ -166,8 +166,8 @@
           </span>
         </div>
         <div class="bc-account-sheet--ios-offer">
-          <button type="button" class="bc-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
-          <span class="bc-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="bc-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+          <button type="button" class="bc-account-sheet--subscribe" onclick={() => plus('offer')}>{t('benthicPlus.offer.subscribe')}</button>
+          <span class="bc-account-sheet--already">{t('benthicPlus.offer.already')}&nbsp;<button type="button" class="bc-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('benthicPlus.offer.signIn')}</button></span>
         </div>
       </div>
       {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
@@ -192,7 +192,7 @@
         </button>
       </div>
     {:else}
-      <!-- An account (ios-compte-abonne.dc.html): the e-mail, with the « + » chip for OpenDives+, « Gérer le compte »,
+      <!-- An account (ios-compte-abonne.dc.html): the e-mail, with the « + » chip for Benthic+, « Gérer le compte »,
            the sync line with « Synchroniser ». -->
       <div class="bc-account-sheet--ios-group">
         <div class="bc-account-sheet--ios-row bc-account-sheet--ios-identity">
@@ -202,7 +202,7 @@
           <span class="bc-account-sheet--texts">
             <span class="bc-account-sheet--name">
               {accountName}
-              {#if subscriber}<span class="bc-account-sheet--plus-dot" aria-hidden="true">+</span><span class="bc-sr-only">{t('odplus.chipName')}</span>{/if}
+              {#if subscriber}<span class="bc-account-sheet--plus-dot" aria-hidden="true">+</span><span class="bc-sr-only">{t('benthicPlus.chipName')}</span>{/if}
             </span>
             {#if accountEmail}<span class="bc-account-sheet--email">{accountEmail}</span>{/if}
             <span class="bc-account-sheet--line">{accountLine}</span>
@@ -298,9 +298,9 @@
       <span class="bc-account-sheet--brand">
         <img class="bc-account-sheet--logo bc-account-sheet--light" src="/logo-light.svg" alt="" width="24" height="24" />
         <img class="bc-account-sheet--logo bc-account-sheet--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
-        <!-- A subscriber's sheet: a small round « + » after the name, read « OpenDives Plus » (task 2026-11-18-282). -->
+        <!-- A subscriber's sheet: a small round « + » after the name, read « Benthic Plus » (task 2026-11-18-282). -->
         {#if subscriber}
-          <span class="bc-account-sheet--title"><span aria-hidden="true">{t('menu.title')}<span class="bc-account-sheet--plus-dot">+</span></span><span class="bc-sr-only">{t('odplus.chipName')}</span></span>
+          <span class="bc-account-sheet--title"><span aria-hidden="true">{t('menu.title')}<span class="bc-account-sheet--plus-dot">+</span></span><span class="bc-sr-only">{t('benthicPlus.chipName')}</span></span>
         {:else}
           <span class="bc-account-sheet--title">{t('menu.title')}</span>
         {/if}
@@ -312,7 +312,7 @@
 
     {#if free}
     <!-- Free version (docs/mockups-release/nav-compte-gratuit-android.dc.html): the logbook on this device, the offer, and
-         the two OpenDives+ rows that open it. No e-mail, no sync line. -->
+         the two Benthic+ rows that open it. No e-mail, no sync line. -->
     <div class="bc-account-sheet--card bc-account-sheet--identity bc-account-sheet--free">
       <div class="bc-account-sheet--account">
         <span class="bc-account-sheet--initial bc-account-sheet--silhouette" aria-hidden="true"><Icon name="account" size={22} weight={2} /></span>
@@ -322,8 +322,8 @@
         </span>
       </div>
       <div class="bc-account-sheet--offer">
-        <button type="button" class="bc-account-sheet--subscribe" onclick={() => plus('offer')}>{t('odplus.offer.subscribe')}</button>
-        <span class="bc-account-sheet--already">{t('odplus.offer.already')}&nbsp;<button type="button" class="bc-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('odplus.offer.signIn')}</button></span>
+        <button type="button" class="bc-account-sheet--subscribe" onclick={() => plus('offer')}>{t('benthicPlus.offer.subscribe')}</button>
+        <span class="bc-account-sheet--already">{t('benthicPlus.offer.already')}&nbsp;<button type="button" class="bc-account-sheet--sign-in" onclick={() => plus('signIn')}>{t('benthicPlus.offer.signIn')}</button></span>
       </div>
     </div>
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
@@ -399,7 +399,7 @@
 
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
-    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages, and for an OpenDives+
+    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages, and for an Benthic+
          account « Sauvegarde et restauration » below it (tasks 290 and 291); no chip next to a subscriber's entries. When a piece
          is overdue, the red badge and line (task 2026-11-18-281). -->
     {#if isRelease && !desktopApp}
@@ -833,7 +833,7 @@
       justify-content: center;
     }
 
-    /* Free version (task 2026-11-18-281): the grey silhouette, « S'abonner », « Déjà abonné ? Se connecter », the OpenDives+ rows. */
+    /* Free version (task 2026-11-18-281): the grey silhouette, « S'abonner », « Déjà abonné ? Se connecter », the Benthic+ rows. */
     .bc-account-sheet--silhouette {
       background: var(--bc-surface-container-high);
       color: var(--bc-text-2);
@@ -905,7 +905,7 @@
       margin: 0 16px;
     }
 
-    /* « Mon profil de plongeur » of an OpenDives+ account: the chip above the title, the overdue pieces in red. */
+    /* « Mon profil de plongeur » of an Benthic+ account: the chip above the title, the overdue pieces in red. */
     .bc-account-sheet--profile .bc-account-sheet--row-label {
       font-size: 16px;
       gap: 2px;

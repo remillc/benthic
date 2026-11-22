@@ -240,8 +240,8 @@ test('the plugin cannot resume yet: the capability is read, not assumed', () => 
   assert.equal(canResume({}), false);
   assert.equal(canResume({ list() {}, downloadIds() {} }), true);
   const divelogs = read('components/FirstLaunchDivelogs.svelte');
-  assert.match(divelogs, /\(OpenDivesCore\)\)?\.divelogsList\) === 'function'/);
-  const api = readFileSync(new URL('../../plugins/opendives-core/core-api.js', import.meta.url), 'utf8');
+  assert.match(divelogs, /\(BenthicCore\)\)?\.divelogsList\) === 'function'/);
+  const api = readFileSync(new URL('../../plugins/benthic-core/core-api.js', import.meta.url), 'utf8');
   assert.doesNotMatch(api, /divelogsList/, 'when the plugin gains divelogsList, wire its by-ids download and update this test');
 });
 

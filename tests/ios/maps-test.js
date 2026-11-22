@@ -43,7 +43,7 @@
   }
 
   async function run() {
-    const core = window.Capacitor?.Plugins?.OpenDivesCore;
+    const core = window.Capacitor?.Plugins?.BenthicCore;
     if (!core) return log('FAIL no plugin');
     await core.addListener('mapsDownload', (e) => events.push(e));
 

@@ -31,7 +31,7 @@ test('the router is only passed through its guard', () => {
   // The original `back` and `navigate`: the guard, and the reload of a broken view.
   assert.deepEqual(users(/\bodRaw\b/, ['lib/router-guard.js', 'lib/nav-health.js']), []);
   // Framework7's own switches are only written by the guard and by the repair.
-  assert.deepEqual(users(/\b(allowPageChange|swipeBackActive|odLocks|odAnimating)\s*=[^=]/, ['lib/router-guard.js', 'lib/nav-health.js']), []);
+  assert.deepEqual(users(/\b(allowPageChange|swipeBackActive|bcLocks|bcAnimating)\s*=[^=]/, ['lib/router-guard.js', 'lib/nav-health.js']), []);
   // A history is only edited by the guard (`dropPreviousPage`).
   assert.deepEqual(users(/\bhistory\s*\.\s*(splice|pop|push|shift|unshift)\s*\(/, ['lib/router-guard.js']), []);
   assert.deepEqual(users(/\.history\s*=[^=]/, ['lib/router-guard.js']), []);

@@ -9,7 +9,7 @@
   // 2. The computers: the remembered ones (Settings, dive computers) and the
   //    devices found by the scan whose name is a dive computer (all of them
   //    with "Show all Bluetooth devices"; their model is then chosen).
-  // 3. The download (OpenDivesCore.downloadDives, Subsurface's own code):
+  // 3. The download (BenthicCore.downloadDives, Subsurface's own code):
   //    the computer, the progress and the dives received so far. Closing
   //    the screen cancels it.
   // 4. The new dives are one undoable step: back to the logbook with "3
@@ -20,7 +20,7 @@
   import { confirmedComputer } from '../lib/bluetooth-names.js';
   import { hiddenBluetooth, hideBluetooth, showBluetooth } from '../lib/hidden-bluetooth.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
@@ -41,8 +41,8 @@
   import DcTile from '../components/DcTile.svelte';
 
   /** @typedef {import('../lib/download.js').Computer} Computer */
-  /** @typedef {import('opendives-core').BluetoothDevice} BluetoothDevice */
-  /** @typedef {import('opendives-core').ReceivedDive} ReceivedDive */
+  /** @typedef {import('benthic-core').BluetoothDevice} BluetoothDevice */
+  /** @typedef {import('benthic-core').ReceivedDive} ReceivedDive */
 
   /** @type {{ f7router: any, retry?: boolean }} */
   let { f7router, retry = false } = $props();
@@ -61,7 +61,7 @@
   let found = $state({});
   // svelte-ignore state_referenced_locally
   let forceDownload = $state(retryPending ? lastAttempt.forceDownload : false);
-  /** @type {import('opendives-core').BluetoothVendor[]} */
+  /** @type {import('benthic-core').BluetoothVendor[]} */
   let models = $state([]);
 
   /** The download running. @type {Computer|null} */
@@ -128,7 +128,7 @@
   async function check() {
     phase = 'checking';
     try {
-      const status = await OpenDivesCore.bluetoothStatus();
+      const status = await BenthicCore.bluetoothStatus();
       if (status.permission !== 'granted') {
         phase = status.permission === 'denied' ? 'denied' : 'permission';
         return;
@@ -152,7 +152,7 @@
 
   async function askPermission() {
     try {
-      const status = await OpenDivesCore.requestBluetoothPermission();
+      const status = await BenthicCore.requestBluetoothPermission();
       if (status.permission === 'granted') check();
       else phase = 'denied';
     } catch (e) {
@@ -163,7 +163,7 @@
 
   async function turnOn() {
     try {
-      await OpenDivesCore.enableBluetooth();
+      await BenthicCore.enableBluetooth();
     } catch (e) {
       console.error('Turning Bluetooth on', e);
     }
@@ -173,7 +173,7 @@
   async function scan() {
     found = {};
     try {
-      await OpenDivesCore.startBluetoothScan({ durationMs: 60000 });
+      await BenthicCore.startBluetoothScan({ durationMs: 60000 });
       scanning = true;
     } catch (e) {
       const code = errorCode(e);
@@ -225,10 +225,10 @@
     console.info('Download from', c.vendor, c.product, c.address);
     divesBefore = diveIdsNow();
     try {
-      const result = await OpenDivesCore.downloadDives({ ...c, forceDownload, defaultSalinity: downloadSalinity(settings.downloadWater) });
+      const result = await BenthicCore.downloadDives({ ...c, forceDownload, defaultSalinity: downloadSalinity(settings.downloadWater) });
       await afterDownload(result);
       if (leaving) return;
-      // A computer that is not in the equipment yet (OpenDives+): the screen stays on « Téléchargement terminé » with the
+      // A computer that is not in the equipment yet (Benthic+): the screen stays on « Téléchargement terminé » with the
       // card « Ajouter le … à votre équipement ? » (task 2026-11-19-306); closing it leaves as below.
       if (result.downloaded && computerOffer.computer) {
         finished = result;
@@ -246,13 +246,13 @@
       let kept = 0;
       if (code === 'CANCELLED' || code === 'NOT_FOUND' || code === 'FAILED') {
         try {
-          kept = (await OpenDivesCore.downloadPartial({ action: 'count' })).dives;
+          kept = (await BenthicCore.downloadPartial({ action: 'count' })).dives;
         } catch (err) {
           console.error('Dives received', err);
         }
       }
       if (leaving) {
-        if (kept) OpenDivesCore.downloadPartial({ action: 'discard' }).catch(() => {});
+        if (kept) BenthicCore.downloadPartial({ action: 'discard' }).catch(() => {});
         return;
       }
       if (code === 'CANCELLED') {
@@ -288,7 +288,7 @@
           {
             text: t('download.dropReceived'),
             onClick: () => {
-              OpenDivesCore.downloadPartial({ action: 'discard' }).catch(() => {});
+              BenthicCore.downloadPartial({ action: 'discard' }).catch(() => {});
               toast(t('download.cancelled'));
             },
           },
@@ -303,7 +303,7 @@
     showSnackbar(text);
   }
 
-  /** Back on the logbook after a download: the system may ask for a review, and the toast says what arrived. @param {import('opendives-core').DownloadResult} result @param {string} product */
+  /** Back on the logbook after a download: the system may ask for a review, and the toast says what arrived. @param {import('benthic-core').DownloadResult} result @param {string} product */
   function afterSuccess(result, product) {
     if (result.downloaded) setTimeout(() => askReviewAfterDownload({ dives: logbook.dives.length, error: !!logbook.error, conflict: !!logbook.conflict }), 1500);
     // New dives without a site: « Compléter la plongée » first, the message when it closes.
@@ -315,7 +315,7 @@
   /** The dive ids before the download, to tell the new dives. @type {Set<number>} */
   let divesBefore = new Set();
 
-  /** The download that ended on the offer card. @type {import('opendives-core').DownloadResult|null} */
+  /** The download that ended on the offer card. @type {import('benthic-core').DownloadResult|null} */
   let finished = $state(null);
 
   async function addComputer() {
@@ -335,7 +335,7 @@
       // The core stops at its next step (up to a dive's read); the screen
       // closes once it has.
       stopping = true;
-      OpenDivesCore.cancelDownload().catch(() => {});
+      BenthicCore.cancelDownload().catch(() => {});
       return;
     }
     leaving = true;
@@ -345,13 +345,13 @@
   onMount(async () => {
     navigation.downloadPanes++;
     listeners.push(
-      await OpenDivesCore.addListener('bluetoothDevice', (/** @type {BluetoothDevice} */ d) => {
+      await BenthicCore.addListener('bluetoothDevice', (/** @type {BluetoothDevice} */ d) => {
         found = { ...found, [d.mac]: { ...d, computer: confirmedComputer(d.name, d.computer) } };
       }),
-      await OpenDivesCore.addListener('bluetoothScanStopped', () => {
+      await BenthicCore.addListener('bluetoothScanStopped', () => {
         scanning = false;
       }),
-      await OpenDivesCore.addListener('downloadProgress', (/** @type {import('opendives-core').DownloadProgress} */ p) => {
+      await BenthicCore.addListener('downloadProgress', (/** @type {import('benthic-core').DownloadProgress} */ p) => {
         if (p.state === 'retrying') {
           // BLE failed: the dives of the first attempt are read again over Classic.
           retrying = true;
@@ -369,9 +369,9 @@
       }),
     );
     try {
-      models = await OpenDivesCore.bluetoothModels();
+      models = await BenthicCore.bluetoothModels();
       // The remembered computers as the core holds them now.
-      logbook.prefs = await OpenDivesCore.getPrefs();
+      logbook.prefs = await BenthicCore.getPrefs();
     } catch (e) {
       console.error('Bluetooth models', e);
     }
@@ -391,8 +391,8 @@
     navigation.downloadPanes--;
     leaving = true;
     for (const l of listeners) l.remove();
-    OpenDivesCore.stopBluetoothScan().catch(() => {});
-    if (running) OpenDivesCore.cancelDownload().catch(() => {});
+    BenthicCore.stopBluetoothScan().catch(() => {});
+    if (running) BenthicCore.cancelDownload().catch(() => {});
   });
 
   const vendorOptions = $derived(models.map((m) => ({ value: m.vendor, label: m.vendor })));
@@ -448,7 +448,7 @@
           <button type="button" class="bc-download--filled" onclick={askPermission}>{t('download.permission.button')}</button>
         {:else if phase === 'denied'}
           <button type="button" class="bc-text-button" onclick={askPermission}>{t('download.denied.again')}</button>
-          <button type="button" class="bc-download--filled" onclick={() => OpenDivesCore.openAppSettings()}>{t('download.denied.button')}</button>
+          <button type="button" class="bc-download--filled" onclick={() => BenthicCore.openAppSettings()}>{t('download.denied.button')}</button>
         {:else if phase === 'off'}
           <button type="button" class="bc-download--filled" onclick={turnOn}>{t('download.off.button')}</button>
         {/if}

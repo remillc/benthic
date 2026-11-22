@@ -11,9 +11,9 @@
 
   /**
    * @type {{
-   *   dives: import('opendives-core').Dive[],
+   *   dives: import('benthic-core').Dive[],
    *   location: string,
-   *   prefs: import('opendives-core').Prefs,
+   *   prefs: import('benthic-core').Prefs,
    *   expanded: boolean,
    *   ontoggle: () => void,
    *   index?: number,

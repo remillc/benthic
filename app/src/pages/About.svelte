@@ -17,7 +17,7 @@
   import Icon from '../components/Icon.svelte';
   import githubMark from '../assets/brands/github-invertocat.svg?raw';
   import { t } from '../lib/i18n.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { exportDives } from '../lib/share.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { traceLines } from '../lib/nav-trace.js';
@@ -78,7 +78,7 @@
    */
   let storeBuild = $state(false);
   const platform = Capacitor.getPlatform();
-  OpenDivesCore.installSource()
+  BenthicCore.installSource()
     .then((r) => (storeBuild = r?.store === true))
     .catch(() => {});
 
@@ -99,7 +99,7 @@
       [t('about.report.device'), model],
       [t('about.report.language'), document.documentElement.lang],
       [t('about.report.units'), units],
-      [t('about.report.mode'), t(logbook.email ? (logbook.mode === 'git' ? (logbook.odplus ? 'about.report.server' : 'about.report.git') : 'about.report.cloud') : 'about.report.noAccount')],
+      [t('about.report.mode'), t(logbook.email ? (logbook.mode === 'git' ? (logbook.benthicPlus ? 'about.report.server' : 'about.report.git') : 'about.report.cloud') : 'about.report.noAccount')],
       [t('about.report.dives'), String(logbook.dives.length)],
       [t('about.report.lastSync'), [logbook.lastSync ?? '—', logbook.sync].join(', ')],
       [t('about.report.lastError'), logbook.error ?? '—'],
@@ -127,7 +127,7 @@
               href: '#rate',
               external: true,
               opens: t(platform === 'ios' ? 'about.rateOpensIos' : 'about.rateOpensAndroid'),
-              onclick: () => OpenDivesCore.openStorePage().catch((e) => console.error('Store page', e)),
+              onclick: () => BenthicCore.openStorePage().catch((e) => console.error('Store page', e)),
             }
           : { key: 'rate', text: t('about.feedback'), sub: t('about.feedbackText'), href: LINKS.source, external: true },
         { key: 'source', text: t('about.source'), sub: LINKS.source.replace('https://', ''), href: LINKS.source, external: true },

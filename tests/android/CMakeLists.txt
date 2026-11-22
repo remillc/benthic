@@ -2,11 +2,11 @@
 # The planner tests (tests/plan_test.cpp, tests/plan_oracle.cpp) and the import formats test
 # (tests/import_formats_test.cpp, run by tests/android/run-import-formats.sh) as Android
 # executables, built from the same sources, the same flags and the same
-# dependencies as libopendives.so (native/CMakeLists.txt), to be pushed to a
+# dependencies as libbenthic.so (native/CMakeLists.txt), to be pushed to a
 # device with tests/android/run.sh. Nothing here ships in the app.
 # Run by tests/android/build.sh.
 cmake_minimum_required(VERSION 3.22)
-project(opendives_plan_tests LANGUAGES C CXX)
+project(benthic_plan_tests LANGUAGES C CXX)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
 set(SS "${ROOT}/third_party/subsurface")
@@ -23,16 +23,16 @@ list(APPEND SOURCES
   "${COMPAT}/cloud_compat.cpp"
   "${COMPAT}/https_mbedtls.cpp"
   "${COMPAT}/bluetooth_compat.cpp"
-  "${ROOT}/core/libopendives/opendives.cpp"
-  "${ROOT}/core/libopendives/edit.cpp"
-  "${ROOT}/core/libopendives/tools.cpp"
-  "${ROOT}/core/libopendives/settings.cpp"
-  "${ROOT}/core/libopendives/plan.cpp"
-  "${ROOT}/core/libopendives/filter.cpp"
-  "${ROOT}/core/libopendives/account.cpp"
-  "${ROOT}/core/libopendives/stats.cpp"
-  "${ROOT}/core/libopendives/download.cpp"
-  "${ROOT}/core/libopendives/odgit.cpp")
+  "${ROOT}/core/libbenthic/benthic.cpp"
+  "${ROOT}/core/libbenthic/edit.cpp"
+  "${ROOT}/core/libbenthic/tools.cpp"
+  "${ROOT}/core/libbenthic/settings.cpp"
+  "${ROOT}/core/libbenthic/plan.cpp"
+  "${ROOT}/core/libbenthic/filter.cpp"
+  "${ROOT}/core/libbenthic/account.cpp"
+  "${ROOT}/core/libbenthic/stats.cpp"
+  "${ROOT}/core/libbenthic/download.cpp"
+  "${ROOT}/core/libbenthic/odgit.cpp")
 
 # Written once: a new time stamp at each configuration would rebuild the whole core.
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/build-defs.h")
@@ -58,6 +58,6 @@ foreach(test plan_test plan_oracle import_formats_test)
   target_compile_options(${test} PRIVATE ${COMMON_COMPILE_OPTIONS})
   target_include_directories(${test} PRIVATE ${COMMON_INCLUDES})
   target_link_directories(${test} PRIVATE "${DEPS}/lib")
-  # As libopendives.so: Mbed TLS replaced OpenSSL (native/CMakeLists.txt).
+  # As libbenthic.so: Mbed TLS replaced OpenSSL (native/CMakeLists.txt).
   target_link_libraries(${test} PRIVATE divecomputer git2 mbedtls mbedx509 mbedcrypto zip xslt xml2 sqlite3 z m log)
 endforeach()

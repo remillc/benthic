@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // « Fiche d’urgence » (OpenDives+, task 2026-11-19-311, docs/mockups/urgence-fiche-android.dc.html): the diver's name, birth
+  // « Fiche d’urgence » (Benthic+, task 2026-11-19-311, docs/mockups/urgence-fiche-android.dc.html): the diver's name, birth
   // date and age, blood type, emergency contact (« Appeler Marc » opens the phone's dialer), diving insurance with its
   // emergency line, the medical certificate and, if asked, the highest certificate. Built from the profile kept on the
   // device, so it opens without a network. The header shares it (image or PDF) and chooses its content (pencil).

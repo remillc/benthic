@@ -12,7 +12,7 @@
  */
 
 import { f7 } from 'framework7-svelte';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { afterDownload, logbook } from './logbook.svelte.js';
 import { offerUndo } from './undo.js';
 import { showSnackbar } from './snackbar.js';
@@ -95,7 +95,7 @@ export function endQuickEntry(announce = true) {
  */
 export async function keepReceived() {
   try {
-    const result = await OpenDivesCore.downloadPartial({ action: 'keep' });
+    const result = await BenthicCore.downloadPartial({ action: 'keep' });
     await afterDownload(result);
     announceDownload(result);
     return true;
@@ -113,7 +113,7 @@ export const lastAttempt = { computer: null, forceDownload: false };
  * The address to connect to, as Subsurface's scan writes it: devices seen by
  * the Bluetooth Low Energy scan or paired as LE get "LE:" when the model can
  * use it; otherwise Bluetooth Classic (paired devices only, as on Android).
- * @param {import('opendives-core').BluetoothDevice} device
+ * @param {import('benthic-core').BluetoothDevice} device
  * @param {{ ble: boolean, classic: boolean }|null} transports the model's, null when unknown
  */
 export function addressFor(device, transports) {

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # Development only: reach the local OpenDives development stack from an Android phone or emulator over USB, and try the
-# OpenDives+ flow with the simulated Google sign-in (docs/dev-accounts.md).
+# Benthic+ flow with the simulated Google sign-in (docs/dev-accounts.md).
 #
 # Usage: tools/dev-phone.sh <adb-serial> [--no-start]
 #
-#   1. starts the development stack (unless --no-start); its folder is OPENDIVES_SERVER_DIR, by default the folder
-#      `opendives-server` next to this repository;
+#   1. starts the development stack (unless --no-start); its folder is BENTHIC_SERVER_DIR, by default the folder
+#      `benthic-server` next to this repository;
 #   2. runs `adb reverse` for the API (8080) and the git front (3443), so that the device reaches both at 127.0.0.1;
 #   3. copies the stack's development certificate authority to app/android/app/src/debug/assets/dev-ca.pem (git-ignored;
 #      read only by debug builds);
 #   4. prints the lines to put in app/.env.local.
 #
-# Stop the stack afterwards with: "$OPENDIVES_SERVER_DIR/scripts/stop.sh".
+# Stop the stack afterwards with: "$BENTHIC_SERVER_DIR/scripts/stop.sh".
 set -euo pipefail
 export MSYS_NO_PATHCONV=1
 
@@ -20,8 +20,8 @@ serial="${1:-}"
 start=1; [ "${2:-}" = "--no-start" ] && start=0
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-server="${OPENDIVES_SERVER_DIR:-$here/../opendives-server}"
-[ -d "$server" ] || { echo "Development stack not found: set OPENDIVES_SERVER_DIR (looked in $server)." >&2; exit 1; }
+server="${BENTHIC_SERVER_DIR:-$here/../benthic-server}"
+[ -d "$server" ] || { echo "Development stack not found: set BENTHIC_SERVER_DIR (looked in $server)." >&2; exit 1; }
 
 adb="adb"
 command -v adb >/dev/null 2>&1 || adb="${ANDROID_HOME:-${LOCALAPPDATA:-$HOME}/Android/Sdk}/platform-tools/adb"
