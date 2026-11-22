@@ -6643,6 +6643,7 @@
     }
   },
   "sharedSites": {
+    "mapCredits": "Sites : © OpenDiving Commons, Wikidata, NOAA, FWC",
     "commonMap": "carte commune",
     "show": "Afficher",
     "mine": "Mes sites",
