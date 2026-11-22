@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 148
+Next number: 166
 
 ## List
 
@@ -65,3 +65,5 @@ Next number: 148
 - #145 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
 - #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
 - #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
+- #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
+- #165 [code] On /profile/info, update the sentence to say that all information in this section is encrypted, once #136 is complete.
