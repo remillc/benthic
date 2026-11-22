@@ -55,7 +55,6 @@ Next number: 175
 - #139 [code] On `/`, when a synchronisation needs a progress bar, do not use the ME progress bar; use the wave on the bottom edge of the header instead.
 - #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette et desktop.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
-- #142 [design] Sur /welcome, écran « Le serveur ne répond pas » : dessiner la maquette à partir de la vue de Claude VC.
 - #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
 - #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
 - #145 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
@@ -66,9 +65,7 @@ Next number: 175
 - #151 [code] compléter l'écriture en cascade css des fichiers
 - #152 [design] est-ce que la fonction signer est pertinente sur desktop?
 - #153 [design] desktop, sur /dives/:id, afficher la carte en bg sur toute la largeur de l'en-tête
-- #154 [design] carte des sites de plongée créer à partir des sites de plongée des plongeurs: ajouter les sites de OpenStreetMap (ou freeMap...)
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
-- #157 [design] /tools/desaturation, "Les 16 compartiments...", rephraser
 - #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.

@@ -6417,3 +6417,19 @@ Christian approved this on 22 November 2026. Work in `main`. Rules in `docs/syst
 **Mock-ups:** the design canvases are the reference (198 boards updated). Update the matching files in `docs/mockups/` the same way.
 
 **Test:** on the phone and on a wide desktop window the rays come from the top right, stay subtle (the text keeps its contrast), and disappear before the dive profile.
+
+## [ ] 2026-11-22-321 Decompression tool: shorter caption under the charts (#157)
+
+Christian approved this on 22 November 2026. Work in `main`.
+
+Replace the caption under the tissue-saturation charts of `/tools/desaturation` (phone, tablet, desktop; i18n key `chartText` and its variants):
+- fr: « Une barre par tissu, des plus rapides aux plus lents. À 0 %, l’azote est éliminé. Modèle Bühlmann, facteurs de gradient {gfLow} / {gfHigh}. »
+- en: « One bar per tissue, fastest to slowest. At 0 %, the nitrogen is gone. Bühlmann model, gradient factors {gfLow} / {gfHigh}. »
+
+Keep the non-breaking space before « % ». The gradient factors are those of the planner, as now. Mock-ups: `outils-desaturation-android`, `outils-desaturation-rappel-android`, `outils-desaturation-terminee-android`, the tablet `android-tablette-desaturation-*` and `bureau-outils-desaturation` on the canvases; update `docs/mockups/` the same way.
+
+## [ ] 2026-11-22-322 « Le serveur ne répond pas » (first launch): content centred
+
+Christian approved this on 22 November 2026. Work in `main`.
+
+In the `serverOffline` step of `FirstLaunchServer.svelte` (phone, iPhone, tablet portrait and landscape, desktop): « Retour » stays at the top left; the icon tile, the title, the help text and the two buttons form one block, centred vertically in the space between « Retour » and the « Une question ? » link, with the title and text centred horizontally. On tablet and desktop the two buttons are centred under the text (they were aligned to the right); on the phone « Réessayer » keeps the full width. Mock-ups: `android-serveur-hors-ligne`, `android-tablette-serveur-hors-ligne-portrait`, `android-tablette-serveur-hors-ligne-paysage`, `bureau-serveur-hors-ligne`; update `docs/mockups/` the same way.
