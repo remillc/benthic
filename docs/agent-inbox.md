@@ -6308,7 +6308,7 @@ The map in a site's card has a fixed **aspect ratio of 2.1 : 1** (width : height
 
 **Test:** open a site's card on a phone, then on a tablet in portrait and landscape and on desktop: the map is always 2.1 times wider than tall.
 
-## [ ] 2026-11-19-315 Shared map of dive sites (#76): app screens, terms of use, server, admin pages on the website
+## [x] 2026-11-19-315 Shared map of dive sites (#76): app screens, terms of use, server, admin pages on the website
 
 Christian approved this on 19 November 2026. Work in `main`. App mock-ups in `docs/mockups/` (Android phone; build iPhone, tablet and desktop with their own conventions). Admin mock-ups in `docs/mockups/admin/` (web pages, 1440 wide, fluid). Nothing here is published on the design canvases yet: the files are the reference. OpenDives+ only.
 
