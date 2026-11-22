@@ -7,10 +7,11 @@
   import Md3Dialog from './Md3Dialog.svelte';
   import { onMount } from 'svelte';
   import ChoiceRow from './ChoiceRow.svelte';
+  import ExportFormats from './ExportFormats.svelte';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { exportFile } from '../lib/share.js';
   import { deviceStore } from '../lib/device-store.js';
-  import { defaultScope, exportFileName, exportFormats, usableFormat } from '../lib/desktop-export.js';
+  import { defaultScope, exportFileName, exportFormats, isUpload, rememberable, usableFormat } from '../lib/desktop-export.js';
   import { windowLogbook } from '../lib/desktop-logbooks.svelte.js';
   import { displayName } from '../lib/desktop-logbooks.js';
   import { localDay } from '../lib/logbook-name.js';
@@ -34,7 +35,9 @@
   // svelte-ignore state_referenced_locally
   let scope = $state(whole ? 'all' : defaultScope(selected.length, !!filtered));
   // Stored as chosen; what is written is `usableFormat`: .benthic only exists for the whole logbook.
-  let chosenFormat = $state(String(deviceStore.getItem(FORMAT_KEY) ?? 'ssrf'));
+  let chosenFormat = $state(String(deviceStore.getItem(FORMAT_KEY) ?? ''));
+  // « Inclure les photos et vidéos »: on by default, in the .benthic row only.
+  let withMedia = $state(true);
   const wholeLogbook = $derived(scope === 'all');
   const formats = $derived(exportFormats(wholeLogbook));
   const format = $derived(usableFormat(chosenFormat, wholeLogbook));
@@ -55,15 +58,20 @@
   );
 
   async function run() {
+    if (isUpload(format)) {
+      // The divelogs.de upload has no sign-in or progress screen yet (task 2026-11-22-324): the row says so and the dialog stays.
+      showSnackbar(t('export.divelogsSoon'));
+      return;
+    }
     busy = true;
-    deviceStore.setItem(FORMAT_KEY, format);
+    if (rememberable(format)) deviceStore.setItem(FORMAT_KEY, format);
     try {
       const day = localDay();
       const entry = windowLogbook();
       if (format === 'benthic') {
         // The archive of « Télécharger mes données » (lib/full-export.js), named after the logbook.
         const { buildExport, deliverExport } = await import('../lib/full-export.js');
-        const { file } = await buildExport({ logbookName: entry ? displayName(entry, t) : '' });
+        const { file } = await buildExport({ withMedia, logbookName: entry ? displayName(entry, t) : '' });
         const result = await deliverExport(file);
         onclose();
         if (result?.saved) showSnackbar(t('desktop.export.savedLogbook'));
@@ -82,7 +90,7 @@
   }
 </script>
 
-<Md3Dialog class="bc-desktop-export" title={t('export.title', { n: ids.length })} oncancel={onclose}>
+<Md3Dialog class="bc-desktop-export" title={wholeLogbook ? t('export.titleLogbook') : t('export.title', { n: ids.length })} oncancel={onclose}>
   <h3 class="bc-desktop-export--heading">{t('desktop.export.which')}</h3>
   <div class="bc-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.which')}>
     {#if selected.length}
@@ -103,16 +111,11 @@
   </div>
 
   <h3 class="bc-desktop-export--heading">{t('desktop.export.format')}</h3>
-  <div class="bc-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.format')}>
-    {#each formats as f (f)}
-      <ChoiceRow name="od-export-format" selected={format === f} onselect={() => (chosenFormat = f)}>
-        <span class="bc-desktop-export--label">{t(`export.formats.${f}`)}</span>
-        <span class="bc-desktop-export--line">{t(`export.formatTexts.${f}`)}</span>
-      </ChoiceRow>
-    {/each}
+  <div class="bc-desktop-export--formats">
+    <ExportFormats {formats} {format} bind:withMedia onselect={(f) => (chosenFormat = f)} label={t('desktop.export.format')} />
   </div>
 
-  {#if format !== 'benthic'}
+  {#if format !== 'benthic' && !isUpload(format)}
     <label class="bc-desktop-export--switch">
       <span>
         <span class="bc-desktop-export--label">{t('export.anonymize')}</span>
@@ -149,6 +152,9 @@
       font-size: 14px;
       font-weight: 600;
       color: var(--bc-text);
+    }
+    .bc-desktop-export--formats {
+      padding-inline: 24px;
     }
     .bc-desktop-export--choices {
       display: flex;

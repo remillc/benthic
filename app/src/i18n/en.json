@@ -1848,6 +1848,10 @@
     "menuNew": "New logbook",
     "menuExport": "Export the logbook",
     "menuExportNone": "No dives to export",
+    "menuExportCount": {
+      "one": "The only dive",
+      "other": "The {n} dives"
+    },
     "cloudSoon": "The cloud is coming in a later version.",
     "signInTitle": "Sign in",
     "signInHelp": "Or create an account.",
@@ -2787,6 +2791,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Tablet: the logbook’s ⋮ menu shows the logbook’s name and offers Rename, Open another logbook, New logbook and Export the logbook, with the number of dives.",
+      "Export: a dialog of plain rows, one per format, with the extension and a line of description, on phone, tablet and desktop. UDDF comes before SSRF. « Benthic file » has its « Include photos and videos » switch, on by default. « Send to divelogs.de » is added.",
       "Desktop: « Save a copy » and « Download my dives » leave the menus, and « Export the logbook » leaves the ⋮ menu. To make a copy, export the logbook.",
       "Export: « Benthic file (.benthic) » writes the whole logbook and your data (equipment, profile, certifications, settings). It is offered for the whole logbook only.",
       "First launch: « The server does not respond » is centred, buttons included.",
@@ -4082,29 +4088,42 @@
       "one": "Export {n} dive",
       "other": "Export {n} dives"
     },
-    "text": "Choose a format. The file then opens in the phone’s share sheet.",
     "formats": {
-      "benthic": "Benthic file (.benthic)",
-      "ssrf": "Logbook file (.ssrf)",
-      "uddf": "UDDF (.uddf)",
-      "csv": "CSV, list of dives",
-      "csvProfiles": "CSV, profiles",
-      "pdf": "PDF sheets"
+      "benthic": "Benthic file",
+      "uddf": "UDDF",
+      "ssrf": "Logbook file",
+      "csv": "Dive list",
+      "csvProfiles": "Profiles",
+      "pdf": "Sheets",
+      "divelogs": "Send to divelogs.de"
     },
     "formatTexts": {
-      "benthic": "The whole logbook and your Benthic data: equipment, profile, certifications, settings",
-      "ssrf": "Subsurface format, also readable by Benthic",
-      "uddf": "Exchange format between dive programs",
+      "benthic": "The whole logbook, with gear, profile and settings",
+      "uddf": "Exchange with other dive software",
+      "ssrf": "For Subsurface, without gear or profile",
       "csv": "One line per dive, for a spreadsheet",
       "csvProfiles": "Time, depth and temperature, point by point",
-      "pdf": "One page per dive"
+      "pdf": "One page per dive, to print",
+      "divelogs": "Adds the dives to your divelogs.de account"
     },
     "anonymize": "Anonymize",
     "anonymizeText": "Removes people’s names, notes and GPS positions",
     "showName": "My name in the header",
     "showNameText": "PDF: “{name}” at the top of each page",
     "action": "Export",
-    "failed": "The export could not be done."
+    "failed": "The export could not be done.",
+    "titleLogbook": "Export the logbook",
+    "formatsLabel": "Format",
+    "textLogbook": {
+      "one": "{name} · {n} dive. Choose a format.",
+      "other": "{name} · {n} dives. Choose a format."
+    },
+    "textSelection": "Choose a format.",
+    "footnotePhone": "The file then opens in the phone’s share sheet.",
+    "footnoteTablet": "The file then opens in the tablet’s share sheet.",
+    "withMedia": "Include photos and videos",
+    "withMediaText": "The file can become much larger",
+    "divelogsSoon": "Sending to divelogs.de is not available yet."
   },
   "plans": {
     "title": "Planned dives",

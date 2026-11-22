@@ -408,14 +408,14 @@
 
   /**
    * Export the whole logbook or the checked dives, then open the system's share sheet.
-   * @param {'benthic'|'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize @param {boolean} [showName] « Mon nom dans l’en-tête » (PDF)
+   * @param {'benthic'|'uddf'|'ssrf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize @param {boolean} [showName] « Mon nom dans l’en-tête » (PDF) @param {boolean} [withMedia] « Inclure les photos et vidéos » (.benthic)
    */
-  async function exportFromSheet(format, anonymize, showName = true) {
+  async function exportFromSheet(format, anonymize, showName = true, withMedia = true) {
     try {
       if (format === 'benthic') {
         // The archive of « Télécharger mes données » (lib/full-export.js), through the share sheet.
         const { buildExport, deliverExport } = await import('../lib/full-export.js');
-        const { file } = await buildExport({ logbookName: deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName') });
+        const { file } = await buildExport({ withMedia, logbookName: deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName') });
         await deliverExport(file);
         return;
       }
@@ -924,6 +924,8 @@
    * The release edition's empty logbook on a tablet (task 2026-11-15-220): the list pane only shows the band, the
    * detail pane holds the empty column (components/ReleaseEmptyLogbook.svelte).
    */
+  /** The logbook's menu on a tablet: its name and the logbook-level commands (not the desktop's, which has its own menus). */
+  const tabletMenu = $derived(!layout.phone && !desktopApp);
   const releaseEmpty = $derived(isRelease && layout.split && !logbook.loading && !logbook.error && logbook.dives.length === 0);
 
   let renaming = $state(false);
@@ -1517,7 +1519,7 @@
     the trip above / below.
   -->
   <Popover class="bc-menu bc-logbook-menu" backdrop={false}>
-    <List noChevron>
+    <List noChevron mediaList={tabletMenu}>
       <!-- Undo and Redo always come first. -->
       {#if logbook.dives.length && logbook.undoText}
         <MenuItem icon="undo" text={t('logbook.menuUndo')} onclick={() => undoRedo(false)} />
@@ -1525,8 +1527,27 @@
       {#if logbook.dives.length && logbook.redoText}
         <MenuItem icon="redo" text={t('logbook.menuRedo')} onclick={() => undoRedo(true)} />
       {/if}
+      {#if tabletMenu && !selecting}
+        <!-- Tablet (task 2026-11-22-324, mock-up android-tablette-carnet-menu-paysage): the logbook's name and where it is kept,
+             then what can be done with the logbook itself. -->
+        <li class="bc-menu-label bc-logbook-menu--label">{emptyBand.split('\n')[0]}</li>
+      {/if}
       {#if !desktopApp && !selecting}
         <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={() => (renaming = true)} />
+      {/if}
+      {#if tabletMenu && !selecting}
+        <li class="bc-menu-divider" role="separator"></li>
+        <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
+        <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />
+        <li class="bc-menu-divider" role="separator"></li>
+        <MenuItem
+          icon="upload"
+          text={t('welcomeSteps.menuExport')}
+          supporting={logbook.dives.length ? t('welcomeSteps.menuExportCount', { n: logbook.dives.length }) : t('welcomeSteps.menuExportNone')}
+          disabled={logbook.loading || !!logbook.error || !logbook.dives.length}
+          onclick={() => ((exportWhole = true), (exporting = true))}
+        />
+        {#if logbook.dives.length}<li class="bc-menu-divider" role="separator"></li>{/if}
       {/if}
       {#if logbook.dives.length}
       <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter" />
@@ -1547,7 +1568,7 @@
       {#if !selecting}
         <MenuItem icon="renumber" text={t('logbook.menuRenumber')} onclick={() => (renumbering = true)} />
         <MenuItem icon="computer" text={t('settings.logbookComputers.title')} link="/settings/computers/" />
-        <MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={!logbook.dives.length ? t('welcomeSteps.menuExportNone') : ''} disabled={logbook.loading || !!logbook.error || !logbook.dives.length} onclick={() => ((exportWhole = true), (exporting = true))} />
+        {#if !tabletMenu}<MenuItem icon="upload" text={t('welcomeSteps.menuExport')} supporting={!logbook.dives.length ? t('welcomeSteps.menuExportNone') : ''} disabled={logbook.loading || !!logbook.error || !logbook.dives.length} onclick={() => ((exportWhole = true), (exporting = true))} />{/if}
       {:else}
         <MenuItem icon="renumber" text={t('logbook.menuRenumberChecked', { n: checkedCount })} onclick={() => (renumbering = true)} />
         {#if checkedCount === 1}
@@ -1588,7 +1609,7 @@
   </Popover>
 
   {#if exporting}
-    <ExportSheet count={exportWhole ? logbook.dives.length : checkedCount} whole={exportWhole} onexport={exportFromSheet} onclose={() => ((exporting = false), (exportWhole = false))} />
+    <ExportSheet count={exportWhole ? logbook.dives.length : checkedCount} whole={exportWhole} logbookName={logbookName || t('welcomeSteps.defaultName')} onexport={exportFromSheet} onclose={() => ((exporting = false), (exportWhole = false))} />
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}

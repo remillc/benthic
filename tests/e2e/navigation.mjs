@@ -1192,7 +1192,7 @@ async function exportFlows(expect) {
         allSelected: !scope || scope.querySelector('[role="radio"]:last-child')?.getAttribute('aria-checked') === 'true',
       };
     }, dialog, ids.length);
-    expect(`${desktop ? 'desktop' : 'phone'} export choices`, { shown: true, formatCount: 5, title: true, allSelected: true }, state);
+    expect(`${desktop ? 'desktop' : 'phone'} export choices`, { shown: true, formatCount: 7, title: true, allSelected: true }, state);
     await tab.run((dialog) => {
       const groups = document.querySelector(dialog).querySelectorAll('[role="radiogroup"]');
       groups[groups.length - 1].querySelectorAll('[role="radio"]')[1].click();
