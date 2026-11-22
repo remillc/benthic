@@ -1145,8 +1145,9 @@ async function desktopFlows() {
 }
 
 async function exportFlows(expect) {
-  for (const desktop of [false, true]) {
-    const tab = await openTab(desktop ? 1400 : 390, desktop ? 900 : 844, !desktop, false, desktop, { theme: 'md' });
+  for (const kind of ['phone', 'tablet', 'desktop']) {
+    const desktop = kind === 'desktop';
+    const tab = await openTab(desktop ? 1400 : kind === 'tablet' ? 1280 : 390, desktop ? 900 : kind === 'tablet' ? 800 : 844, kind === 'phone', false, desktop, { theme: 'md' });
     const ids = await tab.run(async () => {
       const { logbook } = await import('/src/lib/logbook.svelte.js');
       const { filter } = await import('/src/lib/filter.svelte.js');
@@ -1167,13 +1168,14 @@ async function exportFlows(expect) {
     });
     await sleep(500);
     await tab.run((desktop) => {
-      const button = document.querySelector(desktop ? '.bc-desktop-logbook--bar .bc-desktop-logbook--icon-button[aria-haspopup="menu"]' : '.page-current [data-popover=".bc-logbook-menu"], .page-master [data-popover=".bc-logbook-menu"]');
+      // The desktop's whole-logbook export is in the logbook selector (task 2026-11-22-323), no longer in the ⋮ menu.
+      const button = document.querySelector(desktop ? '.bc-logbook-selector--pill' : '.page-current [data-popover=".bc-logbook-menu"], .page-master [data-popover=".bc-logbook-menu"]');
       if (!button) throw new Error('logbook menu button missing');
       button.click();
     }, desktop);
     await sleep(500);
     await tab.run((desktop) => {
-      const menu = document.querySelector(desktop ? '.bc-context-menu' : '.bc-logbook-menu');
+      const menu = document.querySelector(desktop ? '.bc-logbook-selector--menu' : '.bc-logbook-menu');
       const item = [...menu.querySelectorAll('a, button')].find((el) => /Exporter le carnet|Export the logbook/.test(el.textContent));
       if (!item) throw new Error('whole logbook export missing');
       item.click();
@@ -1192,7 +1194,18 @@ async function exportFlows(expect) {
         allSelected: !scope || scope.querySelector('[role="radio"]:last-child')?.getAttribute('aria-checked') === 'true',
       };
     }, dialog, ids.length);
-    expect(`${desktop ? 'desktop' : 'phone'} export choices`, { shown: true, formatCount: 7, title: true, allSelected: true }, state);
+    // Task 2026-11-22-324: the formats in the order of the task, the .benthic switch on by default and only in its row.
+    const order = await tab.run((dialog) => {
+      const el = document.querySelector(dialog);
+      const switches = [...el.querySelectorAll('[role="switch"]')].filter((i) => i.closest('[data-format]'));
+      return {
+        formats: [...el.querySelectorAll('[data-format]')].map((r) => r.dataset.format).join(','),
+        switchRows: switches.map((i) => i.closest('[data-format]').dataset.format).join(','),
+        mediaOn: !!switches[0]?.checked,
+      };
+    }, dialog);
+    expect(`${kind} export formats in order, the media switch only in the .benthic row and on`, { formats: 'benthic,uddf,ssrf,csv,csvProfiles,pdf,divelogs', switchRows: 'benthic', mediaOn: true }, order);
+    expect(`${kind} export choices`, { shown: true, formatCount: 7, title: true, allSelected: true }, state);
     await tab.run((dialog) => {
       const groups = document.querySelector(dialog).querySelectorAll('[role="radiogroup"]');
       groups[groups.length - 1].querySelectorAll('[role="radio"]')[1].click();
@@ -1202,7 +1215,7 @@ async function exportFlows(expect) {
     }, dialog);
     await sleep(800);
     const call = await tab.run(() => window.__exportCalls[0] ?? null);
-    expect(`${desktop ? 'desktop' : 'phone'} exports every dive as UDDF`, { ids: JSON.stringify(ids), format: 'uddf' }, { ids: JSON.stringify(call?.ids), format: call?.format });
+    expect(`${kind} exports every dive as UDDF`, { ids: JSON.stringify(ids), format: 'uddf' }, { ids: JSON.stringify(call?.ids), format: call?.format });
     tab.ws.close();
   }
 }
