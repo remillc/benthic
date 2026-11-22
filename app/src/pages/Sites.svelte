@@ -395,7 +395,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   const baseLayer = $derived(
     common && baseBox
       ? {
-          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x)}` })),
+          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x, false)}` })),
           clusters: baseBox.clusters,
         }
       : null,
@@ -443,13 +443,13 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length || canCommon}
     <div class="bc-sites--map" class:bc-sites--map-offline={!connection.online} class:bc-sites--card-open={!!selectedSite || !!baseSelected}>
-      <!-- 5:4 landscape, full width (task 2026-11-07-24). Full screen keeps the pins,
-           and its own « Centrer sur ma position » (task 2026-11-14-147). No names on the
-           map; a tapped pin shows its card, several under the finger a sheet (task 2026-11-14-150). -->
+      <!-- Full screen keeps the pins and its own locate button. A tapped pin shows its card;
+           several under the finger open a sheet. The shared map shows names from zoom 13. -->
       <SiteMap
         bind:this={siteMap}
         sites={located}
-        names="fewInFullScreen"
+        names={common ? 'atZoom' : 'fewInFullScreen'}
+        hideDiveCounts={common}
         selected={selectedUuid}
         onselect={(uuid) => ((stack = null), (baseSelectedId = null), (selectedUuid = uuid))}
         onstack={showStack}
@@ -465,11 +465,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       >
         {#snippet overlay()}
           {#if selectedSite}
-            <MapSiteCard site={selectedSite} onopen={() => openFromMap(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
+            <MapSiteCard site={selectedSite} hideDiveCounts={common} onopen={() => openFromMap(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
           {:else if baseSelected}
             <MapSiteCard
               site={{ name: baseSelected.name, country: baseSelected.country, dives: baseSelected.dives ?? 0, lastDate: '', maxDepthMm: 0 }}
-              line={baseCardLine(baseSelected)}
+              line={baseCardLine(baseSelected, false)}
               onopen={() => baseSelected && openBase(baseSelected.id)}
               onclose={() => (baseSelectedId = null)}
             />
@@ -500,7 +500,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {overMap}
     chip={!connection.online}
     summaryKey={searching}
-    summary={searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
+    summary={common ? '' : searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
   >
     {#if !connection.online}
       <p class="bc-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
@@ -521,7 +521,6 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {:else if baseState === 'failed'}
       <p class="bc-sites--area-count" role="status">{t('sharedSites.failed')}</p>
     {:else if baseState === 'ready' && baseBox}
-      <p class="bc-sites--area-count" role="status">{t('sharedSites.areaCount', { n: baseBox.total })}</p>
       {#if baseList.length}
         <nav class="list no-chevron bc-sites--surface bc-sites--list bc-sites--common-list" aria-label={t('sharedSites.listLabel')}>
           <ul>
@@ -686,7 +685,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   <!-- A new sheet for each tap (MapStackSheet.svelte says why), removed once closed. -->
   {#if stack}
     {#key stack}
-      <MapStackSheet sites={stackSites} place={stackPlace} onclose={() => (stack = null)} onopen={openFromMap} />
+      <MapStackSheet sites={stackSites} place={stackPlace} hideDiveCounts={common} onclose={() => (stack = null)} onopen={openFromMap} />
     {/key}
   {/if}
 

@@ -65,4 +65,3 @@ Next number: 167
 - #145 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
 - #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
 - #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
-- #166 [code] On the shared map at /sites/, do not show totals or the number of dives at a site. Show site names from a zoom level to be determined.
