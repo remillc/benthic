@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 175
+Next number: 176
 
 ## List
 
@@ -73,3 +73,4 @@ Next number: 175
 - #172 [code] Bug: a dive without a site does not show its dive number. Does it have one?
 - #173 [code] Devices should synchronize as soon as data is updated.
 - #174 [design] redessiner le rail des panneaux sur desktop. Il est fusionné avec une scrollbar minuscule.
+- #175 [code] Compléter l’export UDDF avec l’équipement et le profil du plongeur. Subsurface n’écrit presque rien de la fiche du plongeur : à l’export (`third_party/subsurface/xslt/uddf-export.xslt`), seulement les ordinateurs de plongée (nom et modèle) dans `diver › owner › equipment`, le poids du lest de chaque plongée (`equipmentused › leadquantity`), et un prénom et un nom vides ; à l’import (`uddf.xslt`), seulement l’ordinateur, les bouteilles et le lest. Benthic complète l’UDDF avec ce qu’il garde : l’inventaire d’équipement (pièces, fabricant, modèle, numéro de série, achat, entretiens) dans `owner › equipment`, l’équipement utilisé par chaque plongée dans `equipmentused`, et le profil du plongeur : `personal` (nom, date de naissance, groupe sanguin), `education` (brevets, avec les photos des cartes en liens), `medical` et `divinginsurances` (documents). Le contact d’urgence n’a pas de champ prévu dans UDDF (à vérifier dans la spécification). Vérifier d’abord la spécification UDDF (3.2.x) avant de coder ; garder un fichier valide pour les autres logiciels. Le .benthic reste la seule copie complète pour rouvrir le carnet dans Benthic. Décidé le 22 nov. 2026.
