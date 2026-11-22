@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 170
+Next number: 174
 
 ## List
 
@@ -76,3 +76,4 @@ Next number: 170
 - #162 [code] créer un skeleton pour la page /dives/:id sur tablette et desktop
 - #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158).
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
+- #173 [code] Devices should synchronize as soon as data is updated.
