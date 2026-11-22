@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 177
+Next number: 178
 
 ## List
 
@@ -62,3 +62,4 @@ Next number: 177
 - #173 [code] Devices should synchronize as soon as data is updated.
 - #175 [code] Compléter l’export UDDF avec l’équipement et le profil du plongeur. Subsurface n’écrit presque rien de la fiche du plongeur : à l’export (`third_party/subsurface/xslt/uddf-export.xslt`), seulement les ordinateurs de plongée (nom et modèle) dans `diver › owner › equipment`, le poids du lest de chaque plongée (`equipmentused › leadquantity`), et un prénom et un nom vides ; à l’import (`uddf.xslt`), seulement l’ordinateur, les bouteilles et le lest. Benthic complète l’UDDF avec ce qu’il garde : l’inventaire d’équipement (pièces, fabricant, modèle, numéro de série, achat, entretiens) dans `owner › equipment`, l’équipement utilisé par chaque plongée dans `equipmentused`, et le profil du plongeur : `personal` (nom, date de naissance, groupe sanguin), `education` (brevets, avec les photos des cartes en liens), `medical` et `divinginsurances` (documents). Le contact d’urgence n’a pas de champ prévu dans UDDF (à vérifier dans la spécification). Vérifier d’abord la spécification UDDF (3.2.x) avant de coder ; garder un fichier valide pour les autres logiciels. Le .benthic reste la seule copie complète pour rouvrir le carnet dans Benthic. Décidé le 22 nov. 2026.
 - #176 [design] Dessiner les écrans d’exportation vers divelogs.de : connexion (identifiant et mot de passe divelogs.de, jamais gardés) et progression de l’envoi, depuis la ligne « Envoyer vers divelogs.de » de la boîte d’export (téléphone, tablette, ordinateur). La ligne existe déjà et affiche « pas encore disponible » (tâche 324).
+- #177 [design] Réviser les chevrons des maquettes : elles en dessinent quatre. Vers l’avant, `M9 5l7 7-7 7` (975 fois, celui de l’app), `M10 6l6 6-6 6` (77) et `M9 6l6 6-6 6` (51) ; vers l’arrière, `M15 6l-6 6 6 6` (199) et `M15 5l-7 7 7 7` (27). L’app garde partout le dessin majoritaire (décidé le 22 nov. 2026) : aligner les maquettes sur ces deux dessins, ou dire où un autre chevron est voulu et pourquoi.

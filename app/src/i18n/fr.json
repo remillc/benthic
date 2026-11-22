@@ -2791,6 +2791,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages : l’icône est une roue dentée, comme dans les maquettes.",
       "Tablette et bureau : la plongée à côté du carnet s’affiche dès le lancement, comme le carnet ; les données des statistiques, des sites et des outils se lisent une fois la première plongée affichée.",
       "Équipement : retirer une pièce propose une quatrième raison, « Autre », à côté de Vendue, Perdue et Hors d’usage. Elle s’affiche dans « Pièces retirées ».",
       "Icônes : les 19 types d’équipement reprennent les dessins des maquettes, avec de nouveaux dessins pour Recycleur, Masque, Palmes et Scooter. L’entretien prend une clé à molette, « Ouvrir un autre carnet » un carnet ouvert, et l’équipement, l’archive, la renumérotation, le Bluetooth, le calendrier, l’envoi et l’appareil photo celui de leur maquette.",
