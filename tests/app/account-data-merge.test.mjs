@@ -122,6 +122,23 @@ test('merges a legacy ancestor without leaking its birth date or losing concurre
   assert.deepEqual(result.conflicts, []);
 });
 
+test('keeps competing legacy birth dates in encrypted conflicts', async () => {
+  const box = boxFor(10);
+  const item = { id: 'profile', format: 1 };
+  const base = { format: 1, dateOfBirth: '1980-01-01', updatedAt: '2026-01-01T00:00:00Z' };
+  const ours = { format: 1, dateOfBirth: '1980-01-02', updatedAt: '2026-01-02T00:00:00Z' };
+  const theirs = { format: 1, dateOfBirth: '1980-01-03', updatedAt: '2026-01-03T00:00:00Z' };
+  const result = await mergeEncryptedAccountFile(base, ours, theirs, box, item);
+  assert.doesNotMatch(JSON.stringify(result), /1980-01-0[123]/);
+  assert.equal((await box.open(result.value.enc, item)).dateOfBirth, '1980-01-03');
+  assert.deepEqual(await box.open(result.sealedConflicts, { id: 'profile:conflicts', format: 1 }), [{
+    key: 'dateOfBirth',
+    base: { present: true, value: '1980-01-01' },
+    ours: { present: true, value: '1980-01-02' },
+    theirs: { present: true, value: '1980-01-03' },
+  }]);
+});
+
 test('rejects an invalid or contradictory legacy date instead of overwriting either value', async () => {
   const box = boxFor(9);
   const item = { id: 'profile', format: 1 };
