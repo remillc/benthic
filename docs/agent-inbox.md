@@ -6512,3 +6512,11 @@ Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and 
 Mock-ups: `bureau-carnet-profil-droite` (17 dives, the scrollbar), `bureau-carnets-selecteur`, `bureau-carnets-rail-survol` (divider hovered), and every `bureau-*` board, all updated in `docs/mockups/`.
 
 **Test:** no grip on any desktop page; hovering the divider shows the resize cursor and the rust highlight; a logbook longer than the window shows the thin scrollbar next to the list, separate from the divider.
+
+## [ ] 2026-11-22-328 Desktop logbook: a divider between the dives (#150)
+
+Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS.
+
+In the logbook table of the desktop, every dive row gets a 1 px divider at its bottom, #E3E1DC (the colour of the line under the column headers; dark mode: the same token as that line), across the row's full width, inside trip cards too. The last row of a trip card has no divider. Rows are square (no rounded corners) except the selected row, which keeps its rounded #D4E2F2 pill and no divider. The row height stays 48 px, divider included.
+
+Mock-ups: `bureau-carnet-profil-droite` (the list scrolled to the bottom so that the trip shows), `bureau-carnets-selecteur`, `bureau-carnets-rail-survol`, updated in `docs/mockups/`.
