@@ -11,6 +11,21 @@ export const PHONE_QUERY = '(max-width: 767.98px)';
 export const BAND_HEIGHT = Object.freeze({ start: 330, compact: 140 });
 
 /**
+ * The size of the logo and name lockup on the blue band (tasks 2026-11-19-317 and 318): the tablet's panel is the same
+ * on every step in landscape and compact in portrait; a phone shows the phone size on the first step, the compact one
+ * (with « DIVE LOG ») on the Benthic+ offer and sign-in, and the name alone on the other steps.
+ * @param {{ phone: boolean, portrait: boolean }} where
+ * @param {boolean} first the first step
+ * @param {boolean} main the Benthic+ offer or sign-in
+ * @returns {'large'|'phone'|'compact'|'step'}
+ */
+export function lockupSize(where, first, main) {
+  if (!where.phone) return first || !where.portrait ? 'large' : 'step';
+  if (first) return 'phone';
+  return main ? 'compact' : 'step';
+}
+
+/**
  * Whether the first launch shows its iPhone variant (task 2026-11-16-261): the iOS look on a phone. Android phones,
  * tablets and iPads keep their own screens.
  * @param {boolean} ios Framework7's iOS theme (lib/layout.svelte.js, `ios`)

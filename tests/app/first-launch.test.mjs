@@ -180,9 +180,10 @@ test('the band: 330 dp on the welcome screen, 140 dp plus the status bar on a st
 
 test('the band is the blue panel of the tablet: gradient, sheen and hatching of task 234', () => {
   assert.match(theme, /--bc-first-band: linear-gradient\(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%\)/);
-  assert.match(theme, /--bc-first-band-sheen: radial-gradient\(ellipse 70% 45% at 22% 0%, rgb\(255 255 255 \/ 0\.22\), rgb\(255 255 255 \/ 0\) 70%\)/);
-  assert.match(theme, /--bc-first-band-hatch: repeating-linear-gradient\(105deg, rgb\(255 255 255 \/ 0\.035\) 0 60px, rgb\(255 255 255 \/ 0\) 60px 150px\)/);
-  assert.match(band, /mask-image: linear-gradient\(180deg, #000 0%, transparent 55%\)/);
+  assert.match(theme, /--bc-first-band-sheen: radial-gradient\(ellipse 70% 45% at 85% 0%, rgb\(255 255 255 \/ 0\.22\), rgb\(255 255 255 \/ 0\) 70%\)/);
+  // Task 320: the stripes are replaced by the light rays from the top right.
+  assert.doesNotMatch(theme, /--bc-first-band-hatch/);
+  assert.match(band, /<FirstLaunchRays \/>/);
 });
 
 /** WCAG relative luminance and contrast of two sRGB colours. */

@@ -7,6 +7,7 @@
   // on the left. Portrait: 640 dp tall (540 on the steps), across the top. The status bar is part of the panel.
   import ProfileHero from './ProfileHero.svelte';
   import { t } from '../lib/i18n.js';
+  import FirstLaunchRays from './FirstLaunchRays.svelte';
 
   /**
    * playKey: changes each time the screen is shown, the profile is created again and plays its animation again.
@@ -18,7 +19,7 @@
 
 <header class="bc-first-launch-panel" class:bc-first-launch-panel--step={still}>
   <div class="bc-first-launch-panel--sheen" aria-hidden="true"></div>
-  <div class="bc-first-launch-panel--hatch" aria-hidden="true"></div>
+  <div class="bc-first-launch-panel--rays"><FirstLaunchRays /></div>
   <div class="bc-first-launch-panel--brand" role="img" aria-label={t('welcome.brandAlpha')}>
     <img class="bc-first-launch-panel--logo" src="logo-light.svg" alt="" width="96" height="96" />
     <span class="bc-first-launch-panel--name" aria-hidden="true">Benthic</span>
@@ -66,7 +67,7 @@
     }
 
     .bc-first-launch-panel--sheen,
-    .bc-first-launch-panel--hatch {
+    .bc-first-launch-panel--rays {
       position: absolute;
       inset: 0;
       pointer-events: none;
@@ -76,11 +77,7 @@
       background: var(--bc-first-band-sheen);
     }
 
-    /* Faint diagonal hatching, fading out at 55 % of the height. */
-    .bc-first-launch-panel--hatch {
-      background: var(--bc-first-band-hatch);
-      mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
-    }
+    /* The light rays from the top right (task 2026-11-22-320), gone at 65 % of the height. */
 
     .bc-first-launch-panel--brand {
       position: relative;

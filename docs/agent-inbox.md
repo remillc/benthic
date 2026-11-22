@@ -6365,7 +6365,7 @@ Christian approved this on 19 November 2026 (#59, closed). Work in `main`.
 
 **Done (19 November 2026):** texts, names under the icon, both link hosts, server e-mails and console, and the project files whose names carried the old brand (commit 733c63ec). Leftovers that would break installed apps, data or sign-in are listed with their risk in `docs/rename-leftovers.md`, for Christian to decide.
 
-## [ ] 2026-11-19-317 Wordmark: « Benthic » in Outfit, with « DIVE LOG » under it
+## [x] 2026-11-19-317 Wordmark: « Benthic » in Outfit, with « DIVE LOG » under it
 
 Christian approved this on 19 November 2026. Work in `main`. Rules in `docs/system-design.md`, paragraph « Wordmark font » (just after « Fonts »).
 
@@ -6378,7 +6378,7 @@ Christian approved this on 19 November 2026. Work in `main`. Rules in `docs/syst
 
 **Test:** first launch on each platform shows « Benthic » in Outfit with « DIVE LOG » under it; a larger system font scales both lines without overlap; TalkBack and VoiceOver read « Benthic Dive Log » once.
 
-## [ ] 2026-11-19-318 Wordmark: logo size and name weight (follows 317)
+## [x] 2026-11-19-318 Wordmark: logo size and name weight (follows 317)
 
 Christian approved this on 19 November 2026. Work in `main`. Apply together with task 317. Rules in `docs/system-design.md`, « Wordmark font », « Lockup proportions ».
 
@@ -6405,7 +6405,7 @@ Dates follow the format chosen in Réglages; « Aujourd’hui » and « Hier » 
 
 **Test:** each of the three choices opens its screen and back returns to « Que voulez-vous récupérer ? »; restoring a deleted dive puts it back with its number; restoring a version keeps the current logbook as a version.
 
-## [ ] 2026-11-22-320 First-launch header: light rays from the sun (#98)
+## [x] 2026-11-22-320 First-launch header: light rays from the sun (#98)
 
 Christian approved this on 22 November 2026. Work in `main`. Rules in `docs/system-design.md`, « Light rays in the first-launch header » (after « Lockup proportions »).
 

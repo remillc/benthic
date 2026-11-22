@@ -8,6 +8,8 @@
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
+  import FirstLaunchRays from './FirstLaunchRays.svelte';
+  import BrandLockup from './BrandLockup.svelte';
   import BenthicPlusReadyLogo from './BenthicPlusReadyLogo.svelte';
   import googleLogo from '../assets/brands/google-g.svg?raw';
   import appleLogoBlack from '../assets/brands/apple-logo-black.svg';
@@ -155,7 +157,7 @@
 
 {#snippet hero(/** @type {'offer'|'ready'|'welcome'} */ which)}
   <header class="bc-plus-hero bc-plus-hero--{which}">
-    <div class="bc-plus-hero--bands" aria-hidden="true"></div>
+    <div class="bc-plus-hero--rays"><FirstLaunchRays /></div>
     {#if which === 'ready' && motion.bubbles}<BenthicPlusReadyBubbles still={motion.still} />{/if}
     {#if which === 'offer'}
       <!-- The offer's own bubbles: still, at the places of the mock-up (task 2026-11-19-304). -->
@@ -169,10 +171,7 @@
       <path d={BAND_PROFILE} class="bc-plus-hero--profile-line" vector-effect="non-scaling-stroke" />
     </svg>
     <svg class="bc-plus-hero--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
-    <div class="bc-plus-hero--brand">
-      <img src="logo-light.svg" alt="" width="32" height="32" />
-      <span>{t('welcomeSteps.appName')}</span>
-    </div>
+    <div class="bc-plus-hero--brand"><BrandLockup size={which === 'offer' ? 'compact' : 'step'} /></div>
     {#if which === 'offer'}
       <div class="bc-plus-hero--text">
         <BenthicPlusChip label={t('odplus.offer.pill')} large />
@@ -642,21 +641,15 @@
       color: var(--bc-release-on-panel);
     }
 
-    .bc-plus-hero--bands {
+    .bc-plus-hero--rays {
       position: absolute;
       inset: 0;
-      background: repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px);
-      mask-image: linear-gradient(180deg, #000 0%, transparent 60%);
+      pointer-events: none;
     }
 
     .bc-plus-hero--brand {
       position: relative;
       display: none;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      line-height: 26px;
-      font-weight: 500;
     }
 
     .bc-plus-hero--bubbles {
@@ -1298,7 +1291,7 @@
       }
 
       .bc-plus-hero--brand {
-        display: flex;
+        display: block;
         margin-bottom: 24px;
       }
 
@@ -1318,8 +1311,6 @@
         padding: 36px 16px 40px;
 
         .bc-plus-hero--brand {
-          gap: 8px;
-          line-height: 28px;
           margin-bottom: 20px;
         }
 

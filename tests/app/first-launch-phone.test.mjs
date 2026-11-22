@@ -36,10 +36,17 @@ test('the blue band is 330 dp on the first step and 140 dp on the others, the st
   assert.match(page, /min-height: calc\(330px - 24px \+ var\(--bc-welcome-band-top\)\)/);
   assert.match(page, /min-height: calc\(140px - 24px \+ var\(--bc-welcome-band-top\)\)/);
   assert.match(page, /--bc-welcome-band-top: max\(var\(--f7-safe-area-top, 0px\), 24px\)/);
-  // First step: logo 40 dp, name 24 sp, headline 26 sp, line 14 sp; other steps: logo 32 dp, name 20 sp.
-  for (const piece of [/width: 40px;\s+height: 40px/, /width: 32px;\s+height: 32px/, /font-size: 26px/, /font-size: 14px;\s+line-height: 20px/]) {
+  // Headline 26 sp, line 14 sp. The lockup's sizes (tasks 317 and 318: logo 52 dp and name 30 sp on the first step, 48 and 26
+  // on the Benthic+ offer and sign-in, 32 and 22 on the other steps) are in components/BrandLockup.svelte.
+  for (const piece of [/font-size: 26px/, /font-size: 14px;\s+line-height: 20px/]) {
     assert.match(page, piece);
   }
+  const lockup = read('components/BrandLockup.svelte');
+  assert.match(lockup, /--phone \{\s+--bc-lockup-logo: 52px;[^}]*--bc-lockup-name: 30px;/);
+  assert.match(lockup, /--compact \{\s+--bc-lockup-logo: 48px;[^}]*--bc-lockup-name: 26px;/);
+  assert.match(lockup, /--step \{\s+--bc-lockup-logo: 32px;[^}]*--bc-lockup-name: 22px;/);
+  assert.match(lockup, /--bc-lockup-logo: 84px;[^}]*--bc-lockup-name: 52px;/);
+  assert.match(lockup, /font-weight: 700;/);
 });
 
 test('the column has 20 dp of padding, starts at the top, has 24 sp titles and full-width buttons', () => {
@@ -74,15 +81,15 @@ test("the welcome hero is the alpha's hatched dark blue; the steps band takes th
   assert.doesNotMatch(theme, /--bc-release-band-gradient/);
   const token = (name) => theme.match(new RegExp(`${name}: ([^;]*);`))[1];
   assert.equal(token('--bc-first-band'), 'linear-gradient(180deg, #2A6FB0 0%, #1F5C99 22%, #0C3866 70%, #072A4D 100%)');
-  assert.equal(token('--bc-first-band-sheen'), 'radial-gradient(ellipse 70% 45% at 22% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%)');
-  assert.equal(token('--bc-first-band-hatch'), 'repeating-linear-gradient(105deg, rgb(255 255 255 / 0.035) 0 60px, rgb(255 255 255 / 0) 60px 150px)');
+  assert.equal(token('--bc-first-band-sheen'), 'radial-gradient(ellipse 70% 45% at 85% 0%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 70%)');
+  // Task 320: the light comes from the top right and the evenly spaced stripes are gone (the rays are components/FirstLaunchRays.svelte).
+  assert.doesNotMatch(theme, /--bc-first-band-hatch|105deg/);
   // Task 251: the section band's radial gradient, its light centre at -40 %.
   assert.equal(token('--bc-first-step-band'), 'radial-gradient(140% 115% at 38% -40%, #A9C4E2 0%, #7199C2 25%, #5584B5 37%, #2D5E90 59%, #114477 86%)');
   const phone = page.slice(page.lastIndexOf('@media (max-width: 767.98px)'));
-  // The hero (330 dp) keeps the hatched blue, its sheen and its hatching.
+  // The hero (330 dp) keeps the dark blue, its sheen and its light rays.
   assert.match(phone, /background: var\(--bc-first-band\);/);
   assert.match(phone, /bc-welcome-release--panel-light \{\s+background: var\(--bc-first-band-sheen\)/);
-  assert.match(phone, /bc-welcome-release--panel-bands \{\s+background: var\(--bc-first-band-hatch\)/);
   // The steps band: gradient, no sheen, the faint profile (10 % area, 30 % line, 1.5 dp) and the 18 dp wave in the page colour.
   assert.match(phone, /bc-welcome-release--compact \{\s+height: auto;\s+min-height: calc\(140px[^;]*;\s+background: var\(--bc-first-step-band\)/);
   assert.match(phone, /bc-welcome-release--compact \{[^}]*& \.bc-welcome-release--panel-light \{\s+display: none/);
@@ -95,8 +102,9 @@ test("the welcome hero is the alpha's hatched dark blue; the steps band takes th
   assert.equal(token('--bc-band-profile-line'), 'rgb(255 255 255 / 0.3)');
   // Neither the profile nor the wave shows outside a phone step band.
   assert.match(page, /\.bc-welcome-release--panel-profile,\s+\.bc-welcome-release--panel-wave \{\s+display: none/);
-  // The rays fade out at 55 % of the height (the tablet panel's rule, shared).
-  assert.match(page, /mask-image: linear-gradient\(180deg, black 0%, transparent 55%\)/);
+  // The light rays are one component, gone at 65 % of the band's height (task 320).
+  assert.match(page, /<FirstLaunchRays \/>/);
+  assert.match(read('components/FirstLaunchRays.svelte'), /const FADE = 0\.65;/);
 });
 
 test('the sign-in hint reads on two lines, centred; the sign-in button is centred on a tablet', () => {

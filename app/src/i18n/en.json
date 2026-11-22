@@ -1695,6 +1695,8 @@
     "notConnected": "Not connected yet",
     "connect": "Sign in to {service}",
     "appName": "Benthic",
+    "brandLabel": "Benthic Dive Log",
+    "brandSubline": "Dive Log",
     "connectedCreate": "“{file}” will be created in the Benthic folder of this account.",
     "changeAccount": "Change account",
     "createLogbook": "Create the logbook",
@@ -2733,6 +2735,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "First launch: light rays from the top right corner replace the stripes of the blue band.",
+      "First launch: the name Benthic has its own typeface, with « DIVE LOG » under it, and a larger logo.",
       "Logbook on phones and tablets: rename the logbook from the ⋮ menu.",
       "Desktop logbook: the wait before flying appears above the dive list.",
       "Search: a clear button removes the text without leaving the field.",
