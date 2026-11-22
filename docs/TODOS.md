@@ -48,7 +48,6 @@ Next number: 176
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
 - #126 [design] améliorer le visuel du groupe validations dans /dives/:id.
-- #127 [design] améliorer les icônes d'équipement.
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
@@ -56,8 +55,6 @@ Next number: 176
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
 - #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
 - #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
-- #145 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
-- #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes et les détendeurs
 - #149 [code] remplacer les uuid par des id plus courts
 - #150 [code] dans desktop: sur le carnet, ajouter le même trait séparateur gris entre chaque plongée
@@ -65,7 +62,6 @@ Next number: 176
 - #152 [design] est-ce que la fonction signer est pertinente sur desktop?
 - #153 [design] desktop, sur /dives/:id, afficher la carte en bg sur toute la largeur de l'en-tête
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
-- #158 [code] le format d'exportation du carnet Benthic est un zip dont l'extension est: .benthic
 - #159 [code] sur tablette et mobile, faire en sorte que le comportement long press sur une plongée de la liste sur /, en ce moment au lever du doigt la liste devient une liste à cases à cocher. Le nouveau comportement attendu est que la liste à cases à choser apparaîsse après le long press, lorsque le doigt est toujours pressé plutôt que lorsqu'il se lève.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
