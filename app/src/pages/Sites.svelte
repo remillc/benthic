@@ -468,7 +468,9 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     if (!common || !connection.online) {
       clearTimeout(baseTimer);
       untrack(() => baseAsk++);
-      if (!common) baseSelectedId = null;
+      baseSelectedId = null;
+      baseBox = null;
+      baseList = [];
       return;
     }
     if (!sharedSites.linksLoaded) loadLinks();
@@ -597,7 +599,10 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   {#if common}
   <section class="bc-sites--panel" aria-label={t('sharedSites.listLabel')}>
     {#if !connection.online}
-      <p class="bc-sites--area-count" role="status">{t('sharedSites.offline')}</p>
+      <div class="bc-sites--common-offline" role="status">
+        <Icon name="offline" size={24} />
+        <div><h2>{t('sharedSites.offlineTitle')}</h2><p>{t('sharedSites.offline')}</p></div>
+      </div>
     {:else if baseState === 'offer'}
       <div class="bc-sites--common-offer">
         <p>{t('sharedSites.offerText')}</p>
@@ -1136,6 +1141,27 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       color: var(--bc-text-2);
       & p {
         margin: 0;
+      }
+    }
+
+    .bc-sites--common-offline {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 16px 24px;
+      color: var(--bc-text-2);
+
+      h2 {
+        margin: 0;
+        color: var(--bc-text);
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      p {
+        margin: 4px 0 0;
+        font-size: 14px;
+        line-height: 20px;
       }
     }
 
