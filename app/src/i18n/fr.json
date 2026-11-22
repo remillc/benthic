@@ -2709,6 +2709,8 @@
     "version": "Version {version}",
     "versionDated": "Version {version} · {date}",
     "author": "Par {name}",
+    "diveSites": "Données des sites de plongée",
+    "diveSitesText": "© contributeurs OpenDiving Commons et OpenStreetMap ; Wikidata ; NOAA Florida Keys et Thunder Bay ; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). Base sous licence ODbL 1.0.",
     "copyright": "© {year} {name}.",
     "tagline": "Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface.",
     "desktopText": "Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. Le code de l’app est sur GitHub : chacun peut le lire, le modifier et le partager. Exportable en tout temps, votre carnet vous appartient.",
@@ -2723,6 +2725,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carte commune : ajout de sites d’OpenDiving Commons.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",
@@ -6640,6 +6643,7 @@
     }
   },
   "sharedSites": {
+    "mapCredits": "Sites : © OpenDiving Commons, Wikidata, NOAA, FWC",
     "commonMap": "carte commune",
     "show": "Afficher",
     "mine": "Mes sites",
@@ -6671,7 +6675,7 @@
       "encryptedTitle": "Vos données sont chiffrées",
       "encryptedText": "Profil, santé et documents sont gardés chiffrés sur le serveur Benthic.",
       "sharedTitle": "La carte commune des sites",
-      "sharedText": "Les sites de votre carnet alimentent la base commune des sites de plongée de Benthic : nom, position, pays, type d’eau et profondeur. Jamais vos notes, jamais votre nom.",
+      "sharedText": "Les sites de votre carnet alimentent la base commune. Leur nom et leur position sont publiés en données ouvertes. Jamais vos notes, jamais votre nom.",
       "readAll": "Lire les conditions complètes",
       "fullTitle": "Conditions d’utilisation",
       "accept": "J’accepte les conditions",
@@ -6686,7 +6690,8 @@
       "usualDepth": "Profondeur la plus souvent notée",
       "depthRange": "{from} à {to}",
       "recentDives": "Plongées des 12 derniers mois",
-      "note": "Sites versés par les plongeurs de Benthic+. Aucun nom de plongeur n’est affiché.",
+      "note": "Sites versés par les plongeurs de Benthic+ et OpenDiving Commons. Aucun nom de plongeur n’est affiché.",
+      "commonsCredits": "Données : © contributeurs OpenDiving Commons et OpenStreetMap ; Wikidata ; NOAA Florida Keys et Thunder Bay ; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). Licence ODbL 1.0.",
       "add": "Ajouter à mes sites",
       "inYourSites": "Dans vos sites",
       "report": "Signaler",

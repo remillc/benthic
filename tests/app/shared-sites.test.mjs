@@ -64,7 +64,7 @@ test('reading: box, nearby, card with « Ce que disent les carnets », redirect 
     }),
     'GET /v1/sites/base/nearby': ok({ sites: [{ id: '5', name: 'Goat Island', lat: -36.27, lon: 174.8, dives: null, fewDives: true, distanceM: 98000 }] }),
     'GET /v1/sites/base/41': ok({
-      id: '123', redirectedFrom: '41', name: 'Poor Knights', lat: -35.46, lon: 174.74, country: 'NZ', region: '', waterType: 'salt', closed: true, dives: 214, fewDives: false,
+      id: '123', redirectedFrom: '41', name: 'Poor Knights', lat: -35.46, lon: 174.74, country: 'NZ', region: '', waterType: 'salt', closed: true, dives: 214, fewDives: false, commonsSources: ['openstreetmap'],
       carnets: { waterType: 'salt', depthMm: 30000, depthRangeMm: [18000, 30000], divesLast12Months: null, fewDivesLast12Months: true },
     }),
   });
@@ -82,6 +82,7 @@ test('reading: box, nearby, card with « Ce que disent les carnets », redirect 
   const card = await api.card('t', '41');
   assert.equal(card.redirectedFrom, '41');
   assert.equal(card.closed, true);
+  assert.deepEqual(card.commonsSources, ['openstreetmap']);
   assert.deepEqual(card.carnets?.depthRangeMm, [18000, 30000]);
   assert.equal(card.carnets?.fewDivesLast12Months, true);
   assert.deepEqual(diveCountOf(card), { key: 'count', n: 214 });

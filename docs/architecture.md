@@ -527,12 +527,14 @@ Every Benthic+ diver's sites feed one **shared base of dive sites**, read as the
 
 All calls are JSON with `Authorization: Bearer <sessionToken>` (11.2). Base site ids are decimal strings. Errors use the format of 11.2. The calls need a Benthic+ account (`403 SUBSCRIPTION_REQUIRED` otherwise), except where a switch says more (below).
 
-**Who may read the map** is not decided (task 101). The server has one switch: `subscribers` (default: Benthic+ only), `signed-in` (free accounts read) or `public` (no account; the website). Reading calls therefore answer `403 SUBSCRIPTION_REQUIRED` for a free account today; the app shows its Benthic+ offer on that code and does not hard-code who may read. Contributing and the terms are Benthic+ only whatever the switch says.
+**Who may read the map.** The server has one switch: `subscribers` (default: Benthic+ only), `signed-in` (free accounts read) or `public` (no account; the website). The shared map stays for subscribers for now. Reading calls answer `403 SUBSCRIPTION_REQUIRED` for a free account; the app shows its Benthic+ offer on that code and does not hard-code who may read. Contributing and the terms are Benthic+ only whatever the switch says.
+
+The server imports OpenDiving Commons automatically and credits the catalogue and its sources on the map, the site card and About. `GET /v1/sites/open-data` publishes the derived geographic database under ODbL 1.0, without individual logbook sources or dive statistics. It is separate from the subscriber-only map; the export includes Commons source identifiers and the FWC source metadata.
 
 **Terms of use.** Accepted once per account and version, before the first contribution.
 
-- `GET /v1/sites/terms` returns `{ "currentVersion": "2026-11-19", "accepted": false, "acceptedVersion": null, "acceptedAt": null }`. Any signed-in account may read it. `accepted` is true only for the **current** version: when the server raises the version, the app shows the terms screen again.
-- `POST /v1/sites/terms/accept` with `{ "version": "2026-11-19" }` (the `currentVersion` the app showed) returns the same object with the date. `409 TERMS_VERSION_MISMATCH` when the version is not the current one (reread the status); `403 SUBSCRIPTION_REQUIRED` for a free account. Accepting again keeps the first date.
+- `GET /v1/sites/terms` returns `{ "currentVersion": "2026-11-22", "accepted": false, "acceptedVersion": null, "acceptedAt": null }`. Any signed-in account may read it. `accepted` is true only for the **current** version: when the server raises the version, the app shows the terms screen again.
+- `POST /v1/sites/terms/accept` with `{ "version": "2026-11-22" }` (the `currentVersion` the app showed) returns the same object with the date. `409 TERMS_VERSION_MISMATCH` when the version is not the current one (reread the status); `403 SUBSCRIPTION_REQUIRED` for a free account. Accepting again keeps the first date.
 
 **Contributing.** `PUT /v1/sites/contribution` with the diver's **whole** list of sites, each time (a site missing from the list leaves the base):
 

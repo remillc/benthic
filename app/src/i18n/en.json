@@ -2709,6 +2709,8 @@
     "version": "Version {version}",
     "versionDated": "Version {version} · {date}",
     "author": "By {name}",
+    "diveSites": "Dive site data",
+    "diveSitesText": "© OpenDiving Commons and OpenStreetMap contributors; Wikidata; NOAA Florida Keys and Thunder Bay; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). Database licensed under ODbL 1.0.",
     "copyright": "© {year} {name}.",
     "tagline": "Open-source dive logbook, built on the solid, proven foundations of Subsurface.",
     "desktopText": "Open-source dive logbook, built on the solid, proven foundations of Subsurface. The app’s code is on GitHub: anyone can read it, change it and share it. Exportable at any time, your logbook belongs to you.",
@@ -2723,6 +2725,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Shared map: added sites from OpenDiving Commons.",
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
@@ -6637,6 +6640,7 @@
     }
   },
   "sharedSites": {
+    "mapCredits": "Sites: © OpenDiving Commons, Wikidata, NOAA, FWC",
     "commonMap": "shared map",
     "show": "Show",
     "mine": "My sites",
@@ -6668,7 +6672,7 @@
       "encryptedTitle": "Your data is encrypted",
       "encryptedText": "Profile, health and documents are kept encrypted on the Benthic server.",
       "sharedTitle": "The shared map of sites",
-      "sharedText": "The sites in your logbook feed Benthic’s shared base of dive sites: name, position, country, water type and depth. Never your notes, never your name.",
+      "sharedText": "The sites in your logbook feed the shared base. Their names and positions are published as open data. Never your notes, never your name.",
       "readAll": "Read the full terms",
       "fullTitle": "Terms of use",
       "accept": "I accept the terms",
@@ -6683,7 +6687,8 @@
       "usualDepth": "Depth most often logged",
       "depthRange": "{from} to {to}",
       "recentDives": "Dives in the last 12 months",
-      "note": "Sites contributed by Benthic+ divers. No diver’s name is shown.",
+      "note": "Sites contributed by Benthic+ divers and OpenDiving Commons. No diver’s name is shown.",
+      "commonsCredits": "Data: © OpenDiving Commons and OpenStreetMap contributors; Wikidata; NOAA Florida Keys and Thunder Bay; Florida Fish and Wildlife Conservation Commission (FWC-FWRI). ODbL 1.0.",
       "add": "Add to my sites",
       "inYourSites": "In your sites",
       "report": "Report",
