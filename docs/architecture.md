@@ -550,7 +550,8 @@ Answer `200`: `{ "ok": true, "sites": [{ "id": "<local id>", "baseSiteId": "123"
 **Reading the base.**
 
 - `GET /v1/sites/base?bbox=west,south,east,north&zoom=Z&limit=N` (`zoom` 0 to 22, default 10; `limit` 1 to 500, default 200; `west` greater than `east` crosses the antimeridian) returns `{ "mode": "sites" | "clusters", "total": 214, "zoom": 10, "sites": [Site], "clusters": [{ "lat": 0, "lon": 0, "count": 12 }] }`. In `sites` mode (zoom 13 and above, or few sites in the box) `clusters` is empty and `sites` has them all. In `clusters` mode the server has grouped the crowded cells into `clusters` (numbered teal markers; zoom in on tap) and returns the lone sites of the other cells in `sites`. Ask again when the map stops moving.
-- `GET /v1/sites/base/nearby?lat=&lon=&radiusM=&limit=&q=` (`radiusM` 1 to 50000, default 5000; `limit` 1 to 100, default 30; `q` filters by name) returns `{ "sites": [Site + "distanceM"] }`, nearest first: the list under the map, « Choisir un site » and the suggestion « La carte commune a déjà un site à 160 pi » when the diver creates a site (call it with the new site's position and a small radius, for example 300).
+- `GET /v1/sites/base/list?bbox=west,south,east,north&limit=N&after=ID` returns `{ "sites": [Site], "next": ID | null }` in ascending ID order, including sites inside clusters. The list under the mobile map reads pages until `next` is null, restarting when the map moves. The same read permissions and bounding-box rules apply as for the map.
+- `GET /v1/sites/base/nearby?lat=&lon=&radiusM=&limit=&q=` (`radiusM` 1 to 50000, default 5000; `limit` 1 to 100, default 30; `q` filters by name) returns `{ "sites": [Site + "distanceM"] }`, nearest first: « Choisir un site » and the suggestion « La carte commune a déjà un site à 160 pi » when the diver creates a site (call it with the new site's position and a small radius, for example 300).
 - `GET /v1/sites/base/{id}` returns the card:
 
   ```json

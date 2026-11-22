@@ -170,6 +170,22 @@ export function createSharedSitesApi({ baseUrl, transport }) {
       };
     },
     /**
+     * A page of all base sites in the map's box, including sites inside clusters.
+     * @param {string} token
+     * @param {{ bbox: [number, number, number, number], after?: string, limit?: number }} q
+     * @returns {Promise<{ sites: BaseSite[], next: string|null }>}
+     */
+    async inBoxPage(token, { bbox, after, limit }) {
+      const round = (/** @type {number} */ x) => Math.round(x * 1e5) / 1e5;
+      const r = await call(token, 'GET', `/v1/sites/base/list?${qs({ bbox: bbox.map(round).join(','), after, limit })}`);
+      if (!Array.isArray(r.sites) || !(r.next === null || (typeof r.next === 'string' && /^\d{1,18}$/.test(r.next))))
+        throw new SharedSitesError('UNREACHABLE', 0);
+      const sites = r.sites.map(baseSiteOf);
+      if (sites.some((s) => !s) || (r.next !== null && (!sites.length || sites[sites.length - 1]?.id !== r.next || r.next === after)))
+        throw new SharedSitesError('UNREACHABLE', 0);
+      return { sites: /** @type {BaseSite[]} */ (sites), next: r.next };
+    },
+    /**
      * Base sites near a position, nearest first.
      * @param {string} token @param {{ lat: number, lon: number, radiusM?: number, limit?: number, q?: string }} q
      * @returns {Promise<BaseSite[]>}
@@ -208,6 +224,29 @@ export function createSharedSitesApi({ baseUrl, transport }) {
       await call(token, 'POST', `/v1/sites/base/${encodeURIComponent(id)}/report`, body);
     },
   };
+}
+
+/**
+ * Load every page while the requested map view is current.
+ * @param {(after?: string) => Promise<{ sites: BaseSite[], next: string|null }>} fetchPage
+ * @param {() => boolean} isCurrent
+ * @param {(sites: BaseSite[]) => void} show
+ */
+export async function readAreaSites(fetchPage, isCurrent, show) {
+  /** @type {BaseSite[]} */
+  let sites = [];
+  /** @type {string|undefined} */
+  let after;
+  const cursors = new Set();
+  do {
+    const page = await fetchPage(after);
+    if (!isCurrent()) return;
+    sites = [...sites, ...page.sites];
+    show(sites);
+    after = page.next ?? undefined;
+    if (after && cursors.has(after)) throw new SharedSitesError('UNREACHABLE', 0);
+    if (after) cursors.add(after);
+  } while (after && isCurrent());
 }
 
 /**
