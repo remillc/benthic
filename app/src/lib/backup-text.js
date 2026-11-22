@@ -182,3 +182,16 @@ export function versionDay(seconds) {
 export function versionAgo(seconds) {
   return formatShortAgo(isoOfEpoch(seconds));
 }
+
+/**
+ * When a dive was last changed, for the row of « Une version d’une plongée »: « Modifiée hier, 21 h 14 » for today and yesterday,
+ * « Modifiée le 2026-11-15 » for the others (the date in the format chosen in Settings).
+ * @param {number} seconds
+ * @param {string} [now] local time, for the tests
+ */
+export function changedWhen(seconds, now = localNowIso()) {
+  const iso = isoOfEpoch(seconds);
+  const DAY = 86400000;
+  const days = Math.floor(Date.parse(`${now}Z`) / DAY) - Math.floor(Date.parse(`${iso}Z`) / DAY);
+  return days === 0 || days === 1 ? t('backup.dive.changedAt', { when: formatRelativeDateTime(iso, now, false) }) : t('backup.dive.changedOn', { date: formatDate(iso) });
+}

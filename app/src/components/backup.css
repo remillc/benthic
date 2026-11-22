@@ -1,5 +1,5 @@
 /*
- * Backup and restore (task 2026-11-19-290; mock-ups docs/mockups/sauvegarde-*, android-tablette-sauvegarde-*,
+ * Backup and restore (tasks 2026-11-19-290 and 2026-11-22-319; mock-ups docs/mockups/sauvegarde-*, android-tablette-sauvegarde-*,
  * bureau-sauvegarde-*, ios-sauvegarde-*): the cards, the rows and the texts the screens share. The phone's pages, the
  * tablet's two panes and the desktop's dialog use the same classes.
  */
@@ -20,18 +20,13 @@
     gap: 16px;
   }
 
-  .bc-backup--status-tile {
+  .bc-backup--status-icon {
     flex: none;
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-    background: var(--bc-link-ok-badge);
+    width: 24px;
+    height: 24px;
     color: var(--bc-link-ok);
     display: flex;
-    align-items: center;
-    justify-content: center;
     &.bc-backup--pending {
-      background: var(--bc-late-tint);
       color: var(--bc-pending);
     }
   }
@@ -175,33 +170,6 @@
     margin-top: 8px;
   }
 
-  .bc-backup--counts {
-    margin: 8px 16px 0;
-    padding: 16px;
-    border-radius: 20px;
-    background: var(--bc-surface);
-    display: flex;
-    gap: 24px;
-  }
-
-  .bc-backup--count {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .bc-backup--count-n {
-    font-size: 24px;
-    line-height: 28px;
-    font-weight: 600;
-  }
-
-  .bc-backup--count-label {
-    font-size: 13px;
-    line-height: 18px;
-    color: var(--bc-text-2);
-  }
-
   .bc-backup--diff {
     padding: 12px 16px;
     display: flex;
@@ -308,57 +276,29 @@
   .bc-backup-panes--list {
     flex: none;
     width: 380px;
-    overflow: hidden;
+    overflow-y: auto;
     border-inline-end: 1px solid var(--bc-separator);
   }
 
-  /* The list pane shares its height between the versions and « Restaurer seulement »; each list scrolls on its own. */
-  .bc-backup-panes--list .bc-backup-main {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .bc-backup-panes--list .bc-backup-main--status {
-    flex: none;
-  }
-
-  .bc-backup-panes--list .bc-backup-main--versions {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
-  }
-
-  .bc-backup-panes--list .bc-backup-main--only {
-    flex: 0 1 auto;
-    max-height: 50%;
-    min-height: 0;
-    overflow-y: auto;
-  }
-
-  .bc-backup-panes--detail {
+    .bc-backup-panes--detail {
     flex: 1;
     min-width: 0;
     overflow-y: auto;
   }
 
-  .bc-backup-panes--list .bc-backup-main--versions,
-  .bc-backup-panes--list .bc-backup-main--only,
+  .bc-backup-panes--list,
   .bc-backup-panes--detail {
     scrollbar-color: color-mix(in srgb, var(--bc-text) 45%, transparent) transparent;
     scrollbar-width: thin;
   }
 
-  .bc-backup-panes--list .bc-backup-main--versions::-webkit-scrollbar,
-  .bc-backup-panes--list .bc-backup-main--only::-webkit-scrollbar,
+  .bc-backup-panes--list::-webkit-scrollbar,
   .bc-backup-panes--detail::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
 
-  .bc-backup-panes--list .bc-backup-main--versions::-webkit-scrollbar-thumb,
-  .bc-backup-panes--list .bc-backup-main--only::-webkit-scrollbar-thumb,
+  .bc-backup-panes--list::-webkit-scrollbar-thumb,
   .bc-backup-panes--detail::-webkit-scrollbar-thumb {
     border: 2px solid transparent;
     border-radius: 999px;
@@ -377,6 +317,338 @@
     font-size: 15px;
   }
 
+  /* « Que voulez-vous récupérer ? »: three large rows in one card. */
+  .bc-backup--choices {
+    margin: 0 16px;
+    border-radius: 24px;
+    background: var(--bc-surface);
+    overflow: hidden;
+  }
+
+  .bc-backup--choice {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 88px;
+    padding: 16px;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--bc-text);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    & + .bc-backup--choice {
+      border-top: 1px solid var(--bc-separator);
+    }
+    .bc-backup--tile {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      color: var(--bc-release-tile-icon);
+    }
+  }
+
+  .bc-backup--choice-title {
+    font-size: 17px;
+    line-height: 22px;
+    font-weight: 600;
+  }
+
+  .bc-backup--choice-line {
+    font-size: 14px;
+    line-height: 19px;
+    color: var(--bc-text-2);
+  }
+
+  .bc-backup--badge {
+    flex: none;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    background: var(--bc-secondary);
+    color: var(--bc-on-primary);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bc-backup--footnote {
+    margin-top: 16px;
+  }
+
+  /* The round tonal icon button of the status card: « Sauvegarder maintenant ». */
+  .bc-backup--sync {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 24px;
+    background: var(--bc-secondary-container);
+    color: var(--bc-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    &[aria-busy='true'] svg {
+      animation: bc-backup-spin 1s linear infinite;
+    }
+  }
+
+  @keyframes bc-backup-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bc-backup--sync[aria-busy='true'] svg {
+      animation: none;
+    }
+  }
+
+  .bc-backup--filled {
+    box-sizing: border-box;
+    height: 48px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 24px;
+    background: var(--bc-primary-action);
+    color: var(--bc-on-primary);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
+  .bc-backup--actions .bc-outlined-button {
+    height: 48px;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  /* The tile of a difference takes the colour of its chip in the timeline. */
+  .bc-backup--tile-added {
+    background: var(--bc-link-ok-badge);
+    color: var(--bc-link-ok);
+  }
+
+  .bc-backup--tile-modified {
+    background: var(--bc-plus-amber);
+    color: var(--bc-plus-amber-icon);
+  }
+
+  .bc-backup--tile-removed {
+    background: var(--bc-alarm-tint);
+    color: var(--bc-alarm);
+  }
+
+  .bc-backup--count-text {
+    flex: none;
+    font-size: 13px;
+    color: var(--bc-text-2);
+  }
+
+  /* The dives listed under a difference: « N° 310 · Tadoussac », and their day under it. */
+  .bc-backup--diff-dives {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    & li {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .bc-backup--diff-dive {
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  .bc-backup--diff-date {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--bc-text-2);
+  }
+
+  /* One version of the logbook: its date and counts in a card. */
+  .bc-backup-version--card .bc-backup--status-icon {
+    color: var(--bc-release-tile-icon);
+  }
+
+  .bc-backup-version--card .bc-backup--title {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  /* The timeline: a dot per version joined by a 2 dp line, the days as small labels. */
+  .bc-backup--timeline {
+    margin: 8px 16px 0;
+    padding: 4px 0 8px;
+    list-style: none;
+    border-radius: 20px;
+    background: var(--bc-surface);
+  }
+
+  .bc-backup--day {
+    margin: 14px 0 0 52px;
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 600;
+    color: var(--bc-text-2);
+  }
+
+  .bc-backup--version {
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 26px;
+      top: 30px;
+      bottom: -12px;
+      width: 2px;
+      background: color-mix(in srgb, var(--bc-secondary) 22%, transparent);
+    }
+    &.bc-backup--version-last::before {
+      display: none;
+    }
+  }
+
+  .bc-backup--version-row {
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    min-height: 56px;
+    padding: 10px 16px 10px 20px;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    color: var(--bc-text);
+    font: inherit;
+    text-align: start;
+    text-decoration: none;
+  }
+
+  button.bc-backup--version-row {
+    cursor: pointer;
+  }
+
+  .bc-backup--dot-column {
+    flex: none;
+    width: 14px;
+    padding-top: 6px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .bc-backup--dot {
+    box-sizing: border-box;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--bc-release-tile-icon);
+    border-radius: 50%;
+    background: var(--bc-surface);
+  }
+
+  .bc-backup--dot-current {
+    width: 14px;
+    height: 14px;
+    border: none;
+    background: var(--bc-secondary);
+    box-shadow: 0 0 0 4px var(--bc-secondary-container);
+  }
+
+  .bc-backup--version-texts {
+    gap: 6px;
+  }
+
+  .bc-backup--version-title {
+    font-size: 16px;
+    line-height: 21px;
+  }
+
+  .bc-backup--version-dives {
+    font-size: 14px;
+    color: var(--bc-text-2);
+  }
+
+  .bc-backup--chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .bc-backup--change-chip {
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .bc-backup--change-added {
+    background: var(--bc-link-ok-badge);
+    color: var(--bc-link-ok);
+  }
+
+  .bc-backup--change-modified {
+    background: var(--bc-plus-amber);
+    color: var(--bc-plus-amber-icon);
+  }
+
+  .bc-backup--change-removed {
+    background: var(--bc-alarm-tint);
+    color: var(--bc-alarm);
+  }
+
+  .bc-backup--current-chip {
+    flex: none;
+    height: 24px;
+    margin-top: 2px;
+    padding: 0 10px;
+    border-radius: 12px;
+    background: var(--bc-secondary-container);
+    color: var(--bc-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  .bc-backup--older {
+    margin-top: 4px;
+    & .bc-backup--more {
+      border-top: none;
+      padding-inline: 52px 16px;
+    }
+  }
+
+  .bc-backup-pick .bc-backup--search {
+    gap: 12px;
+  }
+
+  /* The deleted dives: the intro, then a card of rows with a text button. */
   .bc-backup-deleted--heading {
     margin: 20px 32px 0;
   }
@@ -389,126 +661,66 @@
     color: var(--bc-text);
   }
 
-  .bc-backup-deleted--summary {
-    margin: 2px 0 0;
+  .bc-backup-deleted--intro {
+    margin: 12px 32px;
     font-size: 14px;
     line-height: 20px;
     color: var(--bc-text-2);
-  }
-
-  .bc-backup-deleted--note {
-    margin: 12px 32px 0;
-    padding: 12px 16px;
-    border-radius: 12px;
-    background: var(--bc-surface-container);
-    color: var(--bc-text-2);
-    font-size: 14px;
-    line-height: 20px;
-  }
-
-  .bc-backup-deleted--list,
-  .bc-backup-deleted--loading {
-    margin: 16px 24px 24px;
   }
 
   .bc-backup-deleted--item {
-    padding: 20px 24px;
-  }
-
-  .bc-backup-deleted--item + .bc-backup-deleted--item {
-    border-top: 1px solid var(--bc-separator);
+    box-sizing: border-box;
+    min-height: 80px;
+    padding: 12px 8px 12px 16px;
+    display: flex;
+    align-items: center;
+    & + .bc-backup-deleted--item {
+      border-top: 1px solid var(--bc-separator);
+    }
   }
 
   .bc-backup-deleted--top {
+    flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 12px;
   }
 
   .bc-backup-deleted--identity {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   .bc-backup-deleted--name {
     margin: 0;
-    font-size: 19px;
-    line-height: 26px;
-    font-weight: 600;
-    color: var(--bc-text);
-    overflow-wrap: anywhere;
-  }
-
-  .bc-backup-deleted--date {
-    margin: 2px 0 0;
-    font-size: 14px;
-    line-height: 20px;
-    color: var(--bc-text-2);
-  }
-
-  .bc-backup-deleted--restore {
-    min-width: 120px;
-    height: 48px;
-    padding: 0 20px;
-    border: 0;
-    border-radius: 24px;
-    background: var(--bc-text);
-    color: var(--bc-surface);
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .bc-backup-deleted--facts {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px 24px;
-    margin: 18px 0 0;
-    padding: 16px 0;
-    border-block: 1px solid var(--bc-separator);
-  }
-
-  .bc-backup-deleted--fact-depth {
-    grid-column: 1;
-  }
-
-  .bc-backup-deleted--fact-duration {
-    grid-column: 2;
-  }
-
-  .bc-backup-deleted--fact-mode {
-    grid-column: 3;
-  }
-
-  .bc-backup-deleted--fact-computer {
-    grid-column: 4;
-  }
-
-  .bc-backup-deleted--facts dt {
-    margin: 0;
-    color: var(--bc-text-2);
-    font-size: 12px;
-    line-height: 18px;
-  }
-
-  .bc-backup-deleted--facts dd {
-    margin: 2px 0 0;
-    color: var(--bc-text);
     font-size: 16px;
-    line-height: 22px;
-    font-weight: 600;
+    line-height: 21px;
+    font-weight: 400;
+    color: var(--bc-text);
     overflow-wrap: anywhere;
   }
 
+  .bc-backup-deleted--facts,
   .bc-backup-deleted--removed {
-    margin: 12px 0 0;
+    margin: 0;
     color: var(--bc-text-2);
     font-size: 13px;
     line-height: 18px;
   }
 
+  .bc-backup-deleted--restore {
+    flex: none;
+    font-weight: 600;
+    color: var(--bc-release-link);
+  }
+
   .bc-backup-deleted--state,
   .bc-backup-deleted--empty {
-    margin: 16px 24px 24px;
+    margin: 16px;
     padding: 28px 24px;
     border-radius: 20px;
     background: var(--bc-surface);
@@ -539,48 +751,32 @@
     height: 48px;
   }
 
-  .bc-backup-deleted--loading .bc-backup-deleted--item {
-    min-height: 154px;
-  }
-
   .bc-backup-deleted--skeleton-title,
   .bc-backup-deleted--skeleton-line,
   .bc-backup-deleted--skeleton-action,
-  .bc-backup-deleted--skeleton-facts .skeleton-block,
   .bc-backup-main--skeleton-title,
   .bc-backup-main--skeleton-line,
   .bc-backup-main--skeleton-chip,
-  .bc-backup-main--deleted-skeleton {
+  .bc-backup-main--badge-skeleton {
     display: block;
     border-radius: 4px;
   }
 
   .bc-backup-deleted--skeleton-title {
-    width: min(60%, 320px);
-    height: 24px;
+    width: min(60%, 260px);
+    height: 18px;
   }
 
   .bc-backup-deleted--skeleton-line {
-    width: min(40%, 220px);
-    height: 16px;
-    margin-top: 8px;
+    width: min(40%, 200px);
+    height: 12px;
+    margin-top: 6px;
   }
 
   .bc-backup-deleted--skeleton-action {
-    width: 120px;
-    height: 48px;
-    border-radius: 24px;
-  }
-
-  .bc-backup-deleted--skeleton-facts {
-    display: flex;
-    gap: 24px;
-    margin-top: 18px;
-  }
-
-  .bc-backup-deleted--skeleton-facts .skeleton-block {
-    width: 96px;
-    height: 36px;
+    width: 88px;
+    height: 32px;
+    border-radius: 16px;
   }
 
   .bc-backup-main--skeleton-row {
@@ -614,49 +810,16 @@
     border-radius: 12px;
   }
 
-  .bc-backup-main--deleted-skeleton {
-    width: min(70%, 180px);
-    height: 13px;
+  .bc-backup-main--badge-skeleton {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
   }
 
-  @media (max-width: 600px) {
-    .bc-backup-deleted--heading,
-    .bc-backup-deleted--note {
-      margin-inline: 16px;
-    }
-
-    .bc-backup-deleted--list,
-    .bc-backup-deleted--loading,
-    .bc-backup-deleted--state,
-    .bc-backup-deleted--empty {
-      margin-inline: 16px;
-    }
-
-    .bc-backup-deleted--item {
-      padding: 16px;
-    }
-
-    .bc-backup-deleted--top {
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .bc-backup-deleted--restore {
-      min-width: 0;
-      padding-inline: 16px;
-    }
-
-    .bc-backup-deleted--facts {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .bc-backup-deleted--fact-mode {
-      grid-column: 1;
-    }
-
-    .bc-backup-deleted--fact-computer {
-      grid-column: 2;
-    }
+  /* The detail pane of a tablet or the desktop: a way back from a version to the timeline. */
+  .bc-backup-panes--back {
+    margin: 8px 8px 0;
   }
 }
 

@@ -13,5 +13,5 @@
       <BackLink label={t('backup.title')} name={t('detail.back')} />
     {/snippet}
   </Navbar>
-  <BackupDeleted />
+  <BackupDeleted heading={false} />
 </Page>

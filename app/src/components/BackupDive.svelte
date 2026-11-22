@@ -1,11 +1,10 @@
 <script>
   // @ts-check
   // The versions of one dive (task 2026-11-19-290; sauvegarde-plongee-android, ios-sauvegarde-plongee): the dive chosen
-  // (« Changer »), the syncs that touched it with what each changed, and « Restaurer » on each, which changes only that dive,
-  // as a new commit. Reached from « Restaurer seulement » and from the dive's menu, « Versions de cette plongée ».
+  // (« Changer » goes back to the choice, BackupDivePick), the syncs that touched it with what each changed, and « Restaurer » on
+  // each, which changes only that dive, as a new commit. Reached from « Une version d’une plongée » and from the dive's menu,
+  // « Versions de cette plongée ».
   import './backup.css';
-  import Icon from './Icon.svelte';
-  import SearchClear from './SearchClear.svelte';
   import { backup, restoreOne, historyCore } from '../lib/backup.svelte.js';
   import { diveVersions, keyOfDate } from '../lib/backup-history.js';
   import { diveVersionLine, versionWhen, versionDay } from '../lib/backup-text.js';
@@ -16,14 +15,12 @@
   import { t } from '../lib/i18n.js';
 
   /**
-   * `startKey`: the dive to show, by its start time (`YYYY-MM-DD HH:MM:SS`); empty: the diver picks one.
-   * @type {{ startKey?: string, onrestored?: () => void }}
+   * `startKey`: the dive to show, by its start time (`YYYY-MM-DD HH:MM:SS`). `onchange`: « Changer », back to the choice of a dive.
+   * @type {{ startKey: string, onrestored?: () => void, onchange: () => void }}
    */
-  let { startKey = '', onrestored } = $props();
+  let { startKey, onrestored, onchange } = $props();
 
-  let key = $state(startKey);
-  let picking = $state(!startKey);
-  let search = $state('');
+  const key = $derived(startKey);
   /** @type {import('../lib/backup-history.js').DiveVersion[]|null} */
   let versions = $state(null);
   let failed = $state(false);
@@ -45,26 +42,11 @@
       });
   });
 
-  /** The dives that match the search: number, site, date. */
-  const choices = $derived.by(() => {
-    const q = search.trim().toLocaleLowerCase();
-    const all = [...logbook.dives].sort((a, b) => (a.date < b.date ? 1 : -1));
-    const found = q ? all.filter((d) => `${d.number} ${d.site} ${d.date}`.toLocaleLowerCase().includes(q)) : all;
-    return found.slice(0, 200);
-  });
-
   /** @param {import('opendives-core').Dive} d */
   function rowText(d) {
     const number = t('backup.version.number', { n: d.number });
     const date = formatDate(d.date);
     return d.site ? t('backup.dive.row', { number, site: d.site, date }) : t('backup.dive.rowNoSite', { number, date });
-  }
-
-  /** @param {import('opendives-core').Dive} d */
-  function choose(d) {
-    key = keyOfDate(d.date);
-    picking = false;
-    search = '';
   }
 
   /** @param {import('../lib/backup-history.js').DiveVersion} v */
@@ -90,31 +72,12 @@
 </script>
 
 <div class="bc-backup bc-backup-dive">
-  {#if picking}
-    <div class="bc-backup--search">
-      <input type="search" bind:value={search} placeholder={t('backup.dive.search')} aria-label={t('backup.dive.search')} />
-      {#if search}<SearchClear onclear={() => (search = '')} />{/if}
-    </div>
-    <div class="bc-backup--list" style="margin-top: 12px">
-      {#each choices as d (d.id)}
-        <button type="button" class="bc-backup--row" onclick={() => choose(d)}>
-          <span class="bc-backup--texts">
-            <span class="bc-backup--row-title">{rowText(d)}</span>
-          </span>
-          <span class="bc-backup--chevron"><Icon name="chevron" size={20} /></span>
-        </button>
-      {/each}
-    </div>
-    {#if key}
-      <p class="bc-backup--note"><button type="button" class="bc-text-button" onclick={() => (picking = false)}>{t('dialog.cancel')}</button></p>
-    {/if}
-  {:else}
     <h2 class="bc-backup--section">{t('backup.dive.pick')}</h2>
     <div class="bc-backup--dive-card">
       <span class="bc-backup--texts">
         <span class="bc-backup--row-title">{dive ? rowText(dive) : key}</span>
       </span>
-      <button type="button" class="bc-text-button" onclick={() => (picking = true)}>{t('backup.dive.change')}</button>
+      <button type="button" class="bc-text-button" onclick={onchange}>{t('backup.dive.change')}</button>
     </div>
 
     <h2 class="bc-backup--section">{t('backup.dive.versions')}</h2>
@@ -142,5 +105,4 @@
       </div>
     {/if}
     <p class="bc-backup--note">{t('backup.dive.note')} {t('backup.media')}</p>
-  {/if}
 </div>

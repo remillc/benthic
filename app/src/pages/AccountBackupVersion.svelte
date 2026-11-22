@@ -5,7 +5,7 @@
   import BackLink from '../components/BackLink.svelte';
   import BackupVersion from '../components/BackupVersion.svelte';
   import { backup, loadVersions } from '../lib/backup.svelte.js';
-  import { versionWhen } from '../lib/backup-text.js';
+  import { versionDay } from '../lib/backup-text.js';
   import { ios } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -20,9 +20,9 @@
 </script>
 
 <Page class="bc-account-backup-page">
-  <Navbar title={ios || !version ? t('backup.version.title') : versionWhen(version.time)}>
+  <Navbar title={ios || !version ? t('backup.version.title') : t('backup.version.navTitle', { date: versionDay(version.time) })}>
     {#snippet left()}
-      <BackLink label={t('backup.title')} name={t('detail.back')} />
+      <BackLink label={t('backup.timeline.title')} name={t('detail.back')} />
     {/snippet}
   </Navbar>
   <BackupVersion {id} heading={false} onrestored={() => f7router.back()} onbrowse={(commit) => f7router.navigate(`/account/backup/browse/${commit}`)} />

@@ -169,6 +169,7 @@
     { path: '/account/backup/version/:id', ...lazy(() => import('./pages/AccountBackupVersion.svelte')) },
     { path: '/account/backup/dive/', ...lazy(() => import('./pages/AccountBackupDive.svelte')) },
     { path: '/account/backup/dive/:key', ...lazy(() => import('./pages/AccountBackupDive.svelte')) },
+    { path: '/account/backup/carnet/', ...lazy(() => import('./pages/AccountBackupCarnet.svelte')) },
     { path: '/account/backup/deleted/', ...lazy(() => import('./pages/AccountBackupDeleted.svelte')) },
     { path: '/account/backup/browse/:id', ...lazy(() => import('./pages/AccountBackupBrowse.svelte')) },
     { path: '/account/manage', ...lazy(() => import('./pages/AccountManage.svelte')) },

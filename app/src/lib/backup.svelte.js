@@ -3,14 +3,14 @@
 // choice shown in the detail pane (a tablet's, a desktop's) — shared by the phone's pages, the tablet's page and the
 // desktop's dialog, which are the same screens. The reading and the restoring are lib/backup-history.js.
 import { OpenDivesCore } from 'opendives-core';
-import { listVersions, deletedDives, restoreVersion, restoreDive } from './backup-history.js';
+import { listVersions, deletedDives, recentDives, restoreVersion, restoreDive } from './backup-history.js';
 import { afterRestore } from './logbook.svelte.js';
 
 /** Versions read per page. */
 export const PAGE = 10;
 
 /**
- * @typedef {{ kind: 'version', id: string } | { kind: 'dive', key: string } | { kind: 'deleted' }} Choice
+ * @typedef {{ kind: 'carnet' } | { kind: 'version', id: string } | { kind: 'dive', key: string } | { kind: 'deleted' }} Choice
  */
 
 export const backup = $state({
@@ -29,6 +29,9 @@ export const backup = $state({
   deletedLoading: false,
   /** The search for deleted dives failed (not the same as finding none). */
   deletedFailed: false,
+  /** @type {import('./backup-history.js').RecentDive[]|null} the dives changed recently (null: not read yet) */
+  recent: null,
+  recentFailed: false,
   /** What the detail pane shows (tablet, desktop). @type {Choice|null} */
   choice: null,
   /** A restore is running. */
@@ -112,6 +115,18 @@ export async function loadDeleted() {
   }
 }
 
+/** Reads the dives the latest syncs touched. */
+export async function loadRecent() {
+  backup.recentFailed = false;
+  try {
+    backup.recent = await recentDives(core);
+  } catch (e) {
+    console.error('Reading the recently changed dives', e);
+    backup.recent = [];
+    backup.recentFailed = true;
+  }
+}
+
 /** Forgets what was read: the account or the logbook changed. */
 export function resetBackup() {
   reading++;
@@ -123,6 +138,8 @@ export function resetBackup() {
   backup.failed = false;
   backup.deleted = null;
   backup.deletedFailed = false;
+  backup.recent = null;
+  backup.recentFailed = false;
   backup.choice = null;
 }
 
@@ -137,6 +154,7 @@ export async function restoreWhole(commit, date) {
     await restoreVersion(core, commit, date);
     await afterRestore();
     backup.deleted = null;
+    backup.recent = null;
     await loadVersions();
     return true;
   } catch (e) {
@@ -158,6 +176,7 @@ export async function restoreOne(what) {
     await restoreDive(core, what);
     await afterRestore();
     backup.deleted = null;
+    backup.recent = null;
     await loadVersions();
     return true;
   } catch (e) {
