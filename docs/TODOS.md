@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 169
+Next number: 170
 
 ## List
 
@@ -77,3 +77,4 @@ Next number: 169
 - #163 [design] clarifier exporter/enregistrer sous/enregistrer une copie, surtout sur desktop, mais devrais aussi se refléter dans tablette et mobile. On a besoin d'un format .benthic qui est le zip qu'on exporte déjà (voir #158).
 - #167 [code] When editing a site, automatically fill in the country and region when GPS coordinates are entered.
 - #168 [code] concernant tous les champs de coordonnées gps, prévoir le parsage de variants dont "23.9404° ; -74.5718°"
+- #169 [code] tous les champs de recherche doivent avoir un "x" quand il y a une valeur
