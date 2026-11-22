@@ -1349,7 +1349,7 @@ async function computerPhotoFlows(expect) {
 
 async function profileInsetsFlows(expect) {
   for (const [label, width, height] of [['landscape narrow', 1000, 700], ['landscape', 1280, 800], ['portrait', 800, 1280]]) {
-    for (const [route, bar] of [['/profile', 'none'], ['/profile/maintenance/', 'none'], ['/profile/certs/', 'main'], ['/profile/gear/new', 'dialog']]) {
+    for (const [route, bar] of [['/profile', 'none'], ['/profile/maintenance/', 'none'], ['/profile/certs/', 'main'], ['/profile/gear/new', 'steps']]) {
       const tab = await openTab(width, height, false, false, false, { theme: 'md' });
       await tab.run(async (path) => {
         window.__odSetInsets({ top: 24, bottom: 48, left: 0, right: 0 });
@@ -1374,22 +1374,22 @@ async function profileInsetsFlows(expect) {
           back: !back,
           add: !add || add.bottom <= bottom,
           main: (!portrait && kind !== 'main') || (!!navbar && !!inner && inner.top + parseFloat(getComputedStyle(page.querySelector(':scope > .navbar .navbar-inner')).paddingTop) >= 24),
-          dialog: portrait || kind !== 'dialog' || (!!navbar && !!box && near(navbar.top, box.top) && box.top >= 24 && box.bottom <= bottom),
+          // A new piece is a two-step dialog with its own header (task 2026-11-22-324): no page bar, the box inside the system bars.
+          dialog: portrait || (kind !== 'dialog' && kind !== 'steps') || (kind === 'steps' ? !navbar && !!box && box.top >= 24 && box.bottom <= bottom : !!navbar && !!box && near(navbar.top, box.top) && box.top >= 24 && box.bottom <= bottom),
           navWidth: portrait || (!!nav && near(nav.width, innerWidth >= 1200 ? 350 : 320)),
           barAligned: portrait || kind !== 'main' || (!!nav && !!navbar && near(nav.right, navbar.left)),
         };
       }, { kind: bar, portrait: label === 'portrait', path: route });
       expect(`${label} ${route}: profile panes and controls avoid system bars`, { frame: true, back: true, add: true, main: true, dialog: true, navWidth: true, barAligned: true }, state);
-      if (label === 'landscape' && bar === 'dialog') {
+      if (label === 'landscape' && bar === 'steps') {
         const changed = await tab.run(() => {
           window.__odSetInsets({ top: 40, bottom: 20, left: 0, right: 0 });
           const page = document.querySelector('.view.tab-active > .page-current:has(.bc-pf)');
           const frame = page.querySelector('.bc-pf').getBoundingClientRect();
           const box = page.querySelector('.bc-pf--box').getBoundingClientRect();
-          const navbar = page.querySelector(':scope > .navbar').getBoundingClientRect();
           return {
             frame: Math.abs(frame.top - 40) < 2 && Math.abs(frame.bottom - (innerHeight - 20)) < 2,
-            dialog: Math.abs(navbar.top - box.top) < 2 && box.top >= 40 && box.bottom <= innerHeight - 20,
+            dialog: box.top >= 40 && box.bottom <= innerHeight - 20,
           };
         });
         expect('landscape: profile dialog follows changed system insets', { frame: true, dialog: true }, changed);
