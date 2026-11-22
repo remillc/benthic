@@ -6483,3 +6483,12 @@ The phone keeps its full-screen form with the type menu.
 **5. Icons.** New drawings (24 grid, stroke 2, round caps and joins, no fill) for Recycleur (the head in the middle with its loop and mouthpiece, a cylinder on each side, a little taller than the head), Masque, Palmes and Scooter (a torpedo body with a light at the nose and the propeller in its shroud). Take the exact paths from `android-tablette-profil-piece-nouvelle-type-paysage`. Then **review every icon of the app** (`Icon.svelte` and every inline SVG) against the mock-ups of both canvases (`docs/mockups/`): several icons in the app do not match the mock-ups. When an icon differs, the mock-up wins: copy its drawing. Write the list of the icons you changed in the done note, and the ones you are not sure about.
 
 **Test:** the tablet ⋮ opens the export dialog with the formats in the order above; the .benthic switch is on and only in its row; a Recycleur can be added with its two dates and gets its two reminders; on tablet and desktop the type grid leads to the form and the back arrow returns to the grid; the gear icons match the mock-ups.
+
+## [ ] 2026-11-22-325 /profile/gear/new, step 2: the type in the title, no type row
+
+Christian approved this on 22 November 2026. Work in `main`. Amends step 2 of task 324 (tablet and desktop):
+- The title becomes « Nouvelle pièce · <type> » (for example « Nouvelle pièce · Détendeur »), 24 px as before. The subtitle « Étape 2 sur 2 · <type> » is removed.
+- The row « Type de pièce · <type> » (icon tile, label and value) at the top of the form is removed; the form starts with the photo and the fields.
+- The back arrow left of the title (back to step 1) and the ✕ are unchanged.
+
+Mock-ups: `android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle` (updated in `docs/mockups/`).
