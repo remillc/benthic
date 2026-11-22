@@ -2743,6 +2743,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Ordinateur : « Enregistrer une copie » et « Télécharger mes plongées » quittent les menus, et « Exporter le carnet » le menu ⋮. Pour faire une copie, exportez le carnet.",
+      "Export : « Fichier Benthic (.benthic) » écrit tout le carnet et vos données (équipement, profil, brevets, réglages). Il n’est proposé que pour tout le carnet.",
       "Premier lancement : « Le serveur ne répond pas » est centré, boutons compris.",
       "Outils, désaturation : la légende sous les graphiques des tissus est plus courte.",
       "Premier lancement : des rayons de lumière venus du coin supérieur droit remplacent les bandes du bandeau bleu.",
@@ -4037,6 +4039,7 @@
     },
     "text": "Choisissez un format. Le fichier s’ouvre ensuite dans le partage du téléphone.",
     "formats": {
+      "benthic": "Fichier Benthic (.benthic)",
       "ssrf": "Fichier de carnet (.ssrf)",
       "uddf": "UDDF (.uddf)",
       "csv": "CSV, liste des plongées",
@@ -4044,6 +4047,7 @@
       "pdf": "Fiches PDF"
     },
     "formatTexts": {
+      "benthic": "Tout le carnet et vos données Benthic : équipement, profil, brevets, réglages",
       "ssrf": "Format Subsurface, lisible aussi par Benthic",
       "uddf": "Format d’échange entre logiciels de plongée",
       "csv": "Une ligne par plongée, pour un tableur",
@@ -4661,7 +4665,6 @@
       "recentTitle": "Carnets récents · chacun s'ouvre dans sa fenêtre",
       "newLogbook": "Nouveau carnet…",
       "openLogbook": "Ouvrir un carnet…",
-      "saveCopy": "Enregistrer une copie…",
       "closeLogbook": "Fermer le carnet",
       "noRecent": "Aucun carnet récent"
     },
@@ -4671,7 +4674,6 @@
       "recentLogbooks": "Carnets récents",
       "clearRecent": "Effacer la liste",
       "closeLogbook": "Fermer le carnet",
-      "saveCopy": "Enregistrer une copie…",
       "noRecent": "Aucun carnet récent"
     },
     "main": {
@@ -4681,8 +4683,6 @@
       "openTitle": "Ouvrir un carnet",
       "fileFilter": "Carnet",
       "newFileTitle": "Nouveau carnet",
-      "copyTitle": "Enregistrer une copie",
-      "copySuffix": "copie",
       "folderTitle": "Choisir le dossier"
     },
     "start": {
@@ -4786,12 +4786,6 @@
       "manual": "Noter une plongée à la main",
       "manualHelp": "Pour une plongée sans ordinateur",
       "drop": "Vous pouvez aussi déposer un fichier sur cette fenêtre."
-    },
-    "copy": {
-      "saved": "Copie enregistrée",
-      "open": "Ouvrir",
-      "failed": "La copie n'a pas pu être enregistrée.",
-      "sameFile": "Choisissez un autre fichier que celui du carnet ouvert."
     }
   },
   "desktopCloud": {
@@ -5300,7 +5294,6 @@
       "file": "Fichier",
       "newDive": "Nouvelle plongée",
       "import": "Importer…",
-      "download": "Télécharger mes plongées…",
       "export": "Exporter…",
       "print": "Imprimer…",
       "edit": "Édition",
@@ -5403,6 +5396,7 @@
         "one": "Plongée exportée",
         "other": "{n} plongées exportées"
       },
+      "savedLogbook": "Carnet exporté",
       "fileDives": "plongees",
       "fileLogbook": "carnet",
       "logbook": "Exporter le carnet…"

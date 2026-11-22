@@ -66,6 +66,25 @@
 	<array>
 		<dict>
 			<key>UTTypeIdentifier</key>
+			<string>app.benthicdivelog.benthic</string>
+			<key>UTTypeDescription</key>
+			<string>Benthic file</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.zip-archive</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>benthic</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/vnd.benthic+zip</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
 			<string>org.opendives.ssrf</string>
 			<key>UTTypeDescription</key>
 			<string>Subsurface logbook</string>
@@ -111,6 +130,18 @@
 	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Benthic file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>app.benthicdivelog.benthic</string>
+			</array>
+		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
 			<string>Subsurface logbook</string>

@@ -58,6 +58,15 @@
         "to": "SampleDivesV2.ssrf"
       }
     ],
+    "fileAssociations": [
+      {
+        "ext": "benthic",
+        "name": "Benthic file",
+        "description": "Benthic file",
+        "mimeType": "application/vnd.benthic+zip",
+        "role": "Viewer"
+      }
+    ],
     "win": {
       "target": [
         "nsis",

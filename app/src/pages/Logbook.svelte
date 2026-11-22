@@ -408,10 +408,17 @@
 
   /**
    * Export the whole logbook or the checked dives, then open the system's share sheet.
-   * @param {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize @param {boolean} [showName] « Mon nom dans l’en-tête » (PDF)
+   * @param {'benthic'|'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} format @param {boolean} anonymize @param {boolean} [showName] « Mon nom dans l’en-tête » (PDF)
    */
   async function exportFromSheet(format, anonymize, showName = true) {
     try {
+      if (format === 'benthic') {
+        // The archive of « Télécharger mes données » (lib/full-export.js), through the share sheet.
+        const { buildExport, deliverExport } = await import('../lib/full-export.js');
+        const { file } = await buildExport({ logbookName: deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName') });
+        await deliverExport(file);
+        return;
+      }
       const ids = exportWhole ? logbook.dives.map((d) => d.id) : checkedIds;
       await exportDives(ids, format, anonymize, logbook.prefs, ids.length > 0 && ids.length === logbook.dives.length, showName);
     } catch (e) {
@@ -1581,7 +1588,7 @@
   </Popover>
 
   {#if exporting}
-    <ExportSheet count={exportWhole ? logbook.dives.length : checkedCount} onexport={exportFromSheet} onclose={() => ((exporting = false), (exportWhole = false))} />
+    <ExportSheet count={exportWhole ? logbook.dives.length : checkedCount} whole={exportWhole} onexport={exportFromSheet} onclose={() => ((exporting = false), (exportWhole = false))} />
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}

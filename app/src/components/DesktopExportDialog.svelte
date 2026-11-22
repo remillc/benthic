@@ -10,7 +10,7 @@
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { exportFile } from '../lib/share.js';
   import { deviceStore } from '../lib/device-store.js';
-  import { defaultScope, exportFileName } from '../lib/desktop-export.js';
+  import { defaultScope, exportFileName, exportFormats, usableFormat } from '../lib/desktop-export.js';
   import { windowLogbook } from '../lib/desktop-logbooks.svelte.js';
   import { displayName } from '../lib/desktop-logbooks.js';
   import { localDay } from '../lib/logbook-name.js';
@@ -29,12 +29,15 @@
    */
   let { selected, filtered, all, prefs, whole = false, onclose } = $props();
 
-  const FORMATS = /** @type {const} */ (['ssrf', 'uddf', 'csv', 'csvProfiles', 'pdf']);
   const FORMAT_KEY = 'od.desktopExportFormat';
 
   // svelte-ignore state_referenced_locally
   let scope = $state(whole ? 'all' : defaultScope(selected.length, !!filtered));
-  let format = $state(/** @type {(typeof FORMATS)[number]} */ (FORMATS.find((f) => f === deviceStore.getItem(FORMAT_KEY)) ?? 'ssrf'));
+  // Stored as chosen; what is written is `usableFormat`: .benthic only exists for the whole logbook.
+  let chosenFormat = $state(String(deviceStore.getItem(FORMAT_KEY) ?? 'ssrf'));
+  const wholeLogbook = $derived(scope === 'all');
+  const formats = $derived(exportFormats(wholeLogbook));
+  const format = $derived(usableFormat(chosenFormat, wholeLogbook));
   let anonymize = $state(false);
   let showName = $state(true);
   const fullName = $derived(diver.info.fullName);
@@ -57,6 +60,15 @@
     try {
       const day = localDay();
       const entry = windowLogbook();
+      if (format === 'benthic') {
+        // The archive of « Télécharger mes données » (lib/full-export.js), named after the logbook.
+        const { buildExport, deliverExport } = await import('../lib/full-export.js');
+        const { file } = await buildExport({ logbookName: entry ? displayName(entry, t) : '' });
+        const result = await deliverExport(file);
+        onclose();
+        if (result?.saved) showSnackbar(t('desktop.export.savedLogbook'));
+        return;
+      }
       const name = exportFileName(/** @type {any} */ (scope), numbers, format, day, { dives: t('desktop.export.fileDives'), logbook: t('desktop.export.fileLogbook') }, entry ? displayName(entry, t) : '');
       const { uri } = await exportFile(ids, format, anonymize, prefs, name, showName);
       const result = await /** @type {any} */ (window).odDesktop.saveAs({ path: uri, name });
@@ -92,21 +104,23 @@
 
   <h3 class="bc-desktop-export--heading">{t('desktop.export.format')}</h3>
   <div class="bc-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.format')}>
-    {#each FORMATS as f (f)}
-      <ChoiceRow name="od-export-format" selected={format === f} onselect={() => (format = f)}>
+    {#each formats as f (f)}
+      <ChoiceRow name="od-export-format" selected={format === f} onselect={() => (chosenFormat = f)}>
         <span class="bc-desktop-export--label">{t(`export.formats.${f}`)}</span>
         <span class="bc-desktop-export--line">{t(`export.formatTexts.${f}`)}</span>
       </ChoiceRow>
     {/each}
   </div>
 
-  <label class="bc-desktop-export--switch">
-    <span>
-      <span class="bc-desktop-export--label">{t('export.anonymize')}</span>
-      <span class="bc-desktop-export--line">{t('export.anonymizeText')}</span>
-    </span>
-    <input type="checkbox" role="switch" bind:checked={anonymize} />
-  </label>
+  {#if format !== 'benthic'}
+    <label class="bc-desktop-export--switch">
+      <span>
+        <span class="bc-desktop-export--label">{t('export.anonymize')}</span>
+        <span class="bc-desktop-export--line">{t('export.anonymizeText')}</span>
+      </span>
+      <input type="checkbox" role="switch" bind:checked={anonymize} />
+    </label>
+  {/if}
 
   {#if format === 'pdf' && fullName}
     <label class="bc-desktop-export--switch">

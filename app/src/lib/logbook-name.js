@@ -85,6 +85,23 @@ export function logbookExportName(name, day, fallback) {
   return `${slugify(name) || slugify(fallback) || 'logbook'}-${day}.ssrf`;
 }
 
+/** The extension of the Benthic archive (`Fichier Benthic`), a ZIP written by lib/full-export.js. */
+export const BENTHIC_EXTENSION = '.benthic';
+
+/** The MIME type registered for it (desktop installers, Android, iOS). */
+export const BENTHIC_MIME = 'application/vnd.benthic+zip';
+
+/**
+ * The file name of the archive of the whole logbook: `<logbook name slug>.benthic`
+ * (« Carnet de Roger » gives `carnet-de-roger.benthic`).
+ * @param {string} name the logbook's name as the app shows it (a file name is accepted)
+ * @param {string} [fallback] the translated word for « logbook », used when the name leaves nothing
+ * @returns {string}
+ */
+export function benthicExportName(name, fallback = '') {
+  return `${slugify(name) || slugify(fallback) || 'benthic'}${BENTHIC_EXTENSION}`;
+}
+
 /** Today's local date as YYYY-MM-DD. @param {Date} [now] */
 export function localDay(now = new Date()) {
   const p = (/** @type {number} */ n) => String(n).padStart(2, '0');

@@ -12,23 +12,26 @@
   import ChoiceRow from './ChoiceRow.svelte';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { exportFormats, usableFormat } from '../lib/desktop-export.js';
 
-  /** @typedef {'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} ExportFormat */
+  /** @typedef {'benthic'|'ssrf'|'uddf'|'csv'|'csvProfiles'|'pdf'} ExportFormat */
 
   /**
    * @type {{
    *   count: number,
+   *   whole?: boolean,
    *   onexport: (format: ExportFormat, anonymize: boolean, showName: boolean) => void,
    *   onclose: () => void,
    * }}
    */
-  let { count, onexport, onclose } = $props();
+  let { count, whole = false, onexport, onclose } = $props();
 
   const KEY = 'od.exportFormat';
-  /** @type {ExportFormat[]} */
-  const FORMATS = ['ssrf', 'uddf', 'csv', 'csvProfiles', 'pdf'];
-  const stored = /** @type {ExportFormat} */ (deviceStore.getItem(KEY) ?? 'ssrf');
-  let format = $state(FORMATS.includes(stored) ? stored : 'ssrf');
+  // « Fichier Benthic (.benthic) » comes first, for the whole logbook only (task 2026-11-22-323).
+  // svelte-ignore state_referenced_locally
+  const FORMATS = /** @type {ExportFormat[]} */ (exportFormats(whole));
+  // svelte-ignore state_referenced_locally
+  let format = $state(/** @type {ExportFormat} */ (usableFormat(String(deviceStore.getItem(KEY) ?? 'ssrf'), whole)));
   let anonymize = $state(false);
   // « Mon nom dans l’en-tête » (task 2026-11-19-312): for the PDF only, on by default, offered when the profile has a name.
   let showName = $state(true);
@@ -60,16 +63,18 @@
         </ChoiceRow>
       {/each}
     </div>
-    <label class="bc-export-sheet--switch-row">
-      <span class="bc-export-sheet--texts">
-        <span class="bc-export-sheet--headline">{t('export.anonymize')}</span>
-        <span class="bc-export-sheet--supporting">{t('export.anonymizeText')}</span>
-      </span>
-      <span class="toggle">
-        <input type="checkbox" bind:checked={anonymize} />
-        <span class="toggle-icon"></span>
-      </span>
-    </label>
+    {#if format !== 'benthic'}
+      <label class="bc-export-sheet--switch-row">
+        <span class="bc-export-sheet--texts">
+          <span class="bc-export-sheet--headline">{t('export.anonymize')}</span>
+          <span class="bc-export-sheet--supporting">{t('export.anonymizeText')}</span>
+        </span>
+        <span class="toggle">
+          <input type="checkbox" bind:checked={anonymize} />
+          <span class="toggle-icon"></span>
+        </span>
+      </label>
+    {/if}
     {#if format === 'pdf' && fullName}
       <label class="bc-export-sheet--switch-row bc-export-sheet--show-name">
         <span class="bc-export-sheet--texts">

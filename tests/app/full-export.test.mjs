@@ -191,7 +191,7 @@ test('the archive holds the logbook, the OpenDives data, a README and a manifest
     deps.openFile = folderSink(dir);
     const progress = [];
     const { file, manifest } = await buildExport({ onProgress: (p) => progress.push(p) }, deps);
-    assert.equal(file.name, 'opendives-data-2026-11-18.zip');
+    assert.equal(file.name, 'benthic.benthic', 'no logbook name given');
     assert.equal(file.size, statSync(file.path).size);
     const zip = readZip(readFileSync(file.path));
 
@@ -550,9 +550,9 @@ test('the phone sink appends to a cache file through @capacitor/filesystem and d
     const { deps } = await fixture();
     deps.openFile = open;
     const { file } = await buildExport({}, deps);
-    assert.equal(file.uri, 'file:///cache/exports/opendives-data-2026-11-18.zip');
-    assert.equal(file.path, 'exports/opendives-data-2026-11-18.zip');
-    assert.ok(readZip(readFileSync(path.join(dir, 'opendives-data-2026-11-18.zip'))).has('manifest.json'));
+    assert.equal(file.uri, 'file:///cache/exports/benthic.benthic');
+    assert.equal(file.path, 'exports/benthic.benthic');
+    assert.ok(readZip(readFileSync(path.join(dir, 'benthic.benthic'))).has('manifest.json'));
     assert.ok(calls.includes('write'));
     const sink = await open('other.zip');
     await sink.write(Uint8Array.of(1, 2));
@@ -603,6 +603,24 @@ test('the desktop sink stages the file in the share area, appends, and removes i
   }
 });
 
-test('the archive name carries the local date', () => {
-  assert.equal(exportFileName(new Date(2026, 0, 5)), 'opendives-data-2026-01-05.zip');
+test('the archive is named after the logbook, with the .benthic extension', () => {
+  assert.equal(exportFileName('Carnet de Roger'), 'carnet-de-roger.benthic');
+  assert.equal(exportFileName('plongees.ssrf'), 'plongees.benthic');
+  assert.equal(exportFileName(''), 'benthic.benthic');
+});
+
+test('the archive written for a named logbook is a .benthic ZIP with the layout of « Télécharger mes données »', async () => {
+  const dir = tempDir();
+  try {
+    const { deps } = await fixture();
+    deps.openFile = folderSink(dir);
+    const { file } = await buildExport({ logbookName: 'Carnet de Roger' }, deps);
+    assert.equal(file.name, 'carnet-de-roger.benthic');
+    const entries = readZip(readFileSync(file.path));
+    assert.ok(entries.has('manifest.json'));
+    assert.ok(entries.has('logbook/logbook.ssrf'));
+    assert.ok(entries.has('opendives/settings.json'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

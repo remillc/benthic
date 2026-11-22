@@ -456,7 +456,7 @@ Using the dives in Subsurface desktop is supported **through this export**. Open
 
 **Full export (decided on 17 November 2026):** a separate « export all my data » action, asked for by the diver (for example from the account), writes everything: the dives, the files of the `opendives` branch, the media files, and the decrypted sensitive items after the device unlocks them. It is the diver's copy of their data, distinct from the Subsurface export.
 
-**Packaging (decided on 18 November 2026, engine in `app/src/lib/full-export.js` and `zip-stream.js`):** one ZIP archive in open formats, named `opendives-data-YYYY-MM-DD.zip`:
+**Packaging (decided on 18 November 2026, engine in `app/src/lib/full-export.js` and `zip-stream.js`):** one ZIP archive in open formats, named `<logbook>.benthic` (task 2026-11-22-323: the same ZIP, with its own extension and MIME type `application/vnd.benthic+zip`):
 
 - `manifest.json` at the root: format version, app version, export date, whether the media are in it, whether it holds sensitive data, and every file with its size and SHA-256 (the files not fetched are listed under `skipped`);
 - `logbook/logbook.ssrf`: the logbook in Subsurface's format, written by the core's own export;
