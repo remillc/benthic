@@ -36,3 +36,18 @@ test('shared and personal pin names follow the same zoom threshold, without clus
   assert.match(sites, /clusters: \[\]/);
   assert.doesNotMatch(sites, /clusters: baseBox\.clusters/);
 });
+
+test('the tablet page content lets map gestures through while its controls stay usable', () => {
+  const sites = read('pages/Sites.svelte');
+  assert.match(sites, /\.bc-sites--tablet > \.page-content\)\s*\{\s*pointer-events: none/);
+  assert.match(sites, /\.bc-sites--tablet > \.page-content > \*\)\s*\{\s*pointer-events: auto/);
+});
+
+test('the shared map mode control has 48 dp targets and clears the locate button', () => {
+  const sites = read('pages/Sites.svelte');
+  assert.match(sites, /max-width: calc\(100% - 88px\)/);
+  assert.match(sites, /\.bc-sites--mode-button\s*\{[^}]*width: auto/s);
+  assert.match(sites, /min-width: 48px/);
+  assert.match(sites, /inset: -4px 0/);
+  assert.match(sites, /white-space: nowrap/);
+});

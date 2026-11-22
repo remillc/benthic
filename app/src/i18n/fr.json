@@ -2724,6 +2724,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Sites sur tablette : le déplacement et le zoom sur la carte fonctionnent dans la page.",
+      "Carte commune : les boutons de sélection sont plus faciles à toucher.",
       "Carte commune : les nombres de plongées et les pastilles de regroupement sont masqués ; les noms des sites apparaissent en zoomant.",
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",

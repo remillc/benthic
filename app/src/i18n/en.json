@@ -2724,6 +2724,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Sites on tablets: the embedded map can be panned and zoomed.",
+      "Shared map: the mode buttons are easier to tap.",
       "Shared map: dive counts and cluster badges are hidden; site names appear when zooming in.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
