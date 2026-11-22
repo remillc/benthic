@@ -19,6 +19,7 @@
   import DesktopSitesWithout from '../components/DesktopSitesWithout.svelte';
   import DesktopSitesCleanup from '../components/DesktopSitesCleanup.svelte';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import { possibleDuplicates } from '../lib/sites.svelte.js';
   import { siteFocus } from '../lib/site-focus.svelte.js';
   import { deskSites, loadSitesChoices, setSitesSort, setSitesWidth, loadRegions, retryWaiting, showSiteDives } from '../lib/desktop-sites.svelte.js';
@@ -76,7 +77,7 @@
   $effect(() => {
     logbook.loading;
     logbook.sitesVersion;
-    if (!logbook.loading) untrack(() => load());
+    if (!logbook.loading && startup.ready) untrack(() => load());
   });
 
   const unused = $derived(sites.filter((s) => s.dives === 0));

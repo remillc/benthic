@@ -18,6 +18,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import { desaturationState } from '../lib/tools-page.js';
   import { formatHoursMinutes } from '../lib/tools.js';
   import { formatDuration, localNowIso } from '../lib/format.js';
@@ -70,7 +71,7 @@
   // changes (a download, a sync, a saved plan).
   $effect(() => {
     void logbook.dives;
-    if (logbook.loading || navigation.section !== 'tools' || !navigation.atRoot) return;
+    if (logbook.loading || !startup.ready || navigation.section !== 'tools' || !navigation.atRoot) return;
     readPlans();
   });
 
@@ -84,7 +85,7 @@
   ]);
 </script>
 
-<Page class="bc-tools" onPageBeforeIn={readPlans}>
+<Page class="bc-tools" onPageBeforeIn={() => startup.ready && readPlans()}>
   <Navbar large={theme.ios} class={theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-titled'} title={t('tools.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight><AccountAvatar /></NavRight>

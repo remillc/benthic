@@ -12,11 +12,11 @@
 //  - keys "od.<name>", values as text (JSON for objects and lists);
 //  - read synchronously from memory, loaded once before the app starts
 //    (main.js); each change is kept in memory and sent to the system at once.
-// Not here: the logbook snapshot (lib/snapshot.js), a cache of the list shown at
-// start, too large for preferences and rebuilt from the logbook when missing.
+// Not here: the logbook snapshot (lib/snapshot.js) and the detail snapshot (lib/detail-snapshot.js),
+// caches of what is shown at start, too large for preferences and rebuilt from the logbook when missing.
 
 /** Keys that are not settings: they stay in the WebView's storage. */
-export const NOT_SETTINGS = new Set(['od.logbookSnapshot', 'od.logbookSnapshotBeta']);
+export const NOT_SETTINGS = new Set(['od.logbookSnapshot', 'od.logbookSnapshotBeta', 'od.detailSnapshot', 'od.detailSnapshotBeta']);
 /** Set once the values kept in localStorage before 15 November 2026 have been copied. */
 const MOVED_KEY = 'od.storeVersion';
 

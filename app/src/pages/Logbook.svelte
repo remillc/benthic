@@ -50,6 +50,7 @@
   import { layout, deviceKind, desktopApp } from '../lib/layout.svelte.js';
   import { deviceKey } from '../lib/first-launch.js';
   import { navigation } from '../lib/navigation.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import { formatDateTime, formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { groupByMonth, stickyMonth } from '../lib/carnet-months.js';
@@ -57,6 +58,8 @@
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { mark } from '../lib/perf.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
+  import { firstDiveOf, orderOf, rememberFirstDetail, seedStartDetail } from '../lib/detail-snapshot.js';
+  import { keepDive, loadDive } from '../lib/dive-preload.js';
   import { offerUndo } from '../lib/undo.js';
   import { importProgress } from '../lib/import-progress.svelte.js';
   import { isCancelled } from '../lib/import-progress.js';
@@ -113,7 +116,12 @@
     if (logbook.loading || logbook.error) return;
     const list = all;
     const prefs = logbook.prefs;
-    const timer = setTimeout(() => saveSnapshot(list.length ? buildSnapshot(list, $state.snapshot(prefs)) : null), 1500);
+    const timer = setTimeout(() => {
+      saveSnapshot(list.length ? buildSnapshot(list, $state.snapshot(prefs)) : null);
+      // Beside the list, the pane shows the first dive: its detail is kept too (lib/detail-snapshot.js).
+      const first = layout.split ? firstDiveOf(list) : null;
+      if (first && navigation.dive === String(first.id)) rememberFirstDetail(first, orderOf(false), loadDive).catch((e) => console.warn('Keeping the detail', e));
+    }, 1500);
     return () => clearTimeout(timer);
   });
 
@@ -806,9 +814,14 @@
     logbook.dives;
     if (logbook.loading || logbook.error) return;
     untrack(() => {
-      loadOptions();
       if (!isEmpty(filter.applied)) applyFilter(filter.applied, logbook.prefs);
     });
+  });
+  // The filter's values only serve the filter sheet: read once the first screen is up (lib/startup.svelte.js).
+  $effect(() => {
+    logbook.dives;
+    if (logbook.loading || logbook.error || !startup.ready) return;
+    untrack(() => loadOptions());
   });
 
   // "Changes not sent": the list follows the pending edits; once everything is
@@ -847,6 +860,8 @@
     if (!dive) navigation.paneOpening = false;
     if (!dive || autoOpening || (pane && !pane.classList.contains('bc-pane-empty'))) return;
     autoOpening = true;
+    // The detail kept at the last start, if it is of this dive: the page draws it from its first frame, then reads the dive.
+    seedStartDetail(dive, keepDive);
     f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
   });
 

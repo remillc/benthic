@@ -37,6 +37,13 @@
   // VITE_SHOW_ROUTE=1, on the development server and in the APKs built here. A release is
   // built without these switches (AGENTS.md, Conventions).
   const showRoute = /** @type {any} */ (import.meta).env?.VITE_SHOW_ROUTE === '1';
+  // The detail of the first dive, kept at the last start: drawn in the pane while the core reads the logbook, when it is
+  // of the dive the list opens (the tablet: the first row of the list snapshot; the desktop: the first row of the table's sort).
+  watchStartup();
+  const keptDetail = startSnapshot();
+  const paneSnapshot = $derived(
+    keptDetail && keptDetail.order === orderOf(layout.desktop, desk.sort) && (layout.desktop || snapshotIsOf(keptDetail, previewFirst(logbook.preview))) ? keptDetail : null,
+  );
   import NavMenu from './components/NavMenu.svelte';
   import NavigationBar from './components/NavigationBar.svelte';
   import AccountSheet from './components/AccountSheet.svelte';
@@ -93,6 +100,9 @@
   import MapsDialogs from './components/MapsDialogs.svelte';
   import ErrorReportHost from './components/ErrorReportHost.svelte';
   import DiveDetailSkeleton from './components/DiveDetailSkeleton.svelte';
+  import { watchStartup } from './lib/startup.svelte.js';
+  import { orderOf, previewFirst, snapshotIsOf, startSnapshot } from './lib/detail-snapshot.js';
+  import { desk } from './lib/desktop-logbook.svelte.js';
   import { noteLog } from './lib/error-report.js';
   import { startOfflineMaps } from './lib/offline-maps.svelte.js';
 
@@ -508,7 +518,14 @@
     <View id="view-logbook" main tab tabActive url="/" routes={logbookRoutes} masterDetailBreakpoint={splitBreakpoint}>
       <!-- At start, the pane beside the list shows the skeleton of the detail until its first dive opens (navigation.paneOpening). -->
       {#if layout.split && navigation.paneOpening && !logbook.welcome && !(desktopApp && noLogbook)}
-        <div class="bc-pane-opening" class:bc-pane-opening--desk={layout.desktop}><DiveDetailSkeleton desk={layout.desktop} /></div>
+        {#if paneSnapshot}
+          <!-- The detail kept at the last start, in the real page's look; inert until the real dive opens over it (lib/detail-snapshot.js). -->
+          <div class="bc-pane-opening bc-pane-opening--snapshot" class:bc-pane-opening--desk={layout.desktop} inert aria-hidden="true">
+            <DiveDetail f7route={{ params: { id: String(paneSnapshot.detail.id) }, url: `/dives/${paneSnapshot.detail.id}` }} f7router={null} preview={paneSnapshot.detail} />
+          </div>
+        {:else}
+          <div class="bc-pane-opening" class:bc-pane-opening--desk={layout.desktop}><DiveDetailSkeleton desk={layout.desktop} /></div>
+        {/if}
       {/if}
     </View>
     <View id="view-sites" tab url="/sites/" />
@@ -614,6 +631,14 @@
       padding-top: calc(var(--f7-safe-area-top) + var(--f7-navbar-height));
       background: var(--bc-surface);
       pointer-events: none;
+    }
+    /* The kept detail is a whole page (its own bar): no room to leave for the navigation bar. */
+    .bc-pane-opening--snapshot {
+      padding-top: 0;
+    }
+    /* Beside the list the real page has no Back (Framework7 hides it on the detail root): the kept one neither. */
+    .bc-pane-opening--snapshot :global(.navbar .left) {
+      display: none;
     }
     .bc-pane-opening--desk {
       padding-top: 0;

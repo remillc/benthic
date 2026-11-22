@@ -49,9 +49,10 @@
    *   trip?: string,
    *   sac?: string,
    *   gasChanges?: string,
+   *   preview?: boolean,
    * }}
    */
-  let { dive, tab, prefs, trip = '', sac = '', gasChanges = '' } = $props();
+  let { dive, tab, prefs, trip = '', sac = '', gasChanges = '', preview = false } = $props();
 
   // « Autre équipement »: in the release edition the pieces of the device's inventory used by this dive
   // (the same record as the phone's editor); in the alpha the list stays inert.
@@ -85,6 +86,7 @@
     saveEquipment(id.startsWith('g:') ? removeFromEquipment(equipment, { gearId: id.slice(2) }) : removeFromEquipment(equipment, { adhocId: id.slice(2) }));
   }
   $effect(() => {
+    if (preview) return;
     if (isRelease && tab === 'equipment') untrack(() => loadInventory().catch((e) => console.error('Inventory', e)));
   });
 
@@ -129,6 +131,8 @@
   const needed = new Set();
   let neededFor = -1;
   $effect(() => {
+    // The kept detail (lib/detail-snapshot.js) draws what it has: the lists for editing are read with the real dive.
+    if (preview) return;
     const shown = tab;
     const version = logbook.sitesVersion; // sites merged, renamed or deleted: read again
     untrack(() => {

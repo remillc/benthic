@@ -2787,6 +2787,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Tablette et bureau : la plongée à côté du carnet s’affiche dès le lancement, comme le carnet ; les données des statistiques, des sites et des outils se lisent une fois la première plongée affichée.",
       "Ordinateur : « Enregistrer une copie » et « Télécharger mes plongées » quittent les menus, et « Exporter le carnet » le menu ⋮. Pour faire une copie, exportez le carnet.",
       "Export : « Fichier Benthic (.benthic) » écrit tout le carnet et vos données (équipement, profil, brevets, réglages). Il n’est proposé que pour tout le carnet.",
       "Premier lancement : « Le serveur ne répond pas » est centré, boutons compris.",

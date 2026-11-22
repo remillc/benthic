@@ -17,6 +17,7 @@
   import DesktopStatPreview from '../components/DesktopStatPreview.svelte';
   import HeatMapCard from '../components/HeatMapCard.svelte';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import { filter } from '../lib/filter.svelte.js';
   import { navigation, goToSection, openAbout } from '../lib/navigation.svelte.js';
   import { desk, loadExtras } from '../lib/desktop-logbook.svelte.js';
@@ -61,7 +62,7 @@
     const dives = logbook.dives;
     const list = myStatistics.list;
     const ids = filter.ids;
-    if (logbook.loading) return;
+    if (logbook.loading || !startup.ready) return;
     void dives;
     void ids;
     computeStatistics([]).then((r) => (result = r));
@@ -70,7 +71,7 @@
 
   $effect(() => {
     logbook.sitesVersion;
-    if (logbook.loading) return;
+    if (logbook.loading || !startup.ready) return;
     cachedSites().then(
       (/** @type {import('opendives-core').SiteSummary[]} */ list) => (sites = list),
       (/** @type {unknown} */ e) => console.error('Sites', e),

@@ -13,6 +13,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
+  import { startup } from '../lib/startup.svelte.js';
   import { desaturationState } from '../lib/tools-page.js';
   import { formatHoursMinutes } from '../lib/tools.js';
   import { formatDuration, localNowIso } from '../lib/format.js';
@@ -74,7 +75,7 @@
   // Read again when the logbook changes (a download, a sync, a saved plan).
   $effect(() => {
     void logbook.dives;
-    if (logbook.loading || navigation.section !== 'tools') return;
+    if (logbook.loading || !startup.ready || navigation.section !== 'tools') return;
     readPlans();
   });
 
@@ -101,7 +102,10 @@
     queueMicrotask(() => /** @type {HTMLElement|null} */ (document.querySelector(`.bc-desktop-tools--row[data-tool="${next.id}"]`))?.focus());
   }
   const current = $derived(DESKTOP_TOOLS.find((tool) => tool.id === desktopTools.tool) ?? DESKTOP_TOOLS[0]);
-  $effect(() => load(current.id));
+  // The planner starts its calls when it mounts: not before the first screen is up (lib/startup.svelte.js).
+  $effect(() => {
+    if (startup.ready) load(current.id);
+  });
 </script>
 
 <Page class="bc-desktop-tools" pageContent={false}>
