@@ -2723,6 +2723,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Shared map: panning and scrolling are smoother when many sites are displayed.",
+      "Shared map: the list follows the visible area, including sites grouped on the map.",
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
@@ -6642,6 +6644,8 @@
     "mine": "My sites",
     "commonMapButton": "Shared map",
     "listLabel": "Sites of the shared map",
+    "loadingArea": "Loading sites…",
+    "emptyArea": "No sites in this area.",
     "clusterLabel": {
       "one": "{n} site of the shared map. Zoom in",
       "other": "{n} sites of the shared map. Zoom in"
