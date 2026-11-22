@@ -67,4 +67,5 @@ test('desktop shared mode loads nearby sites and connects map markers to site sh
   assert.match(desktop, /href="\/sites\/base\/\{encodeURIComponent\(site\.id\)\}"/);
   assert.match(desktop, /clusters=\{common \? baseClusters : \[\]\}/);
   assert.match(map, /onbaseselect\?\.\(site\.id\)/);
+  assert.match(map, /#if common\}\{t\('sharedSites\.mapCredits'\)/);
 });

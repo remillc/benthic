@@ -247,7 +247,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div class="bc-desktop-site-map" role="region" aria-label={t('sites.map')} bind:this={root}>
   <div class="bc-desktop-site-map--canvas" bind:this={container}></div>
-  <p class="bc-desktop-site-map--credits">{t('sites.mapCredits')}</p>
+  <p class="bc-desktop-site-map--credits">{#if common}{t('sharedSites.mapCredits')}<br />{/if}{t('sites.mapCredits')}</p>
   {#if stack}
     <div class="bc-desktop-site-map--stack-list" style:left="{Math.min(stack.x, (root?.clientWidth ?? 900) - 372)}px" style:top="{Math.max(8, Math.min(stack.y - 40, (root?.clientHeight ?? 700) - 440))}px" role="dialog" aria-label={t('sites.stackTitle', { n: stack.uuids.length })}>
       <h2 class="bc-desktop-site-map--stack-title">{t('sites.stackTitle', { n: stack.uuids.length })}</h2>
