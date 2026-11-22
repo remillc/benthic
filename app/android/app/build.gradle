@@ -6,10 +6,10 @@ apply plugin: 'com.android.application'
 def appVersion = new groovy.json.JsonSlurper().parse(file('../../package.json')).version
 
 android {
-    namespace "org.opendives.app"
+    namespace "app.benthicdivelog"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "org.opendives.app"
+        applicationId "app.benthicdivelog"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3

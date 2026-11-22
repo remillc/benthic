@@ -18,7 +18,7 @@ test('« Continuer avec Apple » comes first on iOS, Google first elsewhere, the
 
 test('« Gérer dans l’App Store » opens the system subscription page on an iPhone', () => {
   assert.equal(APP_STORE_SUBSCRIPTIONS, 'https://apps.apple.com/account/subscriptions');
-  assert.equal(storeSubscriptionsUrl('apple', 'org.opendives.app'), 'https://apps.apple.com/account/subscriptions');
+  assert.equal(storeSubscriptionsUrl('apple', 'app.benthicdivelog'), 'https://apps.apple.com/account/subscriptions');
   assert.equal(subscriptionStore(null, true), 'apple');
 });
 

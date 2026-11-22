@@ -8,7 +8,7 @@ source "$(dirname "$0")/../../native/ios/env.sh"
 APP=$1
 L=$OUT/app-run
 rm -rf "$L"; mkdir -p "$L"
-BUNDLE=org.opendives.app
+BUNDLE=app.benthicdivelog
 
 UDID=$(pick_simulator) || { echo "no iPhone simulator available"; exit 2; }
 # A fresh boot: after the core's tests in the same simulator, the launch hung without a word.
@@ -91,7 +91,7 @@ for look in light dark; do
   xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null
   sleep 4
   xcrun simctl io "$UDID" screenshot "$L/home-$look.png" >/dev/null
-  # OD_HOLD_LAUNCH_SCREEN: LaunchCover keeps the launch screen 8 s after the first screen is drawn.
+  # BC_HOLD_LAUNCH_SCREEN: LaunchCover keeps the launch screen 8 s after the first screen is drawn.
   SIMCTL_CHILD_OD_HOLD_LAUNCH_SCREEN=1 xcrun simctl launch --console-pty "$UDID" "$BUNDLE" > "$L/launch-$look.log" 2>&1 &
   LAUNCH=$!
   for i in 1 2 3 4 5; do xcrun simctl io "$UDID" screenshot "$L/launch-$look-$i.png" >/dev/null 2>&1; done

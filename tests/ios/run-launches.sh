@@ -10,7 +10,7 @@ APP=$1
 N=${2:-10}
 L=$OUT/launches
 rm -rf "$L"; mkdir -p "$L"
-BUNDLE=org.opendives.app
+BUNDLE=app.benthicdivelog
 
 COPY=$L/App.app
 cp -R "$APP" "$COPY"

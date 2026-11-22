@@ -12,13 +12,13 @@ KIND=${2:-iPhone}
 LIMIT=${3:-}
 L=$OUT/maps-$KIND
 rm -rf "$L"; mkdir -p "$L"
-BUNDLE=org.opendives.app
+BUNDLE=app.benthicdivelog
 
 COPY=$L/App.app
 cp -R "$APP" "$COPY"
 cp "$ROOT/tests/ios/maps-test.js" "$COPY/public/maps-test.js"
 flag=""
-[ "$LIMIT" = limit ] && flag="<script>window.OD_MAPS_LIMIT_TEST = true</script>"
+[ "$LIMIT" = limit ] && flag="<script>window.BC_MAPS_LIMIT_TEST = true</script>"
 perl -0pi -e "s#</body>#$flag<script src=\"maps-test.js\"></script></body>#" "$COPY/public/index.html"
 grep -q maps-test.js "$COPY/public/index.html" || { echo "the test could not be added to the page"; exit 2; }
 codesign --force --sign - --preserve-metadata=entitlements,identifier "$COPY" >/dev/null 2>&1

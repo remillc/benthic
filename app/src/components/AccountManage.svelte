@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // « Gérer le compte » of an Benthic+ account (task 2026-11-18-281; mock-ups docs/mockups-release/
+  // « Gérer le compte » of a Benthic+ account (task 2026-11-18-281; mock-ups docs/mockups-release/
   // compte-android-connecte, android-tablette-compte-gerer-paysage, bureau-compte-gerer): the account and its sign-in
   // method, the subscription (managed in the store, never here), the photo and video space, the diver's data, and the
   // deletion of the account. One body for the phone's page and for the dialog of a tablet and of the desktop (`columns`).
@@ -28,7 +28,7 @@
    */
   let { columns = false, onclose } = $props();
 
-  const APP_ID = 'org.opendives.app';
+  const APP_ID = 'app.benthicdivelog';
 
   /** @type {import('../lib/server-api.js').AccountOverview|null} */
   let overview = $state(null);
@@ -128,7 +128,7 @@
         {#if renews}{t('account.manage.renews', { date: formatDate(renews), store: storeName })}{:else}{t('account.manage.boughtOn', { store: storeName })}{/if}
       </span>
       <!-- The store's own page: payment method, receipts and renewal are managed there, not here. A link, opened by the
-           system (the browser or the store's app): no billing tool in OpenDives. -->
+           system (the browser or the store's app): no billing tool in Benthic. -->
       <a class="bc-account-manage--store" href={storeSubscriptionsUrl(store, APP_ID)} target="_blank" rel="noopener noreferrer">
         {t(store === 'apple' ? 'account.manage.manageAppStore' : 'account.manage.manageGooglePlay')}<Icon name="openInNew" size={18} />
       </a>
@@ -188,7 +188,7 @@
 </div>
 
 <style>
-  @layer od.components {
+  @layer bc.components {
     .bc-account-manage {
       padding: 8px 0 calc(24px + var(--bc-safe-bottom));
       color: var(--bc-text);

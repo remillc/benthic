@@ -278,7 +278,7 @@ test('the wiring: manifest filters, plugin event, first launch and the two langu
   assert.match(read('app/src/lib/open-link.js'), /addListener\('sharedFile'/);
   assert.match(read('app/src/components/FirstLaunchSteps.svelte'), /sharedFile\.staged/);
   assert.match(read('app/src/lib/open-link.js'), /stageSharedFile/);
-  assert.match(read('app/ios/App/App/Info.plist'), /org\.opendives\.divefile/);
+  assert.match(read('app/ios/App/App/Info.plist'), /app\.benthicdivelog\.divefile/);
   const fr = JSON.parse(read('app/src/i18n/fr.json'));
   const en = JSON.parse(read('app/src/i18n/en.json'));
   for (const key of ['fileCsv', 'sitesText', 'sitesAction', 'sitesDone', 'sitesNothing', 'sitesFirstLaunch', 'sitesFailed']) {

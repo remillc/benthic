@@ -72,7 +72,7 @@ jobs:
             -derivedDataPath build/app CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= build | tail -40
           test "${PIPESTATUS[0]}" = 0
           ditto -c -k --sequesterRsrc --keepParent \
-            build/app/Build/Products/Debug-iphonesimulator/App.app build/ios/OpenDives-simulator.zip
+            build/app/Build/Products/Debug-iphonesimulator/App.app build/ios/Benthic-simulator.zip
 
       - name: Start the app in the simulator
         run: bash tests/ios/run-app.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app"
@@ -108,8 +108,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: OpenDives-simulator
-          path: build/ios/OpenDives-simulator.zip
+          name: Benthic-simulator
+          path: build/ios/Benthic-simulator.zip
           if-no-files-found: ignore
 
       - name: Keep the app's first screen and log

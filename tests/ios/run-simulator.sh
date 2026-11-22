@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# Runs OpenDives' tests, compiled for iOS, in an iOS simulator:
+# Runs Benthic's tests, compiled for iOS, in an iOS simulator:
 #   - the round trip over Subsurface's sample logs (run-roundtrip.sh, unchanged),
 #     expected: 98 passed, 0 failed;
 #   - the planner tests (plan_test, plan_oracle).

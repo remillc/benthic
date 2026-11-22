@@ -67,7 +67,7 @@ test('the account overview refreshes a renamed email and subscription in one req
   assert.match(state, /overview\.email\?\.trim\(\) \|\| info\.email/);
 });
 
-test('the release edition without an Benthic+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
+test('the release edition without a Benthic+ account has the free sheet; with one, the subscriber sheet; the rest keeps its own', () => {
   assert.equal(sheetVariant({ release: true, subscriber: false, email: '' }), 'free');
   assert.equal(sheetVariant({ release: true, subscriber: true, email: 'a@b.c' }), 'subscriber');
   assert.equal(sheetVariant({ release: true, subscriber: false, email: 'a@b.c' }), 'account', 'a cloud account is neither');
@@ -188,7 +188,7 @@ test('Android phone: the ✕ of the sheet is on the right at the logo’s height
   assert.match(head, /<span aria-hidden="true"><\/span>\s*<!--/);
 });
 
-test('« Gérer le compte » opens the new screen for an Benthic+ account: a page on the phone, a dialog elsewhere', () => {
+test('« Gérer le compte » opens the new screen for a Benthic+ account: a page on the phone, a dialog elsewhere', () => {
   assert.match(sheet, /function manage\(\) \{\s*navigation\.accountOpen = false;\s*if \(subscriber\) openManageAccount\(\);\s*else openOver\('\/account'\);/);
   const nav = read('lib/navigation.svelte.js');
   assert.match(nav, /export function openManageAccount\(\) \{\s*if \(layout\.phone\) openOver\('\/account\/manage'\);\s*else navigation\.manageOpen = true;/);
@@ -200,8 +200,8 @@ test('« Gérer le compte » opens the new screen for an Benthic+ account: a pag
 // --- « Gérer le compte » ---
 
 test('the store link: Google Play’s subscription page for this app, the App Store’s for iOS, opened by the system', () => {
-  assert.equal(storeSubscriptionsUrl('google', 'org.opendives.app'), 'https://play.google.com/store/account/subscriptions?package=org.opendives.app');
-  assert.equal(storeSubscriptionsUrl('apple', 'org.opendives.app'), 'https://apps.apple.com/account/subscriptions');
+  assert.equal(storeSubscriptionsUrl('google', 'app.benthicdivelog'), 'https://play.google.com/store/account/subscriptions?package=app.benthicdivelog');
+  assert.equal(storeSubscriptionsUrl('apple', 'app.benthicdivelog'), 'https://apps.apple.com/account/subscriptions');
   assert.equal(subscriptionStore({ store: 'apple' }, false), 'apple', 'the server says where it was bought');
   assert.equal(subscriptionStore({ store: 'google' }, true), 'google');
   assert.equal(subscriptionStore(null, true), 'apple', 'else the store of this device');

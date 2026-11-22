@@ -6,7 +6,7 @@
 //
 // Cold start: App.getLaunchUrl(). Running app: the "appUrlOpen" event; a file shared with « Share to » (Android
 // ACTION_SEND) comes as the plugin's "sharedFile" event. Both give the
-// address of an https link (App Links, Universal Links), of opendives://, or of a file
+// address of an https link (App Links, Universal Links), of benthic://, or of a file
 // (Android content://, iOS file://).
 import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
@@ -28,7 +28,7 @@ import { sharedFile } from './shared-file.svelte.js';
 import { importProgress } from './import-progress.svelte.js';
 
 /** The sites of a shared sites file, kept for the dives file shared next (lib/shared-file.js). */
-const SITES_KEY = 'od.sharedSites';
+const SITES_KEY = 'bc.sharedSites';
 
 /** How long a link waits for the logbook to be read (cold start), in ms. */
 const READY_LIMIT = 20000;
@@ -153,7 +153,7 @@ const sharedDeps = {
   toFirstLaunch: (/** @type {string} */ name, /** @type {{ path: string, size: number }} */ staged, /** @type {any} */ summary) => {
     sharedFile.staged = { path: staged.path, size: staged.size, name, summary };
   },
-  logbookName: () => deviceStore.getItem('od.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
+  logbookName: () => deviceStore.getItem('bc.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
   // One logbook at a time on a phone or a tablet (the device's copy, or the account's): no « Nouveau carnet »; its
   // place is « Remplacer ce carnet », a guarded flow for the device's own logbook (lib/replace-logbook-ui.js). The
   // desktop opens one logbook per window and takes no shared file.
@@ -239,7 +239,7 @@ export function handleLink(url) {
 /** Listens for links: the one that started the app, then those that come while it runs. */
 export function enableDeepLinks() {
   CapacitorApp.addListener('appUrlOpen', (event) => handleLink(event.url));
-  // « Share to OpenDives » (Android ACTION_SEND): the plugin keeps the event until this listener exists.
+  // « Share to Benthic » (Android ACTION_SEND): the plugin keeps the event until this listener exists.
   try {
     Promise.resolve(BenthicCore.addListener('sharedFile', (/** @type {{ uri: string }} */ e) => handleLink(e.uri))).catch(() => {});
   } catch {
