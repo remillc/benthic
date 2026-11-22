@@ -6574,3 +6574,16 @@ Christian approved this on 22 November 2026. Work in `main`. Mock-up: `bureau-ca
 **5. New Benthic+ badge** (replaces the blue `BenthicPlusChip` with its star, which looked like a button). A label, not a control: 20 px high, 7 px side padding, fully rounded, #FBE3B2 background (tertiary container), « Benthic+ » in #3D2200, 11 px bold, letter-spacing 0.3 px, no icon, never blue, no hover or click. Tooltip and accessible name « Réservé à l’abonnement Benthic+ » (en « Benthic+ subscription only »). Dark mode: tertiary container #4A3216 with #FBE3B2 text. Use it wherever `BenthicPlusChip` marks a feature as Benthic+ (list them in the done note); where the chip is a link to the offer, ask Christian.
 
 **Test:** applying a kit fills computer, suit, undersuit, weights and other gear; without Benthic+ the kit, the undersuit, « Ce lest était » and the other gear are visible with the badge and cannot change; the badge has 4.5:1 contrast.
+
+## [ ] 2026-11-22-333 Correction of task 332: the Benthic+ mark in the mock-ups is an annotation, not part of the app
+
+Christian approved this on 22 November 2026. Work in `main`. **This task corrects task 332; where they disagree, this one wins.**
+
+**The convention (also written in `docs/system-design.md`, « Benthic+ annotation in the mock-ups »).** In the mock-ups, a hand-drawn red circle (#E53935, open stroke) around an element, with « B+ » handwritten in red next to it, is a design annotation. It means: **this element exists only for Benthic+ subscribers.** Never draw it in the app. For an account without Benthic+, the element is simply absent (not shown disabled, not shown with a badge); for a subscriber it is shown normally, with no mark at all.
+
+**What changes in task 332:**
+- **Point 5 is cancelled.** No new cream « Benthic+ » badge. The app's existing `BenthicPlusChip` (blue, with the star) stays as it is: it is the in-app mark of the Benthic+ offer, shown to free accounts where the app presents the offer. Do not replace it or restyle it.
+- **Points 1 to 4:** the kit selector, the « Sous-vêtement » row, « Ce lest était » and the « Autre équipement » section are **shown only to Benthic+ subscribers**. Without Benthic+ they are not in the tab at all (no disabled state, no badge). « Ce lest était » becomes Benthic+ on every platform in this way; a tag already written on a dive (`weight-too-light`, `weight-ok`, `weight-too-heavy`) is kept in the file and still read by Subsurface, and the weight suggestion falls back to its plain rule (the last comparable dive, with no correction) for free accounts.
+- Everything else in task 332 is unchanged.
+
+Mock-up: `bureau-carnet-onglet-equipement` (updated in `docs/mockups/`, with the red circles).
