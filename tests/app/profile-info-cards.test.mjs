@@ -11,7 +11,7 @@ import { createServerApi } from '../../app/src/lib/server-api.js';
 import { formatNational, formatInternational, nationalDigits, isCompletePhone } from '../../app/src/lib/phone-format.js';
 import { parseCardText, findDate, scanCard } from '../../app/src/lib/card-scan.js';
 import { blank, warpPerspective, detectCard, removeGlare, orderCorners, homography, cardSize } from '../../app/src/lib/card-image.js';
-import { ReadOnlyError } from '../../app/src/lib/inventory.js';
+import { createInventory, ReadOnlyError } from '../../app/src/lib/inventory.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
@@ -63,6 +63,56 @@ test('raw bytes (a card photo) round trip', async () => {
   const bytes = new Uint8Array([0xff, 0xd8, 0, 1, 2, 3, 250]);
   const block = await box.sealBytes(bytes, { id: 'c', format: 1 });
   assert.deepEqual([...(await box.openBytes(block, { id: 'c', format: 1 }))], [...bytes]);
+});
+
+test('opening encrypted data without a key never creates or replaces one', async () => {
+  const { box } = setup();
+  const block = await box.seal({ x: 1 }, { id: 'one', format: 1 });
+  let writes = 0;
+  const missing = createSecretBox({ read: async () => '', write: async () => { writes++; } });
+  await assert.rejects(missing.open(block, { id: 'one', format: 1 }), /MISSING_DATA_KEY/);
+  const invalid = createSecretBox({ read: async () => 'AQID', write: async () => { writes++; } });
+  await assert.rejects(invalid.seal({}, { id: 'one', format: 1 }), /INVALID_DATA_KEY/);
+  assert.equal(writes, 0);
+});
+
+test('an unreadable profile or certification cannot be overwritten or deleted', async () => {
+  const original = setup();
+  const info = emptyInfo();
+  info.fullName = 'Test diver';
+  await original.profile.saveInfo(info);
+  const cert = await original.profile.saveCertification({ agency: 'PADI', level: 'Rescue Diver' });
+  const diverFile = await original.store.read('profile/diver.json');
+  const certFile = await original.store.read(`certifications/${cert.id}.json`);
+  const foreignBox = createSecretBox({ read: async () => '', write: async () => {} });
+  const foreign = createProfile(original.store, foreignBox);
+  await assert.rejects(foreign.saveInfo(info), /MISSING_DATA_KEY/);
+  await assert.rejects(foreign.deleteBloodGroup(), /MISSING_DATA_KEY/);
+  await assert.rejects(foreign.saveCertification({ id: cert.id, agency: 'PADI', level: 'Rescue Diver' }), /MISSING_DATA_KEY/);
+  await assert.rejects(foreign.deleteCertification(cert.id), /MISSING_DATA_KEY/);
+  assert.deepEqual(await original.store.read('profile/diver.json'), diverFile);
+  assert.deepEqual(await original.store.read(`certifications/${cert.id}.json`), certFile);
+});
+
+test('corrupt sensitive files cannot be overwritten or deleted', async () => {
+  const { backend, profile } = setup();
+  await backend.apply([['profile/diver.json', '{invalid'], ['certifications/bad.json', '{invalid']], []);
+  await assert.rejects(profile.saveInfo(emptyInfo()));
+  await assert.rejects(profile.deleteBloodGroup());
+  await assert.rejects(profile.saveCertification({ id: 'bad', agency: 'PADI', level: 'Rescue Diver' }));
+  await assert.rejects(profile.deleteCertification('bad'));
+  assert.equal(await backend.get('profile/diver.json'), '{invalid');
+  assert.equal(await backend.get('certifications/bad.json'), '{invalid');
+});
+
+test('concurrent profile and inventory writes both remain pending', async () => {
+  const { store, profile } = setup();
+  const inventory = createInventory(store);
+  const [, gear] = await Promise.all([
+    profile.saveInfo({ ...emptyInfo(), fullName: 'Test diver' }),
+    inventory.saveGear({ name: 'Test gear', type: 'other' }),
+  ]);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, [`gear/${gear.id}.json`, 'profile/diver.json']);
 });
 
 test('the sensitive data is not readable in the files of the store', async () => {

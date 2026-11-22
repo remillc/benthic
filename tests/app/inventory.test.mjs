@@ -62,6 +62,41 @@ test('the IndexedDB backend has the same contract when IndexedDB exists', async 
   await store.write('gear/z.json', { id: 'z' });
   assert.deepEqual(await store.read('gear/z.json'), { id: 'z' });
   await store.remove('gear/z.json');
+  await Promise.all([
+    store.trackedBatch({ writes: [['gear/a.json', { version: 1 }]] }),
+    store.trackedBatch({ removes: ['gear/deleted.json'] }),
+  ]);
+  const snapshot = await store.snapshotPending();
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 2 }]] });
+  await store.acknowledgePending(snapshot);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/a.json']);
+});
+
+test('concurrent tracked changes preserve both pending paths and deletions', async () => {
+  const { store } = setup();
+  await Promise.all([
+    store.trackedBatch({ writes: [['gear/a.json', { id: 'a' }]] }),
+    store.trackedBatch({ writes: [['profile/diver.json', { format: 1 }]] }),
+    store.trackedBatch({ removes: ['kits/deleted.json'] }),
+  ]);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/a.json', 'kits/deleted.json', 'profile/diver.json']);
+});
+
+test('a corrupt pending list cannot be replaced by a tracked write', async () => {
+  const { backend, store } = setup();
+  await backend.apply([['meta/pending.json', '{invalid']], []);
+  await assert.rejects(store.trackedBatch({ writes: [['gear/a.json', { id: 'a' }]] }));
+  assert.equal(await store.read('gear/a.json'), null);
+  assert.equal(await backend.get('meta/pending.json'), '{invalid');
+});
+
+test('acknowledging a snapshot keeps files changed during synchronization pending', async () => {
+  const { store } = setup();
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 1 }], ['gear/b.json', { version: 1 }]], removes: ['kits/deleted.json'] });
+  const snapshot = await store.snapshotPending();
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 2 }], ['kits/deleted.json', { restored: true }], ['profile/diver.json', { format: 1 }]] });
+  await store.acknowledgePending(snapshot);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/a.json', 'kits/deleted.json', 'profile/diver.json']);
 });
 
 test('a piece gets a UUID v4, is written under gear/<id>.json and keeps unknown fields', async () => {

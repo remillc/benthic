@@ -11,13 +11,36 @@
 // The contract of a backend (paths are text, contents are text):
 //  - get(path) -> text|null; list(prefix) -> paths that start with prefix;
 //  - apply(writes, removes): all the changes or none (one transaction), so a crash never leaves half a change.
+//  - applyTracked(writes, removes): apply changes and add their paths to meta/pending.json in the same transaction.
+//  - snapshotPending() / acknowledgePending(snapshot): capture and acknowledge unchanged pending files atomically.
 
 /**
  * @typedef {Object} FileBackend
  * @property {(path: string) => Promise<string|null>} get
  * @property {(prefix: string) => Promise<string[]>} list
  * @property {(writes: [string, string][], removes: string[]) => Promise<void>} apply
+ * @property {(writes: [string, string][], removes: string[]) => Promise<void>} applyTracked
+ * @property {() => Promise<[string, string|null][]>} snapshotPending
+ * @property {(snapshot: [string, string|null][]) => Promise<void>} acknowledgePending
  */
+
+const PENDING = 'meta/pending.json';
+
+/** @param {string|null|undefined} text */
+function parsePending(text) {
+  const pending = text == null ? { format: 1, paths: [] } : JSON.parse(text);
+  if (!pending || typeof pending !== 'object' || Array.isArray(pending) || pending.format !== 1
+      || !Array.isArray(pending.paths) || !pending.paths.every((/** @type {unknown} */ p) => typeof p === 'string')) {
+    throw new Error('INVALID_PENDING_DATA');
+  }
+  return pending;
+}
+
+/** @param {string|null|undefined} text @param {string[]} changed */
+function addPending(text, changed) {
+  const pending = parsePending(text);
+  return sortedJson({ ...pending, paths: [...new Set([...pending.paths, ...changed])].sort() });
+}
 
 /**
  * JSON as the format asks: keys sorted at every level, two-space indent and a final newline, so that equal data
@@ -57,6 +80,20 @@ export function memoryBackend() {
     async apply(writes, removes) {
       for (const [path, text] of writes) files.set(path, text);
       for (const path of removes) files.delete(path);
+    },
+    async applyTracked(writes, removes) {
+      const pending = addPending(files.get(PENDING), [...writes.map(([p]) => p), ...removes]);
+      for (const [path, text] of writes) files.set(path, text);
+      for (const path of removes) files.delete(path);
+      files.set(PENDING, pending);
+    },
+    async snapshotPending() {
+      return parsePending(files.get(PENDING)).paths.map((/** @type {string} */ path) => [path, files.get(path) ?? null]);
+    },
+    async acknowledgePending(snapshot) {
+      const pending = parsePending(files.get(PENDING));
+      const acknowledged = new Set(snapshot.filter(([path, text]) => (files.get(path) ?? null) === text).map(([path]) => path));
+      files.set(PENDING, sortedJson({ ...pending, paths: pending.paths.filter((/** @type {string} */ path) => !acknowledged.has(path)) }));
     },
   };
 }
@@ -171,6 +208,87 @@ export function indexedDbBackend(factory = globalThis.indexedDB) {
         tx.onabort = () => reject(tx.error);
       });
     },
+    async applyTracked(writes, removes) {
+      const db = await open();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        const store = tx.objectStore(STORE);
+        /** @type {unknown} */
+        let failure;
+        const request = store.get(PENDING);
+        request.onsuccess = () => {
+          try {
+            const pending = addPending(request.result, [...writes.map(([p]) => p), ...removes]);
+            for (const [path, text] of writes) store.put(text, path);
+            for (const path of removes) store.delete(path);
+            store.put(pending, PENDING);
+          } catch (error) {
+            failure = error;
+            tx.abort();
+          }
+        };
+        tx.oncomplete = () => resolve(undefined);
+        tx.onerror = () => reject(failure ?? tx.error);
+        tx.onabort = () => reject(failure ?? tx.error);
+      });
+    },
+    async snapshotPending() {
+      const db = await open();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly');
+        const store = tx.objectStore(STORE);
+        /** @type {[string, string|null][]} */
+        const snapshot = [];
+        /** @type {unknown} */
+        let failure;
+        const request = store.get(PENDING);
+        request.onsuccess = () => {
+          try {
+            for (const path of parsePending(request.result).paths) {
+              const entry = store.get(path);
+              entry.onsuccess = () => snapshot.push([path, entry.result ?? null]);
+            }
+          } catch (error) {
+            failure = error;
+            tx.abort();
+          }
+        };
+        tx.oncomplete = () => resolve(snapshot);
+        tx.onerror = () => reject(failure ?? tx.error);
+        tx.onabort = () => reject(failure ?? tx.error);
+      });
+    },
+    async acknowledgePending(snapshot) {
+      const db = await open();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        const store = tx.objectStore(STORE);
+        /** @type {unknown} */
+        let failure;
+        const request = store.get(PENDING);
+        request.onsuccess = () => {
+          try {
+            const pending = parsePending(request.result);
+            const remaining = new Set(/** @type {string[]} */ (pending.paths));
+            for (const [path, text] of snapshot) {
+              const entry = store.get(path);
+              entry.onsuccess = () => {
+                if ((entry.result ?? null) === text) remaining.delete(path);
+              };
+            }
+            // This request runs after the reads and writes the list in the same transaction.
+            const marker = store.get(PENDING);
+            marker.onsuccess = () => store.put(sortedJson({ ...pending, paths: [...remaining].sort() }), PENDING);
+          } catch (error) {
+            failure = error;
+            tx.abort();
+          }
+        };
+        tx.oncomplete = () => resolve(undefined);
+        tx.onerror = () => reject(failure ?? tx.error);
+        tx.onabort = () => reject(failure ?? tx.error);
+      });
+    },
   };
 }
 
@@ -180,6 +298,11 @@ export function indexedDbBackend(factory = globalThis.indexedDB) {
  */
 export function createFileStore(backend) {
   return {
+    /** @param {string} path @returns {Promise<any|null>} */
+    async readStrict(path) {
+      const text = await backend.get(path);
+      return text == null ? null : JSON.parse(text);
+    },
     /** @param {string} path @returns {Promise<any|null>} */
     async read(path) {
       const text = await backend.get(path);
@@ -207,6 +330,11 @@ export function createFileStore(backend) {
     remove: (path) => backend.apply([], [path]),
     /** Several changes at once, all or none. @param {{ writes?: [string, unknown][], removes?: string[] }} changes */
     batch: ({ writes = [], removes = [] }) => backend.apply(writes.map(([p, v]) => [p, sortedJson(v)]), removes),
+    /** Changes and their pending paths in one transaction. @param {{ writes?: [string, unknown][], removes?: string[] }} changes */
+    trackedBatch: ({ writes = [], removes = [] }) => backend.applyTracked(writes.map(([p, v]) => [p, sortedJson(v)]), removes),
+    snapshotPending: () => backend.snapshotPending(),
+    /** @param {[string, string|null][]} snapshot */
+    acknowledgePending: (snapshot) => backend.acknowledgePending(snapshot),
   };
 }
 

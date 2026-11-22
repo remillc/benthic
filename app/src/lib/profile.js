@@ -207,11 +207,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
   /** Same rules as the inventory: refused while read only, and recorded as not sent yet. @param {[string, unknown][]} writes @param {string[]} [removes] */
   async function commit(writes, removes = []) {
     if ((await store.read('meta/state.json'))?.readOnlyFrom) throw new ReadOnlyError();
-    const pending = (await store.read('meta/pending.json')) ?? { format: 1, paths: [] };
-    const paths = new Set(/** @type {string[]} */ (pending.paths));
-    for (const [p] of writes) paths.add(p);
-    for (const p of removes) paths.add(p);
-    await store.batch({ writes: [...writes, ['meta/pending.json', { ...pending, format: 1, paths: [...paths].sort() }]], removes });
+    await store.trackedBatch({ writes, removes });
   }
 
   /** @returns {Promise<{ consent: boolean, at: string, synced: boolean }>} */
@@ -220,13 +216,14 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     return { consent: c?.consent === true, at: typeof c?.at === 'string' ? c.at : '', synced: c?.synced !== false };
   }
 
-  /** The sealed block of the diver file, opened; {} when none or unreadable. @returns {Promise<any>} */
-  async function readSealed() {
-    const file = await store.read(DIVER);
+  /** @param {boolean} [strict] @returns {Promise<any>} */
+  async function readSealed(strict = false) {
+    const file = strict ? await store.readStrict(DIVER) : await store.read(DIVER);
     if (!file?.enc) return {};
     try {
       return await box.open(file.enc, { id: 'profile', format: 1 });
-    } catch {
+    } catch (error) {
+      if (strict) throw error;
       return {};
     }
   }
@@ -236,9 +233,9 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
 
     /** Removes the blood group from the sealed block; the rest of the file stays. */
     async deleteBloodGroup() {
-      const file = await store.read(DIVER);
+      const file = await store.readStrict(DIVER);
       if (!file?.enc) return;
-      const sealed = await readSealed();
+      const sealed = await readSealed(true);
       if (!('bloodGroup' in sealed)) return;
       const rest = { ...sealed };
       delete rest.bloodGroup;
@@ -263,8 +260,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     async saveInfo(info) {
       const problems = infoProblems(info, now().toISOString().slice(0, 10));
       if (Object.keys(problems).length) throw new Error(`INVALID_INFO:${Object.keys(problems).join(',')}`);
-      const file = (await store.read(DIVER)) ?? { format: 1 };
-      const sealed = await readSealed();
+      const file = (await store.readStrict(DIVER)) ?? { format: 1 };
+      const sealed = await readSealed(true);
       const phone = { country: info.emergency.phone.country, number: nationalDigits(info.emergency.phone.number, info.emergency.phone.country) };
       const next = {
         ...sealed,
@@ -293,8 +290,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       return out.sort((a, b) => (b.issuedOn || '').localeCompare(a.issuedOn || '') || b.updatedAt.localeCompare(a.updatedAt));
     },
 
-    /** @param {any} file @returns {Promise<Certification|null>} */
-    async openCertification(file) {
+    /** @param {any} file @param {boolean} [strict] @returns {Promise<Certification|null>} */
+    async openCertification(file, strict = false) {
       if (!file?.enc || typeof file.id !== 'string') return null;
       try {
         const p = await box.open(file.enc, { id: file.id, format: file.format ?? 1 });
@@ -322,7 +319,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
           documents: Array.isArray(p.documents) ? p.documents : [],
           updatedAt: file.updatedAt ?? '',
         };
-      } catch {
+      } catch (error) {
+        if (strict) throw error;
         return null;
       }
     },
@@ -354,8 +352,9 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const kind = DOCUMENT_KINDS.includes(f.kind) ? f.kind : 'certification';
       const problems = documentProblems(kind, { ...f, agency: f.agency ?? '', level: f.level ?? '', number: f.number ?? '' }, now().toISOString().slice(0, 10));
       if (Object.keys(problems).length) throw new Error(`INVALID_CERTIFICATION:${Object.keys(problems).join(',')}`);
-      const existingFile = f.id ? await store.read(`certifications/${f.id}.json`) : null;
-      const existing = existingFile ? await api.openCertification(existingFile) : null;
+      const existingFile = f.id ? await store.readStrict(`certifications/${f.id}.json`) : null;
+      const existing = existingFile ? await api.openCertification(existingFile, true) : null;
+      if (existingFile && !existing) throw new Error('INVALID_CERTIFICATION_FILE');
       const certId = existing?.id ?? id();
       const before = existing?.documents ?? [];
       /** The list to keep or to write, before sealing. @type {{ side: 'front'|'back'|'page', page?: number, hash?: string, bytes?: Uint8Array, mime?: string }[]} */
@@ -415,7 +414,9 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
 
     /** @param {string} certId */
     async deleteCertification(certId) {
-      const c = await api.getCertification(certId);
+      const file = await store.readStrict(`certifications/${certId}.json`);
+      const c = file ? await api.openCertification(file, true) : null;
+      if (file && !c) throw new Error('INVALID_CERTIFICATION_FILE');
       await commit([], [`certifications/${certId}.json`, ...(c?.documents ?? []).map((d) => `documents/${d.hash}.json`)]);
     },
 

@@ -388,11 +388,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
    */
   async function commit(writes, removes = []) {
     if ((await readState()).readOnlyFrom) throw new ReadOnlyError();
-    const pending = (await store.read('meta/pending.json')) ?? { format: 1, paths: [] };
-    const paths = new Set(/** @type {string[]} */ (pending.paths));
-    for (const [p] of writes) paths.add(p);
-    for (const p of removes) paths.add(p);
-    await store.batch({ writes: [...writes, ['meta/pending.json', { ...pending, format: 1, paths: [...paths].sort() }]], removes });
+    await store.trackedBatch({ writes, removes });
   }
 
   return {

@@ -48,11 +48,14 @@ export function createSecretBox(keeper) {
   /** @type {Promise<{ key: CryptoKey, kid: string }>|null} */
   let loaded = null;
 
-  const load = () =>
+  /** @param {boolean} create */
+  const load = (create) =>
     (loaded ??= (async () => {
       let text = await keeper.read();
       let raw = text ? fromBase64(text) : new Uint8Array(0);
-      if (raw.length !== 32) {
+      if (text && raw.length !== 32) throw new Error('INVALID_DATA_KEY');
+      if (!text) {
+        if (!create) throw new Error('MISSING_DATA_KEY');
         raw = crypto.getRandomValues(new Uint8Array(32));
         text = toBase64(raw);
         await keeper.write(text);
@@ -74,7 +77,7 @@ export function createSecretBox(keeper) {
      * @returns {Promise<SealedBlock>}
      */
     async seal(value, { id, format }) {
-      const { key, kid } = await load();
+      const { key, kid } = await load(true);
       const nonce = crypto.getRandomValues(new Uint8Array(12));
       const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce, additionalData: aad(id, format) }, key, enc.encode(JSON.stringify(value))));
       return { v: 1, alg: 'A256GCM', kid, nonce: toBase64(nonce), ct: toBase64(ct) };
@@ -87,14 +90,14 @@ export function createSecretBox(keeper) {
      */
     async open(block, { id, format }) {
       if (!block || block.v !== 1 || block.alg !== 'A256GCM') throw new Error('UNKNOWN_ENCRYPTION');
-      const { key } = await load();
+      const { key } = await load(false);
       const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromBase64(block.nonce), additionalData: aad(id, format) }, key, fromBase64(block.ct));
       return JSON.parse(dec.decode(plain));
     },
 
     /** Raw bytes sealed (a card photo): the block is `{ ...block, ct }` with the item's authenticated data. @param {Uint8Array} bytes @param {{ id: string, format: number }} item */
     async sealBytes(bytes, { id, format }) {
-      const { key, kid } = await load();
+      const { key, kid } = await load(true);
       const nonce = crypto.getRandomValues(new Uint8Array(12));
       const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce, additionalData: aad(id, format) }, key, /** @type {BufferSource} */ (bytes)));
       return { v: /** @type {const} */ (1), alg: /** @type {const} */ ('A256GCM'), kid, nonce: toBase64(nonce), ct: toBase64(ct) };
@@ -103,7 +106,7 @@ export function createSecretBox(keeper) {
     /** @param {SealedBlock} block @param {{ id: string, format: number }} item @returns {Promise<Uint8Array>} */
     async openBytes(block, { id, format }) {
       if (!block || block.v !== 1 || block.alg !== 'A256GCM') throw new Error('UNKNOWN_ENCRYPTION');
-      const { key } = await load();
+      const { key } = await load(false);
       return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromBase64(block.nonce), additionalData: aad(id, format) }, key, fromBase64(block.ct)));
     },
   };
