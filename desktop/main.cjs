@@ -229,6 +229,7 @@ app.whenReady().then(async () => {
   // The web storage of the previous origin (settings, equipment, profile) moves to this origin, once, before the
   // first window reads it.
   if (!devUrl && legacy.hasLegacyOriginData(app.getPath('userData'))) {
+    handingOver = true;
     const handOver = await legacy.handOverLegacyOrigin({
       BrowserWindow,
       ipcMain,
@@ -343,11 +344,13 @@ app.whenReady().then(async () => {
   for (const arg of process.argv.slice(1)) if (isLogbookFile(arg)) pendingFiles.push(path.resolve(arg));
   windows.openStartup().then(
     () => {
+      handingOver = false;
       for (const file of pendingFiles.splice(0)) openRequestedFile(file);
     },
     (e) => {
       console.error('[desktop] Opening the logbooks', e.message);
       windows.openMain();
+      handingOver = false;
     },
   );
   app.on('activate', () => {
@@ -355,6 +358,9 @@ app.whenReady().then(async () => {
   });
 });
 
+// The two hidden windows of the one-time web-storage hand-over (legacy-migration.cjs) are the only windows for a moment:
+// closing them must not quit the app.
+let handingOver = false;
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin' && !handingOver) app.quit();
 });
