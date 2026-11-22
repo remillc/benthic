@@ -97,6 +97,14 @@ export const deviceStore = {
     memory.set(key, text);
     system?.set({ key, value: text }).catch((/** @type {unknown} */ e) => console.error('Keeping a setting', key, e));
   },
+  /** @param {string} key @param {string} value */
+  async setItemConfirmed(key, value) {
+    check(key);
+    if (!system) throw new Error('Settings storage is unavailable');
+    const text = String(value);
+    await system.set({ key, value: text });
+    memory.set(key, text);
+  },
   /** @param {string} key */
   removeItem(key) {
     check(key);

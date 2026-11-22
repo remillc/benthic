@@ -318,7 +318,7 @@ test('the empty logbook menu: rename says « coming », open and new enter the f
   assert.equal(fr.menuNew, 'Nouveau carnet');
   assert.equal(fr.menuExport, 'Exporter le carnet');
   assert.equal(fr.menuExportNone, 'Aucune plongée à exporter');
-  for (const lang of ['fr', 'en']) for (const k of ['menuRename', 'menuOpenOther', 'menuNew', 'menuExport', 'menuExportNone', 'menuSoon']) assert.ok(langs[lang].welcomeSteps[k], `${lang}: ${k}`);
+  for (const lang of ['fr', 'en']) for (const k of ['menuRename', 'menuOpenOther', 'menuNew', 'menuExport', 'menuExportNone']) assert.ok(langs[lang].welcomeSteps[k], `${lang}: ${k}`);
 });
 
 test('the empty logbook profile is 724 dp wide in landscape and 624 dp in portrait, inside the pane', () => {

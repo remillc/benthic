@@ -180,6 +180,12 @@ Width decides the layout, not the type of device: below 768 px wide, phone layou
 | Edit a dive | Full screen | iOS: 780 px sheet in two columns; Android: content pane in two columns |
 | Settings | Scrolling list | 600 px centred column; two columns on Android |
 
+On phones and tablets, the logbook's ⋮ menu offers Rename. The chosen display name replaces the
+logbook page title and is kept on the device; it does not rename the file or account.
+
+While the wait before flying is running, the logbook shows its flight banner on phones, tablets
+and desktop. On desktop it sits between the logbook header and the dive table.
+
 **Touch targets:** at least 44 × 44 pt on iOS, 48 × 48 dp on Android; 56 px for list rows used on the boat (site choice, buddies).
 
 **Profile on tablets:** the wide profile panes and their dialogs fit between the system bars, including when their insets change.

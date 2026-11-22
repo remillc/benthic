@@ -1794,7 +1794,6 @@
     "menuNew": "New logbook",
     "menuExport": "Export the logbook",
     "menuExportNone": "No dives to export",
-    "menuSoon": "This is coming in a later version.",
     "cloudSoon": "The cloud is coming in a later version.",
     "signInTitle": "Sign in",
     "signInHelp": "Or create an account.",
@@ -2734,6 +2733,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook on phones and tablets: rename the logbook from the ⋮ menu.",
+      "Desktop logbook: the wait before flying appears above the dive list.",
       "Search: a clear button removes the text without leaving the field.",
       "Merging dives adjusts later dive numbers even when some dives are unnumbered.",
       "Logbook: renumber a dive and all later dives starting with the number you choose.",

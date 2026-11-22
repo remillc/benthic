@@ -1794,7 +1794,6 @@
     "menuNew": "Nouveau carnet",
     "menuExport": "Exporter le carnet",
     "menuExportNone": "Aucune plongée à exporter",
-    "menuSoon": "Cette fonction arrive dans une prochaine version.",
     "cloudSoon": "Le nuage arrive dans une prochaine version.",
     "signInTitle": "Se connecter",
     "signInHelp": "Ou créer un compte.",
@@ -2734,6 +2733,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet sur mobile et tablette : renommez le carnet depuis le menu ⋮.",
+      "Carnet sur ordinateur : l’attente avant l’avion s’affiche au-dessus des plongées.",
       "Recherche : une croix permet d’effacer le texte sans quitter le champ.",
       "La fusion de plongées ajuste les numéros suivants même lorsque certaines plongées ne sont pas numérotées.",
       "Carnet : renumérotez une plongée et toutes les suivantes à partir du numéro choisi.",

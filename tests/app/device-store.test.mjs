@@ -39,3 +39,19 @@ test('written and read the same way, as text', () => {
   assert.equal(deviceStore.getItem('od.count'), null);
   assert.throws(() => deviceStore.setItem('sort', 'x'), /Not a setting/, 'every key is "od.<name>"');
 });
+
+test('a confirmed setting is persisted before its in-memory value changes', async () => {
+  globalThis.window = { localStorage: globalThis.localStorage };
+  await loadDeviceStore();
+  await deviceStore.setItemConfirmed('od.logbookName', 'My dives');
+  assert.equal(deviceStore.getItem('od.logbookName'), 'My dives');
+  const setItem = globalThis.localStorage.setItem;
+  globalThis.localStorage.setItem = () => { throw new Error('storage failed'); };
+  try {
+    await assert.rejects(deviceStore.setItemConfirmed('od.logbookName', 'Other'), /storage failed/);
+    assert.equal(deviceStore.getItem('od.logbookName'), 'My dives');
+  } finally {
+    globalThis.localStorage.setItem = setItem;
+    delete globalThis.window;
+  }
+});

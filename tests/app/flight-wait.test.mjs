@@ -1,6 +1,7 @@
 // The wait before flying (task 2026-11-13-98): the rule, the choices of the setting, the dives
 // taken from the logbook, and the notification at the end of the wait.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { flightWait, flightDives, flightWaitFor, flightWaitName, FLIGHT_WAIT_MODES } from '../../app/src/lib/tools.js';
 import { flightNotice, localDate, FLIGHT_LINK } from '../../app/src/lib/flight-notice.js';
@@ -123,6 +124,11 @@ test('the notification: none when the wait is over or without dives', () => {
 
 test('tapping the notification opens the Desaturation tool', () => {
   assert.equal(FLIGHT_LINK, 'opendives://tools/desaturation');
+});
+
+test('the desktop logbook shows the shared flight banner above its dive table', () => {
+  const page = readFileSync(new URL('../../app/src/pages/DesktopLogbook.svelte', import.meta.url), 'utf8');
+  assert.match(page, /<\/header>\s*<FlightBanner\s*\/>[\s\S]*<table class="bc-desktop-logbook--table"/);
 });
 
 test('a time in words: tomorrow, today, yesterday; further away as a date', () => {

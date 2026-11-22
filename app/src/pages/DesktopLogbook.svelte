@@ -17,6 +17,7 @@
   import DesktopEditTogetherDialog from '../components/DesktopEditTogetherDialog.svelte';
   import DesktopLogbookSelector from '../components/DesktopLogbookSelector.svelte';
   import DesktopLogbookReady from '../components/DesktopLogbookReady.svelte';
+  import FlightBanner from '../components/FlightBanner.svelte';
   import { ownLogbookWindow } from '../lib/window-logbook.js';
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import DesktopContextMenu from '../components/DesktopContextMenu.svelte';
@@ -976,6 +977,8 @@
         <Icon name="more" size={22} />
       </button>
     </header>
+
+    <FlightBanner />
 
     {#if logbook.loading}
       <p class="bc-desktop-logbook--state" role="status" aria-busy="true">{t('logbook.loading')}</p>

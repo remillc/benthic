@@ -32,6 +32,7 @@
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
+  import RenameLogbook from '../components/RenameLogbook.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { replaceEligibility, replacementFromFile } from '../lib/replace-logbook.js';
@@ -46,7 +47,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
-  import { layout, deviceKind } from '../lib/layout.svelte.js';
+  import { layout, deviceKind, desktopApp } from '../lib/layout.svelte.js';
   import { deviceKey } from '../lib/first-launch.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { formatDateTime, formatDate } from '../lib/format.js';
@@ -918,9 +919,18 @@
    */
   const releaseEmpty = $derived(isRelease && layout.split && !logbook.loading && !logbook.error && logbook.dives.length === 0);
 
-  /** « Renommer le carnet »: no flow yet, the message says so. */
-  function emptyMenuSoon() {
-    showSnackbar(t('welcomeSteps.menuSoon'));
+  let renaming = $state(false);
+  let logbookName = $state(deviceStore.getItem('od.logbookName') || '');
+  $effect(() => {
+    logbook.welcome;
+    logbook.dives;
+    logbookName = deviceStore.getItem('od.logbookName') || '';
+  });
+
+  /** @param {string} name */
+  async function rename(name) {
+    await deviceStore.setItemConfirmed('od.logbookName', name);
+    logbookName = name;
   }
 
   /**
@@ -935,12 +945,7 @@
 
   /** « Mon carnet · Dépôt git » then « Aucune plongée »: the logbook's name and where it is kept. */
   const emptyBand = $derived.by(() => {
-    let name = t('welcomeSteps.defaultName');
-    try {
-      name = deviceStore.getItem('od.logbookName') || name;
-    } catch {
-      // Not fatal: the default name.
-    }
+    const name = logbookName || t('welcomeSteps.defaultName');
     const where = logbook.email || logbook.repository ? (logbook.mode === 'git' ? t(logbook.odplus ? 'welcomeSteps.keptServer' : 'welcomeSteps.keptGit') : t('welcomeSteps.keptCloud')) : t('welcomeSteps.keptDevice');
     return `${name} · ${where}\n${t('welcomeSteps.bandNoDives')}`;
   });
@@ -1280,7 +1285,7 @@
 </script>
 
 <Page data-od-scroll class="bc-logbook" onPageInit={keepInSvelteRange}>
-  <Navbar large={theme.ios} class="{theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-tall bc-band-titled'} {showPill && !theme.ios ? 'bc-band-pill' : ''}" title={t('logbook.title')}>
+  <Navbar large={theme.ios} class="{theme.ios ? 'bc-ios-bar' : 'bc-band-bar bc-band-tall bc-band-titled'} {showPill && !theme.ios ? 'bc-band-pill' : ''}" title={!desktopApp && logbookName ? logbookName : t('logbook.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
       <!-- Scrolled, with the month headers in the band (Android, task 2026-11-14-125): the search
@@ -1300,8 +1305,8 @@
           <Icon name="more" weight={4} />
           <span class="bc-sr-only">{t('detail.moreOptions')}</span>
         </Link>
-      {:else if logbook.dives.length || logbook.preview}
-        <Link iconOnly popoverOpen=".bc-logbook-menu" class={logbook.dives.length ? '' : 'disabled'}>
+      {:else if !desktopApp || logbook.dives.length || logbook.preview}
+        <Link iconOnly popoverOpen=".bc-logbook-menu" class={desktopApp && !logbook.dives.length ? 'disabled' : ''}>
           {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
           <span class="bc-sr-only">{t('detail.moreOptions')}</span>
         </Link>
@@ -1484,13 +1489,13 @@
 
   <!--
     The menu of the empty logbook on a release tablet (mock-up android-tablette-carnet-vide-menu-paysage): the
-    logbook's name and where it is kept, then what can be done with the logbook itself. Rename has no flow yet (it says so); the two others open the first launch at its step.
+    logbook's name and where it is kept, then what can be done with the logbook itself.
   -->
   {#if releaseEmpty}
     <Popover class="bc-menu bc-logbook-empty-menu" backdrop={false}>
       <List noChevron mediaList>
         <li class="bc-menu-label">{emptyBand.split('\n')[0]}</li>
-        <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={emptyMenuSoon} />
+        <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={() => (renaming = true)} />
         <li class="bc-menu-divider" role="separator"></li>
         <MenuItem icon="logbook" text={t('welcomeSteps.menuOpenOther')} onclick={() => openFirstLaunch('open')} />
         <MenuItem icon="plus" text={t('welcomeSteps.menuNew')} onclick={() => openFirstLaunch('new')} />
@@ -1507,12 +1512,16 @@
   <Popover class="bc-menu bc-logbook-menu" backdrop={false}>
     <List noChevron>
       <!-- Undo and Redo always come first. -->
-      {#if logbook.undoText}
+      {#if logbook.dives.length && logbook.undoText}
         <MenuItem icon="undo" text={t('logbook.menuUndo')} onclick={() => undoRedo(false)} />
       {/if}
-      {#if logbook.redoText}
+      {#if logbook.dives.length && logbook.redoText}
         <MenuItem icon="redo" text={t('logbook.menuRedo')} onclick={() => undoRedo(true)} />
       {/if}
+      {#if !desktopApp && !selecting}
+        <MenuItem icon="edit" text={t('welcomeSteps.menuRename')} onclick={() => (renaming = true)} />
+      {/if}
+      {#if logbook.dives.length}
       <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter" />
       {#if selecting && checkedCount >= 2}
         <MenuItem icon="edit" text={t('multiDive.menuEdit')} onclick={editChecked} />
@@ -1566,6 +1575,7 @@
           <li class="bc-menu-divider" role="separator"></li>
           <MenuItem icon="delete" text={t('logbook.menuDelete')} destructive onclick={deleteChecked} />
         {/if}
+      {/if}
       {/if}
     </List>
   </Popover>
@@ -1622,6 +1632,9 @@
     </div>
   {/if}
 
+  {#if renaming}
+    <RenameLogbook initialName={logbookName || t('welcomeSteps.defaultName')} onsave={rename} onclose={() => (renaming = false)} />
+  {/if}
   {#if renumbering}
     <RenumberDialog
       ids={selecting ? checkedIds : undefined}
