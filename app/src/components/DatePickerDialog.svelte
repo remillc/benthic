@@ -436,11 +436,11 @@
       font: inherit;
       font-size: 16px;
       cursor: pointer;
-    }
 
-    .bc-date-picker--year[aria-pressed='true'] {
-      background: var(--bc-primary);
-      color: var(--bc-on-primary);
+      &[aria-pressed='true'] {
+        background: var(--bc-primary);
+        color: var(--bc-on-primary);
+      }
     }
 
     .bc-date-picker--input-area {

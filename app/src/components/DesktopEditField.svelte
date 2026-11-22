@@ -422,9 +422,10 @@
         stroke: var(--bc-text);
         stroke-width: 1.6;
         stroke-linejoin: round;
-      }
-      & path.bc-desktop-edit-field--star-on {
-        fill: var(--bc-text);
+
+        &.bc-desktop-edit-field--star-on {
+          fill: var(--bc-text);
+        }
       }
     }
 

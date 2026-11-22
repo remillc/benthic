@@ -239,11 +239,12 @@
       font-size: 15px;
       color: var(--bc-text);
       cursor: pointer;
-    }
-    .bc-desktop-desaturation--notify[aria-pressed='true'] {
-      border-color: transparent;
-      background: var(--bc-desktop-selected);
-      color: var(--bc-desktop-selected-ink);
+
+      &[aria-pressed='true'] {
+        border-color: transparent;
+        background: var(--bc-desktop-selected);
+        color: var(--bc-desktop-selected-ink);
+      }
     }
     .bc-desktop-desaturation--columns {
       display: grid;

@@ -531,9 +531,10 @@
     .bc-desktop-account--row-line {
       font-size: 13px;
       color: var(--bc-text-2);
-    }
-    .bc-desktop-account--row-line.bc-desktop-account--late-line {
-      color: var(--bc-late-text);
+
+      &.bc-desktop-account--late-line {
+        color: var(--bc-late-text);
+      }
     }
     .bc-desktop-account--late-badge {
       flex: none;

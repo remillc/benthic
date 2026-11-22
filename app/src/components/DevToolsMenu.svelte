@@ -717,9 +717,10 @@
         opacity: 0.5;
         cursor: default;
       }
-    }
-    .bc-dev-tools-menu--action[aria-busy='true'] {
-      opacity: 1;
+
+      &[aria-busy='true'] {
+        opacity: 1;
+      }
     }
     .bc-dev-tools-menu--action-text {
       display: flex;
