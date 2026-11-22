@@ -13,6 +13,7 @@ import { storedDemo } from './demo.js';
 import { defaultPrefs } from './format.js';
 import { mark } from './perf.js';
 import { readSnapshot, saveSnapshot } from './snapshot.js';
+import { clearDetailSnapshot } from './detail-snapshot.js';
 import { ownLogbookWindow, noLogbookWindow } from './window-logbook.js';
 import { nextProgress } from './sync-progress.js';
 import { transferCount } from './first-launch.js';
@@ -1056,6 +1057,7 @@ export function showFirstLaunchAgain() {
 function forgetAccount(showWelcome) {
   logbook.preview = null;
   saveSnapshot(null);
+  clearDetailSnapshot();
   logbook.dives = [];
   logbook.email = '';
   logbook.mode = 'cloud';
@@ -1125,6 +1127,7 @@ export function accountReady() {
 export function repositoryChanged() {
   logbook.preview = null;
   saveSnapshot(null);
+  clearDetailSnapshot();
   logbook.dives = [];
   logbook.pending = 0;
   logbook.pendingByDive = {};
