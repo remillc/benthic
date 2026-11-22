@@ -2723,6 +2723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carte commune : la liste suit la zone affichée, y compris les sites regroupés sur la carte.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",
@@ -6645,6 +6646,8 @@
     "mine": "Mes sites",
     "commonMapButton": "Carte commune",
     "listLabel": "Sites de la carte commune",
+    "loadingArea": "Chargement des sites…",
+    "emptyArea": "Aucun site dans cette zone.",
     "clusterLabel": {
       "one": "{n} site de la carte commune. Rapprocher la carte",
       "other": "{n} sites de la carte commune. Rapprocher la carte"

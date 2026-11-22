@@ -6,7 +6,7 @@
   // with a position and "centre on my position", then the list panel: the
   // count, the list items that apply (dives without a site, sites without
   // coordinates, possible duplicates), a divider and the sites.
-  import { tick } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { OpenDivesCore } from 'opendives-core';
@@ -27,7 +27,7 @@
   import { t } from '../lib/i18n.js';
 import { connection } from '../lib/online.svelte.js';
 import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
-import { inBbox } from '../lib/maps-logic.js';
+import { distanceKm, inBbox, normalizeBbox } from '../lib/maps-logic.js';
 import { matchesSite, highlightParts } from '../lib/site-search.js';
 import MapStackSheet from '../components/MapStackSheet.svelte';
 import MapSiteCard from '../components/MapSiteCard.svelte';
@@ -35,9 +35,8 @@ import { placeAt } from '../lib/place-lookup.js';
 import { language } from '../lib/i18n.js';
 import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
 import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
-import { inYourSites } from '../lib/shared-sites.js';
+import { inYourSites, readAreaSites } from '../lib/shared-sites.js';
 import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
-import { distanceKm } from '../lib/maps-logic.js';
 import { openOdPlus } from '../lib/open-offer.svelte.js';
 
   /** @type {import('opendives-core').SiteSummary[]} */
@@ -106,7 +105,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   // The list follows the map (task 2026-11-14-150): the sites inside the visible
   // area, once the map has stopped; a search looks through the whole logbook.
   const inArea = $derived(
-    typed || !view || !located.length ? null : results.filter((s) => s.hasLocation && inBbox(s.lonUdeg / 1e6, s.latUdeg / 1e6, view.bounds)),
+    typed || !view || !located.length ? null : results.filter((s) => s.hasLocation && inBbox(s.lonUdeg / 1e6, s.latUdeg / 1e6, normalizeBbox(view.bounds))),
   );
   const listed = $derived(inArea ?? results);
 
@@ -339,7 +338,6 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   function onview(v) {
     view = v;
     hintIfNotDownloaded();
-    if (common) loadBase(v);
   }
 
   // « Mes sites | Carte commune » (task 2026-11-19-315, docs/mockups/sites-commun-android.dc.html): a signed-in Benthic+
@@ -347,10 +345,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   const canCommon = $derived(odplusAccount.signedIn);
   const common = $derived(canCommon && sharedSites.mode === 'common');
   let baseBox = $state.raw(/** @type {{ mode: string, total: number, sites: import('../lib/shared-sites.js').BaseSite[], clusters: { lat: number, lon: number, count: number }[] }|null} */ (null));
-  /** The base sites around the centre of the map, nearest first. */
+  /** The base sites in the visible area, including those grouped into clusters. */
   let baseList = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
   /** @type {'idle'|'loading'|'ready'|'offer'|'failed'} */
   let baseState = $state('idle');
+  let baseLoadingMore = $state(false);
   let baseSelectedId = $state(/** @type {string|null} */ (null));
   const baseSelected = $derived(baseSelectedId === null ? null : (baseBox?.sites.find((x) => x.id === baseSelectedId) ?? baseList.find((x) => x.id === baseSelectedId) ?? null));
   /** @type {ReturnType<typeof setTimeout>|undefined} */
@@ -360,22 +359,33 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   /** Reads the base in the view once the map has stopped. @param {{ center: [number, number], bounds: [number, number, number, number], zoom: number }} v */
   function loadBase(v) {
     clearTimeout(baseTimer);
+    const ask = ++baseAsk;
+    baseState = 'loading';
+    baseLoadingMore = true;
+    baseBox = null;
+    baseList = [];
     baseTimer = setTimeout(async () => {
       if (!connection.online) return;
-      const ask = ++baseAsk;
-      if (baseState !== 'ready') baseState = 'loading';
-      const [w, so, e, n] = v.bounds;
-      const radiusM = Math.min(50000, Math.max(1, Math.round(distanceKm(v.center[0], v.center[1], e, n) * 1000)));
       try {
-        const [box, near] = await withSession((api, token) =>
-          Promise.all([api.inBox(token, { bbox: [w, so, e, n], zoom: v.zoom }), api.nearby(token, { lat: v.center[1], lon: v.center[0], radiusM, limit: 30 })]),
-        );
-        if (ask !== baseAsk) return;
-        baseBox = box;
-        baseList = near;
-        baseState = 'ready';
+        await withSession(async (api, token) => {
+          const bbox = normalizeBbox(v.bounds);
+          const box = await api.inBox(token, { bbox, zoom: v.zoom });
+          if (ask !== baseAsk) return;
+          baseBox = box;
+          await readAreaSites(
+            (after) => api.inBoxPage(token, { bbox, after, limit: 500 }),
+            () => ask === baseAsk && common,
+            (sites) => {
+              baseList = sites.map((s) => ({ ...s, distanceM: distanceKm(v.center[0], v.center[1], s.lon, s.lat) * 1000 }))
+                .sort((a, b) => a.distanceM - b.distanceM);
+              baseState = 'ready';
+            },
+          );
+          if (ask === baseAsk) baseLoadingMore = false;
+        });
       } catch (err) {
         if (ask !== baseAsk) return;
+        console.error('Shared site area', err);
         const code = /** @type {any} */ (err)?.code;
         baseState = code === 'SUBSCRIPTION_REQUIRED' ? 'offer' : 'failed';
       }
@@ -383,12 +393,15 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   }
 
   $effect(() => {
-    if (!common) {
-      baseSelectedId = null;
+    if (!common || !connection.online) {
+      clearTimeout(baseTimer);
+      untrack(() => baseAsk++);
+      if (!common) baseSelectedId = null;
       return;
     }
     if (!sharedSites.linksLoaded) loadLinks();
-    if (view) loadBase(view);
+    const currentView = view;
+    if (currentView) untrack(() => loadBase(currentView));
   });
 
   /** What the map draws of the base. */
@@ -520,6 +533,8 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       </div>
     {:else if baseState === 'failed'}
       <p class="bc-sites--area-count" role="status">{t('sharedSites.failed')}</p>
+    {:else if baseState === 'loading'}
+      <p class="bc-sites--area-count" role="status">{t('sharedSites.loadingArea')}</p>
     {:else if baseState === 'ready' && baseBox}
       <p class="bc-sites--area-count" role="status">{t('sharedSites.areaCount', { n: baseBox.total })}</p>
       {#if baseList.length}
@@ -540,6 +555,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
             {/each}
           </ul>
         </nav>
+      {/if}
+      {#if baseLoadingMore}
+        <p class="bc-sites--area-count" role="status">{t('sharedSites.loadingArea')}</p>
+      {:else if !baseList.length}
+        <p class="bc-sites--area-count" role="status">{t('sharedSites.emptyArea')}</p>
       {/if}
     {/if}
   </section>

@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  REPORT_REASONS, baseSiteOf, contributionOf, contributionStamp, createSharedSitesApi, diveCountOf, inYourSites, localSiteOf, mergeLinks, redirectLinks,
+  REPORT_REASONS, baseSiteOf, contributionOf, contributionStamp, createSharedSitesApi, diveCountOf, inYourSites, localSiteOf, mergeLinks, readAreaSites, redirectLinks,
 } from '../../app/src/lib/shared-sites.js';
 
 /** A transport that records the requests and answers from a table. */
@@ -85,6 +85,31 @@ test('reading: box, nearby, card with « Ce que disent les carnets », redirect 
   assert.deepEqual(card.carnets?.depthRangeMm, [18000, 30000]);
   assert.equal(card.carnets?.fewDivesLast12Months, true);
   assert.deepEqual(diveCountOf(card), { key: 'count', n: 214 });
+});
+
+test('area list reads every page, including sites represented by clusters', async () => {
+  const { calls, transport } = fakeTransport({
+    'GET /v1/sites/base/list': (req) => {
+      const after = new URL(req.url).searchParams.get('after');
+      return ok(after ? { sites: [{ id: '2', name: 'Clustered', lat: 1, lon: 2 }], next: null }
+        : { sites: [{ id: '1', name: 'First', lat: 1, lon: 2 }], next: '1' });
+    },
+  });
+  const api = createSharedSitesApi({ baseUrl: 'https://api.test', transport });
+  const updates = [];
+  await readAreaSites((after) => api.inBoxPage('t', { bbox: [170, -10, -170, 10], after, limit: 500 }), () => true, (sites) => updates.push(sites.map((s) => s.id)));
+  assert.deepEqual(updates, [['1'], ['1', '2']]);
+  assert.match(calls[1].url, /bbox=170%2C-10%2C-170%2C10&after=1&limit=500$/);
+});
+
+test('area list stops when the map moves and rejects invalid pagination', async () => {
+  let current = true;
+  const updates = [];
+  await readAreaSites(async () => { current = false; return { sites: [], next: null }; }, () => current, (sites) => updates.push(sites));
+  assert.deepEqual(updates, []);
+  const { transport } = fakeTransport({ 'GET /v1/sites/base/list': ok({ sites: [], next: '1' }) });
+  const api = createSharedSitesApi({ baseUrl: 'https://api.test', transport });
+  await assert.rejects(api.inBoxPage('t', { bbox: [0, 0, 1, 1] }), (e) => e.code === 'UNREACHABLE');
 });
 
 test('link and report send what the contract says', async () => {
