@@ -107,26 +107,42 @@ export async function mergeEncryptedAccountFile(base, ours, theirs, box, item) {
     if (!isObject(file) || file.format !== item.format || ('id' in file && file.id !== item.id)) {
       throw new Error('INVALID_ACCOUNT_FILE');
     }
-    if (item.id === 'profile' && Object.hasOwn(file, 'dateOfBirth')) throw new Error('LEGACY_BIRTH_DATE');
   }
   /** @param {Record<string, unknown>|null} file @returns {Promise<FieldVersion>} */
   async function decrypt(file) {
-    if (file === null || !Object.hasOwn(file, 'enc')) return { present: false };
-    if (!isSealedBlock(file.enc)) throw new Error('UNKNOWN_ENCRYPTION');
-    const value = await box.open(file.enc, item);
-    if (!isObject(value)) throw new Error('INVALID_ENCRYPTED_DATA');
+    if (file === null) return { present: false };
+    const legacy = item.id === 'profile' && Object.hasOwn(file, 'dateOfBirth');
+    if (!Object.hasOwn(file, 'enc') && !legacy) return { present: false };
+    let value = {};
+    if (Object.hasOwn(file, 'enc')) {
+      if (!isSealedBlock(file.enc)) throw new Error('UNKNOWN_ENCRYPTION');
+      value = await box.open(file.enc, item);
+      if (!isObject(value)) throw new Error('INVALID_ENCRYPTED_DATA');
+    }
+    if (legacy) {
+      if (typeof file.dateOfBirth !== 'string') throw new Error('INVALID_BIRTH_DATE');
+      if (Object.hasOwn(value, 'dateOfBirth') && value.dateOfBirth !== file.dateOfBirth) throw new Error('CONFLICTING_BIRTH_DATE');
+      if (file.dateOfBirth) value = { ...value, dateOfBirth: file.dateOfBirth };
+    }
     return { present: true, value };
   }
   const [b, o, t] = await Promise.all([decrypt(base), decrypt(ours), decrypt(theirs)]);
-  if (equalFile(ours, theirs)) return { value: ours, conflicts: [], sealedConflicts: null };
-  if (equalFile(base, ours)) return { value: theirs, conflicts: [], sealedConflicts: null };
-  if (equalFile(base, theirs)) return { value: ours, conflicts: [], sealedConflicts: null };
-  if (ours === null) return { value: theirs, conflicts: [], sealedConflicts: null };
-  if (theirs === null) return { value: ours, conflicts: [], sealedConflicts: null };
+  /** @param {Record<string, unknown>|null} file @param {FieldVersion} content */
+  async function selectedFile(file, content) {
+    if (file === null || item.id !== 'profile' || !Object.hasOwn(file, 'dateOfBirth')) return file;
+    const { dateOfBirth, ...rest } = file;
+    return { ...rest, enc: await box.seal(content.value, item) };
+  }
+  if (equalFile(ours, theirs)) return { value: await selectedFile(ours, o), conflicts: [], sealedConflicts: null };
+  if (equalFile(base, ours)) return { value: await selectedFile(theirs, t), conflicts: [], sealedConflicts: null };
+  if (equalFile(base, theirs)) return { value: await selectedFile(ours, o), conflicts: [], sealedConflicts: null };
+  if (ours === null) return { value: await selectedFile(theirs, t), conflicts: [], sealedConflicts: null };
+  if (theirs === null) return { value: await selectedFile(ours, o), conflicts: [], sealedConflicts: null };
   /** @param {Record<string, unknown>|null} file */
   const withoutEnc = (file) => {
     if (file === null) return null;
     const { enc, ...rest } = file;
+    if (item.id === 'profile') delete rest.dateOfBirth;
     return rest;
   };
   const metadata = mergeAccountFile(withoutEnc(base), withoutEnc(ours), withoutEnc(theirs));

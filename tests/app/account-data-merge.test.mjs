@@ -101,11 +101,33 @@ test('does not merge encrypted content with a different key or file identity', a
   await assert.rejects(mergeEncryptedAccountFile(null, null, theirs, box, item));
 });
 
-test('rejects a legacy clear-text birth date before returning a file for synchronization', async () => {
+test('seals a legacy birth date before returning a selected profile for synchronization', async () => {
   const box = boxFor(7);
   const item = { id: 'profile', format: 1 };
   const file = { format: 1, dateOfBirth: '1980-01-02' };
-  await assert.rejects(mergeEncryptedAccountFile(null, null, file, box, item), /LEGACY_BIRTH_DATE/);
+  const result = await mergeEncryptedAccountFile(null, null, file, box, item);
+  assert.doesNotMatch(JSON.stringify(result), /1980-01-02/);
+  assert.deepEqual(await box.open(result.value.enc, item), { dateOfBirth: '1980-01-02' });
+});
+
+test('merges a legacy ancestor without leaking its birth date or losing concurrent changes', async () => {
+  const box = boxFor(8);
+  const item = { id: 'profile', format: 1 };
+  const base = { format: 1, dateOfBirth: '1980-01-02', updatedAt: '2026-01-01T00:00:00Z' };
+  const ours = { format: 1, updatedAt: '2026-01-02T00:00:00Z', enc: await box.seal({ dateOfBirth: '1980-01-02', fullName: 'Name' }, item) };
+  const theirs = { format: 1, dateOfBirth: '1980-01-03', updatedAt: '2026-01-03T00:00:00Z' };
+  const result = await mergeEncryptedAccountFile(base, ours, theirs, box, item);
+  assert.doesNotMatch(JSON.stringify(result), /1980-01-0[23]/);
+  assert.deepEqual(await box.open(result.value.enc, item), { dateOfBirth: '1980-01-03', fullName: 'Name' });
+  assert.deepEqual(result.conflicts, []);
+});
+
+test('rejects an invalid or contradictory legacy date instead of overwriting either value', async () => {
+  const box = boxFor(9);
+  const item = { id: 'profile', format: 1 };
+  await assert.rejects(mergeEncryptedAccountFile(null, null, { format: 1, dateOfBirth: 12 }, box, item), /INVALID_BIRTH_DATE/);
+  const file = { format: 1, dateOfBirth: '1980-01-02', enc: await box.seal({ dateOfBirth: '1980-01-03' }, item) };
+  await assert.rejects(mergeEncryptedAccountFile(null, null, file, box, item), /CONFLICTING_BIRTH_DATE/);
 });
 
 test('resolves deletion of an encrypted block without exposing its conflict in clear text', async () => {
