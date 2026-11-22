@@ -226,3 +226,8 @@ Example values (decided on 8 November 2026): the mock-ups show depths in feet, p
 | `logo-simple-bulles.dc.html` | Logo · simple avec bulles (proposition de Claude, retirée du canevas) |
 | `logo-simple-relief.dc.html` | Logo · simple en relief (proposition de Claude) |
 | `bureau-carnet-vide-actuel.dc.html` | Carnet vide · bureau (app actuelle, capture du 15 novembre 2026) |
+| `android-tablette-carnet-menu-paysage.dc.html` | Carnet, menu ⋮ ouvert, exporter le carnet · tablette Android, paysage |
+| `android-tablette-carnet-exporter-paysage.dc.html` | Exporter le carnet, format .benthic · tablette Android, paysage |
+| `android-tablette-profil-piece-nouvelle-type-paysage.dc.html` | Mon profil de plongeur, nouvelle pièce, étape 1 : type · tablette Android, paysage |
+| `bureau-profil-piece-nouvelle-type.dc.html` | Mon profil de plongeur, nouvelle pièce, étape 1 : type · bureau |
+| `profil-piece-nouvelle-recycleur-android.dc.html` | Mon profil de plongeur, nouvelle pièce, type Recycleur · Android |

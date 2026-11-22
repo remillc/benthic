@@ -6456,3 +6456,30 @@ Christian approved this on 22 November 2026. Work in `main`.
 **Test:** the desktop File menu and logbook selector no longer show « Enregistrer une copie » nor « Télécharger mes plongées »; exporting the whole logbook offers .benthic and writes a file that unzips to the layout of `full-export.js`; « Télécharger mes données » writes the same kind of file.
 
 Done on 22 November 2026: the menus, the export dialogs (desktop dialog, phone sheet), the `<logbook>.benthic` name in `full-export.js`, and the registration of `.benthic` / `application/vnd.benthic+zip` (electron-builder `fileAssociations`, Android intent filters, iOS `Info.plist` type declaration). Not done: the photos and videos choice (the « Télécharger mes données » screen is still to-do #57, the engine takes `withMedia`) and opening a .benthic (#113).
+
+## [ ] 2026-11-22-324 Tablet ⋮ « Exporter le carnet », the export dialog, the Recycleur gear type, the new-piece dialog in two steps, and a review of every icon (#140)
+
+Christian approved this on 22 November 2026. Work in `main`. The design canvases are the reference; the boards named below are copied in `docs/mockups/`.
+
+**1. Tablet: « Exporter le carnet » in the logbook's ⋮ menu (#140).** On the Android tablet (portrait and landscape) the ⋮ of the logbook holds, under the header « Mon carnet · sur cette tablette »: Renommer le carnet, Ouvrir un autre carnet, Nouveau carnet, Exporter le carnet (with « Les 9 plongées » under it, the count of the logbook). Not on the desktop (task 323). Mock-up: `android-tablette-carnet-menu-paysage`.
+
+**2. The export dialog (phone sheet, tablet dialog, desktop dialog).** Title « Exporter le carnet », subtitle « Mon carnet · 9 plongées. Choisissez un format. » Plain rows, one per format, in this order, each with its name, its extension and one line of description:
+- Fichier Benthic · .benthic · « Tout le carnet, avec l’équipement, le profil et les réglages ». Only when the whole logbook is exported (task 323). Inside this row only, the switch « Inclure les photos et vidéos » (« Le fichier peut devenir beaucoup plus gros »), **on by default**. The row is not highlighted more than the others.
+- UDDF · .uddf · « Échange avec d’autres logiciels de plongée » (UDDF comes before SSRF).
+- Fichier de carnet · .ssrf · « Pour Subsurface, sans l’équipement ni le profil ».
+- Liste des plongées · .csv · « Une ligne par plongée, pour un tableur ».
+- Profils · .csv · « Temps, profondeur et température, point par point ».
+- Fiches · .pdf · « Une page par plongée, à imprimer ».
+- Envoyer vers divelogs.de · « Ajoute les plongées à votre compte divelogs.de » (the Subsurface upload). Never keep the divelogs.de user ID or password. The sign-in and progress screens are not drawn yet: wire the row, and ask Christian before building screens of your own.
+Footnote « Le fichier s’ouvre ensuite dans le partage de la tablette. » (phone: « du téléphone »; desktop: a save dialog, no footnote). Actions « Annuler » and « Exporter ». Mock-up: `android-tablette-carnet-exporter-paysage`; apply the same content to `carnet-export-android` and `bureau-carnet-exporter`.
+
+**3. New gear type: Recycleur.** Add `rebreather` to `GEAR_TYPES` in `app/src/lib/inventory.js`, labelled « Recycleur » (en « Rebreather »), right after Bouteille. Its form: Marque, Modèle, Numéro de série (« Sur la plaque du boîtier »), Date d’achat, **Cellules O₂ installées le** (date), **Dernière révision** (date), Notes. Two maintenance reminders, suggested « cellules O₂ aux 12 mois, révision chaque année »: replacing the O₂ cells every 12 months from the cells' date, and a yearly service from the last service. In UDDF it is the `rebreather` element (#175). Mock-ups: `profil-piece-nouvelle-type-menu-android` (phone type menu), `profil-piece-nouvelle-recycleur-android`.
+
+**4. /profile/gear/new in two steps on tablet and desktop (#145, #146).**
+- Step 1, « Nouvelle pièce », choose the type: a grid of the 19 types in 4 columns, each a tile with its icon and its name. ✕ in the header (a dialog with steps), only « Annuler » at the bottom. A tap on a tile opens step 2. Mock-ups: `android-tablette-profil-piece-nouvelle-type-paysage`, `bureau-profil-piece-nouvelle-type`.
+- Step 2, « Nouvelle pièce », subtitle « Étape 2 sur 2 · <type> »: a back arrow left of the title returns to step 1 (it replaces the « Changer » button of the type row, which is removed), ✕ in the header, the form of that type, and only « Enregistrer » at the bottom. Mock-ups: `android-tablette-profil-piece-nouvelle-paysage`, `bureau-profil-piece-nouvelle`.
+The phone keeps its full-screen form with the type menu.
+
+**5. Icons.** New drawings (24 grid, stroke 2, round caps and joins, no fill) for Recycleur (the head in the middle with its loop and mouthpiece, a cylinder on each side, a little taller than the head), Masque, Palmes and Scooter (a torpedo body with a light at the nose and the propeller in its shroud). Take the exact paths from `android-tablette-profil-piece-nouvelle-type-paysage`. Then **review every icon of the app** (`Icon.svelte` and every inline SVG) against the mock-ups of both canvases (`docs/mockups/`): several icons in the app do not match the mock-ups. When an icon differs, the mock-up wins: copy its drawing. Write the list of the icons you changed in the done note, and the ones you are not sure about.
+
+**Test:** the tablet ⋮ opens the export dialog with the formats in the order above; the .benthic switch is on and only in its row; a Recycleur can be added with its two dates and gets its two reminders; on tablet and desktop the type grid leads to the form and the back arrow returns to the grid; the gear icons match the mock-ups.
