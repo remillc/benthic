@@ -6389,3 +6389,18 @@ Christian approved this on 19 November 2026. Work in `main`. Apply together with
 **Mock-ups:** the design canvases are the reference (same boards as 317); update the matching files in `docs/mockups/`.
 
 **Test:** compare the first launch on phone and tablet with the canvases; the wave and the letters look the same thickness.
+
+## [ ] 2026-11-22-319 Backup and restore redesigned (#147): « Que voulez-vous récupérer ? »
+
+Christian approved this on 22 November 2026. Work in `main`. Android phone first; apply the same structure to iPhone, tablet and desktop (desktop keeps its two-pane layout: the list on the left, the chosen screen on the right).
+
+**Flow (`/account/backup`), mock-ups in `docs/mockups/`:**
+1. `sauvegarde-android` — top: one-line status card « Sauvegardé il y a 2 min » / « Chiffré sur le serveur Benthic » with a round tonal icon button « Sauvegarder maintenant » (48 dp, sync icon). Then the section « Que voulez-vous récupérer ? » with three large rows (48 dp icon tile, title 17/22 semibold, one-line description, chevron): « Une plongée supprimée » (with a count badge), « Une version d’une plongée », « Tout le carnet à une date ». Footnote: « Une version est gardée à chaque synchronisation. Rien n’est perdu en restaurant : le carnet actuel est gardé lui aussi. » The version list is no longer on this page.
+2. `sauvegarde-supprimees-android` — « Plongées supprimées »: the deleted dives (number, site, date · duration · depth, « Supprimée le … ») each with a text button « Restaurer », then an outlined « Restaurer les N plongées ». Intro: « Une plongée restaurée reprend sa place et son numéro dans le carnet. »
+3. `sauvegarde-une-plongee-android` — « Une version d’une plongée »: search field, then « Modifiées récemment » (number, site, « Modifiée le … », « N versions », chevron). A row opens the existing `sauvegarde-plongee-android` (versions of one dive), whose back arrow now returns here.
+4. `sauvegarde-carnet-android` — « Tout le carnet à une date »: a vertical timeline grouped by day (day label, then « 10 h 28 · 312 plongées »), a dot per version (current one filled in primary with a halo and the « Actuelle » chip), a 2 dp line joining the dots, and coloured chips for what changed since: « +3 ajoutées » green, « 1 modifiée » brown, « 1 supprimée » red. « Versions plus anciennes » at the end.
+5. `sauvegarde-version-android` — one version of the logbook: a card with the date and « 309 plongées · 47 sites · 14 pièces » on one line (no number tiles), then « Ce qui changera si vous restaurez »: dives added since, listed one by one (number, site, date) with « Elles seront retirées du carnet », and dives modified since with what will come back. Filled « Restaurer cette version » then outlined « Parcourir cette version », and the note about read-only browsing and the current logbook being kept. « Restaurer » goes to the existing confirmation `sauvegarde-restaurer-android`.
+
+Dates follow the format chosen in Réglages; « Aujourd’hui » and « Hier » are used as day labels in the timeline only.
+
+**Test:** each of the three choices opens its screen and back returns to « Que voulez-vous récupérer ? »; restoring a deleted dive puts it back with its number; restoring a version keeps the current logbook as a version.

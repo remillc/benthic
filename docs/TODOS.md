@@ -60,7 +60,6 @@ Next number: 175
 - #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
 - #145 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
 - #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
-- #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes et les détendeurs
 - #149 [code] remplacer les uuid par des id plus courts
 - #150 [code] dans desktop: sur le carnet, ajouter le même trait séparateur gris entre chaque plongée
