@@ -809,6 +809,7 @@ async function syncEdits() {
       // The cloud brought changes: the merged log was read again, its dives
       // are new objects and the undo history is gone (lib/undo.js).
       logbook.dives = await OpenDivesCore.listLoadedDives();
+      logbook.sitesVersion++;
       undoCleared();
     }
     const reached = status.status !== 'offline' && status.status !== 'stopped';

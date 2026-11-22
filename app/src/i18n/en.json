@@ -2723,6 +2723,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Sites: changes received by sync appear without reopening the app.",
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",

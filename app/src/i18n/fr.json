@@ -2723,6 +2723,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Sites : les modifications reçues par synchronisation apparaissent sans rouvrir l’application.",
       "Sites : les coordonnées avec le symbole de degré sont reconnues et affichées selon vos réglages.",
       "Profil de plongeur : l’adresse courriel remplace l’identifiant technique du serveur lorsque le nom n’est pas renseigné.",
       "Compte sur téléphone, tablette et ordinateur : l’adresse courriel remplace l’identifiant technique du serveur.",

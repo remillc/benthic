@@ -19,6 +19,7 @@
 //        git-remote hist <url> <user> <token> <branch> <step>...
 //                                                 the history calls (task 290), each step on the log opened:
 //                                                 add:<ISO date> (a dive, saved, synced), delete-first (saved, synced),
+//                                                 site-create, site-edit (saved, synced), sites (prints sites as JSON),
 //                                                 call:<action>[:<arg>...] (history_call, prints json=), restore:<commit>
 //                                                 (history_call restore, then sync), open:<commit> (read only; tries to save),
 //                                                 close, dives (prints the number of dives in memory)
@@ -27,6 +28,7 @@
 #include "core/libopendives/internal.h"
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -202,6 +204,30 @@ int main(int argc, char **argv)
 					printf("error=add: %s\n", error.c_str());
 					return 1;
 				}
+			} else if (name == "site-create") {
+				if (site_create("Initial site", 23940400, -74571800, result, error) ||
+				    save_local(error) || !sync_now()) {
+					printf("error=site-create: %s\n", error.c_str());
+					return 1;
+				}
+			} else if (name == "site-edit") {
+				sites_json(result);
+				const size_t at = result.find("\"uuid\":");
+				if (at == std::string::npos) {
+					printf("error=site-edit: no site\n");
+					return 1;
+				}
+				uint32_t uuid = static_cast<uint32_t>(strtoul(result.c_str() + at + 7, nullptr, 10));
+				if (site_edit(uuid, "name", "Updated site", 0, 0, result, error) ||
+				    site_edit(uuid, "location", "", 23965000, -74555000, result, error) ||
+				    site_edit(uuid, "country", "Bahamas", 0, 0, result, error) ||
+				    save_local(error) || !sync_now()) {
+					printf("error=site-edit: %s\n", error.c_str());
+					return 1;
+				}
+			} else if (name == "sites") {
+				sites_json(result);
+				printf("sites=%s\n", result.c_str());
 			} else if (name == "delete-first") {
 				std::string list;
 				list_loaded_dives(list);
