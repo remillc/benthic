@@ -1127,7 +1127,7 @@ async function desktopFlows() {
       const page = [...document.querySelectorAll('.view.tab-active > .page')].find((p) => p.f7Page?.route?.path === path) ?? document.body;
       const r = page.getBoundingClientRect();
       const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-      return { cls: page.className, width: Math.round(r.width), onTop: !!hit && page.contains(hit), back: [...page.querySelectorAll('.navbar .left a, .navbar .left button')].some((b) => b.getClientRects().length > 0) };
+      return { cls: page.className, width: Math.round(r.width), onTop: !!hit && page.contains(hit), back: [...page.querySelectorAll('.navbar .left a, .navbar .left button, .bc-piece-edit--close')].some((b) => b.getClientRects().length > 0) };
     }, path);
     checks++;
     const problems = [];
