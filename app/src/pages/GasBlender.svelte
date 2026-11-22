@@ -30,7 +30,7 @@
   // the helium step. Nitrox by default; the last mode chosen is remembered on
   // the device.
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
@@ -110,8 +110,8 @@
   // Read again when the logbook changes: its cylinders are part of the list.
   $effect(() => {
     if (logbook.loading) return;
-    OpenDivesCore.toolQuery({ kind: 'cylinders' })
-      .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => {
+    BenthicCore.toolQuery({ kind: 'cylinders' })
+      .then((/** @type {import('benthic-core').GasCylinderTypes} */ list) => {
         cylinders = list.types.filter((c) => c.ml > 0);
         const names = cylinders.map((c) => c.name);
         if (!cylinder || !names.includes(cylinder)) {

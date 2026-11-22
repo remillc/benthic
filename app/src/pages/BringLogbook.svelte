@@ -12,7 +12,7 @@
   // "Précédent" goes back to step 1, which then only shows the email of the
   // account already created. Also reached when signing in to an account
   // that has no logbook yet.
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { stageFile } from '../lib/staged-file.js';
   import TextField from '../components/TextField.svelte';
   import ChoiceRow from '../components/ChoiceRow.svelte';
@@ -65,14 +65,14 @@
     try {
       if (source === 'divelogs') {
         const credentials = { user: user.trim(), password };
-        await OpenDivesCore.divelogsCheck(credentials);
+        await BenthicCore.divelogsCheck(credentials);
         // Back here from the import ("Précédent" or a cancel), the fields are empty.
         user = '';
         password = '';
         f7router.navigate(`${base}/importing`, { props: { source: 'divelogs', ...credentials } });
         return;
       }
-      await OpenDivesCore.createLog({ source: source === 'device' ? 'device' : 'empty' });
+      await BenthicCore.createLog({ source: source === 'device' ? 'device' : 'empty' });
       finishAccount(f7router, welcome);
     } catch (e) {
       const code = errorCode(e);
@@ -91,7 +91,7 @@
     fileInput.value = '';
     busy = true;
     try {
-      const { path } = await stageFile(OpenDivesCore, file);
+      const { path } = await stageFile(BenthicCore, file);
       f7router.navigate(`${base}/importing`, { props: { source: 'file', path } });
     } catch (e) {
       showFailure(errorCode(e));

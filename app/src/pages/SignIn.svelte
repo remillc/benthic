@@ -7,7 +7,7 @@
   // without a logbook yet goes on to "Reprendre votre carnet ?".
   // Not built yet: from Account, the dives of this device are not added to
   // the account's logbook (they stay in the device's logbook).
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import AccountField from '../components/AccountField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import { errorCode, finishAccount, phoneFirstLaunch, showFailure, validEmail, validPassword } from '../lib/account.js';
@@ -47,7 +47,7 @@
     if (emailError || passwordError) return;
     busy = true;
     try {
-      const result = await OpenDivesCore.signIn({ email: email.trim(), password });
+      const result = await BenthicCore.signIn({ email: email.trim(), password });
       password = '';
       if (result.exists && look) f7router.navigate('/welcome/downloading', { props: { email: email.trim() } });
       else if (result.exists) finishAccount(f7router, welcome, { offerDeviceDives: true });

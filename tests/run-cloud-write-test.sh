@@ -16,16 +16,16 @@
 # test address set, save and sync are refused and the server does not move.
 #
 # Each clone is a separate $HOME (the core's cache is under $HOME/.subsurface).
-# Credentials: <dev-env> (OPENDIVES_CLOUD_EMAIL, OPENDIVES_CLOUD_PASSWORD) and
-# <test-env> (OPENDIVES_CLOUD_TEST_EMAIL); the password is never printed.
+# Credentials: <dev-env> (BENTHIC_CLOUD_EMAIL, BENTHIC_CLOUD_PASSWORD) and
+# <test-env> (BENTHIC_CLOUD_TEST_EMAIL); the password is never printed.
 # usage: run-cloud-write-test.sh <cloud-write> <dev-env> <test-env> <workdir>
 set -uo pipefail
 CW=$(realpath "$1"); DEVF=$2; TESTF=$3; W=$4
 set -a; source <(tr -d '\r' < "$DEVF"); source <(tr -d '\r' < "$TESTF"); set +a
 lc() { tr '[:upper:]' '[:lower:]' <<< "$1"; }
-[ -n "${OPENDIVES_CLOUD_TEST_EMAIL:-}" ] && [ "$(lc "$OPENDIVES_CLOUD_EMAIL")" = "$(lc "$OPENDIVES_CLOUD_TEST_EMAIL")" ] ||
+[ -n "${BENTHIC_CLOUD_TEST_EMAIL:-}" ] && [ "$(lc "$BENTHIC_CLOUD_EMAIL")" = "$(lc "$BENTHIC_CLOUD_TEST_EMAIL")" ] ||
   { echo "REFUSED: the account is not the test account"; exit 2; }
-BR=$OPENDIVES_CLOUD_EMAIL
+BR=$BENTHIC_CLOUD_EMAIL
 rm -rf "$W"; mkdir -p "$W"; W=$(realpath "$W")
 H1=$W/clone1; H2=$W/clone2; H3=$W/fresh
 mkdir -p "$H1" "$H2" "$W/lock"

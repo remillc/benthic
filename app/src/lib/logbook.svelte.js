@@ -7,7 +7,7 @@ import { untrack } from 'svelte';
 import { deviceStore } from './device-store.js';
 import { syncNetwork, syncAllowedOnThisNetwork, networkKnown, onSyncAllowedAgain } from './sync-network.svelte.js';
 import { invalidateCoreCache, setCacheVersions } from './core-cache.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { runCsvImport } from './csv-import.js';
 import { storedDemo } from './demo.js';
 import { defaultPrefs } from './format.js';
@@ -25,12 +25,12 @@ import { importProgress } from './import-progress.svelte.js';
 import { importPayload } from './import-files.js';
 import { isRelease } from './edition.js';
 import { sheetVariant } from './account-sheet.js';
-import { loadOdplusAccount, odplusAccount, odplusSubscriber, setOdplusAccount } from './benthic-plus-state.svelte.js';
+import { loadBenthicPlusAccount, benthicPlusAccount, benthicPlusSubscriber, setBenthicPlusAccount } from './benthic-plus-state.svelte.js';
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 
-/** @typedef {import('opendives-core').Dive} Dive */
-/** @typedef {import('opendives-core').Prefs} Prefs */
+/** @typedef {import('benthic-core').Dive} Dive */
+/** @typedef {import('benthic-core').Prefs} Prefs */
 
 /**
  * - syncing: the device's copy is shown, the sync with the cloud is running;
@@ -44,8 +44,8 @@ import { isServerRepository } from './server-logbook.js';
 
 /**
  * Dives changed here and in the cloud on the same line, which Subsurface's
- * automatic merge could not combine (OpenDivesCore.syncConflicts).
- * @typedef {Extract<import('opendives-core').SyncConflicts, {conflict: true}>} Conflict
+ * automatic merge could not combine (BenthicCore.syncConflicts).
+ * @typedef {Extract<import('benthic-core').SyncConflicts, {conflict: true}>} Conflict
  */
 
 /**
@@ -98,7 +98,7 @@ export const logbook = $state({
   /** The git repository, "host/owner/name"; empty for the cloud. */
   repository: '',
   /** The git repository is the signed-in OpenDives server account's (release edition): shown as « Serveur OpenDives ». */
-  odplus: false,
+  benthicPlus: false,
   /** Cloud server host in use, e.g. ssrf-cloud-eu.subsurface-divelog.org. */
   server: '',
   /** Local time of the last successful sync (ISO, no time zone), or null. */
@@ -134,9 +134,9 @@ export const logbook = $state({
    */
   welcomeHold: false,
   /** Last dive changed by an edit or an undo, for the detail screen. */
-  edited: /** @type {{ id: number, dive: import('opendives-core').DiveDetail }|null} */ (null),
+  edited: /** @type {{ id: number, dive: import('benthic-core').DiveDetail }|null} */ (null),
   /** Last trip changed by a trip change or an undo, for the trip screen. */
-  editedTrip: /** @type {import('opendives-core').TripDetail|null} */ (null),
+  editedTrip: /** @type {import('benthic-core').TripDetail|null} */ (null),
   /** Text of the step that Undo would revert, e.g. "Edit notes [#12]". */
   undoText: '',
   /** Text of the step that Redo would apply again; empty when none. */
@@ -157,14 +157,14 @@ setCacheVersions(() => untrack(() => [logbook.dives, logbook.sitesVersion]));
 /**
  * One trip change (spec, section 4, "Trip"), saved and synced like a dive
  * edit; the logbook list is read again, as trips changed.
- * @param {Parameters<import('opendives-core').OpenDivesCorePlugin['tripAction']>[0]} options
+ * @param {Parameters<import('benthic-core').BenthicCorePlugin['tripAction']>[0]} options
  */
 export async function tripChange(options) {
-  const result = await OpenDivesCore.tripAction(options);
+  const result = await BenthicCore.tripAction(options);
   logbook.editedTrip = result.trip ?? null;
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await persistChanges();
   return result;
 }
@@ -175,10 +175,10 @@ export async function tripChange(options) {
  * @param {boolean} on
  */
 export async function setAutogroup(on) {
-  const result = await OpenDivesCore.tripAction({ action: 'autogroup', value: on ? 'on' : 'off' });
+  const result = await BenthicCore.tripAction({ action: 'autogroup', value: on ? 'on' : 'off' });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.prefs = await prefsAfterLoad();
   await persistChanges();
 }
@@ -190,7 +190,7 @@ export async function setAutogroup(on) {
  * @param {string} newName
  */
 export async function renameCylinderType(name, newName) {
-  const result = await OpenDivesCore.cylinderTypes({ action: 'rename', name, value: newName });
+  const result = await BenthicCore.cylinderTypes({ action: 'rename', name, value: newName });
   invalidateCoreCache();
   keepCylinderLibrary(result.library);
   logbook.undoText = result.undo;
@@ -204,10 +204,10 @@ export async function renameCylinderType(name, newName) {
  * cylinder and how many keep it, with its type cleared (the dive's only cylinder, or one a gas
  * change or the pressure graph depends on). Nothing changes.
  * @param {string} name
- * @returns {Promise<import('opendives-core').CylinderTypeDeletion>}
+ * @returns {Promise<import('benthic-core').CylinderTypeDeletion>}
  */
 export async function previewCylinderTypeDeletion(name) {
-  const result = await OpenDivesCore.cylinderTypes({ action: 'deletePreview', name });
+  const result = await BenthicCore.cylinderTypes({ action: 'deletePreview', name });
   return result.deletion ?? { removed: 0, kept: 0 };
 }
 
@@ -217,12 +217,12 @@ export async function previewCylinderTypeDeletion(name) {
  * @param {string} name
  */
 export async function deleteCylinderType(name) {
-  const result = await OpenDivesCore.cylinderTypes({ action: 'delete', name });
+  const result = await BenthicCore.cylinderTypes({ action: 'delete', name });
   invalidateCoreCache();
   keepCylinderLibrary(result.library);
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await persistChanges();
   return result;
 }
@@ -239,12 +239,12 @@ let syncTimer;
  * @param {Record<string, string|number|string[]>} changes
  */
 export async function saveDiveChanges(id, changes) {
-  const result = await OpenDivesCore.editDive({ id, changes });
+  const result = await BenthicCore.editDive({ id, changes });
   invalidateCoreCache(); // the buddies, tags and site counts may have moved
   logbook.edited = { id, dive: result.dive };
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await persistChanges();
   return result;
 }
@@ -257,7 +257,7 @@ export async function saveDiveChanges(id, changes) {
 export async function refreshAfterChange(undoText) {
   logbook.undoText = undoText;
   logbook.redoText = '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
 }
@@ -276,10 +276,10 @@ export async function deleteDive(id) {
  * @param {number[]} ids
  */
 export async function deleteDives(ids) {
-  const result = await OpenDivesCore.deleteDive({ ids });
+  const result = await BenthicCore.deleteDive({ ids });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
 }
@@ -292,10 +292,10 @@ export async function deleteDives(ids) {
  * @returns {Promise<number>} the merged dive's id (the selection after the merge)
  */
 export async function mergeDives(ids) {
-  const result = await OpenDivesCore.mergeDives({ ids });
+  const result = await BenthicCore.mergeDives({ ids });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
   return result.list?.id ?? 0;
@@ -309,13 +309,13 @@ export async function mergeDives(ids) {
  * @param {number|null} [openId] the dive open in the detail pane (tablet), refreshed when it is one of them
  */
 export async function editDivesTogether(ids, changes, openId = null) {
-  const result = await OpenDivesCore.editDives({ ids, changes });
+  const result = await BenthicCore.editDives({ ids, changes });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   // The dive open in the detail pane (tablet), if it was one of them, shows its new values.
-  if (openId !== null && ids.includes(openId)) logbook.edited = { id: openId, dive: await OpenDivesCore.getDive({ id: openId }) };
+  if (openId !== null && ids.includes(openId)) logbook.edited = { id: openId, dive: await BenthicCore.getDive({ id: openId }) };
   await persistChanges();
 }
 
@@ -326,10 +326,10 @@ export async function editDivesTogether(ids, changes, openId = null) {
  * @param {number} start
  */
 export async function renumberDives(ids, start) {
-  const result = await OpenDivesCore.renumberDives({ ids, start });
+  const result = await BenthicCore.renumberDives({ ids, start });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await persistChanges();
 }
 
@@ -379,10 +379,10 @@ export function renumberShiftPlan(id, target) {
  * @param {number[]} numbers
  */
 export async function renumberDivesTo(ids, numbers) {
-  const result = await OpenDivesCore.renumberDives({ ids, start: 0, numbers });
+  const result = await BenthicCore.renumberDives({ ids, start: 0, numbers });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await persistChanges();
 }
 
@@ -406,10 +406,10 @@ export function renumberPlanFrom(id) {
  * @returns {Promise<number>} the new dive's identifier
  */
 export async function addDive(fields) {
-  const result = await OpenDivesCore.createDive({ fields });
+  const result = await BenthicCore.createDive({ fields });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await persistChanges();
   return result.list?.id ?? 0;
 }
@@ -417,12 +417,12 @@ export async function addDive(fields) {
 /**
  * Saves a plan as a planned dive, or replaces one (one undoable step), saved
  * and synced like an edit. The dive list does not show planned dives.
- * @param {import('opendives-core').PlanRequest} request
+ * @param {import('benthic-core').PlanRequest} request
  * @param {number} [replaceId]
  * @param {string} [title] kept with the plan; empty for none
  */
 export async function savePlan(request, replaceId = 0, title = '') {
-  const result = await OpenDivesCore.savePlan({ request, replaceId, title });
+  const result = await BenthicCore.savePlan({ request, replaceId, title });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   await persistChanges();
@@ -447,7 +447,7 @@ export function importFile(file) {
     // The file goes to the app's cache in pieces and the core reads it there: a logbook is never one string
     // (the plugin's bridge and the Android Java heap cannot hold 100 MB).
     importProgress.phase('copy', file.size);
-    const staged = await stageFile(OpenDivesCore, file, undefined, importProgress.reporter('copy'));
+    const staged = await stageFile(BenthicCore, file, undefined, importProgress.reporter('copy'));
     return importData(file.name, { path: staged.path });
   });
 }
@@ -468,10 +468,10 @@ export async function importFiles(files) {
     return added;
   }
   const before = logbook.dives.length;
-  const result = await OpenDivesCore.importDivesFiles({ files: await importPayload(files) });
+  const result = await BenthicCore.importDivesFiles({ files: await importPayload(files) });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
   return Math.max(0, logbook.dives.length - before);
@@ -513,11 +513,11 @@ export function importData(name, data) {
     const before = logbook.dives.length;
     // The core reports nothing inside the import: the segment is indeterminate (« Lecture des plongées… »).
     importProgress.phase('import');
-    const result = await OpenDivesCore.importDives(typeof data === 'string' ? { name, data } : { name, path: data.path });
+    const result = await BenthicCore.importDives(typeof data === 'string' ? { name, data } : { name, path: data.path });
     importProgress.phase('save');
     logbook.undoText = result.undo;
     logbook.redoText = result.redo ?? '';
-    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.dives = await BenthicCore.listLoadedDives();
     logbook.sitesVersion++;
     await persistChanges();
     return Math.max(0, logbook.dives.length - before);
@@ -529,7 +529,7 @@ export function importData(name, data) {
  * the core's CSV import, one undoable step, saved and synced like any import. The files are staged in the app's
  * cache for the call and discarded after it.
  * @param {File} file
- * @param {import('opendives-core').CsvParams} params the mapping (lib/csv-import.js, buildParams)
+ * @param {import('benthic-core').CsvParams} params the mapping (lib/csv-import.js, buildParams)
  * @param {File|null} [companion] Poseidon MkVI: the .txt of the same dive
  * @returns {Promise<number>} the number of dives added to the logbook
  */
@@ -537,15 +537,15 @@ export async function importCsvFile(file, params, companion = null) {
   const before = logbook.dives.length;
   const result = await runCsvImport(
     {
-      stage: async (f) => (await stageFile(OpenDivesCore, f)).path,
-      discard: (path) => OpenDivesCore.discardImport({ path }),
-      importCsv: (o) => OpenDivesCore.importCsv(o),
+      stage: async (f) => (await stageFile(BenthicCore, f)).path,
+      discard: (path) => BenthicCore.discardImport({ path }),
+      importCsv: (o) => BenthicCore.importCsv(o),
     },
     { file, companion, params, dryRun: false },
   );
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
   return Math.max(0, logbook.dives.length - before);
@@ -563,10 +563,10 @@ export async function importReceived(xml) {
   let binary = '';
   for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   const before = logbook.dives.length;
-  const result = await OpenDivesCore.importDives({ name: 'opendives-qr.ssrf', data: btoa(binary) });
+  const result = await BenthicCore.importDives({ name: 'opendives-qr.ssrf', data: btoa(binary) });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
   return { id: result.list?.id ?? 0, added: Math.max(0, logbook.dives.length - before) };
@@ -577,7 +577,7 @@ export async function deviceDiveCount() {
   // The demo logbook is never offered to an account (task 2026-11-16-224).
   if (storedDemo(deviceStore)) return 0;
   try {
-    return (await OpenDivesCore.deviceLog({ action: 'count' })).count;
+    return (await BenthicCore.deviceLog({ action: 'count' })).count;
   } catch (e) {
     console.error('Device dives', e);
     return 0;
@@ -592,21 +592,21 @@ export async function deviceDiveCount() {
 export async function importDeviceDives() {
   if (storedDemo(deviceStore)) throw new Error('NO_DIVES');
   const before = logbook.dives.length;
-  const result = await OpenDivesCore.deviceLog({ action: 'import' });
+  const result = await BenthicCore.deviceLog({ action: 'import' });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
   return Math.max(0, logbook.dives.length - before);
 }
 
 /**
- * After a download from a dive computer (OpenDivesCore.downloadDives): the
+ * After a download from a dive computer (BenthicCore.downloadDives): the
  * new dives are one undoable step already made by the core; it is saved and
  * synced like an edit. The remembered computers, updated by the core after
  * every attempt as Subsurface does, are kept on this device.
- * @param {import('opendives-core').DownloadResult|null} result null after a failed attempt
+ * @param {import('benthic-core').DownloadResult|null} result null after a failed attempt
  */
 export async function afterDownload(result) {
   try {
@@ -624,7 +624,7 @@ export async function afterDownload(result) {
   }
   logbook.undoText = result.undo;
   logbook.redoText = '';
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   await persistChanges();
   await noteComputer?.();
@@ -637,7 +637,7 @@ export async function afterDownload(result) {
 async function readConflicts() {
   if (!logbook.email) return;
   try {
-    const found = await OpenDivesCore.syncConflicts();
+    const found = await BenthicCore.syncConflicts();
     logbook.conflict = found.conflict ? found : null;
   } catch (e) {
     console.error('Reading the sync conflicts', e);
@@ -654,12 +654,12 @@ let choiceHeld = false;
  * @param {Record<string, 'device'|'cloud'>} choices
  */
 export async function resolveConflict(choices) {
-  await OpenDivesCore.resolveConflicts({ choices });
+  await BenthicCore.resolveConflicts({ choices });
   choiceHeld = true;
   logbook.conflict = null;
   logbook.conflictLater = false;
   undoCleared();
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await countPending();
 }
 
@@ -682,8 +682,8 @@ export async function sendConflictChoice() {
 /** "Annuler": the conflict as it was, and its dialog again. */
 export async function cancelConflictChoice() {
   choiceHeld = false;
-  await OpenDivesCore.cancelConflictResolution();
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  await BenthicCore.cancelConflictResolution();
+  logbook.dives = await BenthicCore.listLoadedDives();
   await readConflicts();
   await countPending();
 }
@@ -694,19 +694,19 @@ export async function cancelConflictChoice() {
  * @param {boolean} [redo]
  */
 export async function undoLastChange(redo = false) {
-  const result = await OpenDivesCore.undo({ redo });
+  const result = await BenthicCore.undo({ redo });
   invalidateCoreCache();
   if (result.dive) logbook.edited = { id: result.dive.id, dive: result.dive };
   if (result.list) {
-    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.dives = await BenthicCore.listLoadedDives();
     logbook.sitesVersion++;
   }
   if (result.trip) {
     logbook.editedTrip = result.trip;
-    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.dives = await BenthicCore.listLoadedDives();
   }
   if (result.site) {
-    logbook.dives = await OpenDivesCore.listLoadedDives();
+    logbook.dives = await BenthicCore.listLoadedDives();
     logbook.sitesVersion++;
   }
   if (result.cylinderTypes) keepCylinderLibrary(result.cylinderTypes.library);
@@ -717,7 +717,7 @@ export async function undoLastChange(redo = false) {
 }
 
 async function persistChanges() {
-  await OpenDivesCore.saveLocal();
+  await BenthicCore.saveLocal();
   await countPending();
   clearTimeout(syncTimer);
   // With a conflict waiting, the automatic sync that would run only brings the dialog back (syncEdits).
@@ -729,7 +729,7 @@ async function persistChanges() {
  * again, the undo history is gone, and the commit is sent like any saved change.
  */
 export async function afterRestore() {
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   invalidateCoreCache();
   undoCleared();
@@ -746,7 +746,7 @@ export async function openVersion(commit) {
   clearTimeout(syncTimer);
   logbook.browsing = true;
   try {
-    return await OpenDivesCore.history('open', [commit]);
+    return await BenthicCore.history('open', [commit]);
   } catch (e) {
     await closeVersion();
     throw e;
@@ -757,7 +757,7 @@ export async function openVersion(commit) {
 export async function closeVersion() {
   if (!logbook.browsing) return;
   try {
-    const cached = await OpenDivesCore.history('close');
+    const cached = await BenthicCore.history('close');
     if (cached.dives) logbook.dives = cached.dives;
     logbook.sitesVersion++;
     invalidateCoreCache();
@@ -806,11 +806,11 @@ async function syncEdits() {
   /** @type {SyncOutcome} */
   let outcome = 'failed';
   try {
-    const status = await OpenDivesCore.syncChanges();
+    const status = await BenthicCore.syncChanges();
     if (status.reloaded) {
       // The cloud brought changes: the merged log was read again, its dives
       // are new objects and the undo history is gone (lib/undo.js).
-      logbook.dives = await OpenDivesCore.listLoadedDives();
+      logbook.dives = await BenthicCore.listLoadedDives();
       logbook.sitesVersion++;
       undoCleared();
     }
@@ -900,15 +900,15 @@ function rememberAccount(has) {
 export function boot() {
   const settingsApplied = applyDeviceSettings().then(() => mark('settings'));
   if (readWelcomeState() === 'done') {
-    const configure = OpenDivesCore.configureCloud();
+    const configure = BenthicCore.configureCloud();
     // Without a remembered account (the beta's local logbook) the device copy of a cloud log is not asked for: the core
     // would answer « Cloud account not configured ». loadCloud asks for it itself once an account is found.
-    const cached = deviceStore.getItem(ACCOUNT_HINT) ? OpenDivesCore.listCloudDives({ cached: true }) : null;
+    const cached = deviceStore.getItem(ACCOUNT_HINT) ? BenthicCore.listCloudDives({ cached: true }) : null;
     let probe = null;
     try {
       // The probe runs on the plugin's network thread, not in the core's
       // order: it is sent once the account is set, or it finds none.
-      if (logbook.autoSync && !syncNetwork.unmeteredOnly && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => OpenDivesCore.probeCloud());
+      if (logbook.autoSync && !syncNetwork.unmeteredOnly && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => BenthicCore.probeCloud());
     } catch {
       // No hint: loadCloud sends the probe.
     }
@@ -937,7 +937,7 @@ export async function startApp() {
   if (firstStart) {
     let configured = false;
     try {
-      const account = await OpenDivesCore.configureCloud();
+      const account = await BenthicCore.configureCloud();
       // The beta after the alpha: a Subsurface-cloud account is not opened, first launch is shown (its files stay).
       configured = account.available && !isIgnoredCloudAccount(account, isRelease);
     } catch (e) {
@@ -961,10 +961,10 @@ export async function startApp() {
  * @param {{ deleteCopy?: boolean }} [options]
  */
 export async function signOut({ deleteCopy = false } = {}) {
-  await OpenDivesCore.signOut({ deleteCopy });
+  await BenthicCore.signOut({ deleteCopy });
   // The OpenDives server's session goes with the logbook that was connected through it (the tokens are erased).
-  if (logbook.odplus || odplusAccount.signedIn) await OpenDivesCore.serverSessionClear();
-  setOdplusAccount({ signedIn: false });
+  if (logbook.benthicPlus || benthicPlusAccount.signedIn) await BenthicCore.serverSessionClear();
+  setBenthicPlusAccount({ signedIn: false });
   forgetAccount(true);
 }
 
@@ -988,16 +988,16 @@ export async function eraseDemoLogbook() {
   // Only this device's own logbook: an account's logbook is never touched, whatever the stored flag says.
   if (logbook.email) throw new Error('NOT_DEMO');
   const ids = logbook.dives.map((d) => d.id);
-  if (ids.length) await OpenDivesCore.deleteDive({ ids });
-  const sites = /** @type {{ uuid: number }[]} */ (await OpenDivesCore.siteQuery({ kind: 'list' }));
-  if (sites.length) await OpenDivesCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
-  await OpenDivesCore.saveLocal();
+  if (ids.length) await BenthicCore.deleteDive({ ids });
+  const sites = /** @type {{ uuid: number }[]} */ (await BenthicCore.siteQuery({ kind: 'list' }));
+  if (sites.length) await BenthicCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
+  await BenthicCore.saveLocal();
   undoCleared();
 }
 
 /**
  * « Remplacer ce carnet » (decided on 18 November 2026): the logbook of this device becomes the file's. Only a device
- * logbook: an account's logbook (cloud, git, OpenDives+ server) is never touched, because removing its dives would be
+ * logbook: an account's logbook (cloud, git, Benthic+ server) is never touched, because removing its dives would be
  * sent to the shared log. The dives of the file are brought in after the current ones are removed; if that fails, the
  * current logbook is put back from a copy taken first, so a bad file never leaves the device without its logbook.
  * @param {string} name the new logbook's name (kept as its label on this device)
@@ -1007,30 +1007,30 @@ export async function eraseDemoLogbook() {
  * @returns {Promise<number>} the dives of the new logbook
  */
 export async function replaceDeviceLogbook(name, data, fileName) {
-  if (logbook.email || logbook.odplus || logbook.repository) throw new Error('NOT_REPLACEABLE');
+  if (logbook.email || logbook.benthicPlus || logbook.repository) throw new Error('NOT_REPLACEABLE');
   const ids = logbook.dives.map((d) => d.id);
   // The copy taken first is a file in the app's cache, written by the core: it never goes through the bridge as a string.
   importProgress.phase('import');
-  const backup = ids.length ? (await OpenDivesCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'replaced-logbook.ssrf', stage: true })).path ?? '' : '';
+  const backup = ids.length ? (await BenthicCore.exportDives({ ids, format: 'ssrf', anonymize: false, name: 'replaced-logbook.ssrf', stage: true })).path ?? '' : '';
   await wipeDeviceLogbook();
   try {
-    await OpenDivesCore.importDives(typeof data === 'string' ? { name: fileName, data } : { name: fileName, path: data.path });
-    const dives = await OpenDivesCore.listLoadedDives();
+    await BenthicCore.importDives(typeof data === 'string' ? { name: fileName, data } : { name: fileName, path: data.path });
+    const dives = await BenthicCore.listLoadedDives();
     if (!dives.length) throw new Error('NO_DIVES');
   } catch (e) {
     await wipeDeviceLogbook();
-    if (backup) await OpenDivesCore.importDives({ name: 'replaced-logbook.ssrf', path: backup });
-    logbook.dives = await OpenDivesCore.listLoadedDives();
+    if (backup) await BenthicCore.importDives({ name: 'replaced-logbook.ssrf', path: backup });
+    logbook.dives = await BenthicCore.listLoadedDives();
     logbook.sitesVersion++;
-    await OpenDivesCore.saveLocal();
+    await BenthicCore.saveLocal();
     undoCleared();
     throw e;
   }
-  if (backup) await OpenDivesCore.discardImport({ path: backup }).catch(() => {});
+  if (backup) await BenthicCore.discardImport({ path: backup }).catch(() => {});
   importProgress.phase('save');
-  await OpenDivesCore.saveLocal();
+  await BenthicCore.saveLocal();
   undoCleared();
-  logbook.dives = await OpenDivesCore.listLoadedDives();
+  logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
   try {
     deviceStore.setItem('od.logbookName', name);
@@ -1042,10 +1042,10 @@ export async function replaceDeviceLogbook(name, data, fileName) {
 
 /** Every dive and every site of the open logbook is removed (the core's undoable steps; the caller drops the history). */
 async function wipeDeviceLogbook() {
-  const ids = (await OpenDivesCore.listLoadedDives()).map((d) => d.id);
-  if (ids.length) await OpenDivesCore.deleteDive({ ids });
-  const sites = /** @type {{ uuid: number }[]} */ (await OpenDivesCore.siteQuery({ kind: 'list' }));
-  if (sites.length) await OpenDivesCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
+  const ids = (await BenthicCore.listLoadedDives()).map((d) => d.id);
+  if (ids.length) await BenthicCore.deleteDive({ ids });
+  const sites = /** @type {{ uuid: number }[]} */ (await BenthicCore.siteQuery({ kind: 'list' }));
+  if (sites.length) await BenthicCore.siteAction({ action: 'delete', uuids: sites.map((x) => x.uuid) });
 }
 
 /** First launch is shown again: the logbook on screen is gone (the demo was erased). */
@@ -1062,7 +1062,7 @@ function forgetAccount(showWelcome) {
   logbook.email = '';
   logbook.mode = 'cloud';
   logbook.repository = '';
-  logbook.odplus = false;
+  logbook.benthicPlus = false;
   logbook.server = '';
   logbook.sync = 'local';
   logbook.pending = 0;
@@ -1211,7 +1211,7 @@ export function pendingFields(commits) {
 
 async function countPending() {
   try {
-    const commits = await OpenDivesCore.pendingChanges();
+    const commits = await BenthicCore.pendingChanges();
     logbook.pending = commits.length;
     logbook.pendingByDive = pendingFields(commits);
   } catch (e) {
@@ -1272,7 +1272,7 @@ if (typeof window !== 'undefined') {
     if (logbook.email && logbook.autoSync && logbook.pending && logbook.sync !== 'syncing' && logbook.sync !== 'offline') syncEdits();
   });
   // Where the sync is: only while one is shown as running.
-  OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
+  BenthicCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
     if (logbook.sync === 'syncing') logbook.syncProgress = nextProgress(message, logbook.syncProgress);
     const first = logbook.firstDownload;
     if (first) {
@@ -1338,14 +1338,14 @@ function markSynced() {
  * @returns {''|'Git'|'Server'}
  */
 export function syncFlavour() {
-  return logbook.mode === 'git' ? (logbook.odplus ? 'Server' : 'Git') : '';
+  return logbook.mode === 'git' ? (logbook.benthicPlus ? 'Server' : 'Git') : '';
 }
 
 /** Whether the connected repository is the signed-in OpenDives server account's (the release edition's sign-in). @param {string} repository */
-async function onOpenDivesServer(repository) {
+async function onBenthicServer(repository) {
   if (!isRelease) return false;
   try {
-    return isServerRepository(repository, await OpenDivesCore.serverSessionInfo());
+    return isServerRepository(repository, await BenthicCore.serverSessionInfo());
   } catch {
     return false;
   }
@@ -1363,8 +1363,8 @@ async function onOpenDivesServer(repository) {
  * @returns {Promise<boolean>} false when no cloud account is configured
  */
 async function loadCloud(force, pre = null) {
-  void loadOdplusAccount();
-  const account = await (pre?.configure ?? OpenDivesCore.configureCloud());
+  void loadBenthicPlusAccount();
+  const account = await (pre?.configure ?? BenthicCore.configureCloud());
   const ignored = isIgnoredCloudAccount(account, isRelease);
   rememberAccount(account.available && !ignored);
   mark('configured');
@@ -1372,19 +1372,19 @@ async function loadCloud(force, pre = null) {
     logbook.email = '';
     logbook.mode = 'cloud';
     logbook.repository = '';
-    logbook.odplus = false;
+    logbook.benthicPlus = false;
     logbook.server = '';
     return false;
   }
   logbook.email = account.email;
   logbook.mode = account.mode === 'git' ? 'git' : 'cloud';
   logbook.repository = account.repository ?? '';
-  logbook.odplus = logbook.mode === 'git' ? await onOpenDivesServer(logbook.repository) : false;
+  logbook.benthicPlus = logbook.mode === 'git' ? await onBenthicServer(logbook.repository) : false;
 
   await networkKnown();
   if (!autoSyncing() && !force) {
     try {
-      const cached = await (pre?.cached ?? OpenDivesCore.listCloudDives({ cached: true }));
+      const cached = await (pre?.cached ?? BenthicCore.listCloudDives({ cached: true }));
       if (cached.dives) {
         if (cached.server) logbook.server = cached.server;
         logbook.dives = cached.dives;
@@ -1399,7 +1399,7 @@ async function loadCloud(force, pre = null) {
     // No copy on this device yet: the first one has to be fetched.
   }
 
-  const probe = (pre?.probe ?? OpenDivesCore.probeCloud()).then(
+  const probe = (pre?.probe ?? BenthicCore.probeCloud()).then(
     (head) => ({ ok: true, ...head }),
     (/** @type {unknown} */ error) => ({ ok: false, exists: false, head: '', error }),
   );
@@ -1407,7 +1407,7 @@ async function loadCloud(force, pre = null) {
   /** @type {string|null} commit of the copy shown */
   let shownHead = null;
   try {
-    const cached = await (pre?.cached ?? OpenDivesCore.listCloudDives({ cached: true }));
+    const cached = await (pre?.cached ?? BenthicCore.listCloudDives({ cached: true }));
     mark('cachedRead');
     if (cached.server) logbook.server = cached.server;
     if (cached.dives) {
@@ -1441,7 +1441,7 @@ async function loadCloud(force, pre = null) {
     }
   }
   try {
-    const fresh = await OpenDivesCore.listCloudDives();
+    const fresh = await BenthicCore.listCloudDives();
     if (fresh.dives) {
       logbook.dives = fresh.dives;
       logbook.prefs = await prefsAfterLoad();
@@ -1485,10 +1485,10 @@ export async function loadLogbook({ force = false } = {}) {
       await countPending();
       await readConflicts();
     } else {
-      let local = await OpenDivesCore.listDives();
+      let local = await BenthicCore.listDives();
       if (!local.exists) {
-        await OpenDivesCore.importSample();
-        local = await OpenDivesCore.listDives();
+        await BenthicCore.importSample();
+        local = await BenthicCore.listDives();
       }
       logbook.dives = local.dives;
       logbook.sync = 'local';
@@ -1506,11 +1506,11 @@ export async function loadLogbook({ force = false } = {}) {
   }
 }
 
-// Development builds only: lets a headless check put the logbook in any state (account, OpenDives+).
+// Development builds only: lets a headless check put the logbook in any state (account, Benthic+).
 if (import.meta.env?.DEV && typeof window !== 'undefined') /** @type {any} */ (window).__logbook = logbook;
 
 /**
- * Whether the diver has an OpenDives+ account (the server's logbook): the equipment of a dive is theirs to change only then;
- * for everyone else « Autre équipement » shows with the OpenDives+ chip and stays inert.
+ * Whether the diver has an Benthic+ account (the server's logbook): the equipment of a dive is theirs to change only then;
+ * for everyone else « Autre équipement » shows with the Benthic+ chip and stays inert.
  */
-export const isSubscriber = () => sheetVariant({ release: isRelease, subscriber: odplusSubscriber(), email: logbook.email }) === 'subscriber';
+export const isSubscriber = () => sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email }) === 'subscriber';

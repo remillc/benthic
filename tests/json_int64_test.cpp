@@ -5,8 +5,8 @@
 //
 // usage: json-int64 <dive-file> <new-folder>
 // Prints "PASS: ..." lines; exit status 0 when all pass, 1 otherwise.
-#include "core/libopendives/opendives.h"
-#include "core/libopendives/json.h"
+#include "core/libbenthic/benthic.h"
+#include "core/libbenthic/json.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -17,9 +17,9 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
-using opendives::internal::JsonReader;
-using opendives::internal::JsonValue;
+using namespace benthic;
+using benthic::internal::JsonReader;
+using benthic::internal::JsonValue;
 
 static int failures = 0;
 

@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newDivesWithoutSite, quickEntryUrl } from '../../app/src/lib/quick-entry.js';
 import { logbook, saveDiveChanges } from '../../app/src/lib/logbook.svelte.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 
 test('the address of the quick entry carries the following dives', () => {
   assert.equal(quickEntryUrl([7]), '/dives/7/complete');
@@ -34,13 +34,13 @@ test('saving a site refreshes the logbook list while preserving the edit and und
   const detail = { id: 7, site: 'Lock 23' };
   const calls = [];
   logbook.dives = before;
-  OpenDivesCore.editDive = async (args) => {
+  BenthicCore.editDive = async (args) => {
     calls.push(['edit', args]);
     return { dive: detail, undo: 'edit', redo: '' };
   };
-  OpenDivesCore.listLoadedDives = async () => { calls.push(['list']); return after; };
-  OpenDivesCore.saveLocal = async () => { calls.push(['save']); };
-  OpenDivesCore.pendingChanges = async () => [];
+  BenthicCore.listLoadedDives = async () => { calls.push(['list']); return after; };
+  BenthicCore.saveLocal = async () => { calls.push(['save']); };
+  BenthicCore.pendingChanges = async () => [];
   try {
     await saveDiveChanges(7, { site: 23, buddies: ['Alex'] });
     assert.deepEqual(logbook.dives, after);
@@ -49,18 +49,18 @@ test('saving a site refreshes the logbook list while preserving the edit and und
     assert.equal(logbook.undoText, 'edit');
     assert.deepEqual(calls, [['edit', { id: 7, changes: { site: 23, buddies: ['Alex'] } }], ['list'], ['save']]);
   } finally {
-    for (const name of ['editDive', 'listLoadedDives', 'saveLocal', 'pendingChanges']) delete OpenDivesCore[name];
+    for (const name of ['editDive', 'listLoadedDives', 'saveLocal', 'pendingChanges']) delete BenthicCore[name];
   }
 });
 
 test('a failed dive edit does not replace the logbook list', async () => {
   const before = [{ id: 7, site: '' }];
   logbook.dives = before;
-  OpenDivesCore.editDive = async () => { throw new Error('WRITE_LOCKED'); };
+  BenthicCore.editDive = async () => { throw new Error('WRITE_LOCKED'); };
   try {
     await assert.rejects(saveDiveChanges(7, { site: 23 }), /WRITE_LOCKED/);
     assert.equal(logbook.dives, before);
   } finally {
-    delete OpenDivesCore.editDive;
+    delete BenthicCore.editDive;
   }
 });

@@ -1,7 +1,7 @@
 # Desktop build of the core
 
-Builds Subsurface's core (unmodified) + `core/compat` + the façade `core/libopendives` as a
-static library `opendives_core`, with the test programs `roundtrip` and `facade` (and
+Builds Subsurface's core (unmodified) + `core/compat` + the façade `core/libbenthic` as a
+static library `benthic_core`, with the test programs `roundtrip` and `facade` (and
 `benthic-host` when `desktop/host/` exists). Mbed TLS is the TLS library on every target.
 
 Targets: `linux-x64`, `win-x64` (cross-compiled from Linux or WSL with llvm-mingw, UCRT,
@@ -18,7 +18,7 @@ TARGET=win-x64 native/desktop/install-llvm-mingw.sh   # once, win-x64 only: inst
 native/desktop/build.sh linux-x64                      # or win-x64, mac-arm64, mac-x64
 ```
 
-Output goes to `build/desktop/<target>/`: `deps/` (static dependencies), `lib/libopendives_core.a`,
+Output goes to `build/desktop/<target>/`: `deps/` (static dependencies), `lib/libbenthic_core.a`,
 `bin/` (programs; `.exe` on Windows). `native/desktop/build-deps.sh` alone builds the dependencies.
 Dependency sources are cached in `build/desktop/src/`. `SS=<path>` overrides the Subsurface checkout.
 
@@ -35,7 +35,7 @@ Expected: `passed: 98  failed: 0`. On Windows the same script runs the `.exe` th
 
 - Windows uses Subsurface's `core/windows.cpp` instead of `core/unix.cpp` (chosen in CMake).
 - `core/compat/https_mbedtls.cpp` has a Winsock branch. Mbed TLS has no system certificate
-  store: the application passes a PEM file with `opendives_https_set_ca_file()` on every target.
+  store: the application passes a PEM file with `benthic_https_set_ca_file()` on every target.
 - CI: `.github/workflows/desktop.yml`, manual only.
 - Windows executables embed `utf8.manifest` (UTF-8 active code page): `argv` and narrow paths are UTF-8, as the core expects.
 - macOS is not tested here; `build-deps.sh` and the CMake file use only portable options (`sed -i.bak`, `-arch`).

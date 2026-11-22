@@ -218,7 +218,7 @@ An insufficient gas reserve in the planner is an ordinary list row whose value i
 
 ## 5. Screens and data requested from the core
 
-Each screen reads and writes through the `libopendives` facade (via the `OpenDivesCore` plugin), never through Subsurface's structures. Today it provides `init`, `log_exists`, `apply_log_prefs`, `import_file`, `list_dives`, `cloud_configure`, `set_ca_file`, `cloud_list_dives` and `cloud_branch_status` (read only). The right-hand column says what must be added, in the order in which the screens will be built.
+Each screen reads and writes through the `libbenthic` facade (via the `BenthicCore` plugin), never through Subsurface's structures. Today it provides `init`, `log_exists`, `apply_log_prefs`, `import_file`, `list_dives`, `cloud_configure`, `set_ca_file`, `cloud_list_dives` and `cloud_branch_status` (read only). The right-hand column says what must be added, in the order in which the screens will be built.
 
 | Screen | Content and actions | Core data (to add in bold) |
 | --- | --- | --- |

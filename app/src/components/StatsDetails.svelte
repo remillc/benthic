@@ -10,7 +10,7 @@
   /**
    * @type {{
    *   figures: import('../lib/statistics.svelte.js').StatsFigures|null,
-   *   prefs: import('opendives-core').Prefs,
+   *   prefs: import('benthic-core').Prefs,
    *   rows: ('total'|'mean'|'shortest'|'longest'|'meanDepth'|'maxDepth'|'meanMaxDepth'|'sac'|'waterMean'|'waterRange')[],
    * }}
    */

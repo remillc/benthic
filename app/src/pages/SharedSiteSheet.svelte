@@ -16,11 +16,11 @@
   import { formatCoordinates } from '../lib/sites.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { connection } from '../lib/online.svelte.js';
-  import { openOdPlus } from '../lib/open-offer.svelte.js';
+  import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   import { addBaseSite, followRedirect, loadLinks, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { localSiteOf } from '../lib/shared-sites.js';
   import { baseCardLine, baseDivesText } from '../lib/shared-sites-format.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
 
   /** @type {{ f7route?: { params: { id: string } } }} */
   let { f7route } = $props();
@@ -94,7 +94,7 @@
     let position;
     if (reason === 'wrong_position' && mine !== null) {
       try {
-        const own = await OpenDivesCore.siteQuery({ kind: 'site', uuid: mine });
+        const own = await BenthicCore.siteQuery({ kind: 'site', uuid: mine });
         if (own?.hasLocation) position = { lat: own.latUdeg / 1e6, lon: own.lonUdeg / 1e6 };
       } catch {
         // Sent without a position.
@@ -169,7 +169,7 @@
   {:else if status === 'offer'}
     <div class="bc-shared-site--message">
       <p>{t('sharedSites.offerText')}</p>
-      <button type="button" class="bc-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button>
+      <button type="button" class="bc-tonal-button" onclick={() => openBenthicPlus('offer')}>{t('sharedSites.offerButton')}</button>
     </div>
   {:else if status === 'failed'}
     <div class="bc-shared-site--message">

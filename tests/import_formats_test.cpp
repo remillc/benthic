@@ -24,7 +24,7 @@
 // Prints one "result:" line per sample: the dives read, how many have a profile, how the
 // dives compare with the reference; the first differing lines follow. Exit status 0 when
 // every sample gives what the table below says, 1 otherwise.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divecomputer.h"
@@ -40,7 +40,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

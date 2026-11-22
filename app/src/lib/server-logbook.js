@@ -74,7 +74,7 @@ export function asServerError(e) {
   return new ServerLogbookError('FAILED');
 }
 
-/** @typedef {Pick<import('opendives-core').OpenDivesCorePlugin, 'gitCheck'|'gitConnect'|'listCloudDives'>} OpenCore */
+/** @typedef {Pick<import('benthic-core').BenthicCorePlugin, 'gitCheck'|'gitConnect'|'listCloudDives'>} OpenCore */
 
 /**
  * Looks at the account's repository and, when it holds the logbook, connects it and downloads it through the core.
@@ -107,9 +107,9 @@ export async function openServerLogbook(core, access, { download = true } = {}) 
 /**
  * @typedef {Object} SendCore
  * @property {OpenCore['gitConnect']} gitConnect
- * @property {import('opendives-core').OpenDivesCorePlugin['deviceLog']} deviceLog
- * @property {import('opendives-core').OpenDivesCorePlugin['saveLocal']} saveLocal
- * @property {import('opendives-core').OpenDivesCorePlugin['syncChanges']} syncChanges
+ * @property {import('benthic-core').BenthicCorePlugin['deviceLog']} deviceLog
+ * @property {import('benthic-core').BenthicCorePlugin['saveLocal']} saveLocal
+ * @property {import('benthic-core').BenthicCorePlugin['syncChanges']} syncChanges
  */
 
 /**

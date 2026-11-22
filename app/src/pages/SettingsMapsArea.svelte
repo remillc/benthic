@@ -12,7 +12,7 @@
   import SearchClear from '../components/SearchClear.svelte';
   import { onMount, onDestroy } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import TextField from '../components/TextField.svelte';
   import { t, language } from '../lib/i18n.js';
   import { MAP_STYLE, showLabelsInLanguage } from '../lib/map-style.js';
@@ -199,7 +199,7 @@
 
   onMount(async () => {
     try {
-      const list = await OpenDivesCore.siteQuery({ kind: 'list' });
+      const list = await BenthicCore.siteQuery({ kind: 'list' });
       allSites = list;
       located = list
         .filter((/** @type {any} */ s) => s.hasLocation && s.dives > 0)

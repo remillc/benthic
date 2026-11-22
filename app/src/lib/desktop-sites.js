@@ -9,7 +9,7 @@ import { defaultKeeper } from './site-merge.js';
 
 export { highlightParts };
 
-/** @typedef {import('opendives-core').SiteSummary} Site */
+/** @typedef {import('benthic-core').SiteSummary} Site */
 
 /**
  * @typedef {'name'|'country'|'dives'|'last'} SortKey

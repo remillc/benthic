@@ -3,14 +3,14 @@
 // Skipped when the host binary is not there.
 //
 //   desktop/host/build-linux-test.sh                  # after poc/build.sh, Linux or WSL
-//   OPENDIVES_HOST=build/desktop/benthic-host node --test tests/desktop/host.test.mjs
+//   BENTHIC_HOST=build/desktop/benthic-host node --test tests/desktop/host.test.mjs
 //
 // Other environment variables (all optional):
-//   OPENDIVES_HOST_ARGS  JSON array of arguments put before the protocol, for a host that
-//                        runs through another program (OPENDIVES_HOST=wsl, ARGS=["-e","<host>"])
-//   OPENDIVES_SAMPLE     the sample log to import, as the host sees the path
+//   BENTHIC_HOST_ARGS  JSON array of arguments put before the protocol, for a host that
+//                        runs through another program (BENTHIC_HOST=wsl, ARGS=["-e","<host>"])
+//   BENTHIC_SAMPLE     the sample log to import, as the host sees the path
 //                        (default: third_party/subsurface/dives/SampleDivesV2.ssrf)
-//   OPENDIVES_TEST_DIR   a directory for the host's files, as the host sees it (default: a
+//   BENTHIC_TEST_DIR   a directory for the host's files, as the host sees it (default: a
 //                        temporary directory)
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -22,15 +22,15 @@ import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const hostPath = process.env.OPENDIVES_HOST ? path.resolve(process.env.OPENDIVES_HOST) : '';
-const hostArgs = process.env.OPENDIVES_HOST_ARGS ? JSON.parse(process.env.OPENDIVES_HOST_ARGS) : [];
-const command = hostArgs.length ? process.env.OPENDIVES_HOST : hostPath;
-const sample = process.env.OPENDIVES_SAMPLE || path.join(root, 'third_party/subsurface/dives/SampleDivesV2.ssrf');
-const skip = !process.env.OPENDIVES_HOST
-  ? 'OPENDIVES_HOST is not set'
+const hostPath = process.env.BENTHIC_HOST ? path.resolve(process.env.BENTHIC_HOST) : '';
+const hostArgs = process.env.BENTHIC_HOST_ARGS ? JSON.parse(process.env.BENTHIC_HOST_ARGS) : [];
+const command = hostArgs.length ? process.env.BENTHIC_HOST : hostPath;
+const sample = process.env.BENTHIC_SAMPLE || path.join(root, 'third_party/subsurface/dives/SampleDivesV2.ssrf');
+const skip = !process.env.BENTHIC_HOST
+  ? 'BENTHIC_HOST is not set'
   : !hostArgs.length && !existsSync(hostPath)
     ? `no host binary at ${hostPath}`
-    : !process.env.OPENDIVES_SAMPLE && !existsSync(sample)
+    : !process.env.BENTHIC_SAMPLE && !existsSync(sample)
       ? `no sample log at ${sample}`
       : false;
 
@@ -103,8 +103,8 @@ describe('benthic-host', { skip }, () => {
 
   before(async () => {
     host = startHost();
-    if (process.env.OPENDIVES_TEST_DIR) {
-      dir = process.env.OPENDIVES_TEST_DIR;
+    if (process.env.BENTHIC_TEST_DIR) {
+      dir = process.env.BENTHIC_TEST_DIR;
     } else {
       dir = mkdtempSync(path.join(tmpdir(), 'od-host-'));
       ownsDir = true;

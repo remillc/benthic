@@ -80,15 +80,15 @@ test('the name steps end with « Créer le carnet » and « Importer le carnet �
 test('the offer has a full-width « Service reminders » tile under the four tiles, in the maintenance colours', () => {
   const plus = read('components/FirstLaunchBenthicPlus.svelte');
   const css = read('theme.css');
-  const offer = plus.slice(plus.indexOf("{:else if step === 'odplusOffer'}"), plus.indexOf("{:else if step === 'odplusReady'}"));
+  const offer = plus.slice(plus.indexOf("{:else if step === 'benthicPlusOffer'}"), plus.indexOf("{:else if step === 'benthicPlusReady'}"));
   assert.ok(offer.indexOf('bc-plus--cards') < offer.indexOf('bc-plus--card-maintenance'));
   assert.ok(offer.indexOf('bc-plus--card-maintenance') < offer.indexOf('priceBlock'));
   assert.match(offer, /name="wrench"/);
   assert.match(plus, /\.bc-plus--card-maintenance \{\s*background: var\(--bc-maintenance\);/);
-  assert.equal(langs.fr.odplus.offer.maintenance, 'Rappels d’entretien');
-  assert.equal(langs.fr.odplus.offer.maintenanceText, 'Détendeur, bouteille, veste : prévenu 30 jours avant l’échéance.');
-  assert.equal(langs.en.odplus.offer.maintenance, 'Service reminders');
-  assert.equal(langs.en.odplus.offer.maintenanceText, 'Regulator, cylinder, vest: notified 30 days before they are due.');
+  assert.equal(langs.fr.benthicPlus.offer.maintenance, 'Rappels d’entretien');
+  assert.equal(langs.fr.benthicPlus.offer.maintenanceText, 'Détendeur, bouteille, veste : prévenu 30 jours avant l’échéance.');
+  assert.equal(langs.en.benthicPlus.offer.maintenance, 'Service reminders');
+  assert.equal(langs.en.benthicPlus.offer.maintenanceText, 'Regulator, cylinder, vest: notified 30 days before they are due.');
   // Light, then dark.
   assert.match(css, /--bc-maintenance: #F6E3E0;\s*--bc-maintenance-icon: #8A2A1F;/);
   assert.match(css, /--bc-maintenance: #4A2723;\s*--bc-maintenance-icon: #F0A59B;/);
@@ -98,12 +98,12 @@ test('the offer has a full-width « Service reminders » tile under the four til
 
 test('the offer opens « Tout ce qui est inclus », which goes back to the offer and keeps the system Back working', async () => {
   const { forward, back, systemBack, hasBack } = await import('../../app/src/lib/first-launch-steps.js');
-  assert.deepEqual(forward(['start', 'odplusOffer'], 'all'), ['start', 'odplusOffer', 'odplusAll']);
-  assert.deepEqual(back(['start', 'odplusOffer', 'odplusAll']), ['start', 'odplusOffer']);
-  assert.equal(hasBack('odplusAll'), true);
-  assert.equal(systemBack(['start', 'odplusOffer', 'odplusAll'], false).kind, 'back');
-  assert.equal(systemBack(['start', 'odplusOffer', 'odplusAll'], true).kind, 'back', 'from the account sheet too: the offer comes back first');
-  assert.equal(systemBack(['start', 'odplusOffer'], true).kind, 'leave', 'the offer still returns to the account sheet');
+  assert.deepEqual(forward(['start', 'benthicPlusOffer'], 'all'), ['start', 'benthicPlusOffer', 'benthicPlusAll']);
+  assert.deepEqual(back(['start', 'benthicPlusOffer', 'benthicPlusAll']), ['start', 'benthicPlusOffer']);
+  assert.equal(hasBack('benthicPlusAll'), true);
+  assert.equal(systemBack(['start', 'benthicPlusOffer', 'benthicPlusAll'], false).kind, 'back');
+  assert.equal(systemBack(['start', 'benthicPlusOffer', 'benthicPlusAll'], true).kind, 'back', 'from the account sheet too: the offer comes back first');
+  assert.equal(systemBack(['start', 'benthicPlusOffer'], true).kind, 'leave', 'the offer still returns to the account sheet');
 });
 
 test('the list shows only the features that are built, in the four groups of the mock-up', async () => {
@@ -113,22 +113,22 @@ test('the list shows only the features that are built, in the four groups of the
   assert.ok(shown.every((g) => g.rows.length > 0 && g.rows.every((r) => r.built)));
   assert.ok(!shown.some((g) => g.key === 'friends'), 'nothing of « Avec vos compagnons » is built yet: the group is dropped');
   for (const lang of ['fr', 'en']) {
-    const all = langs[lang].odplus.all;
+    const all = langs[lang].benthicPlus.all;
     for (const g of INCLUDED) {
       assert.ok(all[g.key], `${lang}: group ${g.key}`);
       for (const r of g.rows) assert.ok(all[r.key] && all[`${r.key}Text`], `${lang}: row ${r.key}`);
     }
     for (const key of ['title', 'subtitle', 'free', 'syncTextPhone', 'syncTextIphone', 'syncTextDesktop']) assert.ok(all[key], `${lang}: ${key}`);
   }
-  assert.equal(langs.fr.odplus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
-  assert.equal(langs.fr.odplus.offer.pill, 'L’offre Benthic+');
-  assert.equal(langs.fr.odplus.offer.lead, 'Votre carnet à l’abri, sur tous vos appareils.');
-  assert.equal(langs.fr.odplus.offer.seeAll, 'Voir tout ce qui est inclus');
+  assert.equal(langs.fr.benthicPlus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
+  assert.equal(langs.fr.benthicPlus.offer.pill, 'L’offre Benthic+');
+  assert.equal(langs.fr.benthicPlus.offer.lead, 'Votre carnet à l’abri, sur tous vos appareils.');
+  assert.equal(langs.fr.benthicPlus.offer.seeAll, 'Voir tout ce qui est inclus');
 });
 
 test('the offer has the new price block, the « see all » link and 48 dp buttons', () => {
   const plus = read('components/FirstLaunchBenthicPlus.svelte');
-  const offer = plus.slice(plus.indexOf("{:else if step === 'odplusOffer'}"), plus.indexOf("{:else if step === 'odplusAll'}"));
+  const offer = plus.slice(plus.indexOf("{:else if step === 'benthicPlusOffer'}"), plus.indexOf("{:else if step === 'benthicPlusAll'}"));
   assert.ok(offer.indexOf('bc-plus--card-maintenance') < offer.indexOf('bc-plus--see-all'));
   assert.ok(offer.indexOf('bc-plus--see-all') < offer.indexOf('priceBlock'));
   assert.match(plus, /.bc-plus--see-all {[^}]*height: 48px;/s);

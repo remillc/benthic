@@ -15,7 +15,7 @@ android {
         versionCode 3
         versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        // The core (libopendives.so) is built for these two ABIs only (native/build-android.sh),
+        // The core (libbenthic.so) is built for these two ABIs only (native/build-android.sh),
         // so the app cannot run on others: drop the other ABIs that libraries bring (ML Kit).
         ndk {
             abiFilters 'arm64-v8a', 'x86_64'

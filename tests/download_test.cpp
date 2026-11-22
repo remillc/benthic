@@ -7,8 +7,8 @@
 // usage: download <a log the core reads> <other dives to import>
 //   e.g. build/poc/download third_party/subsurface/dives/SampleDivesV2.ssrf \
 //        third_party/subsurface/dives/TestDiveDM5.xml (at least 3 dives: the default water type)
-#include "../core/libopendives/opendives.h"
-#include "../core/libopendives/internal.h"
+#include "../core/libbenthic/benthic.h"
+#include "../core/libbenthic/internal.h"
 #include "core/compat/bt_transport.h"
 
 #include "core/bluetoothaddress.h"
@@ -33,7 +33,7 @@
 #include <string>
 #include <thread>
 
-using namespace opendives_compat;
+using namespace benthic_compat;
 
 static int failed = 0;
 
@@ -194,10 +194,10 @@ static void test_names()
 		{ "", "null" },
 	};
 	for (const auto &c: cases) {
-		std::string got = opendives::dc_from_bluetooth_name(c.name);
+		std::string got = benthic::dc_from_bluetooth_name(c.name);
 		check((std::string("name ") + c.name).c_str(), got == c.expected, got);
 	}
-	std::string models = opendives::dc_bluetooth_models();
+	std::string models = benthic::dc_bluetooth_models();
 	check("models list has the Petrel 3 over BLE", models.find("{\"name\":\"Petrel 3\",\"ble\":true,\"classic\":false}") != std::string::npos);
 	check("models list has the Perdix over both", models.find("{\"name\":\"Perdix\",\"ble\":true,\"classic\":true}") != std::string::npos);
 	check("models list leaves out USB-only models", models.find("\"Uemis\"") == std::string::npos);
@@ -383,11 +383,11 @@ static void test_download_failures()
 	std::string request = "{\"vendor\":\"Shearwater\",\"product\":\"Petrel 3\",\"address\":\"LE:C8:5C:A2:11:22:33\","
 			      "\"name\":\"Petrel 3 6F2A\"}";
 	events.clear();
-	int rc = opendives::download_dives(request, on_progress, nullptr, json, error);
+	int rc = benthic::download_dives(request, on_progress, nullptr, json, error);
 	check("connection refused: NOT_FOUND", rc == -1 && error.rfind("NOT_FOUND", 0) == 0, error);
 	check("progress said connecting", events.find("\"state\":\"connecting\"") != std::string::npos, events);
 	std::string prefs;
-	opendives::get_prefs(prefs);
+	benthic::get_prefs(prefs);
 	check("computer remembered after the attempt",
 	      prefs.find("{\"slot\":1,\"vendor\":\"Shearwater\",\"product\":\"Petrel 3\",\"device\":\"LE:C8:5C:A2:11:22:33\","
 			 "\"name\":\"Petrel 3 6F2A\"}") != std::string::npos);
@@ -397,7 +397,7 @@ static void test_download_failures()
 	t.disconnect_when_empty = true;
 	set_bt_transport(&t);
 	events.clear();
-	rc = opendives::download_dives(request, on_progress, nullptr, json, error);
+	rc = benthic::download_dives(request, on_progress, nullptr, json, error);
 	check("connection lost: FAILED", rc == -1 && error.rfind("FAILED", 0) == 0, error);
 	check("progress said connected", events.find("\"state\":\"connected\"") != std::string::npos);
 
@@ -407,32 +407,32 @@ static void test_download_failures()
 	set_bt_transport(&t);
 	std::thread canceller([] {
 		std::this_thread::sleep_for(std::chrono::milliseconds(300));
-		opendives::download_cancel();
+		benthic::download_cancel();
 		cancel_flag = true;
 	});
-	rc = opendives::download_dives(request, on_progress, nullptr, json, error);
+	rc = benthic::download_dives(request, on_progress, nullptr, json, error);
 	canceller.join();
 	check("cancelled: CANCELLED", rc == -1 && error == "CANCELLED", error);
 
 	// Unknown model and bad requests.
-	rc = opendives::download_dives("{\"vendor\":\"Nobody\",\"product\":\"X\",\"address\":\"LE:C8:5C:A2:11:22:33\"}", nullptr,
+	rc = benthic::download_dives("{\"vendor\":\"Nobody\",\"product\":\"X\",\"address\":\"LE:C8:5C:A2:11:22:33\"}", nullptr,
 				       nullptr, json, error);
 	check("unknown model", rc == -1 && error.rfind("UNKNOWN_COMPUTER", 0) == 0, error);
-	rc = opendives::download_dives("{\"vendor\":\"Shearwater\"}", nullptr, nullptr, json, error);
+	rc = benthic::download_dives("{\"vendor\":\"Shearwater\"}", nullptr, nullptr, json, error);
 	check("missing address", rc == -1 && error.rfind("BAD_REQUEST", 0) == 0, error);
 	set_bt_transport(nullptr);
-	rc = opendives::download_dives(request, nullptr, nullptr, json, error);
+	rc = benthic::download_dives(request, nullptr, nullptr, json, error);
 	check("no transport", rc == -1 && error == "NO_TRANSPORT", error);
 
 	// The remembered computers go back into the core as the app keeps them.
-	opendives::get_prefs(prefs);
+	benthic::get_prefs(prefs);
 	size_t at = prefs.find("\"diveComputerList\":");
 	size_t end = prefs.find(']', at);
 	std::string list = prefs.substr(at + 19, end - at - 18);
-	opendives::set_prefs("{\"forgetDiveComputer\":0}", error);
-	opendives::set_prefs("{\"diveComputerList\":" + list + "}", error);
+	benthic::set_prefs("{\"forgetDiveComputer\":0}", error);
+	benthic::set_prefs("{\"diveComputerList\":" + list + "}", error);
 	std::string again;
-	opendives::get_prefs(again);
+	benthic::get_prefs(again);
 	check("diveComputerList set back", again == prefs);
 }
 
@@ -449,14 +449,14 @@ static void test_fallback()
 	t.connect_ok = false;
 	set_bt_transport(&t);
 	events.clear();
-	int rc = opendives::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json,
+	int rc = benthic::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json,
 					   error);
 	check("BLE fails, Classic paired: retried over Classic", t.rfcomm_attempts == 1);
 	check("progress said retrying", events.find("\"state\":\"retrying\"") != std::string::npos);
 	// The fake Classic peer never answers: the protocol fails, connected.
 	check("over Classic the computer was reached (FAILED, not NOT_FOUND)", rc == -1 && error.rfind("FAILED", 0) == 0, error);
 	std::string prefs;
-	opendives::get_prefs(prefs);
+	benthic::get_prefs(prefs);
 	check("the Classic address is remembered", prefs.find("\"device\":\"00:13:43:0D:72:1C\"") != std::string::npos);
 
 	// BLE cannot connect, Classic cannot either: NOT_FOUND after both.
@@ -464,14 +464,14 @@ static void test_fallback()
 	t.connect_ok = false;
 	t.rfcomm_ok = false;
 	set_bt_transport(&t);
-	rc = opendives::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json, error);
+	rc = benthic::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json, error);
 	check("both fail: NOT_FOUND", rc == -1 && error.rfind("NOT_FOUND", 0) == 0 && t.rfcomm_attempts == 1, error);
 
 	// BLE fails, no Classic pairing: no second attempt.
 	t = shearwater_like();
 	t.connect_ok = false;
 	set_bt_transport(&t);
-	rc = opendives::download_dives(perdix + "}", on_progress, nullptr, json, error);
+	rc = benthic::download_dives(perdix + "}", on_progress, nullptr, json, error);
 	check("BLE fails, not paired as Classic: NOT_FOUND, no Classic attempt",
 	      rc == -1 && error.rfind("NOT_FOUND", 0) == 0 && t.rfcomm_attempts == 0, error);
 
@@ -479,7 +479,7 @@ static void test_fallback()
 	t = shearwater_like();
 	t.connect_ok = false;
 	set_bt_transport(&t);
-	rc = opendives::download_dives("{\"vendor\":\"Shearwater\",\"product\":\"Petrel 3\",\"address\":\"LE:00:13:43:0D:72:1C\","
+	rc = benthic::download_dives("{\"vendor\":\"Shearwater\",\"product\":\"Petrel 3\",\"address\":\"LE:00:13:43:0D:72:1C\","
 				       "\"classicAddress\":\"00:13:43:0D:72:1C\"}",
 				       on_progress, nullptr, json, error);
 	check("model without Classic: no Classic attempt", t.rfcomm_attempts == 0, error);
@@ -491,10 +491,10 @@ static void test_fallback()
 	set_bt_transport(&t);
 	std::thread canceller([] {
 		std::this_thread::sleep_for(std::chrono::milliseconds(300));
-		opendives::download_cancel();
+		benthic::download_cancel();
 		stop = true;
 	});
-	rc = opendives::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json, error);
+	rc = benthic::download_dives(perdix + ",\"classicAddress\":\"00:13:43:0D:72:1C\"}", on_progress, nullptr, json, error);
 	canceller.join();
 	check("cancelled: no Classic attempt", rc == -1 && error == "CANCELLED" && t.rfcomm_attempts == 0, error);
 	set_bt_transport(nullptr);
@@ -527,17 +527,17 @@ static void test_import_step(const char *file)
 	size_t fp_before = fingerprints.size();
 	unsigned char raw[4] = { 1, 2, 3, 4 };
 	create_fingerprint_node(fingerprints, 0x1234, 42, raw, sizeof(raw), 7, 8);
-	int rc = opendives::internal::import_downloaded(log, "LE:C8:5C:A2:11:22:33", previous, json, error);
+	int rc = benthic::internal::import_downloaded(log, "LE:C8:5C:A2:11:22:33", previous, json, error);
 	check("downloaded dives imported", rc == 0 && json.rfind("{\"listChange\":true", 0) == 0, rc ? error : json);
-	check("step text", opendives::undo_text() == "import " + std::to_string(imported) + (imported == 1 ? " dive" : " dives") +
+	check("step text", benthic::undo_text() == "import " + std::to_string(imported) + (imported == 1 ? " dive" : " dives") +
 							     " from LE:C8:5C:A2:11:22:33",
-	      opendives::undo_text());
+	      benthic::undo_text());
 	check("fingerprint kept", fingerprints.size() == fp_before + 1);
-	opendives::undo(json, error);
+	benthic::undo(json, error);
 	check("undo removes the fingerprint too", fingerprints.size() == fp_before);
-	opendives::redo(json, error);
+	benthic::redo(json, error);
 	check("redo puts it back", fingerprints.size() == fp_before + 1);
-	opendives::undo(json, error);
+	benthic::undo(json, error);
 }
 
 // The default water type (download_dives "defaultSalinity"): only dives with no
@@ -555,9 +555,9 @@ static void test_default_salinity(const char *file)
 	log.dives[1]->user_salinity = 0;
 	log.dives[1]->dcs[0].salinity = 10300; // given by the computer
 	log.dives[2]->user_salinity = 10000; // already chosen
-	opendives::internal::apply_default_salinity(log, 0);
+	benthic::internal::apply_default_salinity(log, 0);
 	check("0 changes nothing", log.dives[0]->user_salinity == 0);
-	opendives::internal::apply_default_salinity(log, 10200);
+	benthic::internal::apply_default_salinity(log, 10200);
 	check("a dive without salinity gets the type", log.dives[0]->user_salinity == 10200);
 	check("a salinity from the computer is kept and no type is added",
 	      log.dives[1]->user_salinity == 0 && log.dives[1]->dcs[0].salinity == 10300);
@@ -595,7 +595,7 @@ static void test_numbering()
 		log.dives.put(std::move(d));
 	}
 	fingerprint_table before;
-	int rc = opendives::internal::import_downloaded(log, "LE:C8:5C:A2:11:22:33", before, json, error);
+	int rc = benthic::internal::import_downloaded(log, "LE:C8:5C:A2:11:22:33", before, json, error);
 	check("numbering: imported", rc == 0, error);
 	int older = -1, newer = -1, newest = -1;
 	for (auto &d: divelog.dives) {
@@ -610,7 +610,7 @@ static void test_numbering()
 	      newer == last_number + 1 && newest == last_number + 2,
 	      std::to_string(newer) + " " + std::to_string(newest) + " after " + std::to_string(last_number));
 	check("numbering: the older dive stays unnumbered", older == 0, std::to_string(older));
-	opendives::undo(json, error);
+	benthic::undo(json, error);
 	divelog.dives.back()->number = saved_number;
 }
 
@@ -650,7 +650,7 @@ static void test_merged_computers()
 	dc.meandepth = old->meandepth;
 	log.dives.put(std::move(d));
 	fingerprint_table before;
-	int rc = opendives::internal::import_downloaded(log, "LE:C8:5C:A2:44:55:66", before, json, error);
+	int rc = benthic::internal::import_downloaded(log, "LE:C8:5C:A2:44:55:66", before, json, error);
 	check("merged computers: imported", rc == 0, error);
 	check("merged computers: the result says one dive was merged", json.find("\"merged\":1") != std::string::npos, json);
 	check("merged computers: merged, no new dive", divelog.dives.size() == dives_before,
@@ -673,7 +673,7 @@ static void test_merged_computers()
 		check("merged computers: the computer already logged is kept", kept, old_model);
 		// What the dive detail reads.
 		std::string detail;
-		opendives::get_dive(merged->id, detail, error);
+		benthic::get_dive(merged->id, detail, error);
 		size_t list = detail.find("\"diveComputers\":[");
 		size_t first = detail.find("Shearwater Perdix AI", list), second = detail.find(old_model, list);
 		// « Définir comme principal » (task 2026-11-14-144): edit_dive {"mainComputer": n}, Subsurface's
@@ -683,7 +683,7 @@ static void test_merged_computers()
 			int merged_id = merged->id;
 			timestamp_t when = merged->when;
 			std::string result;
-			int mrc = opendives::edit_dive(merged_id, "{\"mainComputer\":1}", result, error);
+			int mrc = benthic::edit_dive(merged_id, "{\"mainComputer\":1}", result, error);
 			const dive *m = divelog.dives.get_by_uniq_id(merged_id);
 			check("make main: done", mrc == 0 && m, error);
 			if (m) {
@@ -691,7 +691,7 @@ static void test_merged_computers()
 				check("make main: the downloaded one is kept second", m->dcs.size() == 2 && m->dcs[1].model == "Shearwater Perdix AI");
 				check("make main: the start time does not change", m->when == when);
 			}
-			opendives::undo(result, error);
+			benthic::undo(result, error);
 			m = divelog.dives.get_by_uniq_id(merged_id);
 			check("make main: undo puts the downloaded one first again", m && m->dcs[0].model == "Shearwater Perdix AI");
 		}
@@ -700,7 +700,7 @@ static void test_merged_computers()
 		      detail.substr(list == std::string::npos ? 0 : list, 200));
 	}
 	const timestamp_t old_when = old->when;
-	opendives::undo(json, error);
+	benthic::undo(json, error);
 	bool perdix_left = false, restored = false;
 	for (auto &x: divelog.dives) {
 		for (auto &c: x->dcs)
@@ -717,7 +717,7 @@ static void test_merged_computers()
 static void test_partial(const char *file)
 {
 	std::string json, error;
-	opendives::download_partial("count", json, error);
+	benthic::download_partial("count", json, error);
 	check("no dives kept aside after failures without dives", json == "{\"dives\":0}", json);
 
 	for (const char *choice: { "keep", "discard" }) {
@@ -744,37 +744,37 @@ static void test_partial(const char *file)
 		size_t fp_before = fingerprints.size();
 		unsigned char raw[4] = { 9, 8, 7, 6 };
 		create_fingerprint_node(fingerprints, 0x4321, 7, raw, sizeof(raw), 1, 2);
-		std::string undo_before = opendives::undo_text();
-		opendives::internal::DownloadedComputer computer { "LE:C8:5C:A2:11:22:33", "Shearwater", "Petrel 3", 42, 99 };
-		int rc = opendives::internal::finish_download(log, computer, "FAILED: Dive data import error", before, json, error);
+		std::string undo_before = benthic::undo_text();
+		benthic::internal::DownloadedComputer computer { "LE:C8:5C:A2:11:22:33", "Shearwater", "Petrel 3", 42, 99 };
+		int rc = benthic::internal::finish_download(log, computer, "FAILED: Dive data import error", before, json, error);
 		check("cut download: FAILED", rc == -1 && error.rfind("FAILED", 0) == 0, error);
 		check("cut download: nothing added, fingerprint table as before",
-		      opendives::undo_text() == undo_before && fingerprints.size() == fp_before);
-		opendives::download_partial("count", json, error);
+		      benthic::undo_text() == undo_before && fingerprints.size() == fp_before);
+		benthic::download_partial("count", json, error);
 		check("cut download: the dives received are offered", json == "{\"dives\":" + std::to_string(received) + "}", json);
 		if (std::string(choice) == "discard") {
-			opendives::download_partial("discard", json, error);
-			opendives::download_partial("count", json, error);
+			benthic::download_partial("discard", json, error);
+			benthic::download_partial("count", json, error);
 			check("dropped: none offered any more", json == "{\"dives\":0}", json);
-			rc = opendives::download_partial("keep", json, error);
+			rc = benthic::download_partial("keep", json, error);
 			check("dropped: nothing to keep", rc == -1 && error == "NO_PARTIAL", error);
 			check("dropped: fingerprint table unchanged", fingerprints.size() == fp_before);
 			continue;
 		}
-		rc = opendives::download_partial("keep", json, error);
+		rc = benthic::download_partial("keep", json, error);
 		check("kept: one step", rc == 0 && json.find("\"downloaded\":" + std::to_string(received)) != std::string::npos &&
 					       json.find("\"listChange\":true") != std::string::npos,
 		      rc ? error : json);
-		check("kept: step text", opendives::undo_text().find("from LE:C8:5C:A2:11:22:33") != std::string::npos,
-		      opendives::undo_text());
+		check("kept: step text", benthic::undo_text().find("from LE:C8:5C:A2:11:22:33") != std::string::npos,
+		      benthic::undo_text());
 		check("kept: the fingerprint of the newest dive received", fingerprints.size() == fp_before + 1 &&
 								     fingerprints.back().model == 0x4321);
-		opendives::undo(json, error);
+		benthic::undo(json, error);
 		check("kept, undone: fingerprint table as before", fingerprints.size() == fp_before);
-		opendives::redo(json, error);
+		benthic::redo(json, error);
 		check("kept, redone: the fingerprint again", fingerprints.size() == fp_before + 1);
-		opendives::undo(json, error);
-		opendives::download_partial("count", json, error);
+		benthic::undo(json, error);
+		benthic::download_partial("count", json, error);
 		check("kept: none offered any more", json == "{\"dives\":0}", json);
 	}
 }
@@ -785,7 +785,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "usage: %s <log> <other dives to import>\n", argv[0]);
 		return 2;
 	}
-	opendives::init();
+	benthic::init();
 	test_addresses();
 	test_names();
 	test_ble_stream();
@@ -794,7 +794,7 @@ int main(int argc, char **argv)
 	test_rfcomm();
 
 	std::string json, error;
-	if (opendives::list_dives(argv[1], json, error)) {
+	if (benthic::list_dives(argv[1], json, error)) {
 		fprintf(stderr, "cannot read %s: %s\n", argv[1], error.c_str());
 		return 2;
 	}

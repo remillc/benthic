@@ -6,7 +6,7 @@
   // country and region are filled from it (a value typed is kept) and complete as the diver types.
   // A site already within 100 m is offered instead of a duplicate.
   import { onMount } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import DesktopSiteField from './DesktopSiteField.svelte';
   import DesktopSitePosMap from './DesktopSitePosMap.svelte';
@@ -19,10 +19,10 @@
 
   /**
    * @type {{
-   *   sites: import('opendives-core').SiteSummary[],
+   *   sites: import('benthic-core').SiteSummary[],
    *   at?: { latUdeg: number, lonUdeg: number }|null,
    *   oncreated: (site: { uuid: number, name: string }) => void,
-   *   onuse: (site: import('opendives-core').SiteSummary) => void,
+   *   onuse: (site: import('benthic-core').SiteSummary) => void,
    *   oncancel: () => void,
    * }}
    * at: where the site starts (the position recorded with a dive without a site).
@@ -41,7 +41,7 @@
   let position = $state(/** @type {{latUdeg: number, lonUdeg: number}|null} */ (null));
   let preview = $state(/** @type {{latUdeg: number, lonUdeg: number}|null} */ (null));
   let coordsText = $state('');
-  let nearby = $state(/** @type {import('opendives-core').SiteSummary|null} */ (null));
+  let nearby = $state(/** @type {import('benthic-core').SiteSummary|null} */ (null));
   let saving = $state(false);
   let lookups = 0;
   let positionLookup = Promise.resolve(true);
@@ -61,7 +61,7 @@
     coordsText = formatCoordinates(p.latUdeg, p.lonUdeg);
     positionLookup = (async () => {
       try {
-        const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
+        const near = await BenthicCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
         if (asked !== lookups) return true;
         nearby = near ?? null;
         const found = await placeAt(p.latUdeg, p.lonUdeg, language);
@@ -119,7 +119,7 @@
       if (notes) await siteChange({ action: 'edit', uuid, field: 'notes', value: notes });
       // Country and region from the position, then what the diver typed where it differs.
       if (position) await fillPlace(uuid);
-      const now = await OpenDivesCore.siteQuery({ kind: 'site', uuid });
+      const now = await BenthicCore.siteQuery({ kind: 'site', uuid });
       if (country.trim() !== now.country) await siteChange({ action: 'edit', uuid, field: 'country', value: country.trim() });
       if (region.trim() !== now.region.value) await siteChange({ action: 'edit', uuid, field: 'region', value: region.trim() });
       oncreated({ uuid, name: name.trim() });

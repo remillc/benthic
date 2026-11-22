@@ -442,8 +442,8 @@ test('the information page is edited in place: no edit route, and Back stops the
 
 test('the subscription screens continue directly to the ready step', () => {
   const steps = read('lib/first-launch-steps.js');
-  assert.match(steps, /'odplusWelcome:next': 'odplusReady'/);
+  assert.match(steps, /'benthicPlusWelcome:next': 'benthicPlusReady'/);
   const screen = read('components/FirstLaunchBenthicPlus.svelte');
-  assert.match(screen, /odplus\.welcome\.next/);
-  assert.doesNotMatch(screen, /odplusHealth/);
+  assert.match(screen, /benthicPlus\.welcome\.next/);
+  assert.doesNotMatch(screen, /benthicPlusHealth/);
 });

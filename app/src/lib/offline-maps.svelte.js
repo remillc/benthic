@@ -7,7 +7,7 @@
 import { deviceStore } from './device-store.js';
 import { f7 } from 'framework7-svelte';
 import { showSnackbar } from './snackbar.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { t, language } from './i18n.js';
 import { showSection } from './navigation.svelte.js';
 import { readTileSource } from './tilejson.js';
@@ -83,7 +83,7 @@ function writeJson(key, value) {
 const stored = readJson(SETTINGS_KEY) ?? {};
 
 /** The native plugin's maps* methods (core-api.js, written by the native part). @type {any} */
-const core = OpenDivesCore;
+const core = BenthicCore;
 
 export const offlineMaps = $state({
   /** @type {Region[]} */

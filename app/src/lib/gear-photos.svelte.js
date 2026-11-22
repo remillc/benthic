@@ -35,7 +35,7 @@ export function forgetPhoto(photoId) {
 
 /**
  * The diver's own photo of the equipment piece that is this logbook computer (same model and serial number), or ''.
- * The piece is found in the inventory once it is loaded (OpenDives+); without one the catalog photo shows.
+ * The piece is found in the inventory once it is loaded (Benthic+); without one the catalog photo shows.
  * @param {string|undefined|null} model the computer's text as the logbook keeps it
  * @param {string|undefined|null} serial
  * @returns {string}

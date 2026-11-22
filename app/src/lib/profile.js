@@ -1,5 +1,5 @@
 // @ts-check
-// « Mon profil de plongeur » (OpenDives+, task 2026-11-18-272): the Informations (date of birth, emergency contact,
+// « Mon profil de plongeur » (Benthic+, task 2026-11-18-272): the Informations (date of birth, emergency contact,
 // blood group) and the certification cards, in the same local store as the equipment (lib/file-store.js), in the
 // layout of the OpenDives logbook (docs/architecture.md, section 11.3):
 //   profile/diver.json          plain: dateOfBirth; sealed block `enc`: emergencyContact, bloodGroup
@@ -25,7 +25,7 @@ export const UNKNOWN_BLOOD = 'unknown';
 
 /**
  * @typedef {Object} DiverInfo
- * @property {string} fullName the diver's full name, '' when none (task 2026-11-19-312; sealed block, OpenDives+ data)
+ * @property {string} fullName the diver's full name, '' when none (task 2026-11-19-312; sealed block, Benthic+ data)
  * @property {string} dateOfBirth YYYY-MM-DD, '' when none
  * @property {{ name: string, relation: string, phone: { country: string, number: string } }} emergency
  * @property {string} bloodGroup '' when none, `UNKNOWN_BLOOD`, or one of BLOOD_GROUPS

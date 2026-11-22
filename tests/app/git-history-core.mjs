@@ -1,4 +1,4 @@
-// A stand-in for the core's `history` calls (core/libopendives/opendives.h, history_call) on a real git repository driven by
+// A stand-in for the core's `history` calls (core/libbenthic/benthic.h, history_call) on a real git repository driven by
 // the git command line, so that the version engine (app/src/lib/backup-history.js) is tested against real commits.
 // Not a test file: tests/app/backup-history.test.mjs uses it.
 import { execFileSync } from 'node:child_process';

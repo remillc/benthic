@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // « Gérer le compte » of an OpenDives+ account (task 2026-11-18-281; mock-ups docs/mockups-release/
+  // « Gérer le compte » of an Benthic+ account (task 2026-11-18-281; mock-ups docs/mockups-release/
   // compte-android-connecte, android-tablette-compte-gerer-paysage, bureau-compte-gerer): the account and its sign-in
   // method, the subscription (managed in the store, never here), the photo and video space, the diver's data, and the
   // deletion of the account. One body for the phone's page and for the dialog of a tablet and of the desktop (`columns`).
@@ -42,7 +42,7 @@
   const method = $derived(overview?.signInMethod ?? '');
   const store = $derived(subscriptionStore(overview?.subscription, ios));
   const storeName = $derived(t(store === 'apple' ? 'account.manage.appStore' : 'account.manage.googlePlay'));
-  const price = $derived(overview?.subscription?.price ?? t('odplus.offer.price'));
+  const price = $derived(overview?.subscription?.price ?? t('benthicPlus.offer.price'));
   const renews = $derived(overview?.subscription?.renewsOn);
   const space = $derived(spaceUse(overview?.storage?.usedBytes, overview?.storage?.limitBytes));
   const limit = $derived(formatMapSize(space.limit));

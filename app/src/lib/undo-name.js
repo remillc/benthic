@@ -1,6 +1,6 @@
 // @ts-check
 // The name of an undo step in the diver's language. The core names its steps as Subsurface
-// does, in English (« add 2 dives to trip [#3, #4] », core/libopendives/edit.cpp); the
+// does, in English (« add 2 dives to trip [#3, #4] », core/libbenthic/edit.cpp); the
 // desktop's « Annuler : {dernière action} » (tasks 2026-11-15-179 and 192) shows this name.
 
 /** Core texts, in the order they are tried, and the i18n key of their name. */

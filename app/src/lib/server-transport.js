@@ -7,7 +7,7 @@ import { Capacitor, CapacitorHttp } from '@capacitor/core';
 
 /** @type {import('./server-api.js').ServerTransport} */
 export async function serverTransport(request) {
-  const desktop = /** @type {any} */ (globalThis).odDesktop;
+  const desktop = /** @type {any} */ (globalThis).benthicDesktop;
   if (desktop?.server?.request) return desktop.server.request(request);
   if (Capacitor.isNativePlatform()) {
     const response = await CapacitorHttp.request({

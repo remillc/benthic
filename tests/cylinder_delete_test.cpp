@@ -6,7 +6,7 @@
 // cylinders. Checked in memory, after undo and redo, and after a save to git and reload.
 //
 // usage: cylinder-delete <tests/data/cylinder-delete.ssrf> <new-folder>
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

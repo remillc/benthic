@@ -7,7 +7,7 @@
   // by FirstLaunchSteps.svelte. The logbook is a Subsurface git logbook made and pushed by the core, like a personal git
   // repository (lib/server-logbook.js); git resumes an interrupted push, so « Reprendre l'envoi » pushes again. The
   // logbook stays on the device too.
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import ReleaseChoiceRow from './ReleaseChoiceRow.svelte';
   import ProgressLine from './ProgressLine.svelte';
@@ -54,7 +54,7 @@
   let fraction = $state(0);
   let objects = $state({ n: 0, total: 0 });
   /** The desktop window without a logbook: its main process makes the logbook, the window reloads on it. */
-  const windowTakes = desktopApp && /** @type {any} */ (globalThis).odDesktop?.logbook === null;
+  const windowTakes = desktopApp && /** @type {any} */ (globalThis).benthicDesktop?.logbook === null;
 
   const fileName = $derived(logbookFileName(c.name, []));
   const nameError = $derived(c.name.trim() && !fileName ? t('welcomeSteps.nameInvalid') : '');
@@ -65,7 +65,7 @@
   /** The logbook already on this device, for « Envoyer le carnet de … ». */
   async function readDeviceLogbook() {
     try {
-      const listed = await OpenDivesCore.listDives();
+      const listed = await BenthicCore.listDives();
       if (!listed.exists) return void (c.deviceLogbook = null);
       const name = deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName');
       c.deviceLogbook = { name, dives: listed.dives.length };
@@ -105,9 +105,9 @@
     busy = true;
     try {
       const dives = await readImportFile(file, {
-        stage: (f) => stageFile(OpenDivesCore, f),
-        count: (o) => OpenDivesCore.importCount(o),
-        discard: (o) => OpenDivesCore.discardImport(o),
+        stage: (f) => stageFile(BenthicCore, f),
+        count: (o) => BenthicCore.importCount(o),
+        discard: (o) => BenthicCore.discardImport(o),
       });
       c.source = 'file';
       c.file = file;
@@ -144,13 +144,13 @@
     if (busy || !fileName) return;
     busy = true;
     try {
-      const access = await OpenDivesCore.serverSessionAccess();
+      const access = await BenthicCore.serverSessionAccess();
       deviceStore.setItem('od.logbookName', sanitiseLogbookName(c.name));
       if (windowTakes) {
         await openInWindow(null);
         return;
       }
-      await createServerLogbook(OpenDivesCore, access, { source: 'blank' });
+      await createServerLogbook(BenthicCore, access, { source: 'blank' });
       onfinished();
     } catch (e) {
       // Nothing was created: « Serveur injoignable » (a refusal only says so in a snackbar).
@@ -178,7 +178,7 @@
     try {
       /** @type {import('../lib/sync-progress.js').SyncProgress|null} */
       let progress = null;
-      listener = await OpenDivesCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
+      listener = await BenthicCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
         if (stage !== 'sending') return;
         progress = nextProgress(message, progress);
         fraction = progress?.fraction ?? fraction;
@@ -189,14 +189,14 @@
       deviceStore.setItem('od.logbookName', name);
       if (c.deviceReady) {
         // The logbook is made and saved here: pushing again sends what the server does not have yet.
-        await pushToServer(OpenDivesCore);
+        await pushToServer(BenthicCore);
       } else if (windowTakes) {
         if (!(await openInWindow(c.source === 'file' ? c.file : null))) goReplace('createChoice');
         return;
       } else {
-        const access = await OpenDivesCore.serverSessionAccess();
+        const access = await BenthicCore.serverSessionAccess();
         const file = c.file;
-        await createServerLogbook(OpenDivesCore, access, {
+        await createServerLogbook(BenthicCore, access, {
           source: c.source === 'file' ? 'file' : 'device',
           importFile: file ? () => importLogbookFile(file) : undefined,
           onStage: (next) => {

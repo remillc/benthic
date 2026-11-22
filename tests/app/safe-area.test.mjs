@@ -23,7 +23,7 @@ function fakeWindow(bridge) {
   return {
     root,
     events,
-    OpenDivesInsets: bridge,
+    BenthicInsets: bridge,
     document: { documentElement: root },
     dispatchEvent: (e) => events.push(e),
   };

@@ -11,8 +11,8 @@
 
   /**
    * @type {{
-   *   prefs: import('opendives-core').Prefs,
-   *   dives: import('opendives-core').Dive[],
+   *   prefs: import('benthic-core').Prefs,
+   *   dives: import('benthic-core').Dive[],
    *   shown: number,
    * }}
    * `dives`: the logbook (trip names); `shown`: dives matching.

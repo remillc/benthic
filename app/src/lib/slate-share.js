@@ -5,7 +5,7 @@
 // or a text. The layout and the matching of rows are slate.js (tested); the plans come
 // from the core (one planDive call per extra plan, made by the page).
 import { Share } from '@capacitor/share';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { decoSummary, formatDate, formatInstantDate, formatDepth, formatGasVolume, locale } from './format.js';
 import { t } from './i18n.js';
 import { planRows } from './plan-rows.js';
@@ -13,9 +13,9 @@ import { letterPaper, planGas } from './share.js';
 import { alignRows, cardHtml, rowSymbol, slateLayout, slatePageHtml, slateSize, slateText, FEET_STEP_MM, METRE_STEP_MM } from './slate.js';
 import { waterTypeName, waterTypeOfSalinity } from './tools.js';
 
-/** @typedef {import('opendives-core').PlanResult} PlanResult */
-/** @typedef {import('opendives-core').PlanRequest} PlanRequest */
-/** @typedef {import('opendives-core').Prefs} Prefs */
+/** @typedef {import('benthic-core').PlanResult} PlanResult */
+/** @typedef {import('benthic-core').PlanRequest} PlanRequest */
+/** @typedef {import('benthic-core').Prefs} Prefs */
 /** @typedef {import('./slate.js').SlateCard} SlateCard */
 /** @typedef {import('./slate.js').SlateVariant} SlateVariant */
 
@@ -174,13 +174,13 @@ export async function shareSlate({ card, result, size, file }) {
   let uri;
   let mime;
   if (file === 'pdf') {
-    ({ uri } = await OpenDivesCore.htmlToPdf({ html: slatePageHtml(card, layout, letter, locale), name: `${name}.pdf`, letter }));
+    ({ uri } = await BenthicCore.htmlToPdf({ html: slatePageHtml(card, layout, letter, locale), name: `${name}.pdf`, letter }));
     mime = 'application/pdf';
   } else {
-    ({ uri } = await OpenDivesCore.writeShareFile({ name: `${name}.png`, base64: await cardPng(card, layout) }));
+    ({ uri } = await BenthicCore.writeShareFile({ name: `${name}.png`, base64: await cardPng(card, layout) }));
     mime = 'image/png';
   }
-  await OpenDivesCore.grantShareFile({ uri, mime });
+  await BenthicCore.grantShareFile({ uri, mime });
   await Share.share({ title: card.title, files: [uri], dialogTitle: t('share.title') });
 }
 
@@ -203,8 +203,8 @@ export async function sharePlanTableImage(result, request, prefs, title) {
  */
 export async function sharePlanFile(planId, title, result) {
   const name = `${t('plan.filePrefix')}-${new Date(result.when * 1000).toISOString().slice(0, 10)}.ssrf`;
-  const { uri } = await OpenDivesCore.exportDives({ ids: [planId], format: 'ssrf', anonymize: false, name });
-  await OpenDivesCore.grantShareFile({ uri, mime: 'application/xml' });
+  const { uri } = await BenthicCore.exportDives({ ids: [planId], format: 'ssrf', anonymize: false, name });
+  await BenthicCore.grantShareFile({ uri, mime: 'application/xml' });
   await Share.share({ title, files: [uri], dialogTitle: t('share.title') });
 }
 

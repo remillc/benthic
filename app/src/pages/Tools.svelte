@@ -8,7 +8,7 @@
   // On a tablet the page takes the width (no list pane): the two cards side by side, and a
   // tool opens over the page, as on a phone.
   import { Page, Navbar, NavRight, theme } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
@@ -59,7 +59,7 @@
     do {
       again = false;
       try {
-        plans = (await OpenDivesCore.listPlans()).length;
+        plans = (await BenthicCore.listPlans()).length;
       } catch {
         plans = null;
       }

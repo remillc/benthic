@@ -35,7 +35,7 @@
     </button>
   </div>
   <div class="bc-backup-dialog--body">
-    {#if shown}{#if logbook.odplus}<BackupPanes onbrowse={browse} />{:else}<BackupNotOnServer />{/if}{/if}
+    {#if shown}{#if logbook.benthicPlus}<BackupPanes onbrowse={browse} />{:else}<BackupNotOnServer />{/if}{/if}
   </div>
 </Popup>
 

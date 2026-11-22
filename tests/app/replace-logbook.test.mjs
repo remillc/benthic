@@ -78,11 +78,11 @@ function screen({ answers = ['replace'], confirm = true, name = 'Neuf', exportOk
 const what = { logbook: 'Mon carnet', file: 'Autre.ssrf', data: { path: '/cache/import-1-Autre.ssrf' } };
 
 test('only a logbook of the device is replaceable; the server and an account are not', () => {
-  assert.equal(replaceEligibility({ email: '', odplus: false, repository: '' }), 'ok');
-  assert.equal(replaceEligibility({ email: 'a@b.c', odplus: true, repository: 'https://x' }), 'server');
-  assert.equal(replaceEligibility({ email: 'a@b.c', odplus: false }), 'account');
+  assert.equal(replaceEligibility({ email: '', benthicPlus: false, repository: '' }), 'ok');
+  assert.equal(replaceEligibility({ email: 'a@b.c', benthicPlus: true, repository: 'https://x' }), 'server');
+  assert.equal(replaceEligibility({ email: 'a@b.c', benthicPlus: false }), 'account');
   assert.equal(replaceEligibility({ email: '', repository: 'https://git.example/x' }), 'account');
-  assert.deepEqual(replaceOffer({ odplus: true }), { replace: false, why: 'server' });
+  assert.deepEqual(replaceOffer({ benthicPlus: true }), { replace: false, why: 'server' });
   assert.deepEqual(replaceOffer({}), { replace: true, why: '' });
 });
 
@@ -185,7 +185,7 @@ test('a device logbook: « Remplacer ce carnet » replaces « Nouveau carnet »;
   assert.equal(log.staging.files.size, 0);
 });
 
-test('the OpenDives+ server logbook and an account logbook are never offered « Remplacer »; they say why', async () => {
+test('the Benthic+ server logbook and an account logbook are never offered « Remplacer »; they say why', async () => {
   for (const eligibility of ['server', 'account']) {
     const { deps, log } = shared({ eligibility });
     await openSharedFile(deps, 'content://x/1');

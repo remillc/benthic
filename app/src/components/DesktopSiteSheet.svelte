@@ -6,7 +6,7 @@
   // right the fields, edited in place and saved at once (task 172): Nom, Coordonnées, Pays,
   // Région, Description, Notes. When the position changes (the crosshair, the map, typed
   // coordinates), country and region are filled again from it; what the diver corrected is kept.
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import DesktopSiteField from './DesktopSiteField.svelte';
   import DesktopSitePosMap from './DesktopSitePosMap.svelte';
@@ -24,14 +24,14 @@
   /**
    * @type {{
    *   uuid: number,
-   *   sites: import('opendives-core').SiteSummary[],
+   *   sites: import('benthic-core').SiteSummary[],
    *   ondeleted: () => void,
    * }}
    * sites: every site of the logbook (the nearby ones on the map, the countries to complete).
    */
   let { uuid, sites, ondeleted } = $props();
 
-  let site = $state(/** @type {import('opendives-core').SiteDetail|null} */ (null));
+  let site = $state(/** @type {import('benthic-core').SiteDetail|null} */ (null));
   /** Second line of each dive, by dive id. */
   let lines = $state(/** @type {Record<number, string>} */ ({}));
   /** The position proposed by the crosshair or the map, not kept yet. */
@@ -45,7 +45,7 @@
 
   async function load() {
     try {
-      const s = await OpenDivesCore.siteQuery({ kind: 'site', uuid });
+      const s = await BenthicCore.siteQuery({ kind: 'site', uuid });
       site = s?.uuid ? s : null;
       if (s?.diveList) diveLines(s.diveList, (l) => (lines = l), ' · ');
     } catch (e) {

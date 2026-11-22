@@ -5,7 +5,7 @@
 /** @typedef {{ id: number, title: string, body: string, at: number, extra: Record<string, unknown> }} DesktopNotification */
 
 /** The bridge, when the app runs in Electron. */
-export const desktopBridge = () => /** @type {any} */ (globalThis).odDesktop?.notifications ?? null;
+export const desktopBridge = () => /** @type {any} */ (globalThis).benthicDesktop?.notifications ?? null;
 
 /** @type {Map<string, DesktopNotification[]>} */
 const parts = new Map();

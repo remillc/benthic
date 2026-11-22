@@ -8,7 +8,7 @@ import { showSnackbar } from './snackbar.js';
 import { t } from './i18n.js';
 
 /** @returns {any} */
-const bridge = () => /** @type {any} */ (globalThis).odDesktop;
+const bridge = () => /** @type {any} */ (globalThis).benthicDesktop;
 
 /** Runs the parked import, if there is one. Safe to call again: the record is taken once. */
 export async function resumePendingImport() {

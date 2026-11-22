@@ -1,7 +1,7 @@
 // @ts-check
 // Editing a dive in place in the desktop detail pane (task 2026-11-15-172, 184, 191): which
 // fields can be edited, what a typed value becomes in the core's terms (the `changes` of
-// OpenDivesCore.editDive, the same keys and units as the phone's editor, pages/EditDive.svelte),
+// BenthicCore.editDive, the same keys and units as the phone's editor, pages/EditDive.svelte),
 // and what the keys do while a field is edited. Pure functions: the pane's components only
 // call them, and tests/app/desktop-edit.test.mjs checks them.
 
@@ -72,7 +72,7 @@ function typed(/** @type {number} */ v, decimals = 0) {
  * The text a field starts from when it is edited, in the diver's units.
  * @param {any} dive
  * @param {string} key
- * @param {import('opendives-core').Prefs|{ length: string, temperature: string, pressure: string, weight: string }} prefs
+ * @param {import('benthic-core').Prefs|{ length: string, temperature: string, pressure: string, weight: string }} prefs
  * @returns {string|string[]|number}
  */
 export function fieldValue(dive, key, prefs) {
@@ -123,7 +123,7 @@ const sameList = (/** @type {string[]} */ a, /** @type {string[]} */ b) => a.len
 
 /**
  * What typing `value` into `key` changes, in the core's terms.
- * - `{ ok: true, changes }`: send `changes` to OpenDivesCore.editDive;
+ * - `{ ok: true, changes }`: send `changes` to BenthicCore.editDive;
  * - `{ ok: true, changes: null }`: nothing changed, nothing is written;
  * - `{ ok: false, error: 'readonly' }`: a recorded value of a dive that was not logged by hand;
  * - `{ ok: false, error: 'invalid' }`: the text is not a valid value (shown while typing).
@@ -131,7 +131,7 @@ const sameList = (/** @type {string[]} */ a, /** @type {string[]} */ b) => a.len
  * @param {any} dive
  * @param {string} key
  * @param {string|string[]|number} value
- * @param {import('opendives-core').Prefs|{ length: string, temperature: string, pressure: string, weight: string }} prefs
+ * @param {import('benthic-core').Prefs|{ length: string, temperature: string, pressure: string, weight: string }} prefs
  * @returns {{ ok: true, changes: Record<string, string|number|string[]>|null } | { ok: false, error: 'readonly'|'invalid' }}
  */
 export function fieldChanges(dive, key, value, prefs) {

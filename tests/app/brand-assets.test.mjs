@@ -44,8 +44,8 @@ test('both logos are shown at 22 px high on the one connection screen used by ph
 
 test('the first step opens the connection screen on every device, and « Continuer sans compte » goes back', () => {
   const steps = read('lib/first-launch-steps.js');
-  assert.match(steps, /'start:signIn': 'odplusConnect'/);
-  assert.match(steps, /'odplusConnect:email': 'server'/);
+  assert.match(steps, /'start:signIn': 'benthicPlusConnect'/);
+  assert.match(steps, /'benthicPlusConnect:email': 'server'/);
   assert.match(read('components/FirstLaunchSteps.svelte'), /goBackTo\('start'\)/);
   assert.match(read('components/FirstLaunchSteps.svelte'), /go\('signIn'\)/);
 });

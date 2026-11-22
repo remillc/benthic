@@ -5,7 +5,7 @@
   // `keepScreenAwake`, the same as the QR sending screen), and a touch on the card shows the next side (the back of a
   // card, the next page).
   import { onDestroy, onMount } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
 
@@ -25,10 +25,10 @@
 
   onMount(() => {
     index = start;
-    OpenDivesCore.keepScreenAwake({ on: true }).catch(() => {});
+    BenthicCore.keepScreenAwake({ on: true }).catch(() => {});
   });
   onDestroy(() => {
-    OpenDivesCore.keepScreenAwake({ on: false }).catch(() => {});
+    BenthicCore.keepScreenAwake({ on: false }).catch(() => {});
   });
 
   function next() {

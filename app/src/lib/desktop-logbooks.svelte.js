@@ -10,7 +10,7 @@ import { logbookShortcut, isLogbookFileName } from './desktop-logbooks.js';
 /** @typedef {import('./desktop-logbooks.js').LogbookEntry} LogbookEntry */
 
 /** @returns {any} */
-const bridge = () => /** @type {any} */ (globalThis).odDesktop;
+const bridge = () => /** @type {any} */ (globalThis).benthicDesktop;
 
 /** @type {LogbookEntry|null|undefined} */
 const initialLogbook = bridge()?.logbook;

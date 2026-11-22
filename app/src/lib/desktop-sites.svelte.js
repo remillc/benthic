@@ -3,7 +3,7 @@
 // list pane's width (remembered on the device), the regions of the sites (read from the core on
 // demand: the sites' list does not carry them), and the position lookups that waited for the
 // network. The reads and writes of the sites themselves stay in lib/sites.svelte.js.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { deviceStore } from './device-store.js';
 import { DEFAULT_SORT, readRegions } from './desktop-sites.js';
 import { geocodeSite } from './sites.svelte.js';
@@ -60,13 +60,13 @@ let loading = false;
 /**
  * Reads the region of every site (a SiteDetail each), for the search and the Region field's
  * completions; once per version of the sites. The reads run side by side (readRegions).
- * @param {import('opendives-core').SiteSummary[]} sites @param {number} version logbook.sitesVersion
+ * @param {import('benthic-core').SiteSummary[]} sites @param {number} version logbook.sitesVersion
  */
 export async function loadRegions(sites, version) {
   if (regionsFor === version || loading) return;
   loading = true;
   try {
-    deskSites.regions = await readRegions(sites, async (uuid) => (await OpenDivesCore.siteQuery({ kind: 'site', uuid }))?.region?.value ?? '');
+    deskSites.regions = await readRegions(sites, async (uuid) => (await BenthicCore.siteQuery({ kind: 'site', uuid }))?.region?.value ?? '');
     regionsFor = version;
   } finally {
     loading = false;

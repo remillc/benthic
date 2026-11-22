@@ -17,7 +17,7 @@ function toast(text) {
 
 /**
  * @param {string} text what was done ("Dive saved")
- * @param {(result: import('opendives-core').EditResult) => void|Promise<void>} [after] once undone
+ * @param {(result: import('benthic-core').EditResult) => void|Promise<void>} [after] once undone
  * @param {number} [timeout] ms the message stays (10 s after deleting a dive)
  * @param {number} [steps] undoable steps the change made (the dive editor can
  *   also create a site or move the dive to a trip): Undo takes them all back

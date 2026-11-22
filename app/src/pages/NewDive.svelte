@@ -10,7 +10,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import ChoiceRow from '../components/ChoiceRow.svelte';
   import TextField from '../components/TextField.svelte';
@@ -66,9 +66,9 @@
   let site = $state(0);
   let saving = $state(false);
   let tried = $state(false);
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
-  /** @type {import('opendives-core').CylinderType[]} */
+  /** @type {import('benthic-core').CylinderType[]} */
   let cylinderTypes = $state([]);
 
   // Leaving with changes asks first (components/LeaveGuard.svelte): the values now
@@ -81,12 +81,12 @@
   onMount(async () => {
     logbookValues('buddy').then((list) => (knownBuddies = list));
     try {
-      sites = await OpenDivesCore.siteQuery({ kind: 'list' });
+      sites = await BenthicCore.siteQuery({ kind: 'list' });
     } catch (e) {
       console.error('Reading the sites', e);
     }
     try {
-      cylinderTypes = (await OpenDivesCore.cylinderTypes({ action: 'list' })).types;
+      cylinderTypes = (await BenthicCore.cylinderTypes({ action: 'list' })).types;
     } catch (e) {
       console.error('Reading the cylinder types', e);
     }

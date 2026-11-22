@@ -369,7 +369,7 @@ test('divelogs.de: « Annuler » keeps nothing; an empty or unreadable download 
 test('git: create needs an empty repository, open a repository with a logbook; both then open the logbook', () => {
   assert.match(sources.git, /create && !found\.empty/);
   assert.match(sources.git, /!create && found\.empty/);
-  assert.match(sources.git, /OpenDivesCore\.gitConnect\(/);
+  assert.match(sources.git, /BenthicCore\.gitConnect\(/);
   assert.match(sources.git, /await accountReady\(\)/);
   assert.match(sources.steps, /<FirstLaunchGit create router=\{f7router\} afterConnect=\{afterGit\}/);
   assert.match(sources.steps, /<FirstLaunchGit create=\{false\}/);

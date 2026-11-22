@@ -1,5 +1,5 @@
 // @ts-check
-// Dive validation by a buddy or an instructor (inbox task 2026-11-19-309, point 2; OpenDives+ only). Pure functions:
+// Dive validation by a buddy or an instructor (inbox task 2026-11-19-309, point 2; Benthic+ only). Pure functions:
 // the records, the fingerprint of a dive that detects « modifiée après la validation », the QR text and the clock of a code.
 //
 // Where it is kept. A validation belongs to the dive, but the Subsurface core has no generic door for a dive's extra data

@@ -3,7 +3,7 @@
   // The list of « Ordinateurs du carnet » (reglages-ordinateurs-android.dc.html; spec, "Settings, logbook dive
   // computers"): the computers the dives come from, each with its photo (task 2026-11-19-306). The page and, behind the
   // side sheet of « Modifier l'ordinateur » on a tablet, the same list.
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import DcTile from './DcTile.svelte';
   import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
@@ -11,7 +11,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {import('opendives-core').LogbookComputer[]} */
+  /** @type {import('benthic-core').LogbookComputer[]} */
   let computers = $state([]);
   /** `selected`: the computer being edited (tablet and desktop: the list stays behind the sheet). @type {{ selected?: { model: string, serial: string }|null }} */
   let { selected = null } = $props();
@@ -19,13 +19,13 @@
   // Again after each change of the logbook, undo included.
   $effect(() => {
     logbook.dives;
-    OpenDivesCore.diveComputers().then(
+    BenthicCore.diveComputers().then(
       (list) => (computers = list),
       (e) => console.error('Logbook computers', e),
     );
   });
 
-  /** @param {import('opendives-core').LogbookComputer} c */
+  /** @param {import('benthic-core').LogbookComputer} c */
   function details(c) {
     return [
       c.nickname ? c.model : '',
@@ -36,7 +36,7 @@
       .join(' · ');
   }
 
-  /** @param {import('opendives-core').LogbookComputer} c */
+  /** @param {import('benthic-core').LogbookComputer} c */
   const link = (c) => `/settings/computers/edit?model=${encodeURIComponent(c.model)}&serial=${encodeURIComponent(c.serial)}`;
 
   const anyDuplicate = $derived(computers.some((c) => mergeTargets(c, computers).length > 0));

@@ -3,7 +3,7 @@
 //  - *.svelte.js (Svelte 5 runes) are compiled with svelte/compiler's
 //    compileModule, from the app's own node_modules;
 //  - *.json is loaded as a default export (the translations);
-//  - 'opendives-core' (the native plugin) is replaced by a stub: the tests
+//  - 'benthic-core' (the native plugin) is replaced by a stub: the tests
 //    never call the core, they test what is sent to it and what is shown;
 //  - OD_JS_MUTATE=<name> changes a constant or a rule in the source as it is
 //    loaded (a wrong psi factor, a wrong comparison...): the tests must then
@@ -16,7 +16,7 @@ import path from 'node:path';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.resolve(here, '../../app');
 const appRequire = createRequire(path.join(appDir, 'package.json'));
-const stub = pathToFileURL(path.join(here, 'opendives-core-stub.mjs')).href;
+const stub = pathToFileURL(path.join(here, 'benthic-core-stub.mjs')).href;
 const srcPrefix = pathToFileURL(path.join(appDir, 'src')).href;
 
 /** The mutations: [file name, text in the source, text put in its place]. */
@@ -38,8 +38,8 @@ function mutate(url, source) {
 }
 
 export async function resolve(specifier, context, nextResolve) {
-  if (specifier === 'opendives-core') return { url: stub, shortCircuit: true };
-  // The plugin's own files (plugins/opendives-core/desktop.js) import Capacitor, installed with the app.
+  if (specifier === 'benthic-core') return { url: stub, shortCircuit: true };
+  // The plugin's own files (plugins/benthic-core/desktop.js) import Capacitor, installed with the app.
   if (specifier.startsWith('@capacitor/') && context.parentURL?.includes('/plugins/')) {
     return nextResolve(specifier, { ...context, parentURL: pathToFileURL(path.join(appDir, 'package.json')).href });
   }

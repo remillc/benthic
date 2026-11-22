@@ -12,7 +12,7 @@
   import { onMount } from 'svelte';
   import { navigation } from '../lib/navigation.svelte.js';
   import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import SelectField from '../components/SelectField.svelte';
@@ -66,7 +66,7 @@
 
   onMount(async () => {
     try {
-      const details = await Promise.all(ids.map((id) => OpenDivesCore.getDive({ id })));
+      const details = await Promise.all(ids.map((id) => BenthicCore.getDive({ id })));
       const s = multiEditState(details);
       siteName = s.site.value;
       notes = s.notes.mixed ? '' : s.notes.value;

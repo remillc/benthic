@@ -11,13 +11,13 @@
   import { planRowTitle } from '../lib/plan-title.js';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ plans: import('opendives-core').PlannedDive[], openId?: number, onchoose: (id: number) => void, onnew: () => void, onclose: () => void }} */
+  /** @type {{ plans: import('benthic-core').PlannedDive[], openId?: number, onchoose: (id: number) => void, onnew: () => void, onclose: () => void }} */
   let { plans, openId = 0, onchoose, onnew, onclose } = $props();
 
   const prefs = $derived(logbook.prefs);
-  /** @param {import('opendives-core').PlannedDive} plan */
+  /** @param {import('benthic-core').PlannedDive} plan */
   const title = (plan) => planRowTitle(plan.title, t('plans.fallbackTitle', { date: formatDate(plan.date) })).text;
-  /** @param {import('opendives-core').PlannedDive} plan */
+  /** @param {import('benthic-core').PlannedDive} plan */
   function detail(plan) {
     const gas = plan.gases[0];
     const o2 = gas?.o2Permille ?? 209;

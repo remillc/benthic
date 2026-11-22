@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds the dependencies, then the core: libopendives_core.a and the test
+# Builds the dependencies, then the core: libbenthic_core.a and the test
 # executables (and benthic-host when desktop/host/ exists).
 # usage: [TARGET=linux-x64|win-x64|mac-arm64|mac-x64] native/desktop/build.sh [TARGET]
 # Output: build/desktop/<target>/{deps,lib,bin}
@@ -12,4 +12,4 @@ cmake -S "$ROOT/native/desktop" -B "$B" -G Ninja -Wno-dev ${CMAKE_TARGET_ARGS[@]
   -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DDEPS="$DEPS" -DSS="$SS" \
   -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY="$OUT/lib" -DOD_BIN_DIR="$OUT/bin"
 cmake --build "$B" -j"$JOBS"
-echo "built $OUT/lib/libopendives_core.a and the programs in $OUT/bin"
+echo "built $OUT/lib/libbenthic_core.a and the programs in $OUT/bin"

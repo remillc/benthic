@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android 11 and earlier (android:fullBackupContent). The repository access
      (address, user name, encrypted token) never leaves the device in a
-     backup; see plugins/opendives-core, GitRemoteStore. -->
+     backup; see plugins/benthic-core, GitRemoteStore. -->
 <full-backup-content>
     <exclude domain="file" path="git-remote.bin" />
     <exclude domain="file" path="git-remote.bin.tmp" />

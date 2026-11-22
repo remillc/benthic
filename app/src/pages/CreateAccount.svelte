@@ -7,7 +7,7 @@
   // ConfirmCode). An email that already has an account with this password
   // signs in instead. Creating an account writes to the cloud: refused, for
   // now, except on the test account (write lock).
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import AccountField from '../components/AccountField.svelte';
   import EditorialPage from '../components/EditorialPage.svelte';
   import { notAvailableYet } from '../lib/not-available.js';
@@ -56,13 +56,13 @@
     if (emailError || passwordError) return;
     busy = true;
     try {
-      const result = await OpenDivesCore.createAccount({ email: email.trim(), password });
+      const result = await BenthicCore.createAccount({ email: email.trim(), password });
       if (result.status === 'need_pin') {
         password = '';
         f7router.navigate(`${base}/code`, { props: { email: result.email } });
       } else if (result.status === 'verified') {
         // The account exists with this password: sign in to it.
-        const signedIn = await OpenDivesCore.signIn({ email: email.trim(), password });
+        const signedIn = await BenthicCore.signIn({ email: email.trim(), password });
         password = '';
         if (signedIn.exists && look) f7router.navigate('/welcome/downloading', { props: { email: email.trim() } });
         else if (signedIn.exists) finishAccount(f7router, welcome, { offerDeviceDives: true });

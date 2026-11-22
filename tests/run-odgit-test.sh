@@ -1,5 +1,5 @@
 #!/bin/bash
-# The git calls of the facade (core/libopendives/odgit.h) against a local git http server (tests/odgit_server.py):
+# The git calls of the facade (core/libbenthic/odgit.h) against a local git http server (tests/odgit_server.py):
 # clone of an empty repository, commit, push, a second device, fast-forward, a clean merge, a conflict and its
 # resolution, a wrong token, an http address refused. usage: tests/run-odgit-test.sh [build/poc/odgit-test]
 set -u

@@ -1,10 +1,10 @@
 // @ts-check
 // DEVELOPMENT ONLY. The simulated « Continuer avec Google », the simulated purchase and the deletion of a temporary
-// account, for trying the OpenDives+ flow on a phone against the local development server before the real Google
+// account, for trying the Benthic+ flow on a phone against the local development server before the real Google
 // Sign-In and the store billing are approved. Loaded only through `import()` behind `devAccounts` (lib/dev-switch.js):
 // a build without VITE_DEV_ACCOUNTS=1 does not contain this file. It also refuses at run time any server that is not
 // this machine's development server.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { ServerError, errorFromResponse } from './server-api.js';
 import { serverTransport } from './server-transport.js';
 import { serverUrl } from './server-url.js';
@@ -116,7 +116,7 @@ export async function subscribePending() {
  * @param {import('./server-api.js').ServerSession} session
  */
 export async function saveSession(session) {
-  await OpenDivesCore.serverSessionSave({
+  await BenthicCore.serverSessionSave({
     email: session.user.email,
     sessionToken: session.sessionToken,
     repositoryUrl: session.repository.url,
@@ -137,6 +137,6 @@ export async function savePending() {
 
 /** Deletes the signed-in temporary account on the server (the caller then signs out of the device). */
 export async function deleteSignedInAccount() {
-  const access = await OpenDivesCore.serverSessionAccess();
+  const access = await BenthicCore.serverSessionAccess();
   await createDevApi().reset(access.sessionToken);
 }

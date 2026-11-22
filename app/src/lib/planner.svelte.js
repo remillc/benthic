@@ -13,7 +13,7 @@
 //   "Dive planner setup": set through setPrefs and kept as this device's
 //   settings (settings.svelte.js), read back with plannerSetup. A saved plan
 //   keeps its own copy, so that reopening it gives the same result.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { settings, setAppSetting, setCorePrefs, resetCorePrefs } from './settings.svelte.js';
 import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, coreSacFactor } from './reserve-factor.js';
 import { SETTING_KEYS } from './settings-reset.js';
@@ -21,10 +21,10 @@ import { altitudeToPressureMbar, salinityOfWaterType } from './tools.js';
 import { bottomCylinder } from './plan-gases.js';
 import { defaultPlanTitle } from './plan-title.js';
 
-/** @typedef {import('opendives-core').PlannerSetup} PlannerSetup */
-/** @typedef {import('opendives-core').DiveDetail} DiveDetail */
-/** @typedef {import('opendives-core').PlanRequest} PlanRequest */
-/** @typedef {import('opendives-core').PlannedDive} PlannedDive */
+/** @typedef {import('benthic-core').PlannerSetup} PlannerSetup */
+/** @typedef {import('benthic-core').DiveDetail} DiveDetail */
+/** @typedef {import('benthic-core').PlanRequest} PlanRequest */
+/** @typedef {import('benthic-core').PlannedDive} PlannedDive */
 
 export { SETTING_KEYS };
 
@@ -92,7 +92,7 @@ export const planner = $state({
 
 /** Reads the core's planner settings (also after a change in Settings). */
 export async function loadSetup() {
-  planner.setup = await OpenDivesCore.plannerSetup();
+  planner.setup = await BenthicCore.plannerSetup();
   return planner.setup;
 }
 

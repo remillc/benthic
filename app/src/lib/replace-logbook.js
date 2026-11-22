@@ -10,13 +10,13 @@ import { isSubsurfaceXml } from './deep-link.js';
 /**
  * Whether the open logbook may be replaced from a file.
  * - `ok`: the logbook of this device, no account;
- * - `server`: the OpenDives+ server logbook: never deleted or overwritten from here;
+ * - `server`: the Benthic+ server logbook: never deleted or overwritten from here;
  * - `account`: a Subsurface cloud or git logbook: removing its dives would be sent to the shared log.
- * @param {{ email?: string, odplus?: boolean, repository?: string }} open
+ * @param {{ email?: string, benthicPlus?: boolean, repository?: string }} open
  * @returns {'ok'|'server'|'account'}
  */
 export function replaceEligibility(open) {
-  if (open.odplus) return 'server';
+  if (open.benthicPlus) return 'server';
   if (open.email || open.repository) return 'account';
   return 'ok';
 }
@@ -99,7 +99,7 @@ export async function runReplace(deps, what) {
 
 /**
  * What the dialog of a file with a logbook open can offer on a device that holds one logbook.
- * @param {{ email?: string, odplus?: boolean, repository?: string }} open
+ * @param {{ email?: string, benthicPlus?: boolean, repository?: string }} open
  * @returns {{ replace: boolean, why: '' | 'server' | 'account' }}
  */
 export function replaceOffer(open) {

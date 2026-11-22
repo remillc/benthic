@@ -31,7 +31,7 @@
     (backup.recent ?? [])
       .filter((r) => r.versions > 1 && byKey.has(r.key))
       .slice(0, 30)
-      .map((r) => ({ key: r.key, dive: /** @type {import('opendives-core').Dive} */ (byKey.get(r.key)), time: r.time, versions: r.versions })),
+      .map((r) => ({ key: r.key, dive: /** @type {import('benthic-core').Dive} */ (byKey.get(r.key)), time: r.time, versions: r.versions })),
   );
 
   /** The dives that match the search: number, site, date. */
@@ -42,7 +42,7 @@
     return all.filter((d) => `${d.number} ${d.site} ${d.date} ${formatDate(d.date)}`.toLocaleLowerCase().includes(q)).slice(0, 100);
   });
 
-  /** « N° 298 · Baie-Comeau, épave » @param {import('opendives-core').Dive} d */
+  /** « N° 298 · Baie-Comeau, épave » @param {import('benthic-core').Dive} d */
   function title(d) {
     const number = t('backup.version.number', { n: d.number });
     return d.site ? t('backup.dive.rowShort', { number, site: d.site }) : number;

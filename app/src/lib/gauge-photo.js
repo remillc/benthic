@@ -2,10 +2,10 @@
 // Reading a cylinder pressure from a photo, page side (docs/ui-specification.md,
 // "Reading cylinder pressures from a photo"): opens the native gauge camera with
 // the translated texts, and turns what it recognised into readings. The camera
-// itself is native (plugins/opendives-core, GaugeCameraActivity); the rules that
+// itself is native (plugins/benthic-core, GaugeCameraActivity); the rules that
 // decide what a reading is are in gauge-reading.js.
 import { Capacitor } from '@capacitor/core';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { t } from './i18n.js';
 
 /** The camera exists on Android only for now (iOS needs a Mac to build). */
@@ -24,7 +24,7 @@ export const gaugeCameraAvailable = () => Capacitor.getPlatform() === 'android';
  *   cylinder: string,
  *   gas: string,
  *   userUnit: 'bar'|'psi',
- *   decide: (blocks: import('opendives-core').GaugeTextBlock[], userUnit: 'bar'|'psi') => import('./gauge-reading.js').GaugeReading[],
+ *   decide: (blocks: import('benthic-core').GaugeTextBlock[], userUnit: 'bar'|'psi') => import('./gauge-reading.js').GaugeReading[],
  * }} options
  * @returns {Promise<{action: 'cancelled'|'manual'} | ({action: 'photo'} & GaugePhoto)>}
  *   decide: the rules (gauge-reading.js readGauges); a photo for which it finds nothing
@@ -33,7 +33,7 @@ export const gaugeCameraAvailable = () => Capacitor.getPlatform() === 'android';
 export async function runGaugeCamera({ field, cylinder, gas, userUnit, decide }) {
   let nothingRead = false;
   for (;;) {
-    const result = await OpenDivesCore.gaugeCamera({
+    const result = await BenthicCore.gaugeCamera({
       title: t(field === 'start' ? 'gauge.titleStart' : 'gauge.titleEnd'),
       subtitle: `${cylinder} · ${gas}`,
       hintMain: t('gauge.hintMain'),

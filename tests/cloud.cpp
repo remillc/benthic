@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0
 // READ-ONLY test of the Subsurface cloud, on the development machine.
-// Credentials are read from OPENDIVES_CLOUD_EMAIL and OPENDIVES_CLOUD_PASSWORD;
+// Credentials are read from BENTHIC_CLOUD_EMAIL and BENTHIC_CLOUD_PASSWORD;
 // the password is never printed.
 //
 // usage: cloud probe   does the log branch exist? (no clone)
 //        cloud load    loads the log through the Subsurface core (clone or
 //                      update of the local cache under $HOME/.subsurface)
-//        cloud list    same path as the app: opendives::cloud_list_dives()
+//        cloud list    same path as the app: benthic::cloud_list_dives()
 //
 // "load" refuses to continue if the branch does not exist on the server:
 // the core would then create it by pushing an empty commit.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 #include "core/divelog.h"
 #include "core/file.h"
 #include "core/git-access.h"
@@ -29,24 +29,24 @@ static std::string host_of(const std::string &url)
 
 int main(int argc, char **argv)
 {
-	const char *email = getenv("OPENDIVES_CLOUD_EMAIL");
-	const char *password = getenv("OPENDIVES_CLOUD_PASSWORD");
+	const char *email = getenv("BENTHIC_CLOUD_EMAIL");
+	const char *password = getenv("BENTHIC_CLOUD_PASSWORD");
 	if (argc != 2 || (strcmp(argv[1], "probe") && strcmp(argv[1], "load") && strcmp(argv[1], "list"))) {
 		fprintf(stderr, "usage: %s probe|load|list\n", argv[0]);
 		return 2;
 	}
 	if (!email || !*email || !password || !*password) {
-		fprintf(stderr, "OPENDIVES_CLOUD_EMAIL and OPENDIVES_CLOUD_PASSWORD are required\n");
+		fprintf(stderr, "BENTHIC_CLOUD_EMAIL and BENTHIC_CLOUD_PASSWORD are required\n");
 		return 2;
 	}
-	if (opendives::init())
+	if (benthic::init())
 		return 2;
 
 	std::string url, error, head;
 	if (!strcmp(argv[1], "list")) {
-		// Same path as the app: opendives::cloud_list_dives().
+		// Same path as the app: benthic::cloud_list_dives().
 		std::string json;
-		if (opendives::cloud_list_dives(email, password, json, error)) {
+		if (benthic::cloud_list_dives(email, password, json, error)) {
 			fprintf(stderr, "failed: %s\n", error.c_str());
 			return 1;
 		}
@@ -58,10 +58,10 @@ int main(int argc, char **argv)
 		printf("dives: %zu\n", count);
 		return 0;
 	}
-	if (opendives::cloud_configure(email, password, url))
+	if (benthic::cloud_configure(email, password, url))
 		return 1;
 	bool exists = false;
-	if (opendives::cloud_branch_status(url, exists, head, error)) {
+	if (benthic::cloud_branch_status(url, exists, head, error)) {
 		fprintf(stderr, "probe: %s (%s)\n", error.c_str(), host_of(url).c_str());
 		return 1;
 	}

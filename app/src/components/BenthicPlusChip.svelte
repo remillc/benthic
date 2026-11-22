@@ -1,7 +1,7 @@
 <script>
   // @ts-check
-  // The « OpenDives+ » chip (task 2026-11-17-265; mock-ups docs/mockups-release/android-odplus-*.dc.html and
-  // android-serveur-telechargement.dc.html): a small frosted pill with the OpenDives+ mark, shown on the blue band
+  // The « Benthic+ » chip (task 2026-11-17-265; mock-ups docs/mockups-release/android-odplus-*.dc.html and
+  // android-serveur-telechargement.dc.html): a small frosted pill with the Benthic+ mark, shown on the blue band
   // above the title of the screens that belong to the subscription. `onLight` is the same chip on a light page.
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
@@ -11,7 +11,7 @@
 </script>
 
 <span class="bc-plus-chip" class:bc-plus-chip--on-light={onLight} class:bc-plus-chip--on-sheet={onSheet} class:bc-plus-chip--large={large}>
-  <Icon name="plusMark" size={large ? 14 : 12} weight={2.2} />{label || t('odplus.chip')}
+  <Icon name="plusMark" size={large ? 14 : 12} weight={2.2} />{label || t('benthicPlus.chip')}
 </span>
 
 <style>

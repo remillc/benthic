@@ -33,18 +33,18 @@ test('the creation steps follow the mock-ups and the upload has no « Retour »'
   assert.deepEqual(forward(stack, 'send'), [...stack, 'createSend']);
   assert.deepEqual(forward([...stack, 'createName'], 'offline').at(-1), 'createOffline');
   assert.deepEqual(replaceTop([...stack, 'createSend'], 'createInterrupted'), [...stack, 'createInterrupted']);
-  for (const step of ['createSend', 'createInterrupted', 'createOffline', 'odplusOffer', 'odplusReady', 'odplusWelcome']) assert.equal(hasBack(step), false, step);
-  for (const step of ['createChoice', 'createName', 'odplusConnect', 'server']) assert.equal(hasBack(step), true, step);
+  for (const step of ['createSend', 'createInterrupted', 'createOffline', 'benthicPlusOffer', 'benthicPlusReady', 'benthicPlusWelcome']) assert.equal(hasBack(step), false, step);
+  for (const step of ['createChoice', 'createName', 'benthicPlusConnect', 'server']) assert.equal(hasBack(step), true, step);
 });
 
 test('the two entries of the first step, and the way of the offer', () => {
-  assert.deepEqual(forward(['start'], 'signIn'), ['start', 'odplusConnect']);
-  assert.deepEqual(forward(['start'], 'discover'), ['start', 'odplusOffer']);
-  assert.deepEqual(forward(['start', 'odplusConnect'], 'email'), ['start', 'odplusConnect', 'server']);
-  assert.deepEqual(forward(['start', 'odplusOffer'], 'welcome').at(-1), 'odplusWelcome');
-  assert.deepEqual(forward(['start', 'odplusOffer', 'odplusWelcome'], 'next').at(-1), 'odplusReady');
-  assert.deepEqual(enterOffer(['start', 'odplusConnect', 'server', 'serverCode']), ['start', 'odplusConnect', 'server', 'odplusOffer']);
-  assert.deepEqual(forward(['start', 'odplusConnect', 'server', 'serverCode', 'serverDownload'], 'ready').at(-1), 'odplusReady');
+  assert.deepEqual(forward(['start'], 'signIn'), ['start', 'benthicPlusConnect']);
+  assert.deepEqual(forward(['start'], 'discover'), ['start', 'benthicPlusOffer']);
+  assert.deepEqual(forward(['start', 'benthicPlusConnect'], 'email'), ['start', 'benthicPlusConnect', 'server']);
+  assert.deepEqual(forward(['start', 'benthicPlusOffer'], 'welcome').at(-1), 'benthicPlusWelcome');
+  assert.deepEqual(forward(['start', 'benthicPlusOffer', 'benthicPlusWelcome'], 'next').at(-1), 'benthicPlusReady');
+  assert.deepEqual(enterOffer(['start', 'benthicPlusConnect', 'server', 'serverCode']), ['start', 'benthicPlusConnect', 'server', 'benthicPlusOffer']);
+  assert.deepEqual(forward(['start', 'benthicPlusConnect', 'server', 'serverCode', 'serverDownload'], 'ready').at(-1), 'benthicPlusReady');
 });
 
 // --- Benthic+ --------------------------------------------------------------------------------------------
@@ -88,8 +88,8 @@ test('« Continuer sans compte » and « Continuer sans abonnement » create not
 
 test('the development switch to « Bienvenue dans Benthic+ » exists in development builds only', () => {
   const screen = read('components/FirstLaunchBenthicPlus.svelte');
-  assert.match(screen, /if \(!import\.meta\.env\?\.DEV \|\| step !== 'odplusOffer'\) return;/);
-  assert.equal([...screen.matchAll(/__odplus/g)].length, 3);
+  assert.match(screen, /if \(!import\.meta\.env\?\.DEV \|\| step !== 'benthicPlusOffer'\) return;/);
+  assert.equal([...screen.matchAll(/__benthicPlus/g)].length, 3);
 });
 
 test('the summary card lists dives, sites, gear and certifications', () => {
@@ -112,19 +112,19 @@ test('every text of the new screens is in fr and en, and the price is the one of
   for (const lang of ['fr', 'en']) {
     const c = langs[lang];
     for (const base of ['sendTitle', 'nameHelp', 'safe', 'created', 'offlineHelp', 'interruptedHelp']) for (const s of ['', 'Phone', 'Iphone', 'Desktop']) assert.ok(`${base}${s}` in c.serverCreate, `${lang}: ${base}${s}`);
-    for (const s of ['', 'Phone', 'Iphone', 'Desktop']) assert.ok(`lead${s}` in c.odplus.ready, `${lang}: ready lead${s}`);
+    for (const s of ['', 'Phone', 'Iphone', 'Desktop']) assert.ok(`lead${s}` in c.benthicPlus.ready, `${lang}: ready lead${s}`);
     for (const key of ['sendHelp', 'sendingName']) assert.equal(typeof c.serverCreate[key], 'object', `${lang}: ${key} is a plural`);
     assert.ok(c.serverSteps.backHome);
     assert.ok(!('title' in c.serverSteps), 'no « Serveur OpenDives » overline text');
   }
-  assert.equal(langs.fr.odplus.offer.price, '14,99 $ US');
-  assert.equal(langs.fr.odplus.offer.per, 'par an');
-  assert.equal(langs.fr.odplus.offer.priceDetail, 'soit 1,25 $ par mois');
-  assert.equal(langs.fr.odplus.offer.cancelAnytime, 'Résiliable en tout temps');
-  assert.equal(langs.fr.odplus.offer.subscribe, 'S’abonner');
-  assert.equal(langs.fr.odplus.offer.without, 'Continuer sans abonnement');
-  assert.equal(langs.fr.odplus.offer.noAccount, 'Aucun compte n’est créé.');
-  assert.equal(langs.fr.odplus.welcome.title, 'Bienvenue dans Benthic+ !');
+  assert.equal(langs.fr.benthicPlus.offer.price, '14,99 $ US');
+  assert.equal(langs.fr.benthicPlus.offer.per, 'par an');
+  assert.equal(langs.fr.benthicPlus.offer.priceDetail, 'soit 1,25 $ par mois');
+  assert.equal(langs.fr.benthicPlus.offer.cancelAnytime, 'Résiliable en tout temps');
+  assert.equal(langs.fr.benthicPlus.offer.subscribe, 'S’abonner');
+  assert.equal(langs.fr.benthicPlus.offer.without, 'Continuer sans abonnement');
+  assert.equal(langs.fr.benthicPlus.offer.noAccount, 'Aucun compte n’est créé.');
+  assert.equal(langs.fr.benthicPlus.welcome.title, 'Bienvenue dans Benthic+ !');
   assert.equal(langs.fr.serverSteps.backHome, 'Revenir à l’accueil');
 });
 

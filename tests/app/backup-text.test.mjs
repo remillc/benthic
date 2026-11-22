@@ -88,7 +88,7 @@ test('French and English have the same texts for the backup screens, and the 90 
 
 test('the screens, the dialog and the dive menu are wired', () => {
   for (const f of ['BackupMain', 'BackupTimeline', 'BackupVersion', 'BackupDivePick', 'BackupDive', 'BackupDeleted', 'BackupBrowse', 'BackupPanes', 'BackupDialog']) assert.ok(existsSync(new URL(`../../app/src/components/${f}.svelte`, import.meta.url)), f);
-  assert.match(read('pages/DiveDetail.svelte'), /logbook\.odplus && dive[\s\S]*icon="history"[\s\S]*openDiveVersions\(dive\.date\)/);
+  assert.match(read('pages/DiveDetail.svelte'), /logbook\.benthicPlus && dive[\s\S]*icon="history"[\s\S]*openDiveVersions\(dive\.date\)/);
   assert.match(read('lib/backup-nav.js'), /layout\.desktop[\s\S]*navigation\.backupOpen = true/);
   // Browsing holds the core: nothing is saved or synced meanwhile.
   const logbook = read('lib/logbook.svelte.js');

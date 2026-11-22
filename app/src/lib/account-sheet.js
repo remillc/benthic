@@ -4,8 +4,8 @@
 // photo space. The screens read these and decide nothing themselves.
 
 /**
- * The version of the account sheet. `free`: the release edition without an OpenDives+ account (the logbook is on the
- * device; every OpenDives+ row opens the offer). `subscriber`: a signed-in, subscribed OpenDives+ account (wherever the logbook lives: the account's, not the logbook's). `account`:
+ * The version of the account sheet. `free`: the release edition without an Benthic+ account (the logbook is on the
+ * device; every Benthic+ row opens the offer). `subscriber`: a signed-in, subscribed Benthic+ account (wherever the logbook lives: the account's, not the logbook's). `account`:
  * `git`: the desktop's one-off licence, a logbook in the diver's own git repository (task 2026-11-19-298). Everything
  * else (the alpha, a Subsurface cloud account) is `account` and keeps the sheet it always had.
  * @param {{ release: boolean, subscriber: boolean, email: string, git?: boolean, repository?: string }} state
@@ -21,12 +21,12 @@ export function sheetVariant({ release, subscriber, email, git = false, reposito
 /**
  * The server session identifies the subscriber; a server logbook's git username is not their email.
  * @param {{ signedIn: boolean, email: string }} account
- * @param {{ email: string, odplus: boolean }} logbook
+ * @param {{ email: string, benthicPlus: boolean }} logbook
  * @returns {string}
  */
 export function accountEmail(account, logbook) {
   if (account.signedIn) return account.email;
-  return logbook.odplus ? '' : logbook.email;
+  return logbook.benthicPlus ? '' : logbook.email;
 }
 
 /**
@@ -67,7 +67,7 @@ export function subscriptionStore(subscription, ios) {
   return ios ? 'apple' : 'google';
 }
 
-/** The photo and video space of an OpenDives+ account: 10 GB (decimal, as the store and the server count). */
+/** The photo and video space of an Benthic+ account: 10 GB (decimal, as the store and the server count). */
 export const SPACE_LIMIT_BYTES = 10 * 1000 * 1000 * 1000;
 
 /**

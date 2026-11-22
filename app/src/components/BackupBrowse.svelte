@@ -2,7 +2,7 @@
   // @ts-check
   // An earlier version of the logbook, read only (task 2026-11-19-290, « Parcourir cette version »): its dives in a list, a
   // banner that says so, and « Revenir au carnet ». The core holds the version instead of the logbook while this is open: nothing
-  // can be edited, saved or sent from it (core/libopendives, history_call "open"); closing it reads the logbook again.
+  // can be edited, saved or sent from it (core/libbenthic, history_call "open"); closing it reads the logbook again.
   import './backup.css';
   import { onDestroy, onMount } from 'svelte';
   import { openVersion, closeVersion, logbook } from '../lib/logbook.svelte.js';
@@ -15,7 +15,7 @@
   let { id, onclose } = $props();
 
   const version = $derived(backup.versions.find((v) => v.id === id) ?? null);
-  /** @type {import('opendives-core').Dive[]|null} */
+  /** @type {import('benthic-core').Dive[]|null} */
   let dives = $state(null);
   let failed = $state(false);
 
@@ -46,7 +46,7 @@
     }
   });
 
-  /** @param {import('opendives-core').Dive} d */
+  /** @param {import('benthic-core').Dive} d */
   const title = (d) => [d.number ? t('backup.version.number', { n: d.number }) : '', d.site].filter(Boolean).join(' · ') || formatDate(d.date);
 </script>
 

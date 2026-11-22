@@ -42,7 +42,7 @@
       });
   });
 
-  /** @param {import('opendives-core').Dive} d */
+  /** @param {import('benthic-core').Dive} d */
   function rowText(d) {
     const number = t('backup.version.number', { n: d.number });
     const date = formatDate(d.date);

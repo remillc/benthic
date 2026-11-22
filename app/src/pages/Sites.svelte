@@ -9,7 +9,7 @@
   import { onDestroy, tick, untrack } from 'svelte';
   import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { cachedSites } from '../lib/core-cache.js';
   import Icon from '../components/Icon.svelte';
   import MenuButton from '../components/MenuButton.svelte';
@@ -34,13 +34,13 @@ import MapStackSheet from '../components/MapStackSheet.svelte';
 import MapSiteCard from '../components/MapSiteCard.svelte';
 import { placeAt } from '../lib/place-lookup.js';
 import { language } from '../lib/i18n.js';
-import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
 import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
 import { inYourSites, readAreaSites } from '../lib/shared-sites.js';
 import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
-import { openOdPlus } from '../lib/open-offer.svelte.js';
+import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
   let withoutSite = $state(0);
   let duplicates = $state(0);
@@ -343,7 +343,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 
   // « Mes sites | Carte commune » (task 2026-11-19-315, docs/mockups/sites-commun-android.dc.html): a signed-in Benthic+
   // account sees the shared map over its own sites. Who may read it is the server's switch: a refusal shows the offer.
-  const canCommon = $derived(odplusAccount.signedIn);
+  const canCommon = $derived(benthicPlusAccount.signedIn);
   const common = $derived(canCommon && sharedSites.mode === 'common');
   let baseBox = $state.raw(/** @type {{ mode: string, total: number, sites: import('../lib/shared-sites.js').BaseSite[], clusters: { lat: number, lon: number, count: number }[] }|null} */ (null));
   /** The base sites in the visible area, including those grouped into clusters. */
@@ -500,7 +500,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   async function load() {
     try {
       sites = await cachedSites();
-      withoutSite = (await OpenDivesCore.siteQuery({ kind: 'without' })).length;
+      withoutSite = (await BenthicCore.siteQuery({ kind: 'without' })).length;
       duplicates = (await possibleDuplicates()).length;
     } catch (e) {
       console.error('Sites', e);
@@ -608,7 +608,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {:else if baseState === 'offer'}
       <div class="bc-sites--common-offer">
         <p>{t('sharedSites.offerText')}</p>
-        <button type="button" class="bc-tonal-button" onclick={() => openOdPlus('offer')}>{t('sharedSites.offerButton')}</button>
+        <button type="button" class="bc-tonal-button" onclick={() => openBenthicPlus('offer')}>{t('sharedSites.offerButton')}</button>
       </div>
     {:else if baseState === 'failed'}
       <p class="bc-sites--area-count" role="status">{t('sharedSites.failed')}</p>

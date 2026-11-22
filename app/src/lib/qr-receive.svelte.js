@@ -3,14 +3,14 @@
 // "+" menu opens the native scanner, which hands back the raw texts of every code of one transfer;
 // they are put together (lib/qr-transfer.js), read for the preview (lib/qr-preview.js) and shown on
 // the "received" screen (components/QrReceived.svelte), where the diver adds them or not.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { logbook, importReceived } from './logbook.svelte.js';
 import { t } from './i18n.js';
 import { showSnackbar } from './snackbar.js';
 import { decodeTexts } from './qr-transfer.js';
 import { readPreview, startKey } from './qr-preview.js';
 import { openDiveById, openPlans } from './open-link.js';
-import { odplusSubscriber } from './benthic-plus-state.svelte.js';
+import { benthicPlusSubscriber } from './benthic-plus-state.svelte.js';
 import { openConfirmation, readValidationCode } from './validation.svelte.js';
 
 /**
@@ -55,10 +55,10 @@ function scanOptions() {
 
 /** "Scanner un code QR": the camera, then the received screen. */
 export async function scanQr() {
-  /** @type {import('opendives-core').QrScanResult} */
+  /** @type {import('benthic-core').QrScanResult} */
   let result;
   try {
-    result = await OpenDivesCore.qrScan(scanOptions());
+    result = await BenthicCore.qrScan(scanOptions());
   } catch (e) {
     console.error('QR scan', e);
     showSnackbar(t('qr.cameraFailed'));
@@ -76,7 +76,7 @@ export async function scanQr() {
   // A code of a dive validation (lib/validation.js): the confirmation sheet, not the received dive.
   const validation = readValidationCode(decoded.xml);
   if (validation) {
-    if (!odplusSubscriber()) showSnackbar(t('validation.confirmError.plus'));
+    if (!benthicPlusSubscriber()) showSnackbar(t('validation.confirmError.plus'));
     else openConfirmation(validation);
     return;
   }

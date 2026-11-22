@@ -6,7 +6,7 @@
   // selection". Each change of the logbook is confirmed first.
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { logbook } from '../lib/logbook.svelte.js';
   import { dismissPair, pairKey, possibleDuplicates, restorePair, siteChange } from '../lib/sites.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -20,9 +20,9 @@
   /** @type {{ f7router: any }} */
   let { f7router } = $props();
 
-  /** @type {{a: import('opendives-core').SiteSummary, b: import('opendives-core').SiteSummary, distanceM: number}[]} */
+  /** @type {{a: import('benthic-core').SiteSummary, b: import('benthic-core').SiteSummary, distanceM: number}[]} */
   let pairs = $state([]);
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let unused = $state([]);
   /** @type {Record<number, boolean>} */
   let selected = $state({});
@@ -39,21 +39,21 @@
     const done = editing;
     editing = null;
     if (done) await announceGone(done);
-    unused = (await OpenDivesCore.siteQuery({ kind: 'list' })).filter((/** @type {any} */ s) => s.dives === 0);
+    unused = (await BenthicCore.siteQuery({ kind: 'list' })).filter((/** @type {any} */ s) => s.dives === 0);
   }
 
   /** @param {{uuid: number, pairs: typeof pairs}} done */
   async function announceGone(done) {
     if (!pairsGone(done.pairs, pairs, done.uuid).length) return;
     try {
-      const site = await OpenDivesCore.siteQuery({ kind: 'site', uuid: done.uuid });
+      const site = await BenthicCore.siteQuery({ kind: 'site', uuid: done.uuid });
       showSnackbar(t('sites.editedNoDuplicate', { name: site.name || t('sites.noName') }), { timeout: 4000 });
     } catch (e) {
       console.error('Site edited', e);
     }
   }
 
-  /** @param {import('opendives-core').SiteSummary} s */
+  /** @param {import('benthic-core').SiteSummary} s */
   function edit(s) {
     editing = { uuid: s.uuid, pairs: [...pairs] };
     f7router.navigate(`/sites/${s.uuid}/edit`);
@@ -66,7 +66,7 @@
 
   const selection = $derived(unused.filter((s) => selected[s.uuid]).map((s) => s.uuid));
 
-  /** @param {import('opendives-core').SiteSummary} s */
+  /** @param {import('benthic-core').SiteSummary} s */
   const describe = (s) =>
     [s.dives ? t('sites.diveCount', { n: s.dives }) : t('sites.noDive'), s.country || t('sites.noCountry'), s.hasLocation ? t('sites.withPosition') : t('sites.withoutPosition')].join(', ');
 

@@ -20,7 +20,7 @@ export const PROFILE_SECTIONS = /** @type {const} */ ({
 /**
  * The diver's line of the profile pane (name, number of dives, first year): the main window writes it, the Mac's separate
  * profile window (it does not load the logbook) reads it.
- * @param {{ email: string, odplus: boolean, dives: { date: string }[] }} book
+ * @param {{ email: string, benthicPlus: boolean, dives: { date: string }[] }} book
  * @param {{ signedIn: boolean, email: string }} account
  * @returns {{ name: string, total: number, since: number }}
  */

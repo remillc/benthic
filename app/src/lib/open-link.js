@@ -10,7 +10,7 @@
 // (Android content://, iOS file://).
 import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { logbook, importData } from './logbook.svelte.js';
 import { replaceEligibility } from './replace-logbook.js';
 import { startReplace } from './replace-logbook-ui.js';
@@ -100,7 +100,7 @@ async function openTarget(target) {
   if (target.kind === 'site') {
     let found = false;
     try {
-      const site = await OpenDivesCore.siteQuery({ kind: 'site', uuid: target.uuid });
+      const site = await BenthicCore.siteQuery({ kind: 'site', uuid: target.uuid });
       found = !!site?.uuid;
     } catch {
       found = false;
@@ -122,21 +122,21 @@ const sharedDeps = {
     /** @type {{ remove: () => Promise<void> }|undefined} */
     let handle;
     try {
-      handle = await OpenDivesCore.addListener('stageProgress', (/** @type {{ uri: string, done: number, total: number }} */ e) => {
+      handle = await BenthicCore.addListener('stageProgress', (/** @type {{ uri: string, done: number, total: number }} */ e) => {
         if (e.uri === uri) onProgress?.(e.done, e.total);
       });
     } catch {
       // The desktop plugin has no events: the line stays indeterminate until the copy is over.
     }
     try {
-      return await OpenDivesCore.stageSharedFile({ uri });
+      return await BenthicCore.stageSharedFile({ uri });
     } finally {
       void handle?.remove();
     }
   },
-  cancelStage: (/** @type {string} */ uri) => OpenDivesCore.cancelStage({ uri }).catch(() => {}),
+  cancelStage: (/** @type {string} */ uri) => BenthicCore.cancelStage({ uri }).catch(() => {}),
   progress: importProgress,
-  core: OpenDivesCore,
+  core: BenthicCore,
   check: checkSharedFile,
   welcome: () => logbook.welcome,
   remembered: () => {
@@ -147,7 +147,7 @@ const sharedDeps = {
     }
   },
   keep: (/** @type {Record<string, any>} */ sites) => deviceStore.setItem(SITES_KEY, JSON.stringify(sites)),
-  listSites: () => OpenDivesCore.siteQuery({ kind: 'list' }),
+  listSites: () => BenthicCore.siteQuery({ kind: 'list' }),
   siteChange,
   importData,
   toFirstLaunch: (/** @type {string} */ name, /** @type {{ path: string, size: number }} */ staged, /** @type {any} */ summary) => {
@@ -241,7 +241,7 @@ export function enableDeepLinks() {
   CapacitorApp.addListener('appUrlOpen', (event) => handleLink(event.url));
   // « Share to OpenDives » (Android ACTION_SEND): the plugin keeps the event until this listener exists.
   try {
-    Promise.resolve(OpenDivesCore.addListener('sharedFile', (/** @type {{ uri: string }} */ e) => handleLink(e.uri))).catch(() => {});
+    Promise.resolve(BenthicCore.addListener('sharedFile', (/** @type {{ uri: string }} */ e) => handleLink(e.uri))).catch(() => {});
   } catch {
     // The desktop plugin has no events: nothing is shared to it.
   }

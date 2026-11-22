@@ -3,7 +3,7 @@
 // itself is lib/replace-logbook.js; the core call is replaceDeviceLogbook (lib/logbook.svelte.js).
 import { f7 } from 'framework7-svelte';
 import { Share } from '@capacitor/share';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { logbook, replaceDeviceLogbook } from './logbook.svelte.js';
 import { deviceStore } from './device-store.js';
 import { sanitiseLogbookName, logbookExportName, localDay } from './logbook-name.js';
@@ -26,7 +26,7 @@ export async function exportOpenLogbook() {
   if (!ids.length) return false;
   const name = logbookExportName(openLogbookName(), localDay(), t('desktop.export.fileLogbook'));
   const { uri, mime } = await exportFile(ids, 'ssrf', false, logbook.prefs, name);
-  await OpenDivesCore.grantShareFile({ uri, mime });
+  await BenthicCore.grantShareFile({ uri, mime });
   try {
     await Share.share({ title: name, files: [uri] });
   } catch (e) {
@@ -66,7 +66,7 @@ export async function startReplace(what) {
   try {
     return await replaceFlow(what, logbookName);
   } finally {
-    await OpenDivesCore.discardImport({ path: what.data.path }).catch(() => {});
+    await BenthicCore.discardImport({ path: what.data.path }).catch(() => {});
   }
 }
 

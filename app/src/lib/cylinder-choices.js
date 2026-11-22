@@ -1,7 +1,7 @@
 // @ts-check
 // The cylinder types offered for a default cylinder (Settings, Équipement):
 // "Aucune", then each type with its volume and working pressure.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { formatCylinderSize, formatPressure } from './format.js';
 import { t } from './i18n.js';
 
@@ -10,7 +10,7 @@ import { t } from './i18n.js';
  * @param {boolean} [withNone] false for a bailout cylinder, which is added or removed instead
  */
 export async function cylinderChoices(prefs, withNone = true) {
-  const { types } = await OpenDivesCore.cylinderTypes({ action: 'list' });
+  const { types } = await BenthicCore.cylinderTypes({ action: 'list' });
   return [
     ...(withNone ? [{ value: '', label: t('settings.defaultCylinder.none'), example: t('settings.defaultCylinder.noneText') }] : []),
     ...types.map((type) => ({

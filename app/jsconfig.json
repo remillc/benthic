@@ -9,8 +9,8 @@
     "noEmit": true,
     "skipLibCheck": true,
     "paths": {
-      "opendives-core": ["../plugins/opendives-core/core-api.js"]
+      "benthic-core": ["../plugins/benthic-core/core-api.js"]
     }
   },
-  "include": ["src/**/*.js", "src/**/*.svelte", "src/**/*.d.ts", "../plugins/opendives-core/core-api.js"]
+  "include": ["src/**/*.js", "src/**/*.svelte", "src/**/*.d.ts", "../plugins/benthic-core/core-api.js"]
 }

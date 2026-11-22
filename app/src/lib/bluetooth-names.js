@@ -8,7 +8,7 @@
 
 /**
  * The prefixes of two or three characters in the core's table of names
- * (core/libopendives/download.cpp, namePattern), with the model each one gives.
+ * (core/libbenthic/download.cpp, namePattern), with the model each one gives.
  * Longer prefixes ("Perdix", "Teric", "OSTC", "Predator", "Sirius", "Puck",
  * "COSMIQ", "EON Core"...) name a product on their own and are not affected; the
  * names built on a pattern (Pelagic "FQ123456", Ratio, Cressi "2_00af") are

@@ -11,7 +11,7 @@
   import { onMount, tick } from 'svelte';
   import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import ChoiceRow from '../components/ChoiceRow.svelte';
   import TextField from '../components/TextField.svelte';
@@ -73,7 +73,7 @@
     ? '--f7-popup-tablet-width: min(780px, calc(100vw - 48px)); --f7-popup-tablet-height: min(740px, calc(100vh - 48px));'
     : `--f7-popup-tablet-width: calc(100vw - ${navWidth}px - 32px); --f7-popup-tablet-height: calc(100vh - 32px); left: calc(50% + ${navWidth / 2}px);`;
 
-  /** @type {import('opendives-core').DiveDetail|null} */
+  /** @type {import('benthic-core').DiveDetail|null} */
   let dive = $state(null);
   // Release edition (task 2026-11-17-267): what this dive used from the equipment inventory, edited here and
   // saved with the dive; and the computer being renamed.
@@ -184,7 +184,7 @@
   let initialWeights = '';
 
   let known = $state({ guide: /** @type {string[]} */ ([]), buddy: /** @type {string[]} */ ([]), tag: /** @type {string[]} */ ([]), suit: /** @type {string[]} */ ([]) });
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
   /** Cylinder types (Settings, Bouteilles): name, size, working pressure. */
   let cylinderTypes = $state(/** @type {{ name: string, ml: number, workingPressureMbar: number }[]} */ ([]));
@@ -194,7 +194,7 @@
   /** @type {'date'|'time'|null} */
   let dialog = $state(null);
 
-  /** @param {import('opendives-core').Cylinder} c */
+  /** @param {import('benthic-core').Cylinder} c */
   function cylinderTexts(c) {
     return {
       description: c.description,
@@ -211,7 +211,7 @@
 
   onMount(async () => {
     try {
-      const d = await OpenDivesCore.getDive({ id: Number(f7route.params.id) });
+      const d = await BenthicCore.getDive({ id: Number(f7route.params.id) });
       // Release edition: the inventory is read before the form shows (it awaits).
       if (isRelease) {
         await loadInventory();
@@ -256,15 +256,15 @@
       console.error('Edit dive', e);
       failed = true;
     }
-    OpenDivesCore.siteQuery({ kind: 'list' })
-      .then((/** @type {import('opendives-core').SiteSummary[]} */ list) => {
+    BenthicCore.siteQuery({ kind: 'list' })
+      .then((/** @type {import('benthic-core').SiteSummary[]} */ list) => {
         sites = list;
       })
       .catch((/** @type {unknown} */ e) => console.error('Sites', e));
-    OpenDivesCore.toolQuery({ kind: 'cylinders' })
-      .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => (cylinderTypes = list.types))
+    BenthicCore.toolQuery({ kind: 'cylinders' })
+      .then((/** @type {import('benthic-core').GasCylinderTypes} */ list) => (cylinderTypes = list.types))
       .catch((/** @type {unknown} */ e) => console.error('Cylinder types', e));
-    OpenDivesCore.toolQuery({ kind: 'weights' })
+    BenthicCore.toolQuery({ kind: 'weights' })
       .then((/** @type {{ types: { name: string, grams: number }[] }} */ list) => (weightTypes = list.types))
       .catch((/** @type {unknown} */ e) => console.error('Weight types', e));
   });
@@ -276,12 +276,12 @@
   let sources = $state([]);
   /** The dive as the rule sees it now: the form, not only the saved dive. */
   const ruleDive = $derived({
-    id: /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.id ?? -1,
+    id: /** @type {import('benthic-core').DiveDetail|null} */ (dive)?.id ?? -1,
     suit: f.suit ?? '',
-    waterType: f.waterType || /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.waterType || '',
+    waterType: f.waterType || /** @type {import('benthic-core').DiveDetail|null} */ (dive)?.waterType || '',
     // Capacity, not name: the saved size while the size fields are untouched, else the typed size.
     cylinders: cylinders.map((c) => {
-      const saved = c.index >= 0 ? /** @type {import('opendives-core').DiveDetail|null} */ (dive)?.cylinders[c.index] : undefined;
+      const saved = c.index >= 0 ? /** @type {import('benthic-core').DiveDetail|null} */ (dive)?.cylinders[c.index] : undefined;
       if (saved && c.f.size === c.initial.size && c.f.workingPressure === c.initial.workingPressure) return { sizeMl: saved.sizeMl };
       const size = parseNumber(c.f.size ?? '');
       const wp = c.f.workingPressure?.trim() ? pressureMbar(parseNumber(c.f.workingPressure)) : 0;
@@ -300,7 +300,7 @@
     let ids = null;
     if (current.suit.trim()) {
       try {
-        const found = await OpenDivesCore.filterQuery({ kind: 'dives', rules: [{ type: 'suit', stringMode: 'exact', data: `${current.suit}\n` }] });
+        const found = await BenthicCore.filterQuery({ kind: 'dives', rules: [{ type: 'suit', stringMode: 'exact', data: `${current.suit}\n` }] });
         ids = new Set(found);
       } catch (e) {
         console.error('Weight suggestion', e);
@@ -315,7 +315,7 @@
           let source = sourceCache.get(d.id);
           if (!source) {
             try {
-              const detail = await OpenDivesCore.getDive({ id: d.id });
+              const detail = await BenthicCore.getDive({ id: d.id });
               source = { id: d.id, number: d.number, date: detail.date, suit: detail.suit ?? '', waterType: detail.waterType ?? '', cylinders: detail.cylinders, tags: detail.tags, weights: detail.weights };
               sourceCache.set(d.id, source);
             } catch (e) {
@@ -525,7 +525,7 @@
 
   /**
    * What the recognised text blocks mean as pressures.
-   * @param {import('opendives-core').GaugeTextBlock[]} blocks
+   * @param {import('benthic-core').GaugeTextBlock[]} blocks
    * @param {'bar'|'psi'} userUnit
    */
   const gaugeDecide = (blocks, userUnit) => readGauges(blocks, { userUnit });
@@ -1471,7 +1471,7 @@
       renaming = null;
       // The dive's computers, read again under their new name.
       try {
-        if (dive) dive = { ...dive, diveComputers: (await OpenDivesCore.getDive({ id: dive.id })).diveComputers };
+        if (dive) dive = { ...dive, diveComputers: (await BenthicCore.getDive({ id: dive.id })).diveComputers };
       } catch (e) {
         console.error('Reading the computers again', e);
       }

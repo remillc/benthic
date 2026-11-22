@@ -109,7 +109,7 @@ test('first launch: the row sits in « Importer un carnet », is shown only with
   assert.match(rows, /welcomeSteps\.alphaHelpDated/);
   // The same name step and the same import as a picked file.
   assert.match(steps, /flow\.source = \{ kind: 'staged', path: staged\.path, fileName: staged\.name, name, summary: summariseScan\(found\.dives, scan\), alpha: true \};\s*flow\.name = name;\s*go\('file'\);/);
-  assert.match(steps, /findAlphaLogbooks\(OpenDivesCore, deviceStore, isRelease\)/);
+  assert.match(steps, /findAlphaLogbooks\(BenthicCore, deviceStore, isRelease\)/);
   const created = steps.slice(steps.indexOf('await createDeviceLogbook('), steps.indexOf('resetFlow();', steps.indexOf('await createDeviceLogbook(')));
   assert.match(created, /if \(flow\.source\?\.alpha\) markAlphaImportDone\(deviceStore\);/);
   // Nothing sends, signs out or deletes in the module that reads the alpha's copy.
@@ -124,12 +124,12 @@ test('first launch: the row sits in « Importer un carnet », is shown only with
 test('the plugin exposes the cache read-only on every platform, and its folder name cannot leave the cache', () => {
   const root = new URL('../../', import.meta.url);
   const text = (p) => readFileSync(new URL(p, root), 'utf8');
-  assert.match(text('plugins/opendives-core/core-api.js'), /alphaCacheList[\s\S]*alphaCacheOpen/);
-  assert.match(text('plugins/opendives-core/android/src/main/java/org/opendives/core/OpenDivesCorePlugin.kt'), /fun alphaCache\(/);
-  assert.match(text('plugins/opendives-core/ios/Plugin/OpenDivesCorePlugin.swift'), /name: "alphaCache"[\s\S]*@objc func alphaCache\(/);
-  assert.match(text('plugins/opendives-core/desktop.js'), /async alphaCache\(/);
+  assert.match(text('plugins/benthic-core/core-api.js'), /alphaCacheList[\s\S]*alphaCacheOpen/);
+  assert.match(text('plugins/benthic-core/android/src/main/java/app/benthicdivelog/core/BenthicCorePlugin.kt'), /fun alphaCache\(/);
+  assert.match(text('plugins/benthic-core/ios/Plugin/BenthicCorePlugin.swift'), /name: "alphaCache"[\s\S]*@objc func alphaCache\(/);
+  assert.match(text('plugins/benthic-core/desktop.js'), /async alphaCache\(/);
   assert.match(text('desktop/bridge.cjs'), /'alphaCacheList', 'alphaCacheOpen'/);
   assert.match(text('desktop/host/host.cpp'), /add\("alphaCacheList"[\s\S]*add\("alphaCacheOpen"/);
-  const facade = text('core/libopendives/opendives.cpp');
+  const facade = text('core/libbenthic/benthic.cpp');
   assert.match(facade, /alpha_cache_valid_id/);
 });

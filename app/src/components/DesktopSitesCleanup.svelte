@@ -17,7 +17,7 @@
   import { desktopMac } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** @typedef {import('opendives-core').SiteSummary} Site */
+  /** @typedef {import('benthic-core').SiteSummary} Site */
 
   /**
    * @type {{

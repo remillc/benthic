@@ -4,8 +4,8 @@
 // tablet and the desktop. The actions themselves are `mergeDives` and
 // `editDivesTogether` of lib/logbook.svelte.js, which call the core.
 
-/** @typedef {import('opendives-core').Dive} Dive */
-/** @typedef {import('opendives-core').DiveDetail} DiveDetail */
+/** @typedef {import('benthic-core').Dive} Dive */
+/** @typedef {import('benthic-core').DiveDetail} DiveDetail */
 
 /** The longest surface interval between two dives that can be merged, in seconds. */
 export const MERGE_MAX_GAP_SECONDS = 60 * 60;

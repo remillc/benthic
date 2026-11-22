@@ -3,7 +3,7 @@
   // The fields of the desktop detail pane's tabs Informations, Équipement, Gaz and Notes, edited in
   // place (tasks 2026-11-15-172, 184, 191). Each field is a <DesktopEditField>; a value kept is written
   // at once through the same core edit function as the phone's editor (saveDiveChanges →
-  // OpenDivesCore.editDive), one undoable step, so Ctrl/⌘+Z undoes it. What the dive computer
+  // BenthicCore.editDive), one undoable step, so Ctrl/⌘+Z undoes it. What the dive computer
   // recorded is plain text, editable only on a dive logged by hand (lib/desktop-edit.js).
   import { untrack } from 'svelte';
   import { cachedCylinderTypes, cachedPlannerSetup, cachedSites, cachedValues } from '../lib/core-cache.js';
@@ -43,9 +43,9 @@
    * `tab`: 'info', 'equipment', 'gas', 'notes' or 'map'. `location` and `trip` are the read-only lines of
    * the Informations tab; `sac` and `gasChanges` those of the Gaz tab.
    * @type {{
-   *   dive: import('opendives-core').DiveDetail,
+   *   dive: import('benthic-core').DiveDetail,
    *   tab: 'info'|'equipment'|'gas'|'notes'|'map',
-   *   prefs: import('opendives-core').Prefs,
+   *   prefs: import('benthic-core').Prefs,
    *   trip?: string,
    *   sac?: string,
    *   gasChanges?: string,
@@ -90,7 +90,7 @@
     if (isRelease && tab === 'equipment') untrack(() => loadInventory().catch((e) => console.error('Inventory', e)));
   });
 
-  /** @type {import('opendives-core').SiteSummary[]} */
+  /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
   let known = $state({ buddy: /** @type {{ key: string, dives: number }[]} */ ([]), guide: /** @type {{ key: string, dives: number }[]} */ ([]), tag: /** @type {{ key: string, dives: number }[]} */ ([]) });
   let cylinderTypes = $state(/** @type {{ name: string, ml: number, workingPressureMbar: number }[]} */ ([]));
@@ -123,7 +123,7 @@
   }
   function loadCylinderTypes() {
     cachedCylinderTypes()
-      .then((/** @type {import('opendives-core').GasCylinderTypes} */ list) => (cylinderTypes = list.types))
+      .then((/** @type {import('benthic-core').GasCylinderTypes} */ list) => (cylinderTypes = list.types))
       .catch((/** @type {unknown} */ e) => console.error('Cylinder types', e));
   }
   // Each tab reads what it shows when it is first shown; the cache makes a second tab or dive free.
@@ -270,7 +270,7 @@
     [rows[from], rows[to]] = [rows[to], rows[from]];
     return saveCylinders(rows);
   }
-  /** @param {import('opendives-core').Cylinder} c */
+  /** @param {import('benthic-core').Cylinder} c */
   const typeOptions = (c) => {
     const list = cylinderTypes.map((x) => ({ value: x.name, label: cylinderTypeLabel(x.name) }));
     if (c.description && !list.some((o) => o.value === c.description)) list.unshift({ value: c.description, label: cylinderTypeLabel(c.description) });
@@ -281,7 +281,7 @@
     const type = cylinderTypes.find((x) => x.name === name);
     return saveCylinder(index, type ? { description: name, sizeMl: type.ml, workingPressureMbar: type.workingPressureMbar } : { description: name });
   }
-  /** The mix of a cylinder: always both parts, as the phone's editor sends them. @param {number} index @param {import('opendives-core').Cylinder} c @param {{ o2?: string, he?: string }} typed */
+  /** The mix of a cylinder: always both parts, as the phone's editor sends them. @param {number} index @param {import('benthic-core').Cylinder} c @param {{ o2?: string, he?: string }} typed */
   function saveGas(index, c, typed) {
     const o2 = typed.o2 !== undefined ? parseTyped(typed.o2) * 10 : c.o2Permille || 210;
     const he = typed.he !== undefined ? parseTyped(typed.he) * 10 : c.hePermille;
@@ -328,7 +328,7 @@
     const mbar = (/** @type {number} */ v) => (v ? pressureMbarOf(String(v), prefs) : 0);
     return saveCylinder(index, { startMbar: mbar(pair.start), endMbar: mbar(pair.end) });
   }
-  /** « 232 → 70 » as the Pression field holds it. @param {import('opendives-core').Cylinder} c */
+  /** « 232 → 70 » as the Pression field holds it. @param {import('benthic-core').Cylinder} c */
   const pairText = (c) => (c.startMbar ? `${pressureText(c.startMbar)}${c.endMbar ? ` → ${pressureText(c.endMbar)}` : ''}` : '');
   const pairOk = (/** @type {string} */ text) => !text.trim() || parsePressurePair(text) !== null;
   const mixOk = (/** @type {string} */ text) => parseGas(text) !== null;
@@ -415,7 +415,7 @@
       <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
       <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
     {:else if equipment}
-      <!-- Without an OpenDives+ account the list shows, with the chip, and cannot change. -->
+      <!-- Without an Benthic+ account the list shows, with the chip, and cannot change. -->
       <DesktopOtherGear items={otherItems} locked />
     {:else}
       <!-- Alpha edition: the list is not stored anywhere. -->

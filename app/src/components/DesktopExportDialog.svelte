@@ -20,7 +20,7 @@
 
   /**
    * @type {{
-   *   selected: import('opendives-core').Dive[],
+   *   selected: import('benthic-core').Dive[],
    *   filtered: number[]|null,
    *   all: number[],
    *   prefs: any,
@@ -79,7 +79,7 @@
       }
       const name = exportFileName(/** @type {any} */ (scope), numbers, format, day, { dives: t('desktop.export.fileDives'), logbook: t('desktop.export.fileLogbook') }, entry ? displayName(entry, t) : '');
       const { uri } = await exportFile(ids, format, anonymize, prefs, name, showName);
-      const result = await /** @type {any} */ (window).odDesktop.saveAs({ path: uri, name });
+      const result = await /** @type {any} */ (window).benthicDesktop.saveAs({ path: uri, name });
       onclose();
       if (result?.saved) showSnackbar(t('desktop.export.saved', { n: ids.length }));
     } catch (e) {

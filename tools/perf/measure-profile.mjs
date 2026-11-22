@@ -22,7 +22,7 @@ delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(`${MAIN}/desktop/node_modules/electron/dist/electron.exe`, [path.join(root, 'desktop'), `--remote-debugging-port=${process.env.CDP_PORT || 9391}`, "--disable-features=CalculateNativeWinOcclusion", "--disable-backgrounding-occluded-windows", path.resolve(ssrf)], { env, stdio: 'ignore' });
 const p = await attachLogbook();
 await sleep(3000);
-await p.eval(`(async()=>{const mod=await import('/@fs/${root.replace(/\\/g, '/')}/plugins/opendives-core/desktop.js');window.__calls=[];const proto=mod.OpenDivesCoreDesktop.prototype;proto.__orig=proto.core;
+await p.eval(`(async()=>{const mod=await import('/@fs/${root.replace(/\\/g, '/')}/plugins/benthic-core/desktop.js');window.__calls=[];const proto=mod.BenthicCoreDesktop.prototype;proto.__orig=proto.core;
  proto.core=async function(method,args){const t=performance.now();let size=-1;try{const r=await proto.__orig.call(this,method,args);size=typeof r==='string'?r.length:JSON.stringify(r??null).length;return r}finally{window.__calls.push({method,resultBytes:size,ms:Math.round(performance.now()-t)})}};
  window.__lt=[];new PerformanceObserver(l=>{for(const e of l.getEntries())window.__lt.push(Math.round(e.duration))}).observe({type:'longtask',buffered:true});
  window.__frames=(n=2)=>new Promise(r=>{const f=()=>--n<=0?r():requestAnimationFrame(f);requestAnimationFrame(f)})})()`);

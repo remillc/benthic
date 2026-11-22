@@ -11,7 +11,7 @@
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import LeaveGuard from '../components/LeaveGuard.svelte';
@@ -31,14 +31,14 @@
   const original = f7route.query?.name ?? '';
   const editing = !!original;
 
-  /** @type {import('opendives-core').CylinderType|null} */
+  /** @type {import('benthic-core').CylinderType|null} */
   let type = $state(null);
   let name = $state(original);
   let volume = $state('');
   let pressure = $state('');
   let error = $state('');
   let saving = $state(false);
-  /** What deleting the type does to the dives, read once the type is open. @type {import('opendives-core').CylinderTypeDeletion|null} */
+  /** What deleting the type does to the dives, read once the type is open. @type {import('benthic-core').CylinderTypeDeletion|null} */
   let deletion = $state(null);
 
   const cuft = $derived(logbook.prefs.volume === 'cuft');
@@ -58,7 +58,7 @@
   onMount(async () => {
     if (!editing) return;
     try {
-      const { types } = await OpenDivesCore.cylinderTypes({ action: 'list' });
+      const { types } = await BenthicCore.cylinderTypes({ action: 'list' });
       type = types.find((ty) => ty.name === original) ?? null;
       if (!type) return;
       if (deletable(type)) deletion = await previewCylinderTypeDeletion(original).catch(() => null);
@@ -112,7 +112,7 @@
     saving = true;
     try {
       if (!editing) {
-        keepCylinderLibrary((await OpenDivesCore.cylinderTypes({ action: 'add', name: trimmed, ...size })).library);
+        keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'add', name: trimmed, ...size })).library);
       } else {
         let current = original;
         if (trimmed !== original) {
@@ -120,7 +120,7 @@
           current = trimmed;
         }
         if (!type || size.ml !== type.ml || size.mbar !== type.mbar)
-          keepCylinderLibrary((await OpenDivesCore.cylinderTypes({ action: 'size', name: current, ...size })).library);
+          keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'size', name: current, ...size })).library);
       }
       f7router.back();
     } catch (e) {
@@ -185,7 +185,7 @@
       action: t('settings.cylinders.deleteAction'),
       onConfirm: async () => {
         try {
-          keepCylinderLibrary((await OpenDivesCore.cylinderTypes({ action: 'remove', name: original })).library);
+          keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'remove', name: original })).library);
           f7router.back();
         } catch (e) {
           failure(e);

@@ -9,7 +9,7 @@
   import Md3Dialog from './Md3Dialog.svelte';
   import TextField from './TextField.svelte';
   import Icon from './Icon.svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { t } from '../lib/i18n.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -21,7 +21,7 @@
 
   /**
    * @type {{
-   *   type: import('opendives-core').CylinderType|null,
+   *   type: import('benthic-core').CylinderType|null,
    *   oncancel: () => void,
    *   ondone: () => void,
    * }}
@@ -45,7 +45,7 @@
   let pressure = $state(start.pressure);
   let error = $state('');
   let saving = $state(false);
-  /** What deleting the type does to the dives. @type {import('opendives-core').CylinderTypeDeletion|null} */
+  /** What deleting the type does to the dives. @type {import('benthic-core').CylinderTypeDeletion|null} */
   let deletion = $state(null);
 
   onMount(async () => {
@@ -102,14 +102,14 @@
     saving = true;
     try {
       if (!type) {
-        keepCylinderLibrary((await OpenDivesCore.cylinderTypes({ action: 'add', name: trimmed, ...size })).library);
+        keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'add', name: trimmed, ...size })).library);
       } else {
         let current = original;
         if (trimmed !== original) {
           await renameCylinderType(original, trimmed);
           current = trimmed;
         }
-        if (size.ml !== type.ml || size.mbar !== type.mbar) keepCylinderLibrary((await OpenDivesCore.cylinderTypes({ action: 'size', name: current, ...size })).library);
+        if (size.ml !== type.ml || size.mbar !== type.mbar) keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'size', name: current, ...size })).library);
       }
       ondone();
     } catch (e) {
@@ -151,7 +151,7 @@
       action: t('settings.cylinders.deleteAction'),
       onConfirm: async () => {
         try {
-          keepCylinderLibrary((await OpenDivesCore.cylinderTypes({ action: 'remove', name: original })).library);
+          keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'remove', name: original })).library);
           ondone();
         } catch (e) {
           failure(e);

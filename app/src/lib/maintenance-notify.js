@@ -4,7 +4,7 @@
 // them (from Réglages › Notifications); the function installed here cancels what was scheduled and schedules the plan.
 //   Phone and tablet: local notifications (@capacitor/local-notifications), with the buttons « Voir » and
 //   « Noter l'entretien » (or « Me le rappeler dans 1 semaine » when late).
-//   Desktop (Electron): the main process shows them while the app runs (desktop/notifications.cjs, `odDesktop.notifications`);
+//   Desktop (Electron): the main process shows them while the app runs (desktop/notifications.cjs, `benthicDesktop.notifications`);
 //   a notification cannot be scheduled while the app is closed there.
 // The flight reminder is apart (lib/flight-reminder.svelte.js): it comes when the wait ends, not at 9:00.
 import { Capacitor } from '@capacitor/core';

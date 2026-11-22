@@ -4,7 +4,7 @@
 // the component (components/DesktopLogbookTable.svelte) formats and draws.
 
 /**
- * The extra values of a dive for the table (the core's dive_columns, opendives.h).
+ * The extra values of a dive for the table (the core's dive_columns, benthic.h).
  * @typedef {{id: number, waterTempMk: number, airTempMk: number, meanDepthMm: number, sacMlMin: number,
  *   rating: number, buddies: string[], guides: string[], computer: string, suit: string, gases: string[],
  *   tags: string[], divemode: string, country: string}} DiveColumns
@@ -13,7 +13,7 @@
 /**
  * @typedef {{key: string, label: string, numeric: boolean, defaultShown: boolean,
  *   sortable?: boolean,
- *   value: (dive: import('opendives-core').Dive, extra: DiveColumns|undefined) => string|number}} Column
+ *   value: (dive: import('benthic-core').Dive, extra: DiveColumns|undefined) => string|number}} Column
  */
 
 /** Text of a list for sorting: « Anne, Marc ». */
@@ -203,15 +203,15 @@ const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: tr
 /**
  * The dives sorted by `sort`; ties keep the logbook's order (date, then number), newest first.
  * Empty text sorts last whatever the direction, so that « Site à préciser » never heads the list.
- * @param {import('opendives-core').Dive[]} dives
+ * @param {import('benthic-core').Dive[]} dives
  * @param {Map<number, DiveColumns>} extras
  * @param {Sort} sort
- * @returns {import('opendives-core').Dive[]}
+ * @returns {import('benthic-core').Dive[]}
  */
 export function sortDives(dives, extras, sort) {
   const column = COLUMNS.find((c) => c.key === sort.key) ?? COLUMNS[1];
   const sign = sort.descending ? -1 : 1;
-  const tie = (/** @type {import('opendives-core').Dive} */ a, /** @type {import('opendives-core').Dive} */ b) =>
+  const tie = (/** @type {import('benthic-core').Dive} */ a, /** @type {import('benthic-core').Dive} */ b) =>
     b.date.localeCompare(a.date) || b.number - a.number;
   return [...dives].sort((a, b) => {
     const va = column.value(a, extras.get(a.id));
@@ -226,8 +226,8 @@ export function sortDives(dives, extras, sort) {
 }
 
 /**
- * @typedef {{type: 'dive', dive: import('opendives-core').Dive, inTrip: boolean, last?: boolean}
- *   | {type: 'trip', id: number, location: string, dives: import('opendives-core').Dive[], expanded: boolean}} TableRow
+ * @typedef {{type: 'dive', dive: import('benthic-core').Dive, inTrip: boolean, last?: boolean}
+ *   | {type: 'trip', id: number, location: string, dives: import('benthic-core').Dive[], expanded: boolean}} TableRow
  */
 
 /**
@@ -235,14 +235,14 @@ export function sortDives(dives, extras, sort) {
  * expandable trip row (at the place of its first dive in that order); sorted by any other
  * column, the rows are the dives alone, since a trip's dives no longer follow each other.
  * A trip of one dive is no trip: its dive is a row of its own, as in the phone's logbook (lib/trip-shown.js).
- * @param {import('opendives-core').Dive[]} sorted
+ * @param {import('benthic-core').Dive[]} sorted
  * @param {Sort} sort
  * @param {Record<number, boolean>} collapsed trips the diver folded, by trip id
  * @returns {TableRow[]}
  */
 export function tableRows(sorted, sort, collapsed) {
   if (sort.key !== 'date' && sort.key !== 'number') return sorted.map((dive) => ({ type: 'dive', dive, inTrip: false }));
-  /** @type {Map<number, import('opendives-core').Dive[]>} */
+  /** @type {Map<number, import('benthic-core').Dive[]>} */
   const byTrip = new Map();
   for (const d of sorted) {
     if (!d.trip) continue;
@@ -397,7 +397,7 @@ export function emptyAreaMenuEntries({ mac, canPaste }) {
 /**
  * What the detail pane says for several dives: their numbers (« 6 et 7 », « 2, 5 et 9 »,
  * long lists shortened by the caller), the time under water and the deepest depth.
- * @param {import('opendives-core').Dive[]} dives
+ * @param {import('benthic-core').Dive[]} dives
  * @returns {{count: number, numbers: number[], seconds: number, maxDepthMm: number}}
  */
 export function selectionSummary(dives) {
@@ -437,7 +437,7 @@ export function tableWidthFor(stored, available) {
  * précédent / suivant »): in the logbook's order, newest first, the selection must be one run
  * of consecutive dives; « previous » is the trip of the dive just above it (more recent), « next »
  * that of the dive just below, each only when the run is not already in that trip.
- * @param {import('opendives-core').Dive[]} dives every dive of the logbook
+ * @param {import('benthic-core').Dive[]} dives every dive of the logbook
  * @param {number[]} ids the selected dives
  * @returns {{previous: {id: number, location: string}|null, next: {id: number, location: string}|null}}
  */
@@ -452,7 +452,7 @@ export function adjacentTrips(dives, ids) {
   const last = at[at.length - 1];
   if (last - first + 1 !== at.length) return none;
   const inside = new Set(order.slice(first, last + 1).map((d) => d.trip?.id ?? null));
-  /** @param {import('opendives-core').Dive|undefined} d */
+  /** @param {import('benthic-core').Dive|undefined} d */
   const tripOf = (d) => (d?.trip && !(inside.size === 1 && inside.has(d.trip.id)) ? { id: d.trip.id, location: d.trip.location } : null);
   return { previous: tripOf(order[first - 1]), next: tripOf(order[last + 1]) };
 }
@@ -543,7 +543,7 @@ export const showsYearLine = (sort) => sort.key === 'date' || sort.key === 'numb
 
 /**
  * How many of the listed dives each year holds.
- * @param {import('opendives-core').Dive[]} dives
+ * @param {import('benthic-core').Dive[]} dives
  * @returns {Map<string, number>}
  */
 export function yearCounts(dives) {

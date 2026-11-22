@@ -57,11 +57,11 @@ test('the text goes to the core as base64 of its UTF-8 bytes', () => {
 
 test('the clipboard of the desktop bridge is read for dives', async () => {
   const xml = '<divelog program="subsurface"></divelog>';
-  globalThis.window = { odDesktop: { clipboard: { read: async () => ({ text: 'x', dives: xml }) } } };
+  globalThis.window = { benthicDesktop: { clipboard: { read: async () => ({ text: 'x', dives: xml }) } } };
   assert.equal(await clipboardDives(), xml);
-  globalThis.window = { odDesktop: { clipboard: { read: async () => ({ text: 'N°\tDate', dives: '' }) } } };
+  globalThis.window = { benthicDesktop: { clipboard: { read: async () => ({ text: 'N°\tDate', dives: '' }) } } };
   assert.equal(await clipboardDives(), '');
-  globalThis.window = { odDesktop: { clipboard: { read: async () => Promise.reject(new Error('gone')) } } };
+  globalThis.window = { benthicDesktop: { clipboard: { read: async () => Promise.reject(new Error('gone')) } } };
   assert.equal(await clipboardDives(), '');
 });
 

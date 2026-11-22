@@ -2,9 +2,9 @@
 // The checks of the account and git repository forms, run as the diver types (forms are
 // validated live, Christian's rule of 14 November 2026). The same rules as the C++ façade,
 // which keeps its own copy as a guard before credentials go to the cloud or to libgit2:
-// cloud_valid_email and cloud_valid_password (core/libopendives/account.cpp), and
+// cloud_valid_email and cloud_valid_password (core/libbenthic/account.cpp), and
 // normalise_git_url, valid_git_username, valid_git_token, valid_git_branch
-// (core/libopendives/opendives.cpp). A rule changed here changes there too.
+// (core/libbenthic/benthic.cpp). A rule changed here changes there too.
 
 /** The cloud's e-mail syntax: RFC 5321 lengths, then Subsurface's pattern. */
 const EMAIL = /^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.+_-]+\.[a-zA-Z0-9+_-]{2,}$/;

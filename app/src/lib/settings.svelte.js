@@ -9,7 +9,7 @@
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
 import { deviceStore } from './device-store.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { invalidateCoreCache } from './core-cache.js';
 import { impliedPpUnit, systemAfterPpUnit, ppUnitAfterReset } from './pp-unit.js';
 import { DEFAULT_STRESS_FACTOR, DEFAULT_DIVERS, coreSacFactor, reserveSettings } from './reserve-factor.js';
@@ -24,7 +24,7 @@ const COMPUTERS_KEY = 'od.diveComputers';
 /** The units set one by one (Subsurface's "personalize" system). */
 const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'volume', 'weight']);
 
-/** @typedef {import('opendives-core').CorePrefValues} CorePrefValues */
+/** @typedef {import('benthic-core').CorePrefValues} CorePrefValues */
 
 /**
  * @typedef {Object} AppSettings
@@ -194,16 +194,16 @@ export function applyDeviceSettings() {
   delete storedCore.threeMGrid;
   // A value refused by this core (an older version kept something else): the others are kept.
   if (Object.keys(storedCore).length) {
-    send('Restoring the settings of this device', () => OpenDivesCore.setPrefs({ changes: storedCore }));
+    send('Restoring the settings of this device', () => BenthicCore.setPrefs({ changes: storedCore }));
   }
   const computers = readJson(COMPUTERS_KEY);
   if (Array.isArray(computers)) {
-    send('Restoring the dive computers of this device', () => OpenDivesCore.setPrefs({ changes: { diveComputerList: computers } }));
+    send('Restoring the dive computers of this device', () => BenthicCore.setPrefs({ changes: { diveComputerList: computers } }));
   }
   const library = readJson(LIBRARY_KEY);
   if (Array.isArray(library)) {
     send('Restoring the cylinder types of this device', () =>
-      OpenDivesCore.cylinderTypes({ action: 'library', value: JSON.stringify({ library }) }),
+      BenthicCore.cylinderTypes({ action: 'library', value: JSON.stringify({ library }) }),
     );
   }
   return Promise.all(calls).then(() => {});
@@ -216,9 +216,9 @@ export function applyDeviceSettings() {
  */
 export async function prefsAfterLoad() {
   if (Object.keys(storedCore).length) {
-    await OpenDivesCore.setPrefs({ changes: storedCore }).catch((/** @type {unknown} */ e) => console.error('Restoring the settings of this device', e));
+    await BenthicCore.setPrefs({ changes: storedCore }).catch((/** @type {unknown} */ e) => console.error('Restoring the settings of this device', e));
   }
-  return OpenDivesCore.getPrefs();
+  return BenthicCore.getPrefs();
 }
 
 /**
@@ -226,10 +226,10 @@ export async function prefsAfterLoad() {
  * @param {Partial<CorePrefValues>} changes
  */
 export async function setCorePrefs(changes) {
-  await OpenDivesCore.setPrefs({ changes });
+  await BenthicCore.setPrefs({ changes });
   invalidateCoreCache(); // the planner's setup follows the preferences
   // Changing one unit makes the system "personalize" in the core: kept too.
-  const prefs = await OpenDivesCore.getPrefs();
+  const prefs = await BenthicCore.getPrefs();
   Object.assign(storedCore, changes);
   // A chosen system replaces the units kept one by one: restored later, they would override it.
   if (changes.unitSystem && changes.unitSystem !== 'personalize') for (const key of UNIT_KEYS) if (!(key in changes)) delete storedCore[key];
@@ -259,7 +259,7 @@ export async function setCorePrefs(changes) {
  */
 export async function setPpUnit(ppUnit) {
   setAppSetting('ppUnit', ppUnit);
-  const prefs = await OpenDivesCore.getPrefs();
+  const prefs = await BenthicCore.getPrefs();
   if (systemAfterPpUnit(prefs.unitSystem, ppUnit) === prefs.unitSystem) return prefs;
   const changes = /** @type {Partial<CorePrefValues>} */ ({ unitSystem: 'personalize' });
   for (const key of UNIT_KEYS) /** @type {any} */ (changes)[key] = prefs[key];
@@ -274,19 +274,19 @@ export async function setPpUnit(ppUnit) {
  * @param {(keyof CorePrefValues)[]} keys
  */
 export async function resetCorePrefs(keys) {
-  const { defaults } = await OpenDivesCore.getPrefs();
+  const { defaults } = await BenthicCore.getPrefs();
   if (!defaults) return;
   /** @type {Partial<CorePrefValues>} */
   const changes = Object.fromEntries(keys.map((key) => [key, defaults[key]]));
-  await OpenDivesCore.setPrefs({ changes });
+  await BenthicCore.setPrefs({ changes });
   for (const key of keys) delete storedCore[key];
   writeJson(CORE_KEY, storedCore);
 }
 
 /** Forgets one remembered dive computer (slot 1 to 4), or all of them (0). @param {number} slot */
 export async function forgetDiveComputers(slot) {
-  await OpenDivesCore.setPrefs({ changes: { forgetDiveComputer: slot } });
-  const prefs = await OpenDivesCore.getPrefs();
+  await BenthicCore.setPrefs({ changes: { forgetDiveComputer: slot } });
+  const prefs = await BenthicCore.getPrefs();
   if (prefs.diveComputerList) keepDiveComputers(prefs.diveComputerList);
   return prefs;
 }
@@ -332,7 +332,7 @@ export function setAppSetting(key, value) {
  * @param {Partial<CorePrefValues>} defaults
  */
 export async function resetAllSettings(defaults) {
-  await OpenDivesCore.setPrefs({ changes: { ...coreResetChanges(defaults), ...OD_CORE_DEFAULTS } });
+  await BenthicCore.setPrefs({ changes: { ...coreResetChanges(defaults), ...OD_CORE_DEFAULTS } });
   const kept = storedAfterReset(storedCore);
   for (const key of Object.keys(storedCore)) delete storedCore[/** @type {keyof CorePrefValues} */ (key)];
   Object.assign(storedCore, kept, OD_CORE_DEFAULTS);
@@ -347,5 +347,5 @@ export async function resetAllSettings(defaults) {
   settings.ppUnit = ppUnitAfterReset(defaults.unitSystem);
   setAppSetting('theme', settings.theme);
   if (languageChanged) location.reload();
-  return OpenDivesCore.getPrefs();
+  return BenthicCore.getPrefs();
 }

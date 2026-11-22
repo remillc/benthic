@@ -1,5 +1,5 @@
 // @ts-check
-// Maintenance of the equipment (task 2026-11-18-274, OpenDives+): the reminder rule of a piece (a duration, a number
+// Maintenance of the equipment (task 2026-11-18-274, Benthic+): the reminder rule of a piece (a duration, a number
 // of dives, or both: the first reached wins), when it falls due, and the notifications that go with it.
 //
 // Everything here is pure: dates are 'YYYY-MM-DD' strings and `today` is given by the caller, so the tests set the

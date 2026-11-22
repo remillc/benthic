@@ -23,7 +23,7 @@
     "framework7": "^9.3.0",
     "framework7-svelte": "^9.3.0",
     "maplibre-gl": "^5.24.0",
-    "opendives-core": "file:../plugins/opendives-core",
+    "benthic-core": "file:../plugins/benthic-core",
     "qrcode-generator": "^1.5.2",
     "svelte": "^5.57.3"
   },

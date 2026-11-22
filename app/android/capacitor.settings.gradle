@@ -20,5 +20,5 @@ project(':capacitor-preferences').projectDir = new File('../node_modules/@capaci
 include ':capacitor-share'
 project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/share/android')
 
-include ':opendives-core'
-project(':opendives-core').projectDir = new File('../node_modules/opendives-core/android')
+include ':benthic-core'
+project(':benthic-core').projectDir = new File('../node_modules/benthic-core/android')

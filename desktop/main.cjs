@@ -81,7 +81,7 @@ let windows = null;
 let settingsWin = null;
 /** @type {import('electron').BrowserWindow|null} */
 let profileWin = null;
-/** « Mon profil de plongeur » is an OpenDives+ feature: the menu item is on while the interface says the diver has it. */
+/** « Mon profil de plongeur » is an Benthic+ feature: the menu item is on while the interface says the diver has it. */
 let profileAvailable = false;
 
 /**

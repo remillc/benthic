@@ -35,7 +35,7 @@ const agreeingBrowser = async (url) => {
 const service = (overrides = {}) =>
   createCloudService({ userData, safeStorage, openExternal: agreeingBrowser, clients: CLIENTS, endpoints: fake.endpoints, ports: { dropbox: 0 }, texts: () => ({}), ...overrides });
 
-/** What window.odDesktop.logbooks is to the interface: the main process's answers to cloudStatus and cloudSignIn. */
+/** What window.benthicDesktop.logbooks is to the interface: the main process's answers to cloudStatus and cloudSignIn. */
 const logbooksOf = (cloud) => ({
   cloudStatus: async () => cloud.status(),
   cloudSignIn: ({ provider, switchAccount }) => cloud.signIn(provider, { switchAccount }),

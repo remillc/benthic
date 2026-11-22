@@ -100,7 +100,7 @@
   const fadeMs = () => (reducedMotion() ? 0 : 150);
 
   /** @returns {any} */
-  const bridge = () => /** @type {any} */ (globalThis).odDesktop;
+  const bridge = () => /** @type {any} */ (globalThis).benthicDesktop;
 
   async function refreshStatus() {
     try {

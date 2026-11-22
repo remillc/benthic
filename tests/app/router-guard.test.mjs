@@ -47,7 +47,7 @@ test('Back is ignored during a page change and while the router is held', () => 
 test('the original methods bypass the hold, for the code that holds it', () => {
   const { router, calls } = fixture();
   lockRouter(router);
-  router.odRaw.navigate('/b');
+  router.bcRaw.navigate('/b');
   assert.deepEqual(calls, [['navigate', '/b']]);
 });
 
@@ -139,7 +139,7 @@ test('a router closed for too long with no page animation is reopened by the nex
 test('a router closed while its page animation runs is left alone', () => {
   const { router, calls, tick } = fixture();
   router.allowPageChange = false;
-  router.odAnimating = true;
+  router.bcAnimating = true;
   tick(BUSY_LIMIT + 1000);
   router.back();
   assert.equal(calls.length, 0);
@@ -185,10 +185,10 @@ test('a page animation that ends by itself: the watchdog does nothing', () => {
   const { router, timers, events, oldPage, newPage, listeners } = animated();
   let ended = 0;
   router.animate([oldPage], [newPage], 'forward', undefined, () => ended++);
-  assert.equal(router.odAnimating, true);
+  assert.equal(router.bcAnimating, true);
   listeners.get('new')();
   assert.equal(ended, 1);
-  assert.equal(router.odAnimating, false);
+  assert.equal(router.bcAnimating, false);
   timers[0][0]();
   assert.equal(ended, 1);
   assert.deepEqual(events, []);

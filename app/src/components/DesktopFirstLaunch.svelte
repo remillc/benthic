@@ -28,7 +28,7 @@
   let pushed = $state(false);
   const visible = $derived(navigation.section !== 'account' && !pushed);
   /** The screen: the first launch, or the recent logbooks; null until the list is read. */
-  const plusPanel = $derived(currentStep() === 'odplusReady');
+  const plusPanel = $derived(currentStep() === 'benthicPlusReady');
   const mode = $derived(startMode(logbooks.recentLoaded ? logbooks.recent : null));
 
   /** The same router the pages use, read when it is needed (the views are built after this component). */

@@ -4,7 +4,7 @@
 # when desktop/host/ exists, the benthic-host executable.
 # Run by native/desktop/build.sh. Options taken from native/CMakeLists.txt.
 cmake_minimum_required(VERSION 3.22)
-project(opendives_desktop LANGUAGES C CXX)
+project(benthic_desktop LANGUAGES C CXX)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
 if(NOT SS)
@@ -32,21 +32,21 @@ list(APPEND SOURCES
   "${COMPAT}/cloud_compat.cpp"
   "${COMPAT}/https_mbedtls.cpp"
   "${COMPAT}/bluetooth_compat.cpp"
-  "${ROOT}/core/libopendives/opendives.cpp"
-  "${ROOT}/core/libopendives/edit.cpp"
-  "${ROOT}/core/libopendives/tools.cpp"
-  "${ROOT}/core/libopendives/settings.cpp"
-  "${ROOT}/core/libopendives/plan.cpp"
-  "${ROOT}/core/libopendives/filter.cpp"
-  "${ROOT}/core/libopendives/account.cpp"
-  "${ROOT}/core/libopendives/stats.cpp"
-  "${ROOT}/core/libopendives/download.cpp"
-  "${ROOT}/core/libopendives/odgit.cpp")
+  "${ROOT}/core/libbenthic/benthic.cpp"
+  "${ROOT}/core/libbenthic/edit.cpp"
+  "${ROOT}/core/libbenthic/tools.cpp"
+  "${ROOT}/core/libbenthic/settings.cpp"
+  "${ROOT}/core/libbenthic/plan.cpp"
+  "${ROOT}/core/libbenthic/filter.cpp"
+  "${ROOT}/core/libbenthic/account.cpp"
+  "${ROOT}/core/libbenthic/stats.cpp"
+  "${ROOT}/core/libbenthic/download.cpp"
+  "${ROOT}/core/libbenthic/odgit.cpp")
 
 file(WRITE "${CMAKE_BINARY_DIR}/gen/build-defs.h" "#define SUBSURFACE_SOURCE \"\"\n")
 
-add_library(opendives_core STATIC ${SOURCES})
-target_compile_features(opendives_core PUBLIC cxx_std_20)
+add_library(benthic_core STATIC ${SOURCES})
+target_compile_features(benthic_core PUBLIC cxx_std_20)
 
 # Flags shared by the library and the executables that include the façade.
 set(OD_COMPILE_OPTIONS -w -O2
@@ -65,9 +65,9 @@ if(WIN32)
   list(APPEND OD_DEFINITIONS LIBXML_STATIC LIBXSLT_STATIC LIBEXSLT_STATIC ZIP_STATIC NOMINMAX)
 endif()
 
-target_compile_options(opendives_core PRIVATE ${OD_COMPILE_OPTIONS})
-target_compile_definitions(opendives_core PUBLIC ${OD_DEFINITIONS})
-target_include_directories(opendives_core PUBLIC ${OD_INCLUDES})
+target_compile_options(benthic_core PRIVATE ${OD_COMPILE_OPTIONS})
+target_compile_definitions(benthic_core PUBLIC ${OD_DEFINITIONS})
+target_include_directories(benthic_core PUBLIC ${OD_INCLUDES})
 
 # Link libraries, in dependency order. Static runtime on Windows.
 set(OD_LIBS "${DEPS}/lib/libdivecomputer.a" "${DEPS}/lib/libgit2.a"
@@ -76,15 +76,15 @@ set(OD_LIBS "${DEPS}/lib/libdivecomputer.a" "${DEPS}/lib/libgit2.a"
   "${DEPS}/lib/libsqlite3.a" "${DEPS}/lib/libz.a")
 if(WIN32)
   list(APPEND OD_LIBS pthread ws2_32 rpcrt4 crypt32 secur32 bcrypt advapi32 shell32 ole32 user32 shlwapi)
-  target_link_options(opendives_core PUBLIC -static)
+  target_link_options(benthic_core PUBLIC -static)
 elseif(APPLE)
   list(APPEND OD_LIBS m iconv bz2 "-framework CoreFoundation" "-framework Security")
 else()
   list(APPEND OD_LIBS pthread dl m)
 endif()
-target_link_libraries(opendives_core PUBLIC ${OD_LIBS})
+target_link_libraries(benthic_core PUBLIC ${OD_LIBS})
 
-# Test executables: the same programs as poc/build.sh, against opendives_core.
+# Test executables: the same programs as poc/build.sh, against benthic_core.
 # On Windows each executable carries a manifest that makes its narrow strings UTF-8.
 set(OD_EXE_EXTRA "")
 if(WIN32)
@@ -96,7 +96,7 @@ set(TESTS roundtrip facade)
 foreach(t ${TESTS})
   add_executable(${t} "${ROOT}/tests/${t}.cpp" ${OD_EXE_EXTRA})
   target_compile_options(${t} PRIVATE ${OD_COMPILE_OPTIONS})
-  target_link_libraries(${t} PRIVATE opendives_core)
+  target_link_libraries(${t} PRIVATE benthic_core)
 endforeach()
 
 # benthic-host: the desktop application's native host, written in desktop/host/.
@@ -104,7 +104,7 @@ file(GLOB HOST_SOURCES "${ROOT}/desktop/host/*.cpp")
 if(HOST_SOURCES)
   add_executable(benthic-host ${HOST_SOURCES} ${OD_EXE_EXTRA})
   target_compile_options(benthic-host PRIVATE ${OD_COMPILE_OPTIONS})
-  target_link_libraries(benthic-host PRIVATE opendives_core)
+  target_link_libraries(benthic-host PRIVATE benthic_core)
 endif()
 
 # Binaries in <build>/bin.

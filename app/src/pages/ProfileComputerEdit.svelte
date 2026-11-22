@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   // « Modifier l’ordinateur de plongée » (task 2026-11-19-303, docs/mockups/profil-piece-modifier-android.dc.html):
-  // edits one dive computer of the equipment inventory (OpenDives+). Opens from the pencil of the piece's page. The
+  // edits one dive computer of the equipment inventory (Benthic+). Opens from the pencil of the piece's page. The
   // type cannot change, so there is no type field; a large image (the diver's own photo, else the catalog photo of
   // the model, else the generic drawing) and « Changer d’image »; Marque and Modèle are text fields with
   // suggestions from libdivecomputer's names (any other text can be typed; changing the brand clears the model);
@@ -11,7 +11,7 @@
   import { dateHint, readTypedDate, typedDate } from '../lib/format.js';
   import { onMount } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import DcTile from '../components/DcTile.svelte';
   import ComboField from '../components/ComboField.svelte';
@@ -69,7 +69,7 @@
     }
     followed = brand;
     const [bluetooth, catalog] = await Promise.all([
-      OpenDivesCore.bluetoothModels().catch(() => []),
+      BenthicCore.bluetoothModels().catch(() => []),
       getCatalog().catch(() => []),
     ]);
     lists = brandModels(bluetooth, catalog);

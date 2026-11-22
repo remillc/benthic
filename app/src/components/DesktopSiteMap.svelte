@@ -15,7 +15,7 @@
 
   /**
    * @type {{
-   *   sites: import('opendives-core').SiteSummary[],
+   *   sites: import('benthic-core').SiteSummary[],
    *   selected: number|null,
    *   matching: Set<number>|null,
    *   onselect: (uuid: number) => void,
@@ -70,7 +70,7 @@
       return { uuid: s.uuid, x: p.x, y: p.y };
     });
     for (const group of stackPins(pins, STACK_RADIUS)) {
-      const first = /** @type {import('opendives-core').SiteSummary} */ (sites.find((s) => s.uuid === group.uuids[0]));
+      const first = /** @type {import('benthic-core').SiteSummary} */ (sites.find((s) => s.uuid === group.uuids[0]));
       /** @type {HTMLElement} */
       let node;
       if (group.uuids.length > 1) {
@@ -156,7 +156,7 @@
   }
 
   let stackAsk = 0;
-  /** @param {number[]} uuids @param {import('opendives-core').SiteSummary} first @param {HTMLElement} node */
+  /** @param {number[]} uuids @param {import('benthic-core').SiteSummary} first @param {HTMLElement} node */
   function openStack(uuids, first, node) {
     const ask = ++stackAsk;
     const box = node.getBoundingClientRect();

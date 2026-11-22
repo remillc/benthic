@@ -1,6 +1,6 @@
 // @ts-check
 // Progress of a sync with the cloud, from the messages of Subsurface's git
-// work ("syncProgress" events, opendives.h set_sync_progress). The core gives
+// work ("syncProgress" events, benthic.h set_sync_progress). The core gives
 // stages and, while transferring, counts ("Transfer from storage (30/80)");
 // they are mapped onto one bar that never goes back:
 //   connect  0 to 15 %   connection, fetch started

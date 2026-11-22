@@ -1,5 +1,5 @@
 // @ts-check
-// « Fiche d’urgence » (OpenDives+, task 2026-11-19-311, docs/mockups/urgence-*.dc.html): what the sheet shows, built from the
+// « Fiche d’urgence » (Benthic+, task 2026-11-19-311, docs/mockups/urgence-*.dc.html): what the sheet shows, built from the
 // profile (lib/profile.js) and the documents of « Brevets et documents ». Pure: the date, the texts and the date format are
 // given by the caller, so the tests set them. The sheet is made on the device from data that is already there, so it opens
 // without a network.

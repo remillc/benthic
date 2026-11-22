@@ -6,7 +6,7 @@
   // deletes it.
   import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
@@ -21,7 +21,7 @@
   import { sharePlanPdf, sharePlanSummary } from '../lib/share.js';
   import { t } from '../lib/i18n.js';
 
-  /** @typedef {import('opendives-core').PlannedDive} PlannedDive */
+  /** @typedef {import('benthic-core').PlannedDive} PlannedDive */
 
   const uid = $props.id();
   const menuId = `od-plans-menu-${uid}`;
@@ -40,7 +40,7 @@
 
   async function load() {
     try {
-      plans = await OpenDivesCore.listPlans();
+      plans = await BenthicCore.listPlans();
       failed = false;
     } catch (e) {
       console.error('Planned dives', e);
@@ -136,7 +136,7 @@
     if (!plan) return;
     try {
       const request = requestOfPlan(plan, prefs);
-      const result = await OpenDivesCore.planDive(request);
+      const result = await BenthicCore.planDive(request);
       if (kind === 'pdf') await sharePlanPdf(result, request, prefs, title(plan));
       else await sharePlanSummary(result, request, prefs, title(plan));
     } catch (e) {

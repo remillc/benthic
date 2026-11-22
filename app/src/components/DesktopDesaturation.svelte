@@ -5,7 +5,7 @@
   // calculation used. The data and the figures are the phone's (Desaturation.svelte): the core's
   // tissues, lib/tools.js for the wait, lib/desaturation.js for the surface interval. No figure
   // of OpenDives' own is added (the mock-up's « Désaturation restante » is left out).
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -18,12 +18,12 @@
   import { overlapStart, surfaceSeconds } from '../lib/desaturation.js';
   import { t } from '../lib/i18n.js';
 
-  let desat = $state(/** @type {import('opendives-core').Desaturation|null} */ (null));
+  let desat = $state(/** @type {import('benthic-core').Desaturation|null} */ (null));
   let failed = $state(false);
 
   async function load() {
     try {
-      desat = await OpenDivesCore.toolQuery({ kind: 'desaturation' });
+      desat = await BenthicCore.toolQuery({ kind: 'desaturation' });
       failed = false;
     } catch (e) {
       console.error('Desaturation', e);

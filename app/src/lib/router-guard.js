@@ -35,18 +35,18 @@ export const LOCK_LIMIT = 8000;
 
 /**
  * @typedef {{
- *   allowPageChange?: boolean, currentRoute?: { url?: string, path?: string }, odLocks?: number,
+ *   allowPageChange?: boolean, currentRoute?: { url?: string, path?: string }, bcLocks?: number,
  *   back: Function, navigate: Function, animate?: Function, history?: string[], el?: Element, params?: any, findMatchingRoute?: Function,
- *   odRaw?: { back: Function, navigate: Function }, odBusySince?: number|null, odAnimating?: boolean, odName?: string,
+ *   bcRaw?: { back: Function, navigate: Function }, bcBusySince?: number|null, bcAnimating?: boolean, bcName?: string,
  *   [key: string]: any,
  * }} GuardedRouter
  */
 
 /** @param {GuardedRouter} router */
-export const isBusy = (router) => (router.odLocks ?? 0) > 0 || router.allowPageChange === false;
+export const isBusy = (router) => (router.bcLocks ?? 0) > 0 || router.allowPageChange === false;
 
 /** The view of a router, for the trace. @param {GuardedRouter} router */
-const nameOf = (router) => router.odName ?? (router.odName = String(router.el?.id || router.view?.name || 'view').replace(/^view-/, ''));
+const nameOf = (router) => router.bcName ?? (router.bcName = String(router.el?.id || router.view?.name || 'view').replace(/^view-/, ''));
 
 /**
  * Holds the router: `back` is ignored and `navigate` waits until the returned function is called, or `LOCK_LIMIT`.
@@ -56,7 +56,7 @@ const nameOf = (router) => router.odName ?? (router.odName = String(router.el?.i
  * @returns {() => void} releases the hold (once)
  */
 export function lockRouter(router, why = '', clock = {}) {
-  router.odLocks = (router.odLocks ?? 0) + 1;
+  router.bcLocks = (router.bcLocks ?? 0) + 1;
   trace('lock', `${nameOf(router)} ${why}`.trim());
   let released = false;
   /** @type {any} */
@@ -65,7 +65,7 @@ export function lockRouter(router, why = '', clock = {}) {
     if (released) return;
     released = true;
     (clock.clearTimeout ?? clearTimeout)(timer);
-    router.odLocks = Math.max(0, (router.odLocks ?? 1) - 1);
+    router.bcLocks = Math.max(0, (router.bcLocks ?? 1) - 1);
     trace(how, `${nameOf(router)} ${why}`.trim());
   };
   timer = (clock.setTimeout ?? setTimeout)(() => release('lock-timeout'), LOCK_LIMIT);
@@ -130,35 +130,35 @@ export function navigateKeepingMaster(router, navigate, args) {
  * @returns {GuardedRouter} the same router
  */
 export function guardRouter(router, clock = {}) {
-  if (router.odRaw) return router;
+  if (router.bcRaw) return router;
   const wait = clock.setTimeout ?? setTimeout;
   const unwait = clock.clearTimeout ?? clearTimeout;
   const now = clock.now ?? Date.now;
   /** After the next frame is drawn (at once where there are no frames: the tests). */
   const frame = clock.frame ?? (typeof requestAnimationFrame === 'function' ? (/** @type {() => void} */ fn) => void requestAnimationFrame(fn) : (/** @type {() => void} */ fn) => fn());
   const raw = { back: router.back.bind(router), navigate: router.navigate.bind(router) };
-  router.odRaw = raw;
+  router.bcRaw = raw;
   /** The address waiting to run (the latest one only: a tap sequence ends on the last tap). @type {{ args: any[], url: string, from: string }|null} */
   let queued = null;
   let polling = false;
 
   // Since when the router refuses page changes: Framework7 only writes `allowPageChange`, this notes the time it closes.
   let allow = router.allowPageChange !== false;
-  router.odBusySince = allow ? null : now();
+  router.bcBusySince = allow ? null : now();
   Object.defineProperty(router, 'allowPageChange', {
     configurable: true,
     enumerable: true,
     get: () => allow,
     set(value) {
       const next = value !== false;
-      if (next !== allow) router.odBusySince = next ? null : now();
+      if (next !== allow) router.bcBusySince = next ? null : now();
       allow = next;
     },
   });
 
   /** Reopens a router closed for too long with no page animation running: its page change was lost. */
   function reopenIfStuck() {
-    if (allow || router.odAnimating || router.odBusySince == null || now() - router.odBusySince < BUSY_LIMIT) return;
+    if (allow || router.bcAnimating || router.bcBusySince == null || now() - router.bcBusySince < BUSY_LIMIT) return;
     trace('busy-forced', nameOf(router));
     router.allowPageChange = true;
   }
@@ -199,8 +199,8 @@ export function guardRouter(router, clock = {}) {
     // Framework7 itself calls `back` to load the page under the current one ahead of time: not a Back.
     const preload = args.some((a) => a && typeof a === 'object' && a.preload);
     if (preload) return raw.back(...args);
-    if ((router.odLocks ?? 0) > 0 || (!forced && router.allowPageChange === false)) {
-      trace('back-ignored', `${nameOf(router)} ${(router.odLocks ?? 0) > 0 ? 'held' : 'changing'}`);
+    if ((router.bcLocks ?? 0) > 0 || (!forced && router.allowPageChange === false)) {
+      trace('back-ignored', `${nameOf(router)} ${(router.bcLocks ?? 0) > 0 ? 'held' : 'changing'}`);
       return router;
     }
     trace('back', `${nameOf(router)} from ${pathOf(currentUrl(router))}`);
@@ -236,11 +236,11 @@ export function guardRouter(router, clock = {}) {
         if (done) return;
         done = true;
         unwait(timer);
-        router.odAnimating = false;
+        router.bcAnimating = false;
         trace('anim-end', `${nameOf(router)} ${direction}`);
         callback?.();
       };
-      router.odAnimating = true;
+      router.bcAnimating = true;
       trace('anim', `${nameOf(router)} ${direction}`);
       rawAnimate($old, $new, direction, transition, finish);
       const pages = [$old?.[0], $new?.[0]];
@@ -271,7 +271,7 @@ export function guardRouter(router, clock = {}) {
  */
 export function heldNavigate(router, ...args) {
   trace('nav', `${nameOf(router)} ${pathOf(urlOf(args[0]))} held`);
-  return navigateKeepingMaster(router, (router.odRaw ?? router).navigate, args);
+  return navigateKeepingMaster(router, (router.bcRaw ?? router).navigate, args);
 }
 
 /**
@@ -281,7 +281,7 @@ export function heldNavigate(router, ...args) {
  */
 export function heldBack(router, ...args) {
   trace('back', `${nameOf(router)} from ${pathOf(currentUrl(router))} held`);
-  return (router.odRaw ?? router).back(...args);
+  return (router.bcRaw ?? router).back(...args);
 }
 
 /**

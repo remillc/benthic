@@ -1,7 +1,7 @@
 <script>
   // @ts-check
   import { onMount } from 'svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import { showSnackbar } from '../lib/snackbar.js';
   import { renumberDives } from '../lib/logbook.svelte.js';
   import { renumberFromPlan } from '../lib/renumber-from.js';
@@ -31,7 +31,7 @@
 
   onMount(() => {
     let active = true;
-    OpenDivesCore.listLoadedDives({ includeInvalid: true }).then((all) => {
+    BenthicCore.listLoadedDives({ includeInvalid: true }).then((all) => {
       if (!active) return;
       const initial = renumberFromPlan(all, id);
       if (!initial) throw new Error('NOT_FOUND');
@@ -47,7 +47,7 @@
     busy = true;
     const first = wanted;
     try {
-      const all = await OpenDivesCore.listLoadedDives({ includeInvalid: true });
+      const all = await BenthicCore.listLoadedDives({ includeInvalid: true });
       const latest = renumberFromPlan(all, id, first);
       if (!latest) throw new Error('NOT_FOUND');
       dives = all;

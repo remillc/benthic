@@ -39,9 +39,9 @@ export function tidyView(router) {
     for (const effect of page.querySelectorAll(':scope > .page-shadow-effect, :scope > .page-opacity-effect')) effect.remove();
     if (page.classList.contains('page-next')) router.removePage?.(page);
   }
-  router.odLocks = 0;
+  router.bcLocks = 0;
   router.swipeBackActive = false;
-  router.odAnimating = false;
+  router.bcAnimating = false;
   router.allowPageChange = true;
 }
 
@@ -52,7 +52,7 @@ export function tidyView(router) {
 export function reloadView(router) {
   const first = router?.view?.params?.url || router?.history?.[0] || '/';
   tidyView(router);
-  (router.odRaw ?? router).navigate(first, { reloadAll: true, animate: false });
+  (router.bcRaw ?? router).navigate(first, { reloadAll: true, animate: false });
 }
 
 /**

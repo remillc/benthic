@@ -7,7 +7,7 @@ import { t } from './i18n.js';
 /**
  * Spoken depth: "91 pieds", "27,5 mètres"; empty for a depth the core does not know (zero).
  * @param {number} mm
- * @param {import('opendives-core').Prefs} prefs
+ * @param {import('benthic-core').Prefs} prefs
  */
 export function spokenDepth(mm, prefs) {
   if (!mm) return '';
@@ -24,7 +24,7 @@ export function spokenDuration(seconds) {
 
 /**
  * @param {{ number: number, date: string, site: string, maxDepthMm: number, durationSeconds: number }} dive
- * @param {import('opendives-core').Prefs} prefs
+ * @param {import('benthic-core').Prefs} prefs
  */
 export function diveRowLabel(dive, prefs) {
   const notSet = t('dive.siteNotSet');

@@ -12,7 +12,7 @@ import { logbookKey } from './window-logbook.js';
 import { isRelease } from './edition.js';
 import { groupByMonth } from './carnet-months.js';
 
-/** @typedef {import('opendives-core').DiveDetail} DiveDetail */
+/** @typedef {import('benthic-core').DiveDetail} DiveDetail */
 /** @typedef {{ v: 1, date: string, number: number, order: string, detail: DiveDetail }} DetailSnapshot */
 
 const KEY = logbookKey(isRelease ? 'od.detailSnapshotBeta' : 'od.detailSnapshot');

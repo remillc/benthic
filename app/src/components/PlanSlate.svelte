@@ -7,7 +7,7 @@
   // planner screen): nothing about decompression is computed here (lib/slate.js).
   import { onMount } from 'svelte';
   import { Popup, Page, Navbar, Link } from 'framework7-svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import RowMenu from './RowMenu.svelte';
   import { formatDepth, formatNumber } from '../lib/format.js';
@@ -21,9 +21,9 @@
 
   /**
    * @type {{
-   *   result: import('opendives-core').PlanResult,
-   *   request: import('opendives-core').PlanRequest,
-   *   prefs: import('opendives-core').Prefs,
+   *   result: import('benthic-core').PlanResult,
+   *   request: import('benthic-core').PlanRequest,
+   *   prefs: import('benthic-core').Prefs,
    *   title: string,
    *   onclose: () => void,
    * }}
@@ -43,7 +43,7 @@
   /** The plan's levels: its own, or those of the measured profile it starts from, simplified. */
   let levels = $state(/** @type {{ depthMm: number, durationSeconds: number }[]|null} */ (null));
   /** The core's plans by variant id: a result, null when the core could not plan it. */
-  let computed = $state(/** @type {Record<string, import('opendives-core').PlanResult|null>} */ ({}));
+  let computed = $state(/** @type {Record<string, import('benthic-core').PlanResult|null>} */ ({}));
   let menu = $state(/** @type {null|{ kind: 'size'|'file', anchor: HTMLElement }} */ (null));
   let sharing = $state(false);
 
@@ -53,7 +53,7 @@
     } else if (request.sourceDiveId) {
       // A measured profile: the extra plans start from its simplified levels ("Simplifier le profil").
       try {
-        const dive = await OpenDivesCore.getDive({ id: request.sourceDiveId });
+        const dive = await BenthicCore.getDive({ id: request.sourceDiveId });
         const simple = simplifyProfile(dive.samples);
         levels = simple.length ? simple : [{ depthMm: result.maxDepthMm, durationSeconds: Math.max(60, Math.round(result.runtimeSeconds / 60) * 60) }];
       } catch (e) {
@@ -68,7 +68,7 @@
   $effect(() => {
     for (const v of variants) {
       if (v.id in computed) continue;
-      OpenDivesCore.planDive(v.request)
+      BenthicCore.planDive(v.request)
         .then((r) => (computed[v.id] = r))
         .catch((e) => {
           console.error('Slate plan', v.id, e);

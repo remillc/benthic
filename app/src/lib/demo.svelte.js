@@ -2,7 +2,7 @@
 // The demo logbook as reactive state (task 2026-11-16-224, part 7), with the calls of the app behind the pure
 // functions of demo.js. `demo` is read by components/DemoHost.svelte (the banner and the two dialogs) and by the
 // screens that add dives (pages/Logbook.svelte, `guardAdd`) or open an account (App.svelte, `leaveGuard`).
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { deviceStore } from './device-store.js';
 import { logbook, startWithoutAccount, eraseDemoLogbook, showFirstLaunchAgain } from './logbook.svelte.js';
 import { resetFlow } from './first-launch.svelte.js';
@@ -23,11 +23,11 @@ function remember(on) {
   }
 }
 
-const deviceLogExists = async () => (await OpenDivesCore.deviceLog({ action: 'exists' })).exists;
+const deviceLogExists = async () => (await BenthicCore.deviceLog({ action: 'exists' })).exists;
 
 // listDives loads the device's logbook into the core, which would replace the account's log already open (the dive
 // ids of the list on screen are then unknown to the core): the offer only counts the dives, nothing is loaded.
-const deviceLogHasDives = async () => (await OpenDivesCore.deviceLog({ action: 'count' })).count > 0;
+const deviceLogHasDives = async () => (await BenthicCore.deviceLog({ action: 'count' })).count > 0;
 
 /** The first launch's link is shown only on a device without a logbook. @returns {Promise<boolean>} */
 export function canTryDemo() {

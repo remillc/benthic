@@ -13,7 +13,7 @@
 // tests/import_formats_test.cpp: the number of a dive and the depth of a cylinder.
 //
 // usage: import-csv <subsurface-dives-folder> <new-folder> [<xslt-folder>]
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/dive.h"
 #include "core/divecomputer.h"
@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 static int failures = 0;
 

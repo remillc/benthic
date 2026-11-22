@@ -83,7 +83,7 @@ export async function deleteAllDatabases(factory = globalThis.indexedDB) {
 
 /** The real dependencies (dynamic imports: the app's modules are not loaded by the tests). */
 export async function realDevReset() {
-  const [{ OpenDivesCore }, store, { devAccounts }] = await Promise.all([import('opendives-core'), import('./device-store.js'), import('./dev-switch.js')]);
+  const [{ BenthicCore }, store, { devAccounts }] = await Promise.all([import('benthic-core'), import('./device-store.js'), import('./dev-switch.js')]);
   return createDevReset({
     allowed: () => devAccounts,
     cancelNotifications: async () => {
@@ -91,7 +91,7 @@ export async function realDevReset() {
       const pending = (await LocalNotifications.getPending()).notifications;
       if (pending.length) await LocalNotifications.cancel({ notifications: pending.map((n) => ({ id: n.id })) });
     },
-    native: (options) => OpenDivesCore.devResetApp(options),
+    native: (options) => BenthicCore.devResetApp(options),
     clearIndexedDb: () => deleteAllDatabases(),
     clearDeviceStore: () => store.clearDeviceStore(),
     clearLocalStorage: () => globalThis.localStorage?.clear(),

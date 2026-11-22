@@ -2,7 +2,7 @@
 // The state of the backup and restore screens (task 2026-11-19-290): the versions read so far, the deleted dives, and the
 // choice shown in the detail pane (a tablet's, a desktop's) — shared by the phone's pages, the tablet's page and the
 // desktop's dialog, which are the same screens. The reading and the restoring are lib/backup-history.js.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { listVersions, deletedDives, recentDives, restoreVersion, restoreDive } from './backup-history.js';
 import { afterRestore } from './logbook.svelte.js';
 
@@ -47,7 +47,7 @@ let adopted = null;
  * @returns {Promise<unknown>}
  */
 function adoptDeviceHistory() {
-  adopted ??= OpenDivesCore.history('adopt', []).catch((e) => {
+  adopted ??= BenthicCore.history('adopt', []).catch((e) => {
     adopted = null;
     console.warn('Reading the history of the device logbook', e);
   });
@@ -58,7 +58,7 @@ function adoptDeviceHistory() {
 const core = {
   history: async (/** @type {string} */ action, /** @type {string[]} */ args) => {
     await adoptDeviceHistory();
-    return OpenDivesCore.history(action, args);
+    return BenthicCore.history(action, args);
   },
 };
 

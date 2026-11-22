@@ -107,7 +107,7 @@
   :root {
     /* Meaning colors. */
     --bc-alarm: #C62828;
-    /* The emergency sheet (OpenDives+): a deep red band with white text, 7.2:1; white tiles with the red on them. */
+    /* The emergency sheet (Benthic+): a deep red band with white text, 7.2:1; white tiles with the red on them. */
     --bc-emergency: #A1372B;
     --bc-on-emergency: #FFFFFF;
     /* Developer tools (dev only, DevToolsRow and DevToolsMenu): a crimson red on white, close to but apart from the alarm red; 6.0:1 on white. */
@@ -356,7 +356,7 @@
     /* The thin ring of the logo's disc on the blue band. */
     --bc-release-logo-ring: rgb(255 255 255 / 0.3);
     --bc-release-chip-caption: rgb(255 255 255 / 0.75);
-    /* OpenDives+ (task 2026-11-17-265): the hero's gradient, the soft colour of each benefit card with its icon, the price card. */
+    /* Benthic+ (task 2026-11-17-265): the hero's gradient, the soft colour of each benefit card with its icon, the price card. */
     --bc-plus-hero: radial-gradient(140% 100% at 38% -20%, #A9C4E2 0%, #7199C2 22%, #3F70A3 42%, #1F5C99 62%, #0C3866 100%);
     --bc-plus-blue: #DCE8F5;
     --bc-plus-blue-icon: #1F5C99;
@@ -379,7 +379,7 @@
     --bc-plus-price: #114477;
     --bc-plus-on-price-soft: rgb(255 255 255 / 0.85);
     --bc-plus-chip: rgb(255 255 255 / 0.22);
-    /* The account sheet (task 2026-11-18-281): the OpenDives+ chip on a white card, the overdue maintenance (badge with white text, red line), the red tile of « Supprimer le compte ». */
+    /* The account sheet (task 2026-11-18-281): the Benthic+ chip on a white card, the overdue maintenance (badge with white text, red line), the red tile of « Supprimer le compte ». */
     --bc-account-chip: #D4E2F2;
     --bc-account-chip-ink: #114477;
     --bc-late: #A1372B;
@@ -555,7 +555,7 @@
     --bc-release-line: #6B6E72;
     --bc-release-line-soft: #3A3C40;
     --bc-release-ios-help: #98989D;
-    /* OpenDives+: the soft cards go deep, their icons light (each pair 4.5:1 or more). */
+    /* Benthic+: the soft cards go deep, their icons light (each pair 4.5:1 or more). */
     --bc-plus-blue: #1E3552;
     --bc-plus-blue-icon: #8FB6E6;
     --bc-plus-green: #1D3A2A;

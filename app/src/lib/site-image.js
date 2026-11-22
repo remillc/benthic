@@ -3,7 +3,7 @@
 // header"): the base map of the Sites screen, drawn off screen as a picture and
 // kept on the device. The pictures are prepared ahead, on Wi-Fi, so that a site
 // shows at once, offline too.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { cachedSites } from './core-cache.js';
 import { loadMapLibre } from './maplibre.js';
 import { buildMapStyle } from './map-style.js';
@@ -295,7 +295,7 @@ export function sharedSiteMap(latUdeg, lonUdeg) {
 /** Never on mobile data, nor with the app in the background. */
 async function canPrepare() {
   if (document.hidden || !navigator.onLine) return false;
-  return OpenDivesCore.networkStatus().then(
+  return BenthicCore.networkStatus().then(
     (status) => status.wifi,
     () => false,
   );

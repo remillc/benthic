@@ -146,9 +146,9 @@ test('a scan of one side: the picture comes back as an image the screen can show
 });
 
 test('the Android scanner hands the picture to the plugin through a file, not through the result Intent (Binder limit of about 1 MB)', () => {
-  const dir = new URL('../../plugins/opendives-core/android/src/main/java/org/opendives/core/', import.meta.url);
+  const dir = new URL('../../plugins/benthic-core/android/src/main/java/app/benthicdivelog/core/', import.meta.url);
   const activity = readFileSync(new URL('DocumentScanActivity.kt', dir), 'utf8');
-  const plugin = readFileSync(new URL('OpenDivesCorePlugin.kt', dir), 'utf8');
+  const plugin = readFileSync(new URL('BenthicCorePlugin.kt', dir), 'utf8');
   assert.match(activity, /put\("path"/);
   assert.doesNotMatch(activity, /put\("image"/);
   assert.match(plugin, /optString\("path"/);

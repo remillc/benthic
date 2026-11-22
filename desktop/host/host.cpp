@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // benthic-host: the desktop app's helper process around the C++ facade.
-// It is the desktop twin of plugins/opendives-core/android/src/main/cpp/
-// opendives_jni.cpp: one handler per NativeCore function, with the same names,
+// It is the desktop twin of plugins/benthic-core/android/src/main/cpp/
+// benthic_jni.cpp: one handler per NativeCore function, with the same names,
 // the same arguments, the same results and the same errors. Electron's main
 // process spawns it and talks to it over stdio (see desktop/bridge.cjs).
 //
@@ -25,8 +25,8 @@
 // while the core thread loads the log). The odgit* calls (git on the device, odgit.h) run in order on a third,
 // git thread: a long clone blocks neither the core nor gitCheck; odgitCancel runs at once. stdout writes are serialised. When
 // stdin closes, the requests already received finish, then the process exits.
-#include "core/libopendives/odgit.h"
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/odgit.h"
+#include "core/libbenthic/benthic.h"
 #include "desktop/host/json_value.h"
 
 #include <condition_variable>
@@ -163,7 +163,7 @@ struct Args {
 
 // --- Ports of the JNI's helpers --------------------------------------------------
 
-// A result {"<key>":…, "undo":…, "redo":…} (edit_result in opendives_jni.cpp).
+// A result {"<key>":…, "undo":…, "redo":…} (edit_result in benthic_jni.cpp).
 Result edit_result(const std::string &dive_json)
 {
 	// A trip step gives the trip ({"tripId":...}), a dive step the dive.
@@ -172,8 +172,8 @@ Result edit_result(const std::string &dive_json)
 			: dive_json.rfind("{\"types\"", 0) == 0 ? "cylinderTypes"
 			: dive_json.rfind("{\"listChange\"", 0) == 0 ? "list"
 			: dive_json.rfind("{\"presetList\"", 0) == 0 ? "presets" : "dive";
-	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":" + json_string(opendives::undo_text());
-	json += ",\"redo\":" + json_string(opendives::redo_text()) + "}";
+	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":" + json_string(benthic::undo_text());
+	json += ",\"redo\":" + json_string(benthic::redo_text()) + "}";
 	return S(json);
 }
 
@@ -185,9 +185,9 @@ Result json_or_fail(int ret, const std::string &json, const std::string &error)
 }
 
 // Five strings per rule: type, string mode, range mode, negate ("1" or "0"), data.
-std::vector<opendives::filter_rule> rules_of(const std::vector<std::string> &flat)
+std::vector<benthic::filter_rule> rules_of(const std::vector<std::string> &flat)
 {
-	std::vector<opendives::filter_rule> rules;
+	std::vector<benthic::filter_rule> rules;
 	for (size_t i = 0; i + 4 < flat.size(); i += 5)
 		rules.push_back({ flat[i], flat[i + 1], flat[i + 2], flat[i + 4], flat[i + 3] == "1" });
 	return rules;
@@ -215,7 +215,7 @@ void add(const char *name, Lane lane, std::function<Result(const Args &)> run)
 
 void register_methods()
 {
-	using opendives::filter_rule;
+	using benthic::filter_rule;
 	const Lane core = Lane::Core;
 
 	// Host only: answers at once on the reader thread; checks that the process is alive.
@@ -230,123 +230,123 @@ void register_methods()
 #else
 		setenv("HOME", home.c_str(), 1);
 #endif
-		if (opendives::init())
+		if (benthic::init())
 			fail("Cannot initialize libgit2");
-		opendives::set_sync_progress(send_sync_progress);
+		benthic::set_sync_progress(send_sync_progress);
 		return NOTHING;
 	});
 	// `enabled` false stops the "syncProgress" events.
 	add("setSyncListener", core, [](const Args &a) {
-		opendives::set_sync_progress(a.flag("enabled", true) ? send_sync_progress : nullptr);
+		benthic::set_sync_progress(a.flag("enabled", true) ? send_sync_progress : nullptr);
 		return NOTHING;
 	});
 
-	add("logExists", core, [](const Args &a) { return B(opendives::log_exists(a.str("repo"))); });
+	add("logExists", core, [](const Args &a) { return B(benthic::log_exists(a.str("repo"))); });
 	add("countDives", core, [](const Args &a) {
 		std::string error;
-		int count = opendives::count_dives(a.str("log"), error);
+		int count = benthic::count_dives(a.str("log"), error);
 		if (count < 0)
 			fail(error);
 		return N(count);
 	});
 	add("importFile", core, [](const Args &a) {
 		std::string error;
-		int count = opendives::import_file(a.str("source"), a.str("repo"), error);
+		int count = benthic::import_file(a.str("source"), a.str("repo"), error);
 		if (count < 0)
 			fail(error);
 		return N(count);
 	});
 	// Allowed off the core thread (it sets a libgit2 option), like Android's setup thread.
 	add("setCaFile", Lane::Immediate, [](const Args &a) {
-		if (opendives::set_ca_file(a.str("path")))
+		if (benthic::set_ca_file(a.str("path")))
 			fail("Certificate authorities rejected by libgit2");
 		return NOTHING;
 	});
 	add("setXsltDir", Lane::Immediate, [](const Args &a) {
-		opendives::set_xslt_dir(a.str("dir"));
+		benthic::set_xslt_dir(a.str("dir"));
 		return NOTHING;
 	});
 
 	// --- Cloud account ---
 	add("cloudListDives", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::cloud_list_dives(a.str("email"), a.str("password"), json, error), json, error);
+		return json_or_fail(benthic::cloud_list_dives(a.str("email"), a.str("password"), json, error), json, error);
 	});
 	add("cloudConfigure", core, [](const Args &a) {
 		std::string url;
-		if (opendives::cloud_configure(a.str("email"), a.str("password"), url))
+		if (benthic::cloud_configure(a.str("email"), a.str("password"), url))
 			fail("Incomplete cloud credentials");
 		return NOTHING;
 	});
 	// Empty string: no local cache yet.
 	add("cloudListCachedDives", core, [](const Args &) {
 		std::string json, error;
-		if (opendives::cloud_list_cached_dives(json, error) < 0)
+		if (benthic::cloud_list_cached_dives(json, error) < 0)
 			fail(error);
 		return S(json);
 	});
 	// The previous version's cloud cache (read-only): the folders, or one opened (id).
 	add("alphaCacheList", core, [](const Args &) {
 		std::string json;
-		opendives::alpha_cache_list(json);
+		benthic::alpha_cache_list(json);
 		return S(json);
 	});
 	add("history", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::history_call(a.str("action"), a.strs("args"), json, error), json, error);
+		return json_or_fail(benthic::history_call(a.str("action"), a.strs("args"), json, error), json, error);
 	});
 	add("alphaCacheOpen", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::alpha_cache_open(a.str("id"), json, error), json, error);
+		return json_or_fail(benthic::alpha_cache_open(a.str("id"), json, error), json, error);
 	});
 	add("cloudSignOut", core, [](const Args &a) {
 		std::string error;
-		if (opendives::cloud_sign_out(a.flag("deleteCopy"), error))
+		if (benthic::cloud_sign_out(a.flag("deleteCopy"), error))
 			fail(error);
 		return NOTHING;
 	});
 	add("cloudDeleteAccount", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::cloud_delete_account(a.str("password"), a.str("keepDivesIn"), json, error), json, error);
+		return json_or_fail(benthic::cloud_delete_account(a.str("password"), a.str("keepDivesIn"), json, error), json, error);
 	});
 	add("cloudCreateAccount", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::cloud_create_account(a.str("email"), a.str("password"), json, error), json, error);
+		return json_or_fail(benthic::cloud_create_account(a.str("email"), a.str("password"), json, error), json, error);
 	});
 	add("cloudVerifyPin", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::cloud_verify_pin(a.str("email"), a.str("password"), a.str("pin"), json, error), json, error);
+		return json_or_fail(benthic::cloud_verify_pin(a.str("email"), a.str("password"), a.str("pin"), json, error), json, error);
 	});
 	add("cloudCreateLog", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::cloud_create_log(a.str("importPath"), json, error), json, error);
+		return json_or_fail(benthic::cloud_create_log(a.str("importPath"), json, error), json, error);
 	});
 	add("importCount", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::import_count(a.str("path"), json, error), json, error);
+		return json_or_fail(benthic::import_count(a.str("path"), json, error), json, error);
 	});
 	add("divelogsCheck", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::divelogs_check(a.str("user"), a.str("password"), json, error), json, error);
+		return json_or_fail(benthic::divelogs_check(a.str("user"), a.str("password"), json, error), json, error);
 	});
 	add("divelogsDownload", core, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::divelogs_download(a.str("user"), a.str("password"), a.str("outPath"), json, error), json,
+		return json_or_fail(benthic::divelogs_download(a.str("user"), a.str("password"), a.str("outPath"), json, error), json,
 				    error);
 	});
 	add("setCloudTestEmail", core, [](const Args &a) {
-		opendives::set_cloud_test_email(a.str("email"));
+		benthic::set_cloud_test_email(a.str("email"));
 		return NOTHING;
 	});
 	add("pendingChanges", core, [](const Args &) {
 		std::string json;
-		opendives::pending_changes(json);
+		benthic::pending_changes(json);
 		return S(json);
 	});
 	// The one call allowed beside a load: network only.
 	add("cloudProbe", Lane::Network, [](const Args &) {
 		std::string json, error;
-		if (opendives::cloud_probe(json, error))
+		if (benthic::cloud_probe(json, error))
 			fail(error);
 		return S(json);
 	});
@@ -354,14 +354,14 @@ void register_methods()
 	// --- Git on the device (odgit.h): the working copies of the OpenDives server's logbooks ---
 	// `dir` is the absolute folder (the bridge maps the page's name onto it); `allowHttp` is set by the bridge in
 	// development only. The token is only passed through. Progress goes out as "gitProgress" events.
-	auto git_progress = [](const Args &) -> opendives::OdgitProgress {
+	auto git_progress = [](const Args &) -> benthic::OdgitProgress {
 		return [](const char *phase, uint64_t done, uint64_t total) {
 			emit(std::string("{\"event\":\"gitProgress\",\"data\":{\"phase\":") + json_string(phase) + ",\"done\":" +
 			     std::to_string(done) + ",\"total\":" + std::to_string(total) + "}}");
 		};
 	};
 	auto git_author = [](const Args &a) {
-		opendives::OdgitAuthor author;
+		benthic::OdgitAuthor author;
 		if (!a.str("authorName").empty() && !a.str("authorEmail").empty()) {
 			author.name = a.str("authorName");
 			author.email = a.str("authorEmail");
@@ -370,85 +370,85 @@ void register_methods()
 	};
 	add("odgitClone", Lane::Git, [git_progress](const Args &a) {
 		std::string json, error;
-		opendives::odgit_allow_http(a.flag("allowHttp"));
-		return json_or_fail(opendives::odgit_clone(a.str("url"), a.str("dir"), a.str("branch"),
+		benthic::odgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(benthic::odgit_clone(a.str("url"), a.str("dir"), a.str("branch"),
 							   { a.str("username"), a.str("token") }, git_progress(a), json, error),
 				    json, error);
 	});
 	add("odgitPull", Lane::Git, [git_progress, git_author](const Args &a) {
 		std::string json, error;
-		opendives::odgit_allow_http(a.flag("allowHttp"));
-		return json_or_fail(opendives::odgit_pull(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
+		benthic::odgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(benthic::odgit_pull(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
 							  git_author(a), git_progress(a), json, error),
 				    json, error);
 	});
 	add("odgitCommit", Lane::Git, [git_author](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::odgit_commit(a.str("dir"), a.strs("paths"), a.str("message"), git_author(a),
+		return json_or_fail(benthic::odgit_commit(a.str("dir"), a.strs("paths"), a.str("message"), git_author(a),
 							    a.str("mergeParent"), json, error),
 				    json, error);
 	});
 	add("odgitPush", Lane::Git, [git_progress](const Args &a) {
 		std::string json, error;
-		opendives::odgit_allow_http(a.flag("allowHttp"));
-		return json_or_fail(opendives::odgit_push(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
+		benthic::odgit_allow_http(a.flag("allowHttp"));
+		return json_or_fail(benthic::odgit_push(a.str("dir"), a.str("branch"), { a.str("username"), a.str("token") },
 							  git_progress(a), json, error),
 				    json, error);
 	});
 	add("odgitStatus", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::odgit_status(a.str("dir"), a.strs("paths"), json, error), json, error);
+		return json_or_fail(benthic::odgit_status(a.str("dir"), a.strs("paths"), json, error), json, error);
 	});
 	add("odgitUnpushed", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::odgit_unpushed(a.str("dir"), a.str("branch"), json, error), json, error);
+		return json_or_fail(benthic::odgit_unpushed(a.str("dir"), a.str("branch"), json, error), json, error);
 	});
 	add("odgitHead", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::odgit_head(a.str("dir"), a.str("branch"), json, error), json, error);
+		return json_or_fail(benthic::odgit_head(a.str("dir"), a.str("branch"), json, error), json, error);
 	});
 	add("odgitListFiles", Lane::Git, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::odgit_list_files(a.str("dir"), a.str("prefix"), json, error), json, error);
+		return json_or_fail(benthic::odgit_list_files(a.str("dir"), a.str("prefix"), json, error), json, error);
 	});
 	add("odgitRemove", Lane::Git, [](const Args &a) {
 		std::string error;
-		if (opendives::odgit_remove(a.str("dir"), error))
+		if (benthic::odgit_remove(a.str("dir"), error))
 			fail(error);
 		return NOTHING;
 	});
 	add("odgitCancel", Lane::Immediate, [](const Args &) {
-		opendives::odgit_cancel();
+		benthic::odgit_cancel();
 		return NOTHING;
 	});
 
 	// --- Own git repository: the token is only passed through, never kept or logged ---
 	add("gitCheck", Lane::Network, [](const Args &a) {
 		std::string json, error;
-		return json_or_fail(opendives::git_check(a.str("url"), a.str("username"), a.str("token"), json, error), json, error);
+		return json_or_fail(benthic::git_check(a.str("url"), a.str("username"), a.str("token"), json, error), json, error);
 	});
 	add("gitConfigure", core, [](const Args &a) {
 		std::string address, error;
-		if (opendives::git_configure(a.str("url"), a.str("username"), a.str("token"), a.str("branch"), address, error))
+		if (benthic::git_configure(a.str("url"), a.str("username"), a.str("token"), a.str("branch"), address, error))
 			fail(error);
 		return NOTHING;
 	});
 	add("gitCreateLog", core, [](const Args &) {
 		std::string json, error;
-		return json_or_fail(opendives::git_create_log(json, error), json, error);
+		return json_or_fail(benthic::git_create_log(json, error), json, error);
 	});
 
 	// --- Editing ---
 	add("editDive", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::edit_dive(a.i32("id"), a.str("changes"), json, error))
+		if (benthic::edit_dive(a.i32("id"), a.str("changes"), json, error))
 			fail(error);
 		return edit_result(json);
 	});
 	// No error: an unknown trip gives what the facade writes.
 	add("getTrip", core, [](const Args &a) {
 		std::string json, error;
-		opendives::trip_json(a.i32("id"), json, error);
+		benthic::trip_json(a.i32("id"), json, error);
 		return S(json);
 	});
 	// One trip change: action is location, notes, remove, split, merge, add, ungroup, create or autogroup.
@@ -458,21 +458,21 @@ void register_methods()
 		std::vector<int> ids = a.ints("diveIds");
 		int ret;
 		if (action == "location" || action == "notes")
-			ret = opendives::edit_trip(tripId, action, value, json, error);
+			ret = benthic::edit_trip(tripId, action, value, json, error);
 		else if (action == "remove")
-			ret = ids.empty() ? opendives::trip_remove_dive(diveId, json, error) : opendives::trip_remove_dives(ids, json, error);
+			ret = ids.empty() ? benthic::trip_remove_dive(diveId, json, error) : benthic::trip_remove_dives(ids, json, error);
 		else if (action == "split")
-			ret = opendives::trip_split_at(diveId, json, error);
+			ret = benthic::trip_split_at(diveId, json, error);
 		else if (action == "merge")
-			ret = opendives::trips_merge(tripId, otherId, json, error);
+			ret = benthic::trips_merge(tripId, otherId, json, error);
 		else if (action == "add")
-			ret = opendives::trip_add_dives(tripId, ids, json, error);
+			ret = benthic::trip_add_dives(tripId, ids, json, error);
 		else if (action == "ungroup")
-			ret = opendives::trip_ungroup(tripId, json, error);
+			ret = benthic::trip_ungroup(tripId, json, error);
 		else if (action == "create")
-			ret = opendives::trip_create(ids, json, error);
+			ret = benthic::trip_create(ids, json, error);
 		else if (action == "autogroup")
-			ret = opendives::trips_autogroup(value == "on", json, error);
+			ret = benthic::trips_autogroup(value == "on", json, error);
 		else {
 			ret = -1;
 			error = "BAD_REQUEST: unknown action " + action;
@@ -483,12 +483,12 @@ void register_methods()
 	});
 	add("diveComputers", core, [](const Args &) {
 		std::string json;
-		opendives::dive_computers(json);
+		benthic::dive_computers(json);
 		return S(json);
 	});
 	add("diveComputerAction", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::dive_computer_action(a.str("action"), a.str("model"), a.str("serial"), a.str("value"), a.str("intoModel"),
+		if (benthic::dive_computer_action(a.str("action"), a.str("model"), a.str("serial"), a.str("value"), a.str("intoModel"),
 						    a.str("intoSerial"), json, error))
 			fail(error);
 		return edit_result(json);
@@ -497,15 +497,15 @@ void register_methods()
 	add("siteQuery", core, [](const Args &a) {
 		std::string kind = a.str("kind"), json, error;
 		if (kind == "list")
-			opendives::sites_json(json);
+			benthic::sites_json(json);
 		else if (kind == "site")
-			opendives::site_json(static_cast<uint32_t>(a.num("uuid")), json, error);
+			benthic::site_json(static_cast<uint32_t>(a.num("uuid")), json, error);
 		else if (kind == "nearby")
-			opendives::site_nearby(a.i32("lat"), a.i32("lon"), a.i32("a"), json);
+			benthic::site_nearby(a.i32("lat"), a.i32("lon"), a.i32("a"), json);
 		else if (kind == "duplicates")
-			opendives::sites_duplicates(a.i32("a"), a.i32("b"), json);
+			benthic::sites_duplicates(a.i32("a"), a.i32("b"), json);
 		else if (kind == "without")
-			opendives::dives_without_site(json);
+			benthic::dives_without_site(json);
 		else
 			json = "null";
 		return S(json);
@@ -514,51 +514,51 @@ void register_methods()
 	add("filterQuery", core, [](const Args &a) {
 		std::string kind = a.str("kind"), json, error;
 		if (kind == "options") {
-			opendives::filter_options(json);
+			benthic::filter_options(json);
 			return S(json);
 		}
 		if (kind == "search") {
-			opendives::search_dives(a.str("fulltext"), json, error);
+			benthic::search_dives(a.str("fulltext"), json, error);
 			return S(json);
 		}
 		std::vector<filter_rule> rules = rules_of(a.strs("rules"));
-		if (opendives::filter_dives(a.str("fulltext"), a.str("mode"), rules, json, error))
+		if (benthic::filter_dives(a.str("fulltext"), a.str("mode"), rules, json, error))
 			fail(error);
 		return S(json);
 	});
 	add("createDive", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::create_dive(a.str("fields"), json, error))
+		if (benthic::create_dive(a.str("fields"), json, error))
 			fail(error);
 		return edit_result(json);
 	});
 	add("deleteDive", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::delete_dives(a.ints("ids"), json, error))
+		if (benthic::delete_dives(a.ints("ids"), json, error))
 			fail(error);
 		return edit_result(json);
 	});
 	add("mergeDives", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::merge_dives(a.ints("ids"), json, error))
+		if (benthic::merge_dives(a.ints("ids"), json, error))
 			fail(error);
 		return edit_result(json);
 	});
 	add("editDives", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::edit_dives(a.ints("ids"), a.str("changes"), json, error))
+		if (benthic::edit_dives(a.ints("ids"), a.str("changes"), json, error))
 			fail(error);
 		return edit_result(json);
 	});
 	add("renumberDives", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::renumber_dives(a.ints("ids"), a.i32("start"), json, error, a.ints("numbers")))
+		if (benthic::renumber_dives(a.ints("ids"), a.i32("start"), json, error, a.ints("numbers")))
 			fail(error);
 		return edit_result(json);
 	});
 	add("importDives", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::import_dives(a.str("file"), a.str("source"), json, error))
+		if (benthic::import_dives(a.str("file"), a.str("source"), json, error))
 			fail(error);
 		return edit_result(json);
 	});
@@ -566,14 +566,14 @@ void register_methods()
 	add("filterPresets", core, [](const Args &a) {
 		std::string action = a.str("action"), json, error;
 		if (action == "list") {
-			opendives::filter_presets_json(json);
+			benthic::filter_presets_json(json);
 			return S(json);
 		}
 		int ret;
 		if (action == "delete")
-			ret = opendives::filter_preset_delete(a.i32("index", -1), json, error);
+			ret = benthic::filter_preset_delete(a.i32("index", -1), json, error);
 		else
-			ret = opendives::filter_preset_save(a.str("name"), a.str("fulltext"), a.str("mode"), rules_of(a.strs("rules")), json,
+			ret = benthic::filter_preset_save(a.str("name"), a.str("fulltext"), a.str("mode"), rules_of(a.strs("rules")), json,
 							    error);
 		if (ret)
 			fail(error);
@@ -582,20 +582,20 @@ void register_methods()
 	// Sync conflict: the read, the choice of a side, and taking the choice back.
 	add("syncConflicts", core, [](const Args &) {
 		std::string json, error;
-		if (opendives::sync_conflicts(json, error))
+		if (benthic::sync_conflicts(json, error))
 			fail(error);
 		return S(json);
 	});
 	add("resolveConflicts", core, [](const Args &a) {
 		std::string error;
-		if (opendives::resolve_conflicts(a.str("choices"), error))
+		if (benthic::resolve_conflicts(a.str("choices"), error))
 			fail(error);
 		return NOTHING;
 	});
 	// On the core thread like Android's: it works on the conflict the core thread holds.
 	add("cancelConflictResolution", core, [](const Args &) {
 		std::string error;
-		if (opendives::cancel_conflict_resolution(error))
+		if (benthic::cancel_conflict_resolution(error))
 			fail(error);
 		return NOTHING;
 	});
@@ -609,17 +609,17 @@ void register_methods()
 		int lat = a.i32("lat"), lon = a.i32("lon");
 		int ret;
 		if (action == "create")
-			ret = opendives::site_create(value, lat, lon, json, error);
+			ret = benthic::site_create(value, lat, lon, json, error);
 		else if (action == "edit")
-			ret = opendives::site_edit(uuid, field, value, lat, lon, json, error);
+			ret = benthic::site_edit(uuid, field, value, lat, lon, json, error);
 		else if (action == "geocode")
-			ret = opendives::site_geocode(uuid, a.str("country"), a.str("region"), a.str("county"), a.str("city"), json, error);
+			ret = benthic::site_geocode(uuid, a.str("country"), a.str("region"), a.str("county"), a.str("city"), json, error);
 		else if (action == "merge")
-			ret = opendives::sites_merge(uuid, other, json, error);
+			ret = benthic::sites_merge(uuid, other, json, error);
 		else if (action == "delete")
-			ret = opendives::sites_delete_unused(uuids, json, error);
+			ret = benthic::sites_delete_unused(uuids, json, error);
 		else if (action == "deleteSite")
-			ret = opendives::site_delete(uuid, json, error);
+			ret = benthic::site_delete(uuid, json, error);
 		else {
 			ret = -1;
 			error = "BAD_REQUEST: unknown action " + action;
@@ -632,11 +632,11 @@ void register_methods()
 	add("toolQuery", core, [](const Args &a) {
 		std::string kind = a.str("kind"), json;
 		if (kind == "cylinders")
-			opendives::gas_cylinder_types(json);
+			benthic::gas_cylinder_types(json);
 		else if (kind == "weights")
-			opendives::weight_types(json);
+			benthic::weight_types(json);
 		else if (kind == "desaturation")
-			opendives::desaturation(0, json);
+			benthic::desaturation(0, json);
 		else
 			json = "null";
 		return S(json);
@@ -644,60 +644,60 @@ void register_methods()
 	// The dives written to `path` (export_dives); read only for the logbook.
 	add("exportDives", core, [](const Args &a) {
 		std::string error;
-		if (opendives::export_dives(a.ints("ids"), a.str("format"), a.flag("anonymize"), a.str("path"), error))
+		if (benthic::export_dives(a.ints("ids"), a.str("format"), a.flag("anonymize"), a.str("path"), error))
 			fail(error);
 		return NOTHING;
 	});
 	// The whole loaded log as a plain .ssrf file (Subsurface's Save As).
 	add("saveLogbookFile", core, [](const Args &a) {
 		std::string error;
-		if (opendives::save_logbook_file(a.str("path"), error))
+		if (benthic::save_logbook_file(a.str("path"), error))
 			fail(error);
 		return NOTHING;
 	});
 	add("undo", core, [](const Args &a) {
 		std::string json, error;
-		if (a.flag("redo") ? opendives::redo(json, error) : opendives::undo(json, error))
+		if (a.flag("redo") ? benthic::redo(json, error) : benthic::undo(json, error))
 			fail(error);
 		return edit_result(json);
 	});
 	add("sync", core, [](const Args &) {
 		std::string json, error;
-		if (opendives::sync(json, error))
+		if (benthic::sync(json, error))
 			fail(error);
 		return S(json);
 	});
 	add("listLoadedDives", core, [](const Args &a) {
 		std::string json;
-		opendives::list_loaded_dives(json, a.flag("includeInvalid"));
+		benthic::list_loaded_dives(json, a.flag("includeInvalid"));
 		return S(json);
 	});
 	// Desktop only: the logbook table's extra columns (task 2026-11-15-169).
 	add("diveColumns", core, [](const Args &) {
 		std::string json;
-		opendives::dive_columns(json);
+		benthic::dive_columns(json);
 		return S(json);
 	});
 	add("saveLocal", core, [](const Args &) {
 		std::string error;
-		if (opendives::save_local(error))
+		if (benthic::save_local(error))
 			fail(error);
 		return NOTHING;
 	});
 	add("getDive", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::get_dive(a.i32("id"), json, error))
+		if (benthic::get_dive(a.i32("id"), json, error))
 			fail(error);
 		return S(json);
 	});
 	add("getPrefs", core, [](const Args &) {
 		std::string json;
-		opendives::get_prefs(json);
+		benthic::get_prefs(json);
 		return S(json);
 	});
 	add("setPrefs", core, [](const Args &a) {
 		std::string error;
-		if (opendives::set_prefs(a.str("changes"), error))
+		if (benthic::set_prefs(a.str("changes"), error))
 			fail(error);
 		return NOTHING;
 	});
@@ -706,18 +706,18 @@ void register_methods()
 		std::string action = a.str("action"), name = a.str("name"), value = a.str("value"), json, error;
 		int ret;
 		if (action == "list")
-			ret = opendives::cylinder_types(json);
+			ret = benthic::cylinder_types(json);
 		else if (action == "library")
-			ret = opendives::set_cylinder_library(value, error) ? -1 : opendives::cylinder_types(json);
+			ret = benthic::set_cylinder_library(value, error) ? -1 : benthic::cylinder_types(json);
 		else if (action == "standard") {
-			opendives::reset_cylinder_library();
-			ret = opendives::cylinder_types(json);
+			benthic::reset_cylinder_library();
+			ret = benthic::cylinder_types(json);
 		} else if (action == "rename")
-			ret = opendives::cylinder_type_rename(name, value, json, error);
+			ret = benthic::cylinder_type_rename(name, value, json, error);
 		else if (action == "delete" || action == "deletePreview")
-			ret = opendives::cylinder_type_delete(name, action == "deletePreview", json, error);
+			ret = benthic::cylinder_type_delete(name, action == "deletePreview", json, error);
 		else
-			ret = opendives::cylinder_type_action(action, name, a.i32("ml"), a.i32("mbar"), json, error);
+			ret = benthic::cylinder_type_action(action, name, a.i32("ml"), a.i32("mbar"), json, error);
 		if (ret)
 			fail(error);
 		return edit_result(json);
@@ -726,36 +726,36 @@ void register_methods()
 	// --- Planner ---
 	add("plannerSetup", core, [](const Args &) {
 		std::string json;
-		opendives::planner_setup(json);
+		benthic::planner_setup(json);
 		return S(json);
 	});
 	add("planDive", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::plan_dive(a.str("request"), json, error))
+		if (benthic::plan_dive(a.str("request"), json, error))
 			fail(error);
 		return S(json);
 	});
 	add("listPlans", core, [](const Args &) {
 		std::string json;
-		opendives::list_plans(json);
+		benthic::list_plans(json);
 		return S(json);
 	});
 	add("savePlan", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::save_plan(a.str("request"), a.i32("replaceId"), json, error, a.str("title")))
+		if (benthic::save_plan(a.str("request"), a.i32("replaceId"), json, error, a.str("title")))
 			fail(error);
 		return edit_result(json);
 	});
 	add("listDives", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::list_dives(a.str("repo"), json, error))
+		if (benthic::list_dives(a.str("repo"), json, error))
 			fail(error);
 		return S(json);
 	});
 	// Read-only statistics: kind "stats" with the criteria as JSON in `text`, or "values" with a field name.
 	add("statsQuery", core, [](const Args &a) {
 		std::string kind = a.str("kind"), text = a.str("text"), json, error;
-		int rc = kind == "values" ? opendives::stats_values(text, json, error) : opendives::stats(text, json, error);
+		int rc = kind == "values" ? benthic::stats_values(text, json, error) : benthic::stats(text, json, error);
 		if (rc)
 			fail(error);
 		return S(json);
@@ -764,16 +764,16 @@ void register_methods()
 	// --- Download from a dive computer ---
 	// Bluetooth is not done here: on desktop it will come from the web layer (Web Bluetooth), so
 	// downloadDives is left out. What does not touch the transport is ported.
-	add("dcFromBluetoothName", Lane::Immediate, [](const Args &a) { return S(opendives::dc_from_bluetooth_name(a.str("name"))); });
-	add("dcBluetoothModels", Lane::Immediate, [](const Args &) { return S(opendives::dc_bluetooth_models()); });
+	add("dcFromBluetoothName", Lane::Immediate, [](const Args &a) { return S(benthic::dc_from_bluetooth_name(a.str("name"))); });
+	add("dcBluetoothModels", Lane::Immediate, [](const Args &) { return S(benthic::dc_bluetooth_models()); });
 	add("downloadPartial", core, [](const Args &a) {
 		std::string json, error;
-		if (opendives::download_partial(a.str("action"), json, error))
+		if (benthic::download_partial(a.str("action"), json, error))
 			fail(error);
 		return S(json);
 	});
 	add("downloadCancel", Lane::Immediate, [](const Args &) {
-		opendives::download_cancel();
+		benthic::download_cancel();
 		return NOTHING;
 	});
 }

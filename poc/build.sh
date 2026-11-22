@@ -45,12 +45,12 @@ FLAGS="-std=c++20 -O1 -w
   echo "$ROOT/tests/edit_roundtrip.cpp"; echo "$ROOT/tests/cloud_write.cpp"
   echo "$ROOT/tests/tools_test.cpp"; echo "$ROOT/tests/plan_test.cpp"
   echo "$ROOT/tests/account_test.cpp"; echo "$ROOT/tests/git_remote_test.cpp"; echo "$ROOT/tests/plan_oracle.cpp"
-  echo "$ROOT/core/libopendives/opendives.cpp"; echo "$ROOT/core/libopendives/edit.cpp"
-  echo "$ROOT/core/libopendives/tools.cpp"
-  echo "$ROOT/core/libopendives/settings.cpp"; echo "$ROOT/core/libopendives/plan.cpp"
-  echo "$ROOT/core/libopendives/filter.cpp"; echo "$ROOT/core/libopendives/account.cpp"
-  echo "$ROOT/core/libopendives/stats.cpp"; echo "$ROOT/tests/stats_test.cpp"
-  echo "$ROOT/core/libopendives/download.cpp"; echo "$ROOT/core/libopendives/odgit.cpp"; echo "$ROOT/tests/odgit_test.cpp"; echo "$ROOT/tests/download_test.cpp"; echo "$ROOT/tests/cylinder_reorder_test.cpp"; echo "$ROOT/tests/cylinder_delete_test.cpp"; echo "$ROOT/tests/fit_import_test.cpp"; echo "$ROOT/tests/multi_dive_test.cpp"; echo "$ROOT/tests/import_formats_test.cpp"; echo "$ROOT/tests/import_csv_test.cpp"; echo "$ROOT/tests/save_logbook_test.cpp"; echo "$ROOT/tests/json_int64_test.cpp"; } > "$B/sources.txt"
+  echo "$ROOT/core/libbenthic/benthic.cpp"; echo "$ROOT/core/libbenthic/edit.cpp"
+  echo "$ROOT/core/libbenthic/tools.cpp"
+  echo "$ROOT/core/libbenthic/settings.cpp"; echo "$ROOT/core/libbenthic/plan.cpp"
+  echo "$ROOT/core/libbenthic/filter.cpp"; echo "$ROOT/core/libbenthic/account.cpp"
+  echo "$ROOT/core/libbenthic/stats.cpp"; echo "$ROOT/tests/stats_test.cpp"
+  echo "$ROOT/core/libbenthic/download.cpp"; echo "$ROOT/core/libbenthic/odgit.cpp"; echo "$ROOT/tests/odgit_test.cpp"; echo "$ROOT/tests/download_test.cpp"; echo "$ROOT/tests/cylinder_reorder_test.cpp"; echo "$ROOT/tests/cylinder_delete_test.cpp"; echo "$ROOT/tests/fit_import_test.cpp"; echo "$ROOT/tests/multi_dive_test.cpp"; echo "$ROOT/tests/import_formats_test.cpp"; echo "$ROOT/tests/import_csv_test.cpp"; echo "$ROOT/tests/save_logbook_test.cpp"; echo "$ROOT/tests/json_int64_test.cpp"; } > "$B/sources.txt"
 
 # Objects are only rebuilt when their source is newer: compiled again in full
 # when the flags change (BT_SUPPORT and BLE_SUPPORT enable Subsurface's
@@ -64,8 +64,8 @@ export FLAGS B
 xargs -P"$JOBS" -I{} bash -c 'o="$B/obj/$(basename {} .cpp).o"; [ "$o" -nt {} ] || g++ $FLAGS -c {} -o "$o"' < "$B/sources.txt"
 
 # 4. Link.
-OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|cylinder_delete_test|fit_import_test|multi_dive_test|import_formats_test|import_csv_test|save_logbook_test|json_int64_test|opendives|edit|tools|settings|plan|filter|account|stats|download|odgit|odgit_test)[.]o$')
-FACADE="$B/obj/opendives.o $B/obj/edit.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o $B/obj/odgit.o"
+OBJS=$(ls "$B"/obj/*.o | grep -Ev '/(roundtrip|facade|cloud|edit_roundtrip|cloud_write|tools_test|plan_test|plan_oracle|account_test|git_remote_test|stats_test|download_test|cylinder_reorder_test|cylinder_delete_test|fit_import_test|multi_dive_test|import_formats_test|import_csv_test|save_logbook_test|json_int64_test|benthic|edit|tools|settings|plan|filter|account|stats|download|odgit|odgit_test)[.]o$')
+FACADE="$B/obj/benthic.o $B/obj/edit.o $B/obj/tools.o $B/obj/settings.o $B/obj/plan.o $B/obj/filter.o $B/obj/account.o $B/obj/stats.o $B/obj/download.o $B/obj/odgit.o"
 LIBS="$B/libdc/lib/libdivecomputer.a $(pkg-config --libs libgit2 libxml-2.0 libxslt libzip sqlite3) -lssl -lcrypto -lz -lm"
 g++ $OBJS $FACADE "$B/obj/roundtrip.o" -o "$B/roundtrip" $LIBS
 g++ $OBJS $FACADE "$B/obj/facade.o" -o "$B/facade" $LIBS

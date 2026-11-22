@@ -20,7 +20,7 @@
   /**
    * @type {{
    *   dives: { site: string }[],
-   *   sites: import('opendives-core').SiteSummary[],
+   *   sites: import('benthic-core').SiteSummary[],
    *   height?: string,
    * }}
    * `height`: of the map (the desktop Statistiques screen gives it more room).

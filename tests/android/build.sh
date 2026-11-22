@@ -1,6 +1,6 @@
 #!/bin/bash
 # Builds the planner tests for Android with the NDK (same sources and flags as
-# libopendives.so): build/android/tests/<abi>/{plan_test,plan_oracle}.
+# libbenthic.so): build/android/tests/<abi>/{plan_test,plan_oracle}.
 # Needs the dependencies of native/build-android.sh (build/android/deps/<abi>),
 # so run native/build-android.sh once first (or at least native/build-deps.sh).
 # usage: tests/android/build.sh [abi...]     (default: x86_64)

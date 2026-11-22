@@ -35,7 +35,7 @@
 #include <android/log.h>
 #endif
 
-namespace opendives_compat {
+namespace benthic_compat {
 
 static BtTransport *current_transport = nullptr;
 
@@ -62,18 +62,18 @@ void bt_log(const char *fmt, ...)
 	vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
 #ifdef __ANDROID__
-	__android_log_print(ANDROID_LOG_INFO, "OpenDives", "%s", buf);
+	__android_log_print(ANDROID_LOG_INFO, "Benthic", "%s", buf);
 #else
-	if (getenv("OPENDIVES_BT_LOG"))
+	if (getenv("BENTHIC_BT_LOG"))
 		fprintf(stderr, "bt: %s\n", buf);
 #endif
 	if (bt_log_hook)
 		bt_log_hook(buf);
 }
 
-} // namespace opendives_compat
+} // namespace benthic_compat
 
-using namespace opendives_compat;
+using namespace benthic_compat;
 
 // --- core/bluetoothaddress.cpp -----------------------------------------------
 

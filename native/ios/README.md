@@ -8,14 +8,14 @@ GitHub macOS runner (`.github/workflows/ios.yml`). It uses the same web layer
 ## What is where
 
 - `native/ios/build-ios.sh` builds Subsurface's core, the compatibility layer,
-  the facade and their dependencies into `build/ios/OpenDivesCore.xcframework`,
+  the facade and their dependencies into `build/ios/BenthicCore.xcframework`,
   for iPhone (arm64) and the simulator (arm64 and x86_64).
 - `native/ios/prepare-app.sh` puts the framework, its headers and its assets in
-  the plugin (`plugins/opendives-core/ios/`), builds the web layer and runs
+  the plugin (`plugins/benthic-core/ios/`), builds the web layer and runs
   `cap sync ios`.
-- `plugins/opendives-core/ios/Plugin/` is the Swift side of the plugin, the
-  counterpart of the Kotlin side in `plugins/opendives-core/android/`; its pod
-  is `plugins/opendives-core/OpendivesCore.podspec`.
+- `plugins/benthic-core/ios/Plugin/` is the Swift side of the plugin, the
+  counterpart of the Kotlin side in `plugins/benthic-core/android/`; its pod
+  is `plugins/benthic-core/BenthicCore.podspec`.
 - `app/ios/` is the Capacitor iOS project (icon, launch screen, Info.plist).
 - `tests/ios/` runs the round-trip and planner tests in a simulator
   (`run-simulator.sh`; expected round-trip result: 98 passed,

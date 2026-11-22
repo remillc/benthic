@@ -9,11 +9,11 @@
 //   - the terms version accepted and the fingerprint of the last list sent, in the device store (`od.sharedSitesTerms`,
 //     `od.sharedSitesSent`): what the server answers wins.
 // Only a subscribed Benthic+ account contributes (whatever the server's reading switch says).
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { deviceStore } from './device-store.js';
 import { serverTransport } from './server-transport.js';
 import { serverUrl } from './server-url.js';
-import { odplusAccount, odplusSubscriber } from './benthic-plus-state.svelte.js';
+import { benthicPlusAccount, benthicPlusSubscriber } from './benthic-plus-state.svelte.js';
 import { logbook } from './logbook.svelte.js';
 import { cachedSites } from './core-cache.js';
 import { inventoryApi } from './inventory.svelte.js';
@@ -58,7 +58,7 @@ const api = () => fake ?? createSharedSitesApi({ baseUrl: serverUrl(), transport
 async function token() {
   if (fakeToken) return fakeToken();
   try {
-    return (await OpenDivesCore.serverSessionAccess()).sessionToken || '';
+    return (await BenthicCore.serverSessionAccess()).sessionToken || '';
   } catch {
     return '';
   }
@@ -76,7 +76,7 @@ export async function withSession(f) {
 }
 
 /** Whether this device may show the shared map and contribute: a subscribed Benthic+ account. */
-export const sharedSitesAvailable = () => odplusSubscriber();
+export const sharedSitesAvailable = () => benthicPlusSubscriber();
 
 // --- Mode of the Sites tab ---------------------------------------------------------------------------------------
 
@@ -169,12 +169,12 @@ export function scheduleContribution(ms = 8000) {
 
 /** The logbook's sites with their dives, for the list sent. */
 async function readDetails() {
-  const list = /** @type {import('opendives-core').SiteSummary[]} */ (await cachedSites());
+  const list = /** @type {import('benthic-core').SiteSummary[]} */ (await cachedSites());
   const details = [];
   for (const s of list) {
     if (!s.hasLocation || !s.dives || !s.name.trim()) continue;
     try {
-      const d = await OpenDivesCore.siteQuery({ kind: 'site', uuid: s.uuid });
+      const d = await BenthicCore.siteQuery({ kind: 'site', uuid: s.uuid });
       if (d?.uuid) details.push(d);
     } catch {
       // A site removed meanwhile.
@@ -238,7 +238,7 @@ export async function addBaseSite(baseId) {
   for (const [local, base] of Object.entries(sharedSites.links)) {
     if (base !== baseSiteId && base !== baseId) continue;
     const uuid = Number(local);
-    const known = /** @type {import('opendives-core').SiteSummary[]} */ (await cachedSites()).some((s) => s.uuid === uuid);
+    const known = /** @type {import('benthic-core').SiteSummary[]} */ (await cachedSites()).some((s) => s.uuid === uuid);
     if (known) return uuid;
   }
   const created = await siteChange({ action: 'create', value: site.name, lat: Math.round(site.lat * 1e6), lon: Math.round(site.lon * 1e6) });
@@ -273,7 +273,7 @@ export function startSharedSites() {
   let asked = false;
   $effect.root(() => {
     $effect(() => {
-      const on = odplusAccount.signedIn && odplusAccount.subscribed;
+      const on = benthicPlusAccount.signedIn && benthicPlusAccount.subscribed;
       const online = connection.online;
       if (!on) {
         sharedSites.terms = null;
@@ -289,7 +289,7 @@ export function startSharedSites() {
     $effect(() => {
       logbook.sitesVersion;
       logbook.lastSync;
-      if (odplusAccount.signedIn && odplusAccount.subscribed && !logbook.loading && connection.online && termsAccepted()) scheduleContribution();
+      if (benthicPlusAccount.signedIn && benthicPlusAccount.subscribed && !logbook.loading && connection.online && termsAccepted()) scheduleContribution();
     });
   });
 }

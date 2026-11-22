@@ -16,8 +16,8 @@
 <div class="bc-plus-panel">
   <BenthicPlusReadyLogo play={readyMotion.play} size={120} />
   <BenthicPlusChip />
-  <h1 class="bc-plus-panel--title">{t('odplus.ready.title')}</h1>
-  <p class="bc-plus-panel--lead">{t(deviceKey('odplus.ready.lead', kind))}</p>
+  <h1 class="bc-plus-panel--title">{t('benthicPlus.ready.title')}</h1>
+  <p class="bc-plus-panel--lead">{t(deviceKey('benthicPlus.ready.lead', kind))}</p>
 </div>
 
 <style>

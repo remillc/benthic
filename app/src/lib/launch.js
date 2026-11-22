@@ -3,7 +3,7 @@
 // the WebView has painted its first content AND the screen the app starts on is drawn and laid out
 // (the first launch when no way to start was chosen yet, the Logbook otherwise). Android and iOS only;
 // elsewhere the call does nothing. A safety timeout lets the launch screen go whatever happens.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { mark } from './perf.js';
 
 /** The launch screen is released after this, even if the first screen never says it is ready. */
@@ -46,7 +46,7 @@ export function releaseLaunchScreen() {
   const release = () => {
     mark('launchScreenReleased');
     try {
-      OpenDivesCore.contentShown().catch(() => {});
+      BenthicCore.contentShown().catch(() => {});
     } catch {
       // No native layer (browser): nothing to tell.
     }

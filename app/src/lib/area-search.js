@@ -7,7 +7,7 @@
 // implement such a service on the client side"), at most one request per
 // second, with results cached.
 
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { checkTiles, rectAround, DEFAULT_HALF_KM } from './maps-logic.js';
 
 export const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
@@ -105,7 +105,7 @@ export function placesKey(query, lang) {
  * @param {string} url
  */
 async function nativeFetch(url) {
-  const { status, body } = await OpenDivesCore.placesSearch({ url });
+  const { status, body } = await BenthicCore.placesSearch({ url });
   return { ok: status >= 200 && status < 300, status, json: async () => JSON.parse(body) };
 }
 

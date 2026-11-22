@@ -11,7 +11,7 @@
    * @type {{
    *   profile: number[],
    *   maxDepthMm: number,
-   *   prefs: import('opendives-core').Prefs,
+   *   prefs: import('benthic-core').Prefs,
    *   small?: boolean,
    *   wide?: boolean,
    * }}

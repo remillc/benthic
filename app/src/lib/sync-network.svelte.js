@@ -3,7 +3,7 @@
 // (device-store.js) and applied: the automatic sync (edits sent a few seconds after a change, the retry after a
 // failure, the exchange at start, the catch-up when the network comes back) does not run on a metered or tethered
 // connection. The desktop's main process tells the connection type (desktop/network.cjs, through
-// window.odDesktop.network: cached, asked again when the network interfaces change, never blocking); « unknown »
+// window.benthicDesktop.network: cached, asked again when the network interfaces change, never blocking); « unknown »
 // allows the sync. « Synchroniser maintenant » is manual and always works.
 import { deviceStore } from './device-store.js';
 import { syncAllowed } from './sync-network.js';
@@ -21,7 +21,7 @@ function read() {
 /** @type {{ unmeteredOnly: boolean, cost: import('./sync-network.js').ConnectionCost }} */
 export const syncNetwork = $state({ unmeteredOnly: read(), cost: 'unknown' });
 
-const bridge = () => /** @type {any} */ (typeof window === 'undefined' ? null : window).odDesktop?.network ?? null;
+const bridge = () => /** @type {any} */ (typeof window === 'undefined' ? null : window).benthicDesktop?.network ?? null;
 
 /** @type {(() => void)[]} */
 const allowedAgain = [];

@@ -289,10 +289,10 @@ test('reset: the module is behind the switch, the menu asks twice and offers the
   assert.match(menu, /resetArmed/);
   assert.match(menu, /bind:checked=\{keepAlpha\}/);
   assert.match(read('lib/dev-reset.js'), /if \(!deps\.allowed\(\)\) throw new Error\('NOT_DEV'\)/);
-  const kotlin = readFileSync(new URL('../../plugins/opendives-core/android/src/main/java/org/opendives/core/OpenDivesCorePlugin.kt', import.meta.url), 'utf8');
+  const kotlin = readFileSync(new URL('../../plugins/benthic-core/android/src/main/java/app/benthicdivelog/core/BenthicCorePlugin.kt', import.meta.url), 'utf8');
   assert.match(kotlin, /fun devResetApp[\s\S]*FLAG_DEBUGGABLE[\s\S]*NOT_DEBUG/);
   assert.doesNotMatch(kotlin.match(/fun devResetApp[\s\S]*?call\.resolve\(\)\n    \}/)[0], /cacerts|maps/i);
-  const swift = readFileSync(new URL('../../plugins/opendives-core/ios/Plugin/OpenDivesCorePlugin.swift', import.meta.url), 'utf8');
+  const swift = readFileSync(new URL('../../plugins/benthic-core/ios/Plugin/BenthicCorePlugin.swift', import.meta.url), 'utf8');
   assert.match(swift, /func devResetApp[\s\S]*#if DEBUG[\s\S]*#else[\s\S]*NOT_DEBUG/);
 });
 

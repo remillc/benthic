@@ -17,8 +17,8 @@
    * `inTrip`: the row belongs to an expanded trip and is shifted to the right.
    * `index` and `top`: position in the logbook's virtual list.
    * @type {{
-   *   dive: import('opendives-core').Dive,
-   *   prefs: import('opendives-core').Prefs,
+   *   dive: import('benthic-core').Dive,
+   *   prefs: import('benthic-core').Prefs,
    *   inTrip?: boolean,
    *   index?: number,
    *   top?: number,

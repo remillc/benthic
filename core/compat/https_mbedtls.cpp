@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// OpenDives — opendives_https_get() with Mbed TLS (Android and desktop, Winsock on Windows).
+// OpenDives — benthic_https_get() with Mbed TLS (Android and desktop, Winsock on Windows).
 // Full validation: trusted authorities, chain and host name.
 // Mbed TLS is used under its GPL-2.0-or-later option, compatible with the
 // GPL v2 of Subsurface's core; OpenSSL's Apache 2.0 licence is not.
@@ -42,7 +42,7 @@ typedef int socket_t;
 
 static std::string ca_file;
 
-void opendives_https_set_ca_file(const std::string &path)
+void benthic_https_set_ca_file(const std::string &path)
 {
 	ca_file = path;
 }
@@ -253,13 +253,13 @@ static int https_request(const std::string &method, const std::string &url, cons
 	return 0;
 }
 
-int opendives_https_get(const std::string &url, const std::string &user_agent,
+int benthic_https_get(const std::string &url, const std::string &user_agent,
 			int timeout_seconds, int &status, std::string &body)
 {
 	return https_request("GET", url, user_agent, "text/plain", std::string(), std::string(), timeout_seconds, status, body);
 }
 
-int opendives_https_post(const std::string &url, const std::string &user_agent, const std::string &accept,
+int benthic_https_post(const std::string &url, const std::string &user_agent, const std::string &accept,
 			 const std::string &content_type, const std::string &request_body,
 			 int timeout_seconds, int &status, std::string &body)
 {

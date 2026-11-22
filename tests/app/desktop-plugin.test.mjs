@@ -1,9 +1,9 @@
-// The desktop implementation of the OpenDivesCore plugin (plugins/opendives-core/desktop.js),
-// with a fake window.odDesktop: what it sends to the core and what it resolves, as the Android
-// plugin does (OpenDivesCorePlugin.kt).
+// The desktop implementation of the BenthicCore plugin (plugins/benthic-core/desktop.js),
+// with a fake window.benthicDesktop: what it sends to the core and what it resolves, as the Android
+// plugin does (BenthicCorePlugin.kt).
 import { test, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { OpenDivesCoreDesktop, fileUrl, flatRules, joinPath, parseEnv } from '../../plugins/opendives-core/desktop.js';
+import { BenthicCoreDesktop, fileUrl, flatRules, joinPath, parseEnv } from '../../plugins/benthic-core/desktop.js';
 
 const paths = { userData: '/data/OpenDives', temp: '/tmp/opendives', resourcesDir: '/app/resources', xsltDir: '/app/resources/xslt', caFile: '/data/OpenDives/cacerts.pem' };
 
@@ -105,21 +105,21 @@ let plugin;
 
 function install(answers) {
   bridge = fakeBridge(answers);
-  globalThis.odDesktop = bridge;
-  plugin = new OpenDivesCoreDesktop();
+  globalThis.benthicDesktop = bridge;
+  plugin = new BenthicCoreDesktop();
 }
 
 beforeEach(() => install({}));
 afterEach(() => {
-  delete globalThis.odDesktop;
+  delete globalThis.benthicDesktop;
 });
 
 const rejection = (promise) => promise.then(() => assert.fail('it must reject'), (e) => e);
 const lastCall = () => bridge.calls[bridge.calls.length - 1];
 
 test('without the desktop bridge every call rejects with UNAVAILABLE', async () => {
-  delete globalThis.odDesktop;
-  const error = await rejection(new OpenDivesCoreDesktop().listDives());
+  delete globalThis.benthicDesktop;
+  const error = await rejection(new BenthicCoreDesktop().listDives());
   assert.equal(error.code, 'UNAVAILABLE');
 });
 
@@ -213,7 +213,7 @@ test('statsQuery sends the criteria as JSON text, or the field name', async () =
 test('configureCloud: the stored account, then the write lock from cloud-test.env', async () => {
   install({ cloudConfigure: null, setCloudTestEmail: null });
   bridge.secrets.cloud = { email: 'a@b.c', password: 'pw' };
-  bridge.env['cloud-test.env'] = '# test\nOPENDIVES_CLOUD_TEST_EMAIL=test@b.c\n';
+  bridge.env['cloud-test.env'] = '# test\nBENTHIC_CLOUD_TEST_EMAIL=test@b.c\n';
   assert.deepEqual(await plugin.configureCloud(), { available: true, email: 'a@b.c' });
   assert.deepEqual(bridge.calls.map((c) => c.method), ['cloudConfigure', 'setCloudTestEmail']);
   assert.deepEqual(bridge.calls[1].args, { email: 'test@b.c' });
@@ -233,7 +233,7 @@ test('listCloudDives: cached, development credentials, none', async () => {
   assert.deepEqual(await plugin.listCloudDives({ cached: true }), { available: true, json: '' });
   install({ cloudListDives: '{}' });
   assert.deepEqual(await plugin.listCloudDives(), { available: false });
-  bridge.env['cloud-dev.env'] = 'OPENDIVES_CLOUD_EMAIL=d@e.f\nOPENDIVES_CLOUD_PASSWORD=x\n';
+  bridge.env['cloud-dev.env'] = 'BENTHIC_CLOUD_EMAIL=d@e.f\nBENTHIC_CLOUD_PASSWORD=x\n';
   assert.deepEqual(await plugin.listCloudDives(), { available: true, json: '{}' });
   assert.deepEqual(lastCall().args, { email: 'd@e.f', password: 'x' });
 });

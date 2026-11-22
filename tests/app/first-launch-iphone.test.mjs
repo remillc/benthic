@@ -85,12 +85,12 @@ test('choosing iCloud Drive goes to the connected screen with no sign-in, and ba
 });
 
 test('the plugin: createIcloudLogbook in the contract, in Swift, and a stub on Android', () => {
-  const api = read('plugins/opendives-core/core-api.js');
+  const api = read('plugins/benthic-core/core-api.js');
   assert.match(api, /createIcloudLogbook: \(options\) => native\.createIcloudLogbook\(options\)/);
   assert.match(api, /@property \{\(options: \{name: string\}\) => Promise<\{path: string, created: boolean\}>\} createIcloudLogbook/);
-  const kotlin = read('plugins/opendives-core/android/src/main/java/org/opendives/core/OpenDivesCorePlugin.kt');
+  const kotlin = read('plugins/benthic-core/android/src/main/java/app/benthicdivelog/core/BenthicCorePlugin.kt');
   assert.match(kotlin, /fun createIcloudLogbook\(call: PluginCall\) \{\s+call\.reject\("NOT_AVAILABLE", "NOT_AVAILABLE"\)/);
-  const swift = read('plugins/opendives-core/ios/Plugin/OpenDivesCorePlugin.swift');
+  const swift = read('plugins/benthic-core/ios/Plugin/BenthicCorePlugin.swift');
   assert.match(swift, /CAPPluginMethod\(name: "createIcloudLogbook", returnType: CAPPluginReturnPromise\)/);
   assert.match(swift, /@objc func createIcloudLogbook\(_ call: CAPPluginCall\)/);
   assert.match(swift, /url\(forUbiquityContainerIdentifier: nil\)/);

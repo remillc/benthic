@@ -10,13 +10,13 @@
 #   6. B -> b.xml, C -> c.xml    identical files                          [strict]
 #   7. probe: the head of the server branch has not changed              [strict]
 #
-# Credentials are read from <env-file> (OPENDIVES_CLOUD_EMAIL,
-# OPENDIVES_CLOUD_PASSWORD); the password is never printed.
+# Credentials are read from <env-file> (BENTHIC_CLOUD_EMAIL,
+# BENTHIC_CLOUD_PASSWORD); the password is never printed.
 # usage: run-cloud-readonly.sh <cloud> <roundtrip> <env-file> <workdir>
 set -euo pipefail
 CLOUD=$(realpath "$1"); RT=$(realpath "$2"); ENVF=$3; W=$4
 set -a; source <(tr -d '\r' < "$ENVF"); set +a
-BR=$OPENDIVES_CLOUD_EMAIL
+BR=$BENTHIC_CLOUD_EMAIL
 rm -rf "$W"; mkdir -p "$W/home"; W=$(realpath "$W")
 export HOME=$W/home   # core cache: $HOME/.subsurface/cloudstorage/...
 tree() { git -C "$1" rev-parse "refs/heads/$BR^{tree}"; }

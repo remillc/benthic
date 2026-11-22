@@ -13,7 +13,7 @@
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { ios } from '../lib/layout.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import SiteMap from '../components/SiteMap.svelte';
@@ -25,7 +25,7 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { confirmAction } from '../lib/dialogs.js';
   import LeaveGuard from '../components/LeaveGuard.svelte';
-  import { odplusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { linkSite, loadLinks, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { SUGGEST_RADIUS_M, inYourSites } from '../lib/shared-sites.js';
   import { baseDivesText, distanceValue } from '../lib/shared-sites-format.js';
@@ -42,7 +42,7 @@
   const givenPosition =
     f7route.query?.lat && f7route.query?.lon ? { latUdeg: Number(f7route.query.lat), lonUdeg: Number(f7route.query.lon) } : null;
 
-  let original = $state(/** @type {import('opendives-core').SiteDetail|null} */ (null));
+  let original = $state(/** @type {import('benthic-core').SiteDetail|null} */ (null));
   let name = $state('');
   let description = $state('');
   let notes = $state('');
@@ -54,7 +54,7 @@
   let position = $state(/** @type {{latUdeg: number, lonUdeg: number}|null} */ (null));
   let coordsText = $state('');
   let coordsError = $state(false);
-  let nearby = $state(/** @type {import('opendives-core').SiteSummary|null} */ (null));
+  let nearby = $state(/** @type {import('benthic-core').SiteSummary|null} */ (null));
   /** The closest site of the shared map, when the logbook has none close. */
   let commonNear = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite|null} */ (null));
   /** « Utiliser ce site »: the base site the new site is linked to when saved. */
@@ -104,7 +104,7 @@
       );
       return;
     }
-    const s = await OpenDivesCore.siteQuery({ kind: 'site', uuid: editing });
+    const s = await BenthicCore.siteQuery({ kind: 'site', uuid: editing });
     original = s;
     name = s.name;
     description = s.description;
@@ -128,7 +128,7 @@
     coordsError = false;
     positionLookup = (async () => {
       try {
-        const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
+        const near = await BenthicCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
         if (asked !== lookups) return true;
         nearby = near && near.uuid !== editing ? near : null;
         if (!editing) suggestCommon(p, asked);
@@ -148,7 +148,7 @@
 
   /** A base site close to the new site's position (none when the logbook already has one close). @param {{latUdeg: number, lonUdeg: number}} p @param {number} asked */
   async function suggestCommon(p, asked) {
-    if (nearby || !odplusAccount.signedIn || !connection.online) {
+    if (nearby || !benthicPlusAccount.signedIn || !connection.online) {
       commonNear = null;
       return;
     }
@@ -229,7 +229,7 @@
       // Country and region found from the position, then what the diver
       // typed where it differs (kept as a correction).
       if (moved) await geocodeSite(uuid);
-      const now = await OpenDivesCore.siteQuery({ kind: 'site', uuid });
+      const now = await BenthicCore.siteQuery({ kind: 'site', uuid });
       if (country.trim() !== now.country) await siteChange({ action: 'edit', uuid, field: 'country', value: country.trim() });
       if (region.trim() !== now.region.value) await siteChange({ action: 'edit', uuid, field: 'region', value: region.trim() });
       if (forDive) {

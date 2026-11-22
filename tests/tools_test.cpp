@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
-// Tools of the façade (core/libopendives/tools.cpp): desaturation and the cylinder
+// Tools of the façade (core/libbenthic/tools.cpp): desaturation and the cylinder
 // types, against values worked out by hand from Subsurface's formulas. The gas
 // calculator and the gas blender are in JavaScript; their checks are in
 // tests/app/gas-tools.test.mjs.
 // usage: tools <log with dives, e.g. third_party/subsurface/dives/SampleDivesV2.ssrf>
-#include "../core/libopendives/opendives.h"
+#include "../core/libbenthic/benthic.h"
 #include "zhl16c.h"
 
 #include "core/dive.h"
@@ -216,17 +216,17 @@ int main(int argc, char **argv)
 	}
 	std::string json, error;
 
-	opendives::gas_cylinder_types(json);
+	benthic::gas_cylinder_types(json);
 	check_true("cylinder types listed", json.find("\"name\":\"AL80\"") != std::string::npos);
 
 	// Desaturation with nothing loaded: tissues at rest, (1.013 - 0.0627) * 0.781
 	// = 0.7422 bar of nitrogen, 0.7422 / 1.013 * 50 = 37 % in Subsurface's graph.
-	opendives::desaturation(1700000000, json);
+	benthic::desaturation(1700000000, json);
 	check("no dive: surfaceSeconds", number(json, "surfaceSeconds"), -1);
 	check("no dive: fastest tissue at rest", number(json, "percent"), 37);
 	check("no dive: slowest tissue at rest", number(json, "percent", json.rfind("{\"percent\"")), 37);
 
-	if (opendives::list_dives(argv[1], json, error)) {
+	if (benthic::list_dives(argv[1], json, error)) {
 		fprintf(stderr, "%s\n", error.c_str());
 		return 2;
 	}
@@ -237,7 +237,7 @@ int main(int argc, char **argv)
 	strptime(json.substr(date, 19).c_str(), "%Y-%m-%dT%H:%M:%S", &tm);
 	int64_t end = static_cast<int64_t>(timegm(&tm)) + number(json, "durationSeconds", last);
 
-	opendives::desaturation(end + 3600, json);
+	benthic::desaturation(end + 3600, json);
 	printf("%s\n", json.c_str());
 	long surface = number(json, "surfaceSeconds");
 	check_true("one hour after: surface interval about an hour", surface > 3000 && surface <= 3600);
@@ -253,7 +253,7 @@ int main(int argc, char **argv)
 	size_t slowest = json.rfind("\"n2Bar\":");
 	check_true("one hour after: slowest compartment above rest", atof(json.c_str() + slowest + 8) > 0.7430);
 
-	opendives::desaturation(end + 49 * 3600, json);
+	benthic::desaturation(end + 49 * 3600, json);
 	check("49 hours after: no dive counts", number(json, "surfaceSeconds"), -1);
 	check("49 hours after: dives", json.find("\"dives\":[]") != std::string::npos, 1);
 
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
 	// time-stepping error, which TOL_DESAT_BAR is set just above (measured below).
 	auto desat_vs_reference = [&](const char *what, int64_t now, size_t expected_dives) {
 		std::string j;
-		opendives::desaturation(now + (mutated("desat") ? 600 : 0), j);
+		benthic::desaturation(now + (mutated("desat") ? 600 : 0), j);
 		auto used = ref::chain(now);
 		bool ok = used.size() == expected_dives;
 		size_t at = 0;

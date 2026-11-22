@@ -3,7 +3,7 @@
 // answer, and what « Envoyer » does. Nothing leaves the device before that tap. The pure parts (building, scrubbing, queue,
 // sending) are in error-report.js and error-scrub.js.
 import { Capacitor } from '@capacitor/core';
-import { OpenDivesCore, setCoreErrorHook } from 'opendives-core';
+import { BenthicCore, setCoreErrorHook } from 'benthic-core';
 import { deviceStore } from './device-store.js';
 import { edition } from './edition.js';
 import { serverUrl } from './server-url.js';
@@ -41,7 +41,7 @@ let routeNow = () => '';
 
 /** What the app knows of itself, for the report. */
 function info() {
-  const desktop = /** @type {any} */ (globalThis).odDesktop;
+  const desktop = /** @type {any} */ (globalThis).benthicDesktop;
   const platform = desktop ? 'desktop' : Capacitor.getPlatform();
   return {
     appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '',
@@ -116,10 +116,10 @@ export function declineCurrent() {
 /** A crash that Kotlin or Swift code saved before the app died: it becomes a report of its own. */
 async function collectNativeCrash() {
   try {
-    const saved = await OpenDivesCore.pendingCrashReport();
+    const saved = await BenthicCore.pendingCrashReport();
     if (!saved?.json) return;
     const crash = JSON.parse(saved.json);
-    await OpenDivesCore.clearCrashReport();
+    await BenthicCore.clearCrashReport();
     const base = info();
     const report = buildReport({
       kind: 'native',

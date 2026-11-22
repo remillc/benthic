@@ -18,14 +18,14 @@
 
   /**
    * @type {{
-   *   samples: import('opendives-core').DiveSamples,
-   *   cylinders: import('opendives-core').Cylinder[],
+   *   samples: import('benthic-core').DiveSamples,
+   *   cylinders: import('benthic-core').Cylinder[],
    *   divemode: string,
    *   maxDepthMm: number,
    *   durationSeconds: number,
    *   startIso?: string,
    *   meanDepthMm?: number,
-   *   prefs: import('opendives-core').Prefs,
+   *   prefs: import('benthic-core').Prefs,
    * }}
    */
   // `hover` (desktop, task 2026-11-15-169): the mouse pointer reads the values without a press:

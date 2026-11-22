@@ -1,5 +1,5 @@
 // Builds core/data/regions.txt, the offline country and region lookup used
-// when Nominatim cannot be reached (core/libopendives/regions.cpp).
+// when Nominatim cannot be reached (core/libbenthic/regions.cpp).
 //
 // Source: Natural Earth 1:10m, public domain (https://www.naturalearthdata.com):
 //   ne_10m_admin_1_states_provinces.zip and ne_10m_admin_0_countries.zip from

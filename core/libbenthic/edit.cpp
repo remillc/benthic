@@ -1,0 +1,4381 @@
+// SPDX-License-Identifier: GPL-2.0
+// Editing dives, undo and redo, local save and cloud sync
+// (docs/editing-and-sync-plan.md, sections 3 and 4).
+//
+// Ported from Subsurface without modifying it:
+//  - the edit itself from commands/command_edit.cpp: EditDive::exchangeDives()
+//    (copy the dive, change the copy, swap the contents, with the fulltext and
+//    dive site registration around the swap), and the Edit* command texts;
+//  - the tag-like lists (tags, buddies, dive guide) from EditTagsBase: only
+//    the entries added or removed change, the order of the others is kept;
+//  - the commit message text from commands/command_base.cpp: changesMade();
+//  - the save flow from mobile-widgets/qmlmanager.cpp: saveChangesLocal()
+//    (refuse unless classify_git_save() says "normal", then save with
+//    git_local_only) and saveChangesCloud() (then reload with sync).
+#include "benthic.h"
+#include "internal.h"
+#include "json.h"
+
+#include "core/device.h"
+#include "core/extradata.h"
+#include <cmath>
+#include <map>
+#include <set>
+#include "core/dive.h"
+#include "core/divecomputer.h"
+#include "core/sample.h"
+#include "core/tanksensormapping.h"
+#include "core/divefilter.h"
+#include "core/divelog.h"
+#include "core/divesite.h"
+#include "core/equipment.h"
+#include "core/filterpreset.h"
+#include "core/filterpresettable.h"
+#include "core/subsurface-time.h"
+#include "core/file.h"
+#include "core/import-csv.h"
+#include "core/xmlparams.h"
+#include "core/fulltext.h"
+#include "core/git-access.h"
+#include "core/pref.h"
+#include "core/tag.h"
+#include "core/trip.h"
+#include "core/taxonomy.h"
+#include "core/compat/platform_https.h"
+#include "core/qthelper.h"
+#include "core/version.h"
+#include "commands/command.h"
+
+#include <git2.h>
+#include <algorithm>
+#include <cctype>
+#include <chrono>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <ctime>
+#include <initializer_list>
+#include <map>
+#include <memory>
+#include <set>
+#include <thread>
+#include <vector>
+
+// save-git.cpp: checks out a new tree in a non-bare repository (not in a header).
+int update_git_checkout(git_repository *repo, git_object *parent, git_tree *tree);
+
+namespace benthic {
+
+using internal::JsonReader;
+using internal::JsonValue;
+
+namespace {
+
+void append_json_string(std::string &out, const std::string &s)
+{
+	out += '"';
+	for (unsigned char c: s) {
+		switch (c) {
+		case '"': out += "\\\""; break;
+		case '\\': out += "\\\\"; break;
+		case '\n': out += "\\n"; break;
+		case '\r': out += "\\r"; break;
+		case '\t': out += "\\t"; break;
+		default:
+			if (c < 0x20) {
+				char buf[8];
+				snprintf(buf, sizeof(buf), "\\u%04x", c);
+				out += buf;
+			} else {
+				out += static_cast<char>(c);
+			}
+		}
+	}
+	out += '"';
+}
+
+// ---------------------------------------------------------------------------
+// Undo stack: for each step, the dive's previous contents and the command
+// text, as Subsurface's EditDive keeps the old and new dives.
+
+// A dive moved to a trip (null: out of any trip); after a move, `trip` holds
+// the previous one, so the same move done again reverts it.
+struct TripMove {
+	dive *d;
+	dive_trip *trip;
+};
+
+// A dive out of the log, with the trip and site it goes back to (Subsurface's
+// DiveToAdd, commands/command_divelist.h).
+struct DiveToAdd {
+	std::unique_ptr<dive> d;
+	dive_trip *trip = nullptr;
+	dive_site *site = nullptr;
+};
+
+// Dives, trips and sites to put in the log (owned), and those to take out:
+// Subsurface's DivesAndTripsToAdd and DivesAndSitesToRemove.
+struct DiveListChange {
+	std::vector<DiveToAdd> dives;
+	std::vector<std::unique_ptr<dive_trip>> trips;
+	std::vector<std::unique_ptr<dive_site>> sites;
+	std::vector<dive *> remove_dives;
+	std::vector<dive_site *> remove_sites;
+};
+
+struct Step {
+	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER, DEVICES,
+		    MERGE, DIVES_EDIT } kind = DIVE;
+	// DIVE_LIST: as Subsurface's AddDive and ImportDives: what the next undo
+	// or redo puts in and takes out; for an import, the dive computers and
+	// filter presets it brings, and whether they are in the log now.
+	DiveListChange list;
+	std::vector<device> devices;
+	std::vector<std::pair<std::string, FilterData>> presets_to_add;
+	std::vector<int> presets_to_remove;
+	bool list_applied = false;
+	// RENUMBER and deletion: each dive with the number to swap in on undo or redo.
+	std::vector<std::pair<dive *, int>> renumbered;
+	// A download from a dive computer (download.cpp): the core's fingerprint
+	// table to swap in on the next undo or redo, so that undoing the download
+	// also forgets the fingerprint of its newest dive (an OpenDives addition:
+	// Subsurface keeps it, and the next download then skips those dives).
+	bool swap_fingerprints = false;
+	fingerprint_table fingerprints;
+	// FILTER_PRESET: as CreateFilterPreset, RemoveFilterPreset and
+	// EditFilterPreset (commands/command_filter.cpp).
+	enum PresetOp { CREATE, REMOVE, EDIT } preset_op = CREATE;
+	int preset_index = 0;
+	std::string preset_name;
+	FilterData preset_data;
+	bool preset_applied = false;
+	// DIVE: the dive and the contents to swap in on the next undo or redo.
+	int dive_id = 0;
+	std::unique_ptr<dive> other;
+	// TRIP_FIELD: the trip, which field, and the value to swap in.
+	dive_trip *trip = nullptr;
+	bool notes = false;
+	std::string value;
+	// MOVE: as Subsurface's DivesToTrip (commands/command_divelist.h).
+	std::vector<TripMove> moves;
+	std::vector<std::unique_ptr<dive_trip>> trips_to_add;
+	// SITE_FIELD: a site, which field (0 name, 1 description, 2 notes,
+	// 3 location, 4 taxonomy) and the value to swap in.
+	dive_site *site = nullptr;
+	int site_field = 0;
+	location_t location {};
+	taxonomy_data taxonomy;
+	// SITES: as Subsurface's AddDiveSite, DeleteDiveSites and MergeDiveSites:
+	// sites to remove from the core, or removed ones (owned) to put back;
+	// for a merge, the site that receives their dives.
+	std::vector<dive_site *> sites_to_remove;
+	std::vector<std::unique_ptr<dive_site>> sites_to_add;
+	dive_site *merge_into = nullptr;
+	// CYLINDER_TYPE: as Subsurface's RenameCylinderType, the cylinders of that
+	// type in the log; after each undo or redo, `value` holds the name to put
+	// back and `type_name` the name in use.
+	std::vector<std::pair<dive *, int>> cylinders;
+	std::string type_name;
+	// DEVICES: the device table, the dives (by id) and the fingerprints' device
+	// ids to swap in on the next undo or redo.
+	device_table devices_swap;
+	std::vector<std::pair<int, std::unique_ptr<dive>>> dive_swaps;
+	std::vector<std::pair<size_t, uint32_t>> fingerprint_moves;
+	std::string text;
+};
+
+std::vector<Step> steps;
+size_t applied = 0;           // steps currently applied (QUndoStack::index())
+long clean_index = 0;         // `applied` at the last save; -1 if unreachable
+long next_to_write = 0;       // changesMade(): first step not yet in a commit message
+int loaded_format_version = 0; // "version" line of 00-Subsurface; 0 if unknown
+
+// Cloud write lock (plan, section 4).
+std::string cloud_test_email;
+bool cloud_writes_enabled = false;
+
+// is_git_repository() resets git_remote_sync_successful (it expects a new
+// remote): the façade's own lookups after a sync must keep the flag.
+bool git_info_of(const std::string &log, struct git_info &info)
+{
+	bool kept = git_remote_sync_successful;
+	bool found = is_git_repository(log.c_str(), &info);
+	git_remote_sync_successful = kept;
+	return found;
+}
+
+const std::string &step_text(long i)
+{
+	static const std::string none;
+	return i >= 0 && static_cast<size_t>(i) < steps.size() ? steps[i].text : none;
+}
+
+// Port of Command::changesMade() (commands/command_base.cpp): the texts of the
+// commands since the last commit, "(undo) " before the ones walked back.
+std::string changes_made()
+{
+	long cur = static_cast<long>(applied);
+	std::string texts;
+	if (cur > next_to_write) {
+		for (long i = next_to_write; i < cur; i++)
+			texts += step_text(i) + "\n";
+	} else if (cur < next_to_write) {
+		for (long i = next_to_write - 1; i >= cur; i--)
+			texts += "(undo) " + step_text(i) + "\n";
+	} else if (cur > 0) {
+		// Something was undone, then something else done: only the last change is known.
+		texts += step_text(cur - 1) + "\n";
+	}
+	next_to_write = cur;
+	return texts;
+}
+
+struct HookInstaller {
+	HookInstaller() { benthic_compat::changes_made_hook = changes_made; }
+} hook_installer;
+
+// Port of EditDive::exchangeDives(): `other` holds the contents to put in
+// `d`; afterwards it holds the previous contents. The dive site travels in
+// `other.dive_site` while `other` is not a registered dive.
+void exchange(dive *d, dive &other)
+{
+	fulltext_unregister(d);
+	dive_site *old_site = d->dive_site;
+	if (old_site)
+		unregister_dive_from_dive_site(d); // sets d->dive_site to null
+	dive_site *new_site = other.dive_site;
+	other.dive_site = nullptr;
+	std::swap(*d, other);
+	fulltext_register(d);
+	if (new_site)
+		new_site->add_dive(d);
+	other.dive_site = old_site;
+	d->invalidate_cache(); // so that save-git writes this dive again
+	// The gas used and other cylinder data, as the cylinder commands update them.
+	divelog.dives.update_cylinder_related_info(*d);
+	// Changing times may have unsorted the dive and trip tables.
+	if (d->when != other.when) {
+		divelog.dives.sort();
+		divelog.trips.sort();
+		if (d->divetrip)
+			d->divetrip->sort_dives(); // Keep the trip-table in order
+	}
+}
+
+// Port of moveDiveToTrip() (commands/command_divelist.cpp), without the
+// selection and the signals: an emptied trip leaves the trip table and is
+// returned, owned, to be put back on the next undo or redo.
+std::unique_ptr<dive_trip> move_dive_to_trip(TripMove &move)
+{
+	if (move.trip == move.d->divetrip)
+		return {};
+	std::unique_ptr<dive_trip> removed;
+	dive_trip *trip = unregister_dive_from_trip(move.d);
+	if (trip && trip->dives.empty()) {
+		auto [t, idx] = divelog.trips.pull(trip);
+		removed = std::move(t);
+	}
+	std::swap(trip, move.trip);
+	if (trip)
+		trip->add_dive(move.d);
+	move.d->invalidate_cache(); // so that save-git writes this dive again
+	return removed;
+}
+
+// Port of moveDivesBetweenTrips(): put back the trips to add, move each dive,
+// keep the trips that became empty. Doing it twice is a no-op.
+void move_dives_between_trips(Step &step)
+{
+	for (std::unique_ptr<dive_trip> &trip: step.trips_to_add)
+		divelog.trips.put(std::move(trip));
+	step.trips_to_add.clear();
+	for (TripMove &move: step.moves) {
+		std::unique_ptr<dive_trip> removed = move_dive_to_trip(move);
+		if (removed)
+			step.trips_to_add.push_back(std::move(removed));
+	}
+	divelog.trips.sort(); // as TripBase::redoit()
+}
+
+dive_trip *trip_by_id(int id)
+{
+	for (auto &trip: divelog.trips)
+		if (trip->id == id)
+			return trip.get();
+	return nullptr;
+}
+
+// Ports of addDiveSites() and removeDiveSites() (commands/command_divesite.cpp),
+// without signals. A removed site keeps its list of dives for the undo. The
+// dives' cache is invalidated so that their site is written again (Subsurface
+// does not do it here).
+std::vector<dive_site *> add_sites(std::vector<std::unique_ptr<dive_site>> &sites)
+{
+	std::vector<dive_site *> res;
+	for (std::unique_ptr<dive_site> &ds: sites) {
+		for (dive *d: ds->dives) {
+			d->dive_site = ds.get();
+			d->invalidate_cache();
+		}
+		res.push_back(divelog.sites.register_site(std::move(ds)).ptr);
+	}
+	sites.clear();
+	return res;
+}
+
+std::vector<std::unique_ptr<dive_site>> remove_sites(std::vector<dive_site *> &sites)
+{
+	std::vector<std::unique_ptr<dive_site>> res;
+	for (dive_site *ds: sites) {
+		for (dive *d: ds->dives) {
+			d->dive_site = nullptr;
+			d->invalidate_cache();
+		}
+		res.push_back(std::move(divelog.sites.pull(ds).ptr));
+	}
+	sites.clear();
+	return res;
+}
+
+// Redo and undo of a SITES step (AddDiveSite, DeleteDiveSites, MergeDiveSites).
+void apply_sites(Step &step)
+{
+	if (!step.sites_to_remove.empty()) {
+		step.sites_to_add = remove_sites(step.sites_to_remove);
+		if (step.merge_into) {
+			for (const std::unique_ptr<dive_site> &site: step.sites_to_add)
+				for (dive *d: site->dives) {
+					step.merge_into->add_dive(d);
+					d->invalidate_cache();
+				}
+		}
+	} else {
+		if (step.merge_into) {
+			for (const std::unique_ptr<dive_site> &site: step.sites_to_add)
+				for (dive *d: site->dives) {
+					unregister_dive_from_dive_site(d);
+					d->invalidate_cache();
+				}
+		}
+		step.sites_to_remove = add_sites(step.sites_to_add);
+	}
+}
+
+// Redo and undo of a SITE_FIELD step: the value is swapped.
+void apply_site_field(Step &step)
+{
+	dive_site *ds = step.site;
+	switch (step.site_field) {
+	case 0: std::swap(ds->name, step.value); break;
+	case 1: std::swap(ds->description, step.value); break;
+	case 2: std::swap(ds->notes, step.value); break;
+	case 3: std::swap(ds->location, step.location); break;
+	default: std::swap(ds->taxonomy, step.taxonomy); break;
+	}
+	for (dive *d: ds->dives)
+		d->invalidate_cache();
+}
+
+// "#12", or "@" and the date when the dive has no number. Subsurface's
+// diveNumberOrDate() uses the date format of the user's settings; a fixed
+// format is used here.
+std::string dive_number_or_date(const dive &d)
+{
+	if (d.number != 0)
+		return "#" + std::to_string(d.number);
+	time_t t = static_cast<time_t>(d.when);
+	struct tm tm;
+	gmtime_r(&t, &tm);
+	char buf[32];
+	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M", &tm);
+	return std::string("@") + buf;
+}
+
+std::string trim(const std::string &s)
+{
+	size_t a = s.find_first_not_of(" \t\r\n"), b = s.find_last_not_of(" \t\r\n");
+	return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
+}
+
+// Port of stringToList() (core/qthelper.cpp): split on commas, trim, skip empty.
+std::vector<std::string> string_to_list(const std::string &s)
+{
+	std::vector<std::string> out;
+	size_t start = 0;
+	while (start <= s.size()) {
+		size_t comma = s.find(',', start);
+		std::string item = s.substr(start, comma == std::string::npos ? std::string::npos : comma - start);
+		if (!item.empty()) // SkipEmptyParts applies before trimming
+			out.push_back(trim(item));
+		if (comma == std::string::npos)
+			break;
+		start = comma + 1;
+	}
+	return out;
+}
+
+std::string join(const std::vector<std::string> &list)
+{
+	std::string out;
+	for (size_t i = 0; i < list.size(); i++) {
+		if (i)
+			out += ", ";
+		out += list[i];
+	}
+	return out;
+}
+
+bool contains(const std::vector<std::string> &list, const std::string &s)
+{
+	return std::find(list.begin(), list.end(), s) != list.end();
+}
+
+// Port of EditTagsBase::workToBeDone() and undo() for one dive: returns
+// false when nothing changes; otherwise `list` becomes the old list without
+// the removed entries, then the added ones.
+bool apply_tag_edit(std::vector<std::string> &list, const std::vector<std::string> &wanted_in)
+{
+	std::vector<std::string> wanted;
+	for (const std::string &s: wanted_in) { // the edit field gives trimmed entries
+		std::string t = trim(s);
+		if (!t.empty())
+			wanted.push_back(t);
+	}
+	std::vector<std::string> to_add, to_remove;
+	for (const std::string &s: wanted)
+		if (!contains(list, s))
+			to_add.push_back(s);
+	for (const std::string &s: list)
+		if (!contains(wanted, s))
+			to_remove.push_back(s);
+	if (to_add.empty() && to_remove.empty())
+		return false;
+	for (const std::string &s: to_remove)
+		list.erase(std::remove(list.begin(), list.end(), s), list.end());
+	for (const std::string &s: to_add)
+		if (!contains(list, s))
+			list.push_back(s);
+	return true;
+}
+
+std::vector<std::string> tag_names(const dive &d)
+{
+	std::vector<std::string> out;
+	for (const divetag *tag: d.tags)
+		out.push_back(tag->name);
+	return out;
+}
+
+// Format version of the log in memory, from the "version" line of
+// 00-Subsurface in the commit that was loaded.
+int read_format_version()
+{
+	const std::string &log = internal::current_log();
+	if (log.empty() || loaded_git_commit.empty())
+		return 0;
+	struct git_info info;
+	if (!git_info_of(log, info))
+		return 0;
+	git_repository *repo = nullptr;
+	if (git_repository_open(&repo, info.localdir.c_str()))
+		return 0;
+	int version = 0;
+	git_oid oid;
+	git_commit *commit = nullptr;
+	git_tree *tree = nullptr;
+	git_tree_entry *entry = nullptr;
+	git_blob *blob = nullptr;
+	if (!git_oid_fromstr(&oid, loaded_git_commit.c_str()) &&
+	    !git_commit_lookup(&commit, repo, &oid) &&
+	    !git_commit_tree(&tree, commit) &&
+	    !git_tree_entry_bypath(&entry, tree, "00-Subsurface") &&
+	    !git_blob_lookup(&blob, repo, git_tree_entry_id(entry))) {
+		std::string text(static_cast<const char *>(git_blob_rawcontent(blob)), git_blob_rawsize(blob));
+		size_t pos = 0;
+		while (pos < text.size()) {
+			size_t eol = text.find('\n', pos);
+			std::string line = text.substr(pos, eol == std::string::npos ? std::string::npos : eol - pos);
+			if (line.rfind("version ", 0) == 0)
+				version = atoi(line.c_str() + 8);
+			if (eol == std::string::npos)
+				break;
+			pos = eol + 1;
+		}
+	}
+	git_blob_free(blob);
+	git_tree_entry_free(entry);
+	git_tree_free(tree);
+	git_commit_free(commit);
+	git_repository_free(repo);
+	return version;
+}
+
+bool account_writes_allowed(const std::string &email)
+{
+	if (cloud_writes_enabled)
+		return true;
+	std::string a = email, b = cloud_test_email;
+	std::transform(a.begin(), a.end(), a.begin(), [](unsigned char c) { return std::tolower(c); });
+	std::transform(b.begin(), b.end(), b.begin(), [](unsigned char c) { return std::tolower(c); });
+	return !b.empty() && a == b;
+}
+
+bool writes_allowed()
+{
+	if (!internal::current_log_is_cloud())
+		return true; // a local log cannot affect the cloud (plan, section 4)
+	// The user's own git repository (git_configure): the Subsurface cloud's
+	// write lock does not apply to it.
+	if (git_mode())
+		return true;
+	return account_writes_allowed(prefs.cloud_storage_email);
+}
+
+bool is_git_log(const std::string &log)
+{
+	struct git_info info;
+	return !log.empty() && git_info_of(log, info);
+}
+
+// Port of cloudDestinationIsSafe(): only "normal" may be saved.
+int check_destination(const std::string &log, std::string &error)
+{
+	struct git_info info;
+	if (!git_info_of(log, info)) {
+		error = "NOT_GIT";
+		return -1;
+	}
+	switch (classify_git_save(&info)) {
+	case git_save_kind::normal:
+		return 0;
+	case git_save_kind::replacement:
+		error = "SAVE_REPLACEMENT";
+		return -1;
+	default:
+		error = "SAVE_ERROR: cannot inspect the destination";
+		return -1;
+	}
+}
+
+int save_to(const std::string &log, std::string &error)
+{
+	if (check_destination(log, error))
+		return -1;
+	bool was_local_only = git_local_only;
+	git_local_only = true;
+	uncache_shared_start_times();
+	int ret = save_dives(log.c_str());
+	git_local_only = was_local_only;
+	if (ret) {
+		error = "SAVE_ERROR: save_dives returned " + std::to_string(ret);
+		return -1;
+	}
+	return 0;
+}
+
+// Local branch and remote-tracking branch of a git log, as commit ids; empty
+// when missing.
+struct Heads {
+	std::string local, remote;
+};
+
+std::string ref_target(git_repository *repo, const std::string &name)
+{
+	git_oid oid;
+	if (git_reference_name_to_id(&oid, repo, name.c_str()))
+		return std::string();
+	char sha[GIT_OID_HEXSZ + 1];
+	git_oid_tostr(sha, sizeof(sha), &oid);
+	return sha;
+}
+
+int open_log_repo(const std::string &log, git_repository **repo, std::string &branch)
+{
+	struct git_info info;
+	if (!git_info_of(log, info))
+		return -1;
+	branch = info.branch;
+	return git_repository_open(repo, info.localdir.c_str());
+}
+
+Heads read_heads(const std::string &log)
+{
+	Heads heads;
+	git_repository *repo = nullptr;
+	std::string branch;
+	if (open_log_repo(log, &repo, branch))
+		return heads;
+	heads.local = ref_target(repo, "refs/heads/" + branch);
+	heads.remote = ref_target(repo, "refs/remotes/origin/" + branch);
+	git_repository_free(repo);
+	return heads;
+}
+
+// Is commit `a` the same as or a descendant of `b`, in the log's repository?
+// False when either is unknown locally.
+bool includes(const std::string &log, const std::string &a, const std::string &b)
+{
+	if (a.empty() || b.empty())
+		return false;
+	if (a == b)
+		return true;
+	git_repository *repo = nullptr;
+	std::string branch;
+	if (open_log_repo(log, &repo, branch))
+		return false;
+	git_oid oa, ob;
+	bool result = !git_oid_fromstr(&oa, a.c_str()) && !git_oid_fromstr(&ob, b.c_str()) &&
+		      git_graph_descendant_of(repo, &oa, &ob) == 1;
+	git_repository_free(repo);
+	return result;
+}
+
+// Local commits not yet on the server (not reachable from the
+// remote-tracking branch), newest first.
+struct PendingCommit {
+	std::string id, summary, message;
+};
+
+std::vector<PendingCommit> list_pending(const std::string &log)
+{
+	std::vector<PendingCommit> out;
+	git_repository *repo = nullptr;
+	std::string branch;
+	if (open_log_repo(log, &repo, branch))
+		return out;
+	git_revwalk *walk = nullptr;
+	if (!git_revwalk_new(&walk, repo) && !git_revwalk_push_ref(walk, ("refs/heads/" + branch).c_str())) {
+		git_revwalk_hide_ref(walk, ("refs/remotes/origin/" + branch).c_str()); // absent: everything is pending
+		git_oid oid;
+		while (!git_revwalk_next(&oid, walk)) {
+			git_commit *commit = nullptr;
+			if (git_commit_lookup(&commit, repo, &oid))
+				continue;
+			char sha[GIT_OID_HEXSZ + 1];
+			git_oid_tostr(sha, sizeof(sha), &oid);
+			const char *summary = git_commit_summary(commit);
+			const char *message = git_commit_message(commit);
+			out.push_back({ sha, summary ? summary : "", message ? message : "" });
+			git_commit_free(commit);
+		}
+	}
+	git_revwalk_free(walk);
+	git_repository_free(repo);
+	return out;
+}
+
+int pending_count()
+{
+	return internal::current_log_is_cloud() ? static_cast<int>(list_pending(internal::current_log()).size()) : 0;
+}
+
+std::string sync_json(const std::string &status, bool reloaded, const std::string &cause = std::string())
+{
+	std::string json = "{\"status\":\"" + status + "\",\"pending\":" + std::to_string(pending_count());
+	if (!cause.empty())
+		json += ",\"cause\":\"" + cause + "\"";
+	json += ",\"reloaded\":";
+	json += reloaded ? "true" : "false";
+	json += '}';
+	return json;
+}
+
+} // namespace
+
+// ---------------------------------------------------------------------------
+
+namespace internal {
+
+bool cloud_writes_allowed_for(const std::string &email)
+{
+	return account_writes_allowed(email);
+}
+
+int pending_for(const std::string &log)
+{
+	return static_cast<int>(list_pending(log).size());
+}
+
+void on_log_loaded()
+{
+	download_forget_partial();
+	steps.clear();
+	applied = 0;
+	clean_index = 0;
+	next_to_write = 0;
+	loaded_format_version = read_format_version();
+	// The cylinder types of the new log (as clear_dive_file_data() before a load).
+	reset_tank_info_table(tank_info_table);
+}
+
+} // namespace internal
+
+// Local time of a dive, "YYYY-MM-DDTHH:MM[:SS]", as the core stores it
+// (without time zone); false when the text is not a date.
+static bool parse_local_time(const std::string &text, timestamp_t &when)
+{
+	int y, mo, da, h, mi, se = 0;
+	if (sscanf(text.c_str(), "%d-%d-%dT%d:%d:%d", &y, &mo, &da, &h, &mi, &se) < 5)
+		return false;
+	struct tm tm = {};
+	tm.tm_year = y;
+	tm.tm_mon = mo - 1;
+	tm.tm_mday = da;
+	tm.tm_hour = h;
+	tm.tm_min = mi;
+	tm.tm_sec = se;
+	when = utc_mktime(&tm);
+	return when != 0;
+}
+
+// One object of a list of objects, each sent as a JSON string (the façade's
+// JSON reader reads flat objects only).
+static bool read_items(const JsonValue &value, std::vector<std::vector<std::pair<std::string, JsonValue>>> &items)
+{
+	if (value.kind != JsonValue::LIST)
+		return false;
+	for (const std::string &text: value.list) {
+		std::vector<std::pair<std::string, JsonValue>> fields;
+		if (!JsonReader(text).object(fields))
+			return false;
+		items.push_back(std::move(fields));
+	}
+	return true;
+}
+
+// The weights of a dive, as the whole list (TabDiveEquipment: AddWeight,
+// RemoveWeight, EditWeight): each {"description", "grams"}. The description
+// is Subsurface's untranslated name ("belt", "integrated"…) or the diver's own.
+static int set_weights(dive &d, const JsonValue &value, bool &changed, std::string &error)
+{
+	std::vector<std::vector<std::pair<std::string, JsonValue>>> items;
+	if (!read_items(value, items)) {
+		error = "BAD_REQUEST: weights";
+		return -1;
+	}
+	weightsystem_table list;
+	for (const auto &fields: items) {
+		weightsystem_t ws;
+		for (const auto &[key, v]: fields) {
+			if (key == "description" && v.kind == JsonValue::STRING)
+				ws.description = trim(v.text);
+			else if (key == "grams" && v.kind == JsonValue::NUMBER && v.number >= 0 && v.number <= 200000)
+				ws.weight.grams = static_cast<int>(v.number);
+			else {
+				error = "BAD_REQUEST: weight " + key;
+				return -1;
+			}
+		}
+		list.push_back(std::move(ws));
+	}
+	if (list.size() != d.weightsystems.size() ||
+	    !std::equal(list.begin(), list.end(), d.weightsystems.begin())) {
+		d.weightsystems = std::move(list);
+		changed = true;
+	}
+	return 0;
+}
+
+// The fields of a cylinder that the editor sets.
+static bool same_edited_fields(const cylinder_t &a, const cylinder_t &b)
+{
+	return a.type.description == b.type.description && a.type.size.mliter == b.type.size.mliter &&
+	       a.type.workingpressure.mbar == b.type.workingpressure.mbar && a.cylinder_use == b.cylinder_use &&
+	       a.start.mbar == b.start.mbar && a.end.mbar == b.end.mbar && a.gasmix.o2.permille == b.gasmix.o2.permille &&
+	       a.gasmix.he.permille == b.gasmix.he.permille && a.depth.mm == b.depth.mm;
+}
+
+// The cylinders of a dive (TabDiveEquipment: AddCylinder, RemoveCylinder,
+// EditCylinder). Each entry: "index", the cylinder's index in the dive, or -1
+// for a new one (create_new_manual_cylinder(), added at
+// first_hidden_cylinder()); a cylinder of the dive left out of the list is
+// removed, unless it is protected (used by the profile: CYLINDER_IN_USE).
+// The order of the entries with an index is the new order of those cylinders:
+// when it differs from the dive's, the cylinders are moved and renumbered with
+// cylinder_renumber(), as Subsurface's planner does (CylindersModel::moveAtFirst),
+// so that gas changes and tank-sensor mappings follow; new cylinders always
+// stay at the end of the visible ones.
+// Fields, all optional: "description", "sizeMl", "workingPressureMbar"
+// (EditCylinderType::TYPE, with "use": OC-gas, diluent, oxygen, not used),
+// "startMbar", "endMbar" (PRESSURE), "o2Permille", "hePermille", "depthMm"
+// (GASMIX: the gas switch depth). Edited types go to the cylinder types table
+// (set_tank_info_data), as EditCylinder::redo() does.
+static int set_cylinders(dive &d, const JsonValue &value, bool &changed, std::string &error)
+{
+	std::vector<std::vector<std::pair<std::string, JsonValue>>> items;
+	if (!read_items(value, items)) {
+		error = "BAD_REQUEST: cylinders";
+		return -1;
+	}
+	struct Entry {
+		int index = -1;
+		cylinder_t cyl;
+	};
+	std::vector<Entry> entries;
+	std::set<int> kept;
+	for (const auto &fields: items) {
+		Entry e;
+		for (const auto &[key, v]: fields)
+			if (key == "index" && v.kind == JsonValue::NUMBER)
+				e.index = static_cast<int>(v.number);
+		if (e.index >= static_cast<int>(d.cylinders.size()) || (e.index >= 0 && kept.count(e.index))) {
+			error = "BAD_REQUEST: cylinder index";
+			return -1;
+		}
+		if (e.index >= 0)
+			kept.insert(e.index);
+		e.cyl = e.index >= 0 ? d.cylinders[e.index] : create_new_manual_cylinder(&d);
+		cylinder_t &c = e.cyl;
+		bool gas = false;
+		for (const auto &[key, v]: fields) {
+			bool number = v.kind == JsonValue::NUMBER;
+			if (key == "index") {
+				continue;
+			} else if (key == "description" && v.kind == JsonValue::STRING) {
+				c.type.description = trim(v.text);
+			} else if (key == "use" && v.kind == JsonValue::STRING) {
+				int use = -1;
+				for (int u = 0; u < NUM_GAS_USE; u++)
+					if (v.text == cylinderuse_text[u])
+						use = u;
+				if (use < 0) {
+					error = "BAD_REQUEST: cylinder use";
+					return -1;
+				}
+				c.cylinder_use = static_cast<cylinderuse>(use);
+			} else if (key == "sizeMl" && number && v.number >= 0 && v.number <= 100000) {
+				c.type.size.mliter = static_cast<int>(v.number);
+			} else if (key == "workingPressureMbar" && number && v.number >= 0 && v.number <= 500000) {
+				c.type.workingpressure.mbar = static_cast<int>(v.number);
+			} else if (key == "startMbar" && number && v.number >= 0 && v.number <= 500000) {
+				c.start.mbar = static_cast<int>(v.number);
+			} else if (key == "endMbar" && number && v.number >= 0 && v.number <= 500000) {
+				c.end.mbar = static_cast<int>(v.number);
+			} else if ((key == "o2Permille" || key == "hePermille") && number && v.number >= 0 && v.number <= 1000) {
+				(key == "o2Permille" ? c.gasmix.o2 : c.gasmix.he).permille = static_cast<int>(v.number);
+				gas = true;
+			} else if (key == "depthMm" && number && v.number >= 0 && v.number <= 500000) {
+				c.depth.mm = static_cast<int>(v.number);
+			} else {
+				error = "BAD_REQUEST: cylinder " + key;
+				return -1;
+			}
+		}
+		if (gas) {
+			if (c.gasmix.o2.permille + c.gasmix.he.permille > 1000) {
+				error = "BAD_REQUEST: gas mix";
+				return -1;
+			}
+			sanitize_gasmix(c.gasmix);
+		}
+		entries.push_back(std::move(e));
+	}
+
+	// Removed: the cylinders of the dive not in the list, from the last one,
+	// with the renumbering of RemoveCylinder::redo().
+	for (int i = static_cast<int>(d.cylinders.size()) - 1; i >= 0; i--) {
+		if (kept.count(i))
+			continue;
+		if (d.is_cylinder_prot(i)) {
+			error = "CYLINDER_IN_USE";
+			return -1;
+		}
+	}
+	// Edited, at their index.
+	for (const Entry &e: entries) {
+		if (e.index < 0 || same_edited_fields(e.cyl, d.cylinders[e.index]))
+			continue;
+		if (!e.cyl.type.description.empty()) // a cylinder outside the table ("Other") has no type to record
+			set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
+		d.cylinders[e.index] = e.cyl;
+		changed = true;
+	}
+	// Reordered: the kept cylinders in the order of the list, then those to be
+	// removed. mapping[old] = new position, the table cylinder_renumber() takes.
+	{
+		const int count = static_cast<int>(d.cylinders.size());
+		std::vector<int> order; // old indexes, in the new order
+		for (const Entry &e: entries)
+			if (e.index >= 0)
+				order.push_back(e.index);
+		const int keptCount = static_cast<int>(order.size());
+		for (int i = 0; i < count; i++)
+			if (!kept.count(i))
+				order.push_back(i);
+		std::vector<int> mapping(count);
+		bool moved = false;
+		for (int pos = 0; pos < count; pos++) {
+			mapping[order[pos]] = pos;
+			moved = moved || order[pos] != pos;
+		}
+		if (moved) {
+			// cylinder_renumber() assumes a dive starts on cylinder 0 and adds a gas
+			// change to it; but the start gas of a computer is the one of its
+			// first gas change (at 0:00), or else cylinder 0, or on a rebreather
+			// the diluent. So the events are kept as they were (renumbered here)
+			// and a gas change to the start cylinder, in its new place, is added
+			// only where the start gas would otherwise change.
+			std::vector<std::vector<event>> saved;
+			std::vector<int> start;
+			for (const auto &dc: d.dcs) {
+				saved.push_back(dc.events);
+				start.push_back(gasmix_loop(d, dc).next_cylinder_index().first);
+			}
+			std::vector<cylinder_t> old(d.cylinders.begin(), d.cylinders.end());
+			for (int pos = 0; pos < count; pos++)
+				d.cylinders[pos] = old[order[pos]];
+			cylinder_renumber(d, mapping.data());
+			for (size_t n = 0; n < d.dcs.size(); n++) {
+				divecomputer &dc = d.dcs[n];
+				dc.events = std::move(saved[n]);
+				for (event &ev: dc.events)
+					if (ev.is_gaschange() && ev.gas.index >= 0 && ev.gas.index < count)
+						ev.gas.index = mapping[ev.gas.index];
+				if (start[n] >= 0 && gasmix_loop(d, dc).next_cylinder_index().first != mapping[start[n]])
+					add_gas_switch_event(&d, &dc, 0, mapping[start[n]]);
+			}
+			changed = true;
+		}
+		// From here on the kept cylinders are at 0..keptCount-1.
+		kept.clear();
+		for (int i = 0; i < keptCount; i++)
+			kept.insert(i);
+	}
+	for (int i = static_cast<int>(d.cylinders.size()) - 1; i >= 0; i--) {
+		if (kept.count(i))
+			continue;
+		std::vector<int> mapping = get_cylinder_map_for_remove(static_cast<int>(d.cylinders.size()), i);
+		remove_cylinder(&d, i);
+		cylinder_renumber(d, &mapping[0]);
+		changed = true;
+	}
+	// Added, as AddCylinder::redo().
+	for (const Entry &e: entries) {
+		if (e.index >= 0)
+			continue;
+		if (!e.cyl.type.description.empty()) // a cylinder outside the table ("Other") has no type to record
+			set_tank_info_data(tank_info_table, e.cyl.type.description, e.cyl.type.size, e.cyl.type.workingpressure);
+		d.cylinders.add(first_hidden_cylinder(&d), e.cyl);
+		changed = true;
+	}
+	return 0;
+}
+
+int edit_dive(int id, const std::string &changes_json, std::string &result_json, std::string &error)
+{
+	dive *d = divelog.dives.get_by_uniq_id(id);
+	if (!d) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	if (loaded_format_version > dataformat_version) {
+		error = "FORMAT_NEWER";
+		return -1;
+	}
+	std::vector<std::pair<std::string, JsonValue>> changes;
+	if (!JsonReader(changes_json).object(changes)) {
+		error = "BAD_REQUEST: invalid JSON";
+		return -1;
+	}
+
+	// {"mainComputer": n}: alone, as Subsurface's MoveDiveComputerToFront, its
+	// own command (commands/command_divelist.cpp).
+	if (changes.size() == 1 && changes[0].first == "mainComputer") {
+		const JsonValue &value = changes[0].second;
+		if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number >= d->dcs.size()) {
+			error = "BAD_REQUEST: mainComputer";
+			return -1;
+		}
+		int number = static_cast<int>(value.number);
+		if (number) {
+			std::unique_ptr<dive> moved = clone_make_first_dc(*d, number);
+			moved->id = d->id; // the same dive here: only its computers change places
+			exchange(d, *moved);
+			if (applied < steps.size()) {
+				if (clean_index > static_cast<long>(applied))
+					clean_index = -1;
+				steps.resize(applied);
+			}
+			Step step;
+			step.dive_id = id;
+			step.other = std::move(moved);
+			step.text = "move dive computer to front";
+			steps.push_back(std::move(step));
+			applied++;
+		}
+		return internal::dive_json(id, result_json, error);
+	}
+
+	auto copy = std::make_unique<dive>(*d);
+	std::vector<std::string> fields; // names as in Subsurface's Edit* commands
+	bool water_temp_changed = false;
+	for (const auto &[key, value]: changes) {
+		if (key == "notes" || key == "suit") {
+			if (value.kind != JsonValue::STRING) {
+				error = "BAD_REQUEST: " + key + " must be a string";
+				return -1;
+			}
+			std::string &target = key == "notes" ? copy->notes : copy->suit;
+			if (target != value.text) {
+				target = value.text;
+				fields.push_back(key);
+			}
+		} else if (key == "rating" || key == "visibility" || key == "wavesize" || key == "current" || key == "surge" ||
+			   key == "chill") {
+			// 0 to 5 star ratings (EditRating, EditVisibility, EditWaveSize,
+			// EditCurrent, EditSurge, EditChill); the field name is the command's.
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 5) {
+				error = "BAD_REQUEST: " + key + " must be an integer from 0 to 5";
+				return -1;
+			}
+			int &target = key == "rating" ? copy->rating : key == "visibility" ? copy->visibility
+				    : key == "wavesize" ? copy->wavesize : key == "current" ? copy->current
+				    : key == "surge" ? copy->surge : copy->chill;
+			if (target != value.number) {
+				target = static_cast<int>(value.number);
+				fields.push_back(key);
+			}
+		} else if (key == "buddies" || key == "diveguide") {
+			if (value.kind != JsonValue::LIST) {
+				error = "BAD_REQUEST: " + key + " must be a list of strings";
+				return -1;
+			}
+			std::string &target = key == "buddies" ? copy->buddy : copy->diveguide;
+			std::vector<std::string> list = string_to_list(target);
+			if (apply_tag_edit(list, value.list)) {
+				target = join(list); // EditBuddies::set(): v.join(", ")
+				fields.push_back(key == "buddies" ? "buddies" : "dive guide");
+			}
+		} else if (key == "tags") {
+			if (value.kind != JsonValue::LIST) {
+				error = "BAD_REQUEST: tags must be a list of strings";
+				return -1;
+			}
+			std::vector<std::string> list = tag_names(*copy);
+			if (apply_tag_edit(list, value.list)) {
+				// EditTags::set()
+				copy->tags.clear();
+				for (const std::string &tag: list)
+					taglist_add_tag(copy->tags, tag);
+				taglist_cleanup(copy->tags);
+				fields.push_back("tags");
+			}
+		} else if (key == "site") {
+			// EditDiveSite: the dive's site by uuid; 0: no site.
+			if (value.kind != JsonValue::NUMBER) {
+				error = "BAD_REQUEST: site must be a site uuid";
+				return -1;
+			}
+			dive_site *ds = value.number ? divelog.sites.get_by_uuid(static_cast<uint32_t>(value.number)) : nullptr;
+			if (value.number && !ds) {
+				error = "NOT_FOUND";
+				return -1;
+			}
+			if (copy->dive_site != ds) {
+				copy->dive_site = ds;
+				fields.push_back("dive site");
+			}
+		} else if (key == "number") {
+			// The dive number, as Subsurface-mobile's EditDive sets it.
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 999999) {
+				error = "BAD_REQUEST: number";
+				return -1;
+			}
+			if (copy->number != value.number) {
+				copy->number = static_cast<int>(value.number);
+				fields.push_back("dive");
+			}
+		} else if (key == "date") {
+			// Date and time, local, as EditDive sets dive::when; the dive
+			// computers keep their offset to it (ShiftTime moves them all).
+			timestamp_t when;
+			if (value.kind != JsonValue::STRING || !parse_local_time(value.text, when)) {
+				error = "BAD_REQUEST: date";
+				return -1;
+			}
+			if (copy->when != when) {
+				timestamp_t delta = when - copy->when;
+				copy->when = when;
+				for (divecomputer &dc: copy->dcs)
+					dc.when += delta;
+				fields.push_back("dive");
+			}
+		} else if (key == "durationSeconds" || key == "maxDepthMm") {
+			// EditDuration and EditDepth: only for a dive entered by hand
+			// (TabDiveNotes shows them only then); the profile is made again.
+			bool duration = key == "durationSeconds";
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > (duration ? 48 * 3600 : 500000)) {
+				error = "BAD_REQUEST: " + key;
+				return -1;
+			}
+			if (!is_dc_manually_added_dive(&copy->dcs[0])) {
+				error = "NOT_MANUAL";
+				return -1;
+			}
+			int &target = duration ? copy->dcs[0].duration.seconds : copy->dcs[0].maxdepth.mm;
+			if (target != value.number) {
+				target = static_cast<int>(value.number);
+				if (duration)
+					copy->duration = copy->dcs[0].duration;
+				else
+					copy->maxdepth = copy->dcs[0].maxdepth;
+				copy->dcs[0].meandepth = 0_m;
+				copy->dcs[0].samples.clear();
+				fake_dc(&copy->dcs[0]);
+				fields.push_back(duration ? "duration" : "depth");
+			}
+		} else if (key == "divemode") {
+			// EditMode on the first dive computer: OC, CCR, PSCR, Freedive.
+			int mode = -1;
+			if (value.kind == JsonValue::STRING)
+				for (int m = 0; m < NUM_DIVEMODE; m++)
+					if (value.text == divemode_text[m])
+						mode = m;
+			if (mode < 0) {
+				error = "BAD_REQUEST: divemode";
+				return -1;
+			}
+			if (copy->dcs[0].divemode != mode) {
+				copy->dcs[0].divemode = static_cast<divemode_t>(mode);
+				update_setpoint_events(copy.get(), &copy->dcs[0]);
+				fields.push_back("dive mode");
+			}
+		} else if (key == "airTempMk" || key == "waterTempMk" || key == "userSalinity" || key == "surfacePressureMbar") {
+			// EditAirTemp, EditWaterTemp, EditWaterTypeUser, EditAtmPress: 0 clears.
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 1000000) {
+				error = "BAD_REQUEST: " + key;
+				return -1;
+			}
+			int v = static_cast<int>(value.number);
+			if (key == "airTempMk" && copy->airtemp.mkelvin != static_cast<uint32_t>(v)) {
+				copy->airtemp.mkelvin = v;
+				fields.push_back("air temperature");
+			} else if (key == "waterTempMk" && copy->watertemp.mkelvin != static_cast<uint32_t>(v)) {
+				copy->watertemp.mkelvin = v;
+				fields.push_back("water temperature");
+				water_temp_changed = true;
+			} else if (key == "userSalinity" && copy->user_salinity != v) {
+				copy->user_salinity = v;
+				fields.push_back("salinity");
+			} else if (key == "surfacePressureMbar" && copy->surface_pressure.mbar != v) {
+				copy->surface_pressure.mbar = v;
+				fields.push_back("Atm. pressure");
+			}
+		} else if (key == "invalid") {
+			// EditInvalid.
+			if (value.kind != JsonValue::NUMBER) {
+				error = "BAD_REQUEST: invalid";
+				return -1;
+			}
+			if (copy->invalid != (value.number != 0)) {
+				copy->invalid = value.number != 0;
+				fields.push_back("invalid");
+			}
+		} else if (key == "weights") {
+			bool changed = false;
+			if (set_weights(*copy, value, changed, error))
+				return -1;
+			if (changed)
+				fields.push_back("dive");
+		} else if (key == "cylinders") {
+			bool changed = false;
+			if (set_cylinders(*copy, value, changed, error))
+				return -1;
+			if (changed)
+				fields.push_back("dive");
+		} else {
+			error = "BAD_REQUEST: unknown field " + key;
+			return -1;
+		}
+	}
+
+	if (!fields.empty()) {
+		// One field: the desktop text ("Edit notes [#12]"); several: the
+		// mobile text ("Edit dive [#12]"), as Subsurface-mobile edits a whole dive.
+		std::string what = fields.size() == 1 ? "Edit " + fields[0] : "Edit dive";
+		std::string text = what + " [" + dive_number_or_date(*d) + "]";
+		if (water_temp_changed)
+			divelog.dives.fixup_dive(*copy); // EditWaterTemp::set(): re-populate the temperatures
+		// EditWeight::redo(): the weight types table keeps the last weight of each type.
+		for (const weightsystem_t &ws: copy->weightsystems)
+			add_weightsystem_description(ws);
+		exchange(d, *copy);
+		// A new step drops the steps that were undone, as QUndoStack::push() does.
+		if (applied < steps.size()) {
+			if (clean_index > static_cast<long>(applied))
+				clean_index = -1;
+			steps.resize(applied);
+		}
+		Step step;
+		step.dive_id = id;
+		step.other = std::move(copy);
+		step.text = text;
+		steps.push_back(std::move(step));
+		applied++;
+	}
+	return internal::dive_json(id, result_json, error);
+}
+
+// ---------------------------------------------------------------------------
+// Trips (spec, section 4, "Trip"). Trip identifiers are those of the load:
+// valid until the next one, never stored.
+
+static std::string iso_time(timestamp_t when)
+{
+	time_t t = static_cast<time_t>(when);
+	struct tm tm;
+	gmtime_r(&t, &tm);
+	char buf[32];
+	strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S", &tm);
+	return buf;
+}
+
+int trip_json(int trip_id, std::string &json, std::string &error)
+{
+	(void)error;
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		json = "{\"tripId\":0}"; // the trip no longer exists (emptied)
+		return 0;
+	}
+	json = "{\"tripId\":" + std::to_string(trip->id) + ",\"location\":";
+	append_json_string(json, trip->location);
+	json += ",\"notes\":";
+	append_json_string(json, trip->notes);
+	json += ",\"autogen\":";
+	json += trip->autogen ? "true" : "false";
+	json += ",\"dives\":[";
+	bool first = true;
+	for (const dive *d: trip->dives) {
+		if (internal::is_plan_only(*d))
+			continue;
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
+		append_json_string(json, iso_time(d->when));
+		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds) + ",\"site\":";
+		append_json_string(json, d->dive_site ? d->dive_site->name : std::string());
+		json += '}';
+	}
+	json += "]}";
+	return 0;
+}
+
+// Adds a step that is already applied, as QUndoStack::push() does.
+static void push_step(Step step)
+{
+	if (applied < steps.size()) {
+		if (clean_index > static_cast<long>(applied))
+			clean_index = -1;
+		steps.resize(applied);
+	}
+	steps.push_back(std::move(step));
+	applied++;
+}
+
+// Port of getListOfDives() (commands/command_base.cpp): at most five
+// numbers, or four and "...".
+static std::string list_of_dives(const std::vector<dive *> &dives)
+{
+	if (dives.size() == divelog.dives.size())
+		return "all dives";
+	std::string out;
+	int i = 0;
+	for (dive *d: dives) {
+		if (++i == 4 && dives.size() >= 5)
+			return out + "...";
+		out += dive_number_or_date(*d) + ", ";
+	}
+	if (!out.empty())
+		out.resize(out.size() - 2);
+	return out;
+}
+
+// Applies a MOVE step and keeps it; the result is the trip shown.
+static int do_move(Step step, int show_trip, std::string &json, std::string &error)
+{
+	if (step.moves.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	move_dives_between_trips(step);
+	push_step(std::move(step));
+	return trip_json(show_trip, json, error);
+}
+
+int edit_trip(int trip_id, const std::string &field, const std::string &value, std::string &json, std::string &error)
+{
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	if (field != "location" && field != "notes") {
+		error = "BAD_REQUEST: unknown trip field " + field;
+		return -1;
+	}
+	Step step;
+	step.kind = Step::TRIP_FIELD;
+	step.trip = trip;
+	step.notes = field == "notes";
+	std::string &target = step.notes ? trip->notes : trip->location;
+	if (target != value) { // EditTripBase::workToBeDone()
+		step.value = target;
+		target = value;
+		step.text = step.notes ? "Edit trip notes" : "Edit trip location";
+		push_step(std::move(step));
+	}
+	return trip_json(trip_id, json, error);
+}
+
+// RemoveDivesFromTrip: the dives leave their trip and are not autogrouped again.
+static int remove_from_trip(const std::vector<dive *> &all, int show_trip, std::string &json, std::string &error)
+{
+	std::vector<dive *> dives;
+	for (dive *d: all)
+		if (d->divetrip)
+			dives.push_back(d);
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "remove " + std::to_string(dives.size()) + " dive(s) from trip [" + list_of_dives(dives) + "]";
+	for (dive *d: dives) {
+		d->notrip = true;
+		step.moves.push_back({ d, nullptr });
+	}
+	return do_move(std::move(step), show_trip, json, error);
+}
+
+int trip_remove_dive(int dive_id, std::string &json, std::string &error)
+{
+	return trip_remove_dives({ dive_id }, json, error);
+}
+
+int trip_remove_dives(const std::vector<int> &dive_ids, std::string &json, std::string &error)
+{
+	std::vector<dive *> dives;
+	for (int id: dive_ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (d && d->divetrip && std::find(dives.begin(), dives.end(), d) == dives.end())
+			dives.push_back(d);
+	}
+	if (dives.empty()) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	return remove_from_trip(dives, dives[0]->divetrip->id, json, error);
+}
+
+int trip_ungroup(int trip_id, std::string &json, std::string &error)
+{
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	std::vector<dive *> dives(trip->dives.begin(), trip->dives.end());
+	return remove_from_trip(dives, trip_id, json, error);
+}
+
+int trip_split_at(int dive_id, std::string &json, std::string &error)
+{
+	dive *d = divelog.dives.get_by_uniq_id(dive_id);
+	if (!d || !d->divetrip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	// The dives from this one on go into a new trip (CreateTrip).
+	std::vector<dive *> later;
+	for (dive *other: d->divetrip->dives)
+		if (other->when >= d->when)
+			later.push_back(other);
+	if (later.size() == d->divetrip->dives.size()) {
+		error = "NOTHING_TO_DO"; // the first dive: nothing to split
+		return -1;
+	}
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "create trip";
+	std::unique_ptr<dive_trip> trip = create_trip_from_dive(later[0]);
+	dive_trip *new_trip = trip.get();
+	for (dive *other: later)
+		step.moves.push_back({ other, new_trip });
+	step.trips_to_add.push_back(std::move(trip));
+	int keep = d->divetrip->id;
+	return do_move(std::move(step), keep, json, error);
+}
+
+int trips_merge(int trip_id, int other_id, std::string &json, std::string &error)
+{
+	dive_trip *a = trip_by_id(trip_id), *b = trip_by_id(other_id);
+	if (!a || !b || a == b) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	// MergeTrips: a new trip combining both (Subsurface sets no command text).
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "merge trips";
+	std::unique_ptr<dive_trip> trip = combine_trips(a, b);
+	dive_trip *merged = trip.get();
+	for (dive *d: a->dives)
+		step.moves.push_back({ d, merged });
+	for (dive *d: b->dives)
+		step.moves.push_back({ d, merged });
+	step.trips_to_add.push_back(std::move(trip));
+	int show = merged->id;
+	return do_move(std::move(step), show, json, error);
+}
+
+int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &json, std::string &error)
+{
+	dive_trip *trip = trip_by_id(trip_id);
+	if (!trip) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	std::vector<dive *> dives;
+	for (int id: dive_ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (d && d->divetrip != trip)
+			dives.push_back(d);
+	}
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "add " + std::to_string(dives.size()) + " dives to trip [" + list_of_dives(dives) + "]";
+	for (dive *d: dives)
+		step.moves.push_back({ d, trip });
+	return do_move(std::move(step), trip_id, json, error);
+}
+
+// CreateTrip (commands/command_divelist.cpp), as the dive list's "Create new
+// trip above": a new trip made from the first dive, then every dive moved to it.
+int trip_create(const std::vector<int> &dive_ids, std::string &json, std::string &error)
+{
+	std::vector<dive *> dives;
+	for (int id: dive_ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (!d) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		dives.push_back(d);
+	}
+	if (dives.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	// The selection in the order of the dive table (by date), as Subsurface's.
+	std::sort(dives.begin(), dives.end(), [](const dive *a, const dive *b) { return a->when < b->when; });
+	Step step;
+	step.kind = Step::MOVE;
+	step.text = "create trip";
+	std::unique_ptr<dive_trip> trip = create_trip_from_dive(dives[0]);
+	dive_trip *new_trip = trip.get();
+	for (dive *d: dives)
+		step.moves.push_back({ d, new_trip });
+	step.trips_to_add.push_back(std::move(trip));
+	int show = new_trip->id;
+	return do_move(std::move(step), show, json, error);
+}
+
+// MainWindow::on_actionAutoGroup_triggered(): the flag, then AutogroupDives or
+// RemoveAutogenTrips (commands/command_divelist.cpp).
+int trips_autogroup(bool on, std::string &json, std::string &error)
+{
+	divelog.autogroup = on;
+	Step step;
+	step.kind = Step::MOVE;
+	if (on) {
+		step.text = "autogroup dives";
+		for (auto &entry: get_dives_to_autogroup(divelog.dives)) {
+			if (entry.created_trip)
+				step.trips_to_add.push_back(std::move(entry.created_trip));
+			for (auto it = divelog.dives.begin() + entry.from; it != divelog.dives.begin() + entry.to; ++it)
+				step.moves.push_back({ it->get(), entry.trip });
+		}
+	} else {
+		step.text = "remove autogenerated trips";
+		for (auto &d: divelog.dives)
+			if (d->divetrip && d->divetrip->autogen)
+				step.moves.push_back({ d.get(), nullptr });
+	}
+	if (step.moves.empty()) // TripBase::workToBeDone()
+		return trip_json(0, json, error);
+	move_dives_between_trips(step);
+	dive *first = step.moves[0].d;
+	int show = first->divetrip ? first->divetrip->id : 0;
+	push_step(std::move(step));
+	return trip_json(show, json, error);
+}
+
+// RenameCylinderType::redo() and undo(): from step.type_name to step.value,
+// then the two names are swapped for the next undo or redo.
+static void apply_cylinder_type(Step &step)
+{
+	const std::string &from = step.type_name, &to = step.value;
+	for (auto &[d, idx]: step.cylinders) {
+		d->cylinders[idx].type.description = to;
+		d->invalidate_cache(); // so that save-git writes this dive again
+	}
+	if (tank_info *info = get_tank_info(tank_info_table, from))
+		info->name = to;
+	if (tank_info *info = get_tank_info(get_tank_info_baseline(), from))
+		info->name = to;
+	std::swap(step.type_name, step.value);
+}
+
+int cylinder_type_rename(const std::string &old_name, const std::string &new_name_in, std::string &json,
+			 std::string &error)
+{
+	// TankInfoModel::setData(): trimmed, not empty, not the same, not in use.
+	std::string new_name = trim(new_name_in);
+	if (new_name.empty() || new_name == old_name)
+		return cylinder_types(json);
+	if (internal::cylinder_type_name_in_use(new_name)) {
+		error = "NAME_IN_USE";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::CYLINDER_TYPE;
+	step.cylinders = find_cylinders_with_type_description(old_name);
+	// RenameCylinderType::workToBeDone()
+	if (step.cylinders.empty() && !get_tank_info(tank_info_table, old_name) &&
+	    !get_tank_info(get_tank_info_baseline(), old_name)) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	std::vector<dive *> affected;
+	for (auto &[d, idx]: step.cylinders)
+		if (std::find(affected.begin(), affected.end(), d) == affected.end())
+			affected.push_back(d);
+	step.text = affected.size() <= 1 ? "Rename cylinder type"
+					 : "Rename cylinder type (" + std::to_string(affected.size()) + " dive(s))";
+	step.type_name = old_name;
+	step.value = new_name;
+	apply_cylinder_type(step);
+	push_step(std::move(step));
+	return cylinder_types(json);
+}
+
+// Deleting one of the diver's cylinder types (an OpenDives addition): the
+// cylinders of that type leave the dives that use them, with their pressures
+// and gas mix, unless taking one out would damage the dive. A cylinder stays
+// (only its type description is replaced by "unknown", size, pressures and mix are kept) when:
+//  - it is the cylinder the dive starts on (so also a dive's only cylinder);
+//  - a gas change refers to it;
+//  - a tank sensor of the profile is mapped to it, or, when the computer has
+//    no explicit mapping, a sensor with an index from this cylinder up (the
+//    implied sensor n -> cylinder n mapping would shift).
+// The others are removed with Subsurface's own sequence (get_cylinder_map_for_remove,
+// remove_cylinder, cylinder_renumber), so that the other cylinders' gas changes
+// and sensor mappings follow. With dry_run, nothing changes: only the counts.
+static int check_writable_log(std::string &error);
+
+// How Subsurface itself names a cylinder whose type is not known (add_default_cylinder()): it is
+// written to the log as the description and read back as such.
+static const char *const UNKNOWN_CYLINDER_TYPE = "unknown";
+
+static bool cylinder_removable(const dive &d, int idx)
+{
+	for (const divecomputer &dc: d.dcs) {
+		if (d.has_gaschange_event(&dc, idx))
+			return false;
+		int start = gasmix_loop(d, dc).next_cylinder_index().first;
+		if (start < 0 || start == idx)
+			return false;
+		bool explicit_map = false;
+		for (const tank_sensor_mapping &m: dc.tank_sensor_mappings) {
+			if (m.sensor_id == NO_SENSOR)
+				continue;
+			explicit_map = true;
+			if (static_cast<int>(m.cylinder_index) == idx)
+				return false;
+		}
+		if (!explicit_map && dc.tank_sensor_mappings.empty())
+			for (int16_t s: get_tank_sensor_ids(dc))
+				if (s >= idx)
+					return false;
+	}
+	return true;
+}
+
+int cylinder_type_delete(const std::string &name, bool dry_run, std::string &json, std::string &error)
+{
+	std::vector<tank_info> &library = get_tank_info_baseline();
+	std::vector<tank_info> standard = default_tank_info_table();
+	if (name == UNKNOWN_CYLINDER_TYPE || (!get_tank_info(library, name) && !get_tank_info(tank_info_table, name)) || get_tank_info(standard, name)) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::DIVES_EDIT;
+	int removed = 0, kept = 0;
+	std::vector<dive *> changed;
+	for (const auto &dp: divelog.dives) {
+		dive *d = dp.get();
+		if (internal::is_plan_only(*d))
+			continue;
+		std::vector<int> removable, clear;
+		for (int i = 0; i < static_cast<int>(d->cylinders.size()); i++) {
+			if (d->cylinders[i].type.description != name)
+				continue;
+			(cylinder_removable(*d, i) ? removable : clear).push_back(i);
+		}
+		if (removable.empty() && clear.empty())
+			continue;
+		(clear.empty() ? removed : kept)++;
+		if (dry_run)
+			continue;
+		auto copy = std::make_unique<dive>(*d);
+		for (int i: clear)
+			copy->cylinders[i].type.description = UNKNOWN_CYLINDER_TYPE;
+		for (auto it = removable.rbegin(); it != removable.rend(); ++it) {
+			std::vector<int> mapping = get_cylinder_map_for_remove(static_cast<int>(copy->cylinders.size()), *it);
+			remove_cylinder(copy.get(), *it);
+			cylinder_renumber(*copy, &mapping[0]);
+		}
+		changed.push_back(d);
+		step.dive_swaps.emplace_back(d->id, std::move(copy));
+	}
+	if (!dry_run) {
+		if (!changed.empty() && check_writable_log(error))
+			return -1;
+		if (!changed.empty()) {
+			step.text = changed.size() == 1 ? "Delete cylinder type [" + dive_number_or_date(*changed[0]) + "]"
+							: "Delete cylinder type (" + std::to_string(changed.size()) + " dive(s))";
+			for (auto &[id, other]: step.dive_swaps)
+				if (dive *d = divelog.dives.get_by_uniq_id(id))
+					exchange(d, *other);
+			push_step(std::move(step));
+		}
+		// The type itself: out of the runtime table and of the device's library.
+		auto same = [&name](const tank_info &ti) { return ti.name == name; };
+		tank_info_table.erase(std::remove_if(tank_info_table.begin(), tank_info_table.end(), same), tank_info_table.end());
+		library.erase(std::remove_if(library.begin(), library.end(), same), library.end());
+		if (prefs.default_cylinder == name)
+			prefs.default_cylinder.clear();
+	}
+	if (cylinder_types(json))
+		return -1;
+	json.pop_back(); // the closing brace
+	json += ",\"deletion\":{\"removed\":" + std::to_string(removed) + ",\"kept\":" + std::to_string(kept) + "}}";
+	return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Dive sites (spec, section 4, "Sites"). Sites are identified by their uuid.
+
+static std::string iso_time(timestamp_t when);
+
+static void append_site_summary(std::string &json, const dive_site &ds)
+{
+	json += "{\"uuid\":" + std::to_string(ds.uuid) + ",\"name\":";
+	append_json_string(json, ds.name);
+	json += ",\"hasLocation\":";
+	json += has_location(&ds.location) ? "true" : "false";
+	json += ",\"latUdeg\":" + std::to_string(ds.location.lat.udeg);
+	json += ",\"lonUdeg\":" + std::to_string(ds.location.lon.udeg);
+	json += ",\"country\":";
+	append_json_string(json, taxonomy_get_country(ds.taxonomy));
+	json += ",\"dives\":" + std::to_string(std::count_if(ds.dives.begin(), ds.dives.end(), [](const dive *d) { return !internal::is_plan_only(*d); }));
+	// The latest dive and the deepest, for the list of sites.
+	timestamp_t last = 0;
+	int deepest = 0;
+	for (const dive *d: ds.dives) {
+		last = std::max(last, d->when);
+		deepest = std::max(deepest, d->maxdepth.mm);
+	}
+	json += ",\"lastDate\":";
+	append_json_string(json, last ? iso_time(last) : std::string());
+	json += ",\"maxDepthMm\":" + std::to_string(deepest) + '}';
+}
+
+int sites_json(std::string &json)
+{
+	json = "[";
+	bool first = true;
+	for (const auto &ds: divelog.sites) {
+		if (!first)
+			json += ',';
+		first = false;
+		append_site_summary(json, *ds);
+	}
+	json += ']';
+	return 0;
+}
+
+static const taxonomy *find_taxonomy(const taxonomy_data &t, taxonomy_category cat)
+{
+	for (const taxonomy &entry: t)
+		if (entry.category == cat)
+			return &entry;
+	return nullptr;
+}
+
+static void append_taxonomy_entry(std::string &json, const char *key, const taxonomy_data &t, taxonomy_category cat)
+{
+	const taxonomy *entry = find_taxonomy(t, cat);
+	json += std::string(",\"") + key + "\":{\"value\":";
+	append_json_string(json, entry ? entry->value : std::string());
+	json += ",\"manual\":";
+	json += entry && entry->origin == GEOMANUAL ? "true" : "false";
+	json += '}';
+}
+
+int site_json(uint32_t uuid, std::string &json, std::string &error)
+{
+	(void)error;
+	dive_site *ds = uuid ? divelog.sites.get_by_uuid(uuid) : nullptr;
+	if (!ds) {
+		json = "{\"uuid\":0}"; // the site no longer exists
+		return 0;
+	}
+	append_site_summary(json = std::string(), *ds);
+	json.pop_back(); // reopen the object
+	json += ",\"description\":";
+	append_json_string(json, ds->description);
+	json += ",\"notes\":";
+	append_json_string(json, ds->notes);
+	append_taxonomy_entry(json, "countryTaxonomy", ds->taxonomy, TC_COUNTRY);
+	append_taxonomy_entry(json, "region", ds->taxonomy, TC_ADMIN_L1);
+	append_taxonomy_entry(json, "city", ds->taxonomy, TC_LOCALNAME);
+	json += ",\"diveList\":[";
+	bool first = true;
+	for (const dive *d: ds->dives) {
+		if (internal::is_plan_only(*d))
+			continue;
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
+		append_json_string(json, iso_time(d->when));
+		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds) + ",\"maxDepthMm\":" +
+			std::to_string(d->maxdepth.mm) + '}';
+	}
+	json += "]}";
+	return 0;
+}
+
+int site_nearby(int lat_udeg, int lon_udeg, int distance_m, std::string &json)
+{
+	location_t loc;
+	loc.lat.udeg = lat_udeg;
+	loc.lon.udeg = lon_udeg;
+	dive_site *ds = divelog.sites.get_by_gps_proximity(loc, distance_m);
+	if (!ds) {
+		json = "null";
+		return 0;
+	}
+	json.clear();
+	append_site_summary(json, *ds);
+	return 0;
+}
+
+int site_create(const std::string &name, int lat_udeg, int lon_udeg, std::string &json, std::string &error)
+{
+	location_t loc;
+	loc.lat.udeg = lat_udeg;
+	loc.lon.udeg = lon_udeg;
+	Step step;
+	step.kind = Step::SITES;
+	step.text = "add dive site"; // AddDiveSite
+	step.sites_to_add.push_back(std::make_unique<dive_site>(name, loc));
+	apply_sites(step);
+	uint32_t uuid = step.sites_to_remove[0]->uuid;
+	push_step(std::move(step));
+	return site_json(uuid, json, error);
+}
+
+static int push_site_field(dive_site *ds, Step step, std::string &json, std::string &error)
+{
+	apply_site_field(step);
+	push_step(std::move(step));
+	return site_json(ds->uuid, json, error);
+}
+
+int site_edit(uint32_t uuid, const std::string &field, const std::string &value, int lat_udeg, int lon_udeg,
+	      std::string &json, std::string &error)
+{
+	dive_site *ds = divelog.sites.get_by_uuid(uuid);
+	if (!ds) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::SITE_FIELD;
+	step.site = ds;
+	if (field == "name" || field == "description" || field == "notes") {
+		// EditDiveSiteName, EditDiveSiteDescription, EditDiveSiteNotes
+		const std::string &current = field == "name" ? ds->name : field == "description" ? ds->description : ds->notes;
+		if (current == value)
+			return site_json(uuid, json, error);
+		step.site_field = field == "name" ? 0 : field == "description" ? 1 : 2;
+		step.value = value;
+		step.text = "Edit dive site " + field;
+		return push_site_field(ds, std::move(step), json, error);
+	}
+	if (field == "location") {
+		// EditDiveSiteLocation; 0, 0 removes the position.
+		location_t loc;
+		loc.lat.udeg = lat_udeg;
+		loc.lon.udeg = lon_udeg;
+		bool ok = has_location(&loc), old_ok = has_location(&ds->location);
+		if (ok == old_ok && (!ok || loc == ds->location))
+			return site_json(uuid, json, error);
+		step.site_field = 3;
+		step.location = loc;
+		step.text = "Edit dive site location";
+		return push_site_field(ds, std::move(step), json, error);
+	}
+	if (field == "country" || field == "region" || field == "city") {
+		// A corrected value: origin GEOMANUAL, never replaced by a lookup.
+		taxonomy_data t = ds->taxonomy;
+		if (field == "country") {
+			if (taxonomy_get_country(t) == value)
+				return site_json(uuid, json, error);
+			taxonomy_set_country(t, value, GEOMANUAL); // EditDiveSiteCountry
+			step.text = "Edit dive site country";
+		} else {
+			taxonomy_category cat = field == "region" ? TC_ADMIN_L1 : TC_LOCALNAME;
+			if (taxonomy_get_value(t, cat) == value)
+				return site_json(uuid, json, error);
+			taxonomy_set_category(t, cat, value, GEOMANUAL); // EditDiveSiteTaxonomy
+			step.text = "Edit dive site taxonomy";
+		}
+		step.site_field = 4;
+		step.taxonomy = std::move(t);
+		return push_site_field(ds, std::move(step), json, error);
+	}
+	error = "BAD_REQUEST: unknown site field " + field;
+	return -1;
+}
+
+// The place found by the JavaScript (country, region, county, city: from
+// Nominatim, else the offline Natural Earth file; app/src/lib/place-lookup.js),
+// written in the site's taxonomy as Subsurface's reverseGeoLookup does. An
+// empty value is left out. A corrected value is never replaced (spec,
+// section 4, "Sites"). Error NO_RESULT when all four are empty.
+int site_geocode(uint32_t uuid, const std::string &country, const std::string &region, const std::string &county,
+		 const std::string &city, std::string &json, std::string &error)
+{
+	dive_site *ds = divelog.sites.get_by_uuid(uuid);
+	if (!ds) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	taxonomy_data found;
+	if (!country.empty())
+		taxonomy_set_country(found, country, GEOCODED);
+	if (!region.empty())
+		taxonomy_set_category(found, TC_ADMIN_L1, region, GEOCODED);
+	if (!county.empty())
+		taxonomy_set_category(found, TC_ADMIN_L2, county, GEOCODED);
+	if (!city.empty())
+		taxonomy_set_category(found, TC_LOCALNAME, city, GEOCODED);
+	if (found.empty()) {
+		error = "NO_RESULT";
+		return -1;
+	}
+	taxonomy_data t = ds->taxonomy;
+	for (const taxonomy &entry: found) {
+		const taxonomy *old = find_taxonomy(t, entry.category);
+		if (!old || old->origin != GEOMANUAL)
+			taxonomy_set_category(t, entry.category, entry.value, entry.origin);
+	}
+	Step step;
+	step.kind = Step::SITE_FIELD;
+	step.site = ds;
+	step.site_field = 4;
+	step.taxonomy = std::move(t);
+	step.text = "Edit dive site taxonomy";
+	return push_site_field(ds, std::move(step), json, error);
+}
+
+static std::string lower(std::string s)
+{
+	std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+	return s;
+}
+
+int sites_duplicates(int same_name_m, int same_place_m, std::string &json)
+{
+	// Possible duplicates, as the spec defines them: same name ignoring case
+	// and close, or same position with different names.
+	json = "[";
+	bool first = true;
+	std::vector<dive_site *> all;
+	for (auto &ds: divelog.sites)
+		all.push_back(ds.get());
+	for (size_t i = 0; i < all.size(); i++) {
+		for (size_t j = i + 1; j < all.size(); j++) {
+			dive_site *a = all[i], *b = all[j];
+			bool located = has_location(&a->location) && has_location(&b->location);
+			unsigned int distance = located ? get_distance(a->location, b->location) : 0;
+			bool same_name = !a->name.empty() && lower(a->name) == lower(b->name) &&
+					 (!located || distance <= static_cast<unsigned int>(same_name_m));
+			bool same_place = located && a->name != b->name && distance <= static_cast<unsigned int>(same_place_m);
+			if (!same_name && !same_place)
+				continue;
+			if (!first)
+				json += ',';
+			first = false;
+			json += "{\"a\":";
+			append_site_summary(json, *a);
+			json += ",\"b\":";
+			append_site_summary(json, *b);
+			json += ",\"distanceM\":" + std::to_string(located ? static_cast<int>(distance) : -1) + '}';
+		}
+	}
+	json += ']';
+	return 0;
+}
+
+int sites_merge(uint32_t keep, uint32_t other, std::string &json, std::string &error)
+{
+	dive_site *ds = divelog.sites.get_by_uuid(keep), *gone = divelog.sites.get_by_uuid(other);
+	if (!ds || !gone || ds == gone) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::SITES;
+	step.text = "merge dive sites"; // MergeDiveSites
+	step.merge_into = ds;
+	step.sites_to_remove.push_back(gone);
+	apply_sites(step);
+	push_step(std::move(step));
+	return site_json(keep, json, error);
+}
+
+int sites_delete_unused(const std::vector<uint32_t> &uuids, std::string &json, std::string &error)
+{
+	// PurgeUnusedDiveSites, limited to the selection: only sites without dives.
+	Step step;
+	step.kind = Step::SITES;
+	for (uint32_t uuid: uuids) {
+		dive_site *ds = divelog.sites.get_by_uuid(uuid);
+		if (ds && ds->dives.empty())
+			step.sites_to_remove.push_back(ds);
+	}
+	if (step.sites_to_remove.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	step.text = "delete " + std::to_string(step.sites_to_remove.size()) + " dive site(s)"; // DeleteDiveSites
+	apply_sites(step);
+	push_step(std::move(step));
+	json = "{\"uuid\":0}";
+	return 0;
+}
+
+int site_delete(uint32_t uuid, std::string &json, std::string &error)
+{
+	// DeleteDiveSites for one site, used or not: its dives stay in the
+	// logbook without a site, and get it back on undo.
+	dive_site *ds = divelog.sites.get_by_uuid(uuid);
+	if (!ds) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::SITES;
+	step.sites_to_remove.push_back(ds);
+	step.text = "delete 1 dive site(s)"; // DeleteDiveSites, tr("delete %n dive site(s)")
+	apply_sites(step);
+	push_step(std::move(step));
+	json = "{\"uuid\":0}";
+	return 0;
+}
+
+int dives_without_site(std::string &json)
+{
+	json = "[";
+	bool first = true;
+	for (const auto &d: divelog.dives) {
+		if (d->dive_site || internal::is_plan_only(*d))
+			continue;
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
+		append_json_string(json, iso_time(d->when));
+		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds);
+		// The position recorded with the dive (GPS1/GPS2 of a dive computer,
+		// dive::get_gps_location()), for the map and the suggestion by distance
+		// (task 2026-11-14-148). Without a site, only a recorded one is found.
+		location_t gps = d->get_gps_location();
+		if (has_location(&gps))
+			json += ",\"latUdeg\":" + std::to_string(gps.lat.udeg) + ",\"lonUdeg\":" + std::to_string(gps.lon.udeg);
+		// Suggestion: the site of another dive of the same trip.
+		uint32_t suggestion = 0;
+		if (d->divetrip)
+			for (const dive *other: d->divetrip->dives)
+				if (other->dive_site) {
+					suggestion = other->dive_site->uuid;
+					break;
+				}
+		json += ",\"suggestedSite\":" + std::to_string(suggestion) + '}';
+	}
+	json += ']';
+	return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Adding and importing dives (spec, section 3, "Add"): ports of
+// DiveListBase::removeDive(), addDive(), removeDives() and addDives()
+// (commands/command_divelist.cpp), without the selection, the filter and the
+// signals, which belong to Subsurface's interface.
+
+// removeDive(): the dive leaves its trip and its site, an emptied trip leaves
+// the log (kept in `trips`), and the dive is taken out of the table.
+static DiveToAdd remove_one_dive(dive *d, std::vector<std::unique_ptr<dive_trip>> &trips)
+{
+	DiveToAdd res;
+	res.trip = unregister_dive_from_trip(d);
+	res.site = unregister_dive_from_dive_site(d);
+	if (res.trip && res.trip->dives.empty()) {
+		divelog.trips.sort(); // Removal of dives has changed order of trips! (as Subsurface)
+		auto [t, idx] = divelog.trips.pull(res.trip);
+		trips.push_back(std::move(t));
+	}
+	size_t idx = divelog.dives.get_idx(d);
+	res.d = divelog.dives.unregister_dive(static_cast<int>(idx));
+	return res;
+}
+
+// addDive(): back in its trip and site, then in the table (and the fulltext index).
+static dive *add_one_dive(DiveToAdd &d)
+{
+	if (d.trip)
+		d.trip->add_dive(d.d.get());
+	if (d.site)
+		d.site->add_dive(d.d.get());
+	return divelog.dives.register_dive(std::move(d.d));
+}
+
+// removeDives(): the dives and sites to remove leave the log and become the
+// ones to add on the next call.
+static void remove_listed(DiveListChange &c)
+{
+	std::sort(c.remove_dives.begin(), c.remove_dives.end(),
+		  [](const dive *d1, const dive *d2) { return dive_less_than(*d1, *d2); });
+	for (dive *d: c.remove_dives)
+		c.dives.push_back(remove_one_dive(d, c.trips));
+	c.remove_dives.clear();
+	for (dive_site *ds: c.remove_sites)
+		c.sites.push_back(std::move(divelog.sites.pull(ds).ptr));
+	c.remove_sites.clear();
+}
+
+// addDives(): in reverse order, so that trips are created before use; then
+// the trips and sites.
+static void add_listed(DiveListChange &c, std::vector<dive *> &added, std::vector<dive_site *> &added_sites)
+{
+	std::sort(c.dives.begin(), c.dives.end(),
+		  [](const DiveToAdd &a, const DiveToAdd &b) { return dive_less_than(*a.d, *b.d); });
+	added.assign(c.dives.size(), nullptr);
+	auto out = added.rbegin();
+	for (auto it = c.dives.rbegin(); it != c.dives.rend(); ++it, ++out)
+		*out = add_one_dive(*it);
+	c.dives.clear();
+	for (std::unique_ptr<dive_trip> &trip: c.trips)
+		divelog.trips.put(std::move(trip));
+	c.trips.clear();
+	for (std::unique_ptr<dive_site> &ds: c.sites)
+		added_sites.push_back(divelog.sites.register_site(std::move(ds)).ptr);
+	c.sites.clear();
+}
+
+// ImportDives::redoit() and undoit() (AddDive is the case with nothing to
+// remove): add what is to add, remove what is to remove, and swap the roles.
+// The dive computers and filter presets of an import come and go with it.
+static void apply_dive_list(Step &step)
+{
+	std::vector<dive *> added;
+	std::vector<dive_site *> added_sites;
+	add_listed(step.list, added, added_sites);
+	remove_listed(step.list);
+	step.list.remove_dives = std::move(added);
+	step.list.remove_sites = std::move(added_sites);
+	divelog.trips.sort(); // as AddDive::redoit(): adding a dive may reorder trips
+	step.list_applied = !step.list_applied;
+	if (step.swap_fingerprints)
+		std::swap(::fingerprints, step.fingerprints);
+	if (step.list_applied) {
+		for (const device &dev: step.devices)
+			add_to_device_table(divelog.devices, dev);
+		for (auto &it: step.presets_to_add)
+			step.presets_to_remove.push_back(divelog.filter_presets.add(it.first, it.second));
+		step.presets_to_add.clear();
+	} else {
+		for (const device &dev: step.devices)
+			remove_device(divelog.devices, dev);
+		for (auto it = step.presets_to_remove.rbegin(); it != step.presets_to_remove.rend(); ++it) {
+			const filter_preset &preset = divelog.filter_presets[*it];
+			step.presets_to_add.emplace_back(preset.name, preset.data);
+			divelog.filter_presets.remove(*it);
+		}
+		step.presets_to_remove.clear();
+		std::reverse(step.presets_to_add.begin(), step.presets_to_add.end());
+	}
+}
+
+static void apply_delete(Step &step)
+{
+	const bool deleting = !step.list_applied;
+	if (deleting)
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+	if (deleting && !step.renumbered.empty())
+		divelog.dives.sort();
+	apply_dive_list(step);
+	if (!deleting)
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+	if (!deleting && !step.renumbered.empty())
+		divelog.dives.sort();
+}
+
+// MergeDives::redoit() and undoit() (commands/command_divelist.cpp): redo
+// renumbers the following dives, adds the merged dive, removes the originals
+// and sets the location of the merged dive's site; undo does it in reverse
+// order. The renumbering and the location swap with their previous values.
+static void apply_merge(Step &step)
+{
+	bool redo = !step.list_applied;
+	auto renumber = [&step]() {
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+	};
+	if (redo)
+		renumber();
+	apply_dive_list(step);
+	if (!redo)
+		renumber();
+	if (step.site) {
+		std::swap(step.location, step.site->location);
+		for (dive *d: step.site->dives)
+			d->invalidate_cache();
+	}
+}
+
+// CreateFilterPreset, RemoveFilterPreset, EditFilterPreset: redo and undo.
+static void apply_filter_preset(Step &step)
+{
+	bool create = (step.preset_op == Step::CREATE) != step.preset_applied;
+	if (step.preset_op == Step::EDIT) {
+		std::swap(step.preset_data, divelog.filter_presets[step.preset_index].data);
+	} else if (create) {
+		step.preset_index = divelog.filter_presets.add(step.preset_name, step.preset_data);
+	} else {
+		const filter_preset &preset = divelog.filter_presets[step.preset_index];
+		step.preset_name = preset.name;
+		step.preset_data = preset.data;
+		divelog.filter_presets.remove(step.preset_index);
+	}
+	step.preset_applied = !step.preset_applied;
+}
+
+// The latest dive of the log that is not a plan; the plans do not count in
+// the numbering (OpenDives lists them apart). `usable`: leaves invalid dives out.
+static const dive *last_real_dive(bool usable)
+{
+	for (auto it = divelog.dives.rbegin(); it != divelog.dives.rend(); ++it)
+		if (!internal::is_plan_only(**it) && !(usable && (*it)->invalid))
+			return it->get();
+	return nullptr;
+}
+
+// dive_table::get_dive_nr_at_idx(), the plans left out: a new last dive follows
+// the number of the last one, any other has none.
+static int next_dive_number(const dive &d)
+{
+	const dive *after = last_real_dive(false);
+	if (after && after->when > d.when)
+		return 0;
+	const dive *last = last_real_dive(true);
+	if (!last)
+		return 1;
+	return last->number ? last->number + 1 : 0;
+}
+
+// Result of a dive list step: {"listChange":true, "dives":<dives in the log>,
+// "id":<first dive added, 0 if none>}.
+static std::string dive_list_json(const Step &step)
+{
+	int id = step.list_applied && !step.list.remove_dives.empty() ? step.list.remove_dives[0]->id : 0;
+	return "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":" +
+	       std::to_string(id) + "}";
+}
+
+// Two entries of one dive that are the same recording, under two names (a
+// download and the computer's own log file). Measured on real dives: the same
+// computer has the same sample times, with depths about 15 cm apart at most;
+// two computers worn together sample at other times, or differ by more.
+static bool same_recording(const divecomputer &a, const divecomputer &b)
+{
+	const divecomputer &few = a.samples.size() <= b.samples.size() ? a : b;
+	const divecomputer &many = &few == &a ? b : a;
+	if (few.samples.size() < 2)
+		return false;
+	double xy = 0, xx = 0;
+	std::vector<std::pair<double, double>> points;
+	for (const sample &s: few.samples) {
+		auto it = std::lower_bound(many.samples.begin(), many.samples.end(), s.time.seconds,
+					   [](const sample &o, int t) { return o.time.seconds < t; });
+		if (it == many.samples.end() || it->time.seconds != s.time.seconds)
+			continue;
+		points.emplace_back(s.depth.mm, it->depth.mm);
+		xy += static_cast<double>(s.depth.mm) * it->depth.mm;
+		xx += static_cast<double>(s.depth.mm) * s.depth.mm;
+	}
+	if (points.size() < 0.9 * few.samples.size() || xx <= 0)
+		return false;
+	double scale = xy / xx, gap = 0;
+	for (const auto &[x, y]: points)
+		gap += std::fabs(y - scale * x);
+	return gap / points.size() <= 300;
+}
+
+struct ComputerEntry {
+	std::string model, serial, firmware, nickname;
+	uint32_t deviceid = 0;
+	int dives = 0;
+	bool listed = false;
+	// The other entries found in the same dives: dives, and same recordings.
+	std::map<int, std::pair<int, int>> shared;
+};
+
+static bool logged_computer(const divecomputer &dc)
+{
+	return !dc.model.empty() && !is_dc_planner(&dc) && !is_dc_manually_added_dive(&dc);
+}
+
+static std::vector<ComputerEntry> computer_entries()
+{
+	std::vector<ComputerEntry> list;
+	auto index = [&](const std::string &model, const std::string &serial) {
+		for (size_t i = 0; i < list.size(); i++)
+			if (list[i].model == model && list[i].serial == serial)
+				return static_cast<int>(i);
+		list.emplace_back();
+		list.back().model = model;
+		list.back().serial = serial;
+		return static_cast<int>(list.size() - 1);
+	};
+	for (const device &dev: divelog.devices) {
+		ComputerEntry &e = list[index(dev.model, dev.serialNumber)];
+		e.nickname = dev.nickName;
+		e.deviceid = dev.deviceId;
+		e.listed = true;
+	}
+	for (const auto &d: divelog.dives) {
+		if (internal::is_plan_only(*d))
+			continue;
+		std::vector<std::pair<int, const divecomputer *>> here;
+		for (const divecomputer &dc: d->dcs) {
+			if (!logged_computer(dc))
+				continue;
+			int i = index(dc.model, dc.serial);
+			ComputerEntry &e = list[i];
+			if (!e.deviceid)
+				e.deviceid = dc.deviceid;
+			if (e.firmware.empty())
+				e.firmware = dc.fw_version;
+			here.emplace_back(i, &dc);
+		}
+		std::set<int> counted;
+		for (const auto &[i, dc]: here) {
+			if (counted.insert(i).second)
+				list[i].dives++;
+			for (const auto &[j, other]: here) {
+				if (i == j)
+					continue;
+				auto &pair = list[i].shared[j];
+				pair.first++;
+				pair.second += same_recording(*dc, *other);
+			}
+		}
+	}
+	return list;
+}
+
+static void apply_devices(Step &step);
+static std::string devices_json();
+
+static int swap_step(Step &step, std::string &result_json, std::string &error)
+{
+	if (step.kind == Step::DEVICES) {
+		apply_devices(step);
+		result_json = devices_json();
+		return 0;
+	}
+	if (step.kind == Step::RENUMBER) {
+		// renumberDives(): the old numbers are kept in the array, so doing it
+		// twice is a no-op.
+		for (auto &[d, number]: step.renumbered) {
+			std::swap(d->number, number);
+			d->invalidate_cache();
+		}
+		result_json = "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
+		return 0;
+	}
+	if (step.kind == Step::DIVE_LIST) {
+		apply_delete(step);
+		result_json = dive_list_json(step);
+		return 0;
+	}
+	if (step.kind == Step::MERGE) {
+		apply_merge(step);
+		result_json = dive_list_json(step);
+		return 0;
+	}
+	if (step.kind == Step::DIVES_EDIT) {
+		// EditDivesBase: every dive swaps its contents with the saved ones.
+		for (auto &[id, other]: step.dive_swaps)
+			if (dive *d = divelog.dives.get_by_uniq_id(id))
+				exchange(d, *other);
+		result_json = "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
+		return 0;
+	}
+	if (step.kind == Step::FILTER_PRESET) {
+		apply_filter_preset(step);
+		return filter_presets_json(result_json);
+	}
+	if (step.kind == Step::TRIP_FIELD) {
+		std::string &field = step.notes ? step.trip->notes : step.trip->location;
+		std::swap(field, step.value);
+		return trip_json(step.trip->id, result_json, error);
+	}
+	if (step.kind == Step::SITE_FIELD) {
+		apply_site_field(step);
+		return site_json(step.site->uuid, result_json, error);
+	}
+	if (step.kind == Step::SITES) {
+		apply_sites(step);
+		uint32_t shown = step.merge_into ? step.merge_into->uuid
+			       : !step.sites_to_remove.empty() ? step.sites_to_remove[0]->uuid : 0;
+		return site_json(shown, result_json, error);
+	}
+	if (step.kind == Step::CYLINDER_TYPE) {
+		apply_cylinder_type(step);
+		return cylinder_types(result_json);
+	}
+	if (step.kind == Step::MOVE) {
+		move_dives_between_trips(step);
+		// The trip shown: the one the first dive is in now, or was in.
+		dive_trip *trip = step.moves.empty() ? nullptr : step.moves[0].d->divetrip;
+		if (!trip && !step.moves.empty())
+			trip = step.moves[0].trip;
+		return trip_json(trip ? trip->id : 0, result_json, error);
+	}
+	dive *d = divelog.dives.get_by_uniq_id(step.dive_id);
+	if (!d) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	exchange(d, *step.other);
+	return internal::dive_json(step.dive_id, result_json, error);
+}
+
+// --- Dive computers of the logbook (Settings, "Ordinateurs du carnet") --------
+
+void dive_computers(std::string &json)
+{
+	std::vector<ComputerEntry> list = computer_entries();
+	json = "[";
+	for (size_t i = 0; i < list.size(); i++) {
+		const ComputerEntry &e = list[i];
+		if (i)
+			json += ',';
+		json += "{\"model\":";
+		append_json_string(json, e.model);
+		json += ",\"serial\":";
+		append_json_string(json, e.serial);
+		json += ",\"firmware\":";
+		append_json_string(json, e.firmware);
+		json += ",\"nickname\":";
+		append_json_string(json, e.nickname);
+		json += ",\"dives\":" + std::to_string(e.dives);
+		json += std::string(",\"listed\":") + (e.listed ? "true" : "false");
+		json += ",\"shared\":[";
+		bool first = true;
+		for (const auto &[j, counts]: e.shared) {
+			if (!first)
+				json += ',';
+			first = false;
+			json += "{\"model\":";
+			append_json_string(json, list[j].model);
+			json += ",\"serial\":";
+			append_json_string(json, list[j].serial);
+			json += ",\"dives\":" + std::to_string(counts.first) + ",\"same\":" + std::to_string(counts.second) + '}';
+		}
+		json += "]}";
+	}
+	json += ']';
+}
+
+// Subsurface writes a computer's serial number and firmware in the log as extra
+// data, and reads them back from there (add_extra_data()).
+static void set_extra_data(divecomputer &dc, const std::string &key, const std::string &value)
+{
+	auto it = std::find_if(dc.extra_data.begin(), dc.extra_data.end(), [&](const extra_data &e) { return e.key == key; });
+	if (value.empty()) {
+		if (it != dc.extra_data.end())
+			dc.extra_data.erase(it);
+	} else if (it != dc.extra_data.end()) {
+		it->value = value;
+	} else {
+		dc.extra_data.push_back(extra_data { key, value });
+	}
+}
+
+static void apply_devices(Step &step)
+{
+	std::swap(divelog.devices, step.devices_swap);
+	for (auto &[id, other]: step.dive_swaps)
+		if (dive *d = divelog.dives.get_by_uniq_id(id))
+			exchange(d, *other);
+	for (auto &[i, deviceid]: step.fingerprint_moves)
+		if (i < ::fingerprints.size())
+			std::swap(::fingerprints[i].fdeviceid, deviceid);
+}
+
+static std::string devices_json()
+{
+	return "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
+}
+
+int dive_computer_action(const std::string &action, const std::string &model, const std::string &serial,
+			 const std::string &value, const std::string &into_model, const std::string &into_serial,
+			 std::string &json, std::string &error)
+{
+	if (loaded_format_version > dataformat_version) {
+		error = "FORMAT_NEWER";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::DEVICES;
+	step.devices_swap = divelog.devices;
+	auto listed = std::find_if(step.devices_swap.begin(), step.devices_swap.end(), [&](const device &d) {
+		return d.model == model && d.serialNumber == serial;
+	});
+	if (action == "rename") {
+		// EditDeviceNickname (commands/command_device.cpp): Subsurface keeps a
+		// nickname by model and serial number.
+		if (model.empty() || serial.empty()) {
+			error = "BAD_REQUEST: no serial number";
+			return -1;
+		}
+		if (listed != step.devices_swap.end()) {
+			if (listed->nickName == value)
+				return json = devices_json(), 0;
+			listed->nickName = value;
+		} else {
+			create_device_node(step.devices_swap, model, serial, value);
+		}
+		step.text = "Set nickname of device " + model + " (serial " + serial + ") to " + value;
+	} else if (action == "remove") {
+		if (listed == step.devices_swap.end()) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		step.devices_swap.erase(listed);
+		step.text = "remove dive computer " + model + " from the list";
+	} else if (action == "merge") {
+		std::vector<ComputerEntry> list = computer_entries();
+		auto find = [&](const std::string &m, const std::string &s) {
+			return std::find_if(list.begin(), list.end(), [&](const ComputerEntry &e) { return e.model == m && e.serial == s; });
+		};
+		auto from = find(model, serial), into = find(into_model, into_serial);
+		if (from == list.end() || into == list.end() || from == into) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		uint32_t into_id = into->deviceid ? into->deviceid : into_serial.empty() ? 0 : calculate_string_hash(into_serial.c_str());
+		auto is_from = [&](const divecomputer &dc) { return logged_computer(dc) && dc.model == model && dc.serial == serial; };
+		auto is_into = [&](const divecomputer &dc) { return logged_computer(dc) && dc.model == into_model && dc.serial == into_serial; };
+		for (const auto &owned: divelog.dives) {
+			dive *d = owned.get();
+			int first_from = -1, first_into = -1;
+			for (size_t i = 0; i < d->dcs.size(); i++) {
+				if (first_from < 0 && is_from(d->dcs[i]))
+					first_from = static_cast<int>(i);
+				if (first_into < 0 && is_into(d->dcs[i]))
+					first_into = static_cast<int>(i);
+			}
+			if (first_from < 0)
+				continue;
+			auto copy = std::make_unique<dive>(*d);
+			// Both in this dive and the same recording: one entry stays, the
+			// first of the two, so that the profile shown does not change.
+			// Different recordings are both kept: nothing is lost.
+			int drop = -1;
+			if (first_into >= 0 && same_recording(d->dcs[first_from], d->dcs[first_into]))
+				drop = std::max(first_from, first_into);
+			if (drop >= 0) {
+				uint32_t diveid = d->dcs[first_into].diveid;
+				copy = divelog.dives.clone_delete_divecomputer(*copy, drop);
+				copy->id = d->id;
+				copy->dcs[std::min(first_from, first_into)].diveid = diveid;
+			}
+			for (size_t i = 0; i < copy->dcs.size(); i++) {
+				divecomputer &dc = copy->dcs[i];
+				bool kept = drop >= 0 && static_cast<int>(i) == std::min(first_from, first_into);
+				if (!kept && !is_from(dc))
+					continue;
+				dc.model = into_model;
+				dc.serial = into_serial;
+				dc.deviceid = into_id;
+				set_extra_data(dc, "Serial", into_serial);
+				if (dc.fw_version.empty() && !into->firmware.empty()) {
+					dc.fw_version = into->firmware;
+					set_extra_data(dc, "FW Version", into->firmware);
+				}
+			}
+			step.dive_swaps.emplace_back(d->id, std::move(copy));
+		}
+		if (listed != step.devices_swap.end())
+			step.devices_swap.erase(listed);
+		if (from->deviceid && from->deviceid != into_id)
+			for (size_t i = 0; i < ::fingerprints.size(); i++)
+				if (::fingerprints[i].fdeviceid == from->deviceid)
+					step.fingerprint_moves.emplace_back(i, into_id);
+		step.text = "merge dive computer " + model + " into " + into_model;
+	} else {
+		error = "BAD_REQUEST: unknown action " + action;
+		return -1;
+	}
+	apply_devices(step);
+	push_step(std::move(step));
+	json = devices_json();
+	return 0;
+}
+
+int undo(std::string &result_json, std::string &error)
+{
+	if (!can_undo()) {
+		error = "NOTHING_TO_UNDO";
+		return -1;
+	}
+	applied--;
+	return swap_step(steps[applied], result_json, error);
+}
+
+int redo(std::string &result_json, std::string &error)
+{
+	if (!can_redo()) {
+		error = "NOTHING_TO_REDO";
+		return -1;
+	}
+	applied++;
+	return swap_step(steps[applied - 1], result_json, error);
+}
+
+bool can_undo()
+{
+	return applied > 0;
+}
+
+bool can_redo()
+{
+	return applied < steps.size();
+}
+
+std::string undo_text()
+{
+	return can_undo() ? steps[applied - 1].text : std::string();
+}
+
+std::string redo_text()
+{
+	return can_redo() ? steps[applied].text : std::string();
+}
+
+bool has_unsaved_changes()
+{
+	return static_cast<long>(applied) != clean_index;
+}
+
+int save_local(std::string &error)
+{
+	const std::string &log = internal::current_log();
+	if (!is_git_log(log)) {
+		error = log.empty() ? "NO_LOG" : "NOT_GIT";
+		return -1;
+	}
+	if (!writes_allowed()) {
+		error = "WRITE_LOCKED";
+		return -1;
+	}
+	if (check_destination(log, error))
+		return -1;
+	if (!has_unsaved_changes())
+		return 0;
+	if (save_to(log, error))
+		return -1;
+	clean_index = static_cast<long>(applied);
+	return 0;
+}
+
+int save_as(const std::string &destination, std::string &error)
+{
+	return save_to(destination, error);
+}
+
+static int sync_and_reload_if_needed(const std::string &log, const std::string &local_before, bool server_in_local,
+			      bool local_in_server, std::string &status_json, std::string &error);
+
+static sync_progress sync_progress_target = nullptr;
+
+// Subsurface's callback: a non-zero return would cancel the transfer; the
+// progress only watches.
+static int forward_git_progress(const char *message)
+{
+	if (sync_progress_target && message)
+		sync_progress_target(message);
+	return 0;
+}
+
+void set_sync_progress(sync_progress progress)
+{
+	sync_progress_target = progress;
+	set_git_update_cb(progress ? &forward_git_progress : nullptr);
+}
+
+int sync(std::string &status_json, std::string &error)
+{
+	const std::string log = internal::current_log();
+	if (!is_git_log(log)) {
+		error = log.empty() ? "NO_LOG" : "NOT_GIT";
+		return -1;
+	}
+	if (!internal::current_log_is_cloud()) {
+		if (save_local(error))
+			return -1;
+		// A git log with a remote of its own (not the Subsurface cloud, e.g.
+		// "git://host/repo[branch]", which the tests use): the same exchange.
+		struct git_info info;
+		if (git_info_of(log, info) && info.transport != RT_LOCAL) {
+			Heads before = read_heads(log);
+			return sync_and_reload_if_needed(log, before.local, before.local != before.remote, before.local == before.remote, status_json,
+							 error);
+		}
+		status_json = sync_json("local", false);
+		return 0;
+	}
+	if (!writes_allowed()) {
+		error = "WRITE_LOCKED";
+		return -1;
+	}
+	// Ask the server again before any write: Subsurface treats almost any
+	// clone failure as "branch missing" and would then create an empty
+	// commit (git-access.cpp:52). Never write if the branch status is unknown.
+	bool exists = false;
+	std::string server_head, probe_error;
+	bool reachable = cloud_branch_status(log, exists, server_head, probe_error) == 0;
+	if (reachable && !exists) {
+		error = "STOPPED: no log branch on the server";
+		return -1;
+	}
+	if (save_local(error))
+		return -1;
+	if (!reachable) {
+		status_json = sync_json("offline", false, probe_error.rfind("AUTH", 0) == 0 ? "auth" : "server");
+		return 0;
+	}
+	Heads before = read_heads(log);
+	if (before.local == server_head) {
+		status_json = sync_json("up_to_date", false);
+		return 0;
+	}
+	// The server's head may not be known locally yet (not fetched): then the
+	// local branch is "in the server" when it has no commit of its own.
+	bool server_in_local = includes(log, before.local, server_head);
+	bool local_in_server = includes(log, server_head, before.local) || before.local == before.remote;
+
+	return sync_and_reload_if_needed(log, before.local, server_in_local, local_in_server, status_json, error);
+}
+
+// The exchange with the server without reading the log: Subsurface's
+// open_git_repository() with git_local_only off (get_remote_repo(), then
+// sync_with_remote(): fetch, then fast-forward, merge or push, as on
+// desktop after a save). When the local branch did not move (only this
+// device's commits were sent), the log in memory is still the saved one: it
+// is kept, and so is the undo history, as desktop Subsurface keeps it after
+// a cloud save. When the cloud brought changes, the merged log is read again,
+// as Subsurface-mobile does (saveChangesCloud()), and the undo history goes.
+static int sync_and_reload_if_needed(const std::string &log, const std::string &local_before, bool server_in_local,
+			      bool local_in_server, std::string &status_json, std::string &error)
+{
+	{
+		struct git_info info;
+		if (!is_git_repository(log.c_str(), &info)) {
+			error = "NOT_GIT";
+			return -1;
+		}
+		git_remote_sync_successful = false;
+		bool was_local_only = git_local_only;
+		git_local_only = false;
+		bool opened = open_git_repository(&info);
+		git_local_only = was_local_only;
+		if (!opened) {
+			error = "STOPPED: cannot open the local copy";
+			return -1;
+		}
+	}
+	bool synced = git_remote_sync_successful;
+	Heads after = read_heads(log);
+	if (after.local == local_before) {
+		status_json = sync_json(!synced ? "stopped" : server_in_local ? "pushed" : "up_to_date", false);
+		return 0;
+	}
+	bool was_local_only = git_local_only;
+	git_local_only = true;
+	int ret = internal::load(log, error);
+	git_local_only = was_local_only;
+	git_remote_sync_successful = synced;
+	if (ret) {
+		error = "STOPPED: " + error;
+		return -1;
+	}
+	apply_log_prefs();
+	divelog.process_loaded_dives();
+	if (!synced)
+		status_json = sync_json("stopped", true);
+	else
+		status_json = sync_json(local_in_server ? "pulled" : "merged", true);
+	return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Sync conflict (spec, section 6, "Conflict"; an OpenDives addition). When the
+// device and the cloud both changed the log, Subsurface's sync merges them
+// (try_to_git_merge() in core/git-access.cpp, files merged by the union of
+// their lines) and commits "Automatic merge". When both sides changed the same
+// line of a dive (the notes, the rating…), the union keeps both lines and the
+// loaded dive shows only one of them. The merge commit keeps both versions:
+// these functions find such lines and let the diver choose one side.
+
+namespace {
+
+// A line of a file of the git log and the key it belongs to: lines starting
+// with a space or a tab continue the previous key. Blank lines are kept, with
+// an empty text, and belong to no value.
+struct LogLine {
+	std::string key, text;
+};
+
+std::vector<LogLine> log_lines(const std::string &text)
+{
+	std::vector<LogLine> out;
+	std::string key;
+	size_t start = 0;
+	while (start < text.size()) {
+		size_t nl = text.find('\n', start);
+		std::string line = text.substr(start, nl == std::string::npos ? std::string::npos : nl - start);
+		start = nl == std::string::npos ? text.size() : nl + 1;
+		if (!line.empty() && line[0] != ' ' && line[0] != '\t')
+			key = line.substr(0, line.find(' '));
+		out.push_back({ key, line });
+	}
+	return out;
+}
+
+bool git_file_text(git_repository *repo, const git_tree *tree, const std::string &path, std::string &text)
+{
+	git_tree_entry *entry = nullptr;
+	if (!tree || git_tree_entry_bypath(&entry, tree, path.c_str()))
+		return false;
+	git_blob *blob = nullptr;
+	bool found = !git_blob_lookup(&blob, repo, git_tree_entry_id(entry));
+	if (found) {
+		text.assign(static_cast<const char *>(git_blob_rawcontent(blob)), git_blob_rawsize(blob));
+		git_blob_free(blob);
+	}
+	git_tree_entry_free(entry);
+	return found;
+}
+
+// "key value" lines of a file of the git log, grouped by key.
+std::map<std::string, std::string> git_file_lines(git_repository *repo, const git_tree *tree, const std::string &path)
+{
+	std::map<std::string, std::string> out;
+	std::string text;
+	if (!git_file_text(repo, tree, path, text))
+		return out;
+	for (const LogLine &line: log_lines(text)) {
+		if (line.text.empty())
+			continue;
+		std::string &value = out[line.key];
+		if (!value.empty())
+			value += '\n';
+		value += line.text;
+	}
+	return out;
+}
+
+// The text of a file with one key as another version of the file has it, every
+// other line untouched. A key this file lacks goes where that version has it.
+std::string with_key_from(const std::string &text, const std::string &other, const std::string &key)
+{
+	std::vector<LogLine> kept, wanted;
+	const std::vector<LogLine> from = log_lines(other);
+	for (const LogLine &line: from)
+		if (line.key == key && !line.text.empty())
+			wanted.push_back(line);
+	size_t at = 0;
+	bool present = false;
+	for (const LogLine &line: log_lines(text)) {
+		if (line.key == key && !line.text.empty()) {
+			if (!present)
+				at = kept.size();
+			present = true;
+		} else {
+			kept.push_back(line);
+		}
+	}
+	if (!present) {
+		for (const LogLine &line: from) {
+			if (line.key == key)
+				break;
+			for (size_t i = kept.size(); i-- > 0;) {
+				if (!line.text.empty() && kept[i].key == line.key) {
+					at = std::max(at, i + 1);
+					break;
+				}
+			}
+		}
+	}
+	kept.insert(kept.begin() + at, wanted.begin(), wanted.end());
+	std::string out;
+	for (const LogLine &line: kept)
+		out += line.text + '\n';
+	if (!text.empty() && text.back() != '\n' && !out.empty())
+		out.pop_back();
+	return out;
+}
+
+// The value of a "key value" line for showing it: quotes and escapes removed.
+std::string line_value(const std::string &lines)
+{
+	std::string out;
+	size_t start = 0;
+	while (start < lines.size()) {
+		size_t nl = lines.find('\n', start);
+		std::string line = lines.substr(start, nl == std::string::npos ? std::string::npos : nl - start);
+		start = nl == std::string::npos ? lines.size() : nl + 1;
+		size_t sp = line.find(' ');
+		std::string v = sp == std::string::npos ? std::string() : trim(line.substr(sp + 1));
+		if (v.size() >= 2 && v.front() == '"' && v.back() == '"') {
+			std::string u;
+			for (size_t i = 1; i + 1 < v.size(); i++) {
+				if (v[i] == '\\' && i + 2 < v.size()) {
+					i++;
+					u += v[i] == 'n' ? '\n' : v[i];
+				} else {
+					u += v[i];
+				}
+			}
+			v = u;
+		}
+		if (!out.empty())
+			out += '\n';
+		out += v;
+	}
+	return out;
+}
+
+// A dive's local time from a path of the git log: "YYYY/MM/DD-Wday-hh=mm=ss/…",
+// possibly inside a trip directory (save-git.cpp, create_dive_name()); 0 when
+// the path is not a dive's.
+timestamp_t dive_time_of_path(const std::string &path)
+{
+	std::vector<std::string> parts;
+	size_t start = 0;
+	while (start <= path.size()) {
+		size_t slash = path.find('/', start);
+		parts.push_back(path.substr(start, slash == std::string::npos ? std::string::npos : slash - start));
+		if (slash == std::string::npos)
+			break;
+		start = slash + 1;
+	}
+	if (parts.size() < 3)
+		return 0;
+	int year = atoi(parts[0].c_str()), month = atoi(parts[1].c_str());
+	for (size_t i = 2; i < parts.size(); i++) {
+		int day, h, m, s;
+		char wday[16];
+		if (sscanf(parts[i].c_str(), "%d-%15[^-]-%d=%d=%d", &day, wday, &h, &m, &s) == 5) {
+			struct tm tm = {};
+			tm.tm_year = year;
+			tm.tm_mon = month - 1;
+			tm.tm_mday = day;
+			tm.tm_hour = h;
+			tm.tm_min = m;
+			tm.tm_sec = s;
+			return utc_mktime(&tm);
+		}
+	}
+	return 0;
+}
+
+struct ConflictLine {
+	std::string key, device, cloud;
+};
+
+struct ConflictFile {
+	std::string path;
+	std::vector<ConflictLine> lines;
+};
+
+// The automatic merge at the head of the log's branch, if any: its two
+// parents (this device's commit first, as try_to_git_merge() orders them)
+// and the files whose same key the two sides changed differently.
+struct MergeConflicts {
+	git_oid head {}, device {}, cloud {};
+	git_time_t device_time = 0, cloud_time = 0;
+	std::vector<ConflictFile> files;
+};
+
+// A commit made by resolve_conflicts().
+static bool is_conflict_resolution(const char *message)
+{
+	return strstr(message, "Keep this device's version") || strstr(message, "Take the cloud's version");
+}
+
+int find_merge_conflicts(git_repository *repo, const std::string &branch, MergeConflicts &out)
+{
+	git_commit *head = nullptr, *dev = nullptr, *cld = nullptr, *base_commit = nullptr;
+	git_tree *tdev = nullptr, *tcld = nullptr, *tbase = nullptr;
+	git_diff *ddev = nullptr, *dcld = nullptr;
+	int ret = -1;
+	if (git_reference_name_to_id(&out.head, repo, ("refs/heads/" + branch).c_str()) ||
+	    git_commit_lookup(&head, repo, &out.head))
+		goto done;
+	ret = 0;
+	{
+		// The conflict stays while the diver decides later: edits saved since
+		// sit on top of the merge. Not further back than what the server has,
+		// where a merge is an old one, settled or from another program.
+		git_oid remote;
+		bool has_remote = !git_reference_name_to_id(&remote, repo, ("refs/remotes/origin/" + branch).c_str());
+		while (git_commit_parentcount(head) != 2 || strncmp(git_commit_message(head), "Automatic merge", 15) != 0) {
+			if (git_commit_parentcount(head) != 1 || is_conflict_resolution(git_commit_message(head)) ||
+			    (has_remote && git_oid_equal(git_commit_id(head), &remote)))
+				goto done;
+			git_commit *parent = nullptr;
+			if (git_commit_parent(&parent, head, 0))
+				goto done;
+			git_commit_free(head);
+			head = parent;
+		}
+	}
+	{
+		git_oid base;
+		out.device = *git_commit_parent_id(head, 0);
+		out.cloud = *git_commit_parent_id(head, 1);
+		if (git_commit_lookup(&dev, repo, &out.device) || git_commit_lookup(&cld, repo, &out.cloud) ||
+		    git_merge_base(&base, repo, &out.device, &out.cloud) || git_commit_lookup(&base_commit, repo, &base) ||
+		    git_commit_tree(&tdev, dev) || git_commit_tree(&tcld, cld) || git_commit_tree(&tbase, base_commit) ||
+		    git_diff_tree_to_tree(&ddev, repo, tbase, tdev, nullptr) ||
+		    git_diff_tree_to_tree(&dcld, repo, tbase, tcld, nullptr)) {
+			ret = -1;
+			goto done;
+		}
+		out.device_time = git_commit_time(dev);
+		out.cloud_time = git_commit_time(cld);
+		std::map<std::string, git_oid> changed_on_device;
+		for (size_t i = 0; i < git_diff_num_deltas(ddev); i++) {
+			const git_diff_delta *delta = git_diff_get_delta(ddev, i);
+			if (delta->status == GIT_DELTA_MODIFIED)
+				changed_on_device[delta->new_file.path] = delta->new_file.id;
+		}
+		for (size_t i = 0; i < git_diff_num_deltas(dcld); i++) {
+			const git_diff_delta *delta = git_diff_get_delta(dcld, i);
+			auto it = changed_on_device.find(delta->new_file.path);
+			if (delta->status != GIT_DELTA_MODIFIED || it == changed_on_device.end() ||
+			    git_oid_equal(&it->second, &delta->new_file.id))
+				continue;
+			// Changed on both sides: the keys changed on both sides, differently.
+			std::string path = delta->new_file.path;
+			auto b = git_file_lines(repo, tbase, path), d = git_file_lines(repo, tdev, path),
+			     c = git_file_lines(repo, tcld, path);
+			ConflictFile file { path, {} };
+			std::set<std::string> keys;
+			for (auto &kv: d)
+				keys.insert(kv.first);
+			for (auto &kv: c)
+				keys.insert(kv.first);
+			for (const std::string &key: keys) {
+				const std::string &bv = b[key], &dv = d[key], &cv = c[key];
+				if (dv != bv && cv != bv && dv != cv)
+					file.lines.push_back({ key, dv, cv });
+			}
+			if (!file.lines.empty())
+				out.files.push_back(std::move(file));
+		}
+	}
+done:
+	git_diff_free(ddev);
+	git_diff_free(dcld);
+	git_tree_free(tdev);
+	git_tree_free(tcld);
+	git_tree_free(tbase);
+	git_commit_free(head);
+	git_commit_free(dev);
+	git_commit_free(cld);
+	git_commit_free(base_commit);
+	return ret;
+}
+
+std::string iso_seconds(git_time_t t)
+{
+	time_t tt = static_cast<time_t>(t);
+	struct tm tm;
+	gmtime_r(&tt, &tm);
+	char buf[32];
+	strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", &tm);
+	return buf;
+}
+
+} // namespace
+
+int sync_conflicts(std::string &json, std::string &error)
+{
+	const std::string &log = internal::current_log();
+	json = "{\"conflict\":false}";
+	if (!is_git_log(log))
+		return 0;
+	git_repository *repo = nullptr;
+	std::string branch;
+	if (open_log_repo(log, &repo, branch)) {
+		error = "NOT_GIT";
+		return -1;
+	}
+	MergeConflicts mc;
+	int ret = find_merge_conflicts(repo, branch, mc);
+	git_repository_free(repo);
+	if (ret) {
+		error = "GIT_ERROR: cannot read the merge";
+		return -1;
+	}
+	if (mc.files.empty())
+		return 0;
+	json = "{\"conflict\":true,\"deviceTime\":\"" + iso_seconds(mc.device_time) + "\",\"cloudTime\":\"" +
+	       iso_seconds(mc.cloud_time) + "\",\"items\":[";
+	bool first = true;
+	for (const ConflictFile &f: mc.files) {
+		if (!first)
+			json += ',';
+		first = false;
+		timestamp_t when = dive_time_of_path(f.path);
+		const dive *d = nullptr;
+		for (auto &dp: divelog.dives)
+			if (when && dp->when == when)
+				d = dp.get();
+		json += "{\"path\":";
+		append_json_string(json, f.path);
+		json += ",\"diveId\":" + std::to_string(d ? d->id : 0) + ",\"number\":" + std::to_string(d ? d->number : 0);
+		json += ",\"date\":";
+		append_json_string(json, when ? iso_time(when) : std::string());
+		json += ",\"lines\":[";
+		for (size_t i = 0; i < f.lines.size(); i++) {
+			if (i)
+				json += ',';
+			json += "{\"key\":";
+			append_json_string(json, f.lines[i].key);
+			json += ",\"device\":";
+			append_json_string(json, line_value(f.lines[i].device));
+			json += ",\"cloud\":";
+			append_json_string(json, line_value(f.lines[i].cloud));
+			json += '}';
+		}
+		json += "]}";
+	}
+	json += "]}";
+	return 0;
+}
+
+int resolve_conflicts(const std::string &choices_json, std::string &error)
+{
+	const std::string log = internal::current_log();
+	// One choice per conflicting file: {"<path>":"device"|"cloud", …}.
+	std::vector<std::pair<std::string, JsonValue>> fields;
+	if (!JsonReader(choices_json).object(fields)) {
+		error = "BAD_REQUEST: choices";
+		return -1;
+	}
+	std::map<std::string, bool> keep_device;
+	for (const auto &[path, value]: fields) {
+		if (value.kind != JsonValue::STRING || (value.text != "device" && value.text != "cloud")) {
+			error = "BAD_REQUEST: choice for " + path;
+			return -1;
+		}
+		keep_device[path] = value.text == "device";
+	}
+	if (!is_git_log(log)) {
+		error = log.empty() ? "NO_LOG" : "NOT_GIT";
+		return -1;
+	}
+	if (!writes_allowed()) {
+		error = "WRITE_LOCKED";
+		return -1;
+	}
+	if (has_unsaved_changes() && save_local(error))
+		return -1;
+	git_repository *repo = nullptr;
+	std::string branch;
+	if (open_log_repo(log, &repo, branch)) {
+		error = "NOT_GIT";
+		return -1;
+	}
+	MergeConflicts mc;
+	if (find_merge_conflicts(repo, branch, mc) || mc.files.empty()) {
+		git_repository_free(repo);
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	for (const ConflictFile &f: mc.files) {
+		if (!keep_device.count(f.path)) {
+			git_repository_free(repo);
+			error = "BAD_REQUEST: no choice for " + f.path;
+			return -1;
+		}
+	}
+	// The head's tree, with the conflicting lines of each file as the chosen side
+	// has them. The rest of the file stays as it is at the head: what the merge
+	// combined, and edits saved while the conflict waited.
+	git_commit *head = nullptr, *dev = nullptr, *cld = nullptr;
+	git_tree *head_tree = nullptr, *dev_tree = nullptr, *cld_tree = nullptr, *new_tree = nullptr;
+	git_index *index = nullptr;
+	git_signature *author = nullptr;
+	git_reference *ref = nullptr;
+	git_oid tree_oid, commit_oid;
+	std::string message = "Changes made: \n\n";
+	int ret = -1;
+	if (git_commit_lookup(&head, repo, &mc.head) || git_commit_tree(&head_tree, head) ||
+	    git_commit_lookup(&dev, repo, &mc.device) || git_commit_tree(&dev_tree, dev) ||
+	    git_commit_lookup(&cld, repo, &mc.cloud) || git_commit_tree(&cld_tree, cld) ||
+	    git_index_new(&index) || git_index_read_tree(index, head_tree))
+		goto done;
+	for (const ConflictFile &f: mc.files) {
+		bool device = keep_device[f.path];
+		// An edit saved since may have moved the dive to another file: adding this
+		// one back would make a second dive.
+		git_tree_entry *entry = nullptr;
+		if (!git_tree_entry_bypath(&entry, head_tree, f.path.c_str())) {
+			std::string text, chosen;
+			git_oid blob;
+			git_index_entry ie = {};
+			ie.mode = git_tree_entry_filemode(entry);
+			git_tree_entry_free(entry);
+			if (!git_file_text(repo, head_tree, f.path, text) || !git_file_text(repo, device ? dev_tree : cld_tree, f.path, chosen))
+				goto done;
+			for (const ConflictLine &line: f.lines)
+				text = with_key_from(text, chosen, line.key);
+			if (git_blob_create_frombuffer(&blob, repo, text.data(), text.size()))
+				goto done;
+			ie.id = blob;
+			ie.path = f.path.c_str();
+			if (git_index_add(index, &ie))
+				goto done;
+		}
+		timestamp_t when = dive_time_of_path(f.path);
+		const dive *d = nullptr;
+		for (auto &dp: divelog.dives)
+			if (when && dp->when == when)
+				d = dp.get();
+		message += std::string(device ? "Keep this device's version" : "Take the cloud's version") + " [" +
+			   (d ? dive_number_or_date(*d) : f.path) + "]\n";
+	}
+	message += "\nCreated by " + subsurface_user_agent() + "\n";
+	if (git_index_write_tree_to(&tree_oid, index, repo) || git_tree_lookup(&new_tree, repo, &tree_oid) ||
+	    get_authorship(repo, &author) < 0 ||
+	    git_commit_create_v(&commit_oid, repo, nullptr, author, author, nullptr, message.c_str(), new_tree, 1, head) ||
+	    git_reference_lookup(&ref, repo, ("refs/heads/" + branch).c_str()))
+		goto done;
+	// As create_new_commit() in save-git.cpp: the checkout follows a head branch.
+	if (git_branch_is_head(ref) == 1 && !git_repository_is_bare(repo) &&
+	    update_git_checkout(repo, reinterpret_cast<git_object *>(head), new_tree))
+		goto done;
+	{
+		git_reference *moved = nullptr;
+		if (git_reference_set_target(&moved, ref, &commit_oid, "OpenDives conflict resolution"))
+			goto done;
+		git_reference_free(moved);
+	}
+	ret = 0;
+done:
+	if (ret)
+		error = std::string("GIT_ERROR: ") + (git_error_last() ? git_error_last()->message : "resolution failed");
+	git_reference_free(ref);
+	git_signature_free(author);
+	git_index_free(index);
+	git_tree_free(new_tree);
+	git_tree_free(dev_tree);
+	git_tree_free(cld_tree);
+	git_tree_free(head_tree);
+	git_commit_free(dev);
+	git_commit_free(cld);
+	git_commit_free(head);
+	git_repository_free(repo);
+	if (ret)
+		return -1;
+	// The log in memory is the merged one: read the resolved commit (no network).
+	bool was_local_only = git_local_only;
+	git_local_only = true;
+	int loaded = internal::load(log, error);
+	git_local_only = was_local_only;
+	if (loaded)
+		return -1;
+	apply_log_prefs();
+	divelog.process_loaded_dives();
+	return 0;
+}
+
+int cancel_conflict_resolution(std::string &error)
+{
+	const std::string log = internal::current_log();
+	if (!is_git_log(log)) {
+		error = log.empty() ? "NO_LOG" : "NOT_GIT";
+		return -1;
+	}
+	git_repository *repo = nullptr;
+	std::string branch;
+	if (open_log_repo(log, &repo, branch)) {
+		error = "NOT_GIT";
+		return -1;
+	}
+	git_oid head_id, remote;
+	git_commit *head = nullptr, *parent = nullptr;
+	git_tree *parent_tree = nullptr;
+	git_reference *ref = nullptr, *moved = nullptr;
+	int ret = -1;
+	if (git_reference_lookup(&ref, repo, ("refs/heads/" + branch).c_str()) ||
+	    git_reference_name_to_id(&head_id, repo, ("refs/heads/" + branch).c_str()) || git_commit_lookup(&head, repo, &head_id)) {
+		error = "GIT_ERROR: no head";
+	} else if (!is_conflict_resolution(git_commit_message(head)) || git_commit_parentcount(head) != 1) {
+		error = "NOTHING_TO_DO";
+	} else if (!git_reference_name_to_id(&remote, repo, ("refs/remotes/origin/" + branch).c_str()) && git_oid_equal(&remote, &head_id)) {
+		error = "ALREADY_SENT";
+	} else if (git_commit_parent(&parent, head, 0) || git_commit_tree(&parent_tree, parent) ||
+		   (git_branch_is_head(ref) == 1 && !git_repository_is_bare(repo) &&
+		    update_git_checkout(repo, reinterpret_cast<git_object *>(head), parent_tree)) ||
+		   git_reference_set_target(&moved, ref, git_commit_id(parent), "OpenDives conflict resolution cancelled")) {
+		error = std::string("GIT_ERROR: ") + (git_error_last() ? git_error_last()->message : "cancel failed");
+	} else {
+		ret = 0;
+	}
+	git_reference_free(moved);
+	git_reference_free(ref);
+	git_tree_free(parent_tree);
+	git_commit_free(parent);
+	git_commit_free(head);
+	git_repository_free(repo);
+	if (ret)
+		return -1;
+	bool was_local_only = git_local_only;
+	git_local_only = true;
+	int loaded = internal::load(log, error);
+	git_local_only = was_local_only;
+	if (loaded)
+		return -1;
+	apply_log_prefs();
+	divelog.process_loaded_dives();
+	return 0;
+}
+
+int pending_changes(std::string &json)
+{
+	json = "[";
+	if (internal::current_log_is_cloud()) {
+		bool first = true;
+		for (const PendingCommit &c: list_pending(internal::current_log())) {
+			if (!first)
+				json += ',';
+			first = false;
+			json += "{\"id\":";
+			append_json_string(json, c.id);
+			json += ",\"summary\":";
+			append_json_string(json, c.summary);
+			json += ",\"message\":";
+			append_json_string(json, c.message);
+			json += '}';
+		}
+	}
+	json += ']';
+	return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Adding, importing, filter presets (spec, sections 3 and 5).
+
+static int check_writable_log(std::string &error)
+{
+	if (internal::current_log().empty()) {
+		error = "NO_LOG";
+		return -1;
+	}
+	if (loaded_format_version > dataformat_version) {
+		error = "FORMAT_NEWER";
+		return -1;
+	}
+	return 0;
+}
+
+// Dives of the log from ids, in the order of the table (Subsurface passes its
+// selection in that order); NOT_FOUND for an unknown id.
+static int dives_in_table_order(const std::vector<int> &ids, std::vector<dive *> &out, std::string &error)
+{
+	std::set<dive *> wanted;
+	for (int id: ids) {
+		dive *d = divelog.dives.get_by_uniq_id(id);
+		if (!d) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		wanted.insert(d);
+	}
+	for (auto &d: divelog.dives)
+		if (wanted.count(d.get()))
+			out.push_back(d.get());
+	return 0;
+}
+
+int merge_dives(const std::vector<int> &ids, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	std::vector<dive *> dives;
+	if (dives_in_table_order(ids, dives, error))
+		return -1;
+	if (dives.size() < 2) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	// MergeDives::MergeDives() (commands/command_divelist.cpp).
+	Step step;
+	step.kind = Step::MERGE;
+	step.text = "merge dive";
+	auto [d, set_location] = divelog.dives.merge_dives(dives);
+	if (!d) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	// The merged dive gets the number of the first dive with a non-zero number.
+	for (const dive *item: dives) {
+		if (item->number) {
+			d->number = item->number;
+			break;
+		}
+	}
+	// Keep the merge and its numbering in the same undoable step. Unnumbered
+	// dives do not consume a number or interrupt an otherwise ordered sequence.
+	size_t idx = divelog.dives.get_idx(dives[0]);
+	size_t num = dives.size();
+	if (idx == std::string::npos) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	bool consecutive = idx + num <= divelog.dives.size();
+	for (size_t i = 0; consecutive && i < num; i++)
+		consecutive = divelog.dives[idx + i].get() == dives[i];
+	int firstnr = 0, lastnr = 0;
+	bool ordered = true;
+	for (const dive *item: dives) {
+		if (item->number <= 0)
+			continue;
+		if (lastnr && item->number <= lastnr)
+			ordered = false;
+		if (!firstnr)
+			firstnr = item->number;
+		lastnr = item->number;
+	}
+	if (consecutive && ordered && firstnr && lastnr > firstnr) {
+		int diff = lastnr - firstnr;
+		int previousnr = firstnr;
+		for (size_t i = idx + num; i < divelog.dives.size(); ++i) {
+			if (divelog.dives[i]->number <= 0)
+				continue;
+			int newnr = divelog.dives[i]->number - diff;
+			if (newnr <= previousnr) // stop renumbering if stuff isn't in order
+				break;
+			step.renumbered.push_back({ divelog.dives[i].get(), newnr });
+			previousnr = newnr;
+		}
+		std::set<const dive *> changing(dives.begin(), dives.end());
+		for (const auto &item: step.renumbered)
+			changing.insert(item.first);
+		std::set<int> retained_numbers { firstnr };
+		for (const auto &item: divelog.dives)
+			if (!changing.count(item.get()) && item->number > 0)
+				retained_numbers.insert(item->number);
+		for (const auto &item: step.renumbered) {
+			if (!retained_numbers.insert(item.second).second) {
+				error = "NUMBERING_CONFLICT";
+				return -1;
+			}
+		}
+	}
+	DiveToAdd merged;
+	merged.trip = d->divetrip;
+	merged.site = d->dive_site;
+	if (set_location.has_value() && d->dive_site) {
+		step.location = *set_location;
+		step.site = d->dive_site;
+	}
+	// The preferred trip and site are kept in `merged`; the new dive carries no reference.
+	d->divetrip = nullptr;
+	d->dive_site = nullptr;
+	merged.d = std::move(d);
+	step.list.dives.push_back(std::move(merged));
+	step.list.remove_dives = dives;
+	apply_merge(step);
+	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+// The fields of edit_dives() as they come in the request.
+namespace {
+struct MultiEdit {
+	bool has_site = false, has_notes = false, has_suit = false, has_salinity = false;
+	uint32_t site = 0;
+	std::string notes, suit;
+	int salinity = 0;
+	// Names to add and to remove (the Add and Remove suffixes) from the lists.
+	std::vector<std::string> buddies_add, buddies_remove, guide_add, guide_remove, tags_add, tags_remove;
+	// "diveguide" given as a list: the whole new list.
+	bool has_guide_list = false;
+	std::vector<std::string> guide_list;
+};
+
+bool names_of(const JsonValue &value, std::vector<std::string> &out)
+{
+	if (value.kind != JsonValue::LIST)
+		return false;
+	for (const std::string &s: value.list) {
+		std::string t = trim(s);
+		if (!t.empty())
+			out.push_back(t);
+	}
+	return true;
+}
+
+// EditTagsBase for one dive: the removed names leave, the added ones go at
+// the end; false when nothing changes.
+bool add_remove(std::vector<std::string> &list, const std::vector<std::string> &add, const std::vector<std::string> &remove)
+{
+	bool changed = false;
+	for (const std::string &s: remove) {
+		auto it = std::remove(list.begin(), list.end(), s);
+		if (it != list.end()) {
+			list.erase(it, list.end());
+			changed = true;
+		}
+	}
+	for (const std::string &s: add) {
+		if (!contains(list, s)) {
+			list.push_back(s);
+			changed = true;
+		}
+	}
+	return changed;
+}
+} // namespace
+
+int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	std::vector<dive *> dives;
+	if (dives_in_table_order(ids, dives, error))
+		return -1;
+	if (dives.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	std::vector<std::pair<std::string, JsonValue>> changes;
+	if (!JsonReader(changes_json).object(changes)) {
+		error = "BAD_REQUEST: invalid JSON";
+		return -1;
+	}
+	MultiEdit e;
+	for (const auto &[key, value]: changes) {
+		if (key == "notes" || key == "suit") {
+			if (value.kind != JsonValue::STRING) {
+				error = "BAD_REQUEST: " + key + " must be a string";
+				return -1;
+			}
+			(key == "notes" ? e.has_notes : e.has_suit) = true;
+			(key == "notes" ? e.notes : e.suit) = value.text;
+		} else if (key == "site") {
+			if (value.kind != JsonValue::NUMBER || value.number < 0) {
+				error = "BAD_REQUEST: site must be a site uuid";
+				return -1;
+			}
+			e.has_site = true;
+			e.site = static_cast<uint32_t>(value.number);
+			if (e.site && !divelog.sites.get_by_uuid(e.site)) {
+				error = "NOT_FOUND";
+				return -1;
+			}
+		} else if (key == "userSalinity") {
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 1000000) {
+				error = "BAD_REQUEST: userSalinity";
+				return -1;
+			}
+			e.has_salinity = true;
+			e.salinity = static_cast<int>(value.number);
+		} else if (key == "buddiesAdd" || key == "buddiesRemove" || key == "diveguideAdd" || key == "diveguideRemove" ||
+			   key == "tagsAdd" || key == "tagsRemove" || key == "diveguide") {
+			std::vector<std::string> &target =
+				key == "buddiesAdd" ? e.buddies_add : key == "buddiesRemove" ? e.buddies_remove
+				: key == "diveguideAdd" ? e.guide_add : key == "diveguideRemove" ? e.guide_remove
+				: key == "tagsAdd" ? e.tags_add : key == "tagsRemove" ? e.tags_remove : e.guide_list;
+			if (!names_of(value, target)) {
+				error = "BAD_REQUEST: " + key + " must be a list of strings";
+				return -1;
+			}
+			if (key == "diveguide")
+				e.has_guide_list = true;
+		} else {
+			error = "BAD_REQUEST: unknown field " + key;
+			return -1;
+		}
+	}
+
+	Step step;
+	step.kind = Step::DIVES_EDIT;
+	std::vector<dive *> changed;
+	std::vector<std::string> fields; // names as in Subsurface's Edit* commands
+	auto note_field = [&fields](const std::string &name) {
+		if (std::find(fields.begin(), fields.end(), name) == fields.end())
+			fields.push_back(name);
+	};
+	for (dive *d: dives) {
+		auto copy = std::make_unique<dive>(*d);
+		bool any = false;
+		if (e.has_notes && copy->notes != e.notes) {
+			copy->notes = e.notes;
+			note_field("notes");
+			any = true;
+		}
+		if (e.has_suit && copy->suit != e.suit) {
+			copy->suit = e.suit;
+			note_field("suit");
+			any = true;
+		}
+		if (e.has_salinity && copy->user_salinity != e.salinity) {
+			copy->user_salinity = e.salinity;
+			note_field("salinity");
+			any = true;
+		}
+		if (e.has_site) {
+			dive_site *ds = e.site ? divelog.sites.get_by_uuid(e.site) : nullptr;
+			if (copy->dive_site != ds) {
+				copy->dive_site = ds;
+				note_field("dive site");
+				any = true;
+			}
+		}
+		std::vector<std::string> list = string_to_list(copy->buddy);
+		if (add_remove(list, e.buddies_add, e.buddies_remove)) {
+			copy->buddy = join(list); // EditBuddies::set()
+			note_field("buddies");
+			any = true;
+		}
+		list = string_to_list(copy->diveguide);
+		bool guide_changed = e.has_guide_list ? apply_tag_edit(list, e.guide_list) : false;
+		guide_changed = add_remove(list, e.guide_add, e.guide_remove) || guide_changed;
+		if (guide_changed) {
+			copy->diveguide = join(list);
+			note_field("dive guide");
+			any = true;
+		}
+		list = tag_names(*copy);
+		if (add_remove(list, e.tags_add, e.tags_remove)) {
+			copy->tags.clear(); // EditTags::set()
+			for (const std::string &tag: list)
+				taglist_add_tag(copy->tags, tag);
+			taglist_cleanup(copy->tags);
+			note_field("tags");
+			any = true;
+		}
+		if (!any)
+			continue;
+		changed.push_back(d);
+		step.dive_swaps.emplace_back(d->id, std::move(copy));
+	}
+	if (changed.empty()) {
+		result_json = "{\"listChange\":true,\"dives\":" + std::to_string(divelog.dives.size()) + ",\"id\":0}";
+		return 0;
+	}
+	// EditDivesBase: "Edit notes (3 dive(s)) [#1, #2, #3]", or "Edit dive" when
+	// several fields change.
+	std::string what = fields.size() == 1 ? "Edit " + fields[0] : "Edit dive";
+	if (changed.size() == 1)
+		step.text = what + " [" + dive_number_or_date(*changed[0]) + "]";
+	else
+		step.text = what + " (" + std::to_string(changed.size()) + " dive(s)) [" + list_of_dives(changed) + "]";
+	std::string unused;
+	swap_step(step, result_json, unused);
+	push_step(std::move(step));
+	return 0;
+}
+
+int create_dive(const std::string &fields_json, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	std::vector<std::pair<std::string, JsonValue>> fields;
+	if (!JsonReader(fields_json).object(fields)) {
+		error = "BAD_REQUEST: not a JSON object of fields";
+		return -1;
+	}
+	// QMLManager::addDive(): the core's default dive (manually added, one
+	// default cylinder), then the values of the form as commitChanges() sets them.
+	std::unique_ptr<dive> d = divelog.dives.default_dive();
+	dive_site *site = nullptr;
+	bool profile_changed = false;
+	std::string cylinder_type;
+	int start_mbar = -1, end_mbar = -1, o2 = -1, he = -1;
+	for (const auto &[key, value]: fields) {
+		bool number = value.kind == JsonValue::NUMBER, text = value.kind == JsonValue::STRING,
+		     list = value.kind == JsonValue::LIST;
+		if (key == "date" && text) {
+			// Local time of the dive, "YYYY-MM-DDTHH:MM[:SS]", stored without time zone.
+			int y, mo, da, h, mi, se = 0;
+			if (sscanf(value.text.c_str(), "%d-%d-%dT%d:%d:%d", &y, &mo, &da, &h, &mi, &se) < 5) {
+				error = "BAD_REQUEST: date";
+				return -1;
+			}
+			struct tm tm = {};
+			tm.tm_year = y;
+			tm.tm_mon = mo - 1;
+			tm.tm_mday = da;
+			tm.tm_hour = h;
+			tm.tm_min = mi;
+			tm.tm_sec = se;
+			timestamp_t when = utc_mktime(&tm);
+			if (!when) {
+				error = "BAD_REQUEST: date";
+				return -1;
+			}
+			d->when = d->dcs[0].when = when;
+		} else if (key == "durationSeconds" && number && value.number > 0 && value.number < 48 * 3600) {
+			// checkDuration(): a manually added dive loses its samples.
+			d->dcs[0].duration = d->duration = duration_t { .seconds = static_cast<int32_t>(value.number) };
+			profile_changed = true;
+		} else if (key == "maxDepthMm" && number && value.number >= 0 && value.number <= 500000) {
+			// checkDepth()
+			d->maxdepth.mm = d->dcs[0].maxdepth.mm = static_cast<int32_t>(value.number);
+			profile_changed = true;
+		} else if (key == "site" && number) {
+			site = value.number ? divelog.sites.get_by_uuid(static_cast<uint32_t>(value.number)) : nullptr;
+			if (value.number && !site) {
+				error = "NOT_FOUND: site";
+				return -1;
+			}
+		} else if (key == "notes" && text) {
+			d->notes = value.text;
+		} else if (key == "suit" && text) {
+			d->suit = trim(value.text);
+		} else if ((key == "buddies" || key == "guides") && list) {
+			// Subsurface separates names with ", " (commitChanges()).
+			std::string joined;
+			for (const std::string &name: value.list) {
+				std::string n = trim(name);
+				if (n.empty())
+					continue;
+				if (!joined.empty())
+					joined += ", ";
+				joined += n;
+			}
+			(key == "buddies" ? d->buddy : d->diveguide) = joined;
+		} else if (key == "tags" && list) {
+			for (const std::string &tag: value.list)
+				if (!trim(tag).empty())
+					taglist_add_tag(d->tags, trim(tag));
+		} else if ((key == "rating" || key == "visibility") && number && value.number >= 0 && value.number <= 5) {
+			(key == "rating" ? d->rating : d->visibility) = static_cast<int>(value.number);
+		} else if ((key == "waterTempMk" || key == "airTempMk") && number && value.number >= 0) {
+			(key == "waterTempMk" ? d->watertemp : d->airtemp).mkelvin = static_cast<uint32_t>(value.number);
+		} else if (key == "cylinderType" && text) {
+			cylinder_type = trim(value.text);
+		} else if ((key == "startMbar" || key == "endMbar") && number && value.number >= 0 && value.number <= 500000) {
+			(key == "startMbar" ? start_mbar : end_mbar) = static_cast<int>(value.number);
+		} else if ((key == "o2Permille" || key == "hePermille") && number && value.number >= 0 && value.number <= 1000) {
+			(key == "o2Permille" ? o2 : he) = static_cast<int>(value.number);
+		} else {
+			error = "BAD_REQUEST: field " + key;
+			return -1;
+		}
+	}
+	// commitChanges(): the first cylinder's pressures (the end never above
+	// the start), gas mix (only a valid one) and type, whose size and working
+	// pressure come from the cylinder types table.
+	if (start_mbar >= 0 || end_mbar >= 0) {
+		cylinder_t *cyl = d->get_or_create_cylinder(0);
+		if (start_mbar >= 0)
+			cyl->start.mbar = start_mbar;
+		if (end_mbar >= 0)
+			cyl->end.mbar = end_mbar;
+		if (cyl->end.mbar > cyl->start.mbar)
+			cyl->end.mbar = cyl->start.mbar;
+	}
+	if (o2 >= 0 || he >= 0) {
+		int o2v = o2 >= 0 ? o2 : 0, hev = he >= 0 ? he : 0;
+		if (o2v + hev > 1000) {
+			error = "BAD_REQUEST: gas mix";
+			return -1;
+		}
+		cylinder_t *cyl = d->get_or_create_cylinder(0);
+		cyl->gasmix.o2.permille = o2v;
+		cyl->gasmix.he.permille = hev;
+	}
+	if (!cylinder_type.empty()) {
+		int size = 0, wp = 0;
+		for (const tank_info &ti: tank_info_table) {
+			if (ti.name == cylinder_type) {
+				if (ti.ml > 0) {
+					size = ti.ml;
+					wp = ti.bar * 1000;
+				} else {
+					size = (int)(cuft_to_l(ti.cuft) * 1000 / bar_to_atm(psi_to_bar(ti.psi)));
+					wp = psi_to_mbar(ti.psi);
+				}
+				break;
+			}
+		}
+		cylinder_t *cyl = d->get_or_create_cylinder(0);
+		cyl->type.description = cylinder_type;
+		cyl->type.size.mliter = size;
+		cyl->type.workingpressure.mbar = wp;
+	}
+	if (profile_changed) {
+		d->dcs[0].samples.clear();
+		// commitChanges(): "we have depth > 0, a manually added dive and no
+		// samples: let's create an actual profile so the desktop version can
+		// work it"; the mean depth is cleared first.
+		if (d->maxdepth.mm > 0) {
+			d->meandepth = d->dcs[0].meandepth = 0_m;
+			fake_dc(&d->dcs[0]);
+		}
+	}
+	divelog.dives.fixup_dive(*d);
+
+	// AddDive::AddDive(d, autogroup, newNumber = true).
+	Step step;
+	step.kind = Step::DIVE_LIST;
+	step.text = "add dive";
+	d->maxdepth = 0_m;
+	d->dcs[0].maxdepth = 0_m;
+	divelog.dives.fixup_dive(*d);
+	d->selected = false;
+	d->divetrip = nullptr;
+	d->dive_site = nullptr;
+	dive_trip *trip = nullptr;
+	if (divelog.autogroup) {
+		auto [t, allocated] = get_trip_for_new_dive(divelog, d.get());
+		trip = t;
+		if (allocated)
+			step.list.trips.push_back(std::move(allocated));
+	}
+	d->number = next_dive_number(*d);
+	step.list.dives.push_back({ std::move(d), trip, site });
+	apply_dive_list(step);
+	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+int save_plan(const std::string &request, int replace_id, std::string &result_json, std::string &error,
+	      const std::string &title)
+{
+	if (check_writable_log(error))
+		return -1;
+	dive *replaced = nullptr;
+	if (replace_id) {
+		replaced = divelog.dives.get_by_uniq_id(replace_id);
+		if (!replaced || !internal::is_plan_only(*replaced)) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+	}
+	auto d = std::make_unique<dive>();
+	dive_site *site = nullptr;
+	if (internal::build_plan(request, *d, site, error))
+		return -1;
+	// The title, next to "OpenDives plan" (build_plan): no key when empty.
+	{
+		size_t from = title.find_first_not_of(" \t\r\n");
+		if (from != std::string::npos) {
+			size_t to = title.find_last_not_of(" \t\r\n");
+			add_extra_data(&d->dcs[0], "OpenDives title", title.substr(from, to - from + 1));
+		}
+	}
+	// DivePlannerPointsModel::createPlan(), without a number or a trip. Two
+	// dives of the log never start at the same second: the plan of a logged
+	// dive, or its duplicate, starts a minute later.
+	auto taken = [&](timestamp_t when) {
+		return std::any_of(divelog.dives.begin(), divelog.dives.end(),
+				   [&](auto &o) { return o.get() != replaced && o->when == when; });
+	};
+	while (taken(d->when))
+		d->when += 60;
+	d->dcs[0].when = d->when;
+	divelog.dives.fixup_dive(*d);
+	d->selected = false;
+	d->divetrip = nullptr;
+	d->dive_site = nullptr;
+	d->number = 0;
+
+	Step step;
+	step.kind = Step::DIVE_LIST;
+	step.text = replaced ? "replan dive" : "add dive";
+	if (replaced)
+		step.list.remove_dives.push_back(replaced);
+	step.list.dives.push_back({ std::move(d), nullptr, site });
+	apply_dive_list(step);
+	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+int delete_dive(int id, std::string &result_json, std::string &error)
+{
+	return delete_dives({ id }, result_json, error);
+}
+
+int delete_dives(const std::vector<int> &ids, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	std::vector<dive *> dives;
+	const std::set<int> wanted(ids.begin(), ids.end());
+	std::map<int, dive *> found;
+	for (const auto &d: divelog.dives)
+		if (wanted.count(d->id))
+			found.emplace(d->id, d.get());
+	std::set<int> added;
+	for (int id: ids) {
+		auto it = found.find(id);
+		if (it == found.end()) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		if (added.insert(id).second)
+			dives.push_back(it->second);
+	}
+	if (dives.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	// DeleteDive::DeleteDive() and redoit(): the dives leave the log, each trip
+	// with them when they were its last ones.
+	Step step;
+	step.kind = Step::DIVE_LIST;
+	step.list.remove_dives = dives;
+	step.text = "delete " + std::to_string(dives.size()) + " dive(s) [" + list_of_dives(step.list.remove_dives) + "]";
+	int removed = 0;
+	for (const auto &entry: divelog.dives) {
+		dive *d = entry.get();
+		if (internal::is_plan_only(*d) || d->number <= 0)
+			continue;
+		if (wanted.count(d->id))
+			++removed;
+		else if (removed) {
+			int number = std::max(1, d->number - removed);
+			if (number != d->number)
+				step.renumbered.emplace_back(d, number);
+		}
+	}
+	apply_delete(step);
+	result_json = dive_list_json(step);
+	push_step(std::move(step));
+	return 0;
+}
+
+int renumber_dives(const std::vector<int> &ids, int start, std::string &result_json, std::string &error,
+		   const std::vector<int> &numbers)
+{
+	if (check_writable_log(error))
+		return -1;
+	if (start < 0) {
+		error = "BAD_REQUEST: start";
+		return -1;
+	}
+	if (!numbers.empty()) {
+		// RenumberDives with the given (dive, number) pairs.
+		if (numbers.size() != ids.size()) {
+			error = "BAD_REQUEST: numbers";
+			return -1;
+		}
+		Step step;
+		step.kind = Step::RENUMBER;
+		std::vector<dive *> list;
+		for (size_t i = 0; i < ids.size(); i++) {
+			dive *d = divelog.dives.get_by_uniq_id(ids[i]);
+			if (!d) {
+				error = "NOT_FOUND";
+				return -1;
+			}
+			if (numbers[i] < 0) {
+				error = "BAD_REQUEST: numbers";
+				return -1;
+			}
+			step.renumbered.push_back({ d, numbers[i] });
+			list.push_back(d);
+		}
+		if (step.renumbered.empty()) {
+			error = "NOTHING_TO_DO";
+			return -1;
+		}
+		step.text = "renumber " + std::to_string(list.size()) + " dive(s) [" + list_of_dives(list) + "]";
+		std::string unused;
+		swap_step(step, result_json, unused);
+		push_step(std::move(step));
+		return 0;
+	}
+	std::set<int> wanted(ids.begin(), ids.end());
+	for (int id: ids) {
+		if (!divelog.dives.get_by_uniq_id(id)) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+	}
+	// RenumberDialog::buttonClicked() (desktop-widgets/simplewidgets.cpp): the
+	// dives in date order (the order of the table), from the starting number.
+	Step step;
+	step.kind = Step::RENUMBER;
+	int number = start;
+	for (auto &d: divelog.dives) {
+		if (internal::is_plan_only(*d))
+			continue;
+		if (wanted.empty() || wanted.count(d->id))
+			step.renumbered.push_back({ d.get(), number++ });
+	}
+	if (step.renumbered.empty()) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	std::vector<dive *> list;
+	for (auto &item: step.renumbered)
+		list.push_back(item.first);
+	// RenumberDives::RenumberDives(): "renumber %n dive(s) [list]".
+	step.text = "renumber " + std::to_string(list.size()) + " dive(s) [" + list_of_dives(list) + "]";
+	std::string unused;
+	swap_step(step, result_json, unused);
+	push_step(std::move(step));
+	return 0;
+}
+
+// An OpenDives addition to the numbering of downloaded dives. Subsurface
+// (divelog::process_imported_dives) numbers the new dives only when none of
+// them falls before the last dive of the log: one older dive read again (a
+// dive deleted from the log, a full download) leaves every new dive at 0.
+// Here the new dives after the last dive of the log still follow its number
+// when it has one, as Subsurface would number them alone; the older ones
+// stay unnumbered, as in Subsurface.
+static void number_new_last_dives(dive_table &dives_to_add, bool new_dive_has_number)
+{
+	if (new_dive_has_number)
+		return;
+	const dive *newest = last_real_dive(false);
+	if (!newest || newest->number <= 0)
+		return;
+	const dive &last = *newest;
+	std::vector<dive *> after;
+	for (auto &d: dives_to_add) {
+		if (d->when > last.when) {
+			if (d->number > 0)
+				return; // Subsurface numbered them already
+			after.push_back(d.get());
+		}
+	}
+	std::sort(after.begin(), after.end(), [](const dive *a, const dive *b) { return a->when < b->when; });
+	int nr = last.number;
+	for (dive *d: after)
+		d->number = ++nr;
+}
+
+// ImportDives::ImportDives(log, flags, source) as one undoable step; the
+// tables of `log` are consumed. With `fingerprints_before`, the step swaps the
+// core's fingerprint table with it on each undo and redo.
+static int import_log(struct divelog &log, int flags, const std::string &source,
+		      fingerprint_table *fingerprints_before, std::string &result_json, std::string &error)
+{
+	Step step;
+	step.kind = Step::DIVE_LIST;
+	size_t n = log.dives.size();
+	step.text = (n == 1 ? "import 1 dive from " : "import " + std::to_string(n) + " dives from ") + source;
+	for (auto &dv: log.dives)
+		normalize_imported_cylinder_depths(dv.get());
+	bool new_dive_has_number = std::any_of(log.dives.begin(), log.dives.end(),
+					       [](auto &d) { return d->number > 0; });
+	auto [dives_to_add, dives_to_remove, trips_to_add, sites_to_add, devices_to_add] =
+		divelog.process_imported_dives(log, flags);
+	if (flags & import_flags::is_downloaded)
+		number_new_last_dives(dives_to_add, new_dive_has_number);
+	// The dives merged into dives already in the log (task 2026-11-14-144): each one the core
+	// removes is replaced by its merge with an imported dive, found as the core matched them
+	// (dive::likely_same, as divelog.cpp's merge does).
+	std::vector<int> merged_ids;
+	for (const dive *old: dives_to_remove)
+		for (const auto &dp: dives_to_add)
+			if (old->likely_same(*dp) || dp->likely_same(*old)) {
+				merged_ids.push_back(dp->id);
+				break;
+			}
+	step.devices = std::move(devices_to_add);
+	for (auto &trip: trips_to_add)
+		step.list.trips.push_back(std::move(trip));
+	for (auto &ds: sites_to_add)
+		step.list.sites.push_back(std::move(ds));
+	for (auto &dp: dives_to_add) {
+		dp->selected = false;
+		dive_trip *trip = dp->divetrip;
+		dp->divetrip = nullptr;
+		dive_site *site = dp->dive_site;
+		dp->dive_site = nullptr;
+		step.list.dives.push_back({ std::move(dp), trip, site });
+	}
+	step.list.remove_dives = std::move(dives_to_remove);
+	// Filter presets of the same name and contents are not added twice.
+	for (const filter_preset &preset: log.filter_presets) {
+		auto it = std::find_if(divelog.filter_presets.begin(), divelog.filter_presets.end(),
+				       [&preset](const filter_preset &p) { return p.name == preset.name; });
+		if (it != divelog.filter_presets.end() && internal::filter_data_equal(it->data, preset.data))
+			continue;
+		step.presets_to_add.emplace_back(preset.name, preset.data);
+	}
+	if (step.list.dives.empty()) {
+		// ImportDives::workToBeDone(): every dive is already in the log.
+		error = "NO_NEW_DIVES";
+		return -1;
+	}
+	if (fingerprints_before) {
+		// The core's table holds the new fingerprint: the step keeps it, and
+		// the table goes back to its state before until the step applies.
+		step.swap_fingerprints = true;
+		step.fingerprints = std::move(*fingerprints_before);
+		std::swap(::fingerprints, step.fingerprints);
+	}
+	apply_dive_list(step);
+	result_json = dive_list_json(step);
+	// "merged": how many of the imported dives joined a dive already in the log, "mergedIds" those dives.
+	std::string ids;
+	for (size_t i = 0; i < merged_ids.size(); i++)
+		ids += (i ? "," : "") + std::to_string(merged_ids[i]);
+	result_json.insert(result_json.size() - 1, ",\"merged\":" + std::to_string(merged_ids.size()) + ",\"mergedIds\":[" + ids + "]");
+	push_step(std::move(step));
+	return 0;
+}
+
+int import_dives(const std::string &file, const std::string &source, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	struct divelog log;
+	// A git log read here (this device's log) sets the loaded commit, which
+	// the next save of the log in memory checks against its destination:
+	// it is put back, or that save would be refused (SAVE_REPLACEMENT).
+	std::string loaded = loaded_git_commit;
+	bool failed = internal::read_import_file(file, log);
+	loaded_git_commit = loaded;
+	if (failed) {
+		error = "IMPORT_FAILED";
+		return -1;
+	}
+	if (log.dives.empty()) {
+		error = "NO_DIVES";
+		return -1;
+	}
+	// ImportDives::ImportDives(log, import_flags::merge_all_trips, source), as
+	// QMLManager::importDivesFromFile() and the desktop import do.
+	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
+}
+
+// --- CSV import with a column mapping (task 2026-11-16-224, part 8) --------------------------------
+//
+// The core reads a .csv only through its column-mapping import, which Subsurface's desktop runs from
+// DiveLogImportDialog::on_buttonBox_accepted() (desktop-widgets/divelogimportdialog.cpp): the mapping
+// goes to the stylesheets as parameters (xml_params), then parse_csv_file() (a profile per file),
+// parse_manual_file() (a dive per line), parse_seabear_log() or parse_txt_file() (Poseidon MkVI) read the
+// file. The app's dialog decides the mapping (JavaScript, app/src/lib/csv-import.js); this only runs
+// the core's own functions with it.
+namespace {
+
+// A text value for a stylesheet parameter: the stylesheets take XPath expressions, so a text is quoted
+// (the desktop dialog quotes the hardware name the same way).
+std::string xslt_text(const std::string &value)
+{
+	std::string clean;
+	for (char c: value)
+		if (c != '"')
+			clean += c;
+	return "\"" + clean + "\"";
+}
+
+// The dives a CSV read gave, for the preview: when (the log's own time, as the list shows it), duration,
+// maximum depth and about 200 points of the profile (seconds, millimetres).
+std::string csv_preview_json(const struct divelog &log)
+{
+	std::string json = "{\"dives\":[";
+	bool first = true;
+	for (const auto &dp: log.dives) {
+		const struct dive &d = *dp;
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"when\":" + std::to_string(static_cast<long long>(d.when)) + ",\"number\":" + std::to_string(d.number) +
+			",\"durationSeconds\":" + std::to_string(d.duration.seconds) +
+			",\"maxDepthMm\":" + std::to_string(d.maxdepth.mm) + ",\"profile\":[";
+		if (!d.dcs.empty()) {
+			const auto &samples = d.dcs[0].samples;
+			size_t step = samples.size() / 200 + 1;
+			bool firstPoint = true;
+			for (size_t i = 0; i < samples.size(); i += step) {
+				json += (firstPoint ? "[" : ",[") + std::to_string(samples[i].time.seconds) + "," +
+					std::to_string(samples[i].depth.mm) + "]";
+				firstPoint = false;
+			}
+		}
+		json += "]}";
+	}
+	json += "]}";
+	return json;
+}
+
+} // namespace
+
+int import_csv(const std::string &file, const std::string &companion, const std::string &params_json,
+	       const std::string &source, bool dry_run, std::string &result_json, std::string &error)
+{
+	if (!dry_run && check_writable_log(error))
+		return -1;
+	std::vector<std::pair<std::string, JsonValue>> fields;
+	if (!JsonReader(params_json).object(fields)) {
+		error = "BAD_REQUEST: params";
+		return -1;
+	}
+	std::string format = "samples";
+	std::string templ = "csv";
+	xml_params params;
+	for (auto &[key, value]: fields) {
+		if (key == "format") {
+			format = value.text;
+		} else if (key == "template") {
+			templ = value.text;
+		} else if (value.kind == JsonValue::NUMBER) {
+			xml_params_add_int(&params, key.c_str(), static_cast<int>(value.number));
+		} else if (value.kind == JsonValue::STRING) {
+			xml_params_add(&params, key, key == "hw" ? xslt_text(value.text) : value.text);
+		}
+	}
+	if (format != "samples" && format != "dives" && format != "seabear" && format != "poseidon") {
+		error = "BAD_REQUEST: format";
+		return -1;
+	}
+	// The stylesheets are chosen by name: no path may be given.
+	if (templ.find('/') != std::string::npos || templ.find('\\') != std::string::npos || templ.find("..") != std::string::npos) {
+		error = "BAD_REQUEST: template";
+		return -1;
+	}
+
+	struct divelog log;
+	std::string loaded = loaded_git_commit;
+	int ret;
+	if (format == "seabear") {
+		// The newer Seabear files (H3, T1: a header with the dive mode and the log interval) are read by
+		// their own parser, as the desktop dialog does for "Seabear CSV". The older HUDC files have no
+		// such header and a different layout: the parser would misread their columns, so they go through
+		// the mapping the dialog filled in for Seabear (what Subsurface's own test of such a file does).
+		std::string head;
+		{
+			std::ifstream in(file, std::ios::binary);
+			head.resize(4096);
+			head.resize(static_cast<size_t>(in.read(&head[0], 4096).gcount()));
+		}
+		if (head.find("//Log interval: ") != std::string::npos)
+			ret = parse_seabear_log(file.c_str(), &log);
+		else
+			ret = parse_csv_file(file.c_str(), &params, templ.c_str(), &log);
+	} else if (format == "poseidon") {
+		if (companion.empty()) {
+			error = "IMPORT_FAILED";
+			return -1;
+		}
+		// MkVI: the dive's data are in the .txt, the profile in the .csv.
+		ret = parse_txt_file(companion.c_str(), file.c_str(), &log);
+	} else if (format == "dives") {
+		ret = parse_manual_file(file.c_str(), &params, &log);
+	} else {
+		ret = parse_csv_file(file.c_str(), &params, templ.c_str(), &log);
+	}
+	loaded_git_commit = loaded;
+	if (ret != 0 && log.dives.empty()) {
+		error = "IMPORT_FAILED";
+		return -1;
+	}
+	if (log.dives.empty()) {
+		error = "NO_DIVES";
+		return -1;
+	}
+	if (dry_run) {
+		result_json = csv_preview_json(log);
+		return 0;
+	}
+	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
+}
+
+int import_dives_files(const std::vector<std::string> &files, const std::string &source, std::string &result_json,
+		       std::string &error)
+{
+	if (files.empty()) {
+		error = "NO_DIVES";
+		return -1;
+	}
+	if (files.size() == 1)
+		return import_dives(files[0], source, result_json, error);
+	if (check_writable_log(error))
+		return -1;
+	struct divelog log;
+	std::string loaded = loaded_git_commit;
+	// MainWindow::importFiles(): the Suunto .json and .fit with the same base name are read as one
+	// dive first, then every file not used by a pair is read on its own.
+	std::vector<bool> consumed(files.size(), false);
+	suunto_json_fit_pair_import(files, consumed, &log);
+	size_t failed = 0, read = 0;
+	for (size_t i = 0; i < files.size(); i++) {
+		if (consumed[i])
+			continue;
+		read++;
+		// Subsurface keeps whatever dives parse_file() found, and ignores a file that fails.
+		if (internal::read_import_file(files[i], log))
+			failed++;
+	}
+	loaded_git_commit = loaded;
+	if (log.dives.empty()) {
+		error = read && failed == read ? "IMPORT_FAILED" : "NO_DIVES";
+		return -1;
+	}
+	return import_log(log, import_flags::merge_all_trips, source, nullptr, result_json, error);
+}
+
+namespace internal {
+
+bool read_import_file(const std::string &path, struct divelog &log)
+{
+	int ret = parse_file(path.c_str(), &log);
+	return ret != 0 && log.dives.empty();
+}
+
+int check_writable(std::string &error)
+{
+	return check_writable_log(error);
+}
+
+int import_downloaded(struct divelog &log, const std::string &source, fingerprint_table &fingerprints_before,
+		      std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	// DiveImportedModel::recordDives(): prefer_imported | is_downloaded.
+	return import_log(log, import_flags::prefer_imported | import_flags::is_downloaded, source, &fingerprints_before,
+			  result_json, error);
+}
+
+} // namespace internal
+
+int filter_presets_json(std::string &json)
+{
+	json = "{\"presetList\":[";
+	for (size_t i = 0; i < divelog.filter_presets.size(); i++) {
+		const filter_preset &p = divelog.filter_presets[i];
+		if (i)
+			json += ',';
+		json += "{\"index\":" + std::to_string(i) + ",\"name\":";
+		append_json_string(json, p.name);
+		json += ",\"filter\":";
+		internal::append_filter_data(json, p.data);
+		json += '}';
+	}
+	json += "]}";
+	return 0;
+}
+
+int filter_preset_save(const std::string &name_in, const std::string &fulltext, const std::string &fulltext_mode,
+		       const std::vector<filter_rule> &rules, std::string &json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	std::string name = trim(name_in);
+	if (name.empty()) {
+		error = "BAD_REQUEST: name";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::FILTER_PRESET;
+	if (internal::filter_data_from_rules(fulltext, fulltext_mode, rules, step.preset_data, error))
+		return -1;
+	// Saving under an existing name replaces that preset (filterpresettable.h).
+	int index = divelog.filter_presets.preset_id(name);
+	if (index >= 0) {
+		step.preset_op = Step::EDIT;
+		step.preset_index = index;
+		step.text = "Edit filter preset " + name;
+	} else {
+		step.preset_op = Step::CREATE;
+		step.preset_name = name;
+		step.text = "Create filter preset " + name;
+	}
+	apply_filter_preset(step);
+	push_step(std::move(step));
+	return filter_presets_json(json);
+}
+
+int filter_preset_delete(int index, std::string &json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	if (index < 0 || static_cast<size_t>(index) >= divelog.filter_presets.size()) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::FILTER_PRESET;
+	step.preset_op = Step::REMOVE;
+	step.preset_index = index;
+	step.text = "Delete filter preset " + divelog.filter_presets[index].name;
+	apply_filter_preset(step);
+	push_step(std::move(step));
+	return filter_presets_json(json);
+}
+
+int list_loaded_dives(std::string &json, bool include_invalid)
+{
+	json = internal::dives_json(include_invalid);
+	return 0;
+}
+
+void set_cloud_test_email(const std::string &email)
+{
+	cloud_test_email = email;
+}
+
+void set_cloud_writes_enabled(bool enabled)
+{
+	cloud_writes_enabled = enabled;
+}
+
+} // namespace benthic

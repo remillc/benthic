@@ -8,8 +8,8 @@ on:
     branches: [main]
     paths:
       - app/ios/**
-      - plugins/opendives-core/ios/**
-      - plugins/opendives-core/OpendivesCore.podspec
+      - plugins/benthic-core/ios/**
+      - plugins/benthic-core/BenthicCore.podspec
       - native/env.sh
       - native/ios/**
       - core/**
@@ -99,9 +99,9 @@ jobs:
       - name: Keep the framework
         uses: actions/upload-artifact@v4
         with:
-          name: OpenDivesCore
+          name: BenthicCore
           path: |
-            build/ios/OpenDivesCore.xcframework
+            build/ios/BenthicCore.xcframework
             build/ios/assets
 
       - name: Keep the app for the simulator

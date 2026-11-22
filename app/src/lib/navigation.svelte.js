@@ -155,7 +155,7 @@ export function openOver(path, options) {
 
 /** « Mon profil de plongeur »: the Mac opens its own window (task 2026-11-18-277); elsewhere it opens over the section. */
 export function openProfile() {
-  const desk = /** @type {any} */ (typeof window === 'undefined' ? null : window).odDesktop;
+  const desk = /** @type {any} */ (typeof window === 'undefined' ? null : window).benthicDesktop;
   if (desktopMac && desk?.openProfileWindow) {
     desk.openProfileWindow().catch((/** @type {unknown} */ e) => console.error('Profile window', e));
     return;
@@ -163,13 +163,13 @@ export function openProfile() {
   openOver('/profile');
 }
 
-/** « Gérer le compte » (an OpenDives+ account): a page on the phone, a two-column dialog on a tablet and on the desktop. */
+/** « Gérer le compte » (an Benthic+ account): a page on the phone, a two-column dialog on a tablet and on the desktop. */
 export function openManageAccount() {
   if (layout.phone) openOver('/account/manage');
   else navigation.manageOpen = true;
 }
 
-/** « Sauvegarde et restauration » of an OpenDives+ account: a dialog on the desktop, a page over the current section elsewhere. */
+/** « Sauvegarde et restauration » of an Benthic+ account: a dialog on the desktop, a page over the current section elsewhere. */
 export function openBackup() {
   if (layout.desktop) navigation.backupOpen = true;
   else openOver('/account/backup');
@@ -178,7 +178,7 @@ export function openBackup() {
 /** Settings open over the current section, from the side menu or the tablet navigation. */
 export function openSettings() {
   // The Mac: a separate window (task 2026-11-15-202, desktop/main.cjs).
-  const desk = /** @type {any} */ (typeof window === 'undefined' ? null : window).odDesktop;
+  const desk = /** @type {any} */ (typeof window === 'undefined' ? null : window).benthicDesktop;
   if (desktopMac && desk?.openSettingsWindow) {
     desk.openSettingsWindow().catch((/** @type {unknown} */ e) => console.error('Settings window', e));
     return;

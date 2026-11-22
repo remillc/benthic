@@ -25,16 +25,19 @@ Task 2026-11-19-316. The app is Benthic everywhere the diver reads (texts, names
 
 | Name | Renaming means | Risk |
 |---|---|---|
-| Capacitor plugin package `opendives-core`, folder `plugins/opendives-core`, `OpenDivesCore`, `OpendivesCore.podspec`, Kotlin package `org.opendives.core`, `NativeCore`, JNI `opendives_jni.cpp`, `libopendives.so`, Swift/ObjC `OpenDivesNative*` | Moves every import, the JNI symbol names, the Gradle/CMake/Xcode projects and the native builds (Android, iOS, desktop) | Medium; large diff, needs the full native rebuilds and the release check |
-| `core/libopendives` folder, `opendives.h`, `opendives_*` symbols, CMake target `opendives_core` | Same | Medium |
-| `tests/app/opendives-core-stub.mjs`, env vars `OPENDIVES_HOST`, `OPENDIVES_STAGE` | Rename with the plugin; scripts and the CI use the variables | Low |
-| Logcat tag `OpenDives`, HTTP User-Agent `OpenDives/<version>` of the map downloads (Kotlin, Swift), `OpenDivesInsets` JavaScript bridge | The User-Agent may be allow-listed by the tile host | Low to medium |
-| Font family "Source Sans 3 OD", `odplus` identifiers (`logbook.odplus`) | Mechanical but large | Low |
 | GitHub repositories `remillc/opendives` and `opendives-server`, Cloudflare Pages project `opendives` | Rename on GitHub (redirects stay) and update `SOURCE` in `site/build.mjs` and the remotes | Low | **Done 19 November 2026:** repositories renamed `remillc/benthic` and `remillc/benthic-server` (GitHub redirects the old addresses); links in the code updated.
 | `docs/mockups` and `docs/mockups-release` file names (`*odplus*`), one design file that points to `docs/brand/opendives-*` | Design files, referenced by name in the inbox | Low |
 | History: `CHANGELOG.md`, closed tasks of `docs/agent-inbox.md`, `docs/TODOS.md`, `docs/IDEAS.md` | Left as written | None |
 
 ## Files and folders renamed in this task
+
+Code names (task 2026-11-22, step 1; no user-visible or stored-data effect):
+
+- Capacitor plugin: package `opendives-core` became `benthic-core`, folder `plugins/opendives-core` became `plugins/benthic-core`, `OpenDivesCore` became `BenthicCore` (JS export, Capacitor registration name on Android, iOS and the web), `OpendivesCore.podspec` became `BenthicCore.podspec`, `OpenDivesCorePlugin` became `BenthicCorePlugin`, Kotlin package `org.opendives.core` became `app.benthicdivelog.core` (and the JNI symbols `Java_org_opendives_core_*`), `opendives_jni.cpp` became `benthic_jni.cpp`, `libopendives.so` became `libbenthic.so`, Swift/ObjC `OpenDivesNative*` became `BenthicNative*`.
+- Façade: `core/libopendives` became `core/libbenthic`, `opendives.h/.cpp` became `benthic.h/.cpp`, namespace and symbols `opendives::`, `opendives_*` became `benthic::`, `benthic_*`, CMake target `opendives_core` became `benthic_core`. The `odgit.*` files and `odgit_*` functions keep their name (they are tied to the `<userData>/odgit` folder of step 2).
+- `tests/app/opendives-core-stub.mjs` became `benthic-core-stub.mjs`; the environment variables `OPENDIVES_*` became `BENTHIC_*` (`OPENDIVES_HOST`, `OPENDIVES_STAGE`, `OPENDIVES_DEV_CA`, the cloud test variables and so on).
+- Logcat tag and the map downloads' User-Agent `OpenDives` became `Benthic`; the `OpenDivesInsets` JavaScript bridge became `BenthicInsets`; `odplus` identifiers and translation keys became `benthicPlus` (the device-store key `od.odplusSubscribed` is stored data and keeps its name); `odDesktop` became `benthicDesktop`; the router fields `odLocks`, `odRaw` and so on became `bcLocks`, `bcRaw`; the Vite plugins `od-…` became `bc-…`.
+- Still on the old names, for a later step: the `OD_*` development variables (`OD_HOST`, `OD_STAGE`, `OD_E2E_PORT`, ...), the `od-*` CSS classes, element ids, custom events and keyframes, the `od_*` temporary-folder prefixes, the QR payload key `odValidation` (a wire format), the `org.opendives.maps*` queue labels, the Android server User-Agent `OpenDives` of `desktop/bridge.cjs` and the web view's `appendUserAgent`, the npm names `opendives-app` and `opendives-dc-images`, and the word « OpenDives » in code comments.
 
 - `docs/brand/opendives-*` and `docs/brand/previous/opendives-*` became `benthic-*`.
 - The desktop helper `opendives-host(.exe)` became `benthic-host(.exe)` (CMake target, `native/desktop/build.sh` output, `desktop/main.cjs`, `desktop/scripts/prepare.cjs`, tests, tools).

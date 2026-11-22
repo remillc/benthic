@@ -19,7 +19,7 @@
 // field: notes, suit, rating, visibility, buddies, diveguide, tags
 // Prints KEY=VALUE lines (dives, text, undo_text, error); exit status 0 when
 // the check passes, 1 when it fails, 2 when the log has no dive.
-#include "core/libopendives/opendives.h"
+#include "core/libbenthic/benthic.h"
 
 #include "core/device.h"
 #include "core/dive.h"
@@ -42,7 +42,7 @@
 #include <string>
 #include <vector>
 
-using namespace opendives;
+using namespace benthic;
 
 // save-git.cpp (not in a header).
 int update_git_checkout(git_repository *repo, git_object *parent, git_tree *tree);

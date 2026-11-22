@@ -193,8 +193,8 @@ test('the sites of an old-format file (a <dives> root) are cleaned in memory onl
 });
 
 test('the paths are wired: Kotlin and Swift stream a shared file, nothing returns a logbook as one string', () => {
-  const kotlin = read('plugins/opendives-core/android/src/main/java/org/opendives/core/OpenDivesCorePlugin.kt');
-  const swift = read('plugins/opendives-core/ios/Plugin/OpenDivesCorePlugin.swift');
+  const kotlin = read('plugins/benthic-core/android/src/main/java/app/benthicdivelog/core/BenthicCorePlugin.kt');
+  const swift = read('plugins/benthic-core/ios/Plugin/BenthicCorePlugin.swift');
   for (const method of ['stageSharedFile', 'readFileChunk', 'assembleFile']) {
     assert.match(kotlin, new RegExp(`fun ${method}\\(call: PluginCall\\)`), `Android ${method}`);
     assert.match(swift, new RegExp(`func ${method}\\(_ call: CAPPluginCall\\)`), `iOS ${method}`);

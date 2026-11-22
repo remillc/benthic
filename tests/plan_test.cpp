@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Dive planner of the façade (core/libopendives/plan.cpp), compared with the
+// Dive planner of the façade (core/libbenthic/plan.cpp), compared with the
 // known values of Subsurface's own tests (third_party/subsurface/tests/
 // testplan.cpp, its 17 TestPlan::test* functions: see reference_cases() for
 // those the façade can express and not_expressible() for the others), then
@@ -12,7 +12,7 @@
 // (SAC +10 %), gf (gradient factor high altered), vpmb (conservatism +1),
 // ascent (ascent rate altered), water (fresh instead of sea water), altitude
 // (surface pressure of about 500 m).
-#include "../core/libopendives/opendives.h"
+#include "../core/libbenthic/benthic.h"
 
 #include "core/divelog.h"
 #include "core/pref.h"
@@ -86,7 +86,7 @@ static std::string mutated(std::string request)
 static std::string run(const std::string &request)
 {
 	std::string json, error;
-	if (opendives::plan_dive(mutated(request), json, error)) {
+	if (benthic::plan_dive(mutated(request), json, error)) {
 		printf("plan_dive: %s\n", error.c_str());
 		return "";
 	}
@@ -255,7 +255,7 @@ static void reference_cases()
 
 int main()
 {
-	opendives::init();
+	benthic::init();
 	reference_cases();
 
 	// A request with its own model and settings leaves the preferences as they were.
@@ -338,7 +338,7 @@ int main()
 		at18 |= num(two, "depthMm", item(two, "segments", i)) == 18000;
 	check(at18, "levels: a waypoint at 18 m");
 	std::string bad_level, level_error;
-	check(opendives::plan_dive("{\"levels\":[{\"depthMm\":0,\"durationSeconds\":60}]," + gases, bad_level, level_error) == -1, "levels: an empty level is refused");
+	check(benthic::plan_dive("{\"levels\":[{\"depthMm\":0,\"durationSeconds\":60}]," + gases, bad_level, level_error) == -1, "levels: an empty level is refused");
 
 	// The plan's own gradient factors: for this plan only.
 	std::string conservative = run("{\"levels\":[{\"depthMm\":40000,\"durationSeconds\":1500}],\"gfLow\":20,\"gfHigh\":60,\"when\":1000000000," + gases);
@@ -374,7 +374,7 @@ int main()
 	check(bottom_gas > base_gas, "two SACs: a higher bottom SAC breathes more gas");
 
 	std::string bad, error;
-	check(opendives::plan_dive("{\"depthMm\":0}", bad, error) == -1 && error.rfind("BAD_REQUEST", 0) == 0, "bad request refused");
+	check(benthic::plan_dive("{\"depthMm\":0}", bad, error) == -1 && error.rfind("BAD_REQUEST", 0) == 0, "bad request refused");
 
 	printf("%d failed\n", failed);
 	return failed ? 1 : 0;

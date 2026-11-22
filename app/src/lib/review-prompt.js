@@ -3,7 +3,7 @@
 // is the only one: OpenDives never asks "do you like the app?" first, and never
 // chooses who is asked. Pure decision here; the dates live in the device's storage.
 import { deviceStore } from './device-store.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 
 /** The logbook holds at least this many dives. */
 export const MIN_DIVES = 5;
@@ -72,7 +72,7 @@ export function noteFirstOpen() {
  */
 export async function askReviewAfterDownload(context) {
   try {
-    const { store } = await OpenDivesCore.installSource();
+    const { store } = await BenthicCore.installSource();
     const ask = shouldAskReview({
       now: Date.now(),
       firstOpen: readDate(FIRST_OPEN_KEY),
@@ -85,7 +85,7 @@ export async function askReviewAfterDownload(context) {
     });
     if (!ask) return false;
     deviceStore.setItem(LAST_REVIEW_KEY, String(Date.now()));
-    await OpenDivesCore.requestReview();
+    await BenthicCore.requestReview();
     return true;
   } catch (e) {
     console.error('Review request', e);

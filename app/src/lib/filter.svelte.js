@@ -5,15 +5,15 @@
 // identifiers of the matching dives come back. The same filter applies to the
 // Logbook, the Statistics and the map. A filter can be saved in the logbook as
 // one of Subsurface's filter presets, and a saved filter applied again.
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import { t } from './i18n.js';
 import { formatNumber, readTypedDate } from './format.js';
 import { withoutFeedbackTags } from './weight-feedback.js';
 import { logbook } from './logbook.svelte.js';
 
-/** @typedef {import('opendives-core').FilterRule} FilterRule */
-/** @typedef {import('opendives-core').FilterOptions} FilterOptions */
-/** @typedef {import('opendives-core').Prefs} Prefs */
+/** @typedef {import('benthic-core').FilterRule} FilterRule */
+/** @typedef {import('benthic-core').FilterOptions} FilterOptions */
+/** @typedef {import('benthic-core').Prefs} Prefs */
 
 /**
  * A range typed by the diver, in the diver's units; empty: no limit.
@@ -84,7 +84,7 @@ export const filter = $state({
   /** The core refused the filter or could not be asked. */
   failed: false,
   /** Filters saved in the logbook, as the core lists them. */
-  presets: /** @type {import('opendives-core').FilterPreset[]} */ ([]),
+  presets: /** @type {import('benthic-core').FilterPreset[]} */ ([]),
 });
 
 /**
@@ -395,7 +395,7 @@ async function match(c, prefs) {
   const rest = { ...c, unsent: false, onlyIds: [] };
   if ((unsent || only) && isEmpty(rest)) return new Set([...(unsent ?? only ?? [])].filter((id) => (!unsent || unsent.has(id)) && (!only || only.has(id))));
   /** @type {number[]} */
-  const ids = await OpenDivesCore.filterQuery({ kind: 'dives', ...fulltextOf(c), rules: rulesFor(c, prefs) });
+  const ids = await BenthicCore.filterQuery({ kind: 'dives', ...fulltextOf(c), rules: rulesFor(c, prefs) });
   return new Set(ids.filter((id) => (!unsent || unsent.has(id)) && (!only || only.has(id))));
 }
 
@@ -421,7 +421,7 @@ export function showUnsent(prefs) {
 /** Reads the values present in the logbook (after each load). */
 export async function loadOptions() {
   try {
-    const options = await OpenDivesCore.filterQuery({ kind: 'options' });
+    const options = await BenthicCore.filterQuery({ kind: 'options' });
     // The "Ce lest était" tags are set by buttons, not filtered.
     filter.options = options && Array.isArray(options.tags) ? { ...options, tags: withoutFeedbackTags(options.tags) } : options;
   } catch (e) {
@@ -433,7 +433,7 @@ export async function loadOptions() {
 /** Reads the filters saved in the logbook. */
 export async function loadPresets() {
   try {
-    filter.presets = (await OpenDivesCore.filterPresets({ action: 'list' })).presetList;
+    filter.presets = (await BenthicCore.filterPresets({ action: 'list' })).presetList;
   } catch (e) {
     console.error('Reading the saved filters', e);
     filter.presets = [];
@@ -450,7 +450,7 @@ export async function loadPresets() {
  * @returns {Promise<string>} the text of the step, for Undo
  */
 export async function savePreset(name, c, prefs) {
-  const result = await OpenDivesCore.filterPresets({ action: 'save', name, ...fulltextOf(c), rules: rulesFor(c, prefs) });
+  const result = await BenthicCore.filterPresets({ action: 'save', name, ...fulltextOf(c), rules: rulesFor(c, prefs) });
   filter.presets = result.presets.presetList;
   return result.undo;
 }
@@ -461,7 +461,7 @@ export async function savePreset(name, c, prefs) {
  * @returns {Promise<string>} the text of the step, for Undo
  */
 export async function deletePreset(index) {
-  const result = await OpenDivesCore.filterPresets({ action: 'delete', index });
+  const result = await BenthicCore.filterPresets({ action: 'delete', index });
   filter.presets = result.presets.presetList;
   return result.undo;
 }
@@ -583,7 +583,7 @@ function fillFromRule(c, r, prefs) {
  * The criteria of a saved filter, filling the page. What the page cannot show
  * (a filter made in Subsurface with a negation or another text mode) stays in
  * `preset`, as the core keeps it, and still applies.
- * @param {import('opendives-core').FilterPreset} p
+ * @param {import('benthic-core').FilterPreset} p
  * @param {Prefs} prefs
  * @returns {Criteria}
  */

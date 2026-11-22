@@ -13,7 +13,7 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import MenuItem from '../components/MenuItem.svelte';
-  import { OpenDivesCore } from 'opendives-core';
+  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import { logbook, tripChange, undoLastChange } from '../lib/logbook.svelte.js';
   import { formatDateRange, formatDateTime, formatDuration, formatDate } from '../lib/format.js';
@@ -24,12 +24,12 @@
   /** @type {{ f7route: { params: { id: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
 
-  /** @type {import('opendives-core').TripDetail|null} */
+  /** @type {import('benthic-core').TripDetail|null} */
   let trip = $state(null);
   let tripId = $state(Number(f7route.params.id));
 
   onMount(async () => {
-    trip = await OpenDivesCore.getTrip({ tripId });
+    trip = await BenthicCore.getTrip({ tripId });
   });
 
   // After an undo of a trip change, show the trip again.

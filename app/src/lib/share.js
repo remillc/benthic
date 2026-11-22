@@ -6,7 +6,7 @@
 // is the profile chart drawn on a canvas.
 import { Share } from '@capacitor/share';
 import { useKey } from './cylinder-use.js';
-import { OpenDivesCore } from 'opendives-core';
+import { BenthicCore } from 'benthic-core';
 import {
   formatCylinderSize,
   formatDepth,
@@ -31,8 +31,8 @@ import { settings } from './settings.svelte.js';
 import { bottomVolumeKey, reserveLegendKey } from './reserve-factor.js';
 import { visibleTags } from './weight-feedback.js';
 
-/** @typedef {import('opendives-core').DiveDetail} DiveDetail */
-/** @typedef {import('opendives-core').Prefs} Prefs */
+/** @typedef {import('benthic-core').DiveDetail} DiveDetail */
+/** @typedef {import('benthic-core').Prefs} Prefs */
 
 /** Properties copied from the page's styles into a standalone SVG. */
 const SVG_STYLES = ['fill', 'stroke', 'stroke-width', 'stroke-linejoin', 'font-size', 'font-family', 'font-weight', 'opacity', 'stop-color', 'fill-opacity', 'stroke-opacity', 'stroke-dasharray'];
@@ -127,8 +127,8 @@ export async function shareSummary(dive, prefs, svg) {
   /** @type {string[]} */
   const files = [];
   if (svg) {
-    const { uri } = await OpenDivesCore.writeShareFile({ name: fileName(dive, 'png'), base64: await profilePng(svg) });
-    await OpenDivesCore.grantShareFile({ uri, mime: 'image/png' });
+    const { uri } = await BenthicCore.writeShareFile({ name: fileName(dive, 'png'), base64: await profilePng(svg) });
+    await BenthicCore.grantShareFile({ uri, mime: 'image/png' });
     files.push(uri);
   }
   await Share.share({ title: shareTitle(dive), text, files, dialogTitle: t('share.title') });
@@ -356,7 +356,7 @@ export async function exportDives(ids, format, anonymize, prefs, whole = false, 
       ? logbookExportName(deviceStore.getItem('od.logbookName') || t('welcomeSteps.defaultName'), day, t('desktop.export.fileLogbook'))
       : `${t('share.exportPrefix', { n: String(ids.length) })}-${day}.${ext}`;
   const { uri, mime } = await exportFile(ids, format, anonymize, prefs, name, showName);
-  await OpenDivesCore.grantShareFile({ uri, mime });
+  await BenthicCore.grantShareFile({ uri, mime });
   await Share.share({ title: name, files: [uri], dialogTitle: t('share.title') });
 }
 
@@ -376,16 +376,16 @@ export async function exportFile(ids, format, anonymize, prefs, name, showName =
   if (format === 'pdf') {
     const pages = [];
     for (const id of ids) {
-      const dive = await OpenDivesCore.getDive({ id });
+      const dive = await BenthicCore.getDive({ id });
       pages.push(sheetHtml(dive, prefs, profileSvgFromSamples(dive, prefs), anonymize, await validationItems(dive), await diverNameFor(anonymize, showName)));
     }
     // One document: the style of the first sheet, each sheet's body on its own page.
     const head = pages[0].slice(0, pages[0].indexOf('<body>') + 6);
     const bodies = pages.map((p) => p.slice(p.indexOf('<body>') + 6, p.lastIndexOf('</body>')));
     const html = `${head}${bodies.join('<div style="break-after: page"></div>')}</body></html>`;
-    ({ uri } = await OpenDivesCore.htmlToPdf({ html, name, letter: letterPaper() }));
+    ({ uri } = await BenthicCore.htmlToPdf({ html, name, letter: letterPaper() }));
   } else {
-    ({ uri } = await OpenDivesCore.exportDives({ ids, format, anonymize, name }));
+    ({ uri } = await BenthicCore.exportDives({ ids, format, anonymize, name }));
   }
   const mime = { ssrf: 'application/xml', uddf: 'application/xml', csv: 'text/csv', csvProfiles: 'text/csv', pdf: 'application/pdf' }[format];
   return { uri, mime };
@@ -408,7 +408,7 @@ async function validationItems(dive) {
 }
 
 /**
- * The diver's full name for the header of a PDF sheet: his profile's (OpenDives+ data; '' without one), left out when
+ * The diver's full name for the header of a PDF sheet: his profile's (Benthic+ data; '' without one), left out when
  * the export is anonymized or the switch « Mon nom dans l’en-tête » is off (task 2026-11-19-312).
  * @param {boolean} anonymize @param {boolean} show
  */
@@ -426,15 +426,15 @@ export async function diverNameFor(anonymize, show) {
 
 /** "Fiche PDF". @param {DiveDetail} dive @param {Prefs} prefs @param {SVGSVGElement|null} svg */
 export async function sharePdf(dive, prefs, svg) {
-  const { uri } = await OpenDivesCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg, false, await validationItems(dive), await diverNameFor(false, true)), name: fileName(dive, 'pdf'), letter: letterPaper() });
-  await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
+  const { uri } = await BenthicCore.htmlToPdf({ html: sheetHtml(dive, prefs, svg, false, await validationItems(dive), await diverNameFor(false, true)), name: fileName(dive, 'pdf'), letter: letterPaper() });
+  await BenthicCore.grantShareFile({ uri, mime: 'application/pdf' });
   await Share.share({ title: shareTitle(dive), files: [uri], dialogTitle: t('share.title') });
 }
 
 // --- A plan (spec, "Planner, redesigned", "Partager le plan") -----------------
 
-/** @typedef {import('opendives-core').PlanResult} PlanResult */
-/** @typedef {import('opendives-core').PlanRequest} PlanRequest */
+/** @typedef {import('benthic-core').PlanResult} PlanResult */
+/** @typedef {import('benthic-core').PlanRequest} PlanRequest */
 
 /** @param {number} o2 @param {number} he */
 export const planGas = (o2, he) => (he === 0 && o2 >= 1000 ? formatGasLong(o2, he) : formatMixName(o2, he));
@@ -569,7 +569,7 @@ ${f.gases
 
 /** @param {PlanResult} result @param {PlanRequest} request @param {Prefs} prefs @param {string} title */
 export async function sharePlanPdf(result, request, prefs, title) {
-  const { uri } = await OpenDivesCore.htmlToPdf({ html: planSheetHtml(result, request, prefs, title), name: `${planFileName(result)}.pdf`, letter: letterPaper() });
-  await OpenDivesCore.grantShareFile({ uri, mime: 'application/pdf' });
+  const { uri } = await BenthicCore.htmlToPdf({ html: planSheetHtml(result, request, prefs, title), name: `${planFileName(result)}.pdf`, letter: letterPaper() });
+  await BenthicCore.grantShareFile({ uri, mime: 'application/pdf' });
   await Share.share({ title, files: [uri], dialogTitle: t('share.title') });
 }

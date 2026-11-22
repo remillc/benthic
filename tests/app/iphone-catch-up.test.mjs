@@ -51,17 +51,17 @@ test('StoreKit and Sign in with Apple stay inert: the same « not available » a
 
 test('the offer shows « Restaurer les achats » and the renewal terms on iOS; the texts exist in both languages', () => {
   const offer = src('components/FirstLaunchBenthicPlus.svelte');
-  assert.match(offer, /\{#if ios\}[\s\S]*odplus\.offer\.restore[\s\S]*odplus\.offer\.terms/);
+  assert.match(offer, /\{#if ios\}[\s\S]*benthicPlus\.offer\.restore[\s\S]*benthicPlus\.offer\.terms/);
   for (const lang of ['fr', 'en']) {
     const json = JSON.parse(src(`i18n/${lang}.json`));
-    for (const key of ['restore', 'terms']) assert.ok(json.odplus.offer[key], `${lang}: ${key}`);
+    for (const key of ['restore', 'terms']) assert.ok(json.benthicPlus.offer[key], `${lang}: ${key}`);
     assert.ok(json.account.free.deviceIos, `${lang}: deviceIos`);
     assert.ok(json.sites.openInPlans, `${lang}: openInPlans`);
     assert.ok(json.settings.cylinders.deleteTypeSheet, `${lang}: deleteTypeSheet`);
   }
 });
 
-test('the account sheet on iPhone: « Carnet sur cet iPhone » for the free version, the OpenDives+ chip for a subscriber', () => {
+test('the account sheet on iPhone: « Carnet sur cet iPhone » for the free version, the Benthic+ chip for a subscriber', () => {
   const sheet = src('components/AccountSheet.svelte');
   assert.match(sheet, /account\.free\.deviceIos/);
   assert.match(sheet, /bc-account-sheet--ios-link/);
