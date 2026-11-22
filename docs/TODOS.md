@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 174
+Next number: 175
 
 ## List
 
@@ -79,3 +79,4 @@ Next number: 174
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
 - #169 [code] tous les champs de recherche doivent avoir un "x" quand il y a une valeur
 - #173 [code] Devices should synchronize as soon as data is updated.
+- #174 [design] redessiner le rail des panneaux sur desktop. Il est fusionné avec une scrollbar minuscule.
