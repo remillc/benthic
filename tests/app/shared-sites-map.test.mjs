@@ -25,12 +25,14 @@ test('the shared map hides dive counts without changing the personal map or site
   assert.match(stack, /#if !hideDiveCounts.*bc-map-stack-sheet--dives/);
 });
 
-test('shared and personal pin names follow the same zoom threshold and clusters remain labelled', () => {
+test('shared and personal pin names follow the same zoom threshold, without cluster pills', () => {
   const map = read('components/SiteMap.svelte');
   assert.match(map, /namesFromZoom = 13/);
   assert.match(map, /map\.getZoom\(\) >= namesFromZoom/);
   assert.match(map, /if \(names === 'atZoom'\) updateNames\(\)/);
   assert.match(map, /text\.className = 'bc-site-map--base-name'/);
   assert.match(map, /text\.textContent = s\.name/);
-  assert.match(map, /sharedSites\.clusterLabel/);
+  const sites = read('pages/Sites.svelte');
+  assert.match(sites, /clusters: \[\]/);
+  assert.doesNotMatch(sites, /clusters: baseBox\.clusters/);
 });

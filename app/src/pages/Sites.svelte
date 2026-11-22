@@ -396,7 +396,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     common && baseBox
       ? {
           sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x, false)}` })),
-          clusters: baseBox.clusters,
+          clusters: [],
         }
       : null,
   );
