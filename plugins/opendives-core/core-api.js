@@ -773,8 +773,8 @@ export { waterTypeOf };
  * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
  *   One undoable trip change, as Subsurface's trip commands; "autogroup" (value "on" or
  *   "off") sets the log's trip grouping, as Subsurface's View > Autogroup.
- * @property {() => Promise<Dive[]>} listLoadedDives
- *   The dives of the log in memory, without loading anything.
+ * @property {(options?: {includeInvalid?: boolean}) => Promise<Dive[]>} listLoadedDives
+ *   The dives of the log in memory, without loading anything. includeInvalid also returns hidden invalid dives.
  * @property {(options: {name: string, base64: string}) => Promise<{uri: string}>} writeShareFile
  *   A file to share (the profile image), written in the app's cache; its file URI.
  * @property {(options: {ids: number[], format: 'ssrf'|'uddf'|'csv'|'csvProfiles', anonymize: boolean, name: string, text?: boolean, stage?: boolean}) => Promise<{uri: string, text?: string, path?: string, size?: number}>} exportDives
@@ -1143,8 +1143,8 @@ export const OpenDivesCore = {
   async diveColumns() {
     return JSON.parse((await native.diveColumns()).json);
   },
-  async listLoadedDives() {
-    return JSON.parse((await native.listLoadedDives()).json);
+  async listLoadedDives(options) {
+    return JSON.parse((await native.listLoadedDives(options)).json);
   },
   async syncChanges() {
     return JSON.parse((await native.syncChanges()).json);

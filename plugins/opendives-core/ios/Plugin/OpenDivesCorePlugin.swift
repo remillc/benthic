@@ -480,7 +480,7 @@ public class OpenDivesCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func listLoadedDives(_ call: CAPPluginCall) {
         onCoreThread(call) {
-            call.resolve(["json": OpenDivesNative.listLoadedDives()])
+            call.resolve(["json": OpenDivesNative.listLoadedDives(includeInvalid: call.getBool("includeInvalid") ?? false)])
         }
     }
 

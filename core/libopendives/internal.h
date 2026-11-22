@@ -108,7 +108,7 @@ void on_log_loaded();
 int dive_json(int id, std::string &json, std::string &error);
 
 // JSON array of the dives in memory, as list_dives() returns (opendives.cpp).
-std::string dives_json();
+std::string dives_json(bool include_invalid = false);
 
 // Local commits of the git log `log` not on its remote-tracking branch
 // (edit.cpp), whatever log is in memory.

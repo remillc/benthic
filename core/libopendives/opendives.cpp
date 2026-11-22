@@ -350,13 +350,13 @@ int list_plans(std::string &json)
 	return 0;
 }
 
-static std::string dives_json()
+static std::string dives_json(bool include_invalid = false)
 {
 	std::string json = "[";
 	bool first = true;
 	for (const auto &d: divelog.dives) {
 		// Invalid dives are hidden unless "Show invalid dives" (DiveFilter::showDive).
-		if (d->invalid && !prefs.display_invalid_dives)
+		if (d->invalid && !prefs.display_invalid_dives && !include_invalid)
 			continue;
 		// Plans are listed by the planner only (list_plans).
 		if (internal::is_plan_only(*d))
@@ -1731,9 +1731,9 @@ int dive_json(int id, std::string &json, std::string &error)
 	return get_dive(id, json, error);
 }
 
-std::string dives_json()
+std::string dives_json(bool include_invalid)
 {
-	return opendives::dives_json();
+	return opendives::dives_json(include_invalid);
 }
 
 } // namespace internal

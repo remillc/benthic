@@ -33,6 +33,7 @@
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
+  import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
   import ShareSheet from '../components/ShareSheet.svelte';
   import QrShare from '../components/QrShare.svelte';
   import { qrSummary } from '../lib/qr-send.js';
@@ -462,6 +463,7 @@
 
   /** "Renuméroter la plongée" open. */
   let renumbering = $state(false);
+  let renumberingFrom = $state(false);
 
   /** "Partager" open: the sheet, then the system's share sheet. */
   // The map behind the header: the top bar is see-through over it,
@@ -540,6 +542,7 @@
       items: [
         odplusSubscriber() ? t('detail.moreItemValidate') : '',
         t('detail.moreItemRenumber'),
+        t('renumberFrom.title'),
         removableFromTrip ? t('detail.moreItemTrip') : '',
         t('detail.moreItemDelete'),
       ]
@@ -911,6 +914,14 @@
           renumbering = true;
         }}
       />
+      <MenuItem
+        icon="renumber"
+        text={t('renumberFrom.title')}
+        onclick={() => {
+          f7.popover.close(`#${menuId}`);
+          renumberingFrom = true;
+        }}
+      />
       {#if removableFromTrip}
         <MenuItem icon="tripRemove" text={t('detail.removeFromTrip')} onclick={removeFromTrip} />
       {/if}
@@ -1242,6 +1253,9 @@
       loadDive();
     }}
   />
+{/if}
+{#if renumberingFrom && dive}
+  <RenumberFromDialog id={dive.id} oncancel={() => (renumberingFrom = false)} ondone={() => { renumberingFrom = false; loadDive(); }} />
 {/if}
 
 <style>

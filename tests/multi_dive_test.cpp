@@ -19,6 +19,7 @@
 #include "core/divecomputer.h"
 #include "core/divesite.h"
 #include "core/sample.h"
+#include "core/pref.h"
 
 #include <git2.h>
 
@@ -211,6 +212,32 @@ int main(int argc, char **argv)
 	if (list_dives(log, json, error)) {
 		printf("FAIL: reload after numbering checks: %s\n", error.c_str());
 		return 1;
+	}
+
+	// Hidden invalid dives remain available to a chronological renumbering.
+	{
+		dive *hidden = divelog.dives[2].get();
+		const bool original_invalid = hidden->invalid;
+		const bool original_pref = prefs.display_invalid_dives;
+		hidden->invalid = true;
+		prefs.display_invalid_dives = false;
+		const std::string marker = "\"id\":" + std::to_string(hidden->id) + ",\"number\":";
+		std::string visible, all;
+		list_loaded_dives(visible);
+		list_loaded_dives(all, true);
+		check(visible.find(marker) == std::string::npos && all.find(marker) != std::string::npos,
+		      "the full loaded list includes hidden invalid dives");
+		std::vector<int> ids, original;
+		for (size_t i = 1; i < divelog.dives.size(); ++i) {
+			ids.push_back(divelog.dives[i]->id);
+			original.push_back(divelog.dives[i]->number);
+		}
+		check(renumber_dives(ids, 100, json, error) == 0 && hidden->number == 101,
+		      "renumbering includes the hidden dive in sequence");
+		check(undo(json, error) == 0 && hidden->number == original[1],
+		      "undo restores the hidden dive's number");
+		hidden->invalid = original_invalid;
+		prefs.display_invalid_dives = original_pref;
 	}
 
 	// --- Merge ------------------------------------------------------------

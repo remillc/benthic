@@ -2324,6 +2324,13 @@
     "editSite": "Modifier le site {name}",
     "editedNoDuplicate": "{name} modifié, ce n’est plus un doublon possible"
   },
+  "renumberFrom": {
+    "title": "Renuméroter à partir de cette plongée",
+    "text": "Cette plongée et toutes les suivantes reçoivent des numéros consécutifs, dans l’ordre des dates, même si elles sont masquées. Vous pourrez annuler.",
+    "conflict": "Le numéro {n} est déjà utilisé par une plongée précédente. Choisissez un autre premier numéro.",
+    "tooLarge": "Le premier numéro est trop grand pour numéroter toutes les plongées suivantes.",
+    "failed": "La renumérotation n’a pas pu être terminée. Vérifiez le carnet avant de réessayer."
+  },
   "renumber": {
     "titleChecked": "Renuméroter les plongées cochées ?",
     "dialogTextChecked": {
@@ -2728,6 +2735,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "La fusion de plongées ajuste les numéros suivants même lorsque certaines plongées ne sont pas numérotées.",
+      "Carnet : renumérotez une plongée et toutes les suivantes à partir du numéro choisi.",
       "Ordinateur : le sélecteur affiche le nom du carnet sans libellé superflu.",
       "Carte commune : le déplacement de la carte et le défilement restent plus fluides lorsque beaucoup de sites sont affichés.",
       "Carte commune : la liste suit la zone affichée, y compris les sites regroupés sur la carte.",

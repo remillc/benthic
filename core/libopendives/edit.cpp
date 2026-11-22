@@ -4362,9 +4362,9 @@ int filter_preset_delete(int index, std::string &json, std::string &error)
 	return filter_presets_json(json);
 }
 
-int list_loaded_dives(std::string &json)
+int list_loaded_dives(std::string &json, bool include_invalid)
 {
-	json = internal::dives_json();
+	json = internal::dives_json(include_invalid);
 	return 0;
 }
 

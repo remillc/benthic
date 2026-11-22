@@ -364,6 +364,7 @@ export function contextMenuEntries(count, { mac, available, mergeable = true }) 
       count > 1
         ? { key: 'editTogether', label: 'desktop.menu.editTogether', icon: 'edit', shortcut: key('E') }
         : { key: 'edit', label: 'desktop.menu.edit', icon: 'edit', shortcut: key('E') },
+      count === 1 ? { key: 'renumberFrom', label: 'renumberFrom.title', icon: 'renumber' } : null,
     ].filter((e) => e !== null && available.has(e.key)),
     [
       { key: 'copy', label: 'desktop.menu.copy', icon: 'copy', shortcut: key('C') },
