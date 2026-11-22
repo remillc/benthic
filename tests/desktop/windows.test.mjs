@@ -89,17 +89,6 @@ test('a missing file is reported, not shown as an empty logbook', async () => {
   await bridge.detach(41);
 });
 
-test('a copy is written without touching the logbook file itself', async () => {
-  const file = path.join(root, 'orig.ssrf');
-  writeFileSync(file, '<divelog>orig</divelog>');
-  bridge.attach(fakeContents(51), logbooks.fileDescriptor(file));
-  const copy = path.join(root, 'copy.ssrf');
-  await bridge.saveCopy(51, copy);
-  assert.match(readFileSync(copy, 'utf8'), /^saved after/);
-  assert.equal(readFileSync(file, 'utf8'), '<divelog>orig</divelog>');
-  await bridge.detach(51);
-});
-
 test('the git token belongs to its logbook; the main logbook credentials are not reachable from it', async () => {
   const d = logbooks.gitDescriptor({ url: 'https://example.org/me/book.git', branch: 'main' });
   bridge.attach(fakeContents(61), d);
@@ -384,25 +373,4 @@ test('windows: a new logbook is an empty .ssrf opened in a new window on this co
   assert.ok(readFileSync(`${target}.ssrf`, 'utf8').includes('<dives>'));
   fake.dialogs.save.push({ canceled: true });
   assert.equal((await wm.handle({ sender: main.webContents }, 'create', { where: 'computer', name: 'X' })).canceled, true);
-});
-
-test('windows: a saved copy leaves the original window on the original logbook; opening the copy makes a second window', async () => {
-  const fake = fakeElectron();
-  const wm = manager(fake);
-  const main = wm.openMain();
-  const file = path.join(root, 'orig2.ssrf');
-  writeFileSync(file, '<divelog>o</divelog>');
-  await wm.openPath(file, main);
-  const original = fake.created[1];
-  const copy = path.join(root, 'orig2-copy.ssrf');
-  fake.dialogs.save.push({ canceled: false, filePath: copy });
-  const saved = await wm.handle({ sender: original.webContents }, 'saveCopy');
-  assert.equal(saved.path, copy);
-  assert.equal(bridge.descriptorOf(original.webContents.id).location, path.resolve(file));
-  assert.equal(fake.created.length, 2);
-  await wm.handle({ sender: original.webContents }, 'openCopy', { path: copy });
-  assert.equal(fake.created.length, 3);
-  assert.equal(bridge.descriptorOf(fake.created[2].webContents.id).location, path.resolve(copy));
-  fake.dialogs.save.push({ canceled: false, filePath: file });
-  await assert.rejects(wm.handle({ sender: original.webContents }, 'saveCopy'), /SAME_FILE/);
 });

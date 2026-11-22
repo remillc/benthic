@@ -310,21 +310,20 @@ export function creationErrorKey(error) {
  */
 export function selectorShortcuts(mac) {
   return mac
-    ? { newLogbook: '⇧⌘N', openLogbook: '⌘O', saveCopy: '⇧⌘S', closeLogbook: '⌘W' }
-    : { newLogbook: 'Ctrl+Maj+N', openLogbook: 'Ctrl+O', saveCopy: 'Ctrl+Maj+S', closeLogbook: 'Ctrl+W' };
+    ? { newLogbook: '⇧⌘N', openLogbook: '⌘O', closeLogbook: '⌘W' }
+    : { newLogbook: 'Ctrl+Maj+N', openLogbook: 'Ctrl+O', closeLogbook: 'Ctrl+W' };
 }
 
 /**
  * The logbook command a key press means in a window, or ''. Windows and Linux only (the Mac's menu bar
  * sends these as menu commands); Ctrl+W on a window without a logbook closes the window, which Electron does itself.
  * @param {{ key: string, ctrlKey: boolean, shiftKey: boolean, altKey: boolean, metaKey: boolean }} e
- * @returns {'newLogbook'|'openLogbook'|'saveCopy'|'closeLogbook'|''}
+ * @returns {'newLogbook'|'openLogbook'|'closeLogbook'|''}
  */
 export function logbookShortcut(e) {
   if (!e.ctrlKey || e.altKey || e.metaKey) return '';
   const key = e.key.toLowerCase();
   if (key === 'n' && e.shiftKey) return 'newLogbook';
-  if (key === 's' && e.shiftKey) return 'saveCopy';
   if (key === 'o' && !e.shiftKey) return 'openLogbook';
   if (key === 'w' && !e.shiftKey) return 'closeLogbook';
   return '';

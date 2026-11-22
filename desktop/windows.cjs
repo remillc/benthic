@@ -421,24 +421,6 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     return { canceled: false, created: true, descriptor, opened: !!opened.window };
   }
 
-  /** « Enregistrer une copie… »: the system's save dialog, then the logbook in memory as a .ssrf file there. */
-  async function saveCopy(/** @type {any} */ win) {
-    const descriptor = bridge.descriptorOf(win.webContents.id);
-    if (!descriptor) throw new Error('NO_LOGBOOK');
-    const base = descriptor.kind === 'file' ? path.basename(descriptor.location) : logbooks.logbookFileName(descriptor.name || mainName());
-    const answer = await dialog.showSaveDialog(win, {
-      title: t().copyTitle,
-      defaultPath: path.join(startFolder() ?? '', `${base.replace(/\.ssrf$/i, '')}-${t().copySuffix}.ssrf`),
-      filters: [{ name: t().fileFilter, extensions: ['ssrf'] }],
-    });
-    if (answer.canceled || !answer.filePath) return { canceled: true };
-    const target = /\.ssrf$/i.test(answer.filePath) ? answer.filePath : `${answer.filePath}.ssrf`;
-    // The copy must not be the open logbook's own file: it would be written over while the logbook runs.
-    if (descriptor.kind === 'file' && path.resolve(target).toLowerCase() === path.resolve(descriptor.location).toLowerCase()) throw new Error('SAME_FILE');
-    await bridge.saveCopy(win.webContents.id, target);
-    return { canceled: false, path: target };
-  }
-
   const answer = (work) => async (event, ...args) => {
     try {
       return { ok: true, value: await work(event, ...args) };
@@ -508,14 +490,6 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
         return { mode: store.setStartup(String(options.mode)) };
       case 'create':
         return createLogbook(options, win);
-      case 'saveCopy':
-        if (!win) throw new Error('NO_WINDOW');
-        return saveCopy(win);
-      case 'openCopy':
-        return openPath(options.path, win);
-      case 'revealCopy':
-        if (typeof options.path === 'string' && path.isAbsolute(options.path)) shell.showItemInFolder(options.path);
-        return true;
       default:
         throw new Error(`Unknown logbook operation ${op}`);
     }
@@ -532,7 +506,6 @@ function createWindowManager({ electron, bridge, store, ipcMain, texts, userData
     openPath,
     pickAndOpen,
     closeLogbook,
-    saveCopy,
     recent,
     existence,
     relocate,

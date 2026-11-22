@@ -2,8 +2,8 @@
   // @ts-check
   // The logbook selector of Windows and Linux (task 2026-11-15-173; docs/mockups/bureau-carnets-selecteur.dc.html):
   // the Carnet title becomes « plongees.ssrf ▾ » on a pill. Its menu lists the recent logbooks (name,
-  // source and when, a check on the open one), then Nouveau carnet…, Ouvrir un carnet…, Enregistrer une
-  // copie… and Fermer le carnet with their shortcuts. The Mac has no selector: its menu bar does the same.
+  // source and when, a check on the open one), then Nouveau carnet…, Ouvrir un carnet…, Exporter le carnet… (the whole
+  // logbook, a .benthic file among the formats) and Fermer le carnet with their shortcuts. The Mac has no selector: its menu bar does the same.
   import { onMount, tick } from 'svelte';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
@@ -14,7 +14,6 @@
     refreshRecent,
     openRecent,
     openLogbookDialog,
-    saveCopy,
     closeLogbook,
   } from '../lib/desktop-logbooks.svelte.js';
   import { displayName, sourceText, whenText, selectorShortcuts } from '../lib/desktop-logbooks.js';
@@ -113,9 +112,6 @@
         </button>
         <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(() => (logbooks.renameDialog = true))}>
           <span class="bc-logbook-selector--label">{t('desktopLogbooks.rename.action')}</span>
-        </button>
-        <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(saveCopy)}>
-          <span class="bc-logbook-selector--label">{t('desktopLogbooks.selector.saveCopy')}</span><kbd>{shortcuts.saveCopy}</kbd>
         </button>
         {#if onexport}
           <button type="button" role="menuitem" class="bc-logbook-selector--item" onclick={() => run(onexport)}>

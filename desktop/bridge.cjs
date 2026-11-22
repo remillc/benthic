@@ -646,15 +646,6 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     return work;
   }
 
-  /** Saves the logbook in memory as a copy at `target`: a .ssrf file. @param {WindowContext} ctx @param {string} target */
-  async function saveCopy(ctx, target) {
-    if (typeof target !== 'string' || !path.isAbsolute(target)) throw new Error('BAD_ARGUMENT: not a path');
-    await ctx.host.start();
-    await ctx.mirror.catch(() => {});
-    await exportAll(ctx, target);
-    return { path: target };
-  }
-
   /**
    * Checks a git repository, with a helper of its own (the windows' helpers keep their logbooks), and
    * creates the logbook branch of an empty repository when `create`. Same answers as the plugin's gitConnect.
@@ -1149,7 +1140,6 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     setDescriptorName,
     /** The core call of a window, as the renderer's, without the path checks (the main process asks). */
     callFor: (key, method, args) => coreCall(method, args ?? {}, contexts.get(key) || contextFor()),
-    saveCopy: (key, target) => saveCopy(contexts.get(key) || contextFor(), target),
     probeGit,
     cloudCheck,
     /** The access of a git logbook, from the dialog (the token never goes back to a renderer). */

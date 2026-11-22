@@ -218,11 +218,11 @@ test('keyboard shortcuts of Windows and Linux', () => {
   assert.equal(logbookShortcut(key('N', { shiftKey: true })), 'newLogbook');
   assert.equal(logbookShortcut(key('n')), '');
   assert.equal(logbookShortcut(key('o')), 'openLogbook');
-  assert.equal(logbookShortcut(key('S', { shiftKey: true })), 'saveCopy');
+  assert.equal(logbookShortcut(key('S', { shiftKey: true })), '', 'Save a copy is gone: saving is automatic');
   assert.equal(logbookShortcut(key('w')), 'closeLogbook');
   assert.equal(logbookShortcut(key('w', { ctrlKey: false })), '');
   assert.equal(selectorShortcuts(false).newLogbook, 'Ctrl+Maj+N');
-  assert.equal(selectorShortcuts(true).saveCopy, '⇧⌘S');
+  assert.equal('saveCopy' in selectorShortcuts(true), false);
 });
 
 test('a dropped file is a logbook when it is .ssrf or .xml', () => {
