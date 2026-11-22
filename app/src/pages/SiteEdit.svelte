@@ -61,6 +61,7 @@
   let useBase = $state(/** @type {string|null} */ (null));
   let saving = $state(false);
   let lookups = 0;
+  let positionLookup = Promise.resolve(true);
 
   // Leaving with changes asks first (components/LeaveGuard.svelte): the fields
   // against those at opening. A new site opens at once; one being edited, when it
@@ -74,9 +75,9 @@
     if (!editing) {
       /** @param {{latUdeg: number, lonUdeg: number}} p */
       const start = (p) =>
-        setPosition(p).then(() => {
+        setPosition(p).then((ok) => {
           // The found position, country and region are the opening values; what was typed meanwhile stays a change.
-          if (!opened) return;
+          if (!ok || !opened || position?.latUdeg !== p.latUdeg || position?.lonUdeg !== p.lonUdeg) return;
           const now = values();
           const auto = (/** @type {string} */ typed, /** @type {string} */ found) => (found && typed === found ? typed : null);
           opened = {
@@ -120,20 +121,29 @@
   });
 
   /** @param {{latUdeg: number, lonUdeg: number}} p */
-  async function setPosition(p) {
+  function setPosition(p) {
     const asked = ++lookups;
     position = p;
     coordsText = formatCoordinates(p.latUdeg, p.lonUdeg);
     coordsError = false;
-    const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
-    nearby = near && near.uuid !== editing ? near : null;
-    if (!editing) suggestCommon(p, asked);
-    // Country and region of the new position, unless the diver corrected them.
-    const place = await placeAt(p.latUdeg, p.lonUdeg, language);
-    // Only the answer for the latest position counts.
-    if (asked !== lookups || !place) return;
-    if (!country || country === autoCountry) country = autoCountry = place.country;
-    if (!region || region === autoRegion) region = autoRegion = place.region;
+    positionLookup = (async () => {
+      try {
+        const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
+        if (asked !== lookups) return true;
+        nearby = near && near.uuid !== editing ? near : null;
+        if (!editing) suggestCommon(p, asked);
+        const place = await placeAt(p.latUdeg, p.lonUdeg, language);
+        if (asked !== lookups || !place) return true;
+        if (!country || country === autoCountry) country = autoCountry = place.country;
+        if (!region || region === autoRegion) region = autoRegion = place.region;
+        return true;
+      } catch (e) {
+        console.error('Site position lookup', e);
+        showSnackbar(t('edit.failed'));
+        return false;
+      }
+    })();
+    return positionLookup;
   }
 
   /** A base site close to the new site's position (none when the logbook already has one close). @param {{latUdeg: number, lonUdeg: number}} p @param {number} asked */
@@ -167,7 +177,10 @@
 
   function typedCoordinates() {
     if (!coordsText.trim()) {
+      ++lookups;
+      positionLookup = Promise.resolve(true);
       position = null;
+      nearby = null;
       coordsError = false;
       return;
     }
@@ -188,8 +201,13 @@
 
   async function save() {
     if (saving) return;
+    if (coordsText.trim() && !parseCoordinates(coordsText)) {
+      coordsError = true;
+      return;
+    }
     saving = true;
     try {
+      if (!(await positionLookup)) return;
       let uuid = editing;
       const lat = position?.latUdeg ?? 0;
       const lon = position?.lonUdeg ?? 0;
@@ -318,6 +336,7 @@
       label={t('sites.coordinates')}
       bind:value={coordsText}
       onchange={typedCoordinates}
+      oninput={() => { ++lookups; }}
       invalid={coordsBad}
       supporting={coordsBad ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
     >

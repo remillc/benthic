@@ -65,5 +65,3 @@ Next number: 169
 - #145 [design] /profile/gear/new : le dialogue a été divisé en deux étapes ; refaire les maquettes à partir de ce que Claude VC a fait.
 - #146 [design] Améliorer le visuel des deux écrans du dialogue de /profile/gear/new.
 - #147 [design] Améliorer le visuel de Compte > Sauvegarde et restauration (/account/backup).
-- #167 [code] When editing a site, automatically fill in the country and region when GPS coordinates are entered.
-- #168 [code] concernant tous les champs de coordonnées gps, prévoir le parsage de variants dont "23.9404° ; -74.5718°"

@@ -39,10 +39,12 @@
   let autoCountry = '';
   let autoRegion = '';
   let position = $state(/** @type {{latUdeg: number, lonUdeg: number}|null} */ (null));
+  let preview = $state(/** @type {{latUdeg: number, lonUdeg: number}|null} */ (null));
   let coordsText = $state('');
   let nearby = $state(/** @type {import('opendives-core').SiteSummary|null} */ (null));
   let saving = $state(false);
   let lookups = 0;
+  let positionLookup = Promise.resolve(true);
   /** @type {DesktopSiteField|undefined} */
   let nameField = $state();
 
@@ -52,20 +54,28 @@
   });
 
   /** @param {{latUdeg: number, lonUdeg: number}} p */
-  async function setPosition(p) {
+  function setPosition(p) {
     const asked = ++lookups;
     position = p;
+    preview = null;
     coordsText = formatCoordinates(p.latUdeg, p.lonUdeg);
-    try {
-      nearby = (await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 })) ?? null;
-      const found = await placeAt(p.latUdeg, p.lonUdeg, language);
-      if (asked !== lookups || !found) return;
-      // Filled unless the diver typed a value of their own.
-      if (!country || country === autoCountry) country = autoCountry = found.country;
-      if (!region || region === autoRegion) region = autoRegion = found.region;
-    } catch (e) {
-      console.info('Place lookup not done', String(/** @type {any} */ (e)?.message ?? e));
-    }
+    positionLookup = (async () => {
+      try {
+        const near = await OpenDivesCore.siteQuery({ kind: 'nearby', lat: p.latUdeg, lon: p.lonUdeg, a: 100 });
+        if (asked !== lookups) return true;
+        nearby = near ?? null;
+        const found = await placeAt(p.latUdeg, p.lonUdeg, language);
+        if (asked !== lookups || !found) return true;
+        if (!country || country === autoCountry) country = autoCountry = found.country;
+        if (!region || region === autoRegion) region = autoRegion = found.region;
+        return true;
+      } catch (e) {
+        console.error('Site position lookup', e);
+        showSnackbar(t('edit.failed'));
+        return false;
+      }
+    })();
+    return positionLookup;
   }
 
   /** @param {string} text */
@@ -73,9 +83,16 @@
 
   /** @param {string} text */
   function typedCoordinates(text) {
-    coordsText = text;
     const p = parseCoordinates(text);
     if (p) setPosition(p);
+    else if (!text.trim()) {
+      ++lookups;
+      positionLookup = Promise.resolve(true);
+      position = null;
+      preview = null;
+      coordsText = '';
+      nearby = null;
+    }
   }
 
   const worldNames = $derived(worldCountries(language));
@@ -93,6 +110,7 @@
     if (!valid || saving) return;
     saving = true;
     try {
+      if (!(await positionLookup)) return;
       const lat = position?.latUdeg ?? 0;
       const lon = position?.lonUdeg ?? 0;
       const created = await siteChange({ action: 'create', value: name.trim(), lat, lon });
@@ -128,7 +146,7 @@
   <h2 class="bc-site-form--title">{t('sites.newSite')}</h2>
   <div class="bc-site-form--body">
     <div class="bc-site-form--left">
-      <DesktopSitePosMap {position} others={sites.filter((s) => s.hasLocation)} hint={t('desktopSites.clickToPlace')} placeOnClick onmove={setPosition} />
+      <DesktopSitePosMap position={preview ?? position} others={sites.filter((s) => s.hasLocation)} hint={t('desktopSites.clickToPlace')} placeOnClick onmove={setPosition} />
       <p class="bc-site-form--explain">{t('desktopSites.placeExplain')}</p>
     </div>
     <div class="bc-site-form--right">
@@ -137,7 +155,7 @@
         <DesktopSiteField id="od-new-name" form bind:this={nameField} value={name} oninput={(v) => (name = v)} onkeep={(v) => (name = v)} />
 
         <label for="od-new-coords">{t('sites.coordinates')}</label>
-        <DesktopSiteField id="od-new-coords" form value={coordsText} note={t('desktopSites.coordinatesExample')} error={coordsError} oninput={typedCoordinates} onkeep={typedCoordinates} />
+        <DesktopSiteField id="od-new-coords" form value={coordsText} note={t('desktopSites.coordinatesExample')} error={coordsError} oninput={(text) => (preview = parseCoordinates(text))} onkeep={typedCoordinates} oncancel={() => (preview = null)} />
 
         <label for="od-new-country">{t('sites.country')}</label>
         <DesktopSiteField id="od-new-country" form value={country} note={country && country === autoCountry ? t('sites.fromPosition') : ''} complete={completeCountry} countText={siteCount} oninput={(v) => (country = v)} onkeep={(v) => (country = v)} />
