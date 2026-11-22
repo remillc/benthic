@@ -53,7 +53,6 @@ Next number: 176
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted.
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
 - #139 [code] On `/`, when a synchronisation needs a progress bar, do not use the ME progress bar; use the wave on the bottom edge of the header instead.
-- #140 [design] Ajouter une fonction « Exporter le carnet » dans le menu 3-dots sur / dans tablette. Décidé le 22 nov. 2026 : sur desktop, pas d’« Exporter le carnet » dans le menu 3-dots (l’export passe par le menu Fichier sur macOS et le sélecteur de carnets sur Windows et Linux). À traiter avec #163.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
 - #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
 - #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
