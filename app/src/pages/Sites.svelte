@@ -482,7 +482,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   const baseLayer = $derived(
     common && baseBox
       ? {
-          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x)}` })),
+          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x, false)}` })),
           clusters: baseBox.clusters,
         }
       : null,
@@ -530,13 +530,14 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length || canCommon}
     <div class="bc-sites--map" class:bc-sites--map-offline={!connection.online} class:bc-sites--card-open={!!selectedSite || !!baseSelected}>
-      <!-- 5:4 landscape, full width (task 2026-11-07-24). Full screen keeps the pins,
-           and its own « Centrer sur ma position » (task 2026-11-14-147). No names on the
-           map; a tapped pin shows its card, several under the finger a sheet (task 2026-11-14-150). -->
+      <!-- Full screen keeps the pins and its own locate button. A tapped pin shows its card;
+           several under the finger open a sheet. The shared map shows names from zoom 13. -->
       <SiteMap
         bind:this={siteMap}
         sites={located}
-        names="fewInFullScreen"
+        names={common ? 'atZoom' : 'atZoomOrFewInFullScreen'}
+        hideDiveCounts={common}
+        groupSites
         selected={selectedUuid}
         onselect={(uuid) => ((stack = null), (baseSelectedId = null), (selectedUuid = uuid))}
         onstack={showStack}
@@ -552,11 +553,11 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       >
         {#snippet overlay()}
           {#if selectedSite}
-            <MapSiteCard site={selectedSite} onopen={() => openFromMap(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
+            <MapSiteCard site={selectedSite} hideDiveCounts={common} onopen={() => openFromMap(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
           {:else if baseSelected}
             <MapSiteCard
               site={{ name: baseSelected.name, country: baseSelected.country, dives: baseSelected.dives ?? 0, lastDate: '', maxDepthMm: 0 }}
-              line={baseCardLine(baseSelected)}
+              line={baseCardLine(baseSelected, false)}
               onopen={() => baseSelected && openBase(baseSelected.id)}
               onclose={() => (baseSelectedId = null)}
             />
@@ -587,7 +588,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {overMap}
     chip={!connection.online}
     summaryKey={searching}
-    summary={searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
+    summary={common ? '' : searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
   >
     {#if !connection.online}
       <p class="bc-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
@@ -613,7 +614,6 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
     {:else if baseState === 'loading'}
       <p class="bc-sites--area-count" role="status">{t('sharedSites.loadingArea')}</p>
     {:else if baseState === 'ready' && baseBox}
-      <p class="bc-sites--area-count" role="status">{t('sharedSites.areaCount', { n: baseBox.total })}</p>
       {#if baseList.length}
         <nav class="list no-chevron bc-sites--surface bc-sites--list bc-sites--common-list" aria-label={t('sharedSites.listLabel')} bind:this={baseListEl}>
           <ul>
@@ -783,7 +783,7 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
   <!-- A new sheet for each tap (MapStackSheet.svelte says why), removed once closed. -->
   {#if stack}
     {#key stack}
-      <MapStackSheet sites={stackSites} place={stackPlace} onclose={() => (stack = null)} onopen={openFromMap} />
+      <MapStackSheet sites={stackSites} place={stackPlace} hideDiveCounts={common} onclose={() => (stack = null)} onopen={openFromMap} />
     {/key}
   {/if}
 
@@ -833,6 +833,14 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       display: flex;
     }
 
+    /* Framework7's otherwise empty page content sits above the tablet panes. */
+    :global(.bc-sites--tablet > .page-content) {
+      pointer-events: none;
+    }
+    :global(.bc-sites--tablet > .page-content > *) {
+      pointer-events: auto;
+    }
+
     /* The top bar and the open search or selection belong to the list pane only:
        the map runs up to the top, beside them. */
     :global(.bc-sites--tablet .navbar.bc-sites--bar),
@@ -862,9 +870,9 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       min-width: 0;
     }
 
-    /* Android: the map is a rounded pane, 16 px from the edges. */
+    /* Android: the rounded map pane stays 16 dp clear of the safe area. */
     .bc-sites--split:not(.ios) .bc-sites--map-pane {
-      margin: 16px 16px 16px 0;
+      margin: 16px 16px calc(16px + var(--bc-safe-bottom)) 0;
       border-radius: 28px;
       overflow: hidden;
     }
@@ -1089,24 +1097,45 @@ import { openOdPlus } from '../lib/open-offer.svelte.js';
       bottom: 32px;
       display: flex;
       height: 40px;
+      max-width: calc(100% - 88px);
       border-radius: 20px;
       background: var(--bc-surface);
       box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
-      overflow: hidden;
     }
     .bc-sites--mode-button {
+      position: relative;
       display: flex;
+      flex: none;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      width: auto;
+      min-width: 48px;
       height: 40px;
-      padding: 0 16px;
+      padding: 0 12px;
       border: none;
       background: transparent;
       font: inherit;
       font-size: 14px;
+      line-height: 20px;
       font-weight: 500;
+      white-space: nowrap;
       color: var(--bc-text);
       cursor: pointer;
+      &:first-child {
+        border-radius: 20px 0 0 20px;
+      }
+      &:last-child {
+        border-radius: 0 20px 20px 0;
+      }
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -4px 0;
+      }
+      :global(.bc-icon) {
+        flex: none;
+      }
       &[aria-pressed='true'] {
         padding-left: 12px;
         font-weight: 600;

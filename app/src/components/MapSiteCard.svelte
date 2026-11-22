@@ -4,7 +4,7 @@
   // a map, the site's name, « {pays} · {n} plongées, la dernière le {date} », its maximum
   // depth and a chevron; it opens the site's sheet. Back closes it (lib/back-button.js
   // sends od-cancel to it). On the Sites map and, up close, on the heat map (task 155). A site of the shared map
-  // (task 2026-11-19-315) gives its own line (« Nouvelle-Zélande · carte commune · 214 plongées ») and no depth.
+  // (task 2026-11-19-315) gives its own line and no depth. The shared map hides dive counts.
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
   import { formatDepth, formatDate } from '../lib/format.js';
@@ -14,15 +14,16 @@
    * @type {{
    *   site: { name: string, country: string, dives: number, lastDate: string, maxDepthMm: number },
    *   line?: string,
+   *   hideDiveCounts?: boolean,
    *   onopen: () => void,
    *   onclose: () => void,
    * }}
    */
-  let { site, line = '', onopen, onclose } = $props();
+  let { site, line = '', hideDiveCounts = false, onopen, onclose } = $props();
 
   /** « Northern Arch, Nouvelle-Zélande, 1 plongée. Ouvrir la fiche du site ». */
   const label = $derived(
-    `${line ? [site.name, line].join(', ') : [site.name || t('sites.noName'), site.country, t('sites.diveCount', { n: site.dives })].filter(Boolean).join(', ')}. ${t('sites.openSiteSheet')}`,
+    `${line ? [site.name, line].join(', ') : [site.name || t('sites.noName'), site.country, hideDiveCounts ? '' : t('sites.diveCount', { n: site.dives })].filter(Boolean).join(', ')}. ${t('sites.openSiteSheet')}`,
   );
 
   /** Back closes the card. @param {HTMLElement} node */
@@ -36,7 +37,7 @@
 <button type="button" class="bc-map-site-card" aria-label={label} onclick={onopen} use:cancelable>
   <span class="bc-map-site-card--texts">
     <span class="bc-map-site-card--name">{site.name || t('sites.noName')}</span>
-    <span class="bc-map-site-card--line">{line || [site.country, t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })].filter(Boolean).join(' · ')}</span>
+    <span class="bc-map-site-card--line">{line || [site.country, hideDiveCounts ? '' : t('sites.rowDives', { n: site.dives, date: formatDate(site.lastDate) })].filter(Boolean).join(' · ')}</span>
   </span>
   {#if site.maxDepthMm && !line}<span class="bc-map-site-card--depth bc-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
   <Icon name="chevron" size={20} />

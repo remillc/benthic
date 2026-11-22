@@ -17,11 +17,12 @@
    * @type {{
    *   sites: { uuid: number, name: string, dives: number, maxDepthMm: number }[],
    *   place: string,
+   *   hideDiveCounts?: boolean,
    *   onclose: () => void,
    *   onopen: (uuid: number) => void,
    * }}
    */
-  let { sites, place, onclose, onopen } = $props();
+  let { sites, place, hideDiveCounts = false, onclose, onopen } = $props();
 
   // Mounted open, once per tap (Sites.svelte), and gone only once it has closed
   // (onclose, from sheetClosed): Framework7's Sheet does not reopen reliably through
@@ -53,10 +54,10 @@
     <nav class="bc-map-stack-sheet--list">
       {#each rows as site (site.uuid)}
         <button type="button" class="bc-map-stack-sheet--row" onclick={() => ((chosen = site.uuid), close())}>
-          <span class="bc-map-stack-sheet--badge" aria-hidden="true">{formatNumber(site.dives)}</span>
+          {#if !hideDiveCounts}<span class="bc-map-stack-sheet--badge" aria-hidden="true">{formatNumber(site.dives)}</span>{/if}
           <span class="bc-map-stack-sheet--texts">
             <span class="bc-map-stack-sheet--name">{site.name || t('sites.noName')}</span>
-            <span class="bc-map-stack-sheet--dives">{t('sites.diveCount', { n: site.dives })}</span>
+            {#if !hideDiveCounts}<span class="bc-map-stack-sheet--dives">{t('sites.diveCount', { n: site.dives })}</span>{/if}
           </span>
           {#if site.maxDepthMm}<span class="bc-map-stack-sheet--depth bc-value">{formatDepth(site.maxDepthMm, logbook.prefs)}</span>{/if}
           <Icon name="chevron" size={20} />

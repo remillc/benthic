@@ -20,10 +20,15 @@
    *   matching: Set<number>|null,
    *   onselect: (uuid: number) => void,
    *   onclear: () => void,
+   *   base?: { id: string, name: string, lat: number, lon: number, mine: boolean }[],
+   *   clusters?: { lat: number, lon: number, count: number }[],
+   *   common?: boolean,
+   *   onbaseselect?: (id: string) => void,
+   *   onview?: (view: { center: [number, number], bounds: [number, number, number, number], zoom: number }) => void,
    *   overlay?: import('svelte').Snippet,
    * }}
    */
-  let { sites, selected, matching, onselect, onclear, overlay } = $props();
+  let { sites, selected, matching, onselect, onclear, base = [], clusters = [], common = false, onbaseselect, onview, overlay } = $props();
 
   /** The pins closer than this at the zoom merge, px. */
   const STACK_RADIUS = 16;
@@ -84,7 +89,7 @@
         node.className = 'bc-desktop-site-map--dot';
         node.dataset.uuid = String(first.uuid);
         const name = first.name || t('sites.noName');
-        node.setAttribute('aria-label', first.dives ? t('sites.mapPin', { name, dives: t('sites.diveCount', { n: first.dives }) }) : name);
+        node.setAttribute('aria-label', !common && first.dives ? t('sites.mapPin', { name, dives: t('sites.diveCount', { n: first.dives }) }) : name);
         const label = el(name);
         label.className = 'bc-desktop-site-map--name';
         label.setAttribute('aria-hidden', 'true');
@@ -100,7 +105,45 @@
       }
       markers.push(new maplibregl.Marker({ element: node, anchor: 'center' }).setLngLat(lngLatOf(first)).addTo(m));
     }
+    for (const cluster of clusters) {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'bc-desktop-site-map--shared-cluster';
+      node.textContent = formatNumber(cluster.count);
+      node.setAttribute('aria-label', t('sharedSites.clusterLabel', { n: cluster.count }));
+      node.addEventListener('click', (e) => {
+        e.stopPropagation();
+        m.easeTo({ center: [cluster.lon, cluster.lat], zoom: Math.min(m.getZoom() + 2, m.getMaxZoom()) });
+      });
+      markers.push(new maplibregl.Marker({ element: node, anchor: 'center' }).setLngLat([cluster.lon, cluster.lat]).addTo(m));
+    }
+    for (const site of base) {
+      if (site.mine) continue;
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'bc-desktop-site-map--shared';
+      node.setAttribute('aria-label', site.name);
+      if (m.getZoom() >= Math.min(13, m.getMaxZoom())) {
+        const label = el(site.name);
+        label.className = 'bc-desktop-site-map--name';
+        label.setAttribute('aria-hidden', 'true');
+        node.append(label);
+      }
+      node.addEventListener('click', (e) => {
+        e.stopPropagation();
+        stack = null;
+        onbaseselect?.(site.id);
+      });
+      markers.push(new maplibregl.Marker({ element: node, anchor: 'center' }).setLngLat([site.lon, site.lat]).addTo(m));
+    }
     mark();
+  }
+
+  function reportView() {
+    if (!map) return;
+    const b = map.getBounds();
+    const c = map.getCenter();
+    onview?.({ center: [c.lng, c.lat], bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: map.getZoom() });
   }
 
   /** Selected and dimmed pins. */
@@ -161,7 +204,7 @@
     map = m;
     frame();
     render();
-    m.on('moveend', render);
+    m.on('moveend', () => { render(); reportView(); });
     m.on('click', () => {
       stack = null;
       onclear();
@@ -169,12 +212,16 @@
     const resize = new ResizeObserver(() => m.resize());
     resize.observe(container);
     m.once('remove', () => resize.disconnect());
+    reportView();
   });
 
   onDestroy(() => map?.remove());
 
   $effect(() => {
     sites;
+    base;
+    clusters;
+    common;
     if (map) {
       if (!framed) frame();
       render();
@@ -200,7 +247,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div class="bc-desktop-site-map" role="region" aria-label={t('sites.map')} bind:this={root}>
   <div class="bc-desktop-site-map--canvas" bind:this={container}></div>
-  <p class="bc-desktop-site-map--credits">{t('sites.mapCredits')}</p>
+  <p class="bc-desktop-site-map--credits">{#if common}{t('sharedSites.mapCredits')}<br />{/if}{t('sites.mapCredits')}</p>
   {#if stack}
     <div class="bc-desktop-site-map--stack-list" style:left="{Math.min(stack.x, (root?.clientWidth ?? 900) - 372)}px" style:top="{Math.max(8, Math.min(stack.y - 40, (root?.clientHeight ?? 700) - 440))}px" role="dialog" aria-label={t('sites.stackTitle', { n: stack.uuids.length })}>
       <h2 class="bc-desktop-site-map--stack-title">{t('sites.stackTitle', { n: stack.uuids.length })}</h2>
@@ -209,7 +256,7 @@
         {#each stackSites as s (s.uuid)}
           <li>
             <button type="button" class="bc-desktop-site-map--stack-row" onclick={() => pickFromStack(s.uuid)}>
-              <span class="bc-desktop-site-map--stack-count bc-value">{formatNumber(s.dives)}</span>
+              {#if !common}<span class="bc-desktop-site-map--stack-count bc-value">{formatNumber(s.dives)}</span>{/if}
               <span class="bc-desktop-site-map--stack-site">{s.name || t('sites.noName')}</span>
               {#if s.maxDepthMm}<span class="bc-desktop-site-map--stack-depth bc-value">{formatDepth(s.maxDepthMm, logbook.prefs)}</span>{/if}
             </button>
@@ -266,6 +313,30 @@
       box-sizing: border-box;
       border-radius: 50%;
       background: var(--bc-text-2);
+    }
+    :global(.bc-desktop-site-map--shared) {
+      width: 16px;
+      height: 16px;
+      box-sizing: border-box;
+      padding: 0;
+      border: 2px solid var(--bc-on-shared-site);
+      border-radius: 50%;
+      background: var(--bc-shared-site);
+      cursor: pointer;
+    }
+    :global(.bc-desktop-site-map--shared-cluster) {
+      min-width: 32px;
+      width: auto;
+      height: 32px;
+      padding: 0 6px;
+      border: 2px solid var(--bc-on-shared-site);
+      border-radius: 16px;
+      background: var(--bc-shared-site);
+      color: var(--bc-on-shared-site);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
     }
     :global(.bc-desktop-site-map--name) {
       position: absolute;

@@ -2268,6 +2268,7 @@
     "mapFullscreen": "Map of the sites, full screen",
     "mapWithSites": "{map}: {list}",
     "mapSite": "{name} {place}, {dives}",
+    "mapSiteWithoutDives": "{name} {place}",
     "mapPin": "{name}, {dives}",
     "openSiteSheet": "Open the site sheet",
     "stackTitle": {
@@ -2728,6 +2729,9 @@
       "Shared map: the list follows the visible area, including sites grouped on the map.",
       "Shared map: a message explains when sites are unavailable offline.",
       "Sites: coordinates with degree symbols are recognised and displayed according to your settings.",
+      "Sites: names appear when zooming in on either map; on tablets, the embedded map can be panned and zoomed and clears the system navigation area.",
+      "Shared map: the mode buttons are easier to tap.",
+      "Sites: nearby sites are grouped on phones and tablets; the shared map is available on desktop.",
       "Diver profile: the email address replaces the server's technical identifier when no name is set.",
       "Account on phones, tablets and desktop: the email address replaces the server's technical identifier.",
       "Desktop: the account menu no longer shows a plus sign on the initial.",
@@ -6658,6 +6662,7 @@
     }
   },
   "sharedSites": {
+    "mapCredits": "Sites: © OpenDiving Commons, Wikidata, NOAA, FWC",
     "commonMap": "shared map",
     "show": "Show",
     "mine": "My sites",
