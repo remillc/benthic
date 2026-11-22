@@ -6520,3 +6520,11 @@ Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and 
 In the logbook table of the desktop, every dive row gets a 1 px divider at its bottom, #E3E1DC (the colour of the line under the column headers; dark mode: the same token as that line), across the row's full width, inside trip cards too. The last row of a trip card has no divider. Rows are square (no rounded corners) except the selected row, which keeps its rounded #D4E2F2 pill and no divider. The row height stays 48 px, divider included.
 
 Mock-ups: `bureau-carnet-profil-droite` (the list scrolled to the bottom so that the trip shows), `bureau-carnets-selecteur`, `bureau-carnets-rail-survol`, updated in `docs/mockups/`.
+
+## [ ] 2026-11-22-329 Desktop logbook: no initial badge in the Compagnons column
+
+Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS.
+
+In the Compagnons column of the desktop logbook table, remove the round grey badge (22 px, #ECEAE4) with the buddy's initial in front of the name: the cell shows only the name(s), in the row's text style, cut with an ellipsis when too long. Nothing else changes.
+
+Mock-ups: `bureau-carnet-profil-droite` and the other desktop boards that show the logbook list (28 boards), updated in `docs/mockups/`.
