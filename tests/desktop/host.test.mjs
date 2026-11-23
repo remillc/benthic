@@ -14,7 +14,7 @@
 //                        temporary directory)
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -241,6 +241,27 @@ describe('benthic-host', { skip }, () => {
     assert.equal(await host.call('downloadCancel'), null);
     assert.equal(typeof (await host.call('dcBluetoothModels')), 'string');
     assert.equal(typeof (await host.call('dcFromBluetoothName', { name: 'Perdix' })), 'string');
+  });
+
+  test('git working copy: write, commit, read, files and diff on an account data branch', async () => {
+    const copy = `${dir}/bgit-copy`;
+    execFileSync('git', ['init', '-q', '-b', 'benthic', copy]);
+    const written = JSON.parse(await host.call('bgitWrite', { dir: copy, files: [
+      { path: 'benthic.json', text: '{"v":1}' }, { path: 'inventory/gear.json', text: 'é' }] }));
+    assert.deepEqual(written, { written: 2, deleted: 0 });
+    assert.deepEqual(JSON.parse(await host.call('bgitFiles', { dir: copy })), { files: [] });
+    await assert.rejects(host.call('bgitWrite', { dir: copy, files: [{ path: '../x', text: 'a' }] }), /BAD_PATH/);
+    await assert.rejects(host.call('bgitRead', { dir: copy, paths: ['.git/config'] }), /BAD_PATH/);
+    const first = JSON.parse(await host.call('bgitCommit', { dir: copy, paths: ['benthic.json', 'inventory/gear.json'], message: 'one' })).commit;
+    assert.match(first, /^[0-9a-f]{40}$/);
+    assert.deepEqual(JSON.parse(await host.call('bgitRead', { dir: copy, paths: ['inventory/gear.json', 'none.json'] })), { texts: ['é', null] });
+    await host.call('bgitWrite', { dir: copy, files: [{ path: 'inventory/gear.json', text: null }, { path: 'a.json', text: '1' }] });
+    const second = JSON.parse(await host.call('bgitCommit', { dir: copy, paths: ['inventory/gear.json', 'a.json'], message: 'two' })).commit;
+    assert.deepEqual(JSON.parse(await host.call('bgitFiles', { dir: copy })).files.sort(), ['a.json', 'benthic.json']);
+    const all = JSON.parse(await host.call('bgitDiff', { dir: copy, fromCommit: '', toCommit: first })).changes;
+    assert.deepEqual(all.map((c) => [c.path, c.state]).sort(), [['benthic.json', 'new'], ['inventory/gear.json', 'new']]);
+    const between = JSON.parse(await host.call('bgitDiff', { dir: copy, fromCommit: first, toCommit: second })).changes;
+    assert.deepEqual(between.map((c) => [c.path, c.state]).sort(), [['a.json', 'new'], ['inventory/gear.json', 'deleted']]);
   });
 
   test('stdout holds protocol lines only, and the host exits cleanly when stdin closes', async () => {

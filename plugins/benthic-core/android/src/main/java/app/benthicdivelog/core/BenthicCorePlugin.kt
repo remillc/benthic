@@ -593,6 +593,43 @@ class BenthicCorePlugin : Plugin() {
         bgit(call) { dir, _ -> NativeCore.bgitListFiles(dir, prefix) }
     }
 
+    /** Writes or deletes files in the working copy (options: dir, files: [{path, text|null}], null text = delete). */
+    @PluginMethod
+    fun bgitWrite(call: PluginCall) {
+        val list = call.getArray("files")
+        val paths = ArrayList<String>()
+        val texts = ArrayList<String?>()
+        if (list != null) {
+            for (i in 0 until list.length()) {
+                val item = list.optJSONObject(i)
+                paths.add(item?.optString("path").orEmpty())
+                texts.add(if (item == null || item.isNull("text")) null else item.getString("text"))
+            }
+        }
+        bgit(call) { dir, _ -> NativeCore.bgitWrite(dir, paths.toTypedArray(), texts.toTypedArray()) }
+    }
+
+    /** The text of each path at HEAD (options: dir, paths). */
+    @PluginMethod
+    fun bgitRead(call: PluginCall) {
+        val paths = call.paths()
+        bgit(call) { dir, _ -> NativeCore.bgitRead(dir, paths) }
+    }
+
+    /** What changed between two commits (options: dir, fromCommit, toCommit; empty fromCommit = everything). */
+    @PluginMethod
+    fun bgitDiff(call: PluginCall) {
+        val from = call.getString("fromCommit").orEmpty()
+        val to = call.getString("toCommit").orEmpty()
+        bgit(call) { dir, _ -> NativeCore.bgitDiff(dir, from, to) }
+    }
+
+    /** The paths of every file at HEAD (options: dir). */
+    @PluginMethod
+    fun bgitFiles(call: PluginCall) {
+        bgit(call) { dir, _ -> NativeCore.bgitFiles(dir) }
+    }
+
     /** Removes the working copy's folder. */
     @PluginMethod
     fun bgitRemove(call: PluginCall) {

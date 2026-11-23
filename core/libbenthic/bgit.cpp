@@ -1705,4 +1705,175 @@ int bgit_history_borrow(const std::string &dir, const std::string &commit, const
 	return 0;
 }
 
+// --- The account data branch's calls (docs/account-sync.md): files in and out of a working copy, read at HEAD ---
+
+namespace {
+
+// The commit HEAD names, as a hex string; "" when the working copy has no commit yet.
+std::string head_sha(git_repository *repo)
+{
+	git_oid oid;
+	return lookup_oid(repo, "HEAD", oid) ? oid_string(oid) : std::string();
+}
+
+// A symbolic link in the working copy is never followed, in the path or above it.
+bool has_symlink_part(const std::filesystem::path &root, const std::string &path)
+{
+	std::filesystem::path at = root;
+	size_t from = 0;
+	while (from <= path.size()) {
+		size_t next = path.find('/', from);
+		at /= path.substr(from, next == std::string::npos ? std::string::npos : next - from);
+		std::error_code ec;
+		if (std::filesystem::is_symlink(std::filesystem::symlink_status(at, ec)))
+			return true;
+		if (next == std::string::npos)
+			break;
+		from = next + 1;
+	}
+	return false;
+}
+
+} // namespace
+
+int bgit_write(const std::string &dir, const std::vector<BgitFile> &files, std::string &json, std::string &error)
+{
+	cancel_flag = false;
+	for (const BgitFile &f : files)
+		if (!valid_path(f.path)) {
+			error = "BAD_PATH";
+			return -1;
+		}
+	{
+		Library lib;
+		Repo repo;
+		if (open_repo(dir, repo, error))
+			return -1;
+	}
+	namespace fs = std::filesystem;
+	const fs::path root = fs::u8path(dir);
+	for (const BgitFile &f : files)
+		if (has_symlink_part(root, f.path)) {
+			error = "BAD_PATH";
+			return -1;
+		}
+	int written = 0, deleted = 0;
+	for (const BgitFile &f : files) {
+		const fs::path target = root / fs::u8path(f.path);
+		std::error_code ec;
+		if (f.remove) {
+			if (fs::remove(target, ec))
+				deleted++;
+			else if (ec) {
+				error = "GIT_ERROR: " + ec.message();
+				return -1;
+			}
+			// Folders emptied by the deletion go too, never the working copy itself.
+			for (fs::path up = target.parent_path(); up != root && up.native().size() > root.native().size();
+			     up = up.parent_path()) {
+				std::error_code ignored;
+				if (!fs::is_empty(up, ignored) || ignored || !fs::remove(up, ignored))
+					break;
+			}
+			continue;
+		}
+		fs::create_directories(target.parent_path(), ec);
+		if (ec) {
+			error = "GIT_ERROR: " + ec.message();
+			return -1;
+		}
+		// Written beside it, then moved over it: a crash leaves the old file or the new one, never half of one.
+		const fs::path temp = target.parent_path() / (target.filename().string() + ".benthic-tmp");
+		FILE *out = fopen(temp.string().c_str(), "wb");
+		if (!out || (!f.text.empty() && fwrite(f.text.data(), 1, f.text.size(), out) != f.text.size()) ||
+		    fclose(out) != 0) {
+			error = "GIT_ERROR: cannot write " + f.path;
+			return -1;
+		}
+		fs::rename(temp, target, ec);
+		if (ec) {
+			fs::remove(temp, ec);
+			error = "GIT_ERROR: " + ec.message();
+			return -1;
+		}
+		written++;
+	}
+	json = "{\"written\":" + std::to_string(written) + ",\"deleted\":" + std::to_string(deleted) + "}";
+	return 0;
+}
+
+int bgit_read(const std::string &dir, const std::vector<std::string> &paths, std::string &json, std::string &error)
+{
+	cancel_flag = false;
+	for (const std::string &p : paths)
+		if (!valid_path(p)) {
+			error = "BAD_PATH";
+			return -1;
+		}
+	Library lib;
+	Repo repo;
+	if (open_repo(dir, repo, error))
+		return -1;
+	Tree tree;
+	if (tree_of(repo.get(), head_sha(repo.get()), tree, error))
+		return -1;
+	json = "{\"texts\":[";
+	bool first = true;
+	for (const std::string &path : paths) {
+		if (!first)
+			json += ',';
+		first = false;
+		git_tree_entry *rawentry = nullptr;
+		git_blob *rawblob = nullptr;
+		if (git_tree_entry_bypath(&rawentry, tree.get(), path.c_str())) {
+			json += "null";
+			continue;
+		}
+		std::unique_ptr<git_tree_entry, Free<git_tree_entry, git_tree_entry_free>> entry(rawentry);
+		if (git_tree_entry_type(entry.get()) != GIT_OBJECT_BLOB ||
+		    git_blob_lookup(&rawblob, repo.get(), git_tree_entry_id(entry.get()))) {
+			json += "null";
+			continue;
+		}
+		Blob blob(rawblob);
+		const char *data = static_cast<const char *>(git_blob_rawcontent(blob.get()));
+		size_t size = git_blob_rawsize(blob.get());
+		if (!valid_utf8(data, size))
+			json += "null";
+		else
+			append_json_string(json, std::string(data, size));
+	}
+	json += "]}";
+	return 0;
+}
+
+int bgit_diff(const std::string &dir, const std::string &from, const std::string &to, std::string &json,
+	       std::string &error)
+{
+	cancel_flag = false;
+	std::string target = to;
+	if (target.empty() || target == "HEAD") {
+		Library lib;
+		Repo repo;
+		if (open_repo(dir, repo, error))
+			return -1;
+		target = head_sha(repo.get());
+	}
+	return bgit_history_diff(dir, from, target, json, error);
+}
+
+int bgit_files(const std::string &dir, std::string &json, std::string &error)
+{
+	cancel_flag = false;
+	std::string head;
+	{
+		Library lib;
+		Repo repo;
+		if (open_repo(dir, repo, error))
+			return -1;
+		head = head_sha(repo.get());
+	}
+	return bgit_history_files(dir, head, "", json, error);
+}
+
 } // namespace benthic

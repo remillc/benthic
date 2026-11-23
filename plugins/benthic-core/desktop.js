@@ -465,6 +465,10 @@ export class BenthicCoreDesktop extends WebPlugin {
   bgitUnpushed(/** @type {any} */ o) { return this.bgit('bgitUnpushed', o); }
   bgitHead(/** @type {any} */ o) { return this.bgit('bgitHead', o); }
   bgitListFiles(/** @type {any} */ o) { return this.bgit('bgitListFiles', o); }
+  bgitWrite(/** @type {any} */ o) { return this.bgit('bgitWrite', o); }
+  bgitRead(/** @type {any} */ o) { return this.bgit('bgitRead', o); }
+  bgitDiff(/** @type {any} */ o) { return this.bgit('bgitDiff', o); }
+  bgitFiles(/** @type {any} */ o) { return this.bgit('bgitFiles', o); }
   async bgitRemove(/** @type {any} */ o) { await this.bgit('bgitRemove', o); }
   async bgitCancel() { await this.bridge.core('bgitCancel', {}); }
 

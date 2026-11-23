@@ -82,6 +82,10 @@ internal object NativeCore {
     external fun bgitUnpushed(dir: String, branch: String): String
     external fun bgitHead(dir: String, branch: String): String
     external fun bgitListFiles(dir: String, prefix: String): String
+    external fun bgitWrite(dir: String, paths: Array<String>, texts: Array<String?>): String
+    external fun bgitRead(dir: String, paths: Array<String>): String
+    external fun bgitDiff(dir: String, from: String, to: String): String
+    external fun bgitFiles(dir: String): String
     external fun history(action: String, args: Array<String>): String
     external fun bgitRemove(dir: String)
 

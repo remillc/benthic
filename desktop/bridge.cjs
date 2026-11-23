@@ -94,7 +94,7 @@ const CORE_METHODS = new Set([
   'dcBluetoothModels', 'downloadPartial', 'downloadCancel', 'setSyncListener', 'ping',
   // Git on the device (bgit.h): the working copies of the Benthic server's logbooks, under <userData>/bgit.
   'bgitClone', 'bgitPull', 'bgitCommit', 'bgitPush', 'bgitStatus', 'bgitUnpushed', 'bgitHead', 'bgitListFiles',
-  'bgitRemove', 'bgitCancel',
+  'bgitWrite', 'bgitRead', 'bgitDiff', 'bgitFiles', 'bgitRemove', 'bgitCancel',
 ]);
 
 /**
