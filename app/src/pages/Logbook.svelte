@@ -668,12 +668,18 @@
       const under = document.elementFromPoint(touchX, touchY);
       const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
       const dragged = (dragIds ?? []).map(diveById).filter((d) => d !== undefined);
-      if (li && el?.contains(li) && dragged.length) {
-        const tripId = Number(li.dataset.trip) || 0;
+      // The dive of the row under the finger, if that row is a dive (not a trip or a year header).
+      const underDive = li ? diveById(Number(/** @type {HTMLElement|null} */ (li.querySelector('[data-dive]'))?.dataset.dive)) : undefined;
+      // Back on one of the dragged rows: the dives stay where they are, nothing to do.
+      const onItself = !!underDive && dragged.some((d) => d.id === underDive.id);
+      if (li && el?.contains(li) && dragged.length && !onItself) {
+        // A trip row, or a dive of a trip (its trip read from the dive, as a row does not always carry it).
+        const tripId = Number(li.dataset.trip) || underDive?.trip?.id || 0;
         if (tripId && dragged.some((d) => d.trip?.id !== tripId)) {
           target = { action: 'add', tripId };
           el.querySelectorAll(`li[data-trip="${tripId}"]`).forEach((n) => n.classList.add('bc-logbook--drop-target'));
-        } else if (!tripId && dragged.some((d) => d.trip)) {
+        } else if (!tripId && underDive && dragged.some((d) => d.trip)) {
+          // Only on a dive that is in no trip: a year header or an empty spot does nothing.
           target = { action: 'remove' };
         }
       }

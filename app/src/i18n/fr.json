@@ -2824,6 +2824,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet : une plongée glissée puis relâchée à sa place, ou sur un titre d’année, ne change rien et n’affiche plus d’erreur.",
       "Photos et vidéos (Benthic+) : la fiche d’une plongée montre les photos et les vidéos en miniatures, avec « Ajouter », la ligne « sur tous vos appareils » et « Tout voir » qui ouvre la galerie de la plongée. Elles sont envoyées au compte (10 Go) et suivent le plongeur sur ses autres appareils : les miniatures sont toujours gardées, les originaux arrivent en Wi-Fi selon Réglages › Carnet (« Toutes », « Celles des 12 derniers mois », « À la demande ») et s’ouvrent à la demande. Hors ligne, les envois attendent le retour du réseau. La version gratuite ne montre pas la section.",
       "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",
       "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",

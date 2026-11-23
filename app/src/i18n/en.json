@@ -2824,6 +2824,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: a dive dragged and dropped back on its own place, or on a year header, changes nothing and no longer shows an error.",
       "Photos and videos (Benthic+): a dive shows its photos and videos as thumbnails, with « Add », the line « on all your devices » and « See all », which opens the dive’s gallery. They are sent to the account (10 GB) and follow the diver to the other devices: thumbnails are always kept, originals arrive on Wi-Fi following Settings › Logbook (All, Those of the last 12 months, On demand) and open on demand. Offline, uploads wait for the network. The free version does not show the section.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
       "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
