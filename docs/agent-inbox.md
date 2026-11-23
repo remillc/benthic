@@ -6873,3 +6873,7 @@ Christian asked for this on 23 November 2026. Work in `main`. A diver can be stu
 2. « Demande expirée » (task 349 item 4), on every device: the same text button. Phone: on its own line above « Fermer » / « Nouvelle demande »; tablet and desktop: on the left of the button row.
 
 Both open « Repartir sans les données chiffrées » (task 338 item 6), unchanged.
+
+## [ ] 2026-11-23-351 Download, Bluetooth states: the Bluetooth icon centred, white on a blue disc
+
+Christian asked for this on 23 November 2026. Work in `main`. In the three Bluetooth states of the download from a dive computer, « Autoriser le Bluetooth », « Autorisation refusée » and « Bluetooth désactivé », the Bluetooth icon sits **centred** above the title, **white** (36 dp, stroke 2) in a **72 dp disc filled with #1F5C99** (no more grey icon on the left on the phone, no more pale disc with a coloured icon on the tablet, including the red « refusée » and grey « désactivé » variants). Mock-ups: « Téléchargement, autoriser le Bluetooth · Android », « … autorisation refusée … », « … Bluetooth désactivé … » (phone), and the six tablet boards « Téléchargement … » in paysage and portrait. The title, text and button keep their current layout. iPhone and desktop have no such screen; nothing to change there.
