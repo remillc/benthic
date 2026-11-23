@@ -7171,3 +7171,18 @@ M13.5 10a3.5 3.5 0 0 1 7 0v9.5a1.5 1.5 0 0 1-1.5 1.5h-4a1.5 1.5 0 0 1-1.5-1.5zM1
 It shows wherever `blender` is used: the « Mélangeur de gaz » tile in Outils and the desktop tools menu, « Préparer ce mélange » in Meilleur mélange (phone and desktop), and « Analyse des gaz » in the Benthic+ offer. So 89 keys become Material Symbols, not 90; 18 stay Benthic drawings.
 
 **Test:** Outils shows the cylinder icon on the « Mélangeur de gaz » tile; « Préparer ce mélange » shows it too.
+
+## [ ] 2026-11-23-366 Desktop dive detail, « Équipement » tab: one card per section
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet · bureau, détail, onglet Équipement » (tablet and desktop canvas, page Bureau, subgroup « Détail d’une plongée »), redrawn. Same data and same editing as today; only the layout changes.
+
+- Keep the hint « Les champs gris se modifient d’un clic et s’enregistrent tout de suite. » at the top.
+- Below it, five white cards (16 px corners, 16 px padding, 14 px apart, the pane's usual gap). Each card has a header: a 40 px round icon in #D4E2F2 with the icon in #114477 (stroke 1.8), the title (16 px, semibold, #1F2124) and, where noted, an action on the right. The old 140 px label column and the small uppercase section titles go away.
+  1. **Kit** (Benthic+). Header action: text button « Changer de kit » with a chevron, which opens the kit list as today. Under the header, aligned with the title: the kit's name (17 px, medium) followed by « · 6 pièces » (14 px, grey), then one line « A rempli les champs ci-dessous ; chacun reste modifiable. » (13 px, grey). Icon: `briefcase`.
+  2. **Ordinateurs de plongée**. Each computer is a 64 px grey row (#ECEAE4, 12 px corners): its photo (48 px, white tile), the name (15 px, medium) and « Principal · n° 3A2F1C07 » below (13 px, grey). Click to change it, as today. The old « Deuxième » field becomes a text button « + Ajouter un deuxième ordinateur ». Icon: `diveComputer`.
+  3. **Protection thermique** (was « Protection et lest »). « Combinaison » and « Sous-vêtement » (Benthic+) side by side in two equal columns, label above each field (13 px, grey), 48 px grey fields with a chevron. Icon: the gear `suit` icon.
+  4. **Lest**. Header action: the total, « total » (13 px, grey) then « 8 kg » (22 px, semibold, tabular figures). Under it, one chip per weight (40 px, 8 px corners, 1 px #8F8D86 border: « Ceinture 5 kg » with a ✕ to remove it), then a dashed chip « + Ajouter ». Then « Ce lest était » (Benthic+), label aligned left with the chips, and under it the three-way selector (Trop léger, Juste, Trop lourd), 360 px wide, centred in the card. Icon: the gear `weights` icon.
+  5. **Autre équipement** (Benthic+). Header action: text button « + Ajouter » (it replaces the dashed « Ajouter de l’équipement » tile). Items in two columns, 56 px grey rows: a 36 px white round tile with the gear icon, the name, and a 48 px ✕ « Retirer … de cette plongée ». Icon: the gear `bcd` icon. A knife uses the new `diveKnife` drawing (task 364).
+- Leave 88 px empty at the end of the pane so the + floating button never covers the last row.
+
+**Test:** on the desktop, open a dive, tab Équipement: five cards; change the kit, a computer, the suit, a weight and an item as before; the « Ce lest était » selector is centred and narrower; scroll to the end: the + button does not hide the last item. A free user does not see the Kit card, « Sous-vêtement », « Ce lest était » or « Autre équipement ».
