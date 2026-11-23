@@ -13,7 +13,9 @@ import { divesLocalHead, syncFromPush } from './logbook.svelte.js';
 import { accountLocalHead, triggerAccountSyncFromPush } from './account-sync.svelte.js';
 import { syncAllowedOnThisNetwork } from './sync-network.svelte.js';
 import { sideWindow } from './layout.svelte.js';
+import { Capacitor } from '@capacitor/core';
 import { createPushEvents } from './push-events.js';
+import { createFrontGate } from './push-front.js';
 import { setPushLive } from './push-state.js';
 import { refreshRequests } from './account-sync-flows.svelte.js';
 import { serverUrl } from './server-url.js';
@@ -60,12 +62,22 @@ export function startPushSync() {
   started = true;
   channel = build();
   if (typeof window !== 'undefined') window.addEventListener('online', () => channel?.online());
-  CapacitorApp.addListener('resume', () => channel?.resume()).catch((/** @type {unknown} */ e) => console.error('App resume', e));
+  const gate = createFrontGate({
+    start: () => channel?.start(),
+    stop: () => channel?.stop(),
+    resume: () => channel?.resume(),
+    wanted: () => benthicPlusAccount.signedIn,
+  });
+  CapacitorApp.addListener('resume', () => gate.toFront()).catch((/** @type {unknown} */ e) => console.error('App resume', e));
+  // Phone and tablet: no connection while the app is not on screen (lib/push-front.js). The desktop keeps its own while it runs.
+  if (Capacitor.isNativePlatform()) {
+    CapacitorApp.addListener('pause', () => gate.toBack()).catch((/** @type {unknown} */ e) => console.error('App pause', e));
+  }
   // Signed in: the stream is open; signed out: it is closed.
   $effect.root(() => {
     $effect(() => {
-      if (benthicPlusAccount.signedIn) channel?.start();
-      else channel?.stop();
+      void benthicPlusAccount.signedIn;
+      gate.follow();
     });
   });
 }
