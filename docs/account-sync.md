@@ -178,24 +178,27 @@ Not components:
   pencil are hidden. `canPair` shows the account sheet's « Jumeler un nouvel appareil » row (Android, iPhone and desktop
   sheets), which calls `onpairnew` (show the code, `PairShowCode variant="old"`).
 
-### What the wiring step must do
+### Wiring (done on 23 November 2026)
 
-1. Set `accountLock.locked` from `MISSING_DATA_KEY`, `accountLock.canPair` when the device holds the key, and the three actions.
-2. Open `AccountUnlockDialog` when the key is missing and `keys/account.json` exists. `onpair`: on a phone or tablet, the
-   scanner (`scanPairingCode('new-device')`) then `PairedDialog`; on a computer, `PairShowCode variant="new"`, then `PairedDialog`
-   once the phone has answered. `onrecoverykey`: `RecoveryKeyEnter`, then `PairedDialog` (pass `error="wrong"` on a refusal).
-   `onlost`: `StartOverDialog`.
-3. On the paired device: the account sheet row opens `PairShowCode variant="old"` (give `onscan` on a phone or tablet, which
-   calls `scanPairingCode('computer')`), then `PairConfirmDialog` when the request arrives.
-4. Open `RecoveryKeyOffer` at the first sync, `RecoveryKeyShow` right after « Créer la clé », `JoinSummaryDialog` from
-   `account-join.js`, and call `showTwoDeviceNotice` from the merge.
-5. The pairing code's text is the key module's: nothing here parses it.
-6. Native: the scanner accepts only dive and plan transfer codes (`OD1~d|p~…`, Kotlin `QrScanActivity.parseHeader` and its Swift
-   twin) and answers « Code inconnu » to anything else. Add a `mode: 'text'` that returns the first code as it is (what
-   `pair-scan.js` already sends), or wrap the pairing payload in the transfer header with a third kind. The desktop shows
-   codes only, so it needs no scanner.
-7. Add the release-notes line (`about.releaseNotes`) when the screens become reachable, and update `tests/app/account-sync-screens.test.mjs`
-   (its last test checks that the screens are not imported yet).
+`components/AccountSyncHost.svelte`, mounted once in `App.svelte` (`isRelease` only), picks the screen due from the sync state, one at a
+time and in this order: another account (`AccountDifferentDialog`, new, « Garder séparé » / « Utiliser ce compte » = `forgetLastAccount`),
+the missing key (`AccountUnlockDialog`, once per run of the app), the join (`JoinSummaryDialog`, only when the key is held: a device that
+must be paired first is paired first), the recovery key offer (`RecoveryKeyOffer`, at the first successful sync, asked again after a week
+when postponed). It also sets the flags of `locked-data.svelte.js` (`locked` from `accountSync.keyMissing`; `canPair` when the device
+holds the key, has synced and is not pull-only) and shows the « modifié sur deux appareils » notice from `accountSync.conflicts`.
+`lib/account-sync-flows.svelte.js` is what each button does: the pairing codes and files, adopting the key (`adoptAccountKey`, then
+`resealFiles` into the store as pending writes, then `persistAccountKey`, in that order, so that nothing is lost if the app stops between),
+the recovery key, the start-over, the join. Dialogs own no route: nothing here touches the router.
+
+The engine (`lib/account-sync.js`) handles the keys of the working copy: at the first push to a branch without `keys/account.json` it writes
+the kid of the device's own key (a new key only when the device never had one; a key the device had and lost is never replaced); on each
+run and each pull it reads `keys/account.json` into the box (`setAccountKid`) and reports `keyMissing`; a sealed file under another key than
+the account's is withheld (`locked`); the pairing files past their time are deleted by the clean-up. `keys/` is not in `SYNCED_PREFIXES`:
+those files never enter the local store, and the engine's `readKeys`, `commitKeyFiles` and `paths` are the only doors to them.
+On a conflict, a key file takes the server's side (two devices that both made a first key: the first push wins, the other device is
+then missing the key and pairs).
+
+The scanner has a text mode (`mode: 'text'`, Kotlin `QrScanActivity`, Swift `QrScanController`): the first code ends the scan, whatever it holds.
 
 ### Not covered by the mock-ups (the task asks to list it)
 
@@ -215,5 +218,6 @@ button's default. Questions the mock-ups do not answer:
 - Device name on `PairConfirmDialog`: where it comes from (the new device announces it in the request) is not specified.
 - Item 12: several items changed by one sync show one notice at a time (the snackbar replaces the previous one).
 - The iPhone and iPad portrait boards are not drawn: the same dialogs are used (checked on the iPhone look).
-- Not in the plan: what the paired device does with a pairing request it did not start, an expired request, or two requests.
+- Not in the plan: what the paired device does with a pairing request it did not start, an expired request, or two requests (built: a request is
+  only read from a scan; an expired file is deleted by the next sync).
 - Not in the plan: the recovery key's visibility to screen capture (Android `FLAG_SECURE`) while `RecoveryKeyShow` is open.
