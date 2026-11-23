@@ -8,6 +8,7 @@
   import Icon from './Icon.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { gear, gearMap } from '../lib/inventory.svelte.js';
+  import { isSubscriber } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** @type {{ equipment: import('../lib/inventory.js').DiveEquipment }} */
@@ -17,7 +18,7 @@
   const kit = $derived(equipment.kitId ? gear.kits.find((k) => k.id === equipment.kitId) : undefined);
 </script>
 
-{#if pieces.length || equipment.adhoc.length || kit}
+{#if isSubscriber() && (pieces.length || equipment.adhoc.length || kit)}
   <div class="bc-dive-gear-block">
     {#if pieces.length || equipment.adhoc.length}
       <div class="bc-dive-gear-block--head"><h3>{t('gear.diveGear.other')}</h3><BenthicPlusChip onLight /></div>
