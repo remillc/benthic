@@ -35,6 +35,7 @@ import { diveRenumberFlows } from './dive-renumber.mjs';
 import { downloadFlows } from './download-flow.mjs';
 import { diveMediaFlows } from './dive-media.mjs';
 import { desktopEquipmentFlows } from './desktop-equipment.mjs';
+import { benthicImportFlows } from './benthic-import-flow.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -2743,7 +2744,7 @@ async function profileSectionFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2803,6 +2804,8 @@ try {
     ['download', '--download-only', 60, !phoneOnly && !tabletOnly && !welcomeOnly, () => downloadFlows({ ...harness, shot })],
     // The desktop dive detail's Équipement tab, one card per section (tests/e2e/desktop-equipment.mjs).
     ['desktop equipment', '--equipment-only', 25, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopEquipmentFlows({ ...harness, shot })],
+    // The import of a .benthic file, on every device (tests/e2e/benthic-import-flow.mjs).
+    ['benthic import', '--benthic-import-only', 90, !phoneOnly && !tabletOnly && !welcomeOnly, () => benthicImportFlows({ ...harness, shot, work, core, seeded })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],

@@ -37,7 +37,8 @@
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { replaceEligibility, replacementFromFile } from '../lib/replace-logbook.js';
-  import { startReplace } from '../lib/replace-logbook-ui.js';
+  import { benthicProblemDialog, startBenthicReplace, startReplace } from '../lib/replace-logbook-ui.js';
+  import { isBenthicName, openBenthicFile } from '../lib/benthic-import.svelte.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import CsvImportDialog from '../components/CsvImportDialog.svelte';
   import { pickCsvFiles } from '../lib/csv-import.js';
@@ -1291,6 +1292,18 @@
     fileInput.value = '';
     if (picked) {
       csv = { file: picked.csv, companion: picked.companion };
+      return;
+    }
+    // A .benthic file (the full export): « Remplacer ce carnet ? », then the progress (task 2026-11-23-360).
+    if (files.length === 1 && isBenthicName(files[0].name)) {
+      let inspection;
+      try {
+        inspection = await openBenthicFile(files[0]);
+      } catch (e) {
+        benthicProblemDialog(files[0].name, e);
+        return;
+      }
+      await startBenthicReplace(files[0], inspection);
       return;
     }
     // A phone or a tablet keeps one logbook: a Subsurface logbook file can also replace the open one.
