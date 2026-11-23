@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -986,6 +986,71 @@ async function tabletFlows() {
   await hardwareBack(tab);
   await settled(tab, 'hardware Back', { split: true });
   tab.ws.close();
+}
+
+/**
+ * Task 2026-11-23-341: a long press on a dive starts the selection while the finger is still down; the lift opens
+ * nothing and keeps the selection; a short tap opens the dive, a scroll selects nothing.
+ */
+async function longPressFlows(expect) {
+  for (const [label, width, height, mobile, theme] of [
+    ['phone Android look', 390, 844, true, 'md'],
+    ['phone iOS look', 390, 844, true, 'ios'],
+    ['tablet Android look', 1280, 800, false, 'md'],
+    ['tablet iOS look', 1280, 800, false, 'ios'],
+  ]) {
+    console.log(`Long press, ${label}`);
+    const tab = await openTab(width, height, mobile, false, false, { theme });
+    const list = ['.page-current', '.page-master'];
+    const state = () =>
+      tab.run((scope) => ({
+        checked: document.querySelectorAll(scope.map((x) => `${x} [role=checkbox][aria-checked=true]`).join(', ')).length,
+        boxes: document.querySelectorAll(scope.map((x) => `${x} [role=checkbox]`).join(', ')).length,
+        route: (document.querySelector('.view-main')?.f7View?.router?.currentRoute?.url ?? '').replace(/\?.*$/, ''),
+      }), list);
+    const rowBox = (n) =>
+      tab.run((scope, n) => {
+        const r = document.querySelectorAll(scope.map((x) => `${x} a.bc-dive-row--link`).join(', '))[n]?.getBoundingClientRect();
+        return r ? { x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 30) } : null;
+      }, list, n);
+    await settled(tab, `${label}: logbook`, width > 900 ? { split: true } : { route: '/' });
+    const row = await rowBox(0);
+    const before = await state();
+    // Past the threshold, finger down: selection mode, the dive checked.
+    await tab.touch('touchStart', row.x, row.y);
+    await sleep(900);
+    const during = await state();
+    expect(`${label}: selection starts while the finger is down`, { selecting: true, checked: 1 }, { selecting: during.boxes > 0, checked: during.checked });
+    // A small move after the threshold keeps it.
+    await tab.touch('touchMove', row.x + 3, row.y + 3);
+    await sleep(100);
+    await tab.touch('touchEnd', row.x + 3, row.y + 3);
+    await sleep(700);
+    const after = await state();
+    expect(`${label}: the lift keeps the selection and opens nothing`, { selecting: true, checked: 1, route: before.route }, { selecting: after.boxes > 0, checked: after.checked, route: after.route });
+    await hardwareBack(tab);
+    await sleep(500);
+    const left = await state();
+    expect(`${label}: Back leaves the selection`, { boxes: 0 }, left);
+    // A scroll selects nothing.
+    await tab.touch('touchStart', row.x, row.y + 200);
+    for (let i = 1; i <= 6; i++) {
+      await tab.touch('touchMove', row.x, row.y + 200 - i * 20);
+      await sleep(30);
+    }
+    await sleep(800);
+    const scrolling = await state();
+    await tab.touch('touchEnd', row.x, row.y + 80);
+    expect(`${label}: a scroll does not select`, { boxes: 0 }, scrolling);
+    await sleep(500);
+    // A short tap opens the dive.
+    const row2 = await rowBox(0);
+    await tab.tapAt(row2.x, row2.y);
+    await sleep(900);
+    const tapped = await state();
+    expect(`${label}: a short tap opens the dive and selects nothing`, { boxes: 0, opened: true }, { boxes: tapped.boxes, opened: /^\/dives\/\d+/.test(tapped.route) });
+    tab.ws.close();
+  }
 }
 
 async function deleteFlows(expect) {
@@ -2543,7 +2608,7 @@ async function profileLayersFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2593,6 +2658,7 @@ try {
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],
+    ['long press', '--long-press-only', 20, !welcomeOnly, () => longPressFlows(expect)],
     ['desktop', '--desktop-only', 10, !phoneOnly && !tabletOnly, () => desktopFlows()],
     // The touches the system takes away (tests/e2e/navigation-gestures.mjs).
     ['gestures', '--gestures-only', 18, !tabletOnly && !welcomeOnly, () => gestureFlows(harness)],

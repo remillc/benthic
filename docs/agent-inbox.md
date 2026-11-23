@@ -6747,7 +6747,7 @@ Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `
 
 **Done (23 November 2026).** No mock-up boards were in the repo (`docs/mockups/` has none of the three « échange avec le serveur » boards): built from the task text. `components/SyncProfileLine.svelte` replaces `PullProgress` (deleted; `LinearWavyProgress` stays, other screens use it). It draws, in the band's pixel space (`lib/band-profile.js` scales the new curve to the box's width and 34 px height, no non-uniform scale), a white 2.5 px round line with the two glows, `pathLength="100"`, `stroke-dasharray`; states and timings in `lib/sync-line.js` (unknown: a 25 % segment slides, 1.6 s linear; known: dash up to the fraction; done: 0.6 s fill, 0.3 s hold, 1.1 s ease-in-out fade; reduced motion: still half-opacity line, no animation, gone at the end; a failed load removes it at once). The line is the `progressbar` (« Synchronisation du carnet », key `sync.progressLine`, `aria-valuenow` once known). The new curve replaces the polyline in every band (BandBackdrop, SectionBand, NavMenu, FirstLaunchBand, FirstLaunchBenthicPlus, WelcomeStartRelease). Per device: Material phone, tablet and desktop narrow layout: on the band's faint profile in `BandBackdrop` (the collapsed band carries it, it lives in the sticky layer); iPhone and iPad (no band): the faint profile is added, in ink, under the header (top of the list, `edge`), only while the exchange runs; desktop wide table: same `edge` profile and line under the header bar. Checks: `tests/app/sync-line.test.mjs`, `tests/app/pull-progress.test.mjs` (rewritten for the line), `node tests/e2e/navigation.mjs --sync-line-only` (new block, `tests/e2e/sync-line.mjs`).
 
-## [ ] 2026-11-23-341 Long press on a dive (phone and tablet): selection mode starts while the finger is still down
+## [x] 2026-11-23-341 Long press on a dive (phone and tablet): selection mode starts while the finger is still down
 
 Christian approved this on 23 November 2026 (TODO #159). Work in `main`. No mock-up. On `/` (the Carnet list), on phone and tablet, a long press on a dive row turns the list into the checkbox list (selection mode) only when the finger is lifted. Expected: selection mode starts **as soon as the long press is recognized, while the finger is still down**, with the pressed dive already checked.
 
@@ -6758,3 +6758,31 @@ Christian approved this on 23 November 2026 (TODO #159). Work in `main`. No mock
 - Check both Android and iPhone, phone and tablet.
 
 In the done note, say which event now starts selection mode and how the lift is ignored.
+
+**Done (23 November 2026).** The existing 500 ms timer of the list's `pointerdown` handler (`LONG_PRESS_MS` in `Logbook.svelte`) now starts selection mode itself, finger still down: `startSelection(id)` (or one more check when already selecting) for a dive row, `selectTrip` for a trip row. The lift decides nothing any more: `touchend` only clears the lift style and the drag state, and the `pressed` flag makes the click that follows be dropped before Framework7 opens the dive. A move after the threshold keeps the selection (it still drags the dives to a trip, as before); a move over 10 px before the threshold cancels the press, so a scroll and a short tap are unchanged. Feedback: `lib/haptics.js` calls `navigator.vibrate(15)`; the app has no haptics plugin and no VIBRATE permission, so the real vibration needs Christian's go-ahead for `@capacitor/haptics` (Android and iOS selection haptic). Tests: `tests/app/logbook-long-press.test.mjs`, flow « long press » of `tests/e2e/navigation.mjs` (`--long-press-only`; phone and tablet, Android and iOS look).
+
+## [ ] 2026-11-23-342 Correction of task 338: the join summary's intro line is missing
+
+Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre cet appareil » dialog (task 338, item 11; mock-up « Premier envoi, résumé et pièces à confirmer (Benthic+) · Android » and its tablet and desktop versions), the app does not show the line under the title. Add it, on every device, between the title and the three counters:
+
+« Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte. »
+
+Body text, 14 sp, on-surface-variant colour, 4 dp under the title and 20 dp above the counters, as in the mock-up.
+
+## [ ] 2026-11-23-343 Correction of task 338: the join summary is « Jumeler cet appareil »
+
+Christian asked for this on 23 November 2026. Work in `main`. In the first-sync summary dialog (task 338, item 11; mock-ups « Premier envoi, résumé et pièces à confirmer (Benthic+) » on phone, tablet and desktop), on every device:
+- the title « Joindre cet appareil » becomes **« Jumeler cet appareil »** (also the dialog's accessible name);
+- the confirm button « Joindre » becomes **« Jumeler »**.
+The git commit message of the join step (`account-sync.md`: « Joindre cet appareil ») may stay as it is; it is not shown to the diver.
+
+## [ ] 2026-11-23-344 Addition to task 338: confirmation after the first-sync summary
+
+Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler » in the first-sync summary (tasks 338 item 11 and 343), show a confirmation dialog, on every device. Mock-ups: « Premier envoi, appareil jumelé (Benthic+) » (phone, tablet, desktop), right after the summary board.
+
+- Green check disc (40 dp, #1E6B3A, white check), title « Appareil jumelé ».
+- « Les données de cet appareil sont réunies avec celles de votre compte : <n> pièces reconnues, <n> nouvelles ajoutées, <n> confirmées. » with the counts of the join that just ran (drop a part whose count is 0).
+- « Elles se synchronisent maintenant avec vos autres appareils. »
+- One button: « OK ». Basic dialog, no ✕.
+- Shown once the « Jumeler cet appareil » commit is pushed; on a failure, show the usual sync error instead.
+- If the recovery key offer (338 item 9) follows at the first sync, it comes after this dialog.

@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 180
+Next number: 181
 
 ## List
 
@@ -57,3 +57,4 @@ Next number: 180
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
 - #173 [code] Devices should synchronize as soon as data is updated.
 - #175 [code] Compléter l’export UDDF avec l’équipement et le profil du plongeur. Subsurface n’écrit presque rien de la fiche du plongeur : à l’export (`third_party/subsurface/xslt/uddf-export.xslt`), seulement les ordinateurs de plongée (nom et modèle) dans `diver › owner › equipment`, le poids du lest de chaque plongée (`equipmentused › leadquantity`), et un prénom et un nom vides ; à l’import (`uddf.xslt`), seulement l’ordinateur, les bouteilles et le lest. Benthic complète l’UDDF avec ce qu’il garde : l’inventaire d’équipement (pièces, fabricant, modèle, numéro de série, achat, entretiens) dans `owner › equipment`, l’équipement utilisé par chaque plongée dans `equipmentused`, et le profil du plongeur : `personal` (nom, date de naissance, groupe sanguin), `education` (brevets, avec les photos des cartes en liens), `medical` et `divinginsurances` (documents). Le contact d’urgence n’a pas de champ prévu dans UDDF (à vérifier dans la spécification). Vérifier d’abord la spécification UDDF (3.2.x) avant de coder ; garder un fichier valide pour les autres logiciels. Le .benthic reste la seule copie complète pour rouvrir le carnet dans Benthic. Décidé le 22 nov. 2026.
+- #180 [design] Jumelage d’un appareil (#164, tâche 338), deux manques constatés par Christian le 23 nov. 2026 sur son téléphone : 1) l’écran « Jumeler cet appareil » (lecture du code) et le dialogue « Nouvel appareil, déverrouiller les données chiffrées » ne disent pas où trouver le code QR sur l’autre appareil (aujourd’hui : Compte › « Jumeler un nouvel appareil » sur l’appareil déjà jumelé) ; il faut l’expliquer là où le diver en a besoin. 2) Une fois ce dialogue fermé (« Plus tard » ou la lecture abandonnée), rien ne permet de relancer le jumelage avant le prochain démarrage de l’app : prévoir une entrée permanente tant que les données chiffrées sont verrouillées (par exemple dans Compte et sur la carte « Verrouillé : jumelez cet appareil » du profil), sur téléphone, tablette et ordinateur.
