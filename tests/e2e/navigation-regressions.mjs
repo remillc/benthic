@@ -65,7 +65,7 @@ export async function regressionFlows(h) {
   // the planner by the list of plans), « Nouveau plan », then Back twice: the view was left with no current page.
   console.log(' dive > plan from the dive > Retour (the plans) > new plan > Back > Back');
   await tapDive(tab);
-  await settled(tab, 'plans: dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'plans: dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   const dive = await route(tab);
   await sleep(400);
   await tapText(tab, 'Planifier depuis cette plongée|Plan from this dive');
@@ -141,7 +141,7 @@ export async function regressionFlows(h) {
     await sleep(400);
     await settled(tab, `section ${gap} ms after a dive: the Logbook view is at rest`, {});
     const where = await route(tab);
-    expect(`section ${gap} ms after a dive: on the dive or the list`, { ok: true }, { ok: where === '/' || /^\/dives\/\d+$/.test(where) });
+    expect(`section ${gap} ms after a dive: on the dive or the list`, { ok: true }, { ok: where === '/' || /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/.test(where) });
     if (where !== '/') {
       await hardwareBack(tab);
       await settled(tab, `section ${gap} ms after a dive: Back to the list`, { route: '/' });
@@ -216,9 +216,9 @@ export async function regressionFlows(h) {
   await settled(wide, 'tablet pane: the planner is in the pane', { split: true, route: /^\/plan\/\d+$/, setup: true });
   for (const n of [0, 3]) {
     await tapRow(n);
-    for (let i = 0; i < 30 && !/^\/dives\/\d+$/.test(await route(wide)); i++) await sleep(100);
+    for (let i = 0; i < 30 && !/^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/.test(await route(wide)); i++) await sleep(100);
     await sleep(600);
-    await settled(wide, `tablet pane: dive ${n} of the list replaces the pane`, { split: true, route: /^\/dives\/\d+$/ });
+    await settled(wide, `tablet pane: dive ${n} of the list replaces the pane`, { split: true, route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/ });
     const stack = await wide.run(readStack);
     expect(`tablet pane: the list and one dive, a history of two (dive ${n})`, { pages: 2, history: 2 }, { pages: stack.pages.length, history: stack.history.length });
   }

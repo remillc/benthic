@@ -17,8 +17,11 @@ export async function diveRenumberFlows(h) {
       const { logbook } = await import('/src/lib/logbook.svelte.js');
       const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
       const router = view.f7View.router;
-      const id = Number(/\/dives\/(\d+)/.exec(router.currentRoute.url)?.[1] ?? 0);
-      return { id, date: logbook.dives.find((d) => d.id === id)?.date ?? null, depth: router.history.length, route: router.currentRoute.url };
+      // The route holds the dive's Benthic id (an old numeric address is a core id).
+      const param = /\/dives\/(\w+)/.exec(router.currentRoute.url)?.[1] ?? '';
+      const dive = logbook.dives.find((d) => d.benthicId === param || String(d.id) === param);
+      const id = dive?.id ?? 0;
+      return { id, param, date: dive?.date ?? null, depth: router.history.length, route: router.currentRoute.url };
     });
   /** The core reads the log again; `without` names a date whose dive the other device deleted. */
   const reload = (tab, without = null) =>
@@ -40,14 +43,14 @@ export async function diveRenumberFlows(h) {
       await sleep(800);
     } else {
       await tapDive(tab);
-      await settled(tab, `${name}: dive opened`, { route: /^\/dives\/\d+$/, setup: true });
+      await settled(tab, `${name}: dive opened`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     }
     const before = await shown(tab);
     expect(`${name}: a dive is open`, { open: before.id > 0 && !!before.date }, { open: before.id > 0 && !!before.date });
 
     await reload(tab);
     await sleep(900);
-    await settled(tab, `${name}: after the log was read again`, { route: /^\/dives\/\d+$/, split });
+    await settled(tab, `${name}: after the log was read again`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, split });
     const after = await shown(tab);
     expect(`${name}: the same dive under a new id`, { moved: true, same: true }, { moved: after.id !== before.id, same: after.date === before.date });
     expect(`${name}: no page was added to the history`, { depth: before.depth }, { depth: after.depth });
@@ -57,11 +60,11 @@ export async function diveRenumberFlows(h) {
     // The page shows the dive after the reload: the neighbour is the next of the new list.
     if (!split) {
       await tab.swipe(330, 60, 700);
-      await settled(tab, `${name}: swipe to the neighbour dive`, { route: /^\/dives\/\d+$/ });
+      await settled(tab, `${name}: swipe to the neighbour dive`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/ });
       const next = await shown(tab);
       expect(`${name}: the neighbour is a dive of the new list`, { known: true, other: true }, { known: next.date !== null, other: next.id !== after.id });
       await tab.swipe(60, 330, 700);
-      await settled(tab, `${name}: swipe back to the first dive`, { route: /^\/dives\/\d+$/ });
+      await settled(tab, `${name}: swipe back to the first dive`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/ });
       const again = await shown(tab);
       expect(`${name}: and back on the dive`, { date: after.date }, { date: again.date });
     }
@@ -75,7 +78,7 @@ export async function diveRenumberFlows(h) {
     const msg = await tab.run(() => /supprimée sur un autre appareil|deleted on another device/.test(document.body.textContent ?? ''));
     expect(`${name}: the message tells it`, { msg: true }, { msg });
     const stack = await tab.run(readStack);
-    expect(`${name}: the dive is no longer shown`, { still: false }, { still: new RegExp(`/dives/${now.id}$`).test(stack.current) });
+    expect(`${name}: the dive is no longer shown`, { still: false }, { still: new RegExp(`/dives/${now.param}$`).test(stack.current) });
   };
 
   console.log('Dive renumbering: Android phone');
