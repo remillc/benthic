@@ -64,7 +64,12 @@ test('the logbook follows the window: its table pane, its columns, its header', 
   const page = read('app/src/pages/DesktopLogbook.svelte');
   assert.match(page, /new ResizeObserver\(place\)/);
   assert.match(page, /fittingColumns\(columns, tableRoom, desk\.columnWidths\)/);
-  assert.match(page, /\.bc-desktop-logbook--titles \{[^}]*flex: 1 0\.2 auto/);
+  // The header measures its own width: under NARROW_BAR the search is a magnifier button (task 2026-11-23-372).
+  assert.match(page, /\.bc-desktop-logbook--titles \{[^}]*flex: 1 1 auto/);
+  assert.match(page, /const NARROW_BAR = 560;/);
+  assert.match(page, /const narrow = \$derived\(barWidth < NARROW_BAR\)/);
+  assert.match(page, /desktop\.openSearch/);
+  assert.match(page, /desktop\.closeSearch/);
   assert.match(read('app/src/components/DiveProfile.svelte'), /flex-wrap: wrap;\s*overflow-x: visible;/);
 });
 
@@ -87,4 +92,22 @@ test('panes that scroll as lists are marked for the audit', () => {
   ]) {
     assert.ok(read(file).includes(mark), `${file}: ${mark}`);
   }
+});
+
+test('desktop logbook: the list stops before the divider, so its scroll bar is not under the divider\'s hit area', () => {
+  const src = fs.readFileSync(new URL('../../app/src/pages/DesktopLogbook.svelte', import.meta.url), 'utf8').split('\r\n').join('\n');
+  const handle = src.match(/\.bc-desktop-logbook--handle \{[^}]*?width: (\d+)px;/);
+  const scroll = src.match(/\.bc-desktop-logbook--scroll \{[^}]*?margin-right: (\d+)px;/);
+  assert.ok(handle && scroll, 'both rules are found');
+  assert.equal(scroll[1], handle[1], 'the list leaves exactly the divider\'s width');
+});
+
+test('desktop logbook: the scroll bar\'s thumb widens while the pointer is over the bar', () => {
+  const src = fs.readFileSync(new URL('../../app/src/pages/DesktopLogbook.svelte', import.meta.url), 'utf8').split('\r\n').join('\n');
+  const bar = src.match(/&::-webkit-scrollbar \{\s*width: (\d+)px;/);
+  const gutter = src.match(/const BAR_WIDTH = (\d+);/);
+  assert.ok(bar && gutter);
+  assert.equal(bar[1], gutter[1], 'the hover zone is the bar\'s gutter');
+  assert.match(src, /&\.bc-desktop-logbook--scroll-bar-hover::-webkit-scrollbar-thumb,\s*&::-webkit-scrollbar-thumb:hover,\s*&::-webkit-scrollbar-thumb:active \{\s*border-width: 1px;/);
+  assert.match(src, /class:bc-desktop-logbook--scroll-bar-hover=\{barHover\}[^\n]*onpointermove=\{trackBar\} onpointerleave=/);
 });

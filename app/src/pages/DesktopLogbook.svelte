@@ -152,6 +152,17 @@
 
   // --- Windowing: only the rows in view (plus a margin) are in the DOM; two spacer rows hold the rest's height. ---
   let scrollTop = $state(0);
+  /** The pointer is over the list's vertical scroll bar: its thumb widens (CSS cannot tell when the bar's gutter is hovered). */
+  let barHover = $state(false);
+  /** The width of the scroll bar's gutter, as in the CSS of `.bc-desktop-logbook--scroll`. */
+  const BAR_WIDTH = 12;
+  /** @param {PointerEvent} e */
+  function trackBar(e) {
+    const el = /** @type {HTMLElement} */ (e.currentTarget);
+    const overflows = el.scrollHeight > el.clientHeight;
+    const right = el.getBoundingClientRect().right;
+    barHover = overflows && e.clientX >= right - BAR_WIDTH;
+  }
   let viewHeight = $state(0);
   const offsets = $derived(rowOffsets(rows));
   // The sticky year line sits under the header when the rows follow the dates (task 2026-11-18-279).
@@ -789,6 +800,38 @@
   /** @type {HTMLInputElement|undefined} */
   let searchField = $state();
 
+  // The list header in a narrow column (task 2026-11-23-372): under NARROW_BAR the search box is an
+  // icon button; it opens the field across the header, in place of the title. The width is the
+  // measured one of the header, not the window's: the detail pane takes the rest.
+  const NARROW_BAR = 560;
+  let barEl = $state();
+  let barWidth = $state(Infinity);
+  let searchOpen = $state(false);
+  const narrow = $derived(barWidth < NARROW_BAR);
+  /** Narrow header: the field stays open while it is open by hand or a search is active. */
+  const fieldOpen = $derived(narrow && (searchOpen || query !== ''));
+  $effect(() => {
+    if (!barEl) return;
+    const element = barEl;
+    const measure = () => (barWidth = element.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  });
+
+  /** Opens the field of a narrow header and puts the cursor in it. */
+  async function openSearch() {
+    searchOpen = true;
+    await tick();
+    searchField?.focus();
+    searchField?.select();
+  }
+  function closeSearch() {
+    query = '';
+    searchOpen = false;
+  }
+
   /** Whether the logbook's page is the one in use (no dialog, no page over it). */
   function inUse() {
     return (
@@ -810,8 +853,11 @@
   function command(command) {
     switch (command) {
       case 'find':
-        searchField?.focus();
-        searchField?.select();
+        if (narrow && !searchField) openSearch();
+        else {
+          searchField?.focus();
+          searchField?.select();
+        }
         return true;
       case 'new':
         f7router.navigate('/dives/new');
@@ -900,8 +946,10 @@
         revealFocus();
         return;
       } else if (typing && e.key === 'Escape' && e.target === searchField) {
-        query = '';
-        searchField?.blur();
+        // Narrow header: a first Échap empties the field, the next one closes it.
+        if (narrow && query === '') searchOpen = false;
+        else query = '';
+        if (!narrow || !searchOpen) searchField?.blur();
         return;
       }
       if (cmd && command(cmd)) e.preventDefault();
@@ -983,17 +1031,25 @@
 <Page class="bc-desktop-logbook" pageContent={false}>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="bc-desktop-logbook--frame" bind:this={pageEl} oncontextmenu={areaMenu}>
-    <header class="bc-desktop-logbook--bar">
+    <header class="bc-desktop-logbook--bar" class:bc-desktop-logbook--narrow={narrow} class:bc-desktop-logbook--searching={fieldOpen} bind:this={barEl}>
       <!-- The list column's own header (task 2026-11-15-192): the title, the count on one line under it. -->
       <div class="bc-desktop-logbook--titles">
         {#if desktopMac}<h1 class="bc-desktop-logbook--title">{t('logbook.title')}</h1>{:else}<DesktopLogbookSelector onexport={() => ((exportWhole = true), (exporting = true))} />{/if}
         {#if summary}<p class="bc-desktop-logbook--summary bc-value" title={summary}>{summary}</p>{/if}
       </div>
-      <label class="bc-desktop-logbook--search">
-        <Icon name="search" size={20} />
-        <input type="search" bind:this={searchField} bind:value={query} placeholder={t('logbook.search')} aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} />
-        {#if query}<SearchClear onclear={() => (query = '')} />{:else}<kbd class="bc-desktop-logbook--hint">{mod}F</kbd>{/if}
-      </label>
+      {#if !narrow || fieldOpen}
+        <label class="bc-desktop-logbook--search" class:bc-desktop-logbook--search-across={narrow}>
+          <Icon name="search" size={20} />
+          <input type="search" bind:this={searchField} bind:value={query} placeholder={t('logbook.search')} aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} />
+          {#if narrow}
+            <button type="button" class="bc-desktop-logbook--search-close" aria-label={t('desktop.closeSearch')} title={t('desktop.closeSearch')} onclick={closeSearch}><Icon name="close" size={20} /></button>
+          {:else if query}<SearchClear onclear={() => (query = '')} />{:else}<kbd class="bc-desktop-logbook--hint">{mod}F</kbd>{/if}
+        </label>
+      {:else}
+        <button type="button" class="bc-desktop-logbook--icon-button bc-desktop-logbook--search-button" aria-label={t('desktop.openSearch')} title={t('desktop.openSearch')} aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} onclick={openSearch}>
+          <Icon name="search" size={22} />
+        </button>
+      {/if}
       <div class="bc-desktop-logbook--columns-anchor">
         <button type="button" class="bc-desktop-logbook--icon-button" aria-label={t('desktop.columnsShown')} title={t('desktop.columnsShown')} aria-expanded={columnsOpen} onclick={() => (columnsOpen = !columnsOpen)}>
           <Icon name="columns" size={22} />
@@ -1040,7 +1096,7 @@
         <p class="bc-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
       </div>
     {:else}
-      <div class="bc-desktop-logbook--scroll" data-bc-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
+      <div class="bc-desktop-logbook--scroll" data-bc-scroll class:bc-desktop-logbook--scroll-bar-hover={barHover} bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)} onpointermove={trackBar} onpointerleave={() => (barHover = false)}>
         <table class="bc-desktop-logbook--table" style={tableStyle} aria-multiselectable="true" aria-rowcount={rows.length + 1}>
           <thead>
             <tr aria-rowindex="1">
@@ -1237,9 +1293,9 @@
       padding: 8px 8px 8px 12px;
     }
     .bc-desktop-logbook--titles {
-      /* Fluid layout: in a narrow pane the search field gives way first, then the title. */
-      flex: 1 0.2 auto;
-      min-width: 0;
+      /* Fluid layout: the title and the search field share what the buttons leave; neither pushes a button out. */
+      flex: 1 1 auto;
+      min-width: 150px;
     }
     .bc-desktop-logbook--title {
       margin: 0;
@@ -1261,7 +1317,7 @@
       align-items: center;
       gap: 12px;
       flex: 0 1 300px;
-      min-width: 150px;
+      min-width: 200px;
       height: 44px;
       padding: 0 12px 0 16px;
       border-radius: 22px;
@@ -1276,6 +1332,47 @@
         font-size: 15px;
         color: var(--bc-text);
         outline: none;
+      }
+    }
+    .bc-desktop-logbook--narrow .bc-desktop-logbook--titles {
+      /* The three buttons never give way: the title and its summary take what is left. */
+      flex: 1 1 0;
+    }
+    .bc-desktop-logbook--bar > .bc-desktop-logbook--icon-button,
+    .bc-desktop-logbook--columns-anchor {
+      flex: none;
+    }
+    .bc-desktop-logbook--searching .bc-desktop-logbook--titles {
+      display: none;
+    }
+    .bc-desktop-logbook--search-across {
+      flex: 1 1 auto;
+      max-width: none;
+      min-width: 0;
+      /* The field's focus ring: 2 px, the Benthic blue. */
+      &:focus-within {
+        outline: 2px solid var(--bc-secondary);
+        outline-offset: 0;
+      }
+    }
+    .bc-desktop-logbook--icon-button.bc-desktop-logbook--search-button {
+      width: 40px;
+      height: 40px;
+      flex: none;
+    }
+    .bc-desktop-logbook--search-close {
+      display: grid;
+      place-items: center;
+      flex: none;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: var(--bc-text-2);
+      cursor: pointer;
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
       }
     }
     .bc-desktop-logbook--hint {
@@ -1341,14 +1438,18 @@
     .bc-desktop-logbook--scroll {
       flex: 1;
       overflow: auto;
+      /* The divider's 9 dp hit area sits on the pane's right edge (.bc-desktop-logbook--handle): the list stops before it,
+         so that its scroll bar can be grabbed with the mouse instead of the divider. */
+      margin-right: 9px;
       /* The spacer rows change height as the window moves: the browser must not shift the scroll to follow them. */
       overflow-anchor: none;
-      /* The list's own thin bar (task 2026-11-22-327): 9 dp wide, 6 dp thumb, no track, from under the column headers. */
+      /* The list's own thin bar (task 2026-11-22-327): no track, from under the column headers; a 6 dp thumb that widens to
+         10 dp while the pointer is over the bar or drags it (the bar is 12 dp, the thumb's transparent border makes it thin). */
       scrollbar-width: auto;
       scrollbar-color: auto;
       &::-webkit-scrollbar {
-        width: 9px;
-        height: 9px;
+        width: 12px;
+        height: 12px;
         background: transparent;
       }
       &::-webkit-scrollbar-track {
@@ -1356,9 +1457,14 @@
         margin-top: 38px;
       }
       &::-webkit-scrollbar-thumb {
-        border: 1.5px solid transparent;
-        border-radius: 9px;
+        border: 3px solid transparent;
+        border-radius: 12px;
         background: var(--bc-scrollbar-thumb) padding-box;
+      }
+      &.bc-desktop-logbook--scroll-bar-hover::-webkit-scrollbar-thumb,
+      &::-webkit-scrollbar-thumb:hover,
+      &::-webkit-scrollbar-thumb:active {
+        border-width: 1px;
       }
       &::-webkit-scrollbar-corner {
         background: transparent;

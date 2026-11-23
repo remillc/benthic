@@ -2856,6 +2856,8 @@
       "Photos and videos (Benthic+): “See all” opens the dive’s gallery, in the order the pictures were taken, with the profile depth at the moment of each photo. A long press (“Select” on iPhone and iPad, Ctrl+click on desktop) selects; “Share” sends the files and “Remove” takes them off the dive, after a confirmation, on all your devices (the files stay in the device’s gallery). A photo opens full screen: a swipe changes picture, with the date, time and camera model read from the file; ⋮ offers “Replace the site photo”. A video has its controls (play, position, sound). The same on phone, tablet, iPhone, iPad and desktop.",
       "Logbook: a dive dragged and dropped back on its own place, or on a year header, changes nothing and no longer shows an error.",
       "Photos and videos (Benthic+): a dive shows its photos and videos as thumbnails, with « Add », the line « on all your devices » and « See all », which opens the dive’s gallery. They are sent to the account (10 GB) and follow the diver to the other devices: thumbnails are always kept, originals arrive on Wi-Fi following Settings › Logbook (All, Those of the last 12 months, On demand) and open on demand. Offline, uploads wait for the network. The free version does not show the section.",
+      "Computer, Logbook: the list’s scroll bar can be grabbed with the mouse again (it was under the handle of the divider between the two panes) and widens when the pointer is over it.",
+      "Desktop, logbook list: in a narrow column the search box becomes a magnifier button left of the columns button and ⋮, which stay visible at every width; the magnifier or Ctrl+F opens the field across the header, ✕ or Esc closes it, and the summary line is cut with an ellipsis.",
       "Cylinder types: a type without a working pressure (read from a dive) no longer shows « 0 » in cubic feet and can be renamed without an error; a volume typed without a pressure asks for the working pressure.",
       "Gear: the rebreather icon shows two tall cylinders on each side of a scrubber on its stand, joined by two hoses, and no longer looks like a twin set.",
       "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
@@ -5499,6 +5501,8 @@
     "noMap": "This dive’s site has no coordinates.",
     "columnsShown": "Columns shown",
     "moreLogbook": "More logbook options",
+    "openSearch": "Search the logbook (Ctrl+F)",
+    "closeSearch": "Close the search (Esc)",
     "undo": {
       "editDive": "Edit the dive",
       "editTrip": "Edit the trip",
