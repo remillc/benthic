@@ -8,14 +8,14 @@
   import { Page, Navbar, Link, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import Icon from '../components/Icon.svelte';
-  import SyncControl from '../components/SyncControl.svelte';
+  import SyncButton from '../components/SyncButton.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { bottomNav, layout, ios, deviceKind } from '../lib/layout.svelte.js';
   import { deviceSuffix } from '../lib/first-launch.js';
   import SectionBand from '../components/SectionBand.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
   import { BenthicCore } from 'benthic-core';
-  import { logbook, setAutoSync, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
+  import { logbook, signOut, syncNow, deviceDiveCount } from '../lib/logbook.svelte.js';
   import { showSection, navigation } from '../lib/navigation.svelte.js';
 
   /**
@@ -217,23 +217,7 @@
     <div class="block-title">{t('account.syncGroup')}</div>
     <div class="list list-strong inset list-dividers">
       <ul>
-        <li>
-          <label class="item-content">
-            <div class="item-inner">
-              <div class="item-title">
-                {t('account.autoSync')}
-                <div class="item-footer">{t(logbook.autoSync ? 'account.autoSyncText' : 'account.autoSyncOff')}</div>
-              </div>
-              <div class="item-after">
-                <span class="toggle">
-                  <input type="checkbox" checked={logbook.autoSync} onchange={(e) => setAutoSync(e.currentTarget.checked)} />
-                  <span class="toggle-icon"></span>
-                </span>
-              </div>
-            </div>
-          </label>
-        </li>
-        {#if !logbook.autoSync}
+        {#if logbook.pending > 0}
           <li>
             <div class="item-content">
               <div class="item-inner">
@@ -272,7 +256,7 @@
           </li>
         {/if}
         <li class="bc-account--sync-now">
-          <SyncControl />
+          <SyncButton />
         </li>
       </ul>
     </div>

@@ -1400,11 +1400,10 @@
     {/if}
     {#if filter.failed}<p class="bc-logbook--count bc-logbook--failed" role="status">{t('logbook.filterFailed')}</p>{/if}
     <!--
-      Only offline or in manual synchronisation, when the logbook may be out of
-      date, and while a "Sync" runs: the line stays, only its text and
-      bar change (to-do #2). The side menu shows every state.
+      Only offline, when the logbook may be out of date: the line stays, only
+      its text and bar change (to-do #2). The side menu shows every state.
     -->
-    {#if !showPill && (logbook.sync === 'offline' || logbook.sync === 'manual' || (logbook.sync === 'syncing' && !logbook.autoSync && !!logbook.email))}
+    {#if !showPill && logbook.sync === 'offline'}
       <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} />
     {/if}
   {/if}

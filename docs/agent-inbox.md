@@ -6800,7 +6800,7 @@ Christian asked for this on 23 November 2026. Work in `main`. The row you added 
 
 Check that the app matches on every device (position, divider, icon, texts, the row hidden when `canPair` is false) and fix any gap. It is not in the free account sheet. In the done note, say what you changed, or that nothing needed to change.
 
-## [ ] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
+## [x] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
 
 Christian decided this on 23 November 2026. Work in `main`. The diver can no longer choose a manual sync: the logbook (and the account data) always sync automatically, on every device and in every edition.
 
@@ -6811,6 +6811,8 @@ Christian decided this on 23 November 2026. Work in `main`. The diver can no lon
 5. Update `docs/architecture.md` / `docs/system-design.md` where they describe manual sync, and add a line to the release notes (fr and en).
 
 In the done note, list what was removed.
+
+**Done (23 November 2026).** Removed: the `autoSync` setting and its storage (`readAutoSync`, `setAutoSync`, `logbook.autoSync`; the stored `bc.autoSync` is deleted at start); the switch in `Account.svelte` and `DesktopAccountSheet.svelte` (none in `AccountSheet.svelte` or Réglages); the `manual` sync state and its `SyncStatus` line; the account sheet's ⋮ menu and iPhone action sheet; `SyncControl.svelte` and `SplitButton.svelte` (plain `SyncButton` everywhere); the `autoSync` test in `reconnect.js`; the keys `account.autoSync`, `autoSyncText`, `autoSyncOff`, `syncOptions`, `syncGoAuto`, `syncShowPending`, `sync.manual`, `desktopSettings.account.auto`, `autoText` (fr and en). `autoSyncing()` is exported and now returns `syncAllowedOnThisNetwork() && !logbook.browsing`. The account sheet shows « N modifications non envoyées » with a filled « Synchroniser » when the device is offline or on a metered link with changes waiting. Docs: system-design.md and ui-specification.md updated; release note added (fr, en).
 
 ## [ ] 2026-11-23-347 « Profil » becomes a main navigation entry (Benthic+), with its own home page; « Mon profil de plongeur » leaves the account sheet
 
@@ -6830,3 +6832,11 @@ Mock-ups (the reference for the navigation; the other boards still show the olde
 6. Free account: no Profil entry, no profile pages reachable; the Benthic+ offer stays where it is today.
 
 In the done note, list the devices and files changed, and say what the badge counts in code.
+
+## [ ] 2026-11-23-348 Pairing starts by itself at sign-in on a device without the data key, says where to go on the other device, and can be restarted (TODO #180, #182)
+
+Christian approved this on 23 November 2026. Work in `main`. Note: the pairing **method** (QR code) will be replaced by an approval with a verification code in a next task (#183); build what follows so that only the « how » changes later.
+
+1. **Automatic step at sign-in (#182).** When a diver signs in to the Benthic server for the first time on a device that has no data key while the account has one (`keys/account.json`, `MISSING_DATA_KEY`), the pairing step starts by itself, right after the logbook download and before « Votre carnet est prêt ». Phone mock-up: « Benthic+, jumeler cet appareil à la connexion (Benthic+) · Android » (page Pour commencer, Benthic+ group): title « Jumeler cet appareil », the reason, a card « Sur votre autre appareil » with three numbered steps, « Lire le code » (filled), « Saisir la clé de secours » (outlined), « Plus tard » (text), and « Le reste du compte se synchronise déjà. Vous pourrez jumeler plus tard depuis Compte. ». Tablet and desktop: the « Déverrouiller vos données chiffrées » dialog opens by itself at that moment.
+2. **Where to find the code (#180.1).** In « Déverrouiller vos données chiffrées » (all devices), the pairing row's second line reads « Sur l’autre appareil : Compte › Jumeler un nouvel appareil » (phone and tablet), and the note under the rows reads « En attendant, le reste du compte se synchronise. Vous pourrez jumeler plus tard depuis Compte. ».
+3. **Restart later (#180.2).** While the encrypted data is locked on this device, the account sheet shows a row « Jumeler cet appareil » (lock icon, second line « Données chiffrées verrouillées sur cet appareil » in the warning colour #8A5A00) in place of « Jumeler un nouvel appareil ». It opens the pairing step again. Mock-ups: « Feuille du compte, données chiffrées verrouillées (Benthic+) » on phone, tablet and desktop. The « Verrouillé : jumelez cet appareil » card of the profile keeps its two buttons.
