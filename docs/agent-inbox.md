@@ -7157,3 +7157,17 @@ M10.9 15.8L18.3 8.4L20.4 5.6L21.1 2.0L17.0 4.3L14.5 6.8L14.5 8.0L13.3 8.0L13.4 9
 ```
 
 **Test:** every screen with icons (Carnet, détail, Sites, Profil, Réglages, the account sheet, the download flow, the desktop table) shows the Rounded glyphs at the same sizes and colours, nothing missing or blank; ⋮ is clearly visible; the gear list shows the new knife.
+
+## [ ] 2026-11-23-365 Correction to task 364: `blender` stays a Benthic drawing (a cylinder being filled)
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de Icon.svelte · Android » (phone canvas, page « Thème et couleurs »).
+
+In task 364, `blender` was listed as Material Symbols `blender`: drop that line. Material's `blender` is a kitchen blender, which reads oddly for gas blending. `blender` stays in `paths` (stroke drawing, not in `symbols`) with this new drawing: two lines from the left merging into one arrow that points at a dive cylinder with its valve.
+
+```
+M13.5 10a3.5 3.5 0 0 1 7 0v9.5a1.5 1.5 0 0 1-1.5 1.5h-4a1.5 1.5 0 0 1-1.5-1.5zM17 6.5V3.5M15 3.5h4M2.5 6c3 0 3.5 6 6 6M2.5 18c3 0 3.5-6 6-6h2.5M9.5 9.5L12 12l-2.5 2.5
+```
+
+It shows wherever `blender` is used: the « Mélangeur de gaz » tile in Outils and the desktop tools menu, « Préparer ce mélange » in Meilleur mélange (phone and desktop), and « Analyse des gaz » in the Benthic+ offer. So 89 keys become Material Symbols, not 90; 18 stay Benthic drawings.
+
+**Test:** Outils shows the cylinder icon on the « Mélangeur de gaz » tile; « Préparer ce mélange » shows it too.
