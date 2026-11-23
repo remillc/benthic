@@ -2786,6 +2786,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Downloading from the dive computer takes one gesture. The remembered computer has its card with « Download » (state « In range, ready »), the others each have their own button; « Download everything again », « Show all Bluetooth devices » and « Download help » are in the ⋮ menu. First time: a search with the three things to do; then the connection, the progress with the dives received, « Connection lost » (the dives received are kept, « Try again » reads on), « No new dives » and « N new dives » with « See in the logbook ». The same steps on phone, iPhone, tablet and desktop (a dialog).",
       "Account: no « Sync » button anywhere (account sheet, Account, side menu, desktop). The state stays, with a second line: « Synced 2 min ago » and « Automatic, as soon as a change is made », or « 3 changes not sent » and « Sent automatically when the network is back »; on tablet the state is the third line under the account.",
       "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
@@ -3730,19 +3731,14 @@
     "ratingLabel": "Dive rating"
   },
   "download": {
-    "title": "Download",
+    "title": "Download dives",
     "cancel": "Cancel",
     "stop": "Stop download",
     "stopping": "Stopping after the current dive…",
     "close": "Close",
-    "intro": "Turn the dive computer on, put it in Bluetooth transfer mode and keep it near the phone.",
-    "pairingNote": "The first time, the phone may ask for the code shown by the dive computer.",
-    "remembered": "Remembered dive computers",
-    "nearby": "Nearby",
     "moreFor": "More options for {name}",
     "notAComputer": "This is not a dive computer",
     "hidden": "{name} hidden",
-    "seen": "In range",
     "searching": "Looking for dive computers…",
     "noneFound": "No dive computer found.",
     "searchAgain": "Search again",
@@ -3750,28 +3746,10 @@
     "unknownModel": "Model to choose",
     "chooseVendor": "Dive computer brand",
     "chooseProduct": "{vendor} model",
-    "forceAll": "Download all dives again",
+    "forceAll": "Download everything again",
     "forceAllText": "Only if dives are missing from the logbook.",
-    "computer": "Dive computer",
-    "connecting": "Connecting…",
-    "connected": "Connected",
-    "reading": "Reading the new dives",
-    "readingAll": "Reading all the dives",
-    "percent": "{n}%",
     "progressLabel": "Download progress",
-    "keepNear": "Keep the screen on and the phone near the dive computer.",
-    "finished": "Download finished",
-    "receivedAll": "Dives received",
-    "finishedCount": {"one": "{n} dive", "other": "{n} dives"},
-    "firstTime": "This is the first time this {name} is downloaded.",
-    "notAgain": "Dives already in the logbook are not downloaded again.",
     "received": "Received so far",
-    "newDive": "New dive",
-    "done": {
-      "one": "{n} dive downloaded",
-      "other": "{n} dives downloaded"
-    },
-    "noneNew": "No new dive on the {computer}.",
     "cancelled": "Download cancelled. No dive was added.",
     "cannotAdd": "The dives could not be added to the logbook. No dive was changed.",
     "none": {
@@ -3809,7 +3787,101 @@
       "one": "{n} joined to a dive already in the logbook.",
       "other": "{n} joined to dives already in the logbook."
     },
-    "see": "View"
+    "see": "View",
+    "hint": {
+      "phone": "Dive computer on, in Bluetooth transfer mode, near the phone.",
+      "iphone": "Dive computer on, in Bluetooth transfer mode, near the iPhone.",
+      "tablet": "Dive computer on, in Bluetooth transfer mode, near the tablet.",
+      "desktop": "Plug the dive computer in by USB, or put it in Bluetooth transfer mode near this computer."
+    },
+    "mine": "Your dive computer",
+    "mineMany": "Your dive computers",
+    "menuOn": "On",
+    "others": "Other computers nearby",
+    "usb": "Connected by USB",
+    "bluetoothNearby": "Nearby, over Bluetooth",
+    "lastDownload": "{vendor} · last download on {date}",
+    "inRange": "In range, ready",
+    "notSeen": "Not detected yet",
+    "action": "Download",
+    "chooseModel": "Choose the model",
+    "downloadFrom": "Download from {name}",
+    "menu": "More options",
+    "forceAllEllipsis": "Download everything again…",
+    "forceOn": "Download everything again is on: the next download reads every dive on the computer.",
+    "showAll": "Show all Bluetooth devices",
+    "help": "Download help",
+    "helpClose": "Got it",
+    "search": {
+      "title": "Looking for your dive computer…",
+      "text": "As soon as it appears, tap it to start the download.",
+      "textDesktop": "As soon as it appears, click it to start the download.",
+      "on": "Turn the dive computer on.",
+      "bluetooth": "Put it in Bluetooth transfer mode.",
+      "near": {
+        "phone": "Put it less than one metre from the phone.",
+        "iphone": "Put it less than one metre from the iPhone.",
+        "tablet": "Put it less than one metre from the tablet.",
+        "desktop": "Put it less than one metre from this computer."
+      },
+      "otherApp": "No other app is connected to the dive computer.",
+      "missing": "My computer does not appear"
+    },
+    "connect": {
+      "title": "Connecting to the {product}…",
+      "titleNoName": "Connecting to the dive computer…",
+      "pairing": {
+        "phone": "The first time, Android asks for the code shown on the dive computer.",
+        "iphone": "The first time, the iPhone asks for the code shown on the dive computer.",
+        "tablet": "The first time, Android asks for the code shown on the dive computer."
+      }
+    },
+    "progress": {
+      "received": {
+        "one": "{n} dive received",
+        "other": "{n} dives received"
+      },
+      "none": "No dive received yet",
+      "reading": "Reading the {product}…",
+      "readingAll": "Reading every dive of the {product}…",
+      "readingNoName": "Reading the dive computer…"
+    },
+    "keepNear": {
+      "phone": "Keep the phone near the dive computer.",
+      "iphone": "Keep the iPhone near the dive computer.",
+      "tablet": "Keep the tablet near the dive computer.",
+      "desktop": "Keep the dive computer near this computer."
+    },
+    "newChip": "New",
+    "lost": {
+      "title": "Connection lost",
+      "text": {
+        "none": "Move the dive computer closer: the download resumes where it stopped.",
+        "one": "The dive received is kept in the logbook. Move the dive computer closer: the download resumes where it stopped.",
+        "other": "The {n} dives received are kept in the logbook. Move the dive computer closer: the download resumes where it stopped."
+      },
+      "retry": "Try again"
+    },
+    "nothing": {
+      "title": "No new dives",
+      "text": "The logbook is already up to date with the {product}.",
+      "textNoName": "The logbook is already up to date with the dive computer.",
+      "last": "Last dive received: {date}.",
+      "confirmTitle": "Download everything again?",
+      "confirmButton": "Download again"
+    },
+    "end": "Done",
+    "done": {
+      "one": "{n} dive downloaded",
+      "other": "{n} dives downloaded"
+    },
+    "doneTitle": {
+      "one": "{n} new dive",
+      "other": "{n} new dives"
+    },
+    "doneText": "Downloaded from the {product} and added to the logbook.",
+    "doneTextNoName": "Downloaded from the dive computer and added to the logbook.",
+    "seeInLogbook": "See in the logbook"
   },
   "downloadFailed": {
     "title": "Download",

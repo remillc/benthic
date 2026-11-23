@@ -2786,6 +2786,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Téléchargement depuis l’ordinateur de plongée : un seul geste. L’ordinateur mémorisé a sa carte avec « Télécharger » (état « À portée, prêt »), les autres ont chacun leur bouton ; « Tout retélécharger », « Montrer tous les appareils Bluetooth » et « Aide au téléchargement » sont dans le menu ⋮. Première fois : recherche avec les trois gestes à faire ; puis connexion, progression avec les plongées reçues, « Connexion perdue » (les plongées reçues sont gardées, « Réessayer » reprend), « Aucune nouvelle plongée » et « N nouvelles plongées » avec « Voir dans le carnet ». Même parcours sur téléphone, iPhone, tablette et ordinateur (boîte de dialogue).",
       "Compte : plus de bouton « Synchroniser » nulle part (feuille du compte, Compte, menu latéral, ordinateur). L’état reste, avec une seconde ligne : « Synchronisé il y a 2 min » et « Automatique, dès qu’une modification est faite », ou « 3 modifications non envoyées » et « Envoi automatique au retour du réseau » ; sur tablette, l’état est la troisième ligne sous le compte.",
       "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
@@ -3730,19 +3731,14 @@
     "ratingLabel": "Note de la plongée"
   },
   "download": {
-    "title": "Téléchargement",
+    "title": "Télécharger des plongées",
     "cancel": "Annuler",
     "stop": "Arrêter le téléchargement",
     "stopping": "Arrêt après la plongée en cours…",
     "close": "Fermer",
-    "intro": "Allumez l'ordinateur de plongée, mettez-le en mode transfert Bluetooth et gardez-le près du téléphone.",
-    "pairingNote": "La première fois, le téléphone peut demander le code affiché par l'ordinateur.",
-    "remembered": "Ordinateurs mémorisés",
-    "nearby": "À proximité",
     "moreFor": "Plus d’options pour {name}",
     "notAComputer": "Ce n’est pas un ordinateur de plongée",
     "hidden": "{name} masqué",
-    "seen": "Visible",
     "searching": "Recherche des ordinateurs de plongée…",
     "noneFound": "Aucun ordinateur de plongée trouvé.",
     "searchAgain": "Rechercher à nouveau",
@@ -3752,26 +3748,8 @@
     "chooseProduct": "Modèle {vendor}",
     "forceAll": "Tout retélécharger",
     "forceAllText": "À utiliser seulement si des plongées manquent dans le carnet.",
-    "computer": "Ordinateur de plongée",
-    "connecting": "Connexion…",
-    "connected": "Connecté",
-    "reading": "Lecture des nouvelles plongées",
-    "readingAll": "Lecture de toutes les plongées",
-    "percent": "{n} %",
     "progressLabel": "Progression du téléchargement",
-    "keepNear": "Gardez l'écran allumé et le téléphone près de l'ordinateur.",
-    "finished": "Téléchargement terminé",
-    "receivedAll": "Plongées reçues",
-    "finishedCount": {"one": "{n} plongée", "other": "{n} plongées"},
-    "firstTime": "C’est la première fois que ce {name} est téléchargé.",
-    "notAgain": "Les plongées déjà dans le carnet ne sont pas retéléchargées.",
-    "received": "Reçues jusqu'ici",
-    "newDive": "Nouvelle plongée",
-    "done": {
-      "one": "{n} plongée téléchargée",
-      "other": "{n} plongées téléchargées"
-    },
-    "noneNew": "Aucune nouvelle plongée sur {computer}.",
+    "received": "Reçues jusqu’ici",
     "cancelled": "Téléchargement annulé. Aucune plongée n'a été ajoutée.",
     "cannotAdd": "Les plongées n'ont pas pu être ajoutées au carnet. Aucune plongée n'a été modifiée.",
     "none": {
@@ -3809,7 +3787,101 @@
       "one": "{n} réunie avec une plongée déjà au carnet.",
       "other": "{n} réunies avec des plongées déjà au carnet."
     },
-    "see": "Voir"
+    "see": "Voir",
+    "hint": {
+      "phone": "Ordinateur allumé, en mode transfert Bluetooth, près du téléphone.",
+      "iphone": "Ordinateur allumé, en mode transfert Bluetooth, près de l’iPhone.",
+      "tablet": "Ordinateur allumé, en mode transfert Bluetooth, près de la tablette.",
+      "desktop": "Branchez l’ordinateur de plongée en USB, ou mettez-le en mode transfert Bluetooth près de cet ordinateur."
+    },
+    "mine": "Votre ordinateur",
+    "mineMany": "Vos ordinateurs",
+    "menuOn": "Activé",
+    "others": "Autres ordinateurs à proximité",
+    "usb": "Branché par USB",
+    "bluetoothNearby": "À proximité, en Bluetooth",
+    "lastDownload": "{vendor} · dernier téléchargement le {date}",
+    "inRange": "À portée, prêt",
+    "notSeen": "Pas encore détecté",
+    "action": "Télécharger",
+    "chooseModel": "Choisir le modèle",
+    "downloadFrom": "Télécharger depuis {name}",
+    "menu": "Plus d’options",
+    "forceAllEllipsis": "Tout retélécharger…",
+    "forceOn": "Tout retélécharger est activé : le prochain téléchargement relit toutes les plongées de l’ordinateur.",
+    "showAll": "Montrer tous les appareils Bluetooth",
+    "help": "Aide au téléchargement",
+    "helpClose": "Compris",
+    "search": {
+      "title": "Recherche de votre ordinateur…",
+      "text": "Dès qu’il apparaît, touchez-le pour lancer le téléchargement.",
+      "textDesktop": "Dès qu’il apparaît, cliquez dessus pour lancer le téléchargement.",
+      "on": "Allumez l’ordinateur de plongée.",
+      "bluetooth": "Mettez-le en mode transfert Bluetooth.",
+      "near": {
+        "phone": "Posez-le à moins d’un mètre du téléphone.",
+        "iphone": "Posez-le à moins d’un mètre de l’iPhone.",
+        "tablet": "Posez-le à moins d’un mètre de la tablette.",
+        "desktop": "Posez-le à moins d’un mètre de cet ordinateur."
+      },
+      "otherApp": "Aucune autre app n’est connectée à l’ordinateur.",
+      "missing": "Mon ordinateur n’apparaît pas"
+    },
+    "connect": {
+      "title": "Connexion au {product}…",
+      "titleNoName": "Connexion à l’ordinateur…",
+      "pairing": {
+        "phone": "La première fois, Android demande le code affiché sur l’ordinateur.",
+        "iphone": "La première fois, l’iPhone demande le code affiché sur l’ordinateur.",
+        "tablet": "La première fois, Android demande le code affiché sur l’ordinateur."
+      }
+    },
+    "progress": {
+      "received": {
+        "one": "{n} plongée reçue",
+        "other": "{n} plongées reçues"
+      },
+      "none": "Aucune plongée reçue pour l’instant",
+      "reading": "Lecture du {product}…",
+      "readingAll": "Lecture de toutes les plongées du {product}…",
+      "readingNoName": "Lecture de l’ordinateur…"
+    },
+    "keepNear": {
+      "phone": "Gardez le téléphone près de l’ordinateur.",
+      "iphone": "Gardez l’iPhone près de l’ordinateur.",
+      "tablet": "Gardez la tablette près de l’ordinateur.",
+      "desktop": "Gardez l’ordinateur de plongée près de cet ordinateur."
+    },
+    "newChip": "Nouvelle",
+    "lost": {
+      "title": "Connexion perdue",
+      "text": {
+        "none": "Rapprochez l’ordinateur : le téléchargement reprendra où il s’est arrêté.",
+        "one": "La plongée reçue est gardée dans le carnet. Rapprochez l’ordinateur : le téléchargement reprendra où il s’est arrêté.",
+        "other": "Les {n} plongées reçues sont gardées dans le carnet. Rapprochez l’ordinateur : le téléchargement reprendra où il s’est arrêté."
+      },
+      "retry": "Réessayer"
+    },
+    "nothing": {
+      "title": "Aucune nouvelle plongée",
+      "text": "Le carnet est déjà à jour avec le {product}.",
+      "textNoName": "Le carnet est déjà à jour avec l’ordinateur.",
+      "last": "Dernière plongée reçue : {date}.",
+      "confirmTitle": "Tout retélécharger ?",
+      "confirmButton": "Retélécharger"
+    },
+    "end": "Terminer",
+    "done": {
+      "one": "{n} plongée téléchargée",
+      "other": "{n} plongées téléchargées"
+    },
+    "doneTitle": {
+      "one": "{n} nouvelle plongée",
+      "other": "{n} nouvelles plongées"
+    },
+    "doneText": "Téléchargées du {product} et ajoutées au carnet.",
+    "doneTextNoName": "Téléchargées de l’ordinateur et ajoutées au carnet.",
+    "seeInLogbook": "Voir dans le carnet"
   },
   "downloadFailed": {
     "title": "Téléchargement",
