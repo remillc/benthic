@@ -37,9 +37,9 @@
 </script>
 
 {#snippet panelContent()}
-  <div class="bc-welcome-release--brand"><BrandLockup size={lockup} ring /></div>
+  <div class="bc-welcome-release--brand"><BrandLockup size={plusPanel ? 'compact' : lockup} ring /></div>
   {#if plusPanel}
-    <BenthicPlusPanel />
+    <BenthicPlusPanel centered />
   {:else if offerPanel}
     <div class="bc-welcome-release--chip"><BenthicPlusChip label={t('benthicPlus.offer.pill')} /></div>
     <h1 class="bc-welcome-release--headline bc-welcome-release--headline-offer">{t('benthicPlus.offer.title')}</h1>
@@ -53,7 +53,7 @@
 
 <Page class="bc-welcome-release" noToolbar>
   <div class="bc-welcome-release--page" class:bc-welcome-release--plus={plusHero}>
-    <section class="bc-welcome-release--panel" class:bc-welcome-release--compact={flow.stack.length > 1}>
+    <section class="bc-welcome-release--panel" class:bc-welcome-release--compact={flow.stack.length > 1} class:bc-welcome-release--ready={plusPanel}>
       <div class="bc-welcome-release--panel-light" aria-hidden="true"></div>
       <div class="bc-welcome-release--panel-rays"><FirstLaunchRays /></div>
       <svg class="bc-welcome-release--panel-profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
@@ -199,6 +199,12 @@
         margin: 36px 0 48px;
       }
 
+    }
+
+    /* « Votre carnet est prêt » (task 2026-11-23-335): the small wordmark sits 40 dp from the panel's top and left edges; the
+       column of the panel is centred (components/BenthicPlusPanel.svelte). */
+    .bc-welcome-release--panel.bc-welcome-release--ready {
+      padding: calc(max(var(--f7-safe-area-top, 0px), 24px) + 16px) 40px 0;
     }
 
     /* Phone (tasks 2026-11-16-227, 230 and 244; mock-ups docs/mockups/android-premier-lancement-production*.dc.html, 390 x 844):

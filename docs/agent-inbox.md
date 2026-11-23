@@ -6609,7 +6609,7 @@ Christian approved this on 23 November 2026. Work in `main`. **`docs/equipment-f
 
 In the done note, list the screens you changed and any field of the app that the table does not have.
 
-## [ ] 2026-11-23-335 Tablet, landscape: « Votre carnet est prêt » (Benthic+) must match its mock-up
+## [x] 2026-11-23-335 Tablet, landscape: « Votre carnet est prêt » (Benthic+) must match its mock-up
 
 Christian approved this on 23 November 2026. Work in `main`. Mock-up: « Benthic+, votre carnet est prêt · tablette Android, paysage » (`android-tablette-btplus-pret-paysage`), on the tablet canvas. Code: `FirstLaunchBenthicPlus.svelte` (step `benthicPlusReady`), `BenthicPlusReadyLogo.svelte`, the tablet blue panel. Phone and desktop are not part of this task, but check that your changes do not move them.
 
@@ -6625,3 +6625,5 @@ Christian approved this on 23 November 2026. Work in `main`. Mock-up: « Benthic
 4. Portrait tablet: apply the same centering in its panel if it has the same layout; say in the done note what you did.
 
 In the done note, put a screenshot description of before and after for the landscape tablet.
+
+**Done (23 November 2026).** Left panel: `BenthicPlusPanel` takes a `centered` prop, used by the tablet page only (`WelcomeStartRelease.svelte`); the disc, the chip, the title and the line sit in one column on the panel's axis, 176 dp from its top, side padding 48 dp, chip 24 dp under the disc, title 14 dp under the chip, line 8 dp under the title. The wordmark is the compact lockup at 40 dp / 40 dp. The animation and the reduced-motion fallback are untouched. Right side (tablet only, class `bc-plus--screen-ready`): new heading « Votre carnet » (`benthicPlus.ready.heading`, 28 sp, 500), the card across the column (20 dp radius, 52 dp rows), the account line at the left, the button 48 dp high at the end. Nothing had to be removed: the app showed no row, line or button beyond the mock-up's. The figures, the e-mail and the sync wording come from `flow.plus` (real counts); a zero « Équipement » or « Brevets » row stays hidden, as before. Portrait tablet: same layout (same panel), the column centred on the 540 dp band. Phone and desktop: unchanged (checked with screenshots for the phone; the desktop panel does not pass `centered` and its right side is gated by `!desktopApp`). Before (1280 x 800): the logo, title and line left-aligned at x 56 under a large wordmark, no heading, a 280 dp card, a full-width 56 dp button. After: everything centred on the panel's axis (x 350), small wordmark at the top left, heading above a full-width card, a 183 dp button at the right.

@@ -2792,6 +2792,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Bureau : le séparateur entre les volets n’a plus de poignée ; il passe en orange quand le pointeur le survole ou le déplace. Le carnet a sa propre barre de défilement fine, à part. Chaque plongée est séparée de la suivante par une ligne, et la colonne Compagnons n’affiche plus l’initiale.",
+      "Tablette, premier lancement : « Votre carnet est prêt » centre le logo, la pastille, le titre et la ligne du panneau bleu, et la colonne de droite reprend la maquette : titre « Votre carnet », fiche des chiffres sur toute la largeur, bouton « Ouvrir mon carnet » à droite.",
       "Réglages : l’icône est une roue dentée, comme dans les maquettes.",
       "Tablette et bureau : la plongée à côté du carnet s’affiche dès le lancement, comme le carnet ; les données des statistiques, des sites et des outils se lisent une fois la première plongée affichée.",
       "Équipement : retirer une pièce propose une quatrième raison, « Autre », à côté de Vendue, Perdue et Hors d’usage. Elle s’affiche dans « Pièces retirées ».",
@@ -5691,6 +5692,7 @@
       "leadPhone": "Tout est sur ce téléphone, et y reste même sans réseau.",
       "leadIphone": "Tout est sur cet iPhone, et y reste même sans réseau.",
       "leadDesktop": "Tout est sur cet ordinateur, et y reste même sans réseau.",
+      "heading": "Votre carnet",
       "dives": "Plongées",
       "sites": "Sites",
       "gear": "Équipement",
