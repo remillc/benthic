@@ -26,8 +26,31 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Release signing with the upload key (Play App Signing keeps the app signing key). The key and its passwords stay
+    // out of git, in a properties file giving storeFile, storePassword, keyAlias, keyPassword, looked for in this order:
+    // app/android/keystore.properties (git-ignored), the path in BENTHIC_KEYSTORE_PROPERTIES, then
+    // benthic-keys/keystore.properties next to the repository (F:projetsenthic-keys). Without one, release builds
+    // are left unsigned (debug builds are not concerned).
+    def keystoreFile = [
+        rootProject.file("keystore.properties"),
+        System.getenv("BENTHIC_KEYSTORE_PROPERTIES") ? new File(System.getenv("BENTHIC_KEYSTORE_PROPERTIES")) : null,
+        rootProject.file("../../../benthic-keys/keystore.properties"),
+    ].find { it != null && it.exists() } ?: rootProject.file("keystore.properties")
+    if (keystoreFile.exists()) {
+        def keystore = new Properties()
+        keystoreFile.withInputStream { keystore.load(it) }
+        signingConfigs {
+            release {
+                storeFile file(keystore["storeFile"])
+                storePassword keystore["storePassword"]
+                keyAlias keystore["keyAlias"]
+                keyPassword keystore["keyPassword"]
+            }
+        }
+    }
     buildTypes {
         release {
+            if (keystoreFile.exists()) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
