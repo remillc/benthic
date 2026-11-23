@@ -7282,3 +7282,15 @@ M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.9
 **Test:** the gear list, the type picker of « Nouvelle pièce » and the kit pages show the new rebreather icon at every size; it no longer looks like a twin set.
 
 **Done (23 November 2026).** The `rebreather` path of `GearIcon.svelte` is the given drawing, stroke 1.8 on the 24 grid like the others. No test read the old path. Checked at 24 px on the gear list and the type picker of « Nouvelle pièce » (desktop).
+
+## [ ] 2026-11-23-372 Desktop: the logbook list header adapts to the column's width (TODO #155)
+
+Christian asked for this on 23 November 2026. Work in `main`. It is mostly a bug (in a dive's detail, the first column's header squeezes the search box and the ⋮ menu disappears when space runs out), with a small design part. Mock-up: « En-tête de la liste du carnet, selon la largeur · bureau » (tablet and desktop canvas, page Bureau, under « Carnet · bureau, détail, onglet Notes »).
+
+1. **Wide column (520 px and more, to be tuned):** unchanged: title « Carnet » with its summary line, the search box (Ctrl+F), the columns button, ⋮.
+2. **Narrow column (under the threshold):** the search box becomes a 40 px icon button `search` (« Rechercher dans le carnet (Ctrl+F) ») placed left of the columns button, then ⋮. The summary line under « Carnet » truncates with an ellipsis. The three buttons never disappear, whatever the width.
+3. **Narrow column, search open:** a click on the search button, or Ctrl+F, opens the field across the whole header in place of the title (focused, 2 px #114477 outline), with ✕ (`close`, « Fermer la recherche (Échap) ») at its end; the columns button and ⋮ stay on its right. ✕ closes it and clears the search; Échap closes it when the field is empty. While a search is active the field stays open.
+
+Icons: Material Symbols Rounded `search`, `view_column` (key `columns`), `more_vert`, `close` (task 364). Pick the threshold from the real header (title, summary and the three buttons must fit without overlap); 520 px is the mock-up's value.
+
+**Test:** on the desktop, open a dive and narrow the window: below the threshold the search box turns into the magnifier, ⋮ and the columns button stay visible at every width; the magnifier and Ctrl+F open the field over the title; ✕ and Échap close it; the search results are unchanged.
