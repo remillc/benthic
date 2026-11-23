@@ -101,7 +101,7 @@ export function onIdsComplete(fn) {
 }
 
 /** Called by the logbook for each list it holds; the listeners run when a complete list has a number of dives they have not seen (not at every edit). @param {readonly { date: string, benthicId?: string }[]} dives */
-export function noteDiveList(dives) {
+export function noteIdsList(dives) {
   if (!dives.length || notifiedCount === dives.length || idsLookIncomplete(dives)) return;
   notifiedCount = dives.length;
   for (const fn of idListeners) fn(dives);

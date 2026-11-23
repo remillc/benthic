@@ -6,6 +6,7 @@
   // the list is virtual, only the rows near the screen are in the document.
   import { onDestroy, tick, untrack } from 'svelte';
   import { diveUrl } from '../lib/dive-id.js';
+  import { currentDiveId, currentDiveIds, onDiveIdsRenumbered } from '../lib/dive-ids.js';
   import { Page, Navbar, NavRight, Link, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import SyncStatus from '../components/SyncStatus.svelte';
@@ -192,6 +193,19 @@
   let selecting = $state(false);
   /** Checked dives, by identifier of the current load. */
   let checked = $state(/** @type {Record<number, boolean>} */ ({}));
+  // The core read the log again (a change from another device): the checked dives keep their new ids, the ones deleted leave.
+  $effect(() =>
+    onDiveIdsRenumbered(() => {
+      /** @type {Record<number, boolean>} */
+      const moved = {};
+      for (const [id, on] of Object.entries(untrack(() => checked))) {
+        const now = on ? currentDiveId(Number(id)) : null;
+        if (now !== null) moved[now] = true;
+      }
+      checked = moved;
+      if (selecting && !Object.keys(moved).length) endSelection();
+    }),
+  );
   const checkedCount = $derived(Object.values(checked).filter(Boolean).length);
   const LONG_PRESS_MS = 500;
 
@@ -668,7 +682,7 @@
       target = null;
       const under = document.elementFromPoint(touchX, touchY);
       const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
-      const dragged = (dragIds ?? []).map(diveById).filter((d) => d !== undefined);
+      const dragged = currentDiveIds(dragIds ?? []).map(diveById).filter((d) => d !== undefined);
       // The dive of the row under the finger, if that row is a dive (not a trip or a year header).
       const underDive = li ? diveById(Number(/** @type {HTMLElement|null} */ (li.querySelector('[data-dive]'))?.dataset.dive)) : undefined;
       // Back on one of the dragged rows: the dives stay where they are, nothing to do.
@@ -731,7 +745,8 @@
     }
 
     async function drop() {
-      const ids = dragIds ?? [];
+      // The log may have been read again during the drag: the ids follow (lib/dive-ids.js).
+      const ids = currentDiveIds(dragIds ?? []);
       const what = target;
       endDrag();
       if (!what || !ids.length) return;

@@ -684,6 +684,7 @@
     "deleteSelected": "Supprimer ces plongées",
     "deleteTitle": "Supprimer la plongée",
     "deleted": "Plongée supprimée",
+    "deletedElsewhere": "Cette plongée a été supprimée sur un autre appareil.",
     "deleteFailed": "La plongée n'a pas pu être supprimée. Aucune plongée n'a été modifiée.",
     "computersRow": "Ordinateurs",
     "computersLabel": "Ordinateurs : {list}. Afficher les ordinateurs de cette plongée",
@@ -2824,6 +2825,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Plongées : quand un changement fait sur un autre appareil arrive pendant qu’une plongée est ouverte, la plongée reste ouverte, ses voisines aussi, et une modification en cours est conservée ; une plongée supprimée sur l’autre appareil se ferme avec un court message. Cela ne produit plus de rapport d’erreur.",
       "Carnet : une plongée glissée puis relâchée à sa place, ou sur un titre d’année, ne change rien et n’affiche plus d’erreur.",
       "Photos et vidéos (Benthic+) : la fiche d’une plongée montre les photos et les vidéos en miniatures, avec « Ajouter », la ligne « sur tous vos appareils » et « Tout voir » qui ouvre la galerie de la plongée. Elles sont envoyées au compte (10 Go) et suivent le plongeur sur ses autres appareils : les miniatures sont toujours gardées, les originaux arrivent en Wi-Fi selon Réglages › Carnet (« Toutes », « Celles des 12 derniers mois », « À la demande ») et s’ouvrent à la demande. Hors ligne, les envois attendent le retour du réseau. La version gratuite ne montre pas la section.",
       "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",

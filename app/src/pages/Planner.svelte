@@ -43,6 +43,7 @@
   import QrShare from '../components/QrShare.svelte';
   import { qrSummary } from '../lib/qr-send.js';
   import { settings } from '../lib/settings.svelte.js';
+  import { liveDiveId } from '../lib/dive-ids.js';
   import { bottomVolumeKey, reserveLegendKey } from '../lib/reserve-factor.js';
   import { MM_PER_FT, ML_PER_CUFT, O2_CHOICES, HE_CHOICES, depthToMm, gasTotalMl, gasValid, modAlarm, mmToDepth, roundSacMl } from '../lib/planner-rules.js';
 
@@ -85,8 +86,9 @@
     }
   }
 
-  /** The card of the dive a plan starts from. @param {number} id */
-  async function sourceOf(id) {
+  /** The card of the dive a plan starts from. @param {number} given */
+  async function sourceOf(given) {
+    const id = liveDiveId(given);
     const summary = logbook.dives.find((d) => d.id === id);
     const dive = await BenthicCore.getDive({ id });
     return {

@@ -26,6 +26,7 @@
   import { loadInventory, equipmentOf, gearMap, gear } from '../lib/inventory.svelte.js';
   import { diveKeyOf } from '../lib/inventory.js';
   import { coreIdOfParam, diveParamOf, diveUrl } from '../lib/dive-id.js';
+  import { isShortId } from '../lib/short-id.js';
   import { equipmentIsEmpty } from '../lib/inventory.js';
   import ComputersSheet from '../components/ComputersSheet.svelte';
   import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
@@ -57,6 +58,7 @@
   import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
+  import { currentDiveId, onDiveIdsRenumbered } from '../lib/dive-ids.js';
   import { forgetDive, keepDive, loadDive as readDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
@@ -281,9 +283,44 @@
   const uid = $props.id();
   const menuId = `dive-menu-${uid}`;
   // The address holds the dive's Benthic id (lib/dive-id.js); `diveId` is the core's id of the dive in this session, for the
-  // core's calls. Every address built here uses `diveParam`.
-  const diveParam = $derived(f7route.params.id);
+  // core's calls. Every address built here uses `diveParam`. The core numbers its dives again whenever it reads the log again
+  // (a change from another device arrives): a Benthic id in the address still names the dive, so the page only reads it again;
+  // an old numeric address (a dive with no id yet, a link in flight) follows the renumbering: `renumbered` holds the new
+  // address from that moment, until the route says the same.
+  let renumbered = $state(/** @type {string|null} */ (null));
+  const diveParam = $derived(renumbered ?? f7route.params.id);
   const diveId = $derived(String(coreIdOfParam(diveParam)));
+
+  /** The dive shown has a new id (the log was read again), or is gone: the route follows in place, with no page change. */
+  function followRenumbering() {
+    if (preview) return;
+    // This page is the one the router shows (another page may lie over it).
+    const shown = f7router.currentRoute?.url === f7route.url;
+    const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
+    const gone = () => {
+      showSnackbar(t('detail.deletedElsewhere'));
+      if (!shown) return;
+      if (layout.split) f7router.navigate('/pane/empty', { reloadDetail: true, animate: false });
+      else f7router.back();
+    };
+    if (isShortId(diveParam)) {
+      if (!coreIdOfParam(diveParam)) return gone();
+      forgetDive(Number(diveId));
+      loadDive();
+      return;
+    }
+    const was = Number(diveParam);
+    const now = currentDiveId(was);
+    if (now === was) return;
+    forgetDive(was);
+    if (now === null) return gone();
+    renumbered = diveParamOf(now);
+    if (!shown) {
+      loadDive();
+      return;
+    }
+    f7router.navigate(`${base}${renumbered}`, layout.split ? { reloadDetail: true, animate: false } : { reloadCurrent: true, animate: false });
+  }
 
   // "Delete the dive" (⋮ menu, task 2026-11-07-28, to-do #15): the same
   // confirmation as a Logbook selection of one dive, then the core's undoable
@@ -424,7 +461,8 @@
       // The first screen is up: what waited for it starts (lib/startup.svelte.js).
       if (!preview && !f7route.params.trip) startup.detail = true;
     } catch (e) {
-      console.error('Dive detail', e);
+      // A dive that is gone (deleted on another device) is handled by `followRenumbering`, not reported.
+      if (!/dive not found/i.test(String(/** @type {any} */ (e)?.message ?? e))) console.error('Dive detail', e);
       failed = true;
       return;
     }
@@ -444,9 +482,11 @@
   const validationItems = $derived(dive && benthicPlusSubscriber() ? validationsOf(dive) : []);
   onMount(() => {
     if (preview) return;
+    const stopFollowing = onDiveIdsRenumbered(followRenumbering);
     if (benthicPlusSubscriber()) (validations.ready ? Promise.resolve() : loadValidations()).then(refreshPending).catch((e) => console.error('Validations', e));
     if (isRelease) loadInventory();
-    return loadDive();
+    loadDive();
+    return stopFollowing;
   });
 
   /** « Ordinateurs de cette plongée » open (task 2026-11-14-144), and a change of main computer running. */

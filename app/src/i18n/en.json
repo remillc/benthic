@@ -684,6 +684,7 @@
     "deleteSelected": "Delete these dives",
     "deleteTitle": "Delete the dive",
     "deleted": "Dive deleted",
+    "deletedElsewhere": "This dive was deleted on another device.",
     "deleteFailed": "The dive could not be deleted. No dive was changed.",
     "computersRow": "Computers",
     "computersLabel": "Computers: {list}. Show the computers of this dive",
@@ -2824,6 +2825,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Dives: when a change made on another device reaches this one while a dive is open, the dive stays open, its neighbours still open, and an edit in progress is kept; a dive deleted on the other device closes with a short message. This no longer produces an error report.",
       "Logbook: a dive dragged and dropped back on its own place, or on a year header, changes nothing and no longer shows an error.",
       "Photos and videos (Benthic+): a dive shows its photos and videos as thumbnails, with « Add », the line « on all your devices » and « See all », which opens the dive’s gallery. They are sent to the account (10 GB) and follow the diver to the other devices: thumbnails are always kept, originals arrive on Wi-Fi following Settings › Logbook (All, Those of the last 12 months, On demand) and open on demand. Offline, uploads wait for the network. The free version does not show the section.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",

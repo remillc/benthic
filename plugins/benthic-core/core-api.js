@@ -969,11 +969,12 @@ let coreErrorHook = null;
 
 /**
  * The core answers some expected states with a generic CORE_ERROR and only the message tells them apart: no account is set
- * (the beta's local logbook has none). They are never a fault, so never a report.
+ * (the beta's local logbook has none); a dive id the core no longer holds (the log was read again since the id was taken, the
+ * app asks again under the dive's new id). They are never a fault, so never a report.
  * @param {unknown} message
  */
 export function isExpectedCoreMessage(message) {
-  return typeof message === 'string' && /account not configured|repository not configured/i.test(message);
+  return typeof message === 'string' && /account not configured|repository not configured|dive not found/i.test(message);
 }
 
 /**
