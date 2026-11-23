@@ -35,8 +35,6 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   Benthic itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
  * @property {'bar'|'ata'} ppUnit label of every partial pressure; the number never changes (1 bar = 1 ATA).
  *   Per device, never in the logbook. Métrique implies bar, Impérial ATA (pp-unit.js).
- * @property {boolean} showPhotos "Afficher les champs photos et vidéos" (advanced, off by default,
- *   task 2026-11-12-65): the Photos et vidéos section of the dive detail. Per device, never in the logbook.
  * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
  * @property {'system'|'letter'|'a4'} paperSize the PDF sheet of a dive: "system" follows the
  *   device's region (US Letter where it is used, A4 elsewhere). Used by every printable PDF:
@@ -80,7 +78,6 @@ const APP_DEFAULTS = {
   coordinatesFormat: 'decimal',
   ppUnit: 'bar',
   showAllBluetooth: false,
-  showPhotos: false,
   paperSize: 'system',
   slateSize: 'standard',
   slateFile: 'pdf',
@@ -142,6 +139,11 @@ try {
 }
 
 const storedApp = /** @type {Partial<AppSettings>} */ (readJson(APP_KEY) ?? {});
+// Task 2026-11-23-370: "Afficher les champs photos et vidéos" is gone; the subscription decides. Its stored value is dropped.
+if ('showPhotos' in storedApp) {
+  delete (/** @type {any} */ (storedApp)).showPhotos;
+  writeJson(APP_KEY, storedApp);
+}
 // Task 2026-11-12-74: the app's own stress factor and divers. Devices from before keep the
 // core factor they had if the diver changed it (200, the old default, counts as unchanged).
 const reserve = reserveSettings(storedApp, storedCore.sacFactor);

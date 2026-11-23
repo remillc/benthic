@@ -1212,12 +1212,12 @@
       </section>
     {/if}
 
-    <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
+    <!-- The Photos et vidéos section is for Benthic+ subscribers (task 2026-11-23-370); the pictures stay in the logbook. -->
     {#if desk}
       <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
-    {#if !desk && dive.pictures > 0 && settings.showPhotos}
+    {#if !desk && dive.pictures > 0 && benthicPlusSubscriber()}
       <section class="bc-dive-detail--section">
         <h2 class="bc-dive-detail--section-title">{t('detail.photos')}</h2>
         <div class="bc-dive-detail--group">

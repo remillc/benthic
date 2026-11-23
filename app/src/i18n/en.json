@@ -1156,10 +1156,6 @@
         "salt": "1,030 g/L",
         "en13319": "Standard used by dive computers, 1,020 g/L"
       }
-    },
-    "showPhotos": {
-      "label": "Show photo and video fields",
-      "text": "In the detail and the editing of a dive"
     }
   },
   "gas": {
@@ -2766,6 +2762,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Photos and videos: « Show photo and video fields » is gone from Settings. A Benthic+ subscriber always sees the « Photos and videos » section of a dive; a free user never does. About: « Website » (benthicdivelog.app) replaces « Export my logbook » and sits next to « See on GitHub » on one centred row; exporting stays in the logbook menu.",
       "Trips: « Group dives into trips » is gone from Settings. Benthic never groups dives into trips by itself, whatever a logbook made in Subsurface says: downloads, imports and new dives stay outside any trip until you make or fill one. The trips you made keep working as before.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
@@ -3330,7 +3327,8 @@
       "code": "The base plan always stays free. The apps and their code are on GitHub: anyone can always download the apps there for free, read the code, change it and share it.",
       "logbook": "Exportable at any time, your logbook belongs to you.",
       "github": "See on GitHub",
-      "export": "Export my logbook"
+      "website": "Website",
+      "websiteLabel": "Benthic website (opens in the browser)"
     }
   },
   "bringLogbook": {

@@ -17,7 +17,9 @@ test('the About texts are the ones of the task, and no text names the logbook fi
   assert.equal(fr.free.logbook, 'Exportable en tout temps, votre carnet vous appartient.');
   assert.equal(fr.desktopText, 'Carnet de plongée libre, bâti sur les bases solides et éprouvées de Subsurface. Le code de l’app est sur GitHub : chacun peut le lire, le modifier et le partager. Exportable en tout temps, votre carnet vous appartient.');
   assert.equal(fr.free.github, 'Voir sur GitHub');
-  assert.equal(fr.free.export, 'Exporter mon carnet');
+  assert.equal(fr.free.website, 'Site Web');
+  assert.equal(fr.free.websiteLabel, 'Site Web de Benthic (s’ouvre dans le navigateur)');
+  assert.equal(fr.free.export, undefined, 'the export button is gone (task 2026-11-23-370)');
   for (const lang of ['fr', 'en']) {
     const a = langs[lang].about;
     for (const text of [a.tagline, a.desktopText, a.free.code, a.free.logbook]) assert.doesNotMatch(text, /ssrf|xml|format|git\b(?!hub)/i, lang);
@@ -27,10 +29,12 @@ test('the About texts are the ones of the task, and no text names the logbook fi
 
 test('the two buttons carry a 20 dp icon 8 dp from the text; the GitHub mark is the supplied file, in the ink colour', () => {
   assert.match(about, /import githubMark from '\.\.\/assets\/brands\/github-invertocat\.svg\?raw'/);
-  assert.match(about, /<Icon name="download" size=\{20\}/);
-  assert.match(about, /\.bc-about--free-actions \{[^}]*flex-direction: column;[^}]*gap: 12px;/s);
+  assert.match(about, /<Icon name="globe" size=\{20\}/);
+  assert.match(about, /href=\{LINKS\.website\}[^>]*aria-label=\{t\('about\.free\.websiteLabel'\)\}/);
+  assert.match(about, /website: 'https:\/\/benthicdivelog\.app\/'/);
+  assert.match(about, /\.bc-about--free-actions \{[^}]*flex-direction: row;[^}]*flex-wrap: wrap;[^}]*justify-content: center;[^}]*gap: 12px;/s);
   assert.match(about, /height: 48px;[^}]*gap: 8px;/s);
-  assert.match(about, /\.bc-about--free-desktop \.bc-about--free-actions \{[^}]*a,\s*button \{\s*height: 40px;/s);
+  assert.match(about, /\.bc-about--free-desktop \.bc-about--free-actions \{[^}]*a \{\s*height: 40px;/s);
   assert.match(about, /\.bc-about--free-github :global\(path\) \{\s*fill: currentColor;/);
   const svg = read('assets/brands/github-invertocat.svg');
   assert.match(svg, /viewBox="0 0 98 96"/);

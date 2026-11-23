@@ -18,8 +18,6 @@
   import githubMark from '../assets/brands/github-invertocat.svg?raw';
   import { t } from '../lib/i18n.js';
   import { BenthicCore } from 'benthic-core';
-  import { exportDives } from '../lib/share.js';
-  import { showSnackbar } from '../lib/snackbar.js';
   import { traceLines } from '../lib/nav-trace.js';
 
   /**
@@ -42,25 +40,8 @@
     osm: 'https://www.openstreetmap.org/copyright',
     geonames: 'https://www.geonames.org/about.html',
     diveSites: 'https://github.com/opendiving/opendiving-commons#sources',
+    website: 'https://benthicdivelog.app/',
   };
-
-  /** « Exporter mon carnet »: the whole logbook as a Subsurface file, the same export as elsewhere. */
-  async function exportLogbook() {
-    try {
-      await exportDives(
-        logbook.dives.map((d) => d.id),
-        'ssrf',
-        false,
-        logbook.prefs,
-        true,
-      );
-    } catch (e) {
-      // Closing the system's share sheet without choosing is not an error.
-      if (/cancel/i.test(String(/** @type {any} */ (e)?.message ?? ''))) return;
-      console.error('Export the logbook', e);
-      showSnackbar(t('export.failed'));
-    }
-  }
 
   /**
    * "Version 0.1.0": the installed package's version (its build number stays
@@ -194,7 +175,7 @@
     {/if}
     <div class="bc-about--free-actions">
       <a href={LINKS.source} class="external bc-tonal-button" target="_blank" rel="noopener"><span class="bc-about--free-icon bc-about--free-github" aria-hidden="true">{@html githubMark}</span>{t('about.free.github')}</a>
-      <button type="button" class="bc-outlined-button" disabled={!logbook.dives.length} onclick={exportLogbook}><span class="bc-about--free-icon" aria-hidden="true"><Icon name="download" size={20} weight={2} /></span>{t('about.free.export')}</button>
+      <a href={LINKS.website} class="external bc-outlined-button" target="_blank" rel="noopener" aria-label={t('about.free.websiteLabel')}><span class="bc-about--free-icon" aria-hidden="true"><Icon name="globe" size={20} weight={2} /></span>{t('about.free.website')}</a>
     </div>
   </section>
 
@@ -298,16 +279,17 @@
       font-weight: 700;
     }
 
-    /* The two buttons (task 2026-11-19-296): 48 dp high, a 20 dp icon 8 dp from the text. Phone: full width, one per line,
-       12 dp apart, 16 dp under the text; tablet: side by side, 12 dp apart; desktop: 40 dp high. */
+    /* The two buttons (tasks 2026-11-19-296 and 2026-11-23-370): 48 dp high, a 20 dp icon 8 dp from the text, each as wide
+       as its label, on one row centred horizontally, 12 dp apart, wrapping only when the screen is too narrow; desktop: 40 dp high. */
     .bc-about--free-actions {
       margin-top: 16px;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 12px;
 
-      a,
-      button {
+      a {
         height: 48px;
         padding: 0 16px;
         border-radius: 24px;
@@ -325,19 +307,10 @@
           font-size: 17px;
         }
       }
-
-      @media (min-width: 768px) {
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
     }
 
     .bc-about--free-desktop .bc-about--free-actions {
-      flex-direction: row;
-      flex-wrap: wrap;
-
-      a,
-      button {
+      a {
         height: 40px;
       }
     }
