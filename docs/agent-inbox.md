@@ -6889,3 +6889,31 @@ Christian asked for this on 23 November 2026. Work in `main`. A diver can be stu
 Both open « Repartir sans les données chiffrées » (task 338 item 6), unchanged.
 
 **Done (23 November 2026).** « Plus d’appareil ni de clé ? » is a centred text button under the note of the phone step `benthicPlusPair`, and in « Demande expirée » on every device (phone: its own line above « Nouvelle demande » and « Fermer »; tablet and desktop: left of the row). Both open « Repartir sans les données chiffrées » (`openStartOver`), unchanged; once it is done the pairing step goes on. `dialog-fit.js` now also stacks a row whose buttons are pushed past its start edge (a right-aligned row does not report that in `scrollWidth`).
+
+## [ ] 2026-11-23-351 Download, Bluetooth states: the Bluetooth icon centred, white on a blue disc
+
+Christian asked for this on 23 November 2026. Work in `main`. In the three Bluetooth states of the download from a dive computer, « Autoriser le Bluetooth », « Autorisation refusée » and « Bluetooth désactivé », the Bluetooth icon sits **centred** above the title, **white** (36 dp, stroke 2) in a **72 dp disc filled with #1F5C99** (no more grey icon on the left on the phone, no more pale disc with a coloured icon on the tablet, including the red « refusée » and grey « désactivé » variants). Mock-ups: « Téléchargement, autoriser le Bluetooth · Android », « … autorisation refusée … », « … Bluetooth désactivé … » (phone), and the six tablet boards « Téléchargement … » in paysage and portrait. The title, text and button keep their current layout. iPhone and desktop have no such screen; nothing to change there.
+
+## [ ] 2026-11-23-352 Key icon: use Material Symbols « key »
+
+Christian asked for this on 23 November 2026. Work in `main`. The app has no key icon yet. Add one to `Icon.svelte` using the Material Symbols « key » glyph (outlined, weight 400, viewBox `0 -960 960 960`, filled with `currentColor`):
+
+```
+M280-400q-33 0-56.5-23.5T200-480q0-33 23.5-56.5T280-560q33 0 56.5 23.5T360-480q0 33-23.5 56.5T280-400Zm0 160q-100 0-170-70T40-480q0-100 70-170t170-70q67 0 121.5 33t86.5 87h352l120 120-180 180-80-60-80 60-85-60h-47q-32 54-86.5 87T280-240Zm0-80q56 0 98.5-34t56.5-86h125l58 41 82-61 71 55 75-75-40-40H435q-14-52-56.5-86T280-640q-66 0-113 47t-47 113q0 66 47 113t113 47Z
+```
+
+Use it wherever the recovery key appears: the recovery-key offer, the « Votre clé de secours » dialog, entering the key, and unlocking the encrypted data, on phone, tablet and desktop. Mock-ups: « Clé de secours, affichée une seule fois (Benthic+) · Android » and the other boards of the « Clé de secours » subgroup on each device, plus the unlock (« déverrouiller ») boards.
+
+## [ ] 2026-11-23-353 Addition to 351: « Activer le Bluetooth » button is blue everywhere
+
+Christian asked for this on 23 November 2026. Work in `main`. On the « Bluetooth désactivé » state of the download, the « Activer le Bluetooth » button is the blue filled button (#114477, white text) on every device. The phone mock-up « Téléchargement, Bluetooth désactivé · Android » now shows it blue (it was near-black); the tablet already had it blue.
+
+## [ ] 2026-11-23-354 New design rule: prefer Material Symbols icons
+
+Christian asked for this on 23 November 2026. Work in `main`. Read the new section « Icons » in `docs/system-design.md` (§ 8). From now on, every icon you add comes from Material Symbols (weight 400, grade 0, optical size 24; the filled variant for an active or selected state). Draw an icon by hand only when Material Symbols has nothing that fits, and then on the same grid and weight. Do not replace the existing icons of `app/src/components/Icon.svelte` in bulk yet: Christian will first compare them with Material Symbols in a mock-up (TODO #184) and send the swaps as tasks. The recovery key (task 352) is the first one.
+
+## [ ] 2026-11-23-355 Light rays: four rays scaled to the band, never repeated
+
+Christian asked for this on 23 November 2026. Work in `main`. Correction to task 320. On tablet and desktop the first-launch band shows too many rays: `FirstLaunchRays.svelte` repeats the 390 px pattern across the width (`TILE`), so a 700 or 800 px band gets 7 or 8 narrow rays. Draw **the same four rays at every width**, as the phone mock-up now shows (`android-premier-lancement-production`: rays from the sun at (760, −900) to the bottom at x −115…0, 80…145, 195…315, 275…390, opacity 3.5 %, 3 %, 4 %, 3.5 %, on a 390 px band): scale the whole drawing, sun included, by the band's width ÷ 390, without repeating it. Same blur (2 px) and the same fade, gone at about 65 % of the band's height. Every band that uses the rays: first launch and its steps, server sign-in, Benthic+ screens, on phone, iPhone, tablet (portrait and landscape) and desktop. Mock-ups: « Premier lancement (production), étape 1, tablette Android, paysage » and the other 145 tablet and desktop boards with this band. `docs/system-design.md` (« Light rays in the first-launch header ») is updated.
+
+**Test:** a tablet band (700 px) and a desktop band (800 px) each show four rays, wider than on the phone, from the top right.

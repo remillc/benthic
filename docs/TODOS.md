@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 184
+Next number: 186
 
 ## List
 
@@ -49,7 +49,6 @@ Next number: 184
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
 - #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
-- #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes, les détendeurs, les recycleurs et les combinaisons étanches (drysuit)
 - #149 [code] remplacer les uuid par des id plus courts
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
@@ -57,3 +56,5 @@ Next number: 184
 - #164 [code] Implement synchronization of account data other than the logbook, including the diver profile, equipment, certifications and documents, across devices.
 - #173 [code] Devices should synchronize as soon as data is updated.
 - #175 [code] Compléter l’export UDDF avec l’équipement et le profil du plongeur. Subsurface n’écrit presque rien de la fiche du plongeur : à l’export (`third_party/subsurface/xslt/uddf-export.xslt`), seulement les ordinateurs de plongée (nom et modèle) dans `diver › owner › equipment`, le poids du lest de chaque plongée (`equipmentused › leadquantity`), et un prénom et un nom vides ; à l’import (`uddf.xslt`), seulement l’ordinateur, les bouteilles et le lest. Benthic complète l’UDDF avec ce qu’il garde : l’inventaire d’équipement (pièces, fabricant, modèle, numéro de série, achat, entretiens) dans `owner › equipment`, l’équipement utilisé par chaque plongée dans `equipmentused`, et le profil du plongeur : `personal` (nom, date de naissance, groupe sanguin), `education` (brevets, avec les photos des cartes en liens), `medical` et `divinginsurances` (documents). Le contact d’urgence n’a pas de champ prévu dans UDDF (à vérifier dans la spécification). Vérifier d’abord la spécification UDDF (3.2.x) avant de coder ; garder un fichier valide pour les autres logiciels. Le .benthic reste la seule copie complète pour rouvrir le carnet dans Benthic. Décidé le 22 nov. 2026.
+- #184 [design] dans Claude CC, faire une maquette qui liste toutes les icônes du fichier `Icon.svelte` et les comparer avec ce qui existe dans Material Symbols.
+- #185 [code] Synchronisation en « push » plutôt qu’en « pull » (demandé par Christian le 23 nov. 2026 ; va avec #173). Aujourd’hui chaque appareil va chercher les changements sur le serveur (au démarrage, au retour dans l’app, après une modification, et toutes les 15 s pour les demandes de jumelage). Le serveur Benthic doit plutôt prévenir les appareils dès qu’il y a du nouveau sur le carnet ou les données du compte : tant que l’app est ouverte, au premier plan ou en arrière-plan, une connexion permanente (WebSocket ou Server-Sent Events) qui déclenche la synchronisation tout de suite ; app fermée sur téléphone ou tablette, aucun réveil pour une simple synchronisation des données (elle se fait au démarrage de l’app, comme aujourd’hui) : une notification poussée (Firebase Cloud Messaging sur Android, APNs sur iPhone) seulement pour ce qui demande le diver, comme une demande de jumelage (« Donner accès à … ? »). Bureau : la connexion permanente tant que l’app est ouverte. Demande un travail côté serveur (canal de notification, et l’envoi FCM/APNs pour les demandes), un compte Firebase et les clés Apple ; garder le « pull » actuel en secours. Une fois le « push » en place, retirer le bouton « Synchroniser » partout (feuille du compte, page Compte, menu, bureau) : les modifications partent d’elles-mêmes et celles en attente (hors ligne, échec) repartent au retour du réseau ; garder seulement l’état affiché (« 3 modifications non envoyées », hors ligne, échec).
