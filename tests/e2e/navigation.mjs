@@ -1211,7 +1211,7 @@ async function settingsComputersFlows(expect) {
   }
 }
 
-/** Pages opened over a section (the profile, an equipment piece) must have room in the desktop layout, with Settings opened before. */
+/** Pages opened over a section (À propos' pages) must have room in the desktop layout, with Settings opened before. */
 async function desktopFlows() {
   console.log('Desktop, 1400x900: pages opened over Réglages');
   const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
@@ -1219,7 +1219,8 @@ async function desktopFlows() {
   const open = (path) => tab.run(async (p) => { (await import('/src/lib/navigation.svelte.js')).openOver(p); return 1; }, path);
   await open('/settings/');
   await sleep(1200);
-  for (const path of ['/profile/gear/new', '/about/libraries']) {
+  // The profile is no longer opened over Réglages (it has its own section, task 2026-11-23-347): « À propos » pages remain.
+  for (const path of ['/about/libraries']) {
     await open(path);
     await sleep(1200);
     const room = await tab.run((path) => {
