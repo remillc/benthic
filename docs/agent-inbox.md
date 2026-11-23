@@ -6784,3 +6784,9 @@ Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler �
 - One button: « OK ». Basic dialog, no ✕.
 - Shown once the « Jumeler cet appareil » commit is pushed; on a failure, show the usual sync error instead.
 - If the recovery key offer (338 item 9) follows at the first sync, it comes after this dialog.
+
+## [ ] 2026-11-23-345 Account sheet « Jumeler un nouvel appareil »: the mock-ups now show your row
+
+Christian asked for this on 23 November 2026. Work in `main`. The row you added in `AccountSheet.svelte` and `DesktopAccountSheet.svelte` (QR icon, « Jumeler un nouvel appareil », « Donne accès aux données chiffrées », chevron, only for a subscriber whose device holds the data key, `accountLock.canPair`) is now drawn in the subscriber account sheets: « Feuille du compte, avec « Mon profil de plongeur » · Android », the iPhone subscriber account sheet, the tablet account sheet and the desktop account sheet. It sits right after « Sauvegarde et restauration », in the same group, with a divider like the rows above, and opens « Appareil déjà jumelé, montrer le code ».
+
+Check that the app matches on every device (position, divider, icon, texts, the row hidden when `canPair` is false) and fix any gap. It is not in the free account sheet. In the done note, say what you changed, or that nothing needed to change.
