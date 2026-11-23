@@ -1630,7 +1630,7 @@
   </Popover>
 
   {#if exporting}
-    <ExportSheet count={exportWhole ? logbook.dives.length : checkedCount} whole={exportWhole} logbookName={logbookName || t('welcomeSteps.defaultName')} onexport={exportFromSheet} onclose={() => ((exporting = false), (exportWhole = false))} />
+    <ExportSheet count={exportWhole ? logbook.dives.length : checkedCount} ids={exportWhole ? logbook.dives.map((d) => d.id) : checkedIds} whole={exportWhole} logbookName={logbookName || t('welcomeSteps.defaultName')} onexport={exportFromSheet} onclose={() => ((exporting = false), (exportWhole = false))} />
   {/if}
 
   {#if !logbook.loading && !logbook.error && rows.length}

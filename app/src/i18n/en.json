@@ -2791,6 +2791,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Export: “Send to divelogs.de” sends the dives of the logbook or of the selection to your divelogs.de account, after the user name and the password, which are not kept. The sending shows its progress and resumes after a lost connection.",
       "Profile: the date of birth is encrypted; existing dates are protected when an editable profile opens.",
       "Desktop: the divider between the panes has no grip; it turns orange when the pointer is over it or drags it. The logbook has its own thin scrollbar, apart from it. Each dive is separated from the next by a line, and the Buddies column no longer shows the initial.",
       "Tablet, first launch: « Your logbook is ready » centres the logo, the chip, the title and the line of the blue panel, and the right column follows the mock-up: the « Your logbook » heading, the figures card across the full width, the « Open my logbook » button at the right.",
@@ -4139,7 +4140,40 @@
     "footnoteTablet": "The file then opens in the tablet’s share sheet.",
     "withMedia": "Include photos and videos",
     "withMediaText": "The file can become much larger",
-    "divelogsSoon": "Sending to divelogs.de is not available yet."
+    "divelogsFootnote": "You will then sign in to divelogs.de.",
+    "continue": "Continue"
+  },
+  "divelogsUpload": {
+    "title": "Send to divelogs.de",
+    "text": {
+      "one": "{name} · {n} dive. Sign in to your divelogs.de account.",
+      "other": "{name} · {n} dives. Sign in to your divelogs.de account."
+    },
+    "user": "User name",
+    "password": "Password",
+    "note": "Benthic does not keep these credentials.",
+    "send": "Send",
+    "denied": "Incorrect user name or password.",
+    "progressTitle": "Sending to divelogs.de",
+    "stepConnect": "Connecting to divelogs.de",
+    "stepAccount": "Account “{user}”",
+    "stepSend": "Sending dives",
+    "count": "{done} of {total}",
+    "help": "Keep the app open until it ends. Your dives stay in your logbook.",
+    "unreachable": "divelogs.de does not answer",
+    "unreachableDetail": "Check the connection, then try again.",
+    "interrupted": "Sending interrupted",
+    "interruptedDetail": "{done} of {total} dives sent. Check the connection, then try again.",
+    "refused": "divelogs.de refused the dives",
+    "refusedDetail": "{done} of {total} dives sent. Try again later.",
+    "retry": "Try again",
+    "doneTitle": "Dives sent",
+    "doneText": {
+      "one": "The dive of {name} is now in the divelogs.de account “{user}”.",
+      "other": "The {n} dives of {name} are now in the divelogs.de account “{user}”."
+    },
+    "open": "Open divelogs.de",
+    "ok": "OK"
   },
   "plans": {
     "title": "Planned dives",
