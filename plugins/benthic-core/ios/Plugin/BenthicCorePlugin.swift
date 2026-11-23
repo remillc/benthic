@@ -102,6 +102,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "renumberDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "benthicIds", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importCsv", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDivesFiles", returnType: CAPPluginReturnPromise),
@@ -569,6 +570,17 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
         onCoreThread(call) { [self] in
             call.resolve(["json": try BenthicNative.editDives(numbers(ids), changes: text)])
+        }
+    }
+
+    @objc func benthicIds(_ call: CAPPluginCall) {
+        guard let action = call.getString("action"), action == "audit" || action == "assign" else {
+            call.reject("Missing action", "BAD_ARGUMENT")
+            return
+        }
+        let assignments = call.getString("assignments") ?? "{}"
+        onCoreThread(call) { [self] in
+            call.resolve(["json": try BenthicNative.benthicIds(action, assignments: assignments)])
         }
     }
 

@@ -32,6 +32,8 @@ import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 import { signalAccountData } from './account-sync-signal.js';
 import { signOutPush } from './push-notifications.svelte.js';
+import { assignMissingIds, idsLookIncomplete, noteIdsList, useDives } from './dive-id.js';
+import { newId } from './short-id.js';
 
 /** @typedef {import('benthic-core').Dive} Dive */
 /** @typedef {import('benthic-core').Prefs} Prefs */
@@ -75,6 +77,8 @@ export const logbook = $state({
     diveList = value;
     // A list read again from the log has new ids: whatever holds ids follows (lib/dive-ids.js).
     if (noteDiveList(before, value)) followRenumbering();
+    if (idsLookIncomplete(value)) void ensureBenthicIds();
+    else noteIdsList(value);
   },
   /** Checked dives in the Logbook list, shared with the tablet detail pane. */
   checkedDiveIds: /** @type {number[]} */ ([]),
@@ -160,6 +164,37 @@ export const logbook = $state({
    */
   browsing: false,
 });
+
+useDives(() => diveList);
+
+let ensuring = false;
+/** The dive list the last pass found nothing to assign for, or could not write: it does not run again for the same list. */
+let ensuredFor = /** @type {Dive[]|null} */ (null);
+
+/**
+ * Gives every dive of the log its Benthic id (lib/dive-id.js): the ones with none, and the later one of two that share an id.
+ * Fire and forget, never blocking, once per list of dives: the setter of `logbook.dives` starts it when a loaded list has a dive
+ * without an id (or two with the same), and a pass that assigned reads the list again, saves it (the commit « Benthic ids ») and
+ * sends it like an edit. A log that cannot be written (browsing an old version, a locked cloud log) is left as it is.
+ */
+export async function ensureBenthicIds() {
+  if (ensuring || logbook.browsing || diveList === ensuredFor) return;
+  ensuring = true;
+  const asked = diveList;
+  try {
+    const assigned = await assignMissingIds(BenthicCore);
+    ensuredFor = asked;
+    if (assigned) {
+      logbook.dives = await BenthicCore.listLoadedDives();
+      await persistChanges();
+    }
+  } catch (e) {
+    ensuredFor = asked;
+    console.error('Giving the dives their ids', e);
+  } finally {
+    ensuring = false;
+  }
+}
 
 // What the kept answers of the core (lib/core-cache.js, lib/dive-preload.js) are tied to: they are read
 // again once the list was read again or the sites changed.
@@ -417,7 +452,7 @@ export function renumberPlanFrom(id) {
  * @returns {Promise<number>} the new dive's identifier
  */
 export async function addDive(fields) {
-  const result = await BenthicCore.createDive({ fields });
+  const result = await BenthicCore.createDive({ fields: { benthicId: newId(), ...fields } });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await BenthicCore.listLoadedDives();
@@ -437,6 +472,9 @@ export async function savePlan(request, replaceId = 0, title = '') {
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   await persistChanges();
+  // The plan is not in the dive list: the pass looks at the whole log.
+  ensuredFor = null;
+  void ensureBenthicIds();
   return result.list?.id ?? 0;
 }
 

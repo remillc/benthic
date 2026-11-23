@@ -85,6 +85,21 @@ inline constexpr const char *TITLE_KEY = "Benthic title";
 inline constexpr const char *LEGACY_PLAN_KEY = "OpenDives plan";
 inline constexpr const char *LEGACY_TITLE_KEY = "OpenDives title";
 
+// The stable identifier of a dive (23 November 2026): extra data "Benthic id" of the dive's first dive computer that has
+// one (written on the first dive computer, like "Benthic plan"), 10 characters of lowercase Crockford base32 made by the
+// app (app/src/lib/short-id.js). The core never makes one: the app passes them (assign_benthic_ids).
+inline constexpr const char *ID_KEY = "Benthic id";
+
+// The dive's Benthic id, or "" when it has none.
+std::string benthic_id_of(const ::dive &d);
+
+// Whether `id` has the shape of a Benthic id (10 characters of [0-9a-hjkmnp-tv-z]).
+bool valid_benthic_id(const std::string &id);
+
+// Puts `id` in the dive's extra data (replaces the value that benthic_id_of() reads, else adds the key to the first dive
+// computer). Returns false when the dive already has it.
+bool set_benthic_id(::dive &d, const std::string &id);
+
 // The value of the plan (or title) extra data of a dive computer: the new key wins over the old one; "" when none.
 std::string plan_extra_value(const ::divecomputer &dc, const char *key, const char *legacy_key);
 

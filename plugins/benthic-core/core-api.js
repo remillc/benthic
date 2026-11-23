@@ -109,6 +109,7 @@ export { waterTypeOf };
  * A dive in the logbook list.
  * @typedef {Object} Dive
  * @property {number} id identifier valid until the next load (for getDive)
+ * @property {string} benthicId the dive's stable id (extra data `Benthic id`, 10 characters); empty until one is assigned
  * @property {number} number
  * @property {string} date local time of the dive, e.g. 2012-11-05T10:15:00
  * @property {string} site empty string when there is no site
@@ -156,6 +157,7 @@ export { waterTypeOf };
 /**
  * @typedef {Object} DiveDetail
  * @property {number} id
+ * @property {string} benthicId the stable id; empty until one is assigned
  * @property {number} number
  * @property {string} date
  * @property {string} site
@@ -331,6 +333,7 @@ export { waterTypeOf };
  * A planned dive of the logbook (list_plans).
  * @typedef {Object} PlannedDive
  * @property {number} id
+ * @property {string} benthicId the plan's stable id; empty until one is assigned
  * @property {string} date
  * @property {number} when
  * @property {string} site
@@ -764,6 +767,10 @@ export { waterTypeOf };
  *   The same changes on several dives, one undoable step (edit_dives in benthic.h): site (uuid), notes, suit,
  *   userSalinity, diveguide, and the chip lists buddiesAdd/buddiesRemove, diveguideAdd/diveguideRemove,
  *   tagsAdd/tagsRemove (only those names are added or removed, per dive).
+ * @property {(options: {action: 'audit'|'assign', assignments?: string}) => Promise<any>} benthicIds
+ *   The stable dive ids (benthic_ids_json and assign_benthic_ids in benthic.h; not an undo step). `audit` lists every dive
+ *   of the log, hidden ones too, as `{id, benthicId, when, plan}[]`; `assign` writes `assignments`, a JSON object core id
+ *   to Benthic id (it replaces an id already there), and answers `{assigned}`. Saved with the next save (commit "Benthic ids").
  * @property {(options: {ids: number[], start: number, numbers?: number[]}) => Promise<EditResult>} renumberDives
  *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives);
  *   with numbers (one per id), each dive gets its own number instead.
@@ -1116,6 +1123,9 @@ export const BenthicCore = {
   },
   async editDives(options) {
     return JSON.parse((await native.editDives(options)).json);
+  },
+  async benthicIds(options) {
+    return JSON.parse((await native.benthicIds(options)).json);
   },
   async renumberDives(options) {
     return JSON.parse((await native.renumberDives(options)).json);

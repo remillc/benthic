@@ -659,6 +659,21 @@ static void send_sync_progress(const char *message)
 	return edit_or_fail(ret, json, message, error);
 }
 
++ (NSString *)benthicIds:(NSString *)action assignments:(NSString *)assignments error:(NSError **)error
+{
+	std::string json, message;
+	int ret = 0;
+	if (str(action) == "audit")
+		ret = benthic::benthic_ids_json(json);
+	else
+		ret = benthic::assign_benthic_ids(str(assignments), json, message);
+	if (ret) {
+		fail(error, message);
+		return nil;
+	}
+	return ns(json);
+}
+
 + (NSString *)renumberDives:(NSArray<NSNumber *> *)ids
 		      start:(NSInteger)start
 		    numbers:(NSArray<NSNumber *> *)numbers

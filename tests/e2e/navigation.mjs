@@ -524,13 +524,13 @@ async function phoneFlows() {
 
   console.log(' logbook > dive > back');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapBack(tab);
   await settled(tab, 'back to the logbook', { route: '/' });
 
   console.log(' rapid double Back taps');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapBack(tab);
   await sleep(40);
   await tapBack(tab).catch(() => {});
@@ -549,7 +549,7 @@ async function phoneFlows() {
   // in the flow below (« change a field »).
   console.log(' dive > validate by signature > Back');
   await tapDive(tab);
-  await settled(tab, 'validation: dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'validation: dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   const validated = (await tab.run(readStack)).current;
   await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
   await sleep(800);
@@ -597,7 +597,7 @@ async function phoneFlows() {
   checks++;
   if (!marked) failures.push({ label: 'validation: mark', problems: ['no mark on the validated dive in the logbook list'] });
   await tapDive(tab);
-  await settled(tab, 'validation: dive reopened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'validation: dive reopened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapText(tab, 'Retirer la validation|Remove the validation');
   await sleep(500);
   await tapText(tab, '^\\s*(Retirer|Remove)\\s*$', '.dialog');
@@ -619,7 +619,7 @@ async function phoneFlows() {
   for (const how of ['arrow', 'hardware']) {
     console.log(` dive > edit > change a field > save > Back (${how})`);
     await tapDive(tab);
-    await settled(tab, `${how}: dive opened`, { route: /^\/dives\/\d+$/, setup: true });
+    await settled(tab, `${how}: dive opened`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     const route = (await tab.run(readStack)).current;
     await tapText(tab, '^\s*(Modifier|Edit)\s*$');
     await settled(tab, `${how}: edit opened`, { route: /\/edit$/, setup: true });
@@ -666,7 +666,7 @@ async function phoneFlows() {
     if (sheet.hash || sheet.open) failures.push({ label: `${how}: sheet`, problems: [`after Back: hash "${sheet.hash}", sheet open ${sheet.open}`] });
     // The app still answers: a dive opens and Back returns to the logbook.
     await tapDive(tab);
-    await settled(tab, `${how}: dive opens after Settings`, { route: /^\/dives\/\d+$/, setup: true });
+    await settled(tab, `${how}: dive opens after Settings`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     await tapBack(tab);
     await settled(tab, `${how}: Back again on the logbook`, { route: '/' });
     await sleep(300);
@@ -674,7 +674,7 @@ async function phoneFlows() {
 
   console.log(' edit > suggestion lists float above the following cards');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapText(tab, '^\s*(Modifier|Edit)\s*$');
   await settled(tab, 'edit opened', { route: /\/edit$/, setup: true });
   // Each field is brought to the bottom of the screen (little room below) and to the middle (the list passes over the
@@ -729,7 +729,7 @@ async function phoneFlows() {
   await sleep(500);
   // Typed text asks first; a field only focused does not.
   await tapText(tab, '^(Quitter|Leave)$', '.bc-leave-guard--dialog').catch(() => {});
-  await settled(tab, 'after leaving the edit page', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'after leaving the edit page', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await toLogbook(tab, 'after the suggestions check');
 
   console.log(' quick entry after a download (Complete the dive)');
@@ -772,7 +772,13 @@ async function phoneFlows() {
   await settled(tab, 'quick entry saved', { route: '/' });
   if (here) {
     // The dive was saved with the preselected site (its uuid may be above 2^31: JSON integers are 64-bit in the core).
-    const savedSite = JSON.parse(await core('getDive', { id: Number(quickRoute.split('/')[2]) })).site;
+    // The route holds the dive's Benthic id: the core's id is read from the list.
+    const quickParam = quickRoute.split('/')[2];
+    const quickCoreId = await tab.run(async (param) => {
+      const { logbook } = await import('/src/lib/logbook.svelte.js');
+      return logbook.dives.find((d) => d.benthicId === param || String(d.id) === param)?.id ?? 0;
+    }, quickParam);
+    const savedSite = JSON.parse(await core('getDive', { id: quickCoreId })).site;
     checks++;
     if (savedSite !== here.name) {
       failures.push({ label: 'quick entry: saved site', problems: [`the dive's site is "${savedSite}", expected "${here.name}"`] });
@@ -841,7 +847,7 @@ async function phoneFlows() {
   await sleep(600);
   console.log(' edit > Back arrow, then Back at once after Save');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
   await settled(tab, 'edit opened', { route: /\/edit$/, setup: true });
   await tapBack(tab);
@@ -861,7 +867,7 @@ async function phoneFlows() {
   console.log(' dive page swipe, then Back (the half-transitioned stack)');
   for (const [name, x1, gap] of [['through', 60, 10], ['through', 60, 250], ['short', 250, 100]]) {
     await tapDive(tab);
-    await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+    await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     await tab.swipe(name === 'through' ? 330 : 300, x1, 700);
     await sleep(gap);
     await tapBack(tab).catch(() => {});
@@ -871,11 +877,11 @@ async function phoneFlows() {
 
   console.log(' the Android Back key');
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await hardwareBack(tab);
   await settled(tab, 'hardware Back from the dive', { route: '/' });
   await tapDive(tab);
-  await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await hardwareBack(tab);
   await sleep(30);
   await hardwareBack(tab);
@@ -895,7 +901,7 @@ async function phoneFlows() {
   await sleep(500);
   await settled(tab, 'account sheet closed with Back', { route: '/' });
   await tapDive(tab);
-  await settled(tab, 'dive opened after the sheet', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'dive opened after the sheet', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapBack(tab);
   await settled(tab, 'back after the sheet', { route: '/' });
 
@@ -1086,7 +1092,7 @@ async function longPressFlows(expect) {
     await tab.tapAt(row2.x, row2.y);
     await sleep(900);
     const tapped = await state();
-    expect(`${label}: a short tap opens the dive and selects nothing`, { boxes: 0, opened: true }, { boxes: tapped.boxes, opened: /^\/dives\/\d+/.test(tapped.route) });
+    expect(`${label}: a short tap opens the dive and selects nothing`, { boxes: 0, opened: true }, { boxes: tapped.boxes, opened: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})/.test(tapped.route) });
     tab.ws.close();
   }
 }

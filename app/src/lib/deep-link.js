@@ -10,7 +10,8 @@
 // are safe to land on are listed: never an editor, an account screen or a delete.
 //
 //   /                          Logbook
-//   /dives/at/20121105T101500  the dive that began at that local date and time (see below)
+//   /dives/7k2m9q4x1d          a dive, by its Benthic id (the extra data `Benthic id`, lib/dive-id.js)
+//   /dives/at/20121105T101500  the dive that began at that local date and time (see below); the links shared before the ids
 //   /sites/                    Sites
 //   /sites/12                  a site, by its uuid
 //   /plan/new, /plans/         Planner, saved plans
@@ -39,7 +40,7 @@ export const OLD_LINK_HOST = 'opendives.app';
  * @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} LinkSection
  * @typedef {(
  *   { kind: 'route', section: LinkSection, path: string, over?: boolean } |
- *   { kind: 'dive', stamp: string, date: string } |
+ *   { kind: 'dive', stamp: string, date: string, benthicId?: string } |
  *   { kind: 'site', uuid: number } |
  *   { kind: 'file', uri: string } |
  *   { kind: 'unknown' }
@@ -116,6 +117,8 @@ export function parseLink(url) {
     const [, y, mo, d, h, mi, s] = dive;
     return { kind: 'dive', stamp: `${y}${mo}${d}T${h}${mi}${s}`, date: `${y}-${mo}-${d}T${h}:${mi}:${s}` };
   }
+  const byId = /^\/dives\/([0-9a-hjkmnp-tv-z]{10})\/?$/.exec(path);
+  if (byId) return { kind: 'dive', stamp: '', date: '', benthicId: byId[1] };
   const site = /^\/sites\/(\d{1,10})$/.exec(path);
   if (site) return { kind: 'site', uuid: Number(site[1]) };
   const route = ROUTES[path];
@@ -131,6 +134,15 @@ export function parseLink(url) {
 export function diveLink(date) {
   const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/.exec(date ?? '');
   return m ? `https://${LINK_HOST}/dives/at/${m[1]}${m[2]}${m[3]}T${m[4]}${m[5]}${m[6]}` : null;
+}
+
+/**
+ * The https link to a dive, from its Benthic id (the dive keeps it whatever its start time becomes).
+ * @param {string} benthicId
+ * @returns {string|null} null when it is not a Benthic id
+ */
+export function diveIdLink(benthicId) {
+  return /^[0-9a-hjkmnp-tv-z]{10}$/.test(benthicId ?? '') ? `https://${LINK_HOST}/dives/${benthicId}` : null;
 }
 
 /**

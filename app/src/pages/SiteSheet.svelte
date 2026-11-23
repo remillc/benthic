@@ -3,6 +3,7 @@
   // Site sheet (docs/mockups/sites-fiche-android.dc.html): name and country,
   // map, coordinates with "Open in Maps", description, notes, region and city
   // found from the position, then the dives at this site.
+  import { diveUrl } from '../lib/dive-id.js';
   import { ios } from '../lib/layout.svelte.js';
   import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
@@ -223,7 +224,7 @@
         {#each latestFirst as dive (dive.id)}
           {@const listed = byId.get(dive.id)}
           <li>
-            <a href="/dives/{dive.id}" class="bc-site-sheet--row bc-site-sheet--dive">
+            <a href={diveUrl(dive)} class="bc-site-sheet--row bc-site-sheet--dive">
               {#if listed && !ios}
                 <ProfileThumbnail profile={listed.profile} maxDepthMm={listed.maxDepthMm} prefs={logbook.prefs} />
               {/if}

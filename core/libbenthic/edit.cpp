@@ -188,6 +188,7 @@ std::vector<Step> steps;
 size_t applied = 0;           // steps currently applied (QUndoStack::index())
 long clean_index = 0;         // `applied` at the last save; -1 if unreachable
 long next_to_write = 0;       // changesMade(): first step not yet in a commit message
+bool ids_dirty = false;       // Benthic ids written since the last save (not an undo step: assign_benthic_ids)
 int loaded_format_version = 0; // "version" line of 00-Subsurface; 0 if unknown
 
 // Cloud write lock (plan, section 4).
@@ -216,6 +217,8 @@ std::string changes_made()
 {
 	long cur = static_cast<long>(applied);
 	std::string texts;
+	if (ids_dirty)
+		texts += "Benthic ids\n";
 	if (cur > next_to_write) {
 		for (long i = next_to_write; i < cur; i++)
 			texts += step_text(i) + "\n";
@@ -704,6 +707,7 @@ void on_log_loaded()
 	applied = 0;
 	clean_index = 0;
 	next_to_write = 0;
+	ids_dirty = false;
 	loaded_format_version = read_format_version();
 	// The cylinder types of the new log (as clear_dive_file_data() before a load).
 	reset_tank_info_table(tank_info_table);
@@ -2602,7 +2606,7 @@ std::string redo_text()
 
 bool has_unsaved_changes()
 {
-	return static_cast<long>(applied) != clean_index;
+	return static_cast<long>(applied) != clean_index || ids_dirty;
 }
 
 int save_local(std::string &error)
@@ -2623,6 +2627,7 @@ int save_local(std::string &error)
 	if (save_to(log, error))
 		return -1;
 	clean_index = static_cast<long>(applied);
+	ids_dirty = false;
 	return 0;
 }
 
@@ -3633,6 +3638,71 @@ int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std
 	return 0;
 }
 
+int benthic_ids_json(std::string &json)
+{
+	json = "[";
+	bool first = true;
+	for (const auto &d: divelog.dives) {
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"id\":" + std::to_string(d->id) + ",\"benthicId\":";
+		append_json_string(json, internal::benthic_id_of(*d));
+		json += ",\"when\":" + std::to_string(d->when) + ",\"plan\":" + (internal::is_plan_only(*d) ? "true" : "false") + '}';
+	}
+	json += ']';
+	return 0;
+}
+
+int assign_benthic_ids(const std::string &assignments_json, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	// A flat object, core id -> Benthic id: the façade's JSON reader reads flat objects only.
+	std::vector<std::pair<std::string, JsonValue>> items;
+	if (!JsonReader(assignments_json).object(items)) {
+		error = "BAD_REQUEST: not an object of core id -> Benthic id";
+		return -1;
+	}
+	std::vector<std::pair<dive *, std::string>> todo;
+	for (const auto &[key, v]: items) {
+		char *end = nullptr;
+		long id = std::strtol(key.c_str(), &end, 10);
+		if (key.empty() || *end || v.kind != JsonValue::STRING || !internal::valid_benthic_id(v.text)) {
+			error = "BAD_REQUEST: id or benthicId";
+			return -1;
+		}
+		dive *d = divelog.dives.get_by_uniq_id(static_cast<int>(id));
+		if (!d) {
+			error = "NOT_FOUND";
+			return -1;
+		}
+		todo.emplace_back(d, v.text);
+	}
+	int assigned = 0;
+	for (auto &[d, value]: todo) {
+		if (!internal::set_benthic_id(*d, value))
+			continue;
+		d->invalidate_cache();
+		assigned++;
+		// The copies the undo history holds: an undo must not take the id away.
+		for (Step &step: steps) {
+			if (step.other && step.dive_id == d->id)
+				internal::set_benthic_id(*step.other, value);
+			for (auto &[swap_id, copy]: step.dive_swaps)
+				if (copy && swap_id == d->id)
+					internal::set_benthic_id(*copy, value);
+			for (DiveToAdd &removed: step.list.dives)
+				if (removed.d && removed.d->id == d->id)
+					internal::set_benthic_id(*removed.d, value);
+		}
+	}
+	if (assigned)
+		ids_dirty = true;
+	result_json = "{\"assigned\":" + std::to_string(assigned) + '}';
+	return 0;
+}
+
 int create_dive(const std::string &fields_json, std::string &result_json, std::string &error)
 {
 	if (check_writable_log(error))
@@ -3686,6 +3756,13 @@ int create_dive(const std::string &fields_json, std::string &result_json, std::s
 				error = "NOT_FOUND: site";
 				return -1;
 			}
+		} else if (key == "benthicId" && text) {
+			// The stable id, made by the app (internal.h, ID_KEY): the dive has it from its creation.
+			if (!internal::valid_benthic_id(value.text)) {
+				error = "BAD_REQUEST: benthicId";
+				return -1;
+			}
+			internal::set_benthic_id(*d, value.text);
 		} else if (key == "notes" && text) {
 			d->notes = value.text;
 		} else if (key == "suit" && text) {

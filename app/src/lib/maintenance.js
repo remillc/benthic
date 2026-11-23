@@ -209,8 +209,8 @@ export const hasRule = (item) => item.intervalMonths != null || item.intervalDiv
  */
 
 /**
- * When a reminder falls due. The dives counted are those where the piece is in the equipment (`diveKeys`: the start
- * times that the inventory keeps, lib/inventory.js `diveKeyOf`), after the last service (the service day itself is
+ * When a reminder falls due. The dives counted are those where the piece is in the equipment (`diveKeys`: their start
+ * times, lib/inventory.svelte.js `diveStartsOf`), after the last service (the service day itself is
  * not counted), or, before any service, from the day the rule was set. The first criterion reached wins: the reminder
  * is overdue as soon as the duration is past or the dives are reached.
  * @param {MaintenanceItem} item

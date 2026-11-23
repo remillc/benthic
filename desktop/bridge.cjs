@@ -88,7 +88,7 @@ const CORE_METHODS = new Set([
   'alphaCacheList', 'alphaCacheOpen', 'cloudSignOut', 'cloudDeleteAccount', 'cloudCreateAccount', 'cloudVerifyPin', 'cloudCreateLog', 'importCount',
   'divelogsCheck', 'divelogsDownload', 'setCloudTestEmail', 'pendingChanges', 'history', 'cloudProbe', 'gitCheck',
   'gitConfigure', 'gitCreateLog', 'editDive', 'getTrip', 'tripAction', 'diveComputers', 'diveComputerAction',
-  'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'mergeDives', 'editDives', 'renumberDives', 'importDives', 'filterPresets',
+  'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'mergeDives', 'editDives', 'benthicIds', 'renumberDives', 'importDives', 'filterPresets',
   'syncConflicts', 'resolveConflicts', 'cancelConflictResolution', 'siteAction', 'toolQuery', 'exportDives',
   'saveLogbookFile', 'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
   'plannerSetup', 'planDive', 'listPlans', 'savePlan', 'listDives', 'statsQuery', 'dcFromBluetoothName',

@@ -704,6 +704,20 @@ Java_app_benthicdivelog_core_NativeCore_editDives(JNIEnv *env, jobject, jintArra
 	return edit_result(env, json);
 }
 
+// The stable dive ids: "audit" lists them, "assign" writes the ones the app made (benthic_ids_json, assign_benthic_ids).
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_benthicIds(JNIEnv *env, jobject, jstring action, jstring assignments)
+{
+	std::string json, error;
+	if (to_string(env, action) == "audit") {
+		benthic::benthic_ids_json(json);
+	} else if (benthic::assign_benthic_ids(to_string(env, assignments), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
+}
+
 // Renumbers dives (all of them if ids is empty): one undoable step (renumber_dives).
 JNIEXPORT jstring JNICALL
 Java_app_benthicdivelog_core_NativeCore_renumberDives(JNIEnv *env, jobject, jintArray diveIds, jint start, jintArray diveNumbers)

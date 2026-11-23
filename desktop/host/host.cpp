@@ -580,6 +580,17 @@ void register_methods()
 			fail(error);
 		return edit_result(json);
 	});
+	// The stable dive ids: action "audit" lists every dive's id, "assign" writes the ones the app made.
+	add("benthicIds", core, [](const Args &a) {
+		std::string action = a.str("action"), json, error;
+		if (action == "audit") {
+			benthic::benthic_ids_json(json);
+			return S(json);
+		}
+		if (benthic::assign_benthic_ids(a.str("assignments"), json, error))
+			fail(error);
+		return S(json);
+	});
 	add("renumberDives", core, [](const Args &a) {
 		std::string json, error;
 		if (benthic::renumber_dives(a.ints("ids"), a.i32("start"), json, error, a.ints("numbers")))

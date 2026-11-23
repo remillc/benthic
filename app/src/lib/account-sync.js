@@ -15,6 +15,8 @@ import { mergeMediaFile } from './dive-media.js';
 import { repositoryKey } from './server-logbook.js';
 import { ALIASES_PATH, ensureShortIds, isOldIdPath, newestWins, planShortIds, splitPath } from './short-id-migration.js';
 import { setIdAliases } from './short-id.js';
+import { recordKey } from './inventory.js';
+import { DIVE_REFERENCE_FOLDERS, planDiveIds } from './dive-id-migration.js';
 import { ACCOUNT_KEY_PATH, DEVICES_DIR, PAIRING_DIR, REQUESTS_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
 
 /** The branch of the account data. */
@@ -95,6 +97,7 @@ export const codeOf = (e) => String(/** @type {any} */ (e)?.code ?? /** @type {a
  * @property {() => Promise<unknown>} [sealClear] seals what still holds clear sensitive data (the profile's date of birth); called before each pass, once the account key is known, so that a first push sends the profile
  * @property {string} [authorName]
  * @property {string} [authorEmail]
+ * @property {() => Map<string, string>} [diveIds] start time -> Benthic id of the dives of the logbook (lib/dive-id-migration.js `startToIdMap`); the clean-up pass turns the references that still hold a start time into the id
  */
 
 /** The text of a local file without parsing it. @param {import('./file-store.js').FileStore} store @param {string} path @returns {Promise<string|null>} */
@@ -201,7 +204,7 @@ function mergeMaintenance(base, ours, theirs) {
  * Creates the engine.
  * @param {AccountSyncDeps} deps
  */
-export function createAccountSync({ core, store, box, now = () => new Date(), sealClear, authorName, authorEmail }) {
+export function createAccountSync({ core, store, box, now = () => new Date(), sealClear, authorName, authorEmail, diveIds = () => new Map() }) {
   const stamp = () => now().toISOString().replace(/\.\d{3}Z$/, 'Z');
   const author = { ...(authorName ? { authorName } : {}), ...(authorEmail ? { authorEmail } : {}) };
 
@@ -253,6 +256,39 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
   }
 
   /**
+   * The references to a dive by its start time become its Benthic id (lib/dive-id-migration.js), in the working copy and committed as
+   * « Benthic: dive ids ». Not an edit: the files keep their `updatedAt` and every device writes the same bytes, so two devices that
+   * both run it do not conflict. A start with no dive in the logbook yet is kept as it is and tried again at the next run. Run at
+   * every sync (a device that has not migrated yet sends start times), before the clean-up, which then merges what names the same dive.
+   * @param {{ dir: string }} copy
+   * @returns {Promise<number>} the files changed
+   */
+  async function diveIdPass({ dir }) {
+    const startToId = diveIds();
+    if (!startToId.size) return 0;
+    const { files } = await core.bgitFiles({ dir });
+    const wanted = files.filter((p) => DIVE_REFERENCE_FOLDERS.some((prefix) => p.startsWith(prefix)) && p.endsWith('.json'));
+    if (!wanted.length) return 0;
+    const { texts } = await core.bgitRead({ dir, paths: wanted });
+    /** @type {Map<string, Record<string, any>>} */
+    const byPath = new Map();
+    wanted.forEach((path, i) => {
+      try {
+        const value = parse(texts[i]);
+        if (value) byPath.set(path, value);
+      } catch {
+        // An unreadable file is left as it is.
+      }
+    });
+    const { writes, removes } = planDiveIds({ files: byPath, startToId });
+    if (!writes.size && !removes.length) return 0;
+    const out = [...[...writes].map(([path, value]) => ({ path, text: sortedJson(value) })), ...removes.map((path) => ({ path, text: /** @type {string|null} */ (null) }))];
+    await core.bgitWrite({ dir, files: out });
+    await core.bgitCommit({ dir, paths: out.map((w) => w.path), message: 'Benthic: dive ids', ...author });
+    return out.length;
+  }
+
+  /**
    * The clean-up pass after a merge (docs/account-sync.md): links to pieces that are gone, `dive-equipment` files that
    * share a dive, reminders of a missing piece. Written into the working copy and committed.
    * @param {{ dir: string }} copy
@@ -290,8 +326,8 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
     /** @type {Map<string, string[]>} */
     const byDive = new Map();
     for (const [path, rec] of byPath) {
-      const start = rec.diveKey?.start;
-      if (path.startsWith('dive-equipment/') && typeof start === 'string') byDive.set(start, [...(byDive.get(start) ?? []), path]);
+      const start = recordKey(rec.diveKey);
+      if (path.startsWith('dive-equipment/') && start) byDive.set(start, [...(byDive.get(start) ?? []), path]);
     }
     for (const paths of byDive.values()) {
       if (paths.length < 2) continue;
@@ -741,6 +777,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
             await core.bgitCommit({ dir, paths: writes.map((w) => w.path), message: 'Benthic: merge', mergeParent: pull.theirs, ...author });
           }
           if (!pullOnly && syncState) await shortIdPass(dir, pull.result !== 'upToDate' && pull.result !== 'empty');
+          if (!pullOnly) await diveIdPass({ dir });
           if (pull.result !== 'upToDate' && pull.result !== 'empty') {
             await cleanUp({ dir });
             keys = await readKeyState(dir);

@@ -6,6 +6,7 @@
   // come from the core (Subsurface's planner). Saved, a plan is a planned dive
   // of the logbook, listed by "Plongées planifiées" only.
   import { untrack } from 'svelte';
+  import { coreIdOfParam } from '../lib/dive-id.js';
   import { placeLevelLabels } from '../lib/chart-labels.js';
   import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -115,11 +116,13 @@
     }
   }
 
-  async function reopenPlan(/** @type {number} */ id) {
+  /** @param {string} param the plan's Benthic id (or its core id, an old address) */
+  async function reopenPlan(param) {
     try {
       const plans = await BenthicCore.listPlans();
-      const plan = plans.find((p) => p.id === id);
+      const plan = plans.find((p) => (p.benthicId ? p.benthicId === param : false) || String(p.id) === param);
       if (!plan) throw new Error('No such plan');
+      const id = plan.id;
       const request = requestOfPlan(plan, prefs);
       const stillThere = request.sourceDiveId && logbook.dives.some((d) => d.id === request.sourceDiveId);
       if (request.sourceDiveId && !stillThere) {
@@ -140,9 +143,9 @@
     await refresh();
     planner.planId = 0;
     planner.kept = null;
-    if (reopen) await reopenPlan(Number(id));
+    if (reopen) await reopenPlan(String(id));
     else if (id === 'new') startNewDive(prefs);
-    else await startFrom(Number(id));
+    else await startFrom(coreIdOfParam(id));
     started = true;
     keptHere = planner.kept;
   }

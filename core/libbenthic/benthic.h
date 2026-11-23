@@ -585,6 +585,22 @@ int merge_dives(const std::vector<int> &ids, std::string &result_json, std::stri
 // {"listChange":true,"dives":<count>,"id":0}.
 int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std::string &result_json, std::string &error);
 
+// Stable dive ids (23 November 2026). Every dive carries a "Benthic id" in the extra data of its first dive computer (the
+// key and the shape are in internal.h; "benthicId" in list_dives(), get_dive() and list_plans()). The core never makes
+// an id: the app does (app/src/lib/short-id.js) and passes them, so that there is one generator.
+//
+// benthic_ids_json(): every dive of the log, hidden ones (planned, invalid) included, as
+// [{"id":<core id>,"benthicId":"..."|"","when":<start>,"plan":true|false}], in table order: the app finds out which dives
+// have none and which share one.
+int benthic_ids_json(std::string &json);
+
+// Writes ids: `assignments_json` is a flat object {"<core id>":"<Benthic id>", ...}. A dive that already has an id gets the new one
+// instead (a duplicate: the app picks the later dive by start time). Not an undo step: ids must not go with an undo.
+// The copies the undo history keeps of those dives get the id too. The change is saved with the next save, as the commit
+// "Benthic ids". Result: {"assigned":<dives changed>}. Errors: WRITE_LOCKED (the log is not writable), BAD_REQUEST
+// (malformed list or id), NOT_FOUND (no such dive; nothing is changed then).
+int assign_benthic_ids(const std::string &assignments_json, std::string &result_json, std::string &error);
+
 // Renumbers dives as Subsurface's Renumber dialog (RenumberDialog, then
 // RenumberDives in commands/command_divelist.cpp): the listed dives (all of
 // them if `ids` is empty), in date order, get consecutive numbers from

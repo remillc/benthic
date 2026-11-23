@@ -4,7 +4,7 @@
 // device, a restore, a load) all of them are new. This module finds, for each old id, the dive it became, by the dive's
 // own data, and tells whoever holds ids (the open dive page, an edit form, the selection) so that they follow.
 
-/** @typedef {{ id: number, date: string, number?: number, durationSeconds?: number, maxDepthMm?: number }} DiveEntry */
+/** @typedef {{ id: number, benthicId?: string, date: string, number?: number, durationSeconds?: number, maxDepthMm?: number }} DiveEntry */
 
 /** The most old ids remembered (oldest dropped first): ids only grow, an old one is rarely asked again. */
 const MAX_KEPT = 60000;
@@ -30,8 +30,30 @@ export function matchReload(before, after) {
   const known = new Set(before.map((d) => d.id));
   if (after.some((d) => known.has(d.id))) return null;
 
+  // A dive that has a Benthic id (lib/dive-id.js) is found by it: exact, whatever its start time or number became. What has none,
+  // or whose id is not on both sides, goes through the guesses below (start time, number, duration, depth).
   /** @type {Map<number, number|null>} */
   const result = new Map(before.map((d) => [d.id, null]));
+  const newById = new Map();
+  const dupNew = new Set();
+  for (const d of after) if (d.benthicId) (newById.has(d.benthicId) ? dupNew : newById).set(d.benthicId, d);
+  for (const id of dupNew) newById.delete(id);
+  const oldCount = new Map();
+  for (const d of before) if (d.benthicId) oldCount.set(d.benthicId, (oldCount.get(d.benthicId) ?? 0) + 1);
+  const pairedOld = new Set();
+  const pairedNew = new Set();
+  for (const d of before) {
+    const n = d.benthicId && oldCount.get(d.benthicId) === 1 ? newById.get(d.benthicId) : undefined;
+    if (!n) continue;
+    result.set(d.id, n.id);
+    pairedOld.add(d.id);
+    pairedNew.add(n.id);
+  }
+  if (pairedOld.size) {
+    const rest = matchReload(before.filter((d) => !pairedOld.has(d.id)), after.filter((d) => !pairedNew.has(d.id)));
+    for (const [old, now] of rest ?? []) result.set(old, now);
+    return result;
+  }
   /** @type {Map<string, DiveEntry[]>} */
   const oldByDate = new Map();
   /** @type {Map<string, DiveEntry[]>} */

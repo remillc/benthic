@@ -14,12 +14,12 @@ section 11 (11.3 the `benthic` branch and its merge rules, 11.5 encryption) stay
 | Equipment pieces | `gear/<id>.json` | branch, same path |
 | Kits | `kits/<id>.json` | branch |
 | Maintenance (reminders and history) | `maintenance/<id>.json` | branch; `history` entries are combined by `id` |
-| What a dive used | `dive-equipment/<uuid>.json` (keyed by `diveKey.start`) | branch, plus a clean-up pass: at most one file per `diveKey` |
+| What a dive used | `dive-equipment/<id>.json` (keyed by `diveKey.benthicId`, the dive's Benthic id; `diveKey.start` until moved, « Dive ids ») | branch, plus a clean-up pass: at most one file per `diveKey` |
 | Dive validations | `dive-validations/<id>.json` | branch |
 | Certifications and documents (data) | `certifications/<id>.json` (sealed) | branch |
 | Card photos, scans, PDFs | `documents/<hash>.json` (sealed base64) | branch (v1), encrypted; photos re-encoded at 1024 px, PDFs capped at about 10 MB; object storage with signed URLs later |
 | Gear and invoice photos | `media/<id>.json` | renamed **`gear-photos/<id>.json`** before anything reaches the server (`media/` is reserved for dive media, 11.6) |
-| Dive photos and videos | on the device (`<media folder>/<sha-256>`) | synced for Benthic+ (decided on 23 November 2026): objects by hash in object storage, references in `media/<dive id>.json` on the branch (architecture 11.6), merged as a union by hash (`lib/dive-media.js`). Until the logbook has a stable dive id, `<dive id>` is the dive’s start time, made safe for a file name (`2026-05-01T10-30-00`), so the same dive on two devices is one file. The transfers are `lib/media-sync.js`, not the git sync. |
+| Dive photos and videos | on the device (`<media folder>/<sha-256>`) | synced for Benthic+ (decided on 23 November 2026): objects by hash in object storage, references in `media/<benthic id>.json` on the branch (architecture 11.6), merged as a union by hash (`lib/dive-media.js`). `<benthic id>` is the dive's Benthic id (`7k2m9q4x1d`), so the same dive on two devices is one file; before 23 November 2026 it was the start time made safe for a file name (`2026-05-01T10-30-00`), moved once (« Dive ids »). The transfers are `lib/media-sync.js`, not the git sync. |
 | Diver settings (phase 2): units, cylinder library, planner defaults, dive computer list | `deviceStore` | `settings/units.json`, `settings/planner.json`, `settings/computers.json`, newest file wins |
 | Device settings: language, theme, date/time format, notifications, Bluetooth, paper/slate, autoSync, network, maps, snoozes | `deviceStore` | stay on the device |
 | `meta/*` (pending, state, sync head, consent) | IndexedDB | never synced |
@@ -46,7 +46,7 @@ No screen code; receives `core`, `store` and `box` (tested with fakes, as `serve
 8. Write `meta/sync.json` `{ accountKey, head }`, then reload inventory and profile and reschedule notifications.
 
 **Clean-up pass** after a merge: drop kit `gearIds` and `dive-equipment` links to missing pieces; merge `dive-equipment`
-files that share a `diveKey` (newest `updatedAt` wins, `gearIds` combined); remove maintenance whose piece is gone.
+files that share a `diveKey` (newest `updatedAt` wins, `gearIds` combined); remove maintenance whose piece is gone. The move of the dive references to the dives' ids (« Dive ids ») runs just before it, at every run.
 
 **When it runs:** at start once the logbook is open; about 3 s after a change (`inventory.svelte.js` `change()`,
 `profile.svelte.js` `changeProfile()`, same debounce as `persistChanges`); right after each dives sync (`syncEdits`);
@@ -74,7 +74,7 @@ desktop only the `main` logbook window syncs account data.
   `dive-equipment.*GearId`, `maintenance.gearId`, `photoId`); empty server fields are filled from local, differing values
   follow the newer `updatedAt`. Natural keys: gear `type` + normalised `brand/model/serial` (serial alone when present;
   computers through `dc-model.js` `sameComputer`); kits: normalised name; maintenance: matched piece + `task`;
-  certifications: `kind` + `agency/level/number` (or `title`/`insurer`); `dive-equipment`: `diveKey`; profile: one file,
+  certifications: `kind` + `agency/level/number` (or `title`/`insurer`); `dive-equipment`: `diveKey` (id or start); profile: one file,
   merged by field. Exact matches merge automatically; ambiguous ones are listed on a summary screen
   (« 12 pièces reconnues, 3 nouvelles, 2 à confirmer »). One commit, « Joindre cet appareil ».
 - Before the first push: `media/` → `gear-photos/`; clear `dateOfBirth`/`fullName` move into `enc` (#136); every existing
@@ -212,12 +212,29 @@ device already holds the account key, and no other device or recovery key has th
   reference any document), and it never removes a document still waiting to be sent. It is what deletes the card photos of the
   erased certifications.
 
+## Dive ids (23 November 2026)
+
+Every dive carries a stable **Benthic id** in the logbook itself (extra data `Benthic id` of its first dive computer; architecture 11, « What goes in the dive's extra data »). The three kinds of file that named a dive by its **start time** now name it by this id:
+
+| File | Before | Now |
+| --- | --- | --- |
+| `dive-equipment/<id>.json` | `diveKey: { start }` | `diveKey: { benthicId }` |
+| `dive-validations/<id>.json` | `dives: [{ start, hash }]` | `dives: [{ benthicId, hash }]` |
+| `media/<name>.json` | named by the start made safe, `diveId` = the start | `media/<benthic id>.json`, `diveId` = the id |
+
+**One-time, deterministic move** (`app/src/lib/dive-id-migration.js`, the idea of `short-id-migration.js`). The mapping *start time -> Benthic id* comes from the logbook, which every device shares, so every device derives the same result without talking to the others; two dives that start in the same second go to the smaller id. The planner `planDiveIds` has no state and no clock, and a rewritten file keeps its `updatedAt` (it is the same record, not an edit), so two devices that both run it write the same bytes and git merges them without a conflict. Two callers:
+
+- **the device's store**, once the logbook has every id (`onIdsComplete` in `lib/dive-id.js`, `inventory.migrateDiveIds`): rewritten files and the removed media names are tracked changes, sent at the next run like an edit (an inventory that is read only after a subscription ended is left alone);
+- **the working copy of the `benthic` branch**, in every run (`diveIdPass` in `lib/account-sync.js`, commit `Benthic: dive ids`), before the clean-up pass: it also moves what an older device sends. The clean-up then merges what names the same dive (`dive-equipment` of a start and of an id for the same dive are one file after the move; media files already at the id are merged by hash).
+
+A start time that matches **no dive with an id** (the dive is not loaded yet, has no id yet, or was deleted) is **kept as it is** and tried again at the next run; a screen reads a key either way (`recordKey`: `benthicId`, else `start`). Editing a dive's start time no longer re-keys anything once it has an id.
+
 ## Short ids (to-do #149)
 
 Decided on 23 November 2026. Benthic's own ids (pieces, kits, reminders and their history entries, photos, what a dive used and its
 pieces outside the inventory, certifications, validations, the device) are **10 characters of lowercase Crockford base32**
 (`0123456789abcdefghjkmnpqrstvwxyz`, 50 random bits from `crypto.getRandomValues`, no prefix, e.g. `7k2m9q4x1d`):
-`newId()` in `app/src/lib/short-id.js`, re-exported by `inventory.js`. Never touched: the dive ids and the logbook's git format (branch `main`).
+`newId()` in `app/src/lib/short-id.js`, re-exported by `inventory.js`. Never touched: the logbook's git format (branch `main`); a dive's own id is the `Benthic id` of its extra data (« Dive ids »), made with the same generator.
 
 **Kept as they are.** The data key's `kid` (derived from key material); the pairing request and answer ids (`keys/requests`, `keys/pairing`:
 22 characters of base64url, ten minutes long, bound into the HKDF salt, the authenticated data and the 6-digit code, whose formula does not

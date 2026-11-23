@@ -6,14 +6,15 @@
 // section 11.3) so that it can later be synchronised file by file with the Benthic server:
 //   gear/<id>.json              one piece
 //   kits/<id>.json              one kit: a name and the ids of its pieces
-//   dive-equipment/<id>.json    what one dive used (the on-device logbook has no stable id yet, see `diveKeyOf`)
+//   dive-equipment/<id>.json    what one dive used, `diveKey: { benthicId }` (the dive's Benthic id, see `diveKeyOf`; `{ start }` until migrated)
 //   meta/state.json             this device's state of the inventory: read only after a subscription ends
 //   meta/pending.json           the files changed here and not sent yet
 // Everything is read and written through a FileStore (lib/file-store.js). An unknown field of a file is kept: a
 // file is read as an object, the keys the app owns are changed, and the object is written back.
 
 import { sameComputer } from './dc-model.js';
-import { newId } from './short-id.js';
+import { isShortId, newId } from './short-id.js';
+import { migrateDiveIdsInStore } from './dive-id-migration.js';
 
 import { ruleProblems } from './maintenance.js';
 import { rekey as rekeyValidations } from './validation.js';
@@ -89,14 +90,22 @@ export class ReadOnlyError extends Error {
 export { newId, isUuid } from './short-id.js';
 
 /**
- * The key of a dive in the inventory. The on-device logbook is the Subsurface core's, whose numeric ids are valid
- * for one load only; the number changes at each renumbering. What does not move is the start time to the second
- * (Subsurface itself treats two dives that start together as the same dive, merging them), so a dive is keyed by it.
- * Editing the start time of a dive re-keys its record (`rekeyDive`). The key goes away when the logbook moves to the
- * Benthic format and a dive has its own UUID: the record's content then joins the dive's file.
- * @param {{ date: string }} dive a row of the list or a DiveDetail
+ * The key of a dive in the inventory: its Benthic id (the extra data `Benthic id`, lib/dive-id.js), which never changes. The core's
+ * numeric ids are valid for one load only and the number changes at each renumbering. A dive that has no id yet (the pass that
+ * gives them runs after a load) is keyed by its start time to the second, the key that records made before the ids hold until
+ * `lib/dive-id-migration.js` has turned them into the dive's id.
+ * @param {{ date: string, benthicId?: string }} dive a row of the list or a DiveDetail
  */
-export const diveKeyOf = (dive) => String(dive.date).slice(0, 19);
+export const diveKeyOf = (dive) => (isShortId(dive.benthicId) ? dive.benthicId : startKeyOf(dive));
+
+/** The start time of a dive to the second: the key of the records made before the Benthic ids. @param {{ date: string }} dive */
+export const startKeyOf = (dive) => String(dive.date).slice(0, 19);
+
+/** The key a record holds (`diveKey`): a Benthic id, or a start time while the record has not been migrated. @param {{ benthicId?: string, start?: string }|undefined} diveKey */
+export const recordKey = (diveKey) => diveKey?.benthicId ?? diveKey?.start ?? '';
+
+/** How a record holds a key: `{ benthicId }` for an id, `{ start }` for a start time. @param {string} key @returns {{ benthicId: string }|{ start: string }} */
+export const keyField = (key) => (isShortId(key) ? { benthicId: key } : { start: key });
 
 /**
  * What a dive used, as the edit screen holds it before saving.
@@ -256,12 +265,12 @@ export function uniqueKitName(base, taken, copy) {
 /**
  * What a kit was used for: the dives whose record names it as the last kit applied, and the latest of them.
  * @param {string} kitId
- * @param {{ kitId?: string, diveKey?: { start: string } }[]} records
+ * @param {{ kitId?: string, diveKey?: { benthicId?: string, start?: string } }[]} records
  * @param {{ date: string }[]} dives the logbook's rows (a record whose dive is gone is not counted)
  * @returns {{ dives: number, last: string }} `last`: the start of the latest dive, or ''
  */
 export function kitUse(kitId, records, dives) {
-  const keys = new Set(records.filter((r) => r.kitId === kitId && r.diveKey).map((r) => /** @type {{ start: string }} */ (r.diveKey).start));
+  const keys = new Set(records.filter((r) => r.kitId === kitId && r.diveKey).map((r) => recordKey(r.diveKey)));
   let n = 0;
   let last = '';
   for (const d of dives) {
@@ -695,7 +704,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       return (await store.read(`gear-photos/${photoId}.json`))?.dataUrl ?? '';
     },
 
-    /** @returns {Promise<(DiveEquipment & { id: string, diveKey: { start: string } })[]>} */
+    /** @returns {Promise<(DiveEquipment & { id: string, diveKey: { benthicId?: string, start?: string } })[]>} */
     async listDiveEquipment() {
       return store.readAll('dive-equipment/');
     },
@@ -706,7 +715,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
      * @param {DiveEquipment} equipment
      */
     async saveDiveEquipment(diveKey, equipment) {
-      const existing = (await store.readAll('dive-equipment/')).find((r) => r.diveKey?.start === diveKey);
+      const existing = (await store.readAll('dive-equipment/')).find((r) => recordKey(r.diveKey) === diveKey);
       if (equipmentIsEmpty(equipment)) {
         if (existing) await commit([], [`dive-equipment/${existing.id}.json`]);
         return;
@@ -714,7 +723,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       const rec = {
         ...(existing ?? { format: 1, createdAt: stamp() }),
         id: existing?.id ?? id(),
-        diveKey: { start: diveKey },
+        diveKey: keyField(diveKey),
         suitGearId: equipment.suitGearId,
         undersuitGearId: equipment.undersuitGearId,
         gearIds: [...equipment.gearIds],
@@ -725,12 +734,19 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       await commit([[`dive-equipment/${rec.id}.json`, rec]]);
     },
 
+    /**
+     * The records that name a dive by its start time take its Benthic id (lib/dive-id-migration.js). A no-op when there is none.
+     * @param {Map<string, string>} startToId
+     * @returns {Promise<number>} the files written or removed
+     */
+    migrateDiveIds: (startToId) => migrateDiveIdsInStore(store, startToId, commit),
+
     /** A dive's start time was edited: its record follows. @param {string} from @param {string} to */
     async rekeyDive(from, to) {
       if (from === to) return;
-      const rec = (await store.readAll('dive-equipment/')).find((r) => r.diveKey?.start === from);
+      const rec = (await store.readAll('dive-equipment/')).find((r) => recordKey(r.diveKey) === from);
       const writes = /** @type {[string, unknown][]} */ ([]);
-      if (rec) writes.push([`dive-equipment/${rec.id}.json`, { ...rec, diveKey: { start: to }, updatedAt: stamp() }]);
+      if (rec) writes.push([`dive-equipment/${rec.id}.json`, { ...rec, diveKey: keyField(to), updatedAt: stamp() }]);
       // The dive's validations follow it (lib/validation.js).
       for (const v of rekeyValidations(await store.readAll('dive-validations/'), from, to)) writes.push([`dive-validations/${v.id}.json`, { ...v, updatedAt: stamp() }]);
       if (writes.length) await commit(writes);
@@ -738,7 +754,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
 
     /** A dive was deleted from the logbook. @param {string} diveKey */
     async forgetDive(diveKey) {
-      const rec = (await store.readAll('dive-equipment/')).find((r) => r.diveKey?.start === diveKey);
+      const rec = (await store.readAll('dive-equipment/')).find((r) => recordKey(r.diveKey) === diveKey);
       if (rec) await commit([], [`dive-equipment/${rec.id}.json`]);
     },
   };

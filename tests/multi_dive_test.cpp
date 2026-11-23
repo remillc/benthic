@@ -17,6 +17,7 @@
 #include "core/dive.h"
 #include "core/divelog.h"
 #include "core/divecomputer.h"
+#include "core/extradata.h"
 #include "core/divesite.h"
 #include "core/sample.h"
 #include "core/pref.h"
@@ -168,6 +169,95 @@ static void check_merge_number_persistence(const std::string &log, const std::st
 		      by_when(times[4]) && by_when(times[4])->number == 11 &&
 		      by_when(times[5]) && by_when(times[5])->number == 12,
 	      "the adjusted and unnumbered dives reload with their numbers");
+}
+
+// The stable dive id (23 November 2026): the extra data "Benthic id", written by assign_benthic_ids().
+static std::string commit_message(const std::string &folder)
+{
+	std::string out;
+	FILE *p = popen(("git -C " + folder + " log -1 --format=%B").c_str(), "r");
+	char buf[256];
+	while (p && fgets(buf, sizeof(buf), p))
+		out += buf;
+	if (p)
+		pclose(p);
+	return out;
+}
+
+static std::string benthic_id_in(const dive &d)
+{
+	for (const divecomputer &dc: d.dcs)
+		for (const extra_data &e: dc.extra_data)
+			if (e.key == "Benthic id")
+				return e.value;
+	return std::string();
+}
+
+static void check_benthic_ids(const std::string &log, const std::string &folder)
+{
+	std::string json, result, error;
+	if (list_dives(log, json, error)) {
+		check(false, "reload for the id checks: " + error);
+		return;
+	}
+	size_t n = divelog.dives.size();
+	check(save_local(error) == 0 && !has_unsaved_changes(), "nothing to save before the ids");
+	benthic_ids_json(json);
+	check(json.find("\"benthicId\":\"\"") != std::string::npos && json.find("\"benthicId\":\"a") == std::string::npos,
+	      "no dive has an id in the sample");
+	// Refusals change nothing.
+	check(assign_benthic_ids("{\"" + std::to_string(divelog.dives[0]->id) + "\":\"nope\"}", result, error) != 0 &&
+		      error.rfind("BAD_REQUEST", 0) == 0,
+	      "a malformed id is refused");
+	check(assign_benthic_ids("{\"987654\":\"0123456789\"}", result, error) != 0 && error == "NOT_FOUND", "an unknown dive is refused");
+	check(!has_unsaved_changes(), "refused ids change nothing");
+	// Ids for every dive; the second dive repeats the first one's (a split dive).
+	const char *alphabet = "0123456789abcdefghjkmnpqrstvwxyz";
+	std::string assignments = "{";
+	std::vector<std::string> given;
+	for (size_t i = 0; i < n; i++) {
+		std::string id = "0000000000";
+		id[9] = alphabet[i % 32];
+		id[8] = alphabet[(i / 32) % 32];
+		given.push_back(id);
+	}
+	given[1] = given[0];
+	for (size_t i = 0; i < n; i++)
+		assignments += (i ? ",\"" : "\"") + std::to_string(divelog.dives[i]->id) + "\":\"" + given[i] + "\"";
+	assignments += "}";
+	check(assign_benthic_ids(assignments, result, error) == 0 && result == "{\"assigned\":" + std::to_string(n) + "}",
+	      "assign gives every dive an id");
+	check(has_unsaved_changes() && !can_undo(), "ids are unsaved changes but not an undo step");
+	check(assign_benthic_ids(assignments, result, error) == 0 && result == "{\"assigned\":0}", "assigning the same ids again changes nothing");
+	// The duplicate: the later dive gets a new id, the first keeps its own.
+	const std::string fresh = "zzzzzzzzzz";
+	check(assign_benthic_ids("{\"" + std::to_string(divelog.dives[1]->id) + "\":\"" + fresh + "\"}", result, error) == 0 &&
+		      benthic_id_in(*divelog.dives[1]) == fresh && benthic_id_in(*divelog.dives[0]) == given[0],
+	      "a duplicate gets a new id, the first dive keeps its own");
+	given[1] = fresh;
+	std::string one;
+	get_dive(divelog.dives[2]->id, one, error);
+	check(one.find("\"benthicId\":\"" + given[2] + "\"") != std::string::npos, "get_dive returns benthicId");
+	list_loaded_dives(json);
+	check(json.find("\"benthicId\":\"" + given[2] + "\"") != std::string::npos, "the list returns benthicId");
+	// An edit, then its undo: the id is not taken away by the copy the undo history holds.
+	int id2 = divelog.dives[2]->id;
+	check(edit_dive(id2, "{\"notes\":\"with an id\"}", result, error) == 0 && benthic_id_in(*divelog.dives[2]) == given[2], "an edit keeps the id");
+	check(undo(result, error) == 0 && benthic_id_in(*divelog.dives[2]) == given[2], "an undo keeps the id");
+	// Saved as its own commit, then read again.
+	check(save_local(error) == 0 && !has_unsaved_changes(), "the ids are saved");
+	check(commit_message(folder).find("Benthic ids") != std::string::npos && commit_message(folder).find("Edit") == std::string::npos, "the commit is named \"Benthic ids\"");
+	check(list_dives(log, json, error) == 0 && divelog.dives.size() == n, "the log reads again");
+	bool same = true;
+	for (size_t i = 0; i < n; i++)
+		same = same && benthic_id_in(*divelog.dives[i]) == given[i];
+	check(same, "every id survives the save and the load");
+	// A dive made with its id.
+	check(create_dive("{\"date\":\"2026-06-01T10:00:00\",\"benthicId\":\"7k2m9q4x1d\"}", result, error) == 0, "a dive is created with an id");
+	benthic_ids_json(json);
+	check(json.find("\"benthicId\":\"7k2m9q4x1d\"") != std::string::npos, "the new dive has its id");
+	check(create_dive("{\"benthicId\":\"short\"}", result, error) != 0, "a created dive with a bad id is refused");
+	check(undo(result, error) == 0, "the creation is undone");
 }
 
 int main(int argc, char **argv)
@@ -411,6 +501,7 @@ int main(int argc, char **argv)
 			reread = reread && d->suit == "7 mm";
 	check(reread, "the reloaded dives carry the edit");
 	check_merge_number_persistence(log, folder);
+	check_benthic_ids(log, folder);
 	printf("%s: %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
 	return failures ? 1 : 0;
 }
