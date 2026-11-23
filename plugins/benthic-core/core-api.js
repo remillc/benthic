@@ -253,8 +253,8 @@ export { waterTypeOf };
  * @property {number} ml
  * @property {number} mbar working pressure; 0 when unknown
  * @property {number} dives how many dives of the logbook use it
- * @property {boolean} standard in the core's default list
- * @property {boolean} library in the device's library (can be removed)
+ * @property {boolean} standard in the core's default table (no longer used by the screens)
+ * @property {boolean} library one of the types the diver added (given to the core with action 'added')
  */
 
 /**
@@ -269,6 +269,7 @@ export { waterTypeOf };
  * @typedef {Object} CylinderTypes
  * @property {CylinderType[]} types the runtime table, sorted by name
  * @property {string[]} library the device's library, to keep as is and set again at start
+ * @property {{ name: string, ml: number, mbar: number, imperial: boolean }[]} [defaults] after 'defaults': the core's default table, as suggestions only (`imperial`: AL80, HP100... in cubic feet and psi), never part of the list
  * @property {CylinderTypeDeletion} [deletion] after 'delete' and 'deletePreview'
  * @property {string} undo
  * @property {string} redo
@@ -794,7 +795,7 @@ export { waterTypeOf };
  *   The core's preferences: units (the loaded log's when it has them), the Settings values.
  * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number, diveComputerList?: string[]}}) => Promise<void>} setPrefs
  *   Sets core preferences (set_prefs in benthic.h); a device setting, kept by the app.
- * @property {(options: {action: 'list'|'library'|'standard'|'add'|'size'|'remove'|'rename'|'delete'|'deletePreview', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
+ * @property {(options: {action: 'list'|'library'|'added'|'defaults'|'standard'|'add'|'size'|'remove'|'rename'|'delete'|'deletePreview', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
  *   "delete" removes one of the diver's types and its cylinders from the dives (one undoable
  *   step; `deletion` has the counts), "deletePreview" only returns the counts,

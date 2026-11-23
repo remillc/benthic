@@ -213,7 +213,7 @@ class BenthicCorePlugin : Plugin() {
         call.resolve()
     }
 
-    /** Cylinder types of Settings: list, library, add, size, remove, rename (see benthic.h). */
+    /** Cylinder types of Settings: list, library, added (the diver's own types, from the cylinder-types files), defaults (the common sizes), add, size, remove, rename, delete (see benthic.h). */
     @PluginMethod
     fun cylinderTypes(call: PluginCall) = onCoreThread(call, afterSetup = false) {
         val json = NativeCore.cylinderTypes(

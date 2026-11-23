@@ -114,6 +114,52 @@ static void verify(const Expect *list, const std::string &what)
 	}
 }
 
+// Task 2026-11-23-373: the default table is only offered as suggestions; the diver's added types are given to the core in memory
+// (set_added_cylinder_types) and stay in the table whatever display_default_tank_infos says, after a log is read, and are never
+// written to the log.
+static void cylinder_types_library_checks(const std::string &folder)
+{
+	std::string json, error;
+	// The default table, as suggestions: imperial entries (cubic feet, psi) and metric ones.
+	check(default_cylinder_types(json) == 0, "defaults");
+	check(json.rfind("{\"types\":[],", 0) == 0, "defaults: the answer starts like the other cylinder answers (the plugin reads it by this prefix): " + json);
+	check(json.find("\"name\":\"AL80\"") != std::string::npos && json.find("\"imperial\":true") != std::string::npos, "defaults: imperial entries");
+	check(json.find("\"name\":\"12L 232 bar\",\"ml\":12000,\"mbar\":232000,\"imperial\":false") != std::string::npos, "defaults: metric entries in litres and bar: " + json);
+	check(json.find("\"name\":\"HP100\"") != std::string::npos && json.find("\"name\":\"LP95\"") != std::string::npos, "defaults: HP100 and LP95");
+
+	// "Proposer les tailles standard" is off: the list is the dives' types only.
+	check(set_prefs("{\"displayDefaultTankInfos\":false}", error) == 0, "display_default_tank_infos off: " + error);
+	check(cylinder_types(json) == 0, "list");
+	check(json.find("\"name\":\"HP100\"") == std::string::npos, "the default table is not in the list");
+
+	// The diver's added types: in the table, with the size given, whatever the preference, and not part of any dive.
+	check(set_added_cylinder_types("{\"added\":[\"Acier 10L\t10000\t232000\",\"AL80\t11000\t200000\"]}", error) == 0, "added: " + error);
+	check(json.size() > 0 && cylinder_types(json) == 0, "list after added");
+	check(json.find("\"name\":\"Acier 10L\",\"ml\":10000,\"mbar\":232000,\"dives\":0") != std::string::npos, "an added type no dive uses is in the list: " + json);
+	check(json.find("\"name\":\"HP100\"") == std::string::npos, "still no default table in the list");
+	// A name the dives also have: one entry, the diver's size.
+	size_t first = json.find("\"name\":\"AL80\""), second = first == std::string::npos ? first : json.find("\"name\":\"AL80\"", first + 1);
+	check(first != std::string::npos && second == std::string::npos, "a type of the diver and of the dives is one row: " + json);
+	check(json.find("\"name\":\"AL80\",\"ml\":11000,\"mbar\":200000") != std::string::npos, "the diver's size wins in the table: " + json);
+	check(json.find("\"library\":true") != std::string::npos, "added types are flagged");
+
+	// Reading another log (the table is rebuilt from the dives) keeps them.
+	std::string reread;
+	check(list_dives(folder + "/a[main]", reread, error) == 0, "reload: " + error);
+	check(cylinder_types(json) == 0 && json.find("\"name\":\"Acier 10L\"") != std::string::npos, "added types survive the table being rebuilt: " + json);
+
+	// They can be renamed (no dive: nothing renamed in the log), and deleted although the name is a standard one's.
+	check(cylinder_type_rename("Acier 10L", "Acier 10 L", json, error) == 0, "rename: " + error);
+	check(json.find("\"name\":\"Acier 10 L\"") != std::string::npos, "renamed in the list");
+	check(cylinder_type_delete("Acier 10 L", false, json, error) == 0, "delete an added type: " + error);
+	check(json.find("\"name\":\"Acier 10 L\"") == std::string::npos, "deleted from the list");
+	// An empty list empties the library: the default table does not come back.
+	check(set_added_cylinder_types("{\"added\":[]}", error) == 0, "empty");
+	check(cylinder_types(json) == 0 && json.find("\"name\":\"HP100\"") == std::string::npos && json.find("\"library\":true") == std::string::npos,
+	      "no added type, no default table: " + json);
+	check(set_added_cylinder_types("{\"added\":[\"no tabs\"]}", error) != 0, "a bad entry is refused");
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 3) {
@@ -139,7 +185,11 @@ int main(int argc, char **argv)
 	check(cylinder_type_delete("Mon 3L", true, json, error) == 0, "preview: " + error);
 	check(json.find("\"deletion\":{\"removed\":3,\"kept\":3}") != std::string::npos, "preview counts: " + json);
 	verify(BEFORE, "after the preview");
-	check(cylinder_type_delete("AL80", true, json, error) != 0 && error == "NOT_FOUND", "a standard type is refused");
+	// Task 2026-11-23-373: no type is refused for being in the default table (« AL80 » is a type of these dives, which can be
+	// deleted like any other); only a name that is nowhere is not found.
+	check(cylinder_type_delete("AL80", true, json, error) == 0, "AL80 of the dives is a type like another: " + error);
+	error.clear();
+	check(cylinder_type_delete("No such type", true, json, error) != 0 && error == "NOT_FOUND", "a type that is nowhere is not found");
 	error.clear();
 
 	check(cylinder_type_delete("Mon 3L", false, json, error) == 0, "delete: " + error);
@@ -162,6 +212,8 @@ int main(int argc, char **argv)
 
 	error.clear();
 	check(cylinder_type_delete("Mon 3L", false, json, error) != 0 && error == "NOT_FOUND", "deleted twice");
+	error.clear();
+	cylinder_types_library_checks(folder);
 	printf(failures ? "%d failures\n" : "all checks passed\n", failures);
 	return failures ? 1 : 0;
 }

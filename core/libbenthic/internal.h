@@ -15,6 +15,7 @@ struct dive;
 struct dive_site;
 struct divecomputer;
 struct fingerprint_record;
+struct tank_info;
 using fingerprint_table = std::vector<fingerprint_record>; // core/device.h
 
 namespace benthic::internal {
@@ -133,6 +134,13 @@ int pending_for(const std::string &log);
 // True when `name` is a cylinder type of the runtime table or of the device's
 // library (settings.cpp; TankInfoModel's tank_type_name_in_use()).
 bool cylinder_type_name_in_use(const std::string &name);
+
+// The diver’s own cylinder types, the ones the app gives the core from the device (the `cylinder-types/` files):
+// empty until set, never Subsurface’s default list (that one is only offered as suggestions, default_cylinder_types()).
+std::vector<tank_info> &cylinder_library();
+// The runtime table as Subsurface rebuilds it (the log’s cylinder types), plus the library, which stays whatever
+// the preference display_default_tank_infos says.
+void refresh_cylinder_table();
 
 // Free filter (filter.cpp). A filter as Subsurface's FilterData, for a filter
 // preset: refuses the Benthic criteria (country, region, trip) and text

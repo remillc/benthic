@@ -706,7 +706,7 @@ void on_log_loaded()
 	next_to_write = 0;
 	loaded_format_version = read_format_version();
 	// The cylinder types of the new log (as clear_dive_file_data() before a load).
-	reset_tank_info_table(tank_info_table);
+	internal::refresh_cylinder_table();
 }
 
 } // namespace internal
@@ -1521,7 +1521,7 @@ static void apply_cylinder_type(Step &step)
 	}
 	if (tank_info *info = get_tank_info(tank_info_table, from))
 		info->name = to;
-	if (tank_info *info = get_tank_info(get_tank_info_baseline(), from))
+	if (tank_info *info = get_tank_info(internal::cylinder_library(), from))
 		info->name = to;
 	std::swap(step.type_name, step.value);
 }
@@ -1542,7 +1542,7 @@ int cylinder_type_rename(const std::string &old_name, const std::string &new_nam
 	step.cylinders = find_cylinders_with_type_description(old_name);
 	// RenameCylinderType::workToBeDone()
 	if (step.cylinders.empty() && !get_tank_info(tank_info_table, old_name) &&
-	    !get_tank_info(get_tank_info_baseline(), old_name)) {
+	    !get_tank_info(internal::cylinder_library(), old_name)) {
 		error = "NOT_FOUND";
 		return -1;
 	}
@@ -1603,9 +1603,8 @@ static bool cylinder_removable(const dive &d, int idx)
 
 int cylinder_type_delete(const std::string &name, bool dry_run, std::string &json, std::string &error)
 {
-	std::vector<tank_info> &library = get_tank_info_baseline();
-	std::vector<tank_info> standard = default_tank_info_table();
-	if (name == UNKNOWN_CYLINDER_TYPE || (!get_tank_info(library, name) && !get_tank_info(tank_info_table, name)) || get_tank_info(standard, name)) {
+	std::vector<tank_info> &library = internal::cylinder_library();
+	if (name == UNKNOWN_CYLINDER_TYPE || (!get_tank_info(library, name) && !get_tank_info(tank_info_table, name))) {
 		error = "NOT_FOUND";
 		return -1;
 	}

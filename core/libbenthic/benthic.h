@@ -63,7 +63,13 @@ int cylinder_types(std::string &json);
 // The device's library, {"library":[…]} as cylinder_types() writes it, set
 // again at start (Subsurface keeps it in its settings); rebuilds the table.
 int set_cylinder_library(const std::string &library_json, std::string &error);
-// The library back to Subsurface's standard list (Reset all settings).
+// The diver's own types, {"added":["name\tml\tmbar", ...]}, from the `cylinder-types/` files of the device: they replace
+// the library and are in the table whatever the preference display_default_tank_infos says. Nothing is written to the log.
+int set_added_cylinder_types(const std::string &added_json, std::string &error);
+// Subsurface's default table, as suggestions only (never part of the library):
+// {"types":[],"library":[],"defaults":[{"name","ml","mbar","imperial"}, ...]}.
+int default_cylinder_types(std::string &json);
+// Rebuilds the table (Reset all settings); the diver's own types stay.
 void reset_cylinder_library();
 // action: "add" (a new type `name` of `ml` and `mbar`; NAME_IN_USE), "size"
 // (`ml` and `mbar` of the type `name`, in the table and, if it is there, in the

@@ -731,7 +731,7 @@ void register_methods()
 			fail(error);
 		return NOTHING;
 	});
-	// Cylinder types: list, library, standard, add, size, remove, rename.
+	// Cylinder types: list, library, added, defaults, standard, add, size, remove, rename, delete.
 	add("cylinderTypes", core, [](const Args &a) {
 		std::string action = a.str("action"), name = a.str("name"), value = a.str("value"), json, error;
 		int ret;
@@ -739,6 +739,10 @@ void register_methods()
 			ret = benthic::cylinder_types(json);
 		else if (action == "library")
 			ret = benthic::set_cylinder_library(value, error) ? -1 : benthic::cylinder_types(json);
+		else if (action == "added")
+			ret = benthic::set_added_cylinder_types(value, error) ? -1 : benthic::cylinder_types(json);
+		else if (action == "defaults")
+			ret = benthic::default_cylinder_types(json);
 		else if (action == "standard") {
 			benthic::reset_cylinder_library();
 			ret = benthic::cylinder_types(json);
