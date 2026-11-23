@@ -22,9 +22,8 @@
   import { openManageAccount } from '../lib/navigation.svelte.js';
   import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   import { openBackup } from '../lib/navigation.svelte.js';
-  import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
-  import { accountEmail as emailOfAccount, profileRow, sheetVariant } from '../lib/account-sheet.js';
+  import { accountEmail as emailOfAccount, sheetVariant } from '../lib/account-sheet.js';
 
   const email = $derived(emailOfAccount(benthicPlusAccount, logbook));
   // A Benthic+ account shows the diver's full name first and the e-mail under it, in smaller grey text (task 2026-11-19-312).
@@ -42,11 +41,8 @@
   const variant = $derived(sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email }));
   const free = $derived(variant === 'free');
   const subscriber = $derived(variant === 'subscriber');
-  /** The overdue pieces: the badge and the red line of « Mon profil de plongeur » (the count of the Entretien row). */
-  const late = $derived(profileRow(subscriber ? overdueBadge() : 0));
-  // The reminders are read when the sheet opens, so that the count is the one of the profile's Entretien row.
+  // The diver's name is read when the sheet opens.
   $effect(() => {
-    if (navigation.accountOpen && subscriber && !desktopApp) loadInventory().catch((e) => console.error('Reading the equipment', e));
     if (navigation.accountOpen && subscriber) loadProfile().catch((e) => console.error('Reading the profile', e));
   });
 
@@ -96,7 +92,7 @@
   {#if ios}
   <!-- iPhone (task 2026-11-14-127, appbar-tiroir-ios-ouvert.dc.html): a page sheet « Compte » with
        OK, in grouped lists: the account, the sync, then Réglages and À propos. Its rows are buttons: `data-row` names
-       them as the Android rows' addresses do (« #profile » there, data-row="profile" here), for the navigation tests. -->
+       them as the Android rows' addresses do (« #backup » there, data-row="backup" here), for the navigation tests. -->
   <div class="bc-account-sheet--ios">
     <div class="bc-account-sheet--ios-bar">
       <span class="bc-account-sheet--ios-title">{t('account.title')}</span>
@@ -180,21 +176,8 @@
       </div>
       {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
       {#if isRelease && !desktopApp}
-        <!-- « Mon profil de plongeur », then « Sauvegarde et restauration » (tasks 267, 281, 290, 291): the red line and the badge when a piece is overdue. -->
+        <!-- « Sauvegarde et restauration » (tasks 290, 291): the diver profile is a main destination now (task 2026-11-23-347). -->
         <div class="bc-account-sheet--ios-group">
-          <button type="button" class="bc-account-sheet--ios-row" data-row="profile" onclick={() => go(() => openOver('/profile'))}>
-            <Icon name="briefcase" />
-            <span class="bc-account-sheet--row-label">
-              {t('gear.profile.title')}
-              {#if late.late}
-                <span class="bc-account-sheet--row-line bc-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
-              {:else}
-                <span class="bc-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
-              {/if}
-            </span>
-            {#if late.late}<span class="bc-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
-            <Icon name="chevron" size={20} />
-          </button>
           {#if subscriber}
             <!-- « Sauvegarde et restauration » (task 290; ios-compte-abonne): its own page. -->
             <button type="button" class="bc-account-sheet--ios-row" data-row="backup" onclick={() => go(openBackup)}>
@@ -341,26 +324,11 @@
 
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
-    <!-- Release edition (task 2026-11-17-267): « Mon profil de plongeur », between the account and Réglages, and for a Benthic+
-         account « Sauvegarde et restauration » below it (tasks 290 and 291); no chip next to a subscriber's entries. When a piece
-         is overdue, the red badge and line (task 2026-11-18-281). -->
+    <!-- Release edition: for a Benthic+ account « Sauvegarde et restauration » (tasks 290 and 291); « Mon profil de plongeur » left
+         the sheet for the Profil destination of the navigation (task 2026-11-23-347). -->
     {#if isRelease && !desktopApp}
       <div class="bc-account-sheet--card">
-        <a href="#profile" class="bc-account-sheet--row bc-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(() => openOver('/profile')))}>
-          <Icon name="briefcase" />
-          <span class="bc-account-sheet--row-label">
-            {t('gear.profile.title')}
-            {#if late.late}
-              <span class="bc-account-sheet--row-line bc-account-sheet--late-line">{t('account.sheet.maintenanceLate', { n: late.badge })}</span>
-            {:else}
-              <span class="bc-account-sheet--row-line">{t('gear.profile.cardLine')}</span>
-            {/if}
-          </span>
-          {#if late.late}<span class="bc-account-sheet--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
-          <Icon name="chevron" size={20} />
-        </a>
         {#if subscriber}
-          <div class="bc-account-sheet--divider bc-account-sheet--margin"></div>
           <a href="#backup" class="bc-account-sheet--row bc-account-sheet--profile" onclick={(e) => (e.preventDefault(), go(openBackup))}>
             <Icon name="history" />
             <span class="bc-account-sheet--row-label">
@@ -846,26 +814,6 @@
         border-radius: 11px;
         padding: 0 8px 0 6px;
       }
-    }
-
-    .bc-account-sheet--row-line.bc-account-sheet--late-line {
-      color: var(--bc-late-text);
-    }
-
-    .bc-account-sheet--late-badge {
-      flex: none;
-      min-width: 24px;
-      height: 24px;
-      padding: 0 6px;
-      box-sizing: border-box;
-      border-radius: 12px;
-      background: var(--bc-late);
-      color: #FFFFFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
     }
 
     .bc-account-sheet--badge {

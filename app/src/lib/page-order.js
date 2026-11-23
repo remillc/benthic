@@ -80,7 +80,7 @@ export function keepPageOrder(router) {
 export function enablePageOrder(f7) {
   /** @param {any} view */
   const keep = (view) => view?.router && keepPageOrder(view.router);
-  for (const id of ['logbook', 'sites', 'statistics', 'tools', 'account']) keep(f7.views.get(`#view-${id}`));
+  for (const id of ['logbook', 'sites', 'profile', 'statistics', 'tools', 'account']) keep(f7.views.get(`#view-${id}`));
   keep(f7.views.main);
   f7.on('viewInit', keep);
 }

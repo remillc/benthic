@@ -225,6 +225,7 @@
   "tabs": {
     "logbook": "Logbook",
     "sites": "Sites",
+    "profile": "Profile",
     "statistics": "Statistics",
     "statisticsShort": "Stats",
     "tools": "Tools"
@@ -2782,6 +2783,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Logbook: while the app exchanges with the server at start, a white line is drawn on the faint profile of the header, on every device: a segment slides while the progress is unknown, then the line fills up, completes and fades. It replaces the wavy bar.",
       "Sync: synchronisation is always automatic. The « Sync automatically » switch and the manual mode are gone; « Wi-Fi or cable only » and « Sync now » stay, and changes not sent still show when the device is offline.",
       "Logbook: a long press on a dive or a trip starts selection mode as soon as it is recognised, with the finger still down and a short haptic tap on phones and tablets; letting go no longer decides.",
@@ -5976,10 +5978,10 @@
         "one": "{n} dive since {year}",
         "other": "{n} dives since {year}"
       },
+      "home": "Diver profile",
       "noDive": "No dive yet",
       "defaultName": "Diver",
       "keep": "What you keep here",
-      "kept": "Kept on this phone, even without a network.",
       "equipment": "Equipment",
       "certifications": "Certifications and documents",
       "information": "Information",
@@ -5988,7 +5990,7 @@
       "informationLine": "Emergency contact, health",
       "certificationsLine": "{n} certifications",
       "noCertification": "No certification",
-      "keptWide": "Kept on your Benthic+ account and on this device, even without a network.",
+      "encrypted": "Encrypted end to end",
       "paneEmpty": "Choose an item to see it here"
     },
     "inventory": {

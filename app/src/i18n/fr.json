@@ -225,6 +225,7 @@
   "tabs": {
     "logbook": "Carnet",
     "sites": "Sites",
+    "profile": "Profil",
     "statistics": "Statistiques",
     "statisticsShort": "Stats",
     "tools": "Outils"
@@ -2782,6 +2783,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Carnet : pendant l’échange avec le serveur au démarrage, un trait blanc se dessine sur le profil pâle de l’en-tête, sur tous les appareils : un segment glisse tant que la progression est inconnue, puis le trait se remplit, se complète et s’efface. Il remplace la barre ondulée.",
       "Synchronisation : elle est toujours automatique. Le réglage « Synchroniser automatiquement » et le mode manuel n’existent plus ; « Seulement sur Wi-Fi ou câble » et « Synchroniser maintenant » restent, et les modifications non envoyées s’affichent toujours quand l’appareil est hors ligne.",
       "Carnet : un appui long sur une plongée ou un voyage démarre la sélection dès qu’il est reconnu, le doigt encore posé, avec un court retour haptique sur téléphone et tablette ; lever le doigt ne décide plus.",
@@ -5979,10 +5981,10 @@
         "one": "{n} plongée depuis {year}",
         "other": "{n} plongées depuis {year}"
       },
+      "home": "Profil de plongeur",
       "noDive": "Aucune plongée",
       "defaultName": "Plongeur",
       "keep": "Ce que vous gardez ici",
-      "kept": "Gardé sur ce téléphone, même sans réseau.",
       "equipment": "Équipement",
       "certifications": "Brevets et documents",
       "information": "Informations",
@@ -5991,7 +5993,7 @@
       "informationLine": "Contact d’urgence, santé",
       "certificationsLine": "{n} brevets",
       "noCertification": "Aucun brevet",
-      "keptWide": "Gardé sur votre compte Benthic+ et sur cet appareil, même sans réseau.",
+      "encrypted": "Chiffré de bout en bout",
       "paneEmpty": "Choisissez un élément pour le voir ici"
     },
     "inventory": {

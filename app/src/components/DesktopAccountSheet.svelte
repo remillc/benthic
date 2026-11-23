@@ -13,12 +13,11 @@
   import SyncButton from './SyncButton.svelte';
   import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook, signOut } from '../lib/logbook.svelte.js';
-  import { navigation, openOver, openProfile, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
+  import { navigation, openOver, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { openBenthicPlus } from '../lib/open-offer.svelte.js';
-  import { loadInventory, overdueBadge } from '../lib/inventory.svelte.js';
   import { diver, loadProfile } from '../lib/profile.svelte.js';
-  import { accountEmail as emailOfAccount, profileRow, sheetVariant } from '../lib/account-sheet.js';
+  import { accountEmail as emailOfAccount, sheetVariant } from '../lib/account-sheet.js';
   import { isRelease } from '../lib/edition.js';
   import { logbooks } from '../lib/desktop-logbooks.svelte.js';
   import { syncNetwork, setUnmeteredOnly } from '../lib/sync-network.svelte.js';
@@ -42,9 +41,7 @@
   const free = $derived(variant === 'free');
   const subscriber = $derived(variant === 'subscriber');
   const gitSheet = $derived(variant === 'git');
-  const late = $derived(profileRow(subscriber ? overdueBadge() : 0));
   $effect(() => {
-    if (navigation.accountOpen && subscriber) loadInventory().catch((e) => console.error('Reading the equipment', e));
     if (navigation.accountOpen && subscriber) loadProfile().catch((e) => console.error('Reading the profile', e));
   });
 
@@ -157,15 +154,6 @@
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
     <div class="bc-desktop-account--group">
-      <button type="button" class="bc-desktop-account--entry" onclick={() => leaveTo(openProfile)}>
-        <span class="bc-desktop-account--tile"><Icon name="account" size={22} /></span>
-        <span class="bc-desktop-account--row-texts">
-          <span class="bc-desktop-account--entry-title">{t('gear.profile.title')}</span>
-          <span class="bc-desktop-account--row-line" class:bc-desktop-account--late-line={late.late}>{late.late ? t('account.sheet.maintenanceLate', { n: late.badge }) : t('gear.profile.cardLine')}</span>
-        </span>
-        {#if late.late}<span class="bc-desktop-account--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
-        <Icon name="chevron" size={20} />
-      </button>
       <button type="button" class="bc-desktop-account--entry" onclick={() => leaveTo(openBackup)}>
         <span class="bc-desktop-account--tile"><Icon name="history" size={22} /></span>
         <span class="bc-desktop-account--row-texts"><span class="bc-desktop-account--entry-title">{t('account.sheet.backup')}</span><span class="bc-desktop-account--row-line">{t('account.sheet.backupText')}</span></span>
@@ -312,15 +300,6 @@
     {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if subscriber}
       <div class="bc-desktop-account--divider"></div>
-      <button type="button" class="bc-desktop-account--row bc-desktop-account--profile" onclick={() => leaveTo(openProfile)}>
-        <Icon name="briefcase" size={22} />
-        <span class="bc-desktop-account--row-texts">
-          <span>{t('gear.profile.title')}</span>
-          <span class="bc-desktop-account--row-line" class:bc-desktop-account--late-line={late.late}>{late.late ? t('account.sheet.maintenanceLate', { n: late.badge }) : t('gear.profile.cardLine')}</span>
-        </span>
-        {#if late.late}<span class="bc-desktop-account--late-badge" role="status" aria-label={t('maintenance.badge', { n: late.badge })}>{late.badge}</span>{/if}
-        <Icon name="chevron" size={20} />
-      </button>
       <button type="button" class="bc-desktop-account--row bc-desktop-account--profile" onclick={() => leaveTo(openBackup)}>
         <Icon name="history" size={22} />
         <span class="bc-desktop-account--row-texts"><span>{t('account.sheet.backup')}</span><span class="bc-desktop-account--row-line">{t('account.sheet.backupText')}</span></span>
@@ -524,25 +503,6 @@
     .bc-desktop-account--row-line {
       font-size: 13px;
       color: var(--bc-text-2);
-
-      &.bc-desktop-account--late-line {
-        color: var(--bc-late-text);
-      }
-    }
-    .bc-desktop-account--late-badge {
-      flex: none;
-      min-width: 24px;
-      height: 24px;
-      padding: 0 6px;
-      box-sizing: border-box;
-      border-radius: 12px;
-      background: var(--bc-late);
-      color: #FFFFFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
     }
     /* « Synchroniser maintenant »: the page's main action, in the ink (the mock-up's black button). */
     .bc-desktop-account--sync :global(.bc-sync-button) {
