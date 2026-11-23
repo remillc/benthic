@@ -6652,3 +6652,23 @@ The app already looks right: `Icon.svelte`, the Android list chevron mask in `th
 2. Add one line to `docs/system-design.md`: one chevron drawing (`M9 5l7 7-7 7`); back is the same chevron turned 180°.
 
 In the done note, list what you replaced, or say that nothing needed to change.
+
+## [ ] 2026-11-23-337 « Envoyer vers divelogs.de »: connection, progress, done and error screens, on phone, tablet and desktop
+
+Christian approved this on 23 November 2026. Work in `main`. The row « Envoyer vers divelogs.de » of the « Exporter le carnet » dialog (task 324) shows « pas encore disponible » today. Make it work. Mock-ups, each in a subgroup « Exporter le carnet et envoyer vers divelogs.de » (phone, desktop) or « Envoyer vers divelogs.de » (tablet):
+
+- phone, Android › Carnet et plongées: « Exporter le carnet · Android », « Exporter le carnet, divelogs.de choisi · Android », then « Envoyer vers divelogs.de, connexion / progression / terminé / identifiants refusés · Android »;
+- tablet, Tablette Android › Sélection et modifications en lot: « 03 · Exporter le carnet, divelogs.de choisi », then « 03 · Envoyer vers divelogs.de, connexion / progression / terminé / identifiants refusés · tablette Android, paysage »;
+- desktop, Bureau › Carnet et plongées: « Carnet · bureau, exporter le carnet », « … exporter le carnet, divelogs.de choisi », then « … envoyer vers divelogs.de, connexion / progression / terminé / identifiants refusés ».
+
+The flow, the same on every device, all in basic dialogs over the logbook (no ✕):
+
+1. **Choice.** When « Envoyer vers divelogs.de » is the selected format, the footer line reads « Vous vous connecterez ensuite à divelogs.de. » and the confirm button reads « Continuer » instead of « Exporter ». On the phone the dialog is 16 dp from the screen sides, its footer line sits above the buttons, and the format list scrolls inside the dialog when it does not fit.
+2. **Connection.** Title « Envoyer vers divelogs.de », line « Mon carnet · N plongées. Connectez-vous à votre compte divelogs.de. », outlined fields « Nom d’utilisateur » (focused) and « Mot de passe », then « Benthic ne garde pas ces identifiants. ». Buttons « Annuler » and « Envoyer ». **Never store the divelogs.de user name or password**, not even for the session; reuse the import code of the first launch (same API, same fields).
+3. **Progress.** Title « Envoi vers divelogs.de », the same step card and wave as the divelogs.de import of the first launch: « Connexion à divelogs.de » (done, « Compte « christian » »), « Envoi des plongées » (« X sur N », time left, wave), « Vérification par divelogs.de » (to come). Below: « Gardez l’app ouverte jusqu’à la fin. Vos plongées restent dans votre carnet. ». One button: « Annuler ».
+4. **Done.** Green check disc, title « Plongées envoyées », line « Les N plongées de Mon carnet sont maintenant dans le compte divelogs.de « christian ». ». Buttons « Ouvrir divelogs.de » (with the open-in-new icon, opens the site in the browser) and « OK ».
+5. **Credentials refused.** The connection dialog again, the password field in error with « Nom d’utilisateur ou mot de passe incorrect. ».
+
+Check before you write the texts of steps 3 and 4: what divelogs.de does with dives already in the account (duplicates, updates). If the upload does not end with a check by divelogs.de, drop that step and tell Christian. A network error during the upload is not drawn: show the progress dialog's step in error with « Réessayer » and « Annuler », and say what you did in the done note.
+
+The phone mock-up « Carnet, menu ouvert · Android » does not show « Exporter le carnet » in the ⋮ menu yet; the app's menu is the reference. iPhone is not drawn: apply the same flow with the iOS dialogs if the export exists there.
