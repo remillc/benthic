@@ -41,8 +41,8 @@ When an action touches some data and not other data, name what it touches. The d
 
 Do not add "saved", "stored", "kept" or advice the diver did not ask for when the screen already makes it obvious.
 
-- Before: « Regrouper les plongées en voyages · Enregistré… »
-- After: « Regrouper les plongées en voyages »
+- Before: « Vagues de surface, flux-reflux et froid · Enregistré… »
+- After: « Vagues de surface, flux-reflux et froid »
 - Before: « Plafond de décompression : remonter au-dessus… »
 - After: « Plafond de décompression »
 
