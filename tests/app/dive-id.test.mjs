@@ -301,3 +301,18 @@ test('after a reload the dives are found by their Benthic id, whatever their sta
   assert.equal(map.get(3), 13, 'a dive with no id is still found by its start');
   assert.equal(map.get(4), null, 'a dive that is gone');
 });
+
+test('the quick entry address holds Benthic ids and reads back as the same dives, a dive with no id yet by its core id', async () => {
+  const { quickEntryUrl } = await import('../../app/src/lib/quick-entry.js');
+  const dives = [
+    { id: 12, benthicId: '7k2m9q4x1d', date: '2026-11-23T09:30:00' },
+    { id: 13, benthicId: '', date: '2026-11-23T14:00:00' },
+    { id: 14, benthicId: '0abcdefghj', date: '2026-11-23T16:00:00' },
+  ];
+  useDives(() => dives);
+  const url = quickEntryUrl([12, 13, 14]);
+  assert.equal(url, '/dives/7k2m9q4x1d/complete?next=13,0abcdefghj');
+  const [, , param] = url.split('?')[0].split('/');
+  assert.equal(coreIdOfParam(param), 12);
+  assert.deepEqual(url.split('next=')[1].split(',').map((p) => coreIdOfParam(p)), [13, 14]);
+});

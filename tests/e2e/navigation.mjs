@@ -771,7 +771,13 @@ async function phoneFlows() {
   await settled(tab, 'quick entry saved', { route: '/' });
   if (here) {
     // The dive was saved with the preselected site (its uuid may be above 2^31: JSON integers are 64-bit in the core).
-    const savedSite = JSON.parse(await core('getDive', { id: Number(quickRoute.split('/')[2]) })).site;
+    // The route holds the dive's Benthic id: the core's id is read from the list.
+    const quickParam = quickRoute.split('/')[2];
+    const quickCoreId = await tab.run(async (param) => {
+      const { logbook } = await import('/src/lib/logbook.svelte.js');
+      return logbook.dives.find((d) => d.benthicId === param || String(d.id) === param)?.id ?? 0;
+    }, quickParam);
+    const savedSite = JSON.parse(await core('getDive', { id: quickCoreId })).site;
     checks++;
     if (savedSite !== here.name) {
       failures.push({ label: 'quick entry: saved site', problems: [`the dive's site is "${savedSite}", expected "${here.name}"`] });
@@ -1085,7 +1091,7 @@ async function longPressFlows(expect) {
     await tab.tapAt(row2.x, row2.y);
     await sleep(900);
     const tapped = await state();
-    expect(`${label}: a short tap opens the dive and selects nothing`, { boxes: 0, opened: true }, { boxes: tapped.boxes, opened: /^\/dives\/\d+/.test(tapped.route) });
+    expect(`${label}: a short tap opens the dive and selects nothing`, { boxes: 0, opened: true }, { boxes: tapped.boxes, opened: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})/.test(tapped.route) });
     tab.ws.close();
   }
 }
