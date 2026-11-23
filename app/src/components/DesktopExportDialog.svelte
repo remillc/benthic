@@ -5,6 +5,7 @@
   // then « Exporter… » opens the system's save dialog with a proposed name. Choice rows, no
   // radio buttons; the last format is remembered on this computer.
   import Md3Dialog from './Md3Dialog.svelte';
+  import DivelogsUploadDialog from './DivelogsUploadDialog.svelte';
   import { onMount } from 'svelte';
   import ChoiceRow from './ChoiceRow.svelte';
   import ExportFormats from './ExportFormats.svelte';
@@ -57,10 +58,12 @@
       .sort((a, b) => a - b),
   );
 
+  // « Envoyer vers divelogs.de » (task 2026-11-23-337): « Continuer » opens the connection dialog over the logbook.
+  let uploading = $state(false);
+
   async function run() {
     if (isUpload(format)) {
-      // The divelogs.de upload has no sign-in or progress screen yet (task 2026-11-22-324): the row says so and the dialog stays.
-      showSnackbar(t('export.divelogsSoon'));
+      uploading = true;
       return;
     }
     busy = true;
@@ -90,6 +93,9 @@
   }
 </script>
 
+{#if uploading}
+  <DivelogsUploadDialog {ids} logbookName={windowLogbook() ? displayName(/** @type {any} */ (windowLogbook()), t) : t('welcomeSteps.defaultName')} {onclose} />
+{:else}
 <Md3Dialog class="bc-desktop-export" title={wholeLogbook ? t('export.titleLogbook') : t('export.title', { n: ids.length })} oncancel={onclose}>
   <h3 class="bc-desktop-export--heading">{t('desktop.export.which')}</h3>
   <div class="bc-desktop-export--choices" role="radiogroup" aria-label={t('desktop.export.which')}>
@@ -135,17 +141,26 @@
     </label>
   {/if}
 
+  {#snippet footer()}
+    {#if isUpload(format)}<span class="bc-desktop-export--footnote">{t('export.divelogsFootnote')}</span>{/if}
+  {/snippet}
   {#snippet actions()}
     <button type="button" class="button" onclick={onclose}>{t('dialog.cancel')}</button>
-    <button type="button" class="button button-fill" disabled={busy || !ids.length} onclick={run}>{t('desktop.export.action')}</button>
+    <button type="button" class="button button-fill" disabled={busy || !ids.length} onclick={run}>{isUpload(format) ? t('export.continue') : t('desktop.export.action')}</button>
   {/snippet}
 </Md3Dialog>
+{/if}
 
 <style>
   @layer bc.components {
     .bc-desktop-export--heading,
     .bc-desktop-export--switch {
       padding-inline: 24px;
+    }
+    .bc-desktop-export--footnote {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
     }
     .bc-desktop-export--heading {
       margin: 12px 0 4px;
