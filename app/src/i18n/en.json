@@ -2771,6 +2771,9 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Cylinder types: a type without a working pressure (read from a dive) no longer shows « 0 » in cubic feet and can be renamed without an error; a volume typed without a pressure asks for the working pressure.",
+      "Gear: the rebreather icon shows two tall cylinders on each side of a scrubber on its stand, joined by two hoses, and no longer looks like a twin set.",
+      "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
+      "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
@@ -5002,6 +5005,11 @@
     "openSiteLink": "See the site in Sites",
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
+    "changeKit": "Change kit",
+    "kitFilled": "Filled the fields below; each can still be changed.",
+    "addSecondComputer": "+ Add a second computer",
+    "addFirstComputer": "+ Add a computer",
+    "removeWeightNamed": "Remove {name}",
     "computerRole": {
       "0": "Main",
       "1": "Second",
@@ -5010,7 +5018,7 @@
     },
     "section": {
       "computers": "Dive computers",
-      "protection": "Protection and weights",
+      "protection": "Thermal protection",
       "otherGear": "Other gear"
     },
     "gasCards": "Cylinders of the dive",

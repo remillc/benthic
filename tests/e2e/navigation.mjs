@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -30,6 +30,7 @@ import { regressionFlows } from './navigation-regressions.mjs';
 import { syncLineFlows } from './sync-line.mjs';
 import { syncStateFlows } from './sync-state.mjs';
 import { downloadFlows } from './download-flow.mjs';
+import { desktopEquipmentFlows } from './desktop-equipment.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -1638,7 +1639,7 @@ async function computerPhotoFlows(expect) {
   });
   await sleep(800);
   const state = await tab.run(() => {
-    const row = document.querySelector('.bc-desktop-edit-field[data-field="computer"] .bc-desktop-edit-field--value');
+    const row = document.querySelector('.bc-desktop-dive-fields--computer[data-field="computer"]');
     const image = row?.querySelector('.bc-dc-tile img');
     return { named: !!row?.textContent.includes('Sample'), photo: !!image && image.getAttribute('src')?.startsWith('data:image/svg+xml') };
   });
@@ -2713,7 +2714,7 @@ async function profileSectionFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2725,7 +2726,12 @@ try {
       console.log(`  FAIL ${label}: ${bad.join('; ')}`);
     } else console.log(`  ok   ${label}`);
   };
-  const harness = { openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length };
+  /** Closes every other tab of Chrome (the earlier blocks leave theirs open, and a hidden tab does not lay out or animate). */
+  const closeOtherTabs = async (/** @type {string} */ keepId) => {
+    const list = await (await fetch(`${wsBase}/json/list`)).json();
+    for (const target of list) if (target.type === 'page' && target.id !== keepId) await fetch(`${wsBase}/json/close/${target.id}`).catch(() => {});
+  };
+  const harness = { openTab, closeOtherTabs, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length };
   const monkey = (/** @type {string} */ only) => () =>
     monkeyFlows({
       ...harness,
@@ -2764,6 +2770,8 @@ try {
     ['sync state', '--sync-state-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => syncStateFlows({ ...harness, shot })],
     // The download from a dive computer, step by step (tests/e2e/download-flow.mjs).
     ['download', '--download-only', 60, !phoneOnly && !tabletOnly && !welcomeOnly, () => downloadFlows({ ...harness, shot })],
+    // The desktop dive detail's Équipement tab, one card per section (tests/e2e/desktop-equipment.mjs).
+    ['desktop equipment', '--equipment-only', 25, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopEquipmentFlows({ ...harness, shot })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],

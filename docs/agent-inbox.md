@@ -7051,7 +7051,7 @@ Same on the iPhone and tablet versions of this page.
 
 *Done 23 November 2026: the button reuses the offer's « Continuer sans abonnement » and its exit (`onwithout`: back to where the offer was opened from, no account); the footer follows the last group 16 dp below it (a grid on tablets, the button on its own line); the key `benthicPlus.all.free` is removed. No mock-up file was in the repository: built from the task text.*
 
-## [ ] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
+## [x] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-ups: « Icônes de Icon.svelte · Android » and « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »). Christian handles the licence question himself.
 
@@ -7164,7 +7164,9 @@ M10.9 15.8L18.3 8.4L20.4 5.6L21.1 2.0L17.0 4.3L14.5 6.8L14.5 8.0L13.3 8.0L13.4 9
 
 **Test:** every screen with icons (Carnet, détail, Sites, Profil, Réglages, the account sheet, the download flow, the desktop table) shows the Rounded glyphs at the same sizes and colours, nothing missing or blank; ⋮ is clearly visible; the gear list shows the new knife.
 
-## [ ] 2026-11-23-365 Correction to task 364: `blender` stays a Benthic drawing (a cylinder being filled)
+**Done (23 November 2026).** Built from the task text (the canvas mock-ups are not in the repository). 89 keys of `Icon.svelte` are Material Symbols Rounded glyphs in `symbols` under the same keys (`key` too: Outlined replaced by Rounded); their strokes are gone from `paths`, with the `more` 4 px stroke special case. `tools/build-icon-symbols.mjs` fetches each glyph from the raw GitHub URL and rewrites the `symbols` block (run it again to regenerate). `diveKnife` of `GearIcon.svelte` has the new drawing. `tests/app/icon-sets.test.mjs` checks the 89 symbols, the 18 drawings, shared glyphs and that every `<Icon name>` exists; the tests that read the old paths (`first-launch`, `icons-mockups`) follow. `app/src/pages/Settings.svelte` still has its own inline copy of the old delete icon in the computer menu (not touched here).
+
+## [x] 2026-11-23-365 Correction to task 364: `blender` stays a Benthic drawing (a cylinder being filled)
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de Icon.svelte · Android » (phone canvas, page « Thème et couleurs »).
 
@@ -7178,7 +7180,9 @@ It shows wherever `blender` is used: the « Mélangeur de gaz » tile in Outils 
 
 **Test:** Outils shows the cylinder icon on the « Mélangeur de gaz » tile; « Préparer ce mélange » shows it too.
 
-## [ ] 2026-11-23-366 Desktop dive detail, « Équipement » tab: one card per section
+**Done (23 November 2026).** `blender` stays in `paths` with the cylinder-being-filled drawing of the task, so 89 keys are symbols and 18 stay drawings; checked by `tests/app/icon-sets.test.mjs` and on the Outils tiles, phone and desktop.
+
+## [x] 2026-11-23-366 Desktop dive detail, « Équipement » tab: one card per section
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet · bureau, détail, onglet Équipement » (tablet and desktop canvas, page Bureau, subgroup « Détail d’une plongée »), redrawn. Same data and same editing as today; only the layout changes.
 
@@ -7192,6 +7196,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet
 - Leave 88 px empty at the end of the pane so the + floating button never covers the last row.
 
 **Test:** on the desktop, open a dive, tab Équipement: five cards; change the kit, a computer, the suit, a weight and an item as before; the « Ce lest était » selector is centred and narrower; scroll to the end: the + button does not hide the last item. A free user does not see the Kit card, « Sous-vêtement », « Ce lest était » or « Autre équipement ».
+
+**Done (23 November 2026).** Built from the task text (the canvas mock-up is not in the repository; `docs/mockups/bureau-carnet-onglet-equipement.dc.html` is the old layout). `DesktopDiveFields.svelte` draws the tab as five `DesktopEquipmentCard`s (kit, computers, protection thermique, lest, autre équipement) under the hint; `DesktopWeights` has removable 40 px chips, a dashed « + Ajouter » chip and no total (it is in the card header); `DesktopOtherGear` has 56 px grey rows and no add tile (« + Ajouter » is in the card header); `DesktopEditField` has a `tall` 48 px variant with a chevron. « Changer de kit » is a text button with the kit select laid over it. Computers stay read-only and the add button stays disabled, as the old fields were. 64 px + the pane's 24 px margin leave 88 px at the end. `tests/e2e/desktop-equipment.mjs` (`--equipment-only`) checks the free and Benthic+ tabs, the weight chip, total and centred selector, a knife item, and the end of the pane. Also fixed: `DesktopWeights` threw « Cannot read properties of null » when a weight was kept (bindings on `editing`).
 
 ## [ ] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
 
@@ -7263,7 +7269,7 @@ Docs updated by the design agent: `docs/ui-specification.md` (photos section, Ab
 
 **Test:** Réglages › Carnet has no photos and videos switch; a subscriber sees the Photos et vidéos section of a dive with pictures, a free user does not; À propos shows « Voir sur GitHub » and « Site Web » centred on one row, and « Site Web » opens benthicdivelog.app.
 
-## [ ] 2026-11-23-371 New `rebreather` drawing in `GearIcon.svelte`
+## [x] 2026-11-23-371 New `rebreather` drawing in `GearIcon.svelte`
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »).
 
@@ -7274,3 +7280,5 @@ M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.9
 ```
 
 **Test:** the gear list, the type picker of « Nouvelle pièce » and the kit pages show the new rebreather icon at every size; it no longer looks like a twin set.
+
+**Done (23 November 2026).** The `rebreather` path of `GearIcon.svelte` is the given drawing, stroke 1.8 on the 24 grid like the others. No test read the old path. Checked at 24 px on the gear list and the type picker of « Nouvelle pièce » (desktop).

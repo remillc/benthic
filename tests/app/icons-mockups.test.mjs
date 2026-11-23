@@ -31,20 +31,18 @@ test('the 19 gear types are drawn as the type board of « Nouvelle pièce » dra
   // The subpaths written as paths in the board are found as they are; the shapes the board draws as <rect> and <circle> are
   // checked by the pieces that are paths.
   const board = readFileSync(new URL('android-tablette-profil-piece-nouvelle-type-paysage.dc.html', mockups), 'latin1');
-  for (const type of ['suit', 'undersuit', 'bcd', 'dsmb', 'floatBuoy', 'diveKnife', 'cylinder', 'fins', 'mask', 'knife'])
+  // « diveKnife » is the drawing of task 2026-11-23-364, not the board's: it is not compared.
+  for (const type of ['suit', 'undersuit', 'bcd', 'dsmb', 'floatBuoy', 'cylinder', 'fins', 'mask', 'knife'])
     for (const sp of split(gear[type]).filter((p) => p.length > 12 && !/ 0 1 0 /.test(p)))
       assert.ok(board.includes(sp.replace(/^M/, 'M').slice(0, 20)) || [...board.matchAll(/ d="([^"]+)"/g)].some((m) => split(m[1]).includes(sp)), `${type}: ${sp}`);
 });
 
-test('the icons reviewed against the canvases keep their mock-up drawing', () => {
+// Tasks 2026-11-23-364 and 365: the icons that were reviewed against the canvases one by one (briefcase, wrench, notebook...)
+// are Material Symbols Rounded glyphs now, except the ones Material has no faithful equivalent for. tests/app/icon-sets.test.mjs
+// checks which keys are symbols and which are Benthic drawings.
+test('« notebook » stays the open notebook of its mock-up', () => {
   const icons = table(read('app/src/components/Icon.svelte'));
-  for (const name of ['briefcase', 'wrench', 'notebook', 'archive', 'renumber', 'bluetooth', 'calendar', 'upload', 'camera']) {
-    assert.ok(icons[name], name);
-    // Each subpath that is a plain path in the mock-ups is found there; the rectangle of « archive » and the camera's body and
-    // lens are written as paths here and as <rect> and <circle> there.
-    const plain = split(icons[name]).filter((sp) => !/ 0 1 0 /.test(sp) && !/^M(5\.5 6h13|4\.5 4h15|8\.5 13a)/.test(sp));
-    for (const sp of plain) assert.ok(mockPaths.has(sp), `${name}: ${sp}`);
-  }
+  for (const sp of split(icons.notebook)) assert.ok(mockPaths.has(sp), `notebook: ${sp}`);
 });
 
 test('« Entretien » is a spanner and « Ouvrir un autre carnet » an open notebook', () => {

@@ -40,6 +40,7 @@
    *   note?: string,
    *   disabled?: boolean,
    *   card?: boolean,
+   *   tall?: boolean,
    *   emptyText?: string,
    *   onopen?: () => void,
    *   openLabel?: string,
@@ -49,7 +50,7 @@
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -217,7 +218,7 @@
   const hint = $derived(t(multiline ? 'desktopDetail.hintNotes' : 'desktopDetail.hint'));
 </script>
 
-<div class="bc-desktop-edit-field" class:bc-desktop-edit-field--multiline={multiline} class:bc-desktop-edit-field--stacked={stacked} class:bc-desktop-edit-field--card-root={card} data-field={name || undefined}>
+<div class="bc-desktop-edit-field" class:bc-desktop-edit-field--multiline={multiline} class:bc-desktop-edit-field--stacked={stacked} class:bc-desktop-edit-field--card-root={card} class:bc-desktop-edit-field--tall={tall} data-field={name || undefined}>
   <span class="bc-desktop-edit-field--label" class:bc-sr-only={card} id="bc-df-{uid}">{label}</span>
 
   {#if readonly}
@@ -267,7 +268,7 @@
         {/if}
       </span>
       {#if note && !card && kind !== 'stars'}<span class="bc-desktop-edit-field--note">{note}</span>{/if}
-      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
+      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else if tall}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="expand" size={24} /></span>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
     </div>
   {:else}
     <div class="bc-desktop-edit-field--edit-wrap">
@@ -402,6 +403,20 @@
       &:hover {
         background: color-mix(in srgb, var(--bc-text) 8%, transparent);
       }
+    }
+
+    /* A 48 px field with a chevron at its end (the Équipement cards, task 2026-11-23-366). */
+    .bc-desktop-edit-field--tall {
+      & .bc-desktop-edit-field--rest,
+      & .bc-desktop-edit-field--editing {
+        min-height: 48px;
+      }
+    }
+
+    .bc-desktop-edit-field--chevron {
+      flex: none;
+      display: grid;
+      color: var(--bc-text-2);
     }
 
     .bc-desktop-edit-field--stars {
