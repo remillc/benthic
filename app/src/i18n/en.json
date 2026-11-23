@@ -1113,6 +1113,7 @@
       "nameInUse": "This name is already a type",
       "nameMissing": "Enter a name",
       "volumeInvalid": "Enter a volume greater than 0",
+      "pressureNeeded": "In cubic feet the volume depends on the working pressure: enter it",
       "pressureInvalid": "Enter a valid pressure",
       "renamed": "Type renamed",
       "nameHelp": "The name shown when choosing the type of a cylinder",
@@ -2769,6 +2770,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Cylinder types: a type without a working pressure (read from a dive) no longer shows « 0 » in cubic feet and can be renamed without an error; a volume typed without a pressure asks for the working pressure.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
