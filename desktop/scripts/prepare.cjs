@@ -23,11 +23,14 @@ for (const dir of ['web', 'bin', 'xslt', 'i18n']) fs.mkdirSync(path.join(stage, 
 
 // A release is built without the development switches of app/.env.local (AGENTS.md).
 // Vite reads app/.env.local in every mode; values already in the environment win over it.
+// BC_DEV_SWITCHES=1 keeps them, for a development build of the desktop (the route badge, the timings).
+const devSwitches = process.env.BC_DEV_SWITCHES === '1';
 execSync('npx vite build --mode production', {
   cwd: path.join(root, 'app'),
   stdio: 'inherit',
-  env: { ...process.env, VITE_SHOW_ROUTE: '0', VITE_SHOW_PERF: '0' },
+  env: devSwitches ? process.env : { ...process.env, VITE_SHOW_ROUTE: '0', VITE_SHOW_PERF: '0' },
 });
+if (devSwitches) console.log('development switches of app/.env.local kept (BC_DEV_SWITCHES=1): not a release build');
 fs.cpSync(path.join(root, 'app', 'dist'), path.join(stage, 'web'), { recursive: true });
 
 const host = path.join(root, 'build', 'desktop', target, 'bin', `benthic-host${exe}`);
