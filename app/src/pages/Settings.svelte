@@ -28,7 +28,6 @@
   import { layout, ios, bottomNav, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
-  import RenumberDialog from '../components/RenumberDialog.svelte';
   import { t, tIfExists, deviceLanguage, locale } from '../lib/i18n.js';
   import { CATEGORIES, categoryOf, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
@@ -107,7 +106,6 @@
   const section = f7route?.params?.section ?? '';
 
   let search = $state('');
-  let renumbering = $state(false);
   /** « Ouvrir au démarrage » (desktop): kept by the main process, read here when the page opens. @type {'last'|'ask'} */
   let startupMode = $state('last');
   const UNIT_SYSTEMS = /** @type {const} */ (['metric', 'imperial', 'personalize']);
@@ -540,7 +538,6 @@
             }
           },
         },
-        { kind: 'link', id: 'renumber', label: t('renumber.label'), text: t('renumber.text'), action: () => (renumbering = true) },
         { kind: 'switch', id: 'displayInvalidDives', label: t('settings.invalidDives.label'), text: t('settings.invalidDives.text'), checked: p.displayInvalidDives, set: async (v) => {
           await setCore({ displayInvalidDives: v });
           // The core's list leaves invalid dives out unless this is on.
@@ -1677,10 +1674,6 @@
   {#if !section && nothingShown}<p class="bc-settings--note bc-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
   <div class="bc-settings--bottom"></div>
 </Page>
-{/if}
-
-{#if renumbering}
-  <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
 {/if}
 
 {#if dialog?.kind === 'choice'}

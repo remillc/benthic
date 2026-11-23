@@ -2389,8 +2389,6 @@
       "one": "The checked dive gets the number below. Its current number is replaced, in the logbook and in Subsurface. You can undo it right after.",
       "other": "The {count} checked dives get consecutive numbers, in date order, from the number below. Their current numbers are replaced, in the logbook and in Subsurface. You can undo it right after."
     },
-    "label": "Renumber dives",
-    "text": "Consecutive numbers in date order",
     "title": "Renumber all dives?",
     "dialogText": "All {count} dives get consecutive numbers in date order, from the number below. The numbers they have now are replaced, in the logbook and in Subsurface. You can undo it right after.",
     "start": "First number",
@@ -2786,6 +2784,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
       "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
       "First launch: the light rays of the blue band are always four, scaled to the width of the band, on tablet and computer as on the phone.",

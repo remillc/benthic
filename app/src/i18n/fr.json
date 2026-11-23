@@ -2389,8 +2389,6 @@
       "one": "La plongée cochée reçoit le numéro ci-dessous. Son numéro actuel est remplacé, dans le carnet et dans Subsurface. Vous pourrez annuler juste après.",
       "other": "Les {count} plongées cochées reçoivent des numéros consécutifs, dans l'ordre des dates, à partir du numéro ci-dessous. Leurs numéros actuels sont remplacés, dans le carnet et dans Subsurface. Vous pourrez annuler juste après."
     },
-    "label": "Renuméroter les plongées",
-    "text": "Numéros consécutifs, dans l'ordre des dates",
     "title": "Renuméroter toutes les plongées ?",
     "dialogText": "Les {count} plongées reçoivent des numéros consécutifs, dans l'ordre des dates, à partir du numéro ci-dessous. Leurs numéros actuels sont remplacés, dans le carnet et dans Subsurface. Vous pourrez annuler juste après.",
     "start": "Premier numéro",
@@ -2786,6 +2784,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
       "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",
       "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",
       "Premier lancement : les rayons de lumière de la bande bleue sont toujours quatre, à l’échelle de la largeur de la bande, sur tablette et ordinateur comme sur le téléphone.",
