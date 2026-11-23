@@ -206,12 +206,12 @@
               </span>
               <Icon name="chevron" size={20} />
             </button>
-            {#if accountLock.canPair}
-              <button type="button" class="bc-account-sheet--ios-row" data-row="pair" onclick={() => go(accountLock.onpairnew)}>
-                <Icon name="device" />
+            {#if accountLock.locked}
+              <button type="button" class="bc-account-sheet--ios-row" data-row="pair" onclick={() => go(accountLock.onpair)}>
+                <Icon name="lock" />
                 <span class="bc-account-sheet--row-label">
-                  {t('accountSync.pair.entry')}
-                  <span class="bc-account-sheet--row-line">{accountLock.requests ? t('accountSync.pair.entryPending', { n: accountLock.requests }) : t('accountSync.pair.entryNone')}</span>
+                  {t('accountSync.pair.lockedEntry')}
+                  <span class="bc-account-sheet--row-line bc-account-sheet--row-line-locked">{t('accountSync.pair.lockedLine')}</span>
                 </span>
                 <Icon name="chevron" size={20} />
               </button>
@@ -380,13 +380,13 @@
             </span>
             <Icon name="chevron" size={20} />
           </a>
-          {#if accountLock.canPair}
+          {#if accountLock.locked}
             <div class="bc-account-sheet--divider bc-account-sheet--margin"></div>
-            <a href="#pair" class="bc-account-sheet--row bc-account-sheet--profile" data-row="pair" onclick={(e) => (e.preventDefault(), go(accountLock.onpairnew))}>
-              <Icon name="device" />
+            <a href="#pair" class="bc-account-sheet--row bc-account-sheet--profile" data-row="pair" onclick={(e) => (e.preventDefault(), go(accountLock.onpair))}>
+              <Icon name="lock" />
               <span class="bc-account-sheet--row-label">
-                {t('accountSync.pair.entry')}
-                <span class="bc-account-sheet--row-line">{accountLock.requests ? t('accountSync.pair.entryPending', { n: accountLock.requests }) : t('accountSync.pair.entryNone')}</span>
+                {t('accountSync.pair.lockedEntry')}
+                <span class="bc-account-sheet--row-line bc-account-sheet--row-line-locked">{t('accountSync.pair.lockedLine')}</span>
               </span>
               <Icon name="chevron" size={20} />
             </a>
@@ -761,6 +761,11 @@
       font-size: 14px;
       line-height: 20px;
       color: var(--bc-text-2);
+    }
+
+    /* « Données chiffrées verrouillées sur cet appareil »: the warning colour (pending). */
+    .bc-account-sheet--row-line-locked {
+      color: var(--bc-pending);
     }
 
     /* The changes waiting and « Synchroniser » on one row. */

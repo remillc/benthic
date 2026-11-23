@@ -18,6 +18,8 @@ export const ACCOUNT_KEY_PATH = 'keys/account.json';
 export const RECOVERY_PATH = 'keys/recovery.json';
 export const PAIRING_DIR = 'keys/pairing/';
 export const REQUESTS_DIR = 'keys/requests/';
+/** The paired devices of the account, for the new device's « Vos appareils jumelés » (name and last seen; no secret). */
+export const DEVICES_DIR = 'keys/devices/';
 const MAX_NAME = 60;
 /** How long a pairing file is valid. */
 export const PAIRING_TTL_MS = 10 * 60 * 1000;
@@ -238,6 +240,39 @@ export async function acceptApproval(how, fileJson, d = {}) {
   const a = await describe(raw);
   if (a.kid !== fileJson.kid) throw new Error('PAIRING_WRONG_KEY');
   return a;
+}
+
+/**
+ * « Refuser » / « Les codes sont différents » on the paired device: the request is deleted and a marker takes the answer's place
+ * (`keys/pairing/<id>.json`, `mode: 'declined'`, the name of the device that refused, no secret) so that the new device can say who
+ * refused. It expires like an answer and the new device deletes it.
+ * @param {any} requestJson @param {string} by the name of the refusing device @param {Deps} [d]
+ * @returns {Promise<{ id: string, file: JsonFile, deletes: string[] }>}
+ */
+export async function declineAccessRequest(requestJson, by, d = {}) {
+  const request = await readAccessRequest(requestJson, d);
+  return { id: request.id, deletes: [request.path], file: { path: pairingPath(request.id), json: { format: 1, mode: 'declined', id: request.id, by: String(by).slice(0, MAX_NAME), expiresAt: clock(d) + PAIRING_TTL_MS } } };
+}
+
+/** The answer is a refusal. @param {any} json @returns {{ declined: true, by: string }|null} */
+export function readDeclined(json) {
+  return json && json.format === 1 && json.mode === 'declined' && typeof json.id === 'string' ? { declined: true, by: typeof json.by === 'string' ? json.by : '' } : null;
+}
+
+/**
+ * The record a paired device keeps on the branch (`keys/devices/<id>.json`) so that a new device can show where to approve:
+ * its name and when it was last seen. @param {{ id: string, name: string, platform?: string }} device @param {Deps} [d] @returns {JsonFile}
+ */
+export function deviceRecordFile({ id, name, platform = '' }, d = {}) {
+  return { path: `${DEVICES_DIR}${id}.json`, json: { format: 1, id, name: String(name).slice(0, MAX_NAME), platform, lastSeenAt: clock(d) } };
+}
+
+/** The paired devices a list of `keys/devices/` files describes, the most recently seen first. @param {{ path: string, json: any }[]} files @returns {{ id: string, name: string, lastSeenAt: number }[]} */
+export function parseDevices(files) {
+  return files
+    .filter((f) => f.json && f.json.format === 1 && typeof f.json.id === 'string' && typeof f.json.name === 'string' && Number.isFinite(f.json.lastSeenAt))
+    .map((f) => ({ id: f.json.id, name: f.json.name, lastSeenAt: f.json.lastSeenAt }))
+    .sort((a, b) => b.lastSeenAt - a.lastSeenAt);
 }
 
 /** The path of a request or of its answer, to wait for it or to delete it. @param {string} id */

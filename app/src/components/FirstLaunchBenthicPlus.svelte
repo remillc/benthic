@@ -26,13 +26,20 @@
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { accountFlow, askForAccess, openRecoveryKeyEntry, openStartOver } from '../lib/account-sync-flows.svelte.js';
+  import { seenParts } from '../lib/account-sync-screens.js';
 
   /**
    * `onwithout`: « Continuer sans compte » and « Continuer sans abonnement » (back to the first step, nothing created).
    * `onopen`: « Ouvrir mon carnet ».
-   * @type {{ step: 'benthicPlusConnect'|'benthicPlusOffer'|'benthicPlusAll'|'benthicPlusReady'|'benthicPlusWelcome', onwithout: () => void, onopen: () => void }}
+   * @type {{ step: 'benthicPlusConnect'|'benthicPlusOffer'|'benthicPlusAll'|'benthicPlusReady'|'benthicPlusWelcome'|'benthicPlusPair', onwithout: () => void, onopen: () => void }}
    */
   let { step, onwithout, onopen } = $props();
+
+  // The pairing step ends when the key arrives (the approval, the recovery key) or when the diver starts over without the encrypted data.
+  $effect(() => {
+    if (step === 'benthicPlusPair' && accountFlow.unlocked) go('ready');
+  });
 
   /** The section band's faint dive profile (the same path as SectionBand). */
   const BAND_PROFILE = BAND_CURVE;
@@ -332,6 +339,35 @@
     <p class="bc-plus--account"><Icon name="check" size={16} weight={2.4} />{t('benthicPlus.ready.account', { email: flow.plus.email })}</p>
     <button type="button" class="bc-plus--primary" onclick={onopen}>{t('benthicPlus.ready.open')}</button>
   </div>
+{:else if step === 'benthicPlusPair'}
+  <!-- Phone, at sign-in on a device without the data key (task 2026-11-23-348, 349 and 350): the request is sent from here. -->
+  <div class="bc-plus--screen bc-plus-pair">
+    <h2 class="bc-plus-pair--title">{t('accountSync.pairStep.title')}</h2>
+    <p class="bc-plus-pair--reason">{t('accountSync.pairStep.reason')}</p>
+    <h3 class="bc-plus-pair--label">{t('accountSync.devices.title')}</h3>
+    {#if accountFlow.devices.length}
+      <ul class="bc-plus-pair--devices">
+        {#each accountFlow.devices as device (device.id)}
+          {@const seen = seenParts(device.lastSeenAt)}
+          <li class="bc-plus-pair--device">
+            <Icon name="device" size={22} />
+            <span class="bc-plus-pair--device-name">{device.name}</span>
+            <span class="bc-plus-pair--device-seen">{t(`accountSync.devices.${seen.key}`, { n: seen.n })}</span>
+          </li>
+        {/each}
+      </ul>
+      <p class="bc-plus-pair--line">{t('accountSync.devices.line')}</p>
+    {:else}
+      <p class="bc-plus-pair--line">{t('accountSync.devices.none')}</p>
+    {/if}
+    <div class="bc-plus--buttons">
+      <button type="button" class="bc-plus--primary" data-action="ask" onclick={() => void askForAccess()}>{t('accountSync.pairStep.ask')}</button>
+      <button type="button" class="bc-plus-pair--outlined" data-action="recovery-key" onclick={openRecoveryKeyEntry}>{t('accountSync.unlock.recoveryKey')}</button>
+      <button type="button" class="bc-plus--text bc-plus--text-centre" data-action="later" onclick={() => go('ready')}>{t('accountSync.pairStep.later')}</button>
+    </div>
+    <p class="bc-plus--note">{t('accountSync.pairStep.note')}</p>
+    <button type="button" class="bc-plus--text bc-plus--text-centre" data-action="lost" onclick={openStartOver}>{t('accountSync.unlock.lost')}</button>
+  </div>
 {:else if step === 'benthicPlusWelcome'}
   <div class="bc-plus--screen">
     {@render hero('welcome')}
@@ -536,6 +572,72 @@
         box-sizing: border-box;
         text-align: center;
       }
+    }
+
+    /* « Jumeler cet appareil » at sign-in (phone): the reason, the paired devices, the buttons. */
+    .bc-plus-pair--title {
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 500;
+    }
+
+    .bc-plus-pair--reason,
+    .bc-plus-pair--line {
+      margin: 0 0 16px;
+      font-size: 15px;
+      line-height: 21px;
+      color: var(--bc-text-2);
+    }
+
+    .bc-plus-pair--label {
+      margin: 8px 0;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+    }
+
+    .bc-plus-pair--devices {
+      list-style: none;
+      margin: 0 0 8px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bc-plus-pair--device {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 56px;
+      padding: 8px 16px;
+      border-radius: 16px;
+      background: var(--bc-surface);
+    }
+
+    .bc-plus-pair--device-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .bc-plus-pair--device-seen {
+      font-size: 13px;
+      color: var(--bc-text-2);
+    }
+
+    .bc-plus-pair--outlined {
+      height: 56px;
+      border: 1.5px solid var(--bc-release-row-main);
+      border-radius: 28px;
+      background: transparent;
+      color: var(--bc-release-row-main);
+      font: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     .bc-plus--text-centre {

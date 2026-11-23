@@ -9,6 +9,7 @@
   import AccountDifferentDialog from './AccountDifferentDialog.svelte';
   import PairRequestDialog from './PairRequestDialog.svelte';
   import OrphanedDataDialog from './OrphanedDataDialog.svelte';
+  import PairMismatchDialog from './PairMismatchDialog.svelte';
   import PairConfirmDialog from './PairConfirmDialog.svelte';
   import PairedDialog from './PairedDialog.svelte';
   import RecoveryKeyOffer from './RecoveryKeyOffer.svelte';
@@ -35,10 +36,7 @@
   // The locked look of the profile and the account sheet's « Jumeler un nouvel appareil » row.
   $effect(() => {
     const on = benthicPlusAccount.signedIn;
-    flows.setLockFlags({
-      locked: on && accountSync.keyMissing,
-      canPair: on && accountSync.status === 'synced' && !accountSync.keyMissing && !accountSync.pullOnly,
-    });
+    flows.setLockFlags({ locked: on && accountSync.keyMissing });
   });
 
   // A device that holds the key looks for the requests of new devices while the app is open and in front: every 15 s (and at
@@ -51,7 +49,11 @@
   });
   $effect(() => {
     void accountSync.lastSyncedAt;
-    if (canApprove) untrack(() => void flows.refreshRequests({ network: false }));
+    if (!canApprove) return;
+    untrack(() => {
+      void flows.refreshRequests({ network: false });
+      void flows.touchDevice();
+    });
   });
   // A request is put in front of the diver by itself when nothing else is open; the account sheet's row asks again after a « Plus tard ».
   $effect(() => {
@@ -100,13 +102,15 @@
 
 {#if benthicPlusAccount.signedIn}
   {#if flow.screen === 'unlock'}
-    <AccountUnlockDialog onpair={() => void flows.askForAccess()} onrecoverykey={flows.openRecoveryKeyEntry} onlater={flows.closeScreen} onlost={() => (flow.screen = 'startOver')} />
+    <AccountUnlockDialog names={flow.devices.map((d) => d.name)} onpair={() => void flows.askForAccess()} onrecoverykey={flows.openRecoveryKeyEntry} onlater={flows.closeScreen} onlost={() => (flow.screen = 'startOver')} />
   {:else if flow.screen === 'requestWait'}
-    <PairRequestDialog kind="waiting" code={flow.code} expiresAt={flow.expiresAt} oncancel={flows.cancelAccessRequest} />
+    <PairRequestDialog kind="waiting" code={flow.code} names={flow.devices.map((d) => d.name)} expiresAt={flow.expiresAt} oncancel={flows.cancelAccessRequest} />
   {:else if flow.screen === 'requestEnded'}
-    <PairRequestDialog kind={/** @type {'declined'|'expired'|'failed'} */ (flow.endReason || 'failed')} oncancel={flows.closeScreen} onagain={() => void flows.askForAccess()} />
+    <PairRequestDialog kind={/** @type {'declined'|'expired'|'failed'} */ (flow.endReason || 'failed')} by={flow.endBy} oncancel={flows.closeScreen} onagain={() => void flows.askForAccess()} onlost={flows.openStartOver} />
   {:else if flow.screen === 'approve'}
-    <PairConfirmDialog deviceName={flow.deviceName} code={flow.code} busy={flow.busy} onconfirm={() => void flows.approveNow()} onrefuse={() => void flows.declineNow()} onlater={flows.putAsideRequest} />
+    <PairConfirmDialog deviceName={flow.deviceName} code={flow.code} busy={flow.busy} onconfirm={() => void flows.approveNow()} onrefuse={() => void flows.declineNow()} onmismatch={() => void flows.declineMismatch()} onlater={flows.putAsideRequest} />
+  {:else if flow.screen === 'mismatch'}
+    <PairMismatchDialog deviceName={flow.deviceName} onclose={flows.closeScreen} />
   {:else if flow.screen === 'paired'}
     <PairedDialog onclose={flows.closeScreen} />
   {:else if flow.screen === 'joined'}

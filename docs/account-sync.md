@@ -101,19 +101,27 @@ clear.
    same 6 digits and the buttons « Refuser » / « Autoriser ». Nothing is written before the diver taps.
    - « Autoriser »: makes its own ephemeral ECDH pair, derives the shared secret with the request's public key, wraps the
      account key (HKDF-SHA-256, then AES-256-GCM) and commits `keys/pairing/<id>.json`; the request is deleted in the same commit.
-   - « Refuser »: deletes the request and writes nothing else. Back and the scrim leave it for later (not asked again by itself
-     in this run of the app; the account sheet's row « Demandes d’accès » asks again).
+   - « Refuser » and « Les codes sont différents »: delete the request and leave `keys/pairing/<id>.json` = `{ format: 1, mode:
+     'declined', id, by, expiresAt }` (`by`: this device's name, no secret), so that the new device can say who refused; the new
+     device deletes it. The second also opens « Demande refusée » (the codes did not match, nothing was shared, check who can
+     read the e-mail). Back and the scrim leave the request for later (not asked again by itself in this run of the app).
+   - Only one paired device needs to answer: the request disappears from the others' next look, and a dialog about it closes.
 3. **New device** looks at the server every 3 s: when `keys/pairing/<id>.json` exists, it unwraps with its private key, adopts the
    key, seals its local items with it (`adoptAndReseal`), deletes the answer and shows « Appareil jumelé »; the join summary
    follows when due. If its request disappears without an answer it was declined; after 10 minutes it expired. Both give a clear
    message and « Demander de nouveau ».
 
 **How the paired device finds requests.** Without any push channel (instant push between devices is #173), it polls: every 15 s
-while the app is open and in front (`REQUEST_POLL_MS` in `account-sync-flows.svelte.js`; the poll is a pull of the branch with
-`fetchKeys`, nothing of the data), at once when the app comes back to the front, and after each sync run (reads the working copy,
-no network). It polls only when it can approve: signed in, key held, not pull-only. A request opens the approval dialog by
-itself when no other screen is open (the same « one screen at a time » rule as the other questions); the account sheet's row
-shows the count or « Aucune demande » with how to start one from the new device.
+while the app runs (`REQUEST_POLL_MS` in `account-sync-flows.svelte.js`; the poll is a pull of the branch with `fetchKeys`,
+nothing of the data), at once when the app comes back to the front, and after each sync run (reads the working copy, no
+network). It polls only when it can approve: signed in, key held, not pull-only. A request opens the approval dialog by itself
+when no other screen is open (the same « one screen at a time » rule as the other questions). When the app is not in front
+(the web layer still runs in the background of a phone or a tablet, or in a minimised desktop window) a system notification
+« Donner accès à « <name> » ? / Code de vérification 482 913. Touchez pour répondre. » is shown, only if the notification
+permission is already granted (`lib/access-request-notify.js`). **A closed app is not woken**: that needs a push through the
+server (not built; Forgejo has no such hook for it). The request then waits (10 minutes) for the next start of the app or its
+next poll. The account sheet has no row for requests any more (task 349); while the data is locked it has « Jumeler cet
+appareil » (`accountLock.locked`), which starts the request.
 
 **Files** (`app/src/lib/account-keys.js`, `account-pairing.js`)
 
@@ -123,9 +131,15 @@ shows the count or « Aucune demande » with how to start one from the new devic
 - `keys/pairing/<id>.json`: `{ format: 1, mode: 'e', id, kid, expiresAt, epk, nonce, ct }`; `epk` is the paired device's
   ephemeral public key. HKDF-SHA-256 (salt = the id, info `benthic-pair-ecdh-v1`), then AES-256-GCM; the authenticated data is
   `pair|e|<id>|<kid>|<expiresAt>`, so the expiry cannot be extended.
+- `keys/devices/<id>.json`: `{ format: 1, id, name, platform, lastSeenAt }`, written by a paired device after a sync run, at most
+  every 6 hours (`touchDeviceRecord`; its id is kept in `meta/device.json`, never synced). It is what the new device lists as « Vos
+  appareils jumelés » (name and last seen, devices unseen for 180 days left out) and names in « À approuver sur … ». No secret.
 - The clean-up pass of every run deletes the requests and the answers past their time.
 
-**The verification code.** Six decimal digits: the first 4 bytes of SHA-256 over
+**The verification code.** (Task 349 words it as « derived from the hash of both public keys ». That cannot work as written: the
+new device must show the code before the paired device has made its key. The code below binds everything the new device
+sent, which is what a swapped request changes; the paired device's own key is bound by the ECDH itself, since only the key in
+the request can open the answer.) Six decimal digits: the first 4 bytes of SHA-256 over
 `benthic-pair-sas-v1|<id>|<deviceName>|<pub bytes>`, read as an unsigned number, modulo 1 000 000, zero padded. The new device
 shows it before the paired device has any key, so it can depend only on what both sides read from the request. Both sides
 compute it themselves from the request file's content; it is never sent.
@@ -144,6 +158,16 @@ or a commit step (the new device first publishes only a hash of its key and reve
 own random value, as in ZRTP's short authentication string; one more round trip). Not done in this first version, to keep the
 flow to one approval. The approval dialog also says to approve only if the diver just asked for it, and an answer expires after
 10 minutes.
+
+**At sign-in** (tasks 348 and 350). Right after the logbook download, `probeSignInKeys` reads the account's keys (it clones the
+working copy of the `benthic` branch; nothing of the data is received or joined). When `keys/account.json` exists and this device
+does not hold the key: a **phone** goes to the step `benthicPlusPair` (« Jumeler cet appareil », the reason, « Vos appareils
+jumelés » with names and last seen, « Demander l’accès », « Saisir la clé de secours », « Plus tard », the note, and « Plus d’appareil
+ni de clé ? » centred) before « Votre carnet est prêt »; a **tablet or a computer** goes to « Votre carnet est prêt » and
+« Déverrouiller vos données chiffrées » opens over it by itself. The step ends when the key arrives (`accountFlow.unlocked`),
+or with « Plus tard ». « Demande expirée » carries « Plus d’appareil ni de clé ? » too (phone: its own line above the other
+buttons; tablet and desktop: left of the row). The line « La demande s’affiche sur ces appareils, même si Benthic y est fermé »
+of the mock-up reads « … dès que Benthic y est ouvert » here, because a closed app is not woken.
 
 **Device name.** `lib/device-name.js` names a device without a native call: « Téléphone Android » or « Tablette Android »
 (screen's short side of 600 px and more), « iPhone », « iPad », « Ordinateur Windows », « Ordinateur Mac », « Ordinateur Linux »
@@ -223,9 +247,10 @@ are in `app/src/lib/account-sync-screens.js`, tested by `tests/app/account-sync-
 
 | Component (`app/src/components/`) | Item | Props | Callbacks |
 |---|---|---|---|
-| `AccountUnlockDialog` | 1 | none (the pairing row reads « Demander l’autorisation à un appareil déjà jumelé » everywhere) | `onpair`, `onrecoverykey`, `onlater` (also Back and the scrim), `onlost` (opens `StartOverDialog`) |
-| `PairRequestDialog` | 2, 7 (#183) | `kind` (`'waiting'`: « Demander l’accès », « En attente d’autorisation », the 6 digits large and monospace, the countdown, « Ouvrez Benthic sur un appareil déjà jumelé et autorisez cet appareil »; `'declined'`, `'expired'`, `'failed'`: what happened), `code`, `expiresAt` (ms since 1970), `now` (clock, tests) | `oncancel` (« Annuler » / « Fermer », Back, scrim), `onagain` (« Demander de nouveau », the ended kinds) |
-| `PairConfirmDialog` | 8 (#183) | `deviceName`, `code`, `busy` | `onconfirm` (« Autoriser »: only now is anything committed), `onrefuse` (« Refuser »: deletes the request), `onlater` (Back, scrim) |
+| `AccountUnlockDialog` | 1 | `names` (the paired devices, for « À approuver sur … ») | `onpair`, `onrecoverykey`, `onlater` (also Back and the scrim), `onlost` (opens `StartOverDialog`) |
+| `PairRequestDialog` | 2, 7 (#183) | `kind` (`'waiting'`: « Demande d’accès envoyée », the names, « En attente d’une réponse… » with the wavy line, « Code de vérification » and the 6 digits large and monospace, the countdown; `'declined'` (`by`), `'expired'`, `'failed'`: what happened), `code`, `names`, `by`, `expiresAt` (ms since 1970), `now` (clock, tests) | `oncancel` (« Annuler » / « Fermer », Back, scrim), `onagain` (« Nouvelle demande », the ended kinds), `onlost` (« Plus d’appareil ni de clé ? », the expired kind) |
+| `PairConfirmDialog` | 8 (#183) | `deviceName`, `code`, `busy` | `onconfirm` (« Autoriser »: only now is anything committed), `onrefuse` (« Refuser »), `onmismatch` (« Les codes sont différents », a text button on its own line), `onlater` (Back, scrim) |
+| `PairMismatchDialog` | 349.8 | `deviceName` | `onclose` (« OK ») |
 | `OrphanedDataDialog` | — | `busy` | `onerase` (« Effacer »), `onlater` (« Plus tard », Back, scrim) |
 | `PairedDialog` | 4 | none | `onclose` |
 | `RecoveryKeyOffer` | 9 | `busy` | `oncreate`, `onlater` |
@@ -241,13 +266,11 @@ Not components:
 - `lib/two-device-notice.js`: `showTwoDeviceNotice(name)` (item 12), the app's snackbar with « OK ». It uses two new options of
   `showSnackbar`: `placement: 'center'` (560 dp, centred at the bottom on a tablet and the desktop) and `long` (three lines).
   Above the FAB on the phone as for every snackbar.
-- `lib/locked-data.svelte.js`: `accountLock` `{ locked, canPair, onpair, onpairnew, onrecoverykey }`, all off by default.
-  `requests` is the count of pending access requests.
+- `lib/locked-data.svelte.js`: `accountLock` `{ locked, onpair, onrecoverykey }`, all off by default.
   `locked` turns on the item 5 look: the subtitles of « Fiche d’urgence », « Brevets et documents » and « Informations »
   read « Verrouillé : jumelez cet appareil » (phone page and the wide left pane), `LockedDataCard` appears under the phone
   list and replaces the Informations pane and the Brevets pane on a wide screen, and the Brevets « + » and the Informations
-  pencil are hidden. `canPair` shows the account sheet's « Demandes d’accès » row (Android, iPhone and desktop
-  sheets), whose second line is the count or « Aucune demande … »; it calls `onpairnew` (look for the requests and ask about the first).
+  pencil are hidden. `locked` also shows the account sheet's row « Jumeler cet appareil » (lock icon, « Données chiffrées verrouillées sur cet appareil » in the pending colour; Android, iPhone and desktop sheets), which calls `onpair`.
 
 ### Wiring (done on 23 November 2026)
 
@@ -255,8 +278,8 @@ Not components:
 time and in this order: another account (`AccountDifferentDialog`, new, « Garder séparé » / « Utiliser ce compte » = `forgetLastAccount`),
 the missing key (`AccountUnlockDialog`, once per run of the app), the join (`JoinSummaryDialog`, only when the key is held: a device that
 must be paired first is paired first), the recovery key offer (`RecoveryKeyOffer`, at the first successful sync, asked again after a week
-when postponed). It also sets the flags of `locked-data.svelte.js` (`locked` from `accountSync.keyMissing`; `canPair` when the device
-holds the key, has synced and is not pull-only) and shows the « modifié sur deux appareils » notice from `accountSync.conflicts`.
+when postponed). It also sets the flags of `locked-data.svelte.js` (`locked` from `accountSync.keyMissing`), looks for access requests (`watchRequests`, only when the device holds the key, is
+signed in and is not pull-only) and writes the device's record (`touchDevice`) and shows the « modifié sur deux appareils » notice from `accountSync.conflicts`.
 `lib/account-sync-flows.svelte.js` is what each button does: the pairing codes and files, adopting the key (`adoptAccountKey`, then
 `resealFiles` into the store as pending writes, then `persistAccountKey`, in that order, so that nothing is lost if the app stops between),
 the recovery key, the start-over, the join. Dialogs own no route: nothing here touches the router.

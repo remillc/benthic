@@ -76,6 +76,7 @@ const app = new URL('../../app/src/', import.meta.url);
 const screens = [
   'AccountUnlockDialog',
   'PairRequestDialog',
+  'PairMismatchDialog',
   'OrphanedDataDialog',
   'PairConfirmDialog',
   'PairedDialog',
@@ -87,7 +88,7 @@ const screens = [
   'StartOverDialog',
   'AccountDifferentDialog',
 ].map((n) => [`components/${n}.svelte`, readFileSync(new URL(`components/${n}.svelte`, app), 'utf8')]);
-const libs = ['lib/two-device-notice.js', 'lib/device-name.js', 'lib/account-sync-screens.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
+const libs = ['lib/two-device-notice.js', 'lib/device-name.js', 'lib/access-request-notify.js', 'lib/account-sync-screens.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
 // The wiring: the host picks the screen, the flows hold the texts of the snackbars and the names of the items.
 const wiring = ['components/AccountSyncHost.svelte', 'lib/account-sync-flows.svelte.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
 const everything = [...screens, ...libs, ...wiring];
@@ -100,12 +101,15 @@ test('every accountSync text a screen uses is in fr and en, and every text is us
   for (const [file, source] of everything) {
     // `t('accountSync.x.y')` and the two conditional forms `t(cond ? 'accountSync.a' : 'accountSync.b')`.
     for (const [, key] of source.matchAll(/'(accountSync\.[A-Za-z.]+)'/g)) used.add(key);
-    if (source.includes('`accountSync.device.${kind}`')) for (const id of ['androidPhone', 'androidTablet', 'iphone', 'ipad', 'windows', 'mac', 'linux', 'unknown']) used.add(`accountSync.device.${id}`);
+    if (source.includes('`accountSync.device.${currentDeviceKind()}`')) for (const id of ['androidPhone', 'androidTablet', 'iphone', 'ipad', 'windows', 'mac', 'linux', 'unknown']) used.add(`accountSync.device.${id}`);
     for (const [, key] of source.matchAll(/`(accountSync\.join)\.\$\{counter\.id\}`/g)) for (const id of ['recognised', 'added', 'toConfirm']) used.add(`${key}.${id}`);
     assert.ok(source.length, file);
   }
-  const extra = readFileSync(new URL('components/AccountSheet.svelte', app), 'utf8');
-  for (const [, key] of extra.matchAll(/'(accountSync\.[A-Za-z.]+)'/g)) used.add(key);
+  for (const file of ['components/AccountSheet.svelte', 'components/DesktopAccountSheet.svelte', 'components/FirstLaunchBenthicPlus.svelte']) {
+    const extra = readFileSync(new URL(file, app), 'utf8');
+    for (const [, key] of extra.matchAll(/'(accountSync\.[A-Za-z.]+)'/g)) used.add(key);
+    if (extra.includes('`accountSync.devices.${seen.key}`')) for (const id of ['seenToday', 'seenYesterday', 'seenDays']) used.add(`accountSync.devices.${id}`);
+  }
   /** A text, or its plural forms. @param {any} v */
   const isText = (v) => typeof v === 'string' || (typeof v === 'object' && v !== null && typeof v.other === 'string');
   for (const key of used) {
@@ -128,10 +132,21 @@ test('the texts keep the task’s words', () => {
   assert.equal(fr.accountSync.join.intro, 'Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte.');
   assert.equal(fr.accountSync.join.doneSync, 'Elles se synchronisent maintenant avec vos autres appareils.');
   assert.equal(fr.accountSync.startOver.confirm, 'Effacer et repartir');
-  assert.equal(fr.accountSync.unlock.pairLine, 'Demander l’autorisation à un appareil déjà jumelé');
-  assert.equal(fr.accountSync.pair.askTitle, 'Demander l’accès');
-  assert.equal(fr.accountSync.pair.waiting, 'En attente d’autorisation');
-  assert.equal(fr.accountSync.pair.askHint, 'Ouvrez Benthic sur un appareil déjà jumelé et autorisez cet appareil.');
+  assert.equal(fr.accountSync.unlock.title, 'Déverrouiller vos données chiffrées');
+  assert.equal(fr.accountSync.unlock.pair, 'Demander l’accès à un appareil jumelé');
+  assert.equal(fr.accountSync.unlock.pairLine, 'À approuver sur {names}');
+  assert.equal(fr.accountSync.unlock.meanwhile, 'La demande s’affiche sur vos appareils jumelés. En attendant, le reste du compte se synchronise ; vous pourrez jumeler plus tard depuis Compte.');
+  assert.equal(fr.accountSync.pair.askTitle, 'Demande d’accès envoyée');
+  assert.equal(fr.accountSync.pair.waiting, 'En attente d’une réponse…');
+  assert.equal(fr.accountSync.pair.codeLabel, 'Code de vérification');
+  assert.equal(fr.accountSync.pair.again, 'Nouvelle demande');
+  assert.equal(fr.accountSync.pair.approveText, 'Cet appareil demande à lire votre profil, vos brevets et vos documents chiffrés. Vérifiez qu’il affiche le même code.');
+  assert.equal(fr.accountSync.pair.mismatch, 'Les codes sont différents');
+  assert.equal(fr.accountSync.pair.approved, '« {name} » a maintenant accès aux données chiffrées.');
+  assert.equal(fr.accountSync.pair.lockedEntry, 'Jumeler cet appareil');
+  assert.equal(fr.accountSync.pair.lockedLine, 'Données chiffrées verrouillées sur cet appareil');
+  assert.equal(fr.accountSync.devices.title, 'Vos appareils jumelés');
+  assert.equal(fr.accountSync.unlock.lost, 'Plus d’appareil ni de clé ?');
   assert.equal(fr.accountSync.pair.approveTitle, 'Donner accès à « {name} » ?');
   assert.equal(fr.accountSync.pair.refuse, 'Refuser');
   assert.equal(fr.accountSync.pair.allow, 'Autoriser');
@@ -159,8 +174,9 @@ test('every class of a screen starts with bc-', () => {
 
 test('the locked state and the account-sheet row are off by default; the host turns them on', () => {
   const state = readFileSync(new URL('lib/locked-data.svelte.js', app), 'utf8');
-  assert.match(state, /locked: false,\s*canPair: false/);
-  for (const file of ['components/AccountSheet.svelte', 'components/DesktopAccountSheet.svelte']) assert.match(readFileSync(new URL(file, app), 'utf8'), /\{#if accountLock\.canPair\}/, file);
+  assert.match(state, /locked: false,\s*onpair/);
+  assert.doesNotMatch(state, /canPair|onpairnew/, 'the paired device has no row any more (task 349): requests come as a dialog');
+  for (const file of ['components/AccountSheet.svelte', 'components/DesktopAccountSheet.svelte']) assert.match(readFileSync(new URL(file, app), 'utf8'), /\{#if accountLock\.locked\}/, file);
   for (const file of ['pages/ProfileDiver.svelte', 'pages/ProfileInfo.svelte', 'pages/ProfileCerts.svelte', 'components/ProfileNav.svelte'])
     assert.match(readFileSync(new URL(file, app), 'utf8'), /accountLock\.locked/, file);
 });

@@ -124,3 +124,26 @@ export function dueScreen(state, due) {
 
 /** The 6-digit verification code as the diver compares it: `042 913` (a non-breaking space in the middle). @param {string} code */
 export const groupedCode = (code) => (code.length === 6 ? `${code.slice(0, 3)}${NBSP}${code.slice(3)}` : code);
+
+/** « A, B ou C »: the names of the paired devices as one text, in the interface language. @param {string[]} names @param {string} [language] */
+export function namesText(names, language = 'fr') {
+  try {
+    return new Intl.ListFormat(language, { style: 'long', type: 'disjunction' }).format(names);
+  } catch {
+    return names.join(', ');
+  }
+}
+
+/**
+ * When a paired device was last seen, as the key of the text and its count: `today`, `yesterday` or `days` (calendar days).
+ * @param {number} lastSeenAt ms since 1970 @param {number} [now]
+ * @returns {{ key: 'seenToday'|'seenYesterday'|'seenDays', n: number }}
+ */
+export function seenParts(lastSeenAt, now = Date.now()) {
+  const day = (/** @type {number} */ ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  };
+  const n = Math.max(0, Math.round((day(now) - day(lastSeenAt)) / 86400000));
+  return n === 0 ? { key: 'seenToday', n } : n === 1 ? { key: 'seenYesterday', n } : { key: 'seenDays', n };
+}

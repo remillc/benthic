@@ -14,6 +14,9 @@ export const STACKED = 'bc-dialog-stacked';
  */
 export function overflows(row) {
   if (row.scrollWidth > row.clientWidth + 1) return true;
+  // Buttons pushed past the start edge (the row is right-aligned): scrollWidth does not count what overflows to the left.
+  const edge = row.getBoundingClientRect().left;
+  if ([...row.children].some((b) => b.getBoundingClientRect().left < edge - 1)) return true;
   for (const b of /** @type {HTMLElement[]} */ ([...row.children])) if (b.scrollWidth > b.clientWidth + 1) return true;
   return false;
 }

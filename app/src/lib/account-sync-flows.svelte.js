@@ -12,7 +12,8 @@ import { deviceStore } from './device-store.js';
 import { accountDataDeps, loadProfile } from './profile.svelte.js';
 import { createRecoveryKey, recoverAccountKey, startOver } from './account-keys.js';
 import { isKeyPath } from './account-sync.js';
-import { adoptAndReseal as adopt, approveRequest, cancelRequest, checkAnswer, declineRequest, finishPairing, pendingRequests, requestAccess } from './account-pairing.js';
+import { adoptAndReseal as adopt, approveRequest, cancelRequest, checkAnswer, clearAnswer, declineRequest, finishPairing, ownDeviceId, pairedDevices, pendingRequests, requestAccess, touchDeviceRecord } from './account-pairing.js';
+import { notifyAccessRequest } from './access-request-notify.js';
 import { currentDeviceKind, platformOf } from './device-name.js';
 import { showTwoDeviceNotice } from './two-device-notice.js';
 import { accountLock } from './locked-data.svelte.js';
@@ -31,7 +32,7 @@ import {
   syncAccountNow,
 } from './account-sync.svelte.js';
 
-/** @typedef {'unlock'|'requestWait'|'requestEnded'|'approve'|'paired'|'joined'|'offer'|'show'|'enter'|'startOver'|'join'|'different'|'orphans'} AccountScreen */
+/** @typedef {'unlock'|'requestWait'|'requestEnded'|'approve'|'mismatch'|'paired'|'joined'|'offer'|'show'|'enter'|'startOver'|'join'|'different'|'orphans'} AccountScreen */
 
 /** The screen open now ('' when none) and what it shows. */
 export const accountFlow = $state({
@@ -47,6 +48,12 @@ export const accountFlow = $state({
   requests: [],
   /** Why the new device's request ended: 'declined', 'expired' or 'failed'. */
   endReason: '',
+  /** The paired device that refused (empty when unknown). */
+  endBy: '',
+  /** The paired devices of the account, for « À approuver sur … » and « Vos appareils jumelés ». @type {{ id: string, name: string, lastSeenAt: number }[]} */
+  devices: [],
+  /** The key arrived (pairing, recovery key or start-over) while a first-launch step waits for it. */
+  unlocked: false,
   busy: false,
   /** '' or 'wrong' (the recovery key was refused). */
   error: '',
@@ -99,6 +106,7 @@ export function closeScreen() {
   accountFlow.code = '';
   accountFlow.requestId = '';
   accountFlow.endReason = '';
+  accountFlow.endBy = '';
 }
 
 /** @param {AccountScreen} screen */
@@ -129,6 +137,7 @@ async function adoptAndReseal(account) {
  * confirmation is closed (components/AccountSyncHost.svelte).
  */
 async function afterUnlocked() {
+  accountFlow.unlocked = true;
   open('paired');
   try {
     await syncAccountNow();
@@ -153,11 +162,17 @@ const dismissed = new Set();
 /** How often a paired device looks for requests while the app is open and in front. */
 export const REQUEST_POLL_MS = 15000;
 
-/** Keeps the requests the paired device knows of, the count on the account sheet's row, and the flag the sheet reads. */
+/** This device's name as the other devices read it. */
+const ownName = () => t(`accountSync.device.${currentDeviceKind()}`);
+
+/** Keeps the requests the paired device knows of; a dialog about a request that is gone (answered on another device, expired) closes. @param {typeof accountFlow.requests} list */
 function setRequests(list) {
   accountFlow.requests = list;
-  accountLock.requests = list.length;
+  if (accountFlow.screen === 'approve' && accountFlow.requestId && !list.some((r) => r.id === accountFlow.requestId) && !accountFlow.busy) closeScreen();
 }
+
+/** The requests already known: a new one found while the app is not in front is notified. @type {Set<string>} */
+const known = new Set();
 
 /**
  * Looks for requests: on the server (`network`) or in the working copy the last run left (no network). Never throws.
@@ -166,22 +181,25 @@ function setRequests(list) {
 export async function refreshRequests({ network }) {
   try {
     const keys = network ? await fetchAccountKeys() : await readAccountKeys();
-    setRequests(await pendingRequests(keys));
+    const list = await pendingRequests(keys);
+    const hidden = typeof document !== 'undefined' && document.visibilityState === 'hidden';
+    for (const r of list) {
+      if (!known.has(r.id) && hidden) void notifyAccessRequest(r);
+      known.add(r.id);
+    }
+    setRequests(list);
   } catch (e) {
     if (codeOf(e) !== 'UNREACHABLE' && codeOf(e) !== 'NO_WORKING_COPY') console.warn('Looking for access requests', e);
   }
 }
 
 /**
- * Starts looking: now, every `REQUEST_POLL_MS` while the page is visible, when the app comes back to the front, and after each
- * sync run (`afterRun`, without the network). Returns the function that stops it.
+ * Starts looking: now, every `REQUEST_POLL_MS` (in front or not: a notification is shown when it is not), when the app comes back
+ * to the front, and after each sync run (`afterRun`, without the network). Returns the function that stops it.
  * @returns {() => void}
  */
 export function watchRequests() {
-  const visible = () => typeof document === 'undefined' || document.visibilityState !== 'hidden';
-  const look = () => {
-    if (visible()) void refreshRequests({ network: true });
-  };
+  const look = () => void refreshRequests({ network: true });
   look();
   const timer = setInterval(look, REQUEST_POLL_MS);
   if (typeof document !== 'undefined') document.addEventListener('visibilitychange', look);
@@ -190,6 +208,31 @@ export function watchRequests() {
     if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', look);
     setRequests([]);
   };
+}
+
+/** A paired device writes its name and when it was last seen on the branch (at most every 6 hours), for the new device's list. Never throws. */
+export async function touchDevice() {
+  try {
+    const { store } = accountDataDeps();
+    await touchDeviceRecord({ store, name: ownName(), platform: platformOf(currentDeviceKind()), commitKeyFiles: commitPairingFiles });
+  } catch (e) {
+    console.warn('Writing this device’s record', e);
+  }
+}
+
+/** The paired devices the account lists, without this one. @param {{ devices?: { path: string, json: any }[] }} keys */
+async function listDevices(keys) {
+  const { store } = accountDataDeps();
+  return pairedDevices(keys, { exceptId: await ownDeviceId({ store }) });
+}
+
+/** Reads the paired devices from the server (no data) for the new device's dialogs. Never throws. */
+export async function refreshDevices() {
+  try {
+    accountFlow.devices = await listDevices(await fetchAccountKeys());
+  } catch (e) {
+    if (codeOf(e) !== 'UNREACHABLE') console.warn('Listing the paired devices', e);
+  }
 }
 
 /** The request to show now: the newest one the diver has not put aside. */
@@ -201,15 +244,6 @@ export function askApproval(request) {
   accountFlow.deviceName = request.deviceName;
   accountFlow.code = request.code;
   open('approve');
-}
-
-/** The account sheet's row: the request waiting, or a look at the server and, if there is none, what to do. */
-export async function openRequests() {
-  dismissed.clear();
-  if (!requestDue()) await refreshRequests({ network: true });
-  const next = requestDue();
-  if (next) askApproval(next);
-  else say('accountSync.pair.none');
 }
 
 /** « Plus tard » (Back, the scrim): the request stays on the server until it expires; it is not asked again by itself. */
@@ -228,10 +262,11 @@ export async function approveNow() {
   if (!account || !id) return closeScreen();
   accountFlow.busy = true;
   try {
+    const name = accountFlow.deviceName;
     await approveRequest(id, account, pairingDeps());
     forget(id);
     closeScreen();
-    say('accountSync.pair.approved');
+    showSnackbar(t('accountSync.pair.approved', { name }));
   } catch (e) {
     console.error('Approving the access request', e);
     forget(id);
@@ -240,20 +275,27 @@ export async function approveNow() {
   }
 }
 
-/** « Refuser »: the request is deleted and nothing else is written. */
-export async function declineNow() {
+/**
+ * « Refuser »: the request is deleted and a marker with this device's name tells the new device who refused (nothing else is
+ * written). « Les codes sont différents » does the same, then says what it means (`mismatch`).
+ * @param {boolean} [mismatch]
+ */
+export async function declineNow(mismatch = false) {
   const id = accountFlow.requestId;
   if (!id) return closeScreen();
   accountFlow.busy = true;
   try {
-    await declineRequest(id, pairingDeps());
+    await declineRequest(id, ownName(), pairingDeps());
   } catch (e) {
     console.error('Declining the access request', e);
     say('accountSync.pair.failed');
   }
   forget(id);
-  closeScreen();
+  if (mismatch) open('mismatch');
+  else closeScreen();
 }
+
+export const declineMismatch = () => declineNow(true);
 
 // ---------------------------------------------------------------------------------------------------------------
 // This device has no key (items 1 to 4)
@@ -267,9 +309,9 @@ export async function askForAccess() {
   accountFlow.busy = true;
   accountFlow.code = '';
   try {
-    const kind = currentDeviceKind();
-    const request = await requestAccess({ deviceName: t(`accountSync.device.${kind}`), platform: platformOf(kind) }, pairingDeps());
+    const request = await requestAccess({ deviceName: ownName(), platform: platformOf(currentDeviceKind()) }, pairingDeps());
     pairing = request;
+    accountFlow.devices = request.devices ?? [];
     accountFlow.code = request.code;
     accountFlow.expiresAt = request.expiresAt;
     accountFlow.busy = false;
@@ -303,8 +345,11 @@ async function lookForAnswer() {
       await afterUnlocked();
     } else {
       pairing = null;
-      accountFlow.endReason = answer.state;
+      const by = answer.state === 'declined' ? answer.by : '';
+      if (answer.state === 'declined') void clearAnswer(mine, pairingDeps());
       open('requestEnded');
+      accountFlow.endReason = answer.state;
+      accountFlow.endBy = by;
     }
   } catch (e) {
     // A server that does not answer for a moment is not the end of the request: it is looked at again, until it expires.
@@ -377,6 +422,7 @@ export async function startOverNow() {
     if (result.status !== 'synced') throw new Error(result.error ?? result.status);
     await loadProfile();
     accountSync.keyMissing = false;
+    accountFlow.unlocked = true;
     closeScreen();
   } catch (e) {
     console.error('Starting over', e);
@@ -529,15 +575,13 @@ export async function announceConflicts() {
 // ---------------------------------------------------------------------------------------------------------------
 // The flags the profile screens and the account sheet read (lib/locked-data.svelte.js)
 
-/** @param {{ canPair: boolean, locked: boolean }} flags */
-export function setLockFlags({ canPair, locked }) {
-  accountLock.canPair = canPair;
+/** @param {{ locked: boolean }} flags */
+export function setLockFlags({ locked }) {
   accountLock.locked = locked;
 }
 
 export function wireLockActions() {
   accountLock.onpair = () => void askForAccess();
-  accountLock.onpairnew = () => void openRequests();
   accountLock.onrecoverykey = () => openRecoveryKeyEntry();
 }
 
@@ -589,4 +633,30 @@ export const differentDue = () => !asked.different;
 export function askUnlock() {
   asked.unlock = true;
   open('unlock');
+  void refreshDevices();
+}
+
+/** « Plus d’appareil ni de clé ? »: opens « Repartir sans les données chiffrées ». */
+export function openStartOver() {
+  open('startOver');
+}
+
+/**
+ * Sign-in on a device without the data key (task 2026-11-23-348): right after the logbook download, the account's keys are read
+ * (the working copy of the `benthic` branch is cloned, nothing of the data is received or joined). Says whether this device must be
+ * paired and which paired devices can approve. Never throws: a server that does not answer leaves the pairing to the usual question.
+ * @returns {Promise<{ pairNeeded: boolean, devices: { id: string, name: string, lastSeenAt: number }[] }>}
+ */
+export async function probeSignInKeys() {
+  accountFlow.unlocked = false;
+  try {
+    const keys = await fetchAccountKeys();
+    if (keys.kid && keys.keyMissing) {
+      accountFlow.devices = await listDevices(keys);
+      return { pairNeeded: true, devices: accountFlow.devices };
+    }
+  } catch (e) {
+    if (codeOf(e) !== 'UNREACHABLE') console.warn('Reading the account keys at sign-in', e);
+  }
+  return { pairNeeded: false, devices: [] };
 }

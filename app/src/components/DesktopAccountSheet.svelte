@@ -327,10 +327,10 @@
         <span class="bc-desktop-account--row-texts"><span>{t('account.sheet.backup')}</span><span class="bc-desktop-account--row-line">{t('account.sheet.backupText')}</span></span>
         <Icon name="chevron" size={20} />
       </button>
-      {#if accountLock.canPair}
-        <button type="button" class="bc-desktop-account--row bc-desktop-account--profile" data-row="pair" onclick={() => leaveTo(accountLock.onpairnew)}>
-          <Icon name="device" size={22} />
-          <span class="bc-desktop-account--row-texts"><span>{t('accountSync.pair.entry')}</span><span class="bc-desktop-account--row-line">{accountLock.requests ? t('accountSync.pair.entryPending', { n: accountLock.requests }) : t('accountSync.pair.entryNone')}</span></span>
+      {#if accountLock.locked}
+        <button type="button" class="bc-desktop-account--row bc-desktop-account--profile" data-row="pair" onclick={() => leaveTo(accountLock.onpair)}>
+          <Icon name="lock" size={22} />
+          <span class="bc-desktop-account--row-texts"><span>{t('accountSync.pair.lockedEntry')}</span><span class="bc-desktop-account--row-line bc-desktop-account--row-line-locked">{t('accountSync.pair.lockedLine')}</span></span>
           <Icon name="chevron" size={20} />
         </button>
       {/if}
@@ -535,6 +535,11 @@
 
       &.bc-desktop-account--late-line {
         color: var(--bc-late-text);
+      }
+
+      /* « Données chiffrées verrouillées sur cet appareil »: the warning colour (pending). */
+      &.bc-desktop-account--row-line-locked {
+        color: var(--bc-pending);
       }
     }
     .bc-desktop-account--late-badge {

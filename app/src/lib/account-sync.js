@@ -12,7 +12,7 @@
 import { sortedJson } from './file-store.js';
 import { mergeAccountFile, mergeEncryptedAccountFile } from './account-data-merge.js';
 import { repositoryKey } from './server-logbook.js';
-import { ACCOUNT_KEY_PATH, PAIRING_DIR, REQUESTS_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
+import { ACCOUNT_KEY_PATH, DEVICES_DIR, PAIRING_DIR, REQUESTS_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
 
 /** The branch of the account data. */
 export const BRANCH = 'benthic';
@@ -191,6 +191,7 @@ function mergeMaintenance(base, ours, theirs) {
  * @property {any|null} recovery the content of `keys/recovery.json`
  * @property {{ path: string, json: any }[]} pairing the answers on the branch (`keys/pairing/`)
  * @property {{ path: string, json: any }[]} requests the access requests of new devices (`keys/requests/`)
+ * @property {{ path: string, json: any }[]} devices the paired devices' records (`keys/devices/`)
  */
 
 /**
@@ -384,6 +385,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
       recovery: byPath.get(RECOVERY_PATH) ?? null,
       pairing: [...byPath].filter(([path]) => path.startsWith(PAIRING_DIR)).map(([path, json]) => ({ path, json })),
       requests: [...byPath].filter(([path]) => path.startsWith(REQUESTS_DIR)).map(([path, json]) => ({ path, json })),
+      devices: [...byPath].filter(([path]) => path.startsWith(DEVICES_DIR)).map(([path, json]) => ({ path, json })),
     };
   }
 

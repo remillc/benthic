@@ -12,7 +12,7 @@ import { createSecretBox, toBase64 } from '../../app/src/lib/secret-box.js';
 import { createProfile, emptyInfo } from '../../app/src/lib/profile.js';
 import { createAccountSync } from '../../app/src/lib/account-sync.js';
 import { createAccessRequest } from '../../app/src/lib/account-keys.js';
-import { approveRequest, cancelRequest, checkAnswer, declineRequest, finishPairing, pendingRequests, requestAccess } from '../../app/src/lib/account-pairing.js';
+import { approveRequest, cancelRequest, checkAnswer, clearAnswer, declineRequest, finishPairing, pairedDevices, pendingRequests, requestAccess, touchDeviceRecord } from '../../app/src/lib/account-pairing.js';
 import { dueScreen } from '../../app/src/lib/account-sync-screens.js';
 import { FakeBgit, FakeRemote } from './git-history-core.mjs';
 
@@ -92,16 +92,45 @@ test('approval on a device without a working copy: it clones, asks, is approved,
   }
 });
 
-test('declining deletes the request and writes nothing else; the new device is told', async () => {
+test('declining deletes the request and leaves a marker with the name of the refusing device; the new device is told who refused', async () => {
   const { remote, tablet, phone: p } = await setup();
   try {
     const request = await requestAccess(phone, doors(p));
     const [seen] = await pendingRequests(await tablet.sync.fetchKeys());
-    const before = Object.keys(remote.files()).sort();
-    await declineRequest(seen.id, doors(tablet));
-    assert.deepEqual(Object.keys(remote.files()).sort(), before.filter((f) => f !== request.path));
-    assert.equal((await checkAnswer(request, doors(p))).state, 'declined');
+    await declineRequest(seen.id, 'Tablette Android', doors(tablet));
+    assert.equal(remote.files()[request.path], undefined, 'the request is deleted');
+    const marker = JSON.parse(remote.files()[request.answerPath]);
+    assert.deepEqual([marker.mode, marker.by], ['declined', 'Tablette Android']);
+    assert.equal(JSON.stringify(marker).includes('"ct"'), false, 'no secret in the marker');
+    const answer = await checkAnswer(request, doors(p));
+    assert.deepEqual([answer.state, answer.by], ['declined', 'Tablette Android']);
+    await clearAnswer(request, doors(p));
+    assert.equal(remote.files()[request.answerPath], undefined, 'the new device deletes the marker');
     assert.deepEqual(p.writes, [], 'no key was taken');
+    // A request already gone is nothing to refuse.
+    await declineRequest(seen.id, 'Tablette Android', doors(tablet));
+  } finally {
+    dispose(tablet, p);
+    remote.dispose();
+  }
+});
+
+test('the paired devices list: a paired device writes its record at most every 6 hours; the new device reads names and last seen', async () => {
+  const { remote, tablet, phone: p } = await setup();
+  try {
+    let clock = Date.UTC(2026, 10, 23, 12);
+    const touch = () => touchDeviceRecord({ store: tablet.store, name: 'Tablette Android', platform: 'android', now: () => clock, commitKeyFiles: doors(tablet).commitKeyFiles });
+    assert.equal(await touch(), true);
+    assert.equal(await touch(), false, 'not again within 6 hours');
+    clock += 7 * 3600 * 1000;
+    assert.equal(await touch(), true);
+    const id = (await tablet.store.read('meta/device.json')).id;
+    // The new device lists it before asking.
+    const request = await requestAccess(phone, doors(p));
+    assert.deepEqual(request.devices.map((d) => [d.id, d.name]), [[id, 'Tablette Android']]);
+    const keys = await p.sync.fetchKeys();
+    assert.deepEqual(pairedDevices(keys, { exceptId: id, now: () => clock }), [], 'a device does not list itself');
+    assert.equal(pairedDevices(keys, { now: () => clock + 200 * 24 * 3600 * 1000 }).length, 0, 'not seen for six months: left out');
   } finally {
     dispose(tablet, p);
     remote.dispose();

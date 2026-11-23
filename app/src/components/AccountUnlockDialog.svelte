@@ -1,22 +1,26 @@
 <script>
   // @ts-check
-  // « Nouvel appareil, déverrouiller les données chiffrées » (inbox task 2026-11-23-338, item 1; Benthic+ only): shown over
-  // the profile when this device has no data key and the account has one (`MISSING_DATA_KEY`). Two rows, then the
-  // reassurance line; « Plus tard » closes it, « Plus d’appareil ni de clé ? » opens StartOverDialog. No ✕. Driven by props
-  // and callbacks only; the wiring step (docs/account-sync.md, « Screens ») decides when it opens.
+  // « Déverrouiller vos données chiffrées » (inbox tasks 2026-11-23-338 item 1, 348 and 349; Benthic+ only): shown over the profile,
+  // and by itself at sign-in on a tablet or a computer, when this device has no data key and the account has one
+  // (`MISSING_DATA_KEY`). Two rows, then the note; « Plus tard » closes it, « Plus d’appareil ni de clé ? » opens StartOverDialog.
+  // The first row asks a paired device for access; its second line names the devices that can approve (`names`). No ✕. Driven by
+  // props and callbacks only.
   import Md3Dialog from './Md3Dialog.svelte';
   import Icon from './Icon.svelte';
-  import { t } from '../lib/i18n.js';
+  import { t, language } from '../lib/i18n.js';
+  import { namesText } from '../lib/account-sync-screens.js';
 
   /**
+   * names: the paired devices that can approve (their names, as the account lists them), empty when none is known.
    * @type {{
+   *   names?: string[],
    *   onpair: () => void,
    *   onrecoverykey: () => void,
    *   onlater: () => void,
    *   onlost: () => void,
    * }}
    */
-  let { onpair, onrecoverykey, onlater, onlost } = $props();
+  let { names = [], onpair, onrecoverykey, onlater, onlost } = $props();
 </script>
 
 <Md3Dialog title={t('accountSync.unlock.title')} class="bc-unlock-dialog" oncancel={onlater}>
@@ -25,7 +29,7 @@
       <Icon name="device" size={24} />
       <span class="bc-unlock-dialog--texts">
         <span class="bc-unlock-dialog--label">{t('accountSync.unlock.pair')}</span>
-        <span class="bc-unlock-dialog--line">{t('accountSync.unlock.pairLine')}</span>
+        <span class="bc-unlock-dialog--line">{names.length ? t('accountSync.unlock.pairLine', { names: namesText(names, language) }) : t('accountSync.unlock.pairLineNone')}</span>
       </span>
     </button>
     <button type="button" class="bc-unlock-dialog--row" data-row="recovery-key" onclick={onrecoverykey}>

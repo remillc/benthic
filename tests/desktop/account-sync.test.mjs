@@ -245,7 +245,7 @@ describe('account data sync between devices against the dev server', { skip }, (
     await synced(c);
     const request = await requestAccess(thisDevice, doors(c));
     const [seen] = await pendingRequests(await a.sync.fetchKeys());
-    await declineRequest(seen.id, doors(a));
+    await declineRequest(seen.id, 'Test tablet', doors(a));
     assert.equal((await checkAnswer(request, doors(c))).state, 'declined');
     assert.equal((await synced(c)).keyMissing, true);
   });
