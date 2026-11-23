@@ -28,7 +28,6 @@
   import { layout, ios, bottomNav, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import WheelDialog from '../components/WheelDialog.svelte';
-  import RenumberDialog from '../components/RenumberDialog.svelte';
   import { t, tIfExists, deviceLanguage, locale } from '../lib/i18n.js';
   import { CATEGORIES, categoryOf, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
@@ -56,7 +55,6 @@
   import { afterDocumentNotifyChange } from '../lib/document-notify.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
-  import { visibleRegions, updatesCount } from '../lib/offline-maps.svelte.js';
 
   /** @typedef {import('benthic-core').CorePrefValues} CorePrefValues */
   /** @typedef {{ value: string, label: string, example?: string }} Option */
@@ -107,7 +105,6 @@
   const section = f7route?.params?.section ?? '';
 
   let search = $state('');
-  let renumbering = $state(false);
   /** « Ouvrir au démarrage » (desktop): kept by the main process, read here when the page opens. @type {'last'|'ask'} */
   let startupMode = $state('last');
   const UNIT_SYSTEMS = /** @type {const} */ (['metric', 'imperial', 'personalize']);
@@ -540,7 +537,6 @@
             }
           },
         },
-        { kind: 'link', id: 'renumber', label: t('renumber.label'), text: t('renumber.text'), action: () => (renumbering = true) },
         { kind: 'switch', id: 'displayInvalidDives', label: t('settings.invalidDives.label'), text: t('settings.invalidDives.text'), checked: p.displayInvalidDives, set: async (v) => {
           await setCore({ displayInvalidDives: v });
           // The core's list leaves invalid dives out unless this is on.
@@ -807,21 +803,6 @@
         },
       ],
     },
-    {
-      id: 'maps',
-      title: t('settings.groups.maps'),
-      // Offline maps (/settings/maps/): the number of regions, and a badge when an update is waiting.
-      rows: [
-        {
-          kind: 'link',
-          id: 'regions',
-          label: t('settings.maps.regions'),
-          text: visibleRegions().length ? t('settings.maps.count', { n: visibleRegions().length }) : t('settings.maps.none'),
-          href: '/settings/maps/',
-          badge: updatesCount() ? t('settings.maps.updates', { n: updatesCount() }) : undefined,
-        },
-      ],
-    },
   ]);
 
   /** @param {'system'|'light'|'dark'} theme */
@@ -875,7 +856,7 @@
   const lower = (s) => s.charAt(0).toLocaleLowerCase() + s.slice(1);
 
   /**
-   * The overview's cards: each row opens a subpage (or the offline maps screen) and
+   * The overview's cards: each row opens a subpage and
    * says the current values in one line. `groups`: the groups of rows of the subpage.
    * @type {{ id: string, rows: { id: string, icon: string, href: string, summary: string }[] }[]}
    */
@@ -946,7 +927,6 @@
           href: '/settings/download',
           summary: computers.length ? t('settings.overview.remembered', { name: computerName(computers[0]) }) : t('settings.overview.noComputer'),
         },
-        { id: 'maps', icon: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z M9 4v14 M15 6v14', href: '/settings/maps/', summary: rowOf('regions')?.text ?? '' },
         {
           id: 'advanced',
           icon: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19 12l2-1-1-3-2 .5-1.5-1.5.5-2-3-1-1 2h-2l-1-2-3 1 .5 2L6 7.5 4 7 3 10l2 1v2l-2 1 1 3 2-.5 1.5 1.5-.5 2 3 1 1-2h2l1 2 3-1-.5-2 1.5-1.5 2 .5 1-3-2-1z',
@@ -1453,7 +1433,6 @@
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d={cat.icon}></path></svg>
                   <span class="bc-desktop-settings--category-name">{t(`desktopSettings.categories.${cat.id}`)}</span>
-                  {#if cat.id === 'maps' && updatesCount()}<span class="badge">{t('settings.maps.updates', { n: updatesCount() })}</span>{/if}
                 </button>
               </li>
             {/each}
@@ -1544,7 +1523,6 @@
                 <span class="bc-settings--label">{t(`settings.sections.${row.id}`)}</span>
                 <span class="bc-settings--overview-summary">{row.summary}</span>
               </span>
-              {#if row.id === 'maps' && updatesCount()}<span class="badge">{t('settings.maps.updates', { n: updatesCount() })}</span>{/if}
               <svg class="bc-settings--chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
             </a>
           </div>
@@ -1660,9 +1638,6 @@
     {/if}
   {/if}
 
-  <!-- Offline maps: the overview opens their own screen; the search still lists the row. -->
-  {#if !section && query}{@render groupView('maps')}{/if}
-
   {#if inPage('advanced') && advancedShown}
     {#if !section}<h2 class="bc-settings--title">{t('settings.groups.advanced')}</h2>{/if}
     <div class="bc-settings--surface">
@@ -1677,10 +1652,6 @@
   {#if !section && nothingShown}<p class="bc-settings--note bc-settings--empty">{t('settings.noResult', { text: search.trim() })}</p>{/if}
   <div class="bc-settings--bottom"></div>
 </Page>
-{/if}
-
-{#if renumbering}
-  <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
 {/if}
 
 {#if dialog?.kind === 'choice'}

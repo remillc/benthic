@@ -3,7 +3,7 @@
 // the nearest site with coordinates, when it is within SITE_SUGGESTION_LIMIT_M of
 // the position recorded with the dive. Farther away, no suggestion: « Nouveau site »
 // creates one there. The limit is a constant, listed in docs/advanced-settings.md.
-import { distanceKm } from './maps-logic.js';
+import { distanceKm } from './geo.js';
 
 /** Farther than this, a site is not suggested (500 m, 1 640 ft). */
 export const SITE_SUGGESTION_LIMIT_M = 500;

@@ -18,7 +18,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { formatDate } from '../lib/format.js';
-  import { formatMapSize } from '../lib/maps-format.js';
+  import { formatStorageSize } from '../lib/storage-format.js';
   import { desktopApp, ios } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 
@@ -45,7 +45,7 @@
   const price = $derived(overview?.subscription?.price ?? t('benthicPlus.offer.price'));
   const renews = $derived(overview?.subscription?.renewsOn);
   const space = $derived(spaceUse(overview?.storage?.usedBytes, overview?.storage?.limitBytes));
-  const limit = $derived(formatMapSize(space.limit));
+  const limit = $derived(formatStorageSize(space.limit));
   const initial = $derived(email.trim().charAt(0).toLocaleUpperCase());
 
   async function exportData() {
@@ -142,7 +142,7 @@
       <span class="bc-account-manage--space-head">
         <span>{t('account.manage.photosVideos')}</span>
         {#if space.known}
-          <span class="bc-account-manage--figures">{t('account.manage.spaceOf', { used: formatMapSize(space.used), limit })}</span>
+          <span class="bc-account-manage--figures">{t('account.manage.spaceOf', { used: formatStorageSize(space.used), limit })}</span>
         {:else}
           <span class="bc-account-manage--figures bc-account-manage--unknown">{t('account.manage.spaceUnknown', { limit })}</span>
         {/if}

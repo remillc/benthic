@@ -16,7 +16,7 @@ export const RESET_STEPS = /** @type {const} */ ([
 ]);
 
 /** What is never touched, listed so that the confirmation can say it. */
-export const RESET_KEPT = /** @type {const} */ (['devAuthority', 'offlineMaps', 'serverAccount']);
+export const RESET_KEPT = /** @type {const} */ (['devAuthority', 'serverAccount']);
 
 /**
  * @typedef {Object} DevResetDeps

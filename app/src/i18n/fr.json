@@ -785,7 +785,6 @@
       "computers": "Ordinateurs de plongée",
       "download": "Téléchargement",
       "display": "Affichage",
-      "maps": "Cartes hors ligne",
       "advanced": "Avancé"
     },
     "sections": {
@@ -802,7 +801,6 @@
       "gases": "Gaz et recycleur",
       "tools": "Outils",
       "download": "Ordinateurs et téléchargement",
-      "maps": "Cartes hors ligne",
       "advanced": "Avancé",
       "about": "À propos",
       "privacy": "Confidentialité"
@@ -1074,23 +1072,11 @@
       "light": "Clair",
       "dark": "Sombre"
     },
-    "maps": {
-      "regions": "Régions téléchargées",
-      "none": "Aucune",
-      "count": {
-        "one": "{n} région",
-        "other": "{n} régions"
-      },
-      "updates": {
-        "one": "{n} mise à jour",
-        "other": "{n} mises à jour"
-      }
-    },
     "advanced": {
       "resetText": "Revient aux valeurs par défaut pour tous les réglages de cet appareil",
       "reset": "Réinitialiser tous les réglages",
       "resetTitle": "Réinitialiser tous les réglages ?",
-      "resetConfirm": "Les réglages de cet appareil reviennent à leurs valeurs par défaut : unités, affichage, carnet. Vos plongées, vos sites, votre compte, vos cartes téléchargées et votre liste de bouteilles ne changent pas, ni les paramètres du planificateur et le regroupement en voyages.",
+      "resetConfirm": "Les réglages de cet appareil reviennent à leurs valeurs par défaut : unités, affichage, carnet. Vos plongées, vos sites, votre compte et votre liste de bouteilles ne changent pas, ni les paramètres du planificateur et le regroupement en voyages.",
       "resetAction": "Réinitialiser",
       "note": "Les paramètres de planification (vitesses, réserve, SAC, ppO₂, déco) ainsi que le regroupement en voyages ne sont pas modifiés.",
       "resetDone": "Réglages réinitialisés"
@@ -1597,6 +1583,8 @@
       "storeNoteDesktop": "Mode de paiement, reçus et renouvellement se gèrent dans {store}, sur le téléphone qui a servi à l’achat.",
       "space": "Espace",
       "photosVideos": "Photos et vidéos",
+      "sizeMb": "{value} Mo",
+      "sizeGb": "{value} Go",
       "spaceOf": "{used} sur {limit}",
       "spaceUnknown": "Espace de {limit}, utilisation indisponible",
       "spaceUsed": "Espace utilisé, {n} %",
@@ -2359,9 +2347,6 @@
       "other": "Les {n} plongées qui l’utilisent restent dans le carnet, sans site. C’est annulable."
     },
     "deleteSiteTextUnused": "Aucune plongée ne l’utilise. C’est annulable.",
-    "offline": "Hors ligne",
-    "areaNotDownloaded": "Cette zone n’est pas téléchargée",
-    "downloadArea": "Télécharger",
     "selected": {
       "one": "{n} site sélectionné",
       "other": "{n} sites sélectionnés"
@@ -2389,8 +2374,6 @@
       "one": "La plongée cochée reçoit le numéro ci-dessous. Son numéro actuel est remplacé, dans le carnet et dans Subsurface. Vous pourrez annuler juste après.",
       "other": "Les {count} plongées cochées reçoivent des numéros consécutifs, dans l'ordre des dates, à partir du numéro ci-dessous. Leurs numéros actuels sont remplacés, dans le carnet et dans Subsurface. Vous pourrez annuler juste après."
     },
-    "label": "Renuméroter les plongées",
-    "text": "Numéros consécutifs, dans l'ordre des dates",
     "title": "Renuméroter toutes les plongées ?",
     "dialogText": "Les {count} plongées reçoivent des numéros consécutifs, dans l'ordre des dates, à partir du numéro ci-dessous. Leurs numéros actuels sont remplacés, dans le carnet et dans Subsurface. Vous pourrez annuler juste après.",
     "start": "Premier numéro",
@@ -2786,6 +2769,9 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
+      "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
+      "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
       "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",
       "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",
       "Premier lancement : les rayons de lumière de la bande bleue sont toujours quatre, à l’échelle de la largeur de la bande, sur tablette et ordinateur comme sur le téléphone.",
@@ -4382,133 +4368,6 @@
     },
     "hosts": "Sites"
   },
-  "maps": {
-    "title": "Cartes hors ligne",
-    "units": {
-      "mb": "{value} Mo",
-      "gb": "{value} Go"
-    },
-    "summary": {
-      "regions": {
-        "one": "{n} région",
-        "other": "{n} régions"
-      },
-      "maps": "Cartes",
-      "other": "Autres données",
-      "freeOf": "{free} libres sur {total}",
-      "storageLabel": "Stockage de l’appareil : cartes {maps}, {free} libres sur {total}"
-    },
-    "sections": {
-      "downloads": "Téléchargements",
-      "regions": "Régions téléchargées",
-      "settings": "Réglages"
-    },
-    "updateAll": "Tout mettre à jour",
-    "noNetwork": "Pas de réseau. Les régions téléchargées restent utilisables. Les téléchargements reprendront au retour du réseau.",
-    "add": "Ajouter une région",
-    "empty": {
-      "title": "Aucune région téléchargée",
-      "text": "Téléchargez la région de votre prochain voyage. Sa carte restera visible sur le bateau, même sans réseau."
-    },
-    "cellular": {
-      "label": "Télécharger sur données mobiles",
-      "labelShort": "Données mobiles",
-      "text": "Sinon, les téléchargements attendent le Wi-Fi"
-    },
-    "region": {
-      "sizeDate": "{size} · {date}",
-      "updateAvailable": "Mise à jour disponible",
-      "update": "Mettre à jour",
-      "options": "Options pour {name}",
-      "swipeHint": "Balayez une région vers la gauche pour la supprimer."
-    },
-    "menu": {
-      "update": "Mettre à jour",
-      "view": "Voir sur la carte",
-      "delete": "Supprimer"
-    },
-    "download": {
-      "progress": "{done} sur {total} tuiles · {percent} %",
-      "waitingWifi": "En attente du Wi-Fi · {total} tuiles",
-      "queued": "En attente · {total} tuiles",
-      "now": "Télécharger maintenant",
-      "stop": "Arrêter le téléchargement",
-      "background": "Le téléchargement continue si vous quittez l’app.",
-      "pausedAt": "En pause à {done} sur {total} tuiles",
-      "noSpace": "Espace insuffisant sur l’appareil",
-      "resumesWhen": "Reprendra quand {floor} sera libre.",
-      "manage": "Gérer l’espace",
-      "interrupted": "Interrompu à {done} sur {total} tuiles",
-      "resumesOnline": "Reprendra au retour du réseau",
-      "updating": "Mise à jour · {done} sur {total} tuiles",
-      "updatingWifi": "Mise à jour en attente du Wi-Fi",
-      "oldStays": "L’ancienne carte reste utilisable jusqu’à la fin.",
-      "progressLabel": "Téléchargement de {name}"
-    },
-    "failure": {
-      "title": "Échec du téléchargement",
-      "network": "La connexion a été coupée",
-      "space": "Espace insuffisant sur l’appareil",
-      "server": "Le serveur n’a pas répondu correctement",
-      "retry": "Réessayer",
-      "remove": "Retirer",
-      "limit": "Cette région dépasse les 50 Mo qu’OpenFreeMap permet pour un téléchargement. Choisissez une zone plus petite ou moins de détails."
-    },
-    "updateFailed": "La mise à jour de {name} a échoué. L’ancienne carte reste utilisable.",
-    "deleted": "{name} supprimée",
-    "dialogs": {
-      "cellular": {
-        "title": "Télécharger sur données mobiles ?",
-        "text": "{name} peut peser jusqu’à {size}. Sans Wi-Fi, ces données sont prises sur votre forfait.",
-        "wait": "Attendre le Wi-Fi",
-        "go": "Télécharger"
-      },
-      "space": {
-        "title": "Espace insuffisant",
-        "text": "{name} peut demander jusqu’à {size}. Il resterait {remaining}, sous le minimum de {floor} que Benthic garde libre. Supprimez une région ou libérez de l’espace."
-      },
-      "manage": {
-        "title": "Espace sur l’appareil",
-        "text": "Il reste {free} libres sur l’appareil. Benthic garde toujours au moins {floor} libre pour que le téléphone continue de bien fonctionner. Supprimez des régions ou libérez de l’espace sur l’appareil : le téléchargement reprendra de lui-même."
-      },
-      "replace": {
-        "title": "Remplacer la carte ?",
-        "text": "La mise à jour demande jusqu’à {size} de plus. Faute de place, l’ancienne carte est supprimée d’abord. {name} reste indisponible sans réseau jusqu’à la fin du téléchargement.",
-        "confirm": "Remplacer"
-      },
-      "delete": {
-        "title": "Supprimer {name} ?",
-        "text": "Sa carte ne sera plus visible sans réseau. Cela libère {size}. Vos sites et vos plongées ne changent pas.",
-        "confirm": "Supprimer"
-      }
-    },
-    "area": {
-      "title": "Choisir sur la carte",
-      "name": "Nom de la région",
-      "nameHelp": "Proposé d’après le site le plus proche",
-      "around": "Autour de {site}",
-      "aroundHere": "Zone choisie",
-      "estimate": "environ {size} à télécharger (estimation)",
-      "needNetwork": "Choisir sur la carte demande le réseau.",
-      "download": "Télécharger",
-      "unavailable": "Le serveur de cartes est injoignable. Réessayez avec un réseau.",
-      "choose": "Choisir sur la carte",
-      "size": "Environ {width} × {height} km",
-      "tooBig": "Cette zone est trop grande pour être téléchargée. Zoomez un peu.",
-      "search": {
-        "label": "Rechercher un lieu ou un site",
-        "offline": "Recherche indisponible sans réseau",
-        "sites": "Dans votre carnet",
-        "places": "Lieux",
-        "searchPlaces": "Chercher « {query} » parmi les lieux",
-        "searching": "Recherche en cours…",
-        "none": "Aucun lieu trouvé.",
-        "error": "Recherche impossible pour le moment. Réessayez.",
-        "attribution": "Lieux : données © contributeurs OpenStreetMap, via Nominatim"
-      },
-      "mapLabel": "Carte sous un cadre fixe. Déplacez et zoomez la carte pour choisir la zone à télécharger."
-    }
-  },
   "datePicker": {
     "title": "Sélectionner la date",
     "titleInput": "Saisir la date",
@@ -4675,11 +4534,6 @@
       "one": "{n} modification non envoyée",
       "other": "{n} modifications non envoyées"
     },
-    "mapUpdates": {
-      "one": "{n} mise à jour de carte",
-      "other": "{n} mises à jour de carte"
-    },
-    "mapUpdateWaiting": "Mise à jour de carte disponible",
     "accountLabelFree": "Compte, réglages et à propos"
   },
   "health": {
@@ -5206,7 +5060,6 @@
       "gases": "Gaz et pressions partielles",
       "rebreather": "Recycleur",
       "devices": "Ordinateurs et téléchargement",
-      "maps": "Cartes hors ligne",
       "advanced": "Avancé"
     },
     "notes": {
@@ -5775,7 +5628,7 @@
       "subtitle": "Tout ce qui est inclus dans l’offre Benthic+.",
       "carnet": "Votre carnet",
       "profile": "Votre profil de plongeur",
-      "maps": "Sites et cartes",
+      "sites": "Sites",
       "friends": "Avec vos compagnons",
       "sync": "Synchronisé",
       "syncText": "Plus seulement sur cette tablette : le même carnet sur tous vos appareils.",
@@ -5802,8 +5655,6 @@
       "gasAnalysisText": "Le mélange mesuré est noté avec la plongée, plutôt que sur un bout de papier.",
       "gaugePhoto": "Pression lue par photo",
       "gaugePhotoText": "Une photo du manomètre, plutôt que la saisie à la main.",
-      "offlineMaps": "Cartes hors ligne",
-      "offlineMapsText": "Autant de régions que vous voulez, plutôt qu’une seule.",
       "divers": "Sites des plongeurs",
       "diversText": "En plus de vos sites, ceux notés par les autres abonnés.",
       "buddies": "Compagnons",
@@ -5811,8 +5662,7 @@
       "verified": "Plongée validée",
       "verifiedText": "Un compagnon ou un moniteur confirme votre plongée, vérifiable plus tard.",
       "publicProfile": "Profil public",
-      "publicProfileText": "Montrez vos brevets et votre nombre de plongées par lien ou code QR, si vous le voulez.",
-      "free": "Toujours gratuit, sans abonnement : le téléchargement des ordinateurs de plongée, le planificateur, les outils de gaz, les statistiques et l’exportation du carnet."
+      "publicProfileText": "Montrez vos brevets et votre nombre de plongées par lien ou code QR, si vous le voulez."
     },
     "ready": {
       "title": "Votre carnet est prêt",

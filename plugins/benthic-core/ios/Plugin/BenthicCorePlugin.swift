@@ -135,15 +135,6 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "grantShareFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "exportDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "htmlToPdf", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsFreeSpace", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsTilesStart", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsDownloadPause", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsDownloadResume", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsDownloadCancel", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsDownloads", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsFiles", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsDelete", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "mapsReadTile", returnType: CAPPluginReturnPromise),
     ]
 
     /// The core is not reentrant: only this queue calls it.
@@ -189,8 +180,8 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     override public func load() {
         CrashReporter.install()
-        MapsManager.shared.listener = { [weak self] event in self?.notifyListeners("mapsDownload", data: event) }
-        mapsIo.async { MapsManager.shared.load() }
+        // The regions of the removed offline maps: their files go.
+        DispatchQueue.global(qos: .utility).async { LegacyOfflineMaps.remove() }
         DispatchQueue.main.async { [weak self] in
             LaunchCover.show(over: self?.bridge?.viewController?.view, webView: self?.webView,
                              viewProvider: { [weak self] in self?.bridge?.viewController?.view })
@@ -1439,7 +1430,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         var request = URLRequest(url: url, timeoutInterval: 15)
-        request.setValue(MapsManager.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(Self.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard let http = response as? HTTPURLResponse else {
@@ -1483,133 +1474,10 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    // MARK: - Offline maps (MapsManager)
-
-    /// Reads the tiles and loads the maps state, off the main thread.
-    private let mapsIo = DispatchQueue(label: "app.benthicdivelog.maps.io", attributes: .concurrent)
-
-    /// The region id of a call: letters, digits, dot, dash, underscore (it names a directory).
-    private func mapsId(_ call: CAPPluginCall) -> String? {
-        guard let id = call.getString("id"), MapsManager.isValidId(id) else {
-            call.reject("Bad region id", "BAD_ARGUMENT")
-            return nil
-        }
-        return id
-    }
-
-    /// An integer of the call, whatever form the bridge gives it; nil when absent or not a number.
-    private func number(_ call: CAPPluginCall, _ key: String) -> Double? {
-        (call.options[key] as? NSNumber)?.doubleValue
-    }
-
-    @objc func mapsFreeSpace(_ call: CAPPluginCall) {
-        mapsIo.async {
-            let (free, total) = MapsManager.shared.freeSpace()
-            call.resolve(["freeBytes": free, "totalBytes": total])
-        }
-    }
-
-    /// Queues a region ({id, bbox, maxZoom, urlTemplate, version, allowCellular,
-    /// title}). Rejects with TOO_MANY_TILES above 3,000 tiles (counted here,
-    /// whatever the caller says) or BAD_ARGUMENT. No notification on iOS, so no
-    /// permission to ask.
-    @objc func mapsTilesStart(_ call: CAPPluginCall) {
-        guard let id = mapsId(call) else { return }
-        let raw = call.options["bbox"] as? [Any]
-        let bbox = raw?.count == 4 ? raw!.map { ($0 as? NSNumber)?.doubleValue ?? .nan } : nil
-        let zoom = number(call, "maxZoom")
-        let maxZoom = zoom.flatMap { $0 == $0.rounded() ? Int(exactly: $0) : nil } ?? 0
-        let urlTemplate = call.getString("urlTemplate")
-        if let error = MapsManager.check(bbox, maxZoom, urlTemplate) {
-            call.reject(error == "TOO_MANY_TILES" ? "More than \(MapsManager.maxTiles) tiles" : "Bad region request", error)
-            return
-        }
-        let version = call.getString("version") ?? ""
-        let allowCellular = call.getBool("allowCellular") ?? false
-        let title = call.getString("title") ?? id
-        mapsIo.async {
-            MapsManager.shared.load()
-            MapsManager.shared.start(id: id, bbox: bbox!, maxZoom: maxZoom, urlTemplate: urlTemplate!,
-                                     version: version, allowCellular: allowCellular, title: title)
-            call.resolve()
-        }
-    }
-
-    @objc func mapsDownloadPause(_ call: CAPPluginCall) {
-        guard let id = mapsId(call) else { return }
-        mapsIo.async {
-            MapsManager.shared.load()
-            MapsManager.shared.pause(id)
-            call.resolve()
-        }
-    }
-
-    @objc func mapsDownloadResume(_ call: CAPPluginCall) {
-        guard let id = mapsId(call) else { return }
-        let allowCellular = call.getBool("allowCellular") ?? false
-        mapsIo.async {
-            MapsManager.shared.load()
-            MapsManager.shared.resume(id, allowCellular: allowCellular)
-            call.resolve()
-        }
-    }
-
-    @objc func mapsDownloadCancel(_ call: CAPPluginCall) {
-        guard let id = mapsId(call) else { return }
-        mapsIo.async {
-            MapsManager.shared.load()
-            MapsManager.shared.cancel(id)
-            call.resolve()
-        }
-    }
-
-    @objc func mapsDownloads(_ call: CAPPluginCall) {
-        mapsIo.async {
-            MapsManager.shared.load()
-            call.resolve(["downloads": MapsManager.shared.downloads().map(\.event)])
-        }
-    }
-
-    @objc func mapsFiles(_ call: CAPPluginCall) {
-        mapsIo.async {
-            MapsManager.shared.load()
-            let files = MapsManager.shared.files().map {
-                ["id": $0.id, "sizeBytes": $0.sizeBytes, "version": $0.version, "maxZoom": $0.maxZoom] as [String: Any]
-            }
-            call.resolve(["files": files])
-        }
-    }
-
-    @objc func mapsDelete(_ call: CAPPluginCall) {
-        guard let id = mapsId(call) else { return }
-        mapsIo.async {
-            MapsManager.shared.load()
-            MapsManager.shared.delete(id)
-            call.resolve()
-        }
-    }
-
-    /// One tile of a ready region, base64 ('' for an empty tile). Rejects with NOT_FOUND.
-    @objc func mapsReadTile(_ call: CAPPluginCall) {
-        guard let id = mapsId(call) else { return }
-        let z = number(call, "z").flatMap { Int(exactly: $0) } ?? -1
-        let x = number(call, "x").flatMap { Int(exactly: $0) } ?? -1
-        let y = number(call, "y").flatMap { Int(exactly: $0) } ?? -1
-        if z < 0 || x < 0 || y < 0 {
-            call.reject("Bad tile", "BAD_ARGUMENT")
-            return
-        }
-        mapsIo.async {
-            do {
-                guard let data = try MapsManager.shared.readTile(id, z, x, y) else {
-                    call.reject("No such tile", "NOT_FOUND")
-                    return
-                }
-                call.resolve(["base64": data.base64EncodedString()])
-            } catch {
-                call.reject(error.localizedDescription, "FAILED")
-            }
-        }
+    /// `Benthic/<version> (dive log app; <repository>)`: no personal data.
+    private static var userAgent: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        return "Benthic/(version) (dive log app; https://github.com/remillc/benthic)"
     }
 
     // MARK: - Bluetooth and download from a dive computer

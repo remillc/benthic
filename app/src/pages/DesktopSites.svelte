@@ -46,7 +46,7 @@
   import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { inYourSites } from '../lib/shared-sites.js';
   import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
-  import { distanceKm } from '../lib/maps-logic.js';
+  import { distanceKm } from '../lib/geo.js';
   import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 
   loadSitesChoices();

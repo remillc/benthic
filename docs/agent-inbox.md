@@ -7015,13 +7015,15 @@ Benthic+ data in the file (profile, certificates, documents, photos) is imported
 
 **Test:** export a logbook, import it on a fresh install (first launch) and over an existing logbook; corrupt one file in the archive and check the incomplete message and that nothing was imported.
 
-## [ ] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
+## [x] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
 
 Christian asked for this on 23 November 2026. Work in `main`. Renumbering the dives is an action on the logbook, not a setting. Remove the row « Renuméroter les plongées » (`id: 'renumber'`) from Réglages › Carnet in `app/src/pages/Settings.svelte`, with its dialog state there, on every device. It stays where the mock-ups already put it: the Carnet ⋮ menu (« Renuméroter les plongées », phone, tablet and the desktop list's ⋮), the selection menu (« Renuméroter à partir d’ici ») and the dive's ⋮ menu (« Renuméroter la plongée »). No mock-up shows it in Réglages. If a search in Réglages finds « renuméroter », point the result to the Carnet menu item or drop it.
 
 **Test:** Réglages › Carnet has no renumber row; the Carnet ⋮ menu still renumbers.
 
-## [ ] 2026-11-23-362 Remove offline maps entirely (TODO #103)
+*Done 23 November 2026: row, dialog state and the unused `renumber.label`/`renumber.text` keys removed; the Carnet, selection and dive menus are unchanged.*
+
+## [x] 2026-11-23-362 Remove offline maps entirely (TODO #103)
 
 Christian decided this on 23 November 2026. Work in `main`. Benthic drops offline maps. The maps (Sites, site cards, dive detail) stay online maps; everything that downloads, stores, updates or mentions map packages for offline use goes away, on phone (Android, iPhone), tablet and desktop.
 
@@ -7033,7 +7035,9 @@ Mock-ups: the « Cartes hors ligne » subgroups are deleted from the phone and t
 
 **Test:** no « Cartes hors ligne » anywhere in the app (search the translations too); the account sheet's Réglages row has no badge; the Sites map works online as before; upgrading a device that had downloaded regions frees their space.
 
-## [ ] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
+*Done 23 November 2026: the settings pages, `offline-maps.svelte.js`, the dialogs, the area screen and their translations are removed; the map tiles are read from OpenFreeMap only (`app/src/lib/map-tiles.js`, the simplified world map still draws when there is no network); native: `MapsManager`, `MapsDownloadWorker` and the plugin methods are removed on Android and iOS (WorkManager, foreground service, BGTask and the `offline-maps` notification channel with them), replaced by `LegacyOfflineMaps`, which deletes the stored packages at every start (a no-op once they are gone). The `bc.offlineMaps*` device keys are no longer read. The « Sites des plongeurs » row of the offer is now listed so that the group « Sites » is not empty.*
+
+## [x] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthic+, tout ce qui est inclus · Android » (phone canvas, page « Pour commencer », now right of « Benthic+, l’offre · Android »).
 
@@ -7044,6 +7048,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthi
 Same on the iPhone and tablet versions of this page.
 
 **Test:** open « Tout ce qui est inclus », scroll to the end: no « Toujours gratuit » note, the price block right after the features, and « Continuer sans abonnement » leaves without subscribing.
+
+*Done 23 November 2026: the button reuses the offer's « Continuer sans abonnement » and its exit (`onwithout`: back to where the offer was opened from, no account); the footer follows the last group 16 dp below it (a grid on tablets, the button on its own line); the key `benthicPlus.all.free` is removed. No mock-up file was in the repository: built from the task text.*
 
 ## [ ] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
 

@@ -1,10 +1,9 @@
 // @ts-check
 // The maps of the desktop Sites section (task 2026-11-15-177): MapLibre with the app's map
-// style (downloaded region, else OpenFreeMap, else the simplified world map: map-style.js).
+// style (OpenFreeMap, else the simplified world map: map-style.js).
 // One place creates the map, so that the big map and the sheet's small map behave the same.
 import { loadMapLibre } from './maplibre.js';
 import { buildMapStyle, showLabelsInLanguage } from './map-style.js';
-import { applyZoomCap } from './offline-tiles.js';
 
 /**
  * @param {HTMLElement} container
@@ -26,7 +25,6 @@ export async function createSiteMap(container) {
   });
   map.touchZoomRotate.disableRotation();
   map.on('load', () => showLabelsInLanguage(map));
-  map.on('moveend', () => applyZoomCap(map));
   return { maplibregl, map };
 }
 

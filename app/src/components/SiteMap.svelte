@@ -15,8 +15,6 @@
   import { createHeatScale, rgb, SPOT_GRADIENTS, SPOT_OPACITY, spotKind, spotRadius } from '../lib/heat-density.js';
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
-  import { applyZoomCap } from '../lib/offline-tiles.js';
-  import { offlineMaps } from '../lib/offline-maps.svelte.js';
   import { stackPins } from '../lib/desktop-sites.js';
 
   // Loaded when a map is first shown: about 800 KB the start-up does not need.
@@ -576,10 +574,8 @@
       if (names === 'atZoom' || names === 'atZoomOrFewInFullScreen') updateNames();
     });
     m.on('resize', scheduleHeat);
-    // Where the map looks, for the offline hint (Sites).
+    // Where the map looks (Sites).
     m.on('moveend', () => {
-      // Offline over a region of less detail (zoom 12), the map does not zoom further.
-      applyZoomCap(m);
       readBounds();
       if (groupSites) drawSites();
       updateNames();
@@ -610,16 +606,6 @@
     const b = map.getBounds();
     bounds = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
   }
-
-  // The connection or the regions change: the zoom cap follows.
-  $effect(() => {
-    offlineMaps.online;
-    offlineMaps.regions.map((r) => `${r.status}${r.maxZoom}`);
-    if (map) {
-      applyZoomCap(map);
-      updateNames();
-    }
-  });
 
   /**
    * Centres the map on a position ("centre on my position" of the Sites map).

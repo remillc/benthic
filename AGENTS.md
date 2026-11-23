@@ -23,7 +23,7 @@ Benthic is a full dive log app for mobile. It improves on Subsurface-mobile, but
 - **Web layer:** Svelte 5 + Framework7 v9, in **JavaScript with JSDoc**. No TypeScript.
 - **Business logic:** Subsurface's C++ core, reused as is, plus libdivecomputer. It is exposed to the web layer by a native Capacitor plugin (Swift / Kotlin + JNI).
 - **JavaScript first (decided on 14 November 2026):** Benthic's own code is written in JavaScript wherever possible (`app/src/lib`, tested in `tests/app`). The C++ façade (`core/libbenthic`) only gets what must call Subsurface's functions or read its internal structures (tissues, planner, reading and writing the log, libdivecomputer); logic that can work on the JSON the façade returns goes in JavaScript. Before adding C++, check whether the façade already returns the data.
-- **Offline maps:** self-hosted PMTiles built from OpenStreetMap data.
+- **Maps:** online only, OpenFreeMap vector tiles built from OpenStreetMap data (no offline maps: dropped on 23 November 2026).
 - **Desktop (decided on 15 November 2026):** a desktop version for Windows, macOS and Linux, built with **Electron**, sold through the stores (Microsoft Store, Mac App Store, Linux stores). The same Svelte 5 + Framework7 web layer; the core runs in a helper process (`desktop/host`, JSON lines over stdio) reached from Electron's main process, and `plugins/benthic-core/desktop.js` implements the plugin's JSDoc contract on it, so the app's code does not depend on the platform (docs/architecture.md, section 10). Dive computers: Bluetooth only in the first desktop version, through Chromium's Web Bluetooth in JavaScript. Its look is decided in the design sessions on claude.ai.
 
 ## Golden rule: Subsurface is never modified

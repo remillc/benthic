@@ -20,10 +20,6 @@ on:
       - .github/workflows/ios.yml
   workflow_dispatch:
     inputs:
-      maps_limit:
-        description: Also check the 50 MiB stop of the offline maps (downloads about 50 MiB)
-        type: boolean
-        default: false
       launches:
         description: Also install and start the app this many times, to catch an intermittent start-up error (0 for none)
         type: number
@@ -77,13 +73,6 @@ jobs:
       - name: Start the app in the simulator
         run: bash tests/ios/run-app.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app"
 
-      - name: Offline maps in the iPhone simulator
-        if: always()
-        run: bash tests/ios/run-maps.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app" iPhone ${{ inputs.maps_limit && 'limit' || '' }}
-
-      - name: Offline maps in the iPad simulator
-        if: always()
-        run: bash tests/ios/run-maps.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app" iPad
       - name: Start the app again and again
         if: always() && inputs.launches > 0
         run: bash tests/ios/run-launches.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app" ${{ inputs.launches }}
@@ -119,7 +108,5 @@ jobs:
           name: app-run
           path: |
             build/ios/app-run
-            build/ios/maps-iPhone
-            build/ios/maps-iPad
             build/ios/launches
           if-no-files-found: ignore
