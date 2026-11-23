@@ -162,6 +162,14 @@ export function createPush(deps) {
           if (!session) return false;
           await deps.api.registerPushToken(session, { deviceId, platform: /** @type {'android'|'ios'} */ (deps.platform), token });
           deps.store.setItem(TOKEN_KEY, JSON.stringify({ token, deviceId, at: now() }));
+          // The device id changed (short ids, to-do #149): the token registered under the old id goes, once, best effort.
+          if (last && last.deviceId !== deviceId) {
+            try {
+              await deps.api.removePushToken(session, last.deviceId);
+            } catch (e) {
+              warn('Removing the push token of the old device id', e);
+            }
+          }
           return true;
         } catch (e) {
           warn('Registering the push token', e);

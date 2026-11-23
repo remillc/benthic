@@ -75,6 +75,16 @@ test('the token is sent once with the device id and platform, and not again unti
   assert.equal(JSON.parse(store.getItem(TOKEN_KEY)).token, 'tok-2');
 });
 
+test('a device id that changed (short ids, to-do #149): the token is registered under the new id and removed under the old one', async () => {
+  const { push, calls } = client();
+  await push.onToken('tok-1', 'Ez0yvO2RBjDe-bNmVvTUYA');
+  await push.send('7k2m9q4x1d');
+  assert.deepEqual(calls.register.map((r) => r.deviceId), ['Ez0yvO2RBjDe-bNmVvTUYA', '7k2m9q4x1d']);
+  assert.deepEqual(calls.remove, [{ s: 'session-token', id: 'Ez0yvO2RBjDe-bNmVvTUYA' }]);
+  await push.send('7k2m9q4x1d');
+  assert.equal(calls.remove.length, 1, 'the old id is removed once');
+});
+
 test('a token that arrives before the device has its record id waits for it', async () => {
   const { push, calls } = client();
   assert.equal(await push.onToken('tok-1', ''), false);
