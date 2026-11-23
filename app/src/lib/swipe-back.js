@@ -203,7 +203,7 @@ export function attachSwipeBack(f7, router) {
 export function enableSwipeBack(f7) {
   /** @param {any} view */
   const attach = (view) => view?.router && attachSwipeBack(f7, view.router);
-  for (const id of ['logbook', 'sites', 'statistics', 'tools', 'account']) attach(f7.views.get(`#view-${id}`));
+  for (const id of ['logbook', 'sites', 'profile', 'statistics', 'tools', 'account']) attach(f7.views.get(`#view-${id}`));
   attach(f7.views.main);
   f7.on('viewInit', attach);
 }

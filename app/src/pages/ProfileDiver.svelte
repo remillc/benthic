@@ -1,9 +1,8 @@
 <script>
   // @ts-check
-  // « Mon profil de plongeur » (task 2026-11-17-267, docs/mockups-release/profil-plongeur-android.dc.html): the
+  // The home page of the Profil section (task 2026-11-23-347, was « Mon profil de plongeur », task 2026-11-17-267, docs/mockups-release/profil-plongeur-android.dc.html): the
   // diver's initial, name, number of dives and the Benthic+ chip, then three entries: « Équipement », « Brevets » and
   // « Informations » (task 2026-11-18-272).
-  import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import BenthicPlusChip from '../components/BenthicPlusChip.svelte';
@@ -18,7 +17,9 @@
   import LockedDataCard from '../components/LockedDataCard.svelte';
   import { accountLock } from '../lib/locked-data.svelte.js';
   import { profileWide } from '../lib/profile-frame.js';
-  import { desktopApp, layout } from '../lib/layout.svelte.js';
+  
+  /** @type {{ f7router?: any }} */
+  let { f7router } = $props();
 
   const name = $derived(diver.info.fullName || accountEmail(benthicPlusAccount, logbook) || t('gear.profile.defaultName'));
   const initial = $derived(name.trim().charAt(0).toLocaleUpperCase());
@@ -30,6 +31,12 @@
   const equipmentLine = $derived(
     gear.ready && visibleGear().length ? `${t('gear.inventory.pieces', { n: visibleGear().length })} · ${t('gear.inventory.kitCount', { n: gear.kits.length })}` : t('gear.profile.noPiece'),
   );
+
+  /** Tablet in landscape and desktop: the home page is the list beside a page, « Informations » by default (task 2026-11-23-347). */
+  function showDefaultPane() {
+    // Only while the home page is still the one shown: a page opened over it at start (a notification) stays.
+    if (profileWide() && f7router?.currentRoute?.path === '/profile') f7router.navigate('/profile/info', { reloadCurrent: true, animate: false });
+  }
 </script>
 
 {#snippet body()}
@@ -85,22 +92,18 @@
       <span class="bc-profile--texts">
         <span class="bc-profile--label">{t('gear.profile.information')}</span>
         <span class="bc-profile--supporting">{accountLock.locked ? t('accountSync.locked.line') : t('gear.profile.informationLine')}</span>
+        <span class="bc-profile--encrypted"><Icon name="lock" size={14} />{t('gear.profile.encrypted')}</span>
       </span>
       <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
   </div>
 
   {#if accountLock.locked}<LockedDataCard />{/if}
-
-  <p class="bc-profile--note"><Icon name="info" size={18} /><span>{t('gear.profile.kept')}</span></p>
 {/snippet}
 
-<Page class="bc-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())}>
-  <Navbar title={t('gear.profile.title')}>
-    {#snippet left()}
-      {#if layout.phone && !desktopApp}<BackLink label={t('account.title')} name={t('gear.piece.back')} />{/if}
-    {/snippet}
-  </Navbar>
+<Page class="bc-profile" onPageBeforeIn={() => (loadInventory(), loadProfile())} onPageAfterIn={showDefaultPane}>
+  <!-- A top-level destination: no back arrow. -->
+  <Navbar title={t('gear.profile.home')} />
   {#if profileWide()}
     <ProfileFrame section="gear" list="gear" bar="none" />
   {:else}
@@ -304,11 +307,10 @@
       color: var(--bc-text-2);
     }
 
-    .bc-profile--note {
-      margin: 16px 32px 24px;
+    .bc-profile--encrypted {
       display: flex;
-      gap: 10px;
-      align-items: flex-start;
+      align-items: center;
+      gap: 4px;
       font-size: 13px;
       line-height: 18px;
       color: var(--bc-text-2);

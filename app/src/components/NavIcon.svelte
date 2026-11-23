@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // The icons of the four sections in the Android navigation (task 2026-11-14-120, the phone's
+  // The icons of the main sections in the Android navigation (task 2026-11-14-120, the phone's
   // bottom bar; task 2026-11-14-126, the tablet rail, docs/mockups/nav-barre-android.dc.html):
   // outlined when inactive; when active, filled parts (`fill`) and inner lines (`cut`) drawn in
   // the pill's colour.
@@ -12,6 +12,7 @@
   const ICONS = {
     logbook: { line: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z', fill: 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z', cut: 'M5 17a3 3 0 0 1 3-3h11' },
     sites: { line: 'M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z', fill: 'M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z', dots: [[12, 11]] },
+    profile: { line: 'M4.5 20.5v-1a5 5 0 0 1 5-5h5a5 5 0 0 1 5 5v1z M12 3.5a4 4 0 1 0 0 8 4 4 0 1 0 0-8z', fill: 'M4.5 20.5v-1a5 5 0 0 1 5-5h5a5 5 0 0 1 5 5v1z M12 3.5a4 4 0 1 0 0 8 4 4 0 1 0 0-8z' },
     statistics: { line: 'M3 20h18 M6 16v-4 M10.5 16V6 M15 16v-6 M19.5 16V9' },
     tools: { line: 'M4 7h10 M18 7h2 M4 17h4 M12 17h8', dots: [[16, 7], [10, 17]] },
   };

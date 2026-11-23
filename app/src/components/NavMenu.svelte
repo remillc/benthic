@@ -19,8 +19,8 @@
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { tolerantTaps } from '../lib/tap.js';
 
-  /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
-  const icons = { logbook: 'logbook', sites: 'sites', statistics: 'statistics', tools: 'tools' };
+  /** @type {Record<string, 'logbook'|'sites'|'profile'|'statistics'|'tools'>} */
+  const icons = { logbook: 'logbook', sites: 'sites', profile: 'profile', statistics: 'statistics', tools: 'tools' };
 
   const PROFILE = BAND_PROFILE;
 
@@ -102,7 +102,7 @@
       <svg class="bc-nav-menu--wave" width="300" height="18" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q37.5 2 75 11 T150 11 T225 11 T300 11 V18 H0 Z" /></svg>
     </div>
 
-    {#each sections as section (section)}
+    {#each sections() as section (section)}
       <a href="#{section}" class="bc-nav-menu--item" aria-current={current === section ? 'page' : undefined} onclick={(e) => choose(e, () => goToSection(section))}>
         <Icon name={icons[section]} />
         <span>{t(`tabs.${section}`)}</span>
