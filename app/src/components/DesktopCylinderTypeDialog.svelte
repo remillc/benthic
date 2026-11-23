@@ -2,26 +2,27 @@
   // @ts-check
   // « Modifier le type » / « Nouveau type » on the desktop (task 2026-11-19-287, mock-ups
   // bureau-reglages-equipement-type and -supprimer): the dialog of the phone's cylinder type page, 560 px wide.
-  // Name, water volume and working pressure; for one of the diver's own types the explanation with the
-  // count of dives, and « Supprimer ce type » (red, outlined) at the left of the footer, which asks first
-  // (the phone's confirmation). A standard type has « Retirer ce type » instead (neutral).
+  // Name, water volume and working pressure; for an existing type the explanation with the count of dives, and
+  // « Supprimer ce type » (red, outlined) at the left of the footer, which asks first (the phone's confirmation). A new
+  // type shows the « Tailles courantes » chips (task 2026-11-23-373).
   import { onMount } from 'svelte';
   import Md3Dialog from './Md3Dialog.svelte';
   import TextField from './TextField.svelte';
   import Icon from './Icon.svelte';
-  import { BenthicCore } from 'benthic-core';
+  import CylinderSizeChips from './CylinderSizeChips.svelte';
   import { t } from '../lib/i18n.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { liveError } from '../lib/live-validation.svelte.js';
   import { formatNumber, locale } from '../lib/format.js';
-  import { logbook, renameCylinderType, previewCylinderTypeDeletion, deleteCylinderType } from '../lib/logbook.svelte.js';
+  import { logbook, previewCylinderTypeDeletion } from '../lib/logbook.svelte.js';
   import { deletable, deletionSentences, sizeFields, sizeErrorKey, typedSize, parseSizeNumber as parse } from '../lib/cylinder-types.js';
-  import { keepCylinderLibrary } from '../lib/settings.svelte.js';
+  import { addCylinderType, saveCylinderType, deleteType, readDefaultSizes } from '../lib/cylinder-type-library.svelte.js';
+  import { commonSizes } from '../lib/cylinder-type-files.js';
 
   /**
    * @type {{
-   *   type: import('benthic-core').CylinderType|null,
+   *   type: import('../lib/cylinder-type-files.js').TypeRow|null,
    *   oncancel: () => void,
    *   ondone: () => void,
    * }}
@@ -48,7 +49,18 @@
   /** What deleting the type does to the dives. @type {import('benthic-core').CylinderTypeDeletion|null} */
   let deletion = $state(null);
 
+  /** The core's default table: the source of the « Tailles courantes ». @type {{ name: string, ml: number, mbar: number, imperial: boolean }[]} */
+  let defaults = $state([]);
+  const sizes = $derived(commonSizes(defaults, cuft));
+
+  /** A common size fills the name, the volume and the pressure. @param {{ name: string, ml: number, mbar: number }} size */
+  function pick(size) {
+    name = size.name;
+    ({ volume, pressure } = sizeFields(size, { cuft, psi }, number));
+  }
+
   onMount(async () => {
+    if (!type) defaults = await readDefaultSizes().catch(() => []);
     if (type && deletable(type) && type.dives) deletion = await previewCylinderTypeDeletion(original).catch(() => null);
   });
 
@@ -64,7 +76,7 @@
     if (!type) return '';
     const n = type.dives;
     const use = t(n === 0 ? 'settings.cylinders.usedInNoDive' : n === 1 ? 'settings.cylinders.usedInOneDive' : 'settings.cylinders.usedInDives', { n: formatNumber(n, 0) });
-    const note = t(type.standard ? 'settings.cylinders.noteStandard' : 'settings.cylinders.noteYours', { use });
+    const note = t('settings.cylinders.note', { use: use.charAt(0).toLocaleUpperCase(locale) + use.slice(1) });
     if (!deletable(type) || !n || !deletion) return note;
     return [
       note,
@@ -103,16 +115,8 @@
     }
     saving = true;
     try {
-      if (!type) {
-        keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'add', name: trimmed, ...size })).library);
-      } else {
-        let current = original;
-        if (trimmed !== original) {
-          await renameCylinderType(original, trimmed);
-          current = trimmed;
-        }
-        if (size.ml !== type.ml || size.mbar !== type.mbar) keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'size', name: current, ...size })).library);
-      }
+      if (!type) await addCylinderType({ name: trimmed, ...size });
+      else await saveCylinderType(type, { name: trimmed, ...size });
       ondone();
     } catch (e) {
       failure(e);
@@ -121,8 +125,9 @@
   }
 
   async function deleteNow() {
+    if (!type) return;
     try {
-      await deleteCylinderType(original);
+      await deleteType(type);
       ondone();
     } catch (e) {
       failure(e);
@@ -145,22 +150,6 @@
       failure(e);
     }
   }
-
-  function remove() {
-    confirmAction({
-      title: t('settings.cylinders.deleteTitle', { name: original }),
-      text: t('settings.cylinders.deleteText'),
-      action: t('settings.cylinders.deleteAction'),
-      onConfirm: async () => {
-        try {
-          keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'remove', name: original })).library);
-          ondone();
-        } catch (e) {
-          failure(e);
-        }
-      },
-    });
-  }
 </script>
 
 <Md3Dialog title={editing ? t('settings.cylinders.editTitle') : t('settings.cylinders.newTitle')} class="bc-desktop-cylinder-type" {oncancel}>
@@ -182,6 +171,7 @@
     </div>
     <p class="bc-desktop-cylinder-type--note">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
     {#if explanation}<p class="bc-desktop-cylinder-type--note">{explanation}</p>{/if}
+    {#if !type}<CylinderSizeChips {sizes} onpick={pick} />{/if}
     <button type="submit" class="bc-sr-only" tabindex="-1" aria-hidden="true"></button>
   </form>
   {#snippet actions()}
@@ -190,8 +180,6 @@
         <Icon name="delete" size={18} />
         {t('settings.cylinders.deleteType')}
       </button>
-    {:else if type?.library}
-      <button type="button" class="bc-md3-dialog--start bc-desktop-cylinder-type--remove" onclick={remove}>{t('settings.cylinders.delete')}</button>
     {/if}
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
     <button type="button" disabled={saving} onclick={save}>{t('edit.save')}</button>
@@ -206,6 +194,7 @@
       flex-direction: column;
       gap: 12px;
       --bc-field-margin: 0px;
+      --bc-chips-inset: 0px;
     }
 
     .bc-desktop-cylinder-type--pair {
@@ -231,9 +220,8 @@
       color: var(--bc-text-2);
     }
 
-    /* The footer's outlined buttons: the red of « Supprimer le compte » (--bc-late), or the neutral outline. */
-    :global(.bc-md3-dialog--actions) button.bc-desktop-cylinder-type--delete,
-    :global(.bc-md3-dialog--actions) button.bc-desktop-cylinder-type--remove {
+    /* The footer's outlined buttons: the red of « Supprimer le compte » (--bc-late). */
+    :global(.bc-md3-dialog--actions) button.bc-desktop-cylinder-type--delete {
       display: inline-flex;
       align-items: center;
       gap: 8px;

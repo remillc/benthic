@@ -1,26 +1,26 @@
 <script>
   // @ts-check
-  // Sheet of a cylinder type (spec, section 4, "Cylinder types sub-screen"):
-  // name, volume and working pressure, and "Remove" for a type of the device's
-  // library. As Subsurface's cylinder-type manager: renaming also renames the
-  // cylinders of that type in the logbook (one undoable step); resizing or
-  // removing a standard type changes the device's list only, never existing
-  // dives. Deleting one of the diver's own types also takes its cylinders out of
-  // the dives that use them, except where a dive depends on one (task 285).
+  // Page of a cylinder type (spec, section 4, "Cylinder types sub-screen"), one for every type (task 2026-11-23-373):
+  // name, volume and working pressure, the note with the dive count, and « Supprimer ce type ». A new type shows the
+  // « Tailles courantes » chips. Renaming a type some dive uses also renames the cylinders of that type in the logbook
+  // (one undoable step); changing a size never changes existing dives. Deleting a type also takes its cylinders out of
+  // the dives that use them, except where a dive depends on one (task 285). The added types are files of the account
+  // data (lib/cylinder-type-library.svelte.js).
 
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import LeaveGuard from '../components/LeaveGuard.svelte';
   import { isDirty } from '../lib/leave-guard.js';
   import { t } from '../lib/i18n.js';
   import { liveError } from '../lib/live-validation.svelte.js';
-  import { logbook, renameCylinderType, previewCylinderTypeDeletion, deleteCylinderType } from '../lib/logbook.svelte.js';
+  import { logbook, previewCylinderTypeDeletion } from '../lib/logbook.svelte.js';
   import { deletable, deletionSentences, sizeFields, sizeErrorKey, typedSize as readSize, parseSizeNumber as parse } from '../lib/cylinder-types.js';
-  import { keepCylinderLibrary } from '../lib/settings.svelte.js';
+  import { addCylinderType, saveCylinderType, deleteType, readTypeRows, readDefaultSizes } from '../lib/cylinder-type-library.svelte.js';
+  import { commonSizes } from '../lib/cylinder-type-files.js';
+  import CylinderSizeChips from '../components/CylinderSizeChips.svelte';
   import { confirmAction, confirmActionSheet } from '../lib/dialogs.js';
   import { ios } from '../lib/layout.svelte.js';
   import { formatNumber, locale } from '../lib/format.js';
@@ -31,8 +31,10 @@
   const original = f7route.query?.name ?? '';
   const editing = !!original;
 
-  /** @type {import('benthic-core').CylinderType|null} */
+  /** @type {import('../lib/cylinder-type-files.js').TypeRow|null} */
   let type = $state(null);
+  /** The core's default table: the source of the « Tailles courantes ». @type {{ name: string, ml: number, mbar: number, imperial: boolean }[]} */
+  let defaults = $state([]);
   let name = $state(original);
   let volume = $state('');
   let pressure = $state('');
@@ -56,12 +58,14 @@
   let guard = /** @type {LeaveGuard|undefined} */ (undefined);
 
   onMount(async () => {
-    if (!editing) return;
+    if (!editing) {
+      defaults = await readDefaultSizes().catch(() => []);
+      return;
+    }
     try {
-      const { types } = await BenthicCore.cylinderTypes({ action: 'list' });
-      type = types.find((ty) => ty.name === original) ?? null;
+      type = (await readTypeRows()).find((ty) => ty.name === original) ?? null;
       if (!type) return;
-      if (deletable(type)) deletion = await previewCylinderTypeDeletion(original).catch(() => null);
+      if (deletable(type) && type.dives) deletion = await previewCylinderTypeDeletion(original).catch(() => null);
       ({ volume, pressure } = sizeFields(type, { cuft, psi }, number));
     } catch (e) {
       console.error('Reading the cylinder type', e);
@@ -114,17 +118,8 @@
     if (!size) return;
     saving = true;
     try {
-      if (!editing) {
-        keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'add', name: trimmed, ...size })).library);
-      } else {
-        let current = original;
-        if (trimmed !== original) {
-          await renameCylinderType(original, trimmed);
-          current = trimmed;
-        }
-        if (!type || size.ml !== type.ml || size.mbar !== type.mbar)
-          keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'size', name: current, ...size })).library);
-      }
+      if (!editing || !type) await addCylinderType({ name: trimmed, ...size });
+      else await saveCylinderType(type, { name: trimmed, ...size });
       f7router.back();
     } catch (e) {
       failure(e);
@@ -133,13 +128,22 @@
     }
   }
 
-  /** "Type standard, utilisé dans 3 plongées." and what a change does. */
+  /** « Utilisé dans 3 plongées. » and what a change does. */
   const usageNote = $derived.by(() => {
     if (!type) return '';
     const n = type.dives;
     const use = t(n === 0 ? 'settings.cylinders.usedInNoDive' : n === 1 ? 'settings.cylinders.usedInOneDive' : 'settings.cylinders.usedInDives', { n: formatNumber(n, 0) });
-    return t(type.standard ? 'settings.cylinders.noteStandard' : 'settings.cylinders.noteYours', { use });
+    return t('settings.cylinders.note', { use: use.charAt(0).toLocaleUpperCase(locale) + use.slice(1) });
   });
+
+  /** The chips of a new type: the unit system's common sizes. */
+  const sizes = $derived(commonSizes(defaults, cuft));
+
+  /** A common size fills the name, the volume and the pressure. @param {{ name: string, ml: number, mbar: number }} size */
+  function pick(size) {
+    name = size.name;
+    ({ volume, pressure } = sizeFields(size, { cuft, psi }, number));
+  }
 
   const deleteNote = $derived(!type || !type.dives ? t('settings.cylinders.deleteTypeNone') : deletion ? deletionSentences(deletion).join(' ') : '');
 
@@ -173,28 +177,13 @@
   }
 
   async function deleteNow() {
+    if (!type) return;
     try {
-      await deleteCylinderType(original);
+      await deleteType(type);
       f7router.back();
     } catch (e) {
       failure(e);
     }
-  }
-
-  function remove() {
-    confirmAction({
-      title: t('settings.cylinders.deleteTitle', { name: original }),
-      text: t('settings.cylinders.deleteText'),
-      action: t('settings.cylinders.deleteAction'),
-      onConfirm: async () => {
-        try {
-          keepCylinderLibrary((await BenthicCore.cylinderTypes({ action: 'remove', name: original })).library);
-          f7router.back();
-        } catch (e) {
-          failure(e);
-        }
-      },
-    });
   }
 </script>
 
@@ -228,6 +217,7 @@
     </div>
   </div>
   <p class="bc-cylinder-type--note bc-cylinder-type--first">{t(cuft ? 'settings.cylinders.volumeNoteCuft' : 'settings.cylinders.volumeNoteLitres')}</p>
+  {#if !editing}<CylinderSizeChips {sizes} onpick={pick} />{/if}
   {#if usageNote}<p class="bc-cylinder-type--note">{usageNote}</p>{/if}
 
   {#if editing && type}
@@ -238,10 +228,6 @@
           {t('settings.cylinders.deleteType')}
         </button>
         {#if deleteNote}<p class="bc-cylinder-type--delete-note">{deleteNote}</p>{/if}
-      </div>
-    {:else if type.library}
-      <div class="bc-cylinder-type--action">
-        <button type="button" class="bc-outlined-button" onclick={remove}>{t('settings.cylinders.delete')}</button>
       </div>
     {:else}
       <p class="bc-cylinder-type--note">{t('settings.cylinders.fromLogbook')}</p>

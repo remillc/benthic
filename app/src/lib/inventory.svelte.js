@@ -13,6 +13,7 @@ import { evaluateAll, todayIso, notificationPlan, applyNotificationPlan, section
 import { settings } from './settings.svelte.js';
 import { readSnoozed } from './maintenance-snooze.js';
 import { signalAccountData } from './account-sync-signal.js';
+import { feedCore } from './cylinder-type-library.js';
 
 /** @typedef {import('./inventory.js').Gear} Gear */
 /** @typedef {import('./inventory.js').DiveEquipment} DiveEquipment */
@@ -29,6 +30,8 @@ export const gear = $state({
   kits: [],
   /** @type {(DiveEquipment & { id: string, diveKey: { start: string } })[]} */
   records: [],
+  /** @type {import('./cylinder-type-files.js').CylinderTypeFile[]} the cylinder types the diver added */
+  cylinderTypes: [],
   /** @type {import('./maintenance.js').MaintenanceItem[]} every reminder */
   maintenance: [],
   /** The inventory is read only (the Benthic+ subscription ended). */
@@ -53,8 +56,11 @@ function open() {
 export async function loadInventory() {
   const inv = open();
   await inv.migrateGearPhotos();
-  const [pieces, kits, records, state, pending, maintenance] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths(), inv.listMaintenance()]);
+  const [pieces, kits, records, state, pending, maintenance, types] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths(), inv.listMaintenance(), inv.listCylinderTypes()]);
   gear.maintenance = maintenance;
+  gear.cylinderTypes = types;
+  // What the core offers follows the files: after a sync too.
+  feedCore(types).catch((e) => console.error('Giving the cylinder types to the core', e));
   gear.pieces = pieces;
   // A retired piece has left the kits' screens (it stays in the kit file, for « Remettre en service »).
   const retiredIds = new Set(pieces.filter((g) => g.retired).map((g) => g.id));
@@ -111,6 +117,23 @@ export async function change(work) {
     await loadInventory();
     signalAccountData('edit');
   }
+}
+
+/** The cylinder types the diver added, read from the store. */
+export const readCylinderTypes = () => open().listCylinderTypes();
+
+/**
+ * Adds, changes and removes added cylinder types in one step: the screens, the core and the sync follow. Not refused when
+ * the subscription ended.
+ * @param {import('./cylinder-type-files.js').CylinderTypeFile[]} files
+ * @param {string[]} [removeIds]
+ */
+export async function changeCylinderTypes(files, removeIds = []) {
+  const inv = open();
+  await inv.changeCylinderTypes(files, removeIds);
+  gear.cylinderTypes = await inv.listCylinderTypes();
+  await feedCore(gear.cylinderTypes, true);
+  signalAccountData('edit');
 }
 
 /** A photo kept in the inventory, as a data URL; '' when the file is gone. @param {string} photoId */

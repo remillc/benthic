@@ -1,43 +1,39 @@
 <script>
   // @ts-check
-  // Settings, "Types de bouteilles" (spec, section 4, "Cylinder types
-  // sub-screen"; docs/mockups/reglages-bouteilles-android.dc.html): "Your
-  // types" (from the logbook and added on this device) then "Standard" (the
-  // core's default table), each with its volume and working pressure. A tap
-  // opens the type's sheet; "Add a type" opens an empty one.
+  // Settings, "Types de bouteilles" (spec, section 4, "Cylinder types sub-screen", task 2026-11-23-373): one list, the types
+  // the logbook's dives use united with the ones the diver added, each with its volume and working pressure and how many
+  // dives use it. A tap opens the type's page; "Ajouter un type" opens an empty one.
   import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
-  import { BenthicCore } from 'benthic-core';
+  import { readTypeRows } from '../lib/cylinder-type-library.svelte.js';
   import { t } from '../lib/i18n.js';
   import { ios } from '../lib/layout.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import { formatCylinderSize, formatNumber, formatPressure } from '../lib/format.js';
 
-  /** @type {import('benthic-core').CylinderType[]} */
+  /** @type {import('../lib/cylinder-type-files.js').TypeRow[]} */
   let types = $state([]);
 
   async function refresh() {
     try {
-      types = (await BenthicCore.cylinderTypes({ action: 'list' })).types;
+      types = await readTypeRows();
     } catch (e) {
       console.error('Reading the cylinder types', e);
     }
   }
 
-  const yours = $derived(types.filter((type) => !type.standard));
-  const standard = $derived(types.filter((type) => type.standard));
-
-  /** "11,1 L · 207 bar", in the units of the settings. @param {import('benthic-core').CylinderType} type */
+  /** "11,1 L · 207 bar", in the units of the settings. @param {import('../lib/cylinder-type-files.js').TypeRow} type */
   function size(type) {
     return [formatCylinderSize(type.ml, type.mbar, logbook.prefs), type.mbar ? formatPressure(type.mbar, logbook.prefs) : '']
       .filter(Boolean)
       .join(' · ');
   }
 
-  /** "Dans 12 plongées". @param {number} n */
-  function inDives(n) {
+  /** « Dans 12 plongées », or « Ajouté par vous · dans aucune plongée » for a type of the diver's that no dive uses. @param {import('../lib/cylinder-type-files.js').TypeRow} type */
+  function inDives({ dives: n, fileId }) {
+    if (n === 0 && fileId) return t('settings.cylinders.addedUnused');
     return t(n === 0 ? 'settings.cylinders.inNoDive' : n === 1 ? 'settings.cylinders.inOneDive' : 'settings.cylinders.inDives', { n: formatNumber(n, 0) });
   }
 
@@ -47,14 +43,14 @@
   }
 </script>
 
-{#snippet list(/** @type {import('benthic-core').CylinderType[]} */ items, /** @type {boolean} */ usage)}
+{#snippet list(/** @type {import('../lib/cylinder-type-files.js').TypeRow[]} */ items)}
   <div class="bc-cylinder-types--surface" role="list">
     {#each items as type (type.name)}
       <div role="listitem">
         <button type="button" class="bc-cylinder-types--row" onclick={() => open(type.name)}>
           <span class="bc-cylinder-types--texts">
-            <span class="bc-cylinder-types--label">{cylinderTypeLabel(type.name)}{#if usage && !type.dives}<span class="bc-cylinder-types--unused">{t('settings.cylinders.unused')}</span>{/if}</span>
-            {#if usage}<span class="bc-cylinder-types--supporting">{inDives(type.dives)}</span>{/if}
+            <span class="bc-cylinder-types--label">{cylinderTypeLabel(type.name)}{#if !type.dives && type.fileId}<span class="bc-cylinder-types--unused">{t('settings.cylinders.unused')}</span>{/if}</span>
+            <span class="bc-cylinder-types--supporting">{inDives(type)}</span>
           </span>
           <span class="bc-cylinder-types--value">{size(type)}</span>
           <span class="bc-cylinder-types--chevron"><Icon name="chevron" size={20} /></span>
@@ -76,18 +72,7 @@
 
   <p class="bc-cylinder-types--intro">{t('settings.cylinders.intro')}</p>
 
-  {#if yours.length}
-    <h2 class="bc-cylinder-types--title">{t('settings.cylinders.yours')}</h2>
-    {@render list(yours, true)}
-  {/if}
-
-  <h2 class="bc-cylinder-types--title">{t('settings.cylinders.standard')}</h2>
-  {#if standard.length}
-    {@render list(standard, false)}
-    <p class="bc-cylinder-types--note">{t('settings.cylinders.standardNote')}</p>
-  {:else}
-    <p class="bc-cylinder-types--note">{t('settings.cylinders.hidden')}</p>
-  {/if}
+  {@render list(types)}
   <div class="bc-cylinder-types--bottom"></div>
 
   {#snippet fixedContent()}
@@ -112,16 +97,8 @@
       color: var(--bc-text-2);
     }
 
-    .bc-cylinder-types--title {
-      margin: 0;
-      padding: 22px 20px 8px;
-      font-size: 18px;
-      line-height: 24px;
-      font-weight: 700;
-    }
-
     .bc-cylinder-types--surface {
-      margin: 0 16px;
+      margin: 16px 16px 0;
       border-radius: 20px;
       background: var(--bc-surface);
       overflow: hidden;
@@ -182,13 +159,6 @@
     .bc-cylinder-types--chevron {
       flex: none;
       display: flex;
-      color: var(--bc-text-2);
-    }
-
-    .bc-cylinder-types--note {
-      margin: 10px 20px 0;
-      font-size: 13px;
-      line-height: 18px;
       color: var(--bc-text-2);
     }
 

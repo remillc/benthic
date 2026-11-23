@@ -53,7 +53,7 @@
   import { NOTIFY_CHOICES } from '../lib/maintenance.js';
   import { afterNotifyChange } from '../lib/maintenance-notify.js';
   import { afterDocumentNotifyChange } from '../lib/document-notify.js';
-  import { cylinderChoices } from '../lib/cylinder-choices.js';
+  import { cylinderChoices, ensureCylinderType } from '../lib/cylinder-choices.js';
   import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
 
   /** @typedef {import('benthic-core').CorePrefValues} CorePrefValues */
@@ -220,7 +220,10 @@
       value: settings[key] || t('settings.defaultCylinder.none'),
       current: settings[key],
       options: () => cylinderChoices(p),
-      set: (v) => setAppSetting(key, v),
+      set: async (v) => {
+        await ensureCylinderType(v);
+        setAppSetting(key, v);
+      },
     };
   }
 
@@ -575,7 +578,10 @@
           value: p.defaultCylinder || t('settings.defaultCylinder.none'),
           current: p.defaultCylinder,
           options: () => cylinderChoices(p),
-          set: (v) => setCore({ defaultCylinder: v }),
+          set: async (v) => {
+            await ensureCylinderType(v);
+            setCore({ defaultCylinder: v });
+          },
         },
         rebreatherRow('defaultDiluent', t('settings.defaultCylinder.diluent')),
         rebreatherRow('defaultOxygen', t('settings.defaultCylinder.oxygen')),
@@ -588,7 +594,6 @@
           href: '/settings/bailout',
         },
         { kind: 'switch', id: 'includeUnusedTanks', label: t('settings.unusedTanks.label'), text: t('settings.unusedTanks.text'), checked: p.includeUnusedTanks, set: (v) => setCore({ includeUnusedTanks: v }) },
-        { kind: 'switch', id: 'displayDefaultTankInfos', label: t('settings.standardSizes.label'), text: t('settings.standardSizes.text'), checked: p.displayDefaultTankInfos, set: (v) => setCore({ displayDefaultTankInfos: v }) },
       ],
     },
     {

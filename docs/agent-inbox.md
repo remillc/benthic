@@ -7295,7 +7295,7 @@ Icons: Material Symbols Rounded `search`, `view_column` (key `columns`), `more_v
 
 **Test:** on the desktop, open a dive and narrow the window: below the threshold the search box turns into the magnifier, ⋮ and the columns button stay visible at every width; the magnifier and Ctrl+F open the field over the title; ✕ and Échap close it; the search results are unchanged.
 
-## [ ] 2026-11-23-373 « Types de bouteilles »: one list (logbook and added types), common sizes as suggestions only
+## [x] 2026-11-23-373 « Types de bouteilles »: one list (logbook and added types), common sizes as suggestions only
 
 Christian asked for this on 23 November 2026. Work in `main`. The « Vos types » / « Standard » split goes away. Mock-ups: phone canvas, page Android, « Réglages, Équipement, types de bouteilles », « … nouveau type de bouteille », « … modifier un type de bouteille », « … supprimer un de vos types », and Réglages › Équipement with the default cylinder choice open; page iPhone « Types de bouteilles »; tablet and desktop canvas: « Types de bouteilles » (Android tablet, landscape and portrait) and the three desktop « Réglages, Équipement » boards. The board « modifier un de vos types de bouteille » is deleted: one edit screen for every type.
 

@@ -18,11 +18,10 @@ export function cylinderTypeLabel(name) {
 }
 
 /**
- * One of the diver's own types, which « Supprimer ce type » can delete: not a standard one, and not the
- * "unknown" type a cylinder keeps.
- * @param {{ name: string, standard: boolean }} type
+ * A type « Supprimer ce type » can delete: every type of the list, but the "unknown" type a cylinder keeps.
+ * @param {{ name: string }} type
  */
-export const deletable = (type) => !type.standard && type.name !== UNKNOWN_CYLINDER_TYPE;
+export const deletable = (type) => type.name !== UNKNOWN_CYLINDER_TYPE;
 
 /**
  * The sentences about what deleting a type does to the dives: how many lose the cylinder, how many keep
