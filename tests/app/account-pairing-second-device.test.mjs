@@ -12,7 +12,7 @@ import { createSecretBox, toBase64 } from '../../app/src/lib/secret-box.js';
 import { createProfile, emptyInfo } from '../../app/src/lib/profile.js';
 import { createAccountSync } from '../../app/src/lib/account-sync.js';
 import { createAccessRequest } from '../../app/src/lib/account-keys.js';
-import { approveRequest, cancelRequest, checkAnswer, clearAnswer, declineRequest, finishPairing, pairedDevices, pendingRequests, requestAccess, touchDeviceRecord } from '../../app/src/lib/account-pairing.js';
+import { approveRequest, cancelRequest, checkAnswer, clearAnswer, declineRequest, finishPairing, deviceId, dropOwnDeviceRecord, pairedDevices, pendingRequests, requestAccess, touchDeviceRecord } from '../../app/src/lib/account-pairing.js';
 import { dueScreen } from '../../app/src/lib/account-sync-screens.js';
 import { FakeBgit, FakeRemote } from './git-history-core.mjs';
 
@@ -248,5 +248,70 @@ test('after the pairing the confirmation comes first, then the join when the syn
 test('the pairing code never reaches a camera or a QR', () => {
   for (const file of ['lib/account-pairing.js', 'lib/account-sync-flows.svelte.js', 'components/AccountSyncHost.svelte']) {
     assert.doesNotMatch(readFileSync(new URL(`../../app/src/${file}`, import.meta.url), 'utf8'), /qrScan|scanPairingCode|pair-scan|qrPath|PairShowCode/, file);
+  }
+});
+
+const deviceFiles = (remote) => Object.keys(remote.files()).filter((p) => p.startsWith('keys/devices/'));
+
+test('device record: two concurrent first runs give one id and one file, and the id is kept', async () => {
+  const { remote, tablet, phone: p } = await setup();
+  try {
+    const d = doors(tablet);
+    const args = { store: tablet.store, box: tablet.box, name: 'Tablette Android', platform: 'android', commitKeyFiles: d.commitKeyFiles, fetchKeys: d.fetchKeys };
+    const ids = await Promise.all([deviceId(args), deviceId(args)]);
+    assert.equal(ids[0], ids[1]);
+    await Promise.all([touchDeviceRecord(args), touchDeviceRecord(args), touchDeviceRecord(args)]);
+    assert.deepEqual(deviceFiles(remote), [`keys/devices/${ids[0]}.json`]);
+    assert.equal((await tablet.store.read('meta/device.json')).id, ids[0]);
+    // A later run (a new module state is the same store: the file is the memory) keeps the id.
+    assert.equal(await deviceId({ store: tablet.store }), ids[0]);
+  } finally {
+    dispose(tablet, p);
+    remote.dispose();
+  }
+});
+
+test('device record: a device without the account key writes nothing; one that wrote earlier removes its own record', async () => {
+  const { remote, tablet, phone: p } = await setup();
+  try {
+    // The phone has its own key, not the account's: setAccountKid says which key the account uses.
+    p.box.setAccountKid(await tablet.box.deviceKid());
+    const d = doors(p);
+    const args = { store: p.store, box: p.box, name: 'Téléphone Android', platform: 'android', commitKeyFiles: d.commitKeyFiles, fetchKeys: d.fetchKeys };
+    assert.equal(await touchDeviceRecord(args), false);
+    assert.deepEqual(deviceFiles(remote), []);
+    // An older version wrote one anyway.
+    const id = await deviceId(args);
+    assert.equal(await touchDeviceRecord({ ...args, box: undefined }), true);
+    assert.deepEqual(deviceFiles(remote), [`keys/devices/${id}.json`]);
+    assert.equal(await dropOwnDeviceRecord({ store: p.store, commitKeyFiles: d.commitKeyFiles, fetchKeys: d.fetchKeys }), true);
+    assert.deepEqual(deviceFiles(remote), []);
+    assert.equal(await dropOwnDeviceRecord({ store: p.store, commitKeyFiles: d.commitKeyFiles, fetchKeys: d.fetchKeys }), false, 'nothing left to remove');
+  } finally {
+    dispose(tablet, p);
+    remote.dispose();
+  }
+});
+
+test('device record: the list names each device once; old records and a device’s own leftovers are pruned by a paired device', async () => {
+  const { remote, tablet, phone: p } = await setup();
+  try {
+    const DAY = 24 * 3600 * 1000;
+    let clock = Date.UTC(2026, 10, 23, 12);
+    const d = doors(tablet);
+    const put = async (id, name, platform, lastSeenAt) => d.commitKeyFiles({ writes: [{ path: `keys/devices/${id}.json`, json: { format: 1, id, name, platform, lastSeenAt } }], message: 'seed' });
+    await put('4p2en17xFEZ2Ybl_koUU0g', 'Tablette Android', 'android', clock - 3 * DAY); // leftover twin of this tablet
+    await put('B0125yQ44pzAdCJ0NlQtcg', 'Téléphone Android', 'android', clock - 2 * DAY); // another device: kept
+    await put('c_PQtWFhbklBnIrFAermbQ', 'Téléphone Android', 'android', clock - 2 * DAY + 800); // its twin: same name once in the list
+    await put('IKzYIALveGXP0IH25mf3Rg', 'Ordinateur Windows', 'windows', clock - 70 * DAY); // older than 60 days
+    const list = pairedDevices(await p.sync.fetchKeys(), { now: () => clock });
+    assert.equal(list.filter((x) => x.name === 'Téléphone Android').length, 1, 'no repeated names');
+    assert.equal(await touchDeviceRecord({ store: tablet.store, box: tablet.box, name: 'Tablette Android', platform: 'android', now: () => clock, commitKeyFiles: d.commitKeyFiles, fetchKeys: d.fetchKeys }), true);
+    const left = deviceFiles(remote).map((x) => x.slice('keys/devices/'.length, -5)).sort();
+    const own = (await tablet.store.read('meta/device.json')).id;
+    assert.deepEqual(left, [own, 'B0125yQ44pzAdCJ0NlQtcg', 'c_PQtWFhbklBnIrFAermbQ'].sort(), 'the twin and the old record are gone; the phone’s two are the phone’s to clean');
+  } finally {
+    dispose(tablet, p);
+    remote.dispose();
   }
 });

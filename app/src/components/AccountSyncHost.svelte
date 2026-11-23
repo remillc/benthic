@@ -55,6 +55,12 @@
       void flows.touchDevice();
     });
   });
+  // A device that does not hold the key writes no record of itself: one an earlier run wrote is removed.
+  $effect(() => {
+    void accountSync.lastSyncedAt;
+    if (!benthicPlusAccount.signedIn || !accountSync.keyMissing) return;
+    untrack(() => void flows.dropDeviceRecord());
+  });
   // A request is put in front of the diver by itself when nothing else is open; the account sheet's row asks again after a « Plus tard ».
   $effect(() => {
     void recheck;

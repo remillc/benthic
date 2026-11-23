@@ -12,7 +12,7 @@ import { deviceStore } from './device-store.js';
 import { accountDataDeps, loadProfile } from './profile.svelte.js';
 import { createRecoveryKey, recoverAccountKey, startOver } from './account-keys.js';
 import { isKeyPath } from './account-sync.js';
-import { adoptAndReseal as adopt, approveRequest, cancelRequest, checkAnswer, clearAnswer, declineRequest, finishPairing, ownDeviceId, pairedDevices, pendingRequests, requestAccess, touchDeviceRecord } from './account-pairing.js';
+import { adoptAndReseal as adopt, approveRequest, cancelRequest, checkAnswer, clearAnswer, declineRequest, dropOwnDeviceRecord, finishPairing, ownDeviceId, pairedDevices, pendingRequests, requestAccess, touchDeviceRecord } from './account-pairing.js';
 import { notifyAccessRequest } from './access-request-notify.js';
 import { currentDeviceKind, platformOf } from './device-name.js';
 import { showTwoDeviceNotice } from './two-device-notice.js';
@@ -213,10 +213,20 @@ export function watchRequests() {
 /** A paired device writes its name and when it was last seen on the branch (at most every 6 hours), for the new device's list. Never throws. */
 export async function touchDevice() {
   try {
-    const { store } = accountDataDeps();
-    await touchDeviceRecord({ store, name: ownName(), platform: platformOf(currentDeviceKind()), commitKeyFiles: commitPairingFiles });
+    const { store, box } = accountDataDeps();
+    await touchDeviceRecord({ store, box, name: ownName(), platform: platformOf(currentDeviceKind()), commitKeyFiles: commitPairingFiles, fetchKeys: fetchAccountKeys });
   } catch (e) {
     console.warn('Writing this device’s record', e);
+  }
+}
+
+/** A device that does not hold the account key removes the record an earlier run wrote for it. Never throws. */
+export async function dropDeviceRecord() {
+  try {
+    const { store } = accountDataDeps();
+    await dropOwnDeviceRecord({ store, commitKeyFiles: commitPairingFiles, fetchKeys: fetchAccountKeys });
+  } catch (e) {
+    if (codeOf(e) !== 'UNREACHABLE') console.warn('Removing this device’s record', e);
   }
 }
 
