@@ -17,6 +17,7 @@
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf, evaluations, readPhoto } from '../lib/inventory.svelte.js';
   import { tagText } from '../lib/maintenance-text.js';
+  import { hasReminders } from '../lib/maintenance.js';
   import { detailRows } from '../lib/gear-fields.js';
   import { historyRows, exportHistory } from '../lib/maintenance-export.js';
   import { letterPaper } from '../lib/share.js';
@@ -220,7 +221,7 @@
       <span class="bc-piece-page--figure"><span class="bc-piece-page--value">{figures.deepestMm ? formatDepth(figures.deepestMm, logbook.prefs) : '–'}</span><span class="bc-piece-page--legend">{t('gear.piece.deepest')}</span></span>
     </div>
 
-    {#if !piece.retired}
+    {#if !piece.retired && hasReminders(piece.type, piece.details)}
     <a href={`/profile/gear/${id}/maintenance`} class="bc-piece-page--maintenance" aria-label={t('maintenance.piece.openAria', { name: piece.name })}>
       <Icon name="clock" size={22} />
       <span class="bc-piece-page--maintenance-texts">

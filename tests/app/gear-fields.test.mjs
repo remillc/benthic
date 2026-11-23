@@ -33,10 +33,10 @@ test('the fields of each type follow docs/equipment-fields.md', () => {
   assert.deepEqual(keys('weights'), ['weightsType']);
   assert.deepEqual(keys('mask'), ['corrective']);
   assert.deepEqual(keys('fins'), ['finType', 'size']);
-  assert.deepEqual(keys('scooter'), ['battery', 'burnTime', 'speed']);
-  assert.deepEqual(keys('camera'), ['housingDepth']);
+  assert.deepEqual(keys('scooter'), []);
+  assert.deepEqual(keys('camera'), []);
   assert.deepEqual(keys('dsmb'), ['lift']);
-  assert.deepEqual(keys('floatBuoy'), ['colour']);
+  assert.deepEqual(keys('floatBuoy'), []);
   assert.deepEqual(keys('knife'), []);
   assert.deepEqual(SPECS.diveKnife, SPECS.knife, 'a knife has the same fields as a line cutter');
   assert.deepEqual(SPECS.compass, { brand: true });
@@ -110,9 +110,39 @@ test('a rebreather (Recycleur, task 324): its two dates come after the purchase 
   assert.equal(GEAR_TYPES[GEAR_TYPES.indexOf('cylinder') + 1], 'rebreather', 'right after the bottle');
   const { before, after, late } = detailFields('rebreather');
   assert.deepEqual([before, after], [[], []]);
-  assert.deepEqual(late.map((f) => [f.key, f.kind]), [['o2CellsOn', 'date'], ['lastService', 'date']]);
+  assert.deepEqual(late.map((f) => [f.key, f.kind]), [['o2CellsMadeOn', 'date'], ['o2CellsOn', 'date'], ['lastService', 'date']]);
   assert.deepEqual([SPECS.rebreather.brand, SPECS.rebreather.serial, SPECS.rebreather.photo, SPECS.rebreather.serialHint], [true, true, true, 'rebreather']);
   assert.deepEqual(detailsToKeep('rebreather', { o2CellsOn: '2026-03-14', lastService: '2025-11-08', thickness: '5' }), { o2CellsOn: '2026-03-14', lastService: '2025-11-08' });
   assert.deepEqual(detailProblems('rebreather', { o2CellsOn: '14/03', lastService: '2025-11-08' }), { o2CellsOn: 'date' });
   assert.deepEqual(detailRows('rebreather', { o2CellsOn: '2026-03-14' }, { label: (k) => k, option: (k, o) => o, yes: 'yes', date: (d) => d }), [{ label: 'o2CellsOn', value: '2026-03-14' }]);
+});
+
+test('task 334: the cylinder has a brand after its name, the three types lose their fields, a rebreather has a manufacture date', () => {
+  assert.equal(SPECS.cylinder.brand, true);
+  assert.equal(SPECS.cylinder.brandOnly, true, 'brand without model');
+  assert.equal(SPECS.cylinder.named, true, 'the typed name stays');
+  const keys = (/** @type {any} */ type) => [...detailFields(type).before, ...detailFields(type).after, ...detailFields(type).late].map((f) => f.key);
+  assert.deepEqual(keys('scooter'), []);
+  assert.deepEqual(keys('camera'), []);
+  assert.deepEqual(keys('floatBuoy'), []);
+  assert.deepEqual(keys('rebreather'), ['o2CellsMadeOn', 'o2CellsOn', 'lastService']);
+  assert.equal(detailProblems('rebreather', { o2CellsMadeOn: '2026-02-30' }).o2CellsMadeOn, 'date');
+});
+
+test('task 334: a removed field\'s saved value stays in the file, not shown, while the piece keeps its type', () => {
+  const stored = { battery: '12 Ah', burnTime: '3 h', speed: '2,5 km/h', note2: 'x' };
+  assert.deepEqual(detailsToKeep('scooter', {}, stored), stored);
+  assert.deepEqual(detailsToKeep('camera', {}, { housingDepth: '60 m' }), { housingDepth: '60 m' });
+  assert.deepEqual(detailsToKeep('floatBuoy', { colour: '' }, { colour: 'orange' }), { colour: 'orange' });
+  assert.deepEqual(detailRows('scooter', stored, { label: (k) => k, option: (k, i) => i, yes: 'yes', date: (d) => d }), [], 'nothing shown');
+  // Changed to a lamp: the lamp's own fields win, the typed value of the form replaces the stored one.
+  assert.deepEqual(detailsToKeep('light', { battery: 'new' }, stored, 'scooter'), { battery: 'new', note2: 'x', speed: '2,5 km/h' });
+});
+
+test('task 334: the new labels exist in French and English', () => {
+  for (const l of ['fr', 'en']) {
+    assert.ok(at(langs[l], 'gear.field.o2CellsMadeOn'), l);
+    assert.ok(!at(langs[l], 'gear.field.speed') && !at(langs[l], 'gear.field.housingDepth') && !at(langs[l], 'gear.field.colour'), l);
+  }
+  assert.match(langs.fr.maintenance.reminderCard.suggestRebreather, /18 mois de fabrication ou 12 mois d’installation, révision chaque année/);
 });

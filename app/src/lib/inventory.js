@@ -618,7 +618,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
     /**
      * Creates a reminder (no `id`) or changes one: the keys given replace those of the file, the others (the history
      * included) stay.
-     * @param {{ id?: string, gearId: string, task: Task, label?: string, intervalMonths: number|null, intervalDives: number|null, startOn?: string, notifyDays?: 14|30|60|null, warnInDive?: boolean }} fields
+     * @param {{ id?: string, gearId: string, task: Task, label?: string, intervalMonths: number|null, intervalDives: number|null, startOn?: string, dueOn?: string, dueFrom?: string, notifyDays?: 14|30|60|null, warnInDive?: boolean }} fields
      * @returns {Promise<MaintenanceItem>}
      */
     async saveMaintenance(fields) {

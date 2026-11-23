@@ -6594,7 +6594,7 @@ Christian approved this on 22 November 2026. Work in `main`. **This task correct
 
 Mock-up: `bureau-carnet-onglet-equipement` (updated in `docs/mockups/`, with the red circles).
 
-## [ ] 2026-11-23-334 Equipment fields by type: review every gear form against `docs/equipment-fields.md`
+## [x] 2026-11-23-334 Equipment fields by type: review every gear form against `docs/equipment-fields.md`
 
 Christian approved this on 23 November 2026. Work in `main`. **`docs/equipment-fields.md` now holds the reference table** (type, photo, identification, fields, maintenance and reminders). Review every screen that shows a piece's fields (« Nouvelle pièce », « Modifier la pièce », the piece's sheet, on phone, tablet and desktop) and `app/src/lib/gear-fields.js` against it. The changes:
 
@@ -6608,6 +6608,8 @@ Christian approved this on 23 November 2026. Work in `main`. **`docs/equipment-f
 8. Reminders only for Bouteille, Veste, Détendeur, Recycleur and Combinaison étanche (#148, if not done yet).
 
 In the done note, list the screens you changed and any field of the app that the table does not have.
+
+Done: screens changed are « Nouvelle pièce » and « Modifier la pièce » (`ProfilePieceEdit.svelte`, phone, tablet and desktop dialog) and the piece's sheet (`ProfilePiece.svelte`: its Maintenance link shows only for the five reminder types; the sheet's detail rows follow the fields). Bouteille has « Marque » after « Nom » (no model, the name stays typed). Recycleur has « Cellules O₂ fabriquées le » (`details.o2CellsMadeOn`) before « Cellules O₂ installées le »; the reminder falls due at the earlier of manufacture + 18 months and installation + 12 months (`o2CellsDue` in `lib/maintenance.js`; the reminder file keeps it as `dueOn`/`dueFrom`, which a later service ends), and the suggestion line has the new text. Scooter, Appareil photo and Bouée de surface lose Batterie/Autonomie/Vitesse, Profondeur du caisson and Couleur; saved values stay in `details` (`REMOVED_FIELDS` in `lib/gear-fields.js`). Reminders: `hasReminders` limits them to Bouteille, Veste, Détendeur, Recycleur and Combinaison étanche (evaluation, lists, notifications, piece link). Fields of the app that the table does not have: none for the form (« Nom » on a Combinaison is derived; Veste and Détendeur are listed as in the table); the new-piece card « Rappels d'entretien » is still offered only for Détendeur, Bouteille and Recycleur, a Veste or a drysuit adds its first reminder from the piece's Maintenance link. Tests: `tests/app/gear-fields.test.mjs`, `maintenance-reminders.test.mjs`, the e2e `gear type` flow (phone, tablet, desktop). The existing rebreather test's expected list of dates changed by one key (the new date), as the task asks.
 
 ## [x] 2026-11-23-335 Tablet, landscape: « Votre carnet est prêt » (Benthic+) must match its mock-up
 

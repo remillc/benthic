@@ -21,6 +21,9 @@
  * @property {string} [lastDoneOn] the latest service in the history
  * @property {14|30|60|null} [notifyDays] this reminder's own lead time before the due date (null or absent: the default of
  *   Réglages › Notifications; a stored 7 from before task 2026-11-19-308 reads as 14)
+ * @property {string} [dueOn] a due date set from the piece's own dates (the O₂ cells of a rebreather: `o2CellsDue`); it
+ *   replaces the duration's date while `dueFrom` is the latest service
+ * @property {string} [dueFrom] the `lastDoneOn` (or '') the `dueOn` was worked out at; a later service ends it
  * @property {boolean} warnInDive warn in the edit of a dive that uses the piece while the service is overdue
  * @property {HistoryEntry[]} history
  */
@@ -83,11 +86,35 @@ export const SUGGESTIONS = {
     { task: 'hydrostatic', months: 60 },
   ],
   bcd: [{ task: 'service', months: 12 }],
-  // Task 2026-11-22-324: the O₂ cells every 12 months from the day they were installed, a service every year.
+  // Task 2026-11-22-324 and 334: the O₂ cells at the earlier of 18 months from manufacture and 12 months from installation
+  // (`o2CellsDue`), a service every year.
   rebreather: [
     { task: 'o2Cells', months: 12 },
     { task: 'service', months: 12 },
   ],
+}
+
+/**
+ * Reminders exist only for a cylinder, a BCD, a regulator, a rebreather and a drysuit (docs/equipment-fields.md,
+ * to-do #148). A suit is a drysuit when its type says so.
+ * @param {string} type
+ * @param {Record<string, string>} [details]
+ */
+export const hasReminders = (type, details) => ['regulator', 'cylinder', 'rebreather', 'bcd'].includes(type) || (type === 'suit' && details?.suitType === 'dry')
+
+/** Months from manufacture and from installation at which a rebreather's O₂ cells fall due. */
+export const O2_CELLS_MONTHS = { made: 18, installed: 12 }
+
+/**
+ * When a rebreather's O₂ cells fall due: the earlier of the manufacture date + 18 months and the installation date +
+ * 12 months; with one date only, that date's rule alone; null with none (the month printed on a cell is enough:
+ * a date typed as the first of its month works the same).
+ * @param {{ madeOn?: string, installedOn?: string }} dates YYYY-MM-DD or empty
+ * @returns {string|null}
+ */
+export function o2CellsDue({ madeOn, installedOn }) {
+  const dues = [madeOn ? addMonths(madeOn, O2_CELLS_MONTHS.made) : '', installedOn ? addMonths(installedOn, O2_CELLS_MONTHS.installed) : ''].filter(Boolean).sort()
+  return dues[0] ?? null
 }
 
 /**
@@ -198,7 +225,8 @@ export function evaluate(item, diveKeys, today) {
   const sinceDays = days.filter((d) => (serviced ? d > base : d >= base)).sort()
   const divesSince = sinceDays.length
 
-  const dueDate = item.intervalMonths != null ? addMonths(base, item.intervalMonths) : null
+  const ownDue = item.dueOn && (item.dueFrom ?? '') === (item.lastDoneOn ?? '')
+  const dueDate = item.intervalMonths != null ? (ownDue ? /** @type {string} */ (item.dueOn) : addMonths(base, item.intervalMonths)) : null
   const daysLeft = dueDate ? daysBetween(today, dueDate) : null
   const divesLeft = item.intervalDives != null ? item.intervalDives - divesSince : null
 
@@ -252,11 +280,11 @@ export function evaluate(item, diveKeys, today) {
 /**
  * Every reminder with its due date, for the pieces that count: a piece that is retired leaves the reminders (it keeps
  * its history), and a dive computer has none (task 2026-11-19-308).
- * @param {{ items: MaintenanceItem[], pieces: { id: string, type: string, retired?: boolean }[], diveKeysOf: (gearId: string) => string[], today: string }} input
+ * @param {{ items: MaintenanceItem[], pieces: { id: string, type: string, details?: Record<string, string>, retired?: boolean }[], diveKeysOf: (gearId: string) => string[], today: string }} input
  * @returns {Evaluation[]}
  */
 export function evaluateAll({ items, pieces, diveKeysOf, today }) {
-  const live = new Set(pieces.filter((g) => !g.retired && g.type !== 'computer').map((g) => g.id))
+  const live = new Set(pieces.filter((g) => !g.retired && hasReminders(g.type, g.details)).map((g) => g.id))
   return items.filter((m) => live.has(m.gearId)).map((m) => evaluate(m, diveKeysOf(m.gearId), today))
 }
 

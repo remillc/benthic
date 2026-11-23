@@ -2793,6 +2793,8 @@
     "releaseNotes": [
       "Desktop: the divider between the panes has no grip; it turns orange when the pointer is over it or drags it. The logbook has its own thin scrollbar, apart from it. Each dive is separated from the next by a line, and the Buddies column no longer shows the initial.",
       "Tablet, first launch: « Your logbook is ready » centres the logo, the chip, the title and the line of the blue panel, and the right column follows the mock-up: the « Your logbook » heading, the figures card across the full width, the « Open my logbook » button at the right.",
+      "Equipment: a cylinder has a “Brand” after its name; a rebreather has “O₂ cells made on” before “O₂ cells installed on”, and the cells reminder falls due at the earlier of 18 months after manufacture and 12 months after installation.",
+      "Equipment: the scooter, the camera and the surface buoy lose their extra fields (battery, burn time, speed, housing depth, colour); values already typed stay in the file. The maintenance reminder exists only for cylinders, BCDs, regulators, rebreathers and drysuits.",
       "Settings: the icon is a cog, as in the mock-ups.",
       "Tablet and desktop: the dive beside the list is drawn at once when the app starts, as the list is; the Statistics, Sites and Tools data is read once the first dive is shown.",
       "Equipment: retiring a piece offers a fourth reason, « Other », beside Sold, Lost and Worn out. It shows in « Retired pieces ».",
@@ -5822,14 +5824,12 @@
       "weightsType": "Type",
       "corrective": "Corrective lenses",
       "finType": "Type",
-      "speed": "Speed",
-      "housingDepth": "Housing depth rating",
-      "colour": "Colour",
       "typeName": "Type of piece",
       "cylinderType": "Cylinder type",
       "valve": "Valve",
       "o2Clean": "O₂ clean",
       "lastInspection": "Last visual inspection",
+      "o2CellsMadeOn": "O₂ cells made on",
       "o2CellsOn": "O₂ cells installed on",
       "lastService": "Last service",
       "lastHydro": "Last hydrostatic test"
@@ -5843,8 +5843,6 @@
       "battery": "For example, 12 Ah lithium pack",
       "burnTime": "For example, 3 h at full power",
       "corrective": "The mask has lenses for your sight",
-      "speed": "For example, 2.5 km/h",
-      "housingDepth": "For example, 60 m",
       "typeName": "For example, repair kit",
       "o2Clean": "Prepared for pure oxygen or rich nitrox",
       "lastHydro": "The date stamped on the cylinder, like 03/22.",
@@ -6462,7 +6460,7 @@
     "reminderCard": {
       "title": "Maintenance reminders",
       "suggestCylinder": "Suggested: inspection every year, hydrostatic test every 5 years",
-      "suggestRebreather": "Suggested: O₂ cells every 12 months, service every year",
+      "suggestRebreather": "Suggested: O₂ cells at 18 months from manufacture or 12 months from installation, service every year",
       "suggestDrysuit": "Suggested for a drysuit: annual service, including the valves",
       "suggest": {
         "computer": "Suggested for a computer: {rule}",

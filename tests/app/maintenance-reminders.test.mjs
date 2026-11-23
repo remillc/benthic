@@ -171,3 +171,37 @@ test('adding an overdue piece to a dive: it stays selectable and says what is la
   // The row is a checkbox button like any other: the warning does not disable it.
   assert.match(picker, /role="checkbox" aria-checked=\{on\} \{disabled\}/);
 });
+
+import { o2CellsDue, hasReminders } from '../../app/src/lib/maintenance.js';
+
+test('task 334: the O₂ cells fall due at the earlier of manufacture + 18 months and installation + 12 months', () => {
+  assert.equal(o2CellsDue({ madeOn: '2026-01-15', installedOn: '2026-06-01' }), '2027-06-01', 'installation first');
+  assert.equal(o2CellsDue({ madeOn: '2026-01-15', installedOn: '2026-02-01' }), '2027-02-01');
+  assert.equal(o2CellsDue({ madeOn: '2025-01-15', installedOn: '2026-06-01' }), '2026-07-15', 'manufacture first');
+  assert.equal(o2CellsDue({ madeOn: '2026-01-31' }), '2027-07-31', 'manufacture alone: 18 months');
+  assert.equal(o2CellsDue({ installedOn: '2026-01-31' }), '2027-01-31', 'installation alone: 12 months');
+  assert.equal(o2CellsDue({ madeOn: '2025-08-31', installedOn: '' }), '2027-02-28', 'end of month');
+  assert.equal(o2CellsDue({}), null);
+});
+
+test('task 334: an item with its own due date uses it until a later service is noted', () => {
+  const cells = item({ task: 'o2Cells', startOn: '2026-01-01', lastDoneOn: '2026-06-01', dueOn: '2026-07-15', dueFrom: '2026-06-01' });
+  assert.equal(evaluate(cells, [], today).dueDate, '2026-07-15');
+  assert.equal(evaluate(cells, [], '2026-04-01').status, 'ok');
+  assert.equal(evaluate(cells, [], today).status, 'overdue');
+  const after = { ...cells, lastDoneOn: '2026-09-01' };
+  assert.equal(evaluate(after, [], '2026-09-02').dueDate, '2027-09-01', 'new cells: back to 12 months');
+  const noInstall = item({ task: 'o2Cells', lastDoneOn: undefined, dueOn: '2027-07-31', dueFrom: '' });
+  assert.equal(evaluate(noInstall, [], today).dueDate, '2027-07-31');
+});
+
+test('task 334: reminders only for a cylinder, a BCD, a regulator, a rebreather and a drysuit', () => {
+  for (const type of ['cylinder', 'bcd', 'regulator', 'rebreather']) assert.equal(hasReminders(type), true, type);
+  assert.equal(hasReminders('suit', { suitType: 'dry' }), true);
+  assert.equal(hasReminders('suit', { suitType: 'wet' }), false);
+  assert.equal(hasReminders('suit'), false);
+  for (const type of ['computer', 'light', 'scooter', 'camera', 'weights', 'mask', 'fins', 'undersuit', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other']) assert.equal(hasReminders(type), false, type);
+  const items = [item({ id: 'a', gearId: 'l' }), item({ id: 'b', gearId: 'r' })];
+  const all = evaluateAll({ items, pieces: [{ id: 'l', type: 'light' }, { id: 'r', type: 'regulator' }], diveKeysOf: () => [], today });
+  assert.deepEqual(all.map((e) => e.item.id), ['b']);
+});

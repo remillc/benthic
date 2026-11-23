@@ -23,12 +23,24 @@
  * @property {boolean} [named] the diver names the piece (the name is not made from brand and model)
  * @property {boolean} [photo] the form offers a photo
  * @property {boolean} [brand] brand and model
+ * @property {boolean} [brandOnly] with `brand`: the brand alone, after the name (a cylinder)
  * @property {boolean} [serial]
  * @property {string} [serialHint] a type's own hint for the serial number: `gear.pieceNew.serialHint.<serialHint>`
  * @property {DetailField[]} [before] fields between the name and the brand (the free type name of « Autre »)
  * @property {DetailField[]} [extras] fields after the serial number
  * @property {DetailField[]} [late] fields after « Date d'achat » (a rebreather's two dates), before « Notes »
  */
+
+/**
+ * Fields a type no longer shows (task 334) whose values a saved piece may still hold in `details`: they are kept in
+ * the file when the piece is saved as the same type, but not shown.
+ * @type {Partial<Record<GearType, string[]>>}
+ */
+export const REMOVED_FIELDS = {
+  scooter: ['battery', 'burnTime', 'speed'],
+  camera: ['housingDepth'],
+  floatBuoy: ['colour'],
+};
 
 /** @type {Record<GearType, TypeSpec>} */
 export const SPECS = {
@@ -57,19 +69,24 @@ export const SPECS = {
     ],
   },
   undersuit: { brand: true, extras: [{ key: 'size', kind: 'text' }] },
-  // Task 2026-11-22-324: the date the O₂ cells were installed and the last service, after « Date d'achat »; each feeds a reminder.
+  // Task 2026-11-22-324 and 334: the dates the O₂ cells were made and installed and the last service, after « Date d'achat »;
+  // each feeds a reminder (lib/maintenance.js `o2CellsDue`).
   rebreather: {
     photo: true,
     brand: true,
     serial: true,
     serialHint: 'rebreather',
     late: [
+      { key: 'o2CellsMadeOn', kind: 'date' },
       { key: 'o2CellsOn', kind: 'date' },
       { key: 'lastService', kind: 'date' },
     ],
   },
+  // The cylinder's brand follows its name; the brand does not make the name, and there is no model (task 334).
   cylinder: {
     named: true,
+    brand: true,
+    brandOnly: true,
     serial: true,
     serialHint: 'cylinder',
     extras: [],
@@ -107,15 +124,10 @@ export const SPECS = {
     photo: true,
     brand: true,
     serial: true,
-    extras: [
-      { key: 'battery', kind: 'text', hint: true },
-      { key: 'burnTime', kind: 'text', hint: true },
-      { key: 'speed', kind: 'text', hint: true },
-    ],
   },
-  camera: { photo: true, brand: true, serial: true, extras: [{ key: 'housingDepth', kind: 'text', hint: true }] },
+  camera: { photo: true, brand: true, serial: true },
   dsmb: { brand: true, extras: [{ key: 'lift', kind: 'text', hint: true }] },
-  floatBuoy: { brand: true, extras: [{ key: 'colour', kind: 'text' }] },
+  floatBuoy: { brand: true },
   knife: { brand: true },
   diveKnife: { brand: true },
   compass: { brand: true },
@@ -212,16 +224,18 @@ export function detailProblems(type, details, typed = {}) {
  * @param {GearType} type
  * @param {Record<string, string>} details what the form holds
  * @param {Record<string, string>} [stored] what the file already had
+ * @param {GearType} [storedType] the type the file had (the removed fields of that type are kept); default `type`
  * @returns {Record<string, string>}
  */
-export function detailsToKeep(type, details, stored = {}) {
+export function detailsToKeep(type, details, stored = {}, storedType = type) {
   const { before, after, late } = detailFields(type);
   const own = new Set([...before, ...after, ...late].map((f) => f.key));
   const allKnown = new Set(Object.values(SPECS).flatMap((s) => [...(s.before ?? []), ...(s.extras ?? []), ...(s.late ?? [])].map((f) => f.key)));
   for (const f of [...CYLINDER_BEFORE_SERIAL, ...CYLINDER_AFTER_SERIAL]) allKnown.add(f.key);
   /** @type {Record<string, string>} */
   const out = {};
-  for (const [k, v] of Object.entries(stored)) if (!allKnown.has(k)) out[k] = v;
+  const removed = new Set(REMOVED_FIELDS[storedType] ?? []);
+  for (const [k, v] of Object.entries(stored)) if (!allKnown.has(k) || (removed.has(k) && !own.has(k))) out[k] = v;
   for (const k of own) {
     const v = (details[k] ?? '').trim();
     if (v) out[k] = v;

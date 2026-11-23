@@ -2793,6 +2793,8 @@
     "releaseNotes": [
       "Bureau : le séparateur entre les volets n’a plus de poignée ; il passe en orange quand le pointeur le survole ou le déplace. Le carnet a sa propre barre de défilement fine, à part. Chaque plongée est séparée de la suivante par une ligne, et la colonne Compagnons n’affiche plus l’initiale.",
       "Tablette, premier lancement : « Votre carnet est prêt » centre le logo, la pastille, le titre et la ligne du panneau bleu, et la colonne de droite reprend la maquette : titre « Votre carnet », fiche des chiffres sur toute la largeur, bouton « Ouvrir mon carnet » à droite.",
+      "Équipement : une bouteille a une « Marque » après son nom ; un recycleur a « Cellules O₂ fabriquées le » avant « Cellules O₂ installées le », et le rappel des cellules tombe au plus tôt de 18 mois après la fabrication et 12 mois après l’installation.",
+      "Équipement : le scooter, l’appareil photo et la bouée de surface perdent leurs champs en trop (batterie, autonomie, vitesse, profondeur du caisson, couleur) ; les valeurs déjà saisies restent dans le carnet. Le rappel d’entretien n’existe que pour les bouteilles, les vestes, les détendeurs, les recycleurs et les combinaisons étanches.",
       "Réglages : l’icône est une roue dentée, comme dans les maquettes.",
       "Tablette et bureau : la plongée à côté du carnet s’affiche dès le lancement, comme le carnet ; les données des statistiques, des sites et des outils se lisent une fois la première plongée affichée.",
       "Équipement : retirer une pièce propose une quatrième raison, « Autre », à côté de Vendue, Perdue et Hors d’usage. Elle s’affiche dans « Pièces retirées ».",
@@ -5825,14 +5827,12 @@
       "weightsType": "Type",
       "corrective": "Verres correcteurs",
       "finType": "Type",
-      "speed": "Vitesse",
-      "housingDepth": "Profondeur du caisson",
-      "colour": "Couleur",
       "typeName": "Type de pièce",
       "cylinderType": "Type de bouteille",
       "valve": "Robinet",
       "o2Clean": "Propre O₂",
       "lastInspection": "Dernière inspection visuelle",
+      "o2CellsMadeOn": "Cellules O₂ fabriquées le",
       "o2CellsOn": "Cellules O₂ installées le",
       "lastService": "Dernière révision",
       "lastHydro": "Dernier test hydrostatique"
@@ -5846,8 +5846,6 @@
       "battery": "Par exemple, accumulateur lithium 12 Ah",
       "burnTime": "Par exemple, 3 h à pleine puissance",
       "corrective": "Le masque porte des verres à votre vue",
-      "speed": "Par exemple, 2,5 km/h",
-      "housingDepth": "Par exemple, 60 m",
       "typeName": "Par exemple, trousse de réparation",
       "o2Clean": "Préparée pour l’oxygène pur ou le nitrox riche",
       "lastHydro": "La date frappée sur la bouteille, comme 03/22.",
@@ -6465,7 +6463,7 @@
     "reminderCard": {
       "title": "Rappels d’entretien",
       "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
-      "suggestRebreather": "Suggéré : cellules O₂ aux 12 mois, révision chaque année",
+      "suggestRebreather": "Suggéré : cellules O₂ à 18 mois de fabrication ou 12 mois d’installation, révision chaque année",
       "suggestDrysuit": "Suggéré pour une combinaison étanche : entretien annuel, y compris des valves",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",

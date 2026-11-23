@@ -1628,6 +1628,7 @@ async function gearTypeDialogFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [
     ['Android phone', 390, 844, true, false, 'md'],
     ['Android tablet', 1280, 800, false, false, 'md'],
+    ['desktop', 1400, 900, false, true, 'md'],
   ]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
@@ -1812,7 +1813,7 @@ async function gearTypeDialogFlows(expect) {
         }
       }, label);
       // The two dates are date fields: each opens the date picker, typed in its keyboard mode.
-      for (const [key, value] of [['gear.field.o2CellsOn', '14/03/2026'], ['gear.field.lastService', '08/11/2025']]) {
+      for (const [key, value] of [['gear.field.o2CellsMadeOn', '10/06/2025'], ['gear.field.o2CellsOn', '14/03/2026'], ['gear.field.lastService', '08/11/2025']]) {
         await tab.run(async (key) => {
           const { t } = await import('/src/lib/i18n.js');
           const button = [...document.querySelectorAll('.page-current.bc-piece-edit button')].find((b) => b.textContent.includes(t(key)));
@@ -1836,23 +1837,45 @@ async function gearTypeDialogFlows(expect) {
         });
         await sleep(500);
       }
+      if (process.env.BC_SHOTS) await shot(tab, 'piece-form-rebreather-' + label.replace(/ /g, '-'));
+      if (process.env.BC_SHOTS) {
+        await tab.run(() => { for (const el of document.querySelectorAll('.page-current [data-bc-scroll], .page-current .page-content')) el.scrollTop = el.scrollHeight; });
+        await sleep(300);
+        await shot(tab, 'piece-form-rebreather-dates-' + label.replace(/ /g, '-'));
+      }
       await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
       await sleep(1200);
       const reb = await tab.run(async (brand) => {
         const { gear, loadInventory } = await import('/src/lib/inventory.svelte.js');
         await loadInventory();
         const piece = gear.pieces.find((item) => item.type === 'rebreather' && item.brand === brand);
-        return { found: !!piece, o2CellsOn: piece?.details?.o2CellsOn, lastService: piece?.details?.lastService, id: piece?.id };
+        return { found: !!piece, o2CellsMadeOn: piece?.details?.o2CellsMadeOn, o2CellsOn: piece?.details?.o2CellsOn, lastService: piece?.details?.lastService, id: piece?.id };
       }, 'rEvo ' + label);
-      expect(label + ': a Recycleur keeps its two dates', { found: true, o2CellsOn: '2026-03-14', lastService: '2025-11-08' }, { found: reb.found, o2CellsOn: reb.o2CellsOn, lastService: reb.lastService });
+      expect(label + ': a Recycleur keeps its three dates', { found: true, o2CellsMadeOn: '2025-06-10', o2CellsOn: '2026-03-14', lastService: '2025-11-08' }, { found: reb.found, o2CellsMadeOn: reb.o2CellsMadeOn, o2CellsOn: reb.o2CellsOn, lastService: reb.lastService });
       const reminders = await tab.run(async (id) => {
         const { gear, loadInventory } = await import('/src/lib/inventory.svelte.js');
         await loadInventory();
-        return gear.maintenance.filter((x) => x.gearId === id).map((x) => [x.task, x.intervalMonths, x.lastDoneOn]).sort();
+        return gear.maintenance.filter((x) => x.gearId === id).map((x) => [x.task, x.intervalMonths, x.lastDoneOn, x.dueOn ?? null]).sort();
       }, reb.id);
-      expect(label + ': a Recycleur gets its two reminders, counted from its dates', { reminders: JSON.stringify([['o2Cells', 12, '2026-03-14'], ['service', 12, '2025-11-08']]) }, { reminders: JSON.stringify(reminders) });
+      // Task 334: the cells are due at the earlier of manufacture (10 June 2025) + 18 months and installation (14 March 2026) + 12 months: 10 December 2026.
+      expect(label + ': a Recycleur gets its two reminders, the cells due at the earlier of the two rules', { reminders: JSON.stringify([['o2Cells', 12, '2026-03-14', '2026-12-10'], ['service', 12, '2025-11-08', null]]) }, { reminders: JSON.stringify(reminders) });
     }
-    if (label === 'Android tablet') {
+    {
+      // Task 334: the cylinder has a brand and no model; the scooter, the camera and the surface buoy only have the common fields.
+      for (const [type, expected] of [['cylinder', { brand: true, model: false }], ['scooter', { brand: true, model: true, extra: 0 }], ['camera', { brand: true, model: true, extra: 0 }], ['floatBuoy', { brand: true, model: true, extra: 0 }]]) {
+        await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
+        await sleep(1000);
+        await selectType(type);
+        const labels = await tab.run(() => [...document.querySelectorAll('.page-current .bc-piece-edit--stage label')].map((element) => element.textContent.trim()));
+        const texts = await tab.run(async () => { const { t } = await import('/src/lib/i18n.js'); return { brand: t('gear.pieceEdit.brand'), model: t('gear.pieceEdit.model'), name: t('gear.pieceEdit.name'), colour: 'Couleur', speed: 'Vitesse', battery: t('gear.field.battery'), housing: 'Profondeur du caisson' }; });
+        const got = { brand: labels.includes(texts.brand), model: labels.includes(texts.model) };
+        if (type === 'cylinder') expect(`${label}: the cylinder form has Nom then Marque, no Modèle`, { ...expected, order: true }, { ...got, order: labels.indexOf(texts.name) >= 0 && labels.indexOf(texts.brand) === labels.indexOf(texts.name) + 1 });
+        else expect(`${label}: ${type} has no field besides brand, model, serial number, date and notes`, expected.brand && expected.model ? { ...got, removed: false } : got, { ...got, removed: labels.some((l) => [texts.colour, texts.speed, texts.battery, texts.housing].includes(l)) });
+        if (process.env.BC_SHOTS) await shot(tab, `piece-form-${type}-${label.replace(/ /g, '-')}`);
+        await tab.run(() => (document.querySelector('.page-current .bc-piece-edit--close') ?? document.querySelector('.page-current .navbar .left a')).click());
+        await sleep(700);
+      }
+      if (label !== 'Android phone') {
       // The fields of every type are in tests/app/gear-fields.test.mjs; one without the usual fields shows the form's wiring.
       for (const type of ['compass']) {
         await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
@@ -1884,6 +1907,7 @@ async function gearTypeDialogFlows(expect) {
         expect(`tablet: ${type} can be saved`, { found: true }, { found });
       }
     }
+      }
     tab.ws.close();
   }
 }
