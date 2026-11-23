@@ -5,6 +5,7 @@
   // the core's model, loaded with the logbook dives before now (toolQuery
   // 'desaturation'); the wait before flying is Benthic's own recommendation
   // (lib/tools.js), never a guarantee.
+  import { diveUrl } from '../lib/dive-id.js';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
@@ -181,7 +182,7 @@
     {#if lastDive}
       <h2 class="bc-desaturation--section">{t('desaturation.lastDive')}</h2>
       <div class="bc-desaturation--last-card">
-        <a href="/dives/{lastDive.id}" class="bc-desaturation--last-dive ripple">
+        <a href={diveUrl(lastDive)} class="bc-desaturation--last-dive ripple">
           <span class="bc-desaturation--last-text">
             <span class="bc-desaturation--last-date bc-value">{formatRelativeDateTime(lastDive.date, desat.now)}</span>
             <span class="bc-desaturation--last-line">
@@ -226,7 +227,7 @@
         <ul>
           {#each [...desat.dives].reverse() as dive (dive.id)}
             <li>
-              <a href="/dives/{dive.id}" class="item-link item-content">
+              <a href={diveUrl(dive)} class="item-link item-content">
                 <div class="item-inner">
                   <div class="item-title bc-value">{formatDateTime(dive.date)}</div>
                   <div class="item-text">

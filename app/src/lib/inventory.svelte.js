@@ -7,13 +7,16 @@ import { BenthicCore } from 'benthic-core';
 import { createFileStore, indexedDbBackend, memoryBackend, requestPersistence } from './file-store.js';
 import { sameComputer } from './dc-model.js';
 import { deviceStore } from './device-store.js';
-import { createInventory, diveKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
+import { createInventory, diveKeyOf, recordKey, startKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
 import { logbook } from './logbook.svelte.js';
 import { evaluateAll, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
 import { settings } from './settings.svelte.js';
 import { readSnoozed } from './maintenance-snooze.js';
 import { signalAccountData } from './account-sync-signal.js';
 import { ensureShortIds } from './short-id-migration.js';
+import { isShortId } from './short-id.js';
+import { onIdsComplete } from './dive-id.js';
+import { startToIdMap } from './dive-id-migration.js';
 
 /** @typedef {import('./inventory.js').Gear} Gear */
 /** @typedef {import('./inventory.js').DiveEquipment} DiveEquipment */
@@ -28,7 +31,7 @@ export const gear = $state({
   pieces: [],
   /** @type {{ id: string, name: string, gearIds: string[] }[]} */
   kits: [],
-  /** @type {(DiveEquipment & { id: string, diveKey: { start: string } })[]} */
+  /** @type {(DiveEquipment & { id: string, diveKey: { benthicId?: string, start?: string } })[]} */
   records: [],
   /** @type {import('./maintenance.js').MaintenanceItem[]} every reminder */
   maintenance: [],
@@ -38,6 +41,18 @@ export const gear = $state({
   until: '',
   /** Files changed on this device and not sent to the server yet. */
   pending: 0,
+});
+
+// Once the dives have their ids, the records that name a dive by its start time take its id (lib/dive-id-migration.js).
+onIdsComplete(async (dives) => {
+  try {
+    if (await open().migrateDiveIds(startToIdMap(dives))) {
+      await loadInventory();
+      signalAccountData('edit');
+    }
+  } catch (e) {
+    console.error('Moving the references of the dives to their ids', e);
+  }
 });
 
 /** The store, opened once: IndexedDB in the app; memory where it does not exist. */
@@ -82,7 +97,7 @@ export async function loadInventory() {
  * @returns {import('./maintenance.js').Evaluation[]}
  */
 export function evaluations() {
-  return evaluateAll({ items: gear.maintenance, pieces: gear.pieces, diveKeysOf, today: todayIso() });
+  return evaluateAll({ items: gear.maintenance, pieces: gear.pieces, diveKeysOf: diveStartsOf, today: todayIso() });
 }
 
 /** Whether a non-retired piece has an active maintenance reminder. */
@@ -135,13 +150,24 @@ export const retiredGear = () => gear.pieces.filter((g) => g.retired).sort((a, b
 /** What a dive used, from the working copy; empty when nothing. @param {{ date: string }} dive @returns {DiveEquipment} */
 export function equipmentOf(dive) {
   const key = diveKeyOf(dive);
-  const rec = gear.records.find((r) => r.diveKey?.start === key);
+  const rec = gear.records.find((r) => recordKey(r.diveKey) === key);
   return rec ? cloneEquipment({ suitGearId: rec.suitGearId ?? '', undersuitGearId: rec.undersuitGearId ?? '', gearIds: rec.gearIds ?? [], adhoc: rec.adhoc ?? [], kitId: rec.kitId ?? '' }) : emptyEquipment();
 }
 
 /** The keys of the dives that used a piece (a computer: through its serial number, below). @param {string} gearId */
 export const diveKeysOf = (gearId) =>
-  gear.records.filter((r) => r.suitGearId === gearId || r.undersuitGearId === gearId || (r.gearIds ?? []).includes(gearId)).map((r) => r.diveKey.start);
+  gear.records.filter((r) => r.suitGearId === gearId || r.undersuitGearId === gearId || (r.gearIds ?? []).includes(gearId)).map((r) => recordKey(r.diveKey));
+
+/**
+ * The start times of the dives where a piece was used (the reminders count dives by their day): a record holds the dive's
+ * Benthic id, read here as the dive's start; one whose dive is not in the logbook is left out.
+ * @param {string} gearId
+ * @returns {string[]}
+ */
+export function diveStartsOf(gearId) {
+  const starts = new Map(logbook.dives.map((d) => [diveKeyOf(d), startKeyOf(d)]));
+  return diveKeysOf(gearId).map((k) => (isShortId(k) ? starts.get(k) ?? '' : k)).filter(Boolean);
+}
 
 /** The kits that hold a piece. @param {string} gearId */
 export const kitsOf = (gearId) => gear.kits.filter((k) => k.gearIds.includes(gearId));

@@ -140,6 +140,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)editDives:(NSArray<NSNumber *> *)ids
 			 changes:(NSString *)changes
 			   error:(NSError **)error NS_SWIFT_NAME(editDives(_:changes:));
++ (nullable NSString *)benthicIds:(NSString *)action
+		      assignments:(NSString *)assignments
+			    error:(NSError **)error NS_SWIFT_NAME(benthicIds(_:assignments:));
 + (nullable NSString *)renumberDives:(NSArray<NSNumber *> *)ids
 			       start:(NSInteger)start
 			     numbers:(NSArray<NSNumber *> *)numbers

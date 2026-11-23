@@ -5,6 +5,7 @@
   // iPad sidebar or the Android rail and, in the Logbook, the list and the
   // dive side by side from `splitBreakpoint` (Framework7's master-detail).
   import { onMount, untrack } from 'svelte';
+  import { diveUrlOfCore } from './lib/dive-id.js';
   import { App, Views, View, f7, f7ready } from 'framework7-svelte';
   import Logbook from './pages/Logbook.svelte';
   import DiveDetail from './pages/DiveDetail.svelte';
@@ -545,7 +546,7 @@
         {#if paneSnapshot}
           <!-- The detail kept at the last start, in the real page's look; inert until the real dive opens over it (lib/detail-snapshot.js). -->
           <div class="bc-pane-opening bc-pane-opening--snapshot" class:bc-pane-opening--desk={layout.desktop} inert aria-hidden="true">
-            <DiveDetail f7route={{ params: { id: String(paneSnapshot.detail.id) }, url: `/dives/${paneSnapshot.detail.id}` }} f7router={null} preview={paneSnapshot.detail} />
+            <DiveDetail f7route={{ params: { id: String(paneSnapshot.detail.id) }, url: diveUrlOfCore(paneSnapshot.detail.id) }} f7router={null} preview={paneSnapshot.detail} />
           </div>
         {:else}
           <div class="bc-pane-opening" class:bc-pane-opening--desk={layout.desktop}><DiveDetailSkeleton desk={layout.desktop} /></div>

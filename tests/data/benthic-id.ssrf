@@ -1,0 +1,20 @@
+<divelog program='subsurface' version='2'>
+<dives>
+<dive number='1' date='2026-11-23' time='09:30:00' duration='45:10 min'>
+  <location gps='43.123456 5.654321'>Port-Cros</location>
+  <notes>A dive that carries its Benthic id, and a plan's keys next to it</notes>
+  <divecomputer model='manually added dive'>
+  <depth max='21.0 m' mean='12.5 m' />
+  <extradata key='Benthic id' value='7k2m9q4x1d' />
+  <extradata key='Benthic title' value='Wreck, second day' />
+  </divecomputer>
+</dive>
+<dive number='2' date='2026-11-23' time='14:05:00' duration='38:00 min'>
+  <location gps='43.123456 5.654321'>Port-Cros</location>
+  <divecomputer model='manually added dive'>
+  <depth max='18.0 m' mean='10.0 m' />
+  <extradata key='Benthic id' value='0abcdefghj' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>

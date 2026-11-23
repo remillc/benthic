@@ -877,6 +877,12 @@ export class BenthicCoreDesktop extends WebPlugin {
     return { json: await this.core('editDives', { ids: options.ids, changes: JSON.stringify(options.changes) }) };
   }
 
+  /** The stable dive ids. @param {{action?: 'audit'|'assign', assignments?: string}} options */
+  async benthicIds(options) {
+    if (options?.action !== 'audit' && options?.action !== 'assign') throw reject('Missing action', 'BAD_ARGUMENT');
+    return { json: await this.core('benthicIds', { action: options.action, assignments: options.assignments ?? '{}' }) };
+  }
+
   /** @param {{start?: number, ids?: number[], numbers?: number[]}} options */
   async renumberDives(options) {
     if (options?.start == null) throw reject('Missing start', 'BAD_ARGUMENT');

@@ -10,7 +10,8 @@
   import GearIcon from '../components/GearIcon.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
-  import { gear, loadInventory, change, evaluations, figuresOf, diveKeysOf } from '../lib/inventory.svelte.js';
+  import { startKeyOf } from '../lib/inventory.js';
+  import { gear, loadInventory, change, evaluations, figuresOf, diveStartsOf } from '../lib/inventory.svelte.js';
   import { suggestionsFor, leadDays, ownLeadDays, stampOf } from '../lib/maintenance.js';
   import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel, tagText } from '../lib/maintenance-text.js';
@@ -46,9 +47,9 @@
 
   /** Hours under water since the last service, next to the dive count (« 82 plongées sur 100 · 61 h »). @param {import('../lib/maintenance.js').Evaluation} e */
   function hoursSince(e) {
-    const since = new Set(diveKeysOf(e.item.gearId).filter((k) => (e.item.lastDoneOn ? k.slice(0, 10) > e.base : k.slice(0, 10) >= e.base)));
+    const since = new Set(diveStartsOf(e.item.gearId).filter((k) => (e.item.lastDoneOn ? k.slice(0, 10) > e.base : k.slice(0, 10) >= e.base)));
     let seconds = 0;
-    for (const d of logbook.dives) if (since.has(String(d.date).slice(0, 19))) seconds += d.durationSeconds;
+    for (const d of logbook.dives) if (since.has(startKeyOf(d))) seconds += d.durationSeconds;
     return seconds;
   }
 

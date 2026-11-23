@@ -19,6 +19,7 @@ import { autoSyncing, logbook } from './logbook.svelte.js';
 import { onSyncAllowedAgain } from './sync-network.svelte.js';
 import { accountDataDeps, loadProfile } from './profile.svelte.js';
 import { loadInventory } from './inventory.svelte.js';
+import { startToIdMap } from './dive-id-migration.js';
 import { sideWindow } from './layout.svelte.js';
 import { refreshMedia } from './dive-media.svelte.js';
 
@@ -51,7 +52,7 @@ function build() {
   const { store, box, profile } = accountDataDeps();
   const core = /** @type {any} */ (BenthicCore);
   // A date of birth still in clear is sealed before anything leaves the device (the engine calls this before each pass).
-  const engine = createAccountSync({ core, store, box, sealClear: () => profile.migrateBirthDate() });
+  const engine = createAccountSync({ core, store, box, sealClear: () => profile.migrateBirthDate(), diveIds: () => startToIdMap(logbook.dives) });
   syncEngine = engine;
   const base = createAccountSyncRunner({
     engine,

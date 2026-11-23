@@ -6,6 +6,7 @@
   // come from the core (Subsurface's planner). Saved, a plan is a planned dive
   // of the logbook, listed by "Plongées planifiées" only.
   import { untrack } from 'svelte';
+  import { coreIdOfParam } from '../lib/dive-id.js';
   import { placeLevelLabels } from '../lib/chart-labels.js';
   import { Page, Navbar, Link, List, ListItem, Popup, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -140,7 +141,7 @@
     planner.kept = null;
     if (reopen) await reopenPlan(Number(id));
     else if (id === 'new') startNewDive(prefs);
-    else await startFrom(Number(id));
+    else await startFrom(coreIdOfParam(id));
     started = true;
     keptHere = planner.kept;
   }

@@ -12,6 +12,7 @@
 import { sortedJson } from './file-store.js';
 import { repositoryKey } from './server-logbook.js';
 import { sameComputer } from './dc-model.js';
+import { recordKey } from './inventory.js';
 import { fromBase64 } from './secret-box.js';
 import { BRANCH, SYNCED_PREFIXES, codeOf, isSyncedPath, workingCopyName } from './account-sync.js';
 
@@ -342,7 +343,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
     }
 
     // --- What each dive used: the dive.
-    const remoteByDive = new Map(values('dive-equipment/', remote).map((r) => [r.diveKey?.start, r]));
+    const remoteByDive = new Map(values('dive-equipment/', remote).map((r) => [recordKey(r.diveKey), r]));
     const remapEquipment = (/** @type {Record<string, any>} */ rec) => ({
       ...rec,
       suitGearId: mapGear(rec.suitGearId ?? ''),
@@ -351,7 +352,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
       kitId: mapKit(rec.kitId ?? ''),
     });
     for (const rec of values('dive-equipment/', local)) {
-      const start = rec.diveKey?.start;
+      const start = recordKey(rec.diveKey);
       const r = remoteByDive.get(start);
       const mapped = remapEquipment(rec);
       if (r) {
@@ -382,7 +383,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
         handled.add(pathOf('dive-validations', v));
         count('validation').recognised++;
         const dives = [...(r.dives ?? [])];
-        for (const d of v.dives ?? []) if (!dives.some((x) => x.start === d.start)) dives.push(d);
+        for (const d of v.dives ?? []) if (!dives.some((x) => recordKey(x) === recordKey(d))) dives.push(d);
         finalFiles.set(pathOf('dive-validations', r), equal(dives, r.dives ?? []) ? r : { ...r, dives, updatedAt: stamp() });
         dropLocal.add(pathOf('dive-validations', v));
       } else count('validation').added++;

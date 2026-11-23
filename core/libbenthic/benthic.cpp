@@ -313,7 +313,9 @@ int list_plans(std::string &json)
 		if (!first)
 			json += ',';
 		first = false;
-		json += "{\"id\":" + std::to_string(d.id) + ",\"date\":";
+		json += "{\"id\":" + std::to_string(d.id) + ",\"benthicId\":";
+		append_json_string(json, internal::benthic_id_of(d));
+		json += ",\"date\":";
 		append_json_string(json, iso_date(d.when));
 		json += ",\"when\":" + std::to_string(d.when) + ",\"site\":";
 		append_json_string(json, site_name(d));
@@ -360,6 +362,8 @@ static std::string dives_json(bool include_invalid = false)
 		first = false;
 		json += "{\"id\":" + std::to_string(d->id);
 		json += ",\"number\":" + std::to_string(d->number);
+		json += ",\"benthicId\":";
+		append_json_string(json, internal::benthic_id_of(*d));
 		json += ",\"date\":";
 		append_json_string(json, iso_date(d->when));
 		json += ",\"site\":";
@@ -410,6 +414,8 @@ int get_dive(int id, std::string &json, std::string &error)
 
 	json = "{\"id\":" + std::to_string(d->id);
 	json += ",\"number\":" + std::to_string(d->number);
+	json += ",\"benthicId\":";
+	append_json_string(json, internal::benthic_id_of(*d));
 	json += ",\"date\":";
 	append_json_string(json, iso_date(d->when));
 	json += ",\"site\":";

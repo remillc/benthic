@@ -8,6 +8,7 @@
   // right. Saving adds the dive as one undoable step, with the simple profile
   // Subsurface-mobile makes from the depth and the duration, then opens it.
   import { onMount } from 'svelte';
+  import { diveUrlOfCore } from '../lib/dive-id.js';
   import { Page, Navbar, Link, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { BenthicCore } from 'benthic-core';
@@ -172,7 +173,7 @@
       try {
         await renumberDives(plan.ids, plan.start);
         // The dive page shows the number it had: open it again.
-        f7router.navigate(`/dives/${plan.ids[0]}`, { reloadCurrent: true });
+        f7router.navigate(diveUrlOfCore(plan.ids[0]), { reloadCurrent: true });
         offerUndo(t('renumber.done'), back);
       } catch (e) {
         console.error('Renumber', e);
@@ -212,7 +213,7 @@
       // screen, the Logbook's /dives/<id> (beside the list on a tablet) would
       // load a second Logbook.
       f7router.back({ animate: !id });
-      if (id) f7router.navigate(`/dives/${id}`);
+      if (id) f7router.navigate(diveUrlOfCore(id));
       const back = () => f7router.back();
       // A dive logged between others has no number (0): offer to renumber the
       // logbook from its date onward, as Subsurface's Renumber does.

@@ -5,6 +5,7 @@
   // error, empty logbook, offline with pending changes, sync conflict. A log can hold thousands of dives:
   // the list is virtual, only the rows near the screen are in the document.
   import { onDestroy, tick, untrack } from 'svelte';
+  import { diveUrl } from '../lib/dive-id.js';
   import { Page, Navbar, NavRight, Link, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import SyncStatus from '../components/SyncStatus.svelte';
@@ -159,7 +160,7 @@
     if (!dive) return;
     tick().then(() => {
       // At start, only the logbook holds links to dives and trips.
-      const href = dive.trip ? `/trips/${dive.trip.id}` : `/dives/${dive.id}`;
+      const href = dive.trip ? `/trips/${dive.trip.id}` : diveUrl(dive);
       const link = /** @type {HTMLElement|null} */ (document.querySelector(`a[href="${href}"]`));
       /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.bc-trip-row--expand') : link)?.click();
     });
@@ -877,7 +878,7 @@
     autoOpening = true;
     // The detail kept at the last start, if it is of this dive: the page draws it from its first frame, then reads the dive.
     seedStartDetail(dive, keepDive);
-    f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
+    f7router.navigate(diveUrl(dive), { reloadDetail: true });
   });
 
   // Tablet: a logbook emptied (signed out, data of this device deleted) keeps

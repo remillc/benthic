@@ -1609,6 +1609,17 @@ class BenthicCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.editDives(ids, changes.toString())))
     }
 
+    /** The stable dive ids (benthic_ids_json, assign_benthic_ids): not an undo step. */
+    @PluginMethod
+    fun benthicIds(call: PluginCall) = onCoreThread(call) {
+        val action = call.getString("action")
+        if (action != "audit" && action != "assign") {
+            call.reject("Missing action", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.benthicIds(action, call.getString("assignments") ?: "{}")))
+    }
+
     /** Renumbers dives in date order (renumber_dives): all of them if no ids, one undoable step. */
     @PluginMethod
     fun renumberDives(call: PluginCall) = onCoreThread(call) {

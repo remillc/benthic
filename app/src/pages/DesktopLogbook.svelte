@@ -8,6 +8,7 @@
   // keyboard shortcuts; a file dropped on the window is imported. Below 1200 dp the
   // tablet's Logbook.svelte shows instead (App.svelte).
   import { tick, untrack } from 'svelte';
+  import { diveUrlOfCore } from '../lib/dive-id.js';
   import { Page, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import SearchClear from '../components/SearchClear.svelte';
@@ -226,7 +227,7 @@
       else showDetail('/pane/empty');
       return;
     }
-    showDetail(ids.length === 1 ? `/dives/${ids[0]}` : '/pane/selection');
+    showDetail(ids.length === 1 ? diveUrlOfCore(ids[0]) : '/pane/selection');
   });
 
   // The first dive of the table, once shown in the pane, is kept for the next start (lib/detail-snapshot.js).

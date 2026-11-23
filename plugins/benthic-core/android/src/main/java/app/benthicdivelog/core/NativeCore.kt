@@ -38,6 +38,8 @@ internal object NativeCore {
     external fun renumberDives(ids: IntArray, start: Int, numbers: IntArray): String
     external fun mergeDives(ids: IntArray): String
     external fun editDives(ids: IntArray, changes: String): String
+    /** The stable dive ids: action "audit" (every dive's id) or "assign" (writes `assignments`, a JSON object core id -> id). */
+    external fun benthicIds(action: String, assignments: String): String
     external fun importDives(file: String, source: String): String
     external fun importCsv(file: String, companion: String, params: String, source: String, dryRun: Boolean): String
     external fun importDivesFiles(files: Array<String>, source: String): String

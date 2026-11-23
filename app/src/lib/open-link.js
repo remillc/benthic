@@ -12,6 +12,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { f7 } from 'framework7-svelte';
 import { BenthicCore } from 'benthic-core';
 import { logbook, importData } from './logbook.svelte.js';
+import { diveUrl, diveUrlOfCore } from './dive-id.js';
 import { replaceEligibility } from './replace-logbook.js';
 import { startReplace } from './replace-logbook-ui.js';
 import { goToSection, openOver, backToFirstScreen } from './navigation.svelte.js';
@@ -87,14 +88,14 @@ async function openTarget(target) {
     return;
   }
   if (target.kind === 'dive') {
-    // The stable key is the start time (lib/deep-link.js); the id is only valid until the next load.
-    const dive = logbook.dives.find((d) => d.date.slice(0, 19) === target.date);
+    // A link holds the dive's Benthic id (the start time in the links shared before the ids, lib/deep-link.js); the core's id is only valid until the next load.
+    const dive = target.benthicId ? logbook.dives.find((d) => d.benthicId === target.benthicId) : logbook.dives.find((d) => d.date.slice(0, 19) === target.date);
     if (!dive) {
       await fallBackTo('logbook', 'link.diveNotFound');
       return;
     }
     const view = await freshView('logbook');
-    /** @type {any} */ (view?.router).navigate(`/dives/${dive.id}`, { reloadDetail: true });
+    /** @type {any} */ (view?.router).navigate(diveUrl(dive), { reloadDetail: true });
     return;
   }
   if (target.kind === 'site') {
@@ -187,7 +188,7 @@ const sharedDeps = {
 export async function openDiveById(id) {
   clearOverlays();
   const view = await freshView('logbook');
-  /** @type {any} */ (view?.router).navigate(`/dives/${id}`, { reloadDetail: true });
+  /** @type {any} */ (view?.router).navigate(diveUrlOfCore(id), { reloadDetail: true });
 }
 
 /** Opens the list of planned dives (after a plan received by QR code). */

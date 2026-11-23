@@ -5,8 +5,9 @@
 // The reference of a dive lives in `media/<dive id>.json` on the `benthic` branch:
 //   { format: 1, diveId, items: [ { hash, mime, size, takenAt, caption, thumb, durationMs?, width?, height?, name? } ] }
 // `hash` is the SHA-256 of the original (the object `media/<hash>` on the server) and `thumb` the hash of its 256 px JPEG
-// thumbnail, an object of its own. The logbook has no stable dive id yet: `diveId` is the dive's start time
-// (`diveKeyOf`, as `dive-equipment`), and the file name is that text made safe. The same dive on two devices is one file.
+// thumbnail, an object of its own. `diveId` is the dive's Benthic id
+// (`diveKeyOf`, as `dive-equipment`), and the file name is that text made safe: `media/<benthic id>.json`. Until the one-time
+// migration (lib/dive-id-migration.js) a file is named by the dive's start time. The same dive on two devices is one file.
 
 /** The longest side of a thumbnail, in pixels. */
 export const THUMB_SIZE = 256;
