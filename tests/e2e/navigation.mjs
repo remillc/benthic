@@ -2726,7 +2726,12 @@ try {
       console.log(`  FAIL ${label}: ${bad.join('; ')}`);
     } else console.log(`  ok   ${label}`);
   };
-  const harness = { openTab, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length };
+  /** Closes every other tab of Chrome (the earlier blocks leave theirs open, and a hidden tab does not lay out or animate). */
+  const closeOtherTabs = async (/** @type {string} */ keepId) => {
+    const list = await (await fetch(`${wsBase}/json/list`)).json();
+    for (const target of list) if (target.type === 'page' && target.id !== keepId) await fetch(`${wsBase}/json/close/${target.id}`).catch(() => {});
+  };
+  const harness = { openTab, closeOtherTabs, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length };
   const monkey = (/** @type {string} */ only) => () =>
     monkeyFlows({
       ...harness,

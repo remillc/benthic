@@ -12,14 +12,21 @@ import { readFileSync } from 'node:fs';
  * @param {object} h the harness of navigation.mjs
  */
 export async function desktopEquipmentFlows(h) {
-  const { openTab, sleep, expect, shot } = h;
+  const { openTab, closeOtherTabs, sleep, expect, shot } = h;
   console.log('Desktop, 1400x900: the Équipement tab, one card per section');
   const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
   // Tabs of earlier blocks stay open in a shard: this one must be the visible one, or the page does not lay out.
+  // At start the pane may hold the kept snapshot of the detail (hidden, with its own copy of the fields): only the live page counts.
+  await tab.run(() => {
+    window.__liveAll = (selector) => [...document.querySelectorAll(selector)].filter((e) => !e.closest('.bc-pane-opening'));
+    window.__live = (selector) => window.__liveAll(selector)[0] ?? null;
+    return 1;
+  });
+  await closeOtherTabs?.(tab.targetId);
   await tab.send('Page.bringToFront');
   await tab.send('Emulation.setFocusEmulationEnabled', { enabled: true });
   await tab.send('Page.setWebLifecycleState', { state: 'active' }).catch(() => {});
-  await tab.run(() => !!document.querySelector('.bc-desktop-logbook--table'));
+  await tab.run(() => !!window.__live('.bc-desktop-logbook--table'));
 
   /** Polls the page until `check` is true (a loaded machine is slower than a quiet one). @param {() => boolean} check */
   const waitFor = async (check) => {
@@ -31,20 +38,20 @@ export async function desktopEquipmentFlows(h) {
   const openEquipment = async () => {
     // A second click on the selected row would close the pane (and, on a loaded machine, leave it opening): click it once.
     await tab.run(() => {
-      if (!document.querySelector('.bc-dive-detail')) document.querySelector('.bc-desktop-logbook--row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      if (!window.__live('.bc-dive-detail')) window.__live('.bc-desktop-logbook--row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
       return 1;
     });
-    await waitFor(() => !!document.querySelector('[role="tab"][data-tab="equipment"]'));
+    await waitFor(() => !!window.__live('[role="tab"][data-tab="equipment"]'));
     await tab.run(() => {
-      /** @type {HTMLElement|null} */ (document.querySelector('[role="tab"][data-tab="equipment"]'))?.click();
+      /** @type {HTMLElement|null} */ (window.__live('[role="tab"][data-tab="equipment"]'))?.click();
       return 1;
     });
-    await waitFor(() => (document.querySelector('.bc-desktop-dive-fields--equipment')?.getBoundingClientRect().height ?? 0) > 0);
+    await waitFor(() => (window.__live('.bc-desktop-dive-fields--equipment')?.getBoundingClientRect().height ?? 0) > 0);
   };
   /** The cards, their order, and what the tab shows. */
   const read = () =>
     tab.run(() => {
-      const root = document.querySelector('.bc-desktop-dive-fields--equipment');
+      const root = window.__live('.bc-desktop-dive-fields--equipment');
       const cards = root ? [...root.querySelectorAll('.bc-desktop-equipment-card')] : [];
       const box = (el) => {
         const r = el?.getBoundingClientRect();
@@ -60,7 +67,7 @@ export async function desktopEquipmentFlows(h) {
         radius: style(cards[0], 'border-radius'),
         padding: style(cards[0], 'padding-top'),
         gaps: cards.slice(1).map((c, i) => Math.round(c.getBoundingClientRect().top - cards[i].getBoundingClientRect().bottom)),
-        hint: !!document.querySelector('.bc-desktop-dive-fields--hint'),
+        hint: !!window.__live('.bc-desktop-dive-fields--hint'),
         undersuit: text.includes('Sous-vêtement'),
         feedbackTitle: text.includes('Ce lest était'),
         otherGear: text.includes('Autre équipement'),
@@ -78,7 +85,7 @@ export async function desktopEquipmentFlows(h) {
 
   /** The detail pane scrolled so that the hint above the cards is at its top (for the screenshots). */
   const toHint = async () => {
-    await tab.run(() => (document.querySelector('.bc-desktop-dive-fields--hint')?.scrollIntoView({ block: 'start' }), 1));
+    await tab.run(() => (window.__live('.bc-desktop-dive-fields--hint')?.scrollIntoView({ block: 'start' }), 1));
     await sleep(300);
   };
 
@@ -95,10 +102,10 @@ export async function desktopEquipmentFlows(h) {
   // --- With Benthic+ ----------------------------------------------------------------------------------------------
   await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
   await openEquipment();
-  await waitFor(() => (document.querySelector('[data-card="kit"]')?.getBoundingClientRect().height ?? 0) > 0);
+  await waitFor(() => (window.__live('[data-card="kit"]')?.getBoundingClientRect().height ?? 0) > 0);
   state = await read();
   if (!state.headerIcon[0]) {
-    console.log('  debug:', JSON.stringify(await tab.run(() => { const out = []; for (let e = document.querySelector('[data-card="kit"]'); e; e = e.parentElement) { const c = getComputedStyle(e); const r = e.getBoundingClientRect(); out.push(`${e.tagName}.${String(e.className).split(' ')[0]} ${c.display} ${c.visibility} ${Math.round(r.width)}x${Math.round(r.height)}`); } return out.slice(0, 14); })));
+    console.log('  debug:', JSON.stringify(await tab.run(() => { const out = []; for (let e = window.__live('[data-card="kit"]'); e; e = e.parentElement) { const c = getComputedStyle(e); const r = e.getBoundingClientRect(); out.push(`${e.tagName}.${String(e.className).split(' ')[0]} ${c.display} ${c.visibility} ${Math.round(r.width)}x${Math.round(r.height)}`); } return out.slice(0, 14); })));
     if (process.env.BC_SHOTS) await shot(tab, 'equipment-debug');
   }
   expect('Benthic+: five cards in order, 16 px corners, 16 px padding, 14 px apart, 40 px round icons', { names: 'kit,computers,protection,weights,other-gear', radius: '16px', padding: '16px', gaps: '14,14,14,14', headerIcon: '40,40,40,40,40', kit: true, undersuit: state.undersuit }, { ...state, names: state.names.join(','), gaps: state.gaps.join(','), headerIcon: state.headerIcon.join(',') });
@@ -106,18 +113,18 @@ export async function desktopEquipmentFlows(h) {
 
   // A weight: « + Ajouter », 5, Entrée.
   await tab.run(() => {
-    /** @type {HTMLElement|null} */ (document.querySelector('.bc-desktop-weights--add'))?.click();
+    /** @type {HTMLElement|null} */ (window.__live('.bc-desktop-weights--add'))?.click();
     return 1;
   });
   await sleep(300);
   await tab.run(() => {
-    const input = /** @type {HTMLInputElement} */ (document.querySelector('.bc-desktop-weights--input'));
+    const input = /** @type {HTMLInputElement} */ (window.__live('.bc-desktop-weights--input'));
     input.value = '5';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
     return 1;
   });
-  await waitFor(() => !!document.querySelector('.bc-desktop-dive-fields--feedback-group'));
+  await waitFor(() => !!window.__live('.bc-desktop-dive-fields--feedback-group'));
   state = await read();
   const centred = state.selector && state.weightsCard ? Math.abs((state.selector.left + state.selector.right) / 2 - (state.weightsCard.left + state.weightsCard.right) / 2) < 2 : false;
   expect('a weight: a 5 kg chip, the total in the header, « Ce lest était » narrower than 360 px and centred', { chip: true, total: true, feedbackTitle: true, narrow: true, centred: true }, {
@@ -128,8 +135,8 @@ export async function desktopEquipmentFlows(h) {
     centred,
   });
   expect('a chip is 40 px tall with a cross that removes it', { height: 40, cross: true }, await tab.run(() => ({
-    height: Math.round(document.querySelector('.bc-desktop-weights--chip')?.getBoundingClientRect().height ?? 0),
-    cross: !!document.querySelector('.bc-desktop-weights--chip-x'),
+    height: Math.round(window.__live('.bc-desktop-weights--chip')?.getBoundingClientRect().height ?? 0),
+    cross: !!window.__live('.bc-desktop-weights--chip-x'),
   })));
 
   // An item of the inventory, a dive knife, added to the dive.
@@ -139,26 +146,26 @@ export async function desktopEquipmentFlows(h) {
     return 1;
   });
   await tab.run(() => {
-    /** @type {HTMLElement|null} */ (document.querySelector('[data-card="other-gear"] .bc-desktop-dive-fields--text-button'))?.click();
+    /** @type {HTMLElement|null} */ (window.__live('[data-card="other-gear"] .bc-desktop-dive-fields--text-button'))?.click();
     return 1;
   });
-  await waitFor(() => !!document.querySelector('.bc-add-equipment [role="checkbox"]'));
+  await waitFor(() => !!window.__live('.bc-add-equipment [role="checkbox"]'));
   await tab.run(() => {
-    /** @type {HTMLElement|null} */ (document.querySelector('.bc-add-equipment [role="checkbox"]'))?.click();
+    /** @type {HTMLElement|null} */ (window.__live('.bc-add-equipment [role="checkbox"]'))?.click();
     return 1;
   });
   await sleep(300);
   await tab.run(() => {
-    /** @type {HTMLElement|null} */ (document.querySelector('.bc-add-equipment--main'))?.click();
+    /** @type {HTMLElement|null} */ (window.__live('.bc-add-equipment--main'))?.click();
     return 1;
   });
-  await waitFor(() => !!document.querySelector('.bc-desktop-other-gear--tile'));
+  await waitFor(() => !!window.__live('.bc-desktop-other-gear--tile'));
   state = await read();
   expect('an item added to the dive: a 56 px grey row with the dive knife drawing', { rows: 1, height: 56, knifeIcon: true }, { rows: state.gearRows.length, height: state.gearRows[0]?.height, knifeIcon: state.knifeIcon });
 
   // Scrolled to the end: 88 px stay empty, and the + button covers no card.
   const end = await tab.run(async () => {
-    const root = document.querySelector('.bc-desktop-dive-fields--equipment');
+    const root = window.__live('.bc-desktop-dive-fields--equipment');
     let scroller = root?.parentElement;
     while (scroller && !/(auto|scroll)/.test(getComputedStyle(scroller).overflowY)) scroller = scroller.parentElement;
     if (scroller) scroller.scrollTop = scroller.scrollHeight;
@@ -166,14 +173,14 @@ export async function desktopEquipmentFlows(h) {
     const cards = [...(root?.querySelectorAll('.bc-desktop-equipment-card') ?? [])];
     const last = cards[cards.length - 1]?.getBoundingClientRect();
     const area = scroller?.getBoundingClientRect();
-    const fab = document.querySelector('.bc-fab-menu--button')?.getBoundingClientRect();
+    const fab = window.__live('.bc-fab-menu--button')?.getBoundingClientRect();
     const overlap = !!(fab && last && fab.left < last.right && fab.right > last.left && fab.top < last.bottom && fab.bottom > last.top);
     return { room: area && last ? Math.round(area.bottom - last.bottom) : -1, scrolled: !!scroller, hasFab: !!fab, overlap };
   });
   expect('scrolled to the end: at least 88 px below the last card, and the + button does not cover it', { scrolled: true, roomOk: true, overlap: false }, { scrolled: end.scrolled, roomOk: end.room >= 88, overlap: end.overlap, room: end.room, hasFab: end.hasFab });
   if (process.env.BC_SHOTS) await shot(tab, 'equipment-desktop-plus-end');
   await tab.run(async () => {
-    const root = document.querySelector('.bc-desktop-dive-fields--equipment');
+    const root = window.__live('.bc-desktop-dive-fields--equipment');
     let scroller = root?.parentElement;
     while (scroller && !/(auto|scroll)/.test(getComputedStyle(scroller).overflowY)) scroller = scroller.parentElement;
     if (scroller) scroller.scrollTop = 0;
@@ -183,7 +190,7 @@ export async function desktopEquipmentFlows(h) {
   if (process.env.BC_SHOTS) {
     await toHint();
     await shot(tab, 'equipment-desktop-plus');
-    await tab.run(() => (document.querySelector('[data-card="weights"]')?.scrollIntoView({ block: 'start' }), 1));
+    await tab.run(() => (window.__live('[data-card="weights"]')?.scrollIntoView({ block: 'start' }), 1));
     await sleep(300);
     await shot(tab, 'equipment-desktop-plus-2');
   }
