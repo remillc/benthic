@@ -442,16 +442,13 @@
     "syncedAgo": "Synchronisé {ago}",
     "offline": "Hors ligne : aucune modification en attente",
     "local": "Carnet enregistré sur cet appareil seulement",
-    "manual": {
-      "one": "Synchronisation manuelle : {n} modification non envoyée",
-      "other": "Synchronisation manuelle : {n} modifications non envoyées"
-    },
     "offlinePending": {
       "one": "Hors ligne : {n} modification sera envoyée au retour du réseau",
       "other": "Hors ligne : {n} modifications seront envoyées au retour du réseau"
     },
     "syncingGit": "Synchronisation avec le dépôt git…",
     "cloudGit": "Synchronisé avec le dépôt git",
+    "progressLine": "Synchronisation du carnet",
     "syncingServer": "Synchronisation avec le serveur Benthic…",
     "cloudServer": "Synchronisé avec le serveur Benthic"
   },
@@ -1493,16 +1490,11 @@
     "title": "Compte",
     "cloudLine": "Cloud Subsurface",
     "syncGroup": "Synchronisation",
-    "autoSync": "Synchroniser automatiquement",
-    "autoSyncText": "À l'ouverture, au retour dans l'app et quelques secondes après une modification",
     "lastSync": "Dernière synchronisation",
     "lastSyncNever": "Jamais",
     "todayAt": "aujourd’hui, {time}",
     "cloudDives": "Plongées dans le cloud",
     "syncNow": "Synchroniser",
-    "syncOptions": "Autres options de synchronisation",
-    "syncGoAuto": "Passer en synchronisation automatique",
-    "syncShowPending": "Voir les modifications non envoyées",
     "subsurfaceGroup": "Compte Subsurface",
     "changePassword": "Changer le mot de passe",
     "changePasswordText": "Un lien est envoyé à votre adresse e-mail",
@@ -1544,7 +1536,6 @@
       "other": "Au lieu d’un compte, un dépôt à vous (GitHub, Gitea…). Vos {n} plongées y sont envoyées"
     },
     "notAvailable": "Pas encore disponible",
-    "autoSyncOff": "Désactivée : rien n'est envoyé ni reçu tant que vous ne synchronisez pas.",
     "pending": "Modifications non envoyées",
     "bandSignedIn": "Votre carnet dans le cloud",
     "bandNone": "Aucun compte connecté",
@@ -2792,6 +2783,8 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
+      "Carnet : pendant l’échange avec le serveur au démarrage, un trait blanc se dessine sur le profil pâle de l’en-tête, sur tous les appareils : un segment glisse tant que la progression est inconnue, puis le trait se remplit, se complète et s’efface. Il remplace la barre ondulée.",
+      "Synchronisation : elle est toujours automatique. Le réglage « Synchroniser automatiquement » et le mode manuel n’existent plus ; « Seulement sur Wi-Fi ou câble » et « Synchroniser maintenant » restent, et les modifications non envoyées s’affichent toujours quand l’appareil est hors ligne.",
       "Carnet : un appui long sur une plongée ou un voyage démarre la sélection dès qu’il est reconnu, le doigt encore posé, avec un court retour haptique sur téléphone et tablette ; lever le doigt ne décide plus.",
       "Téléphone Android, Carnet et Sites : la boîte de recherche est sous le résumé et, au défilement, rétrécit et monte dans la barre du haut sous forme de loupe. Une recherche en cours y reste sous forme de pastille avec son texte et son bouton d’effacement ; toucher le texte ou la loupe rouvre la boîte. Sur Sites, le bouton plein écran de la carte passe au-dessus de « Centrer sur ma position ».",
       "Exporter : « Envoyer vers divelogs.de » envoie les plongées du carnet ou de la sélection vers votre compte divelogs.de, après le nom d’utilisateur et le mot de passe, qui ne sont pas gardés. L’envoi a sa progression et se reprend après une coupure de connexion.",
@@ -5153,8 +5146,6 @@
     "account": {
       "sheet": "Compte",
       "syncNow": "Synchroniser maintenant",
-      "auto": "Synchroniser automatiquement",
-      "autoText": "À l’ouverture et après chaque modification",
       "unmetered": "Seulement sur Wi-Fi ou câble",
       "unmeteredText": "Jamais sur un partage de connexion",
       "manage": "Gérer le compte"

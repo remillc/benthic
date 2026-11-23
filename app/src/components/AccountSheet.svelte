@@ -3,18 +3,16 @@
   // Android phone: the account sheet, opened by the avatar of a section's top bar (task
   // 2026-11-14-120, docs/mockups/nav-option-barre-compte-android.dc.html). Everything the side
   // menu held that is not a section: the account (« Gérer le compte » opens Compte), the sync
-  // line with « Synchroniser » (and its other options in manual mode), Réglages and À propos.
+  // line with « Synchroniser », Réglages and À propos.
   // Compte, Réglages and À propos open over the current section, with a back arrow.
-  import { Sheet, f7 } from 'framework7-svelte';
+  import { Sheet } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
-  import SyncControl from './SyncControl.svelte';
   import SyncButton from './SyncButton.svelte';
   import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
-  import { logbook, setAutoSync } from '../lib/logbook.svelte.js';
-  import { showUnsent } from '../lib/filter.svelte.js';
-  import { navigation, openOver, openSettings, openMapSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
+  import { logbook, autoSyncing } from '../lib/logbook.svelte.js';
+  import { navigation, openOver, openSettings, openMapSettings, openAbout } from '../lib/navigation.svelte.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
   import { accountLock } from '../lib/locked-data.svelte.js';
@@ -70,61 +68,11 @@
     openBenthicPlus(screen, 'account');
   }
 
-  /** Manual sync with an account: the changes waiting, a filled « Synchroniser », and its other options under ⋮. */
-  const manual = $derived(!!logbook.email && !logbook.autoSync);
-
   /**
-   * The ⋮ of manual sync (nav-compte-options-android.dc.html): switch to automatic sync, or see
-   * the changes not sent (the Logbook, filtered on them). A popover of the app, outside the sheet.
-   * @param {MouseEvent} e
+   * Changes not sent while the device is offline or the connection is metered (« Seulement sur Wi-Fi ou câble »): their count
+   * and a filled « Synchroniser » (nav-compte-maj-android.dc.html). Sync itself is always automatic.
    */
-  function syncOptions(e) {
-    const item = (/** @type {string} */ action, /** @type {string} */ label) =>
-      `<li><a href="#" class="item-link item-content popover-close" data-action="${action}"><div class="item-inner"><div class="item-title">${label}</div></div></a></li>`;
-    const popover = f7.popover.create({
-      targetEl: /** @type {HTMLElement} */ (e.currentTarget),
-      content: `<div class="popover bc-menu bc-account-sheet--menu"><div class="popover-inner"><div class="list no-chevron"><ul>${item('auto', t('account.syncGoAuto'))}${item('unsent', t('account.syncShowPending'))}</ul></div></div></div>`,
-      on: {
-        opened(/** @type {any} */ p) {
-          p.$el.find('[data-action]').on('click', (/** @type {Event} */ ev) => {
-            ev.preventDefault();
-            const action = /** @type {HTMLElement} */ (ev.currentTarget).dataset.action;
-            if (action === 'auto') setAutoSync(true);
-            else {
-              navigation.accountOpen = false;
-              showSection('logbook');
-              showUnsent(logbook.prefs);
-            }
-          });
-        },
-        closed: () => popover.destroy(),
-      },
-    });
-    popover.open();
-  }
-
-  /** iPhone: the sync options as an action sheet (appbar-tiroir-ios-ouvert.dc.html). */
-  function syncOptionsIos() {
-    f7.actions
-      .create({
-        buttons: [
-          [
-            { text: t('account.syncOptions'), label: true },
-            { text: t('account.syncGoAuto'), onClick: () => setAutoSync(true) },
-            {
-              text: t('account.syncShowPending'),
-              onClick: () => {
-                navigation.accountOpen = false;
-                showSection('logbook');
-                showUnsent(logbook.prefs);
-              },
-            },
-          ],
-          [{ text: t('dialog.cancel'), bold: true }],
-        ],
-      })
-      .open();
-  }
+  const waiting = $derived(!!logbook.email && logbook.pending > 0 && (logbook.sync === 'offline' || !autoSyncing()));
 
   /**
    * Closes the sheet, then opens a page over the current section.
@@ -221,16 +169,13 @@
             <div class="bc-account-sheet--ios-row"><SyncFailureRow conflict /></div>
           {:else}
             <div class="bc-account-sheet--ios-row bc-account-sheet--ios-sync">
-              {#if manual && logbook.pending > 0}
+              {#if waiting}
                 <span class="bc-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
               {:else}
-                <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={0} progress={logbook.syncProgress} live={false} steady />
+                <SyncStatus sync={logbook.sync} pending={0} progress={logbook.syncProgress} live={false} steady />
               {/if}
-              {#if logbook.email}<SyncButton filled={manual && logbook.pending > 0} />{/if}
+              {#if logbook.email}<SyncButton filled={waiting} />{/if}
             </div>
-          {/if}
-          {#if manual}
-            <button type="button" class="bc-account-sheet--ios-row bc-account-sheet--ios-link" onclick={syncOptionsIos}>{t('account.syncOptions')}</button>
           {/if}
         {/if}
       </div>
@@ -383,25 +328,22 @@
             <SyncFailureRow />
           {:else if logbook.conflict && logbook.conflictLater}
             <SyncFailureRow conflict />
-          {:else if manual}
-            <div class="bc-account-sheet--manual">
+          {:else if waiting}
+            <div class="bc-account-sheet--waiting">
               {#if logbook.pending > 0}
                 <span class="bc-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
               {:else}
                 <!-- Nothing waiting: the last sync, as in automatic sync, not « 0 modification ». -->
-                <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={0} progress={logbook.syncProgress} live={false} />
+                <SyncStatus sync={logbook.sync} pending={0} progress={logbook.syncProgress} live={false} />
               {/if}
-              <SyncButton filled={logbook.pending > 0} />
-              <button type="button" class="bc-account-sheet--more" aria-label={t('account.syncOptions')} aria-haspopup="menu" onclick={syncOptions}>
-                <Icon name="more" weight={4} />
-              </button>
+              <SyncButton filled />
             </div>
           {:else}
             <!-- One row: the cloud and the status take the width, « Synchroniser » on the right; a long
                  status wraps beside the button, never above it (task 2026-11-14-156). -->
             <div class="bc-account-sheet--auto">
               <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
-              {#if logbook.email}<SyncControl />{/if}
+              {#if logbook.email}<SyncButton />{/if}
             </div>
           {/if}
         </div>
@@ -821,8 +763,8 @@
       color: var(--bc-text-2);
     }
 
-    /* Manual sync: the changes waiting, « Synchroniser » and ⋮ on one row. */
-    .bc-account-sheet--manual {
+    /* The changes waiting and « Synchroniser » on one row. */
+    .bc-account-sheet--waiting {
       align-self: stretch;
       display: flex;
       align-items: center;
@@ -840,19 +782,6 @@
       line-height: 20px;
       font-weight: 600;
       color: var(--bc-pending);
-    }
-
-    .bc-account-sheet--more {
-      flex: none;
-      width: 40px;
-      height: 40px;
-      border: none;
-      border-radius: 20px;
-      background: var(--bc-surface-container-high);
-      color: var(--bc-text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     /* Free version (task 2026-11-18-281): the grey silhouette, « S'abonner », « Déjà abonné ? Se connecter », the Benthic+ rows. */

@@ -38,9 +38,7 @@ import { signalAccountData } from './account-sync-signal.js';
  * - cloud: read and synced with the Subsurface cloud;
  * - offline: the device's copy, the server did not answer;
  * - local: logbook on this device only (no account);
- * - manual: "Sync automatically" is off: nothing is sent or fetched until
- *   "Sync" (spec, section 4, "Manual synchronisation").
- * @typedef {'syncing'|'cloud'|'offline'|'local'|'manual'} SyncState
+ * @typedef {'syncing'|'cloud'|'offline'|'local'} SyncState
  */
 
 /**
@@ -104,8 +102,6 @@ export const logbook = $state({
   server: '',
   /** Local time of the last successful sync (ISO, no time zone), or null. */
   lastSync: /** @type {string|null} */ (readLastSync()),
-  /** "Sync automatically" (Account screen); a setting of this device. */
-  autoSync: readAutoSync(),
   /** Local changes of the cloud log not sent yet. */
   pending: 0,
   /**
@@ -782,9 +778,12 @@ function undoCleared() {
  * @typedef {'done'|'offline'|'failed'} SyncOutcome
  */
 
-/** Automatic synchronisation is on and the connection allows it (« Seulement sur Wi-Fi ou câble », lib/sync-network.svelte.js). */
+/**
+ * Synchronisation is always automatic; this tells whether it may run now: the connection allows it
+ * (« Seulement sur Wi-Fi ou câble », lib/sync-network.svelte.js) and no older version is being browsed.
+ */
 export function autoSyncing() {
-  return logbook.autoSync && syncAllowedOnThisNetwork() && !logbook.browsing;
+  return syncAllowedOnThisNetwork() && !logbook.browsing;
 }
 
 /**
@@ -816,8 +815,7 @@ async function syncEdits() {
       undoCleared();
     }
     const reached = status.status !== 'offline' && status.status !== 'stopped';
-    // Manual synchronisation: the state says so again once done (spec, section 4).
-    logbook.sync = !reached ? 'offline' : autoSyncing() ? 'cloud' : 'manual';
+    logbook.sync = reached ? 'cloud' : 'offline';
     if (reached) markSynced();
     outcome = reached ? 'done' : status.status === 'offline' ? 'offline' : 'failed';
     if (!reached) noteFailure(status.cause === 'auth');
@@ -911,7 +909,7 @@ export function boot() {
     try {
       // The probe runs on the plugin's network thread, not in the core's
       // order: it is sent once the account is set, or it finds none.
-      if (logbook.autoSync && !syncNetwork.unmeteredOnly && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => BenthicCore.probeCloud());
+      if (!syncNetwork.unmeteredOnly && deviceStore.getItem(ACCOUNT_HINT)) probe = configure.then(() => BenthicCore.probeCloud());
     } catch {
       // No hint: loadCloud sends the probe.
     }
@@ -1145,37 +1143,8 @@ export function repositoryChanged() {
   return loadLogbook({ force: true });
 }
 
-function readAutoSync() {
-  try {
-    return deviceStore.getItem('bc.autoSync') !== 'false';
-  } catch {
-    return true;
-  }
-}
-
 /**
- * Turns automatic synchronisation on or off. Off: the logbook stays as it is
- * and the state says so; on: a sync runs at once.
- * @param {boolean} value
- */
-export function setAutoSync(value) {
-  logbook.autoSync = value;
-  try {
-    deviceStore.setItem('bc.autoSync', String(value));
-  } catch {
-    // Not fatal: the setting only lasts until the app closes.
-  }
-  if (!logbook.email) return;
-  if (value) {
-    loadLogbook();
-  } else {
-    logbook.sync = 'manual';
-    countPending();
-  }
-}
-
-/**
- * "Sync", in either mode. A logbook already shown: the exchange of the
+ * "Sync". A logbook already shown: the exchange of the
  * automatic synchronisation (send, fetch, merge; read again only when the
  * cloud brought changes), so that only the status line moves, not the list
  * nor the menu (to-do #2). Otherwise (no copy yet, an error): the full load.
@@ -1270,9 +1239,9 @@ if (typeof window !== 'undefined') {
       /* no plugin: the events above are all there is */
     }
   }, 5000);
-  // The metered link went away (or the switch was turned off): what waited goes now.
+  // The metered link went away: what waited goes now.
   onSyncAllowedAgain(() => {
-    if (logbook.email && logbook.autoSync && logbook.pending && logbook.sync !== 'syncing' && logbook.sync !== 'offline') syncEdits();
+    if (logbook.email && logbook.pending && logbook.sync !== 'syncing' && logbook.sync !== 'offline') syncEdits();
   });
   // Where the sync is: only while one is shown as running.
   BenthicCore.addListener('syncProgress', (/** @type {{ message: string }} */ { message }) => {
@@ -1287,6 +1256,13 @@ if (typeof window !== 'undefined') {
       }
     }
   }).catch((/** @type {unknown} */ e) => console.error('Sync progress', e));
+}
+
+// Synchronisation is always automatic (task 346): the old on/off setting of an earlier version is dropped.
+try {
+  deviceStore.removeItem('bc.autoSync');
+} catch {
+  // Not fatal: it is ignored anyway.
 }
 
 function readLastSync() {
@@ -1392,7 +1368,7 @@ async function loadCloud(force, pre = null) {
         if (cached.server) logbook.server = cached.server;
         logbook.dives = cached.dives;
         logbook.prefs = await prefsAfterLoad();
-        logbook.sync = 'manual';
+        logbook.sync = 'cloud';
         await countPending();
         return true;
       }
@@ -1482,9 +1458,6 @@ export async function loadLogbook({ force = false } = {}) {
   logbook.error = null;
   try {
     if (await loadCloud(force, pre)) {
-      // Manual synchronisation: the state says so at all times, after a
-      // "Sync" too (spec, section 4).
-      if (!autoSyncing()) logbook.sync = 'manual';
       await countPending();
       await readConflicts();
     } else {

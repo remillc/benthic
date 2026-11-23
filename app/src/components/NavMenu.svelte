@@ -11,17 +11,18 @@
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
-  import SyncControl from './SyncControl.svelte';
+  import SyncButton from './SyncButton.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, sections, goToSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { BAND_PROFILE } from '../lib/band-profile.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { tolerantTaps } from '../lib/tap.js';
 
   /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
   const icons = { logbook: 'logbook', sites: 'sites', statistics: 'statistics', tools: 'tools' };
 
-  const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+  const PROFILE = BAND_PROFILE;
 
   /** @type {HTMLElement|undefined} */
   let menu = $state();
@@ -123,7 +124,7 @@
     {#if !logbook.loading && !logbook.error}
       <div class="bc-nav-menu--status">
         <!-- The button stays in place while it runs and shows its progress (to-do #2). -->
-        {#if logbook.email}<SyncControl />{/if}
+        {#if logbook.email}<SyncButton />{/if}
         {#if logbook.syncFailure}
           <SyncFailureRow />
         {:else if logbook.conflict && logbook.conflictLater}

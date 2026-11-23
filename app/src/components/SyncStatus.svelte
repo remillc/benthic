@@ -16,7 +16,7 @@
    *   steady?: boolean,
    * }}
    * `live`: announced when it changes; false for the copy in the side menu.
-   * `pending`: changes not sent, for the manual and offline states.
+   * `pending`: changes not sent, for the offline state.
    * `progress`: while syncing, the stage and a determinate bar (to-do #12),
    * in the bottom padding: the line keeps its height (to-do #2).
    * `steady`: room for two lines of text, whatever the state says, so that
@@ -36,7 +36,6 @@
 
   /** @type {Record<string, {icon: 'check'|'offline'|'device'|'sync'|'cloud', text: string, pending: boolean}>} */
   const states = $derived({
-    manual: { icon: 'cloud', text: t('sync.manual', { n: pending }), pending: true },
     syncing: { icon: 'sync', text: t(`sync.syncing${syncFlavour()}`), pending: false },
     // With a known last sync: "Synchronisé il y a 2 min", as the side menu's mock-up says.
     cloud: {

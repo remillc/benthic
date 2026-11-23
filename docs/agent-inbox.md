@@ -6734,7 +6734,7 @@ Tablet, desktop and iPhone are not part of this task. In the done note, say how 
 - **Sites.** Box « Rechercher un site » under the summary, the header's search button and the old open-search overlay are gone on the phone; the summary reads « 1 site correspond à « cole » » while searching, the « à faire » card and the + button give way while a search is typed, the map view comes back when the search is emptied. The full-screen button moves above « Centrer sur ma position » (and above it when a site card is open). On the shared map (« Carte commune ») the box is not shown, as the search looks only through your own sites (choice, the task was silent).
 - **Band profile (point 5).** `BandBackdrop` already draws the faint profile above the wave on the collapsed band; nothing to change in code (the two mock-up boards were the ones to fix).
 
-## [ ] 2026-11-23-340 Sync progress: the header's pale profile becomes the progress line, on every device (replaces the Material 3 wavy bar of `PullProgress`)
+## [x] 2026-11-23-340 Sync progress: the header's pale profile becomes the progress line, on every device (replaces the Material 3 wavy bar of `PullProgress`)
 
 Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `PullProgress.svelte` (todo 88) shows the Material 3 Expressive wavy linear indicator (`LinearWavyProgress`) at the top of the Carnet's list while the app exchanges with the server at start, and an 8 pt bar on iOS. Replace it on **every device** (phone, tablet, desktop, iPhone) by a line drawn on the header's own pale profile. Mock-ups, phone canvas, Android › Carnet et plongées › Liste du carnet:
 - « Carnet, échange avec le serveur au démarrage, progression inconnue : un trait glisse sur la vague · Android »
@@ -6753,6 +6753,8 @@ Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `
 7. **Accessibility**: the line is the `progressbar` (`aria-label` « Synchronisation du carnet », `aria-valuenow` when known); keep announcing the stage, not each percent, as now.
 8. **Collapsed band**: when the band is collapsed during the exchange, the line runs on the collapsed band's profile.
 9. **Every device**: tablet and desktop use their band the same way. Where a device's Carnet header has no band profile (iPhone large title, desktop if it applies), add the same faint profile at the bottom edge of the header and draw the line on it; say in the done note what you did per device. Remove `LinearWavyProgress` from `PullProgress` if nothing else uses it.
+
+**Done (23 November 2026).** No mock-up boards were in the repo (`docs/mockups/` has none of the three « échange avec le serveur » boards): built from the task text. `components/SyncProfileLine.svelte` replaces `PullProgress` (deleted; `LinearWavyProgress` stays, other screens use it). It draws, in the band's pixel space (`lib/band-profile.js` scales the new curve to the box's width and 34 px height, no non-uniform scale), a white 2.5 px round line with the two glows, `pathLength="100"`, `stroke-dasharray`; states and timings in `lib/sync-line.js` (unknown: a 25 % segment slides, 1.6 s linear; known: dash up to the fraction; done: 0.6 s fill, 0.3 s hold, 1.1 s ease-in-out fade; reduced motion: still half-opacity line, no animation, gone at the end; a failed load removes it at once). The line is the `progressbar` (« Synchronisation du carnet », key `sync.progressLine`, `aria-valuenow` once known). The new curve replaces the polyline in every band (BandBackdrop, SectionBand, NavMenu, FirstLaunchBand, FirstLaunchBenthicPlus, WelcomeStartRelease). Per device: Material phone, tablet and desktop narrow layout: on the band's faint profile in `BandBackdrop` (the collapsed band carries it, it lives in the sticky layer); iPhone and iPad (no band): the faint profile is added, in ink, under the header (top of the list, `edge`), only while the exchange runs; desktop wide table: same `edge` profile and line under the header bar. Checks: `tests/app/sync-line.test.mjs`, `tests/app/pull-progress.test.mjs` (rewritten for the line), `node tests/e2e/navigation.mjs --sync-line-only` (new block, `tests/e2e/sync-line.mjs`).
 
 ## [x] 2026-11-23-341 Long press on a dive (phone and tablet): selection mode starts while the finger is still down
 
@@ -6808,7 +6810,7 @@ Check that the app matches on every device (position, divider, icon, texts, the 
 
 **Done (23 November 2026).** Checked in `AccountSheet.svelte` (Android card with divider; iOS group) and `DesktopAccountSheet.svelte`: the row sits right after « Sauvegarde et restauration », subscriber only, hidden when `accountLock.canPair` is false, QR icon, texts and chevron as described. Nothing needed to change (the mock-ups were not compared pixel by pixel).
 
-## [ ] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
+## [x] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
 
 Christian decided this on 23 November 2026. Work in `main`. The diver can no longer choose a manual sync: the logbook (and the account data) always sync automatically, on every device and in every edition.
 
@@ -6819,3 +6821,65 @@ Christian decided this on 23 November 2026. Work in `main`. The diver can no lon
 5. Update `docs/architecture.md` / `docs/system-design.md` where they describe manual sync, and add a line to the release notes (fr and en).
 
 In the done note, list what was removed.
+
+**Done (23 November 2026).** Removed: the `autoSync` setting and its storage (`readAutoSync`, `setAutoSync`, `logbook.autoSync`; the stored `bc.autoSync` is deleted at start); the switch in `Account.svelte` and `DesktopAccountSheet.svelte` (none in `AccountSheet.svelte` or Réglages); the `manual` sync state and its `SyncStatus` line; the account sheet's ⋮ menu and iPhone action sheet; `SyncControl.svelte` and `SplitButton.svelte` (plain `SyncButton` everywhere); the `autoSync` test in `reconnect.js`; the keys `account.autoSync`, `autoSyncText`, `autoSyncOff`, `syncOptions`, `syncGoAuto`, `syncShowPending`, `sync.manual`, `desktopSettings.account.auto`, `autoText` (fr and en). `autoSyncing()` is exported and now returns `syncAllowedOnThisNetwork() && !logbook.browsing`. The account sheet shows « N modifications non envoyées » with a filled « Synchroniser » when the device is offline or on a metered link with changes waiting. Docs: system-design.md and ui-specification.md updated; release note added (fr, en).
+
+## [ ] 2026-11-23-347 « Profil » becomes a main navigation entry (Benthic+), with its own home page; « Mon profil de plongeur » leaves the account sheet
+
+Christian approved this on 23 November 2026. Work in `main`. The diver profile (equipment, kits, maintenance, certifications and documents, information) moves out of the account sheet into the main navigation, **after Sites**, on every device. It exists only for Benthic+ subscribers: for a free account the entry is absent (the red « B+ » circles in the mock-ups are annotations, task 333).
+
+Mock-ups (the reference for the navigation; the other boards still show the older 4-entry navigation and are not to be followed on that point):
+- phone: « Profil de plongeur, page d’accueil de la section (Benthic+) · Android » (block Android › Profil (Benthic+)), and « Proposition · barre de navigation avec Profil (Benthic+) · Android »;
+- iPhone: the profile home in iPhone › Profil (Benthic+) (5th tab « Profil » after Sites);
+- tablet: the profile home in Tablette Android › Profil (Benthic+) (rail item « Profil » after Sites);
+- desktop: « Bureau · Profil (Benthic+) » home (rail item « Profil » after Sites).
+
+1. **Navigation entry.** Label « Profil », person silhouette icon (head and shoulders). Android bottom bar: 5 destinations (Carnet, Sites, Profil, Statistiques, Outils); iPhone tab bar: Profil after Sites; tablet and desktop rail: Profil after Sites. Active state as the other entries.
+2. **Badge.** A red badge with the number of maintenance items that need attention (overdue + due soon, the same count as the « Entretien » row's badge on the profile home; « 2 » in the mock-ups). No badge at 0.
+3. **Profile home page** (the section's first page, `/profile`): title « Profil de plongeur », no back arrow / back link (it is a top-level destination). Identity card (avatar, name, dive count, Benthic+ chip), the red « Fiche d’urgence » card (phone and iPhone), then « Ce que vous gardez ici »: Équipement, Entretien (with its badge), Brevets et documents, Informations. Under Informations the line « Chiffré de bout en bout » with a lock. The old footnote « Gardé sur votre compte Benthic+… » (with its icon) is removed. Tablet and desktop: list on the left, the selected page on the right (Informations by default), as drawn.
+4. **Account sheet.** Remove the « Mon profil de plongeur » row (and its maintenance line and badge) from every account sheet; the sheet keeps « Sauvegarde et restauration » and « Jumeler un nouvel appareil » (tasks 338, 345). Mock-ups updated: « Feuille du compte, abonné (Benthic+) · Android » (renamed), the iPhone, tablet and desktop subscriber sheets.
+5. Links that opened the profile from elsewhere (maintenance notifications, reminders, the emergency sheet shortcut…) now open the Profil destination with the right page selected.
+6. Free account: no Profil entry, no profile pages reachable; the Benthic+ offer stays where it is today.
+
+In the done note, list the devices and files changed, and say what the badge counts in code.
+
+## [ ] 2026-11-23-348 Pairing starts by itself at sign-in on a device without the data key, says where to go on the other device, and can be restarted (TODO #180, #182)
+
+Christian approved this on 23 November 2026. Work in `main`. Note: the pairing **method** (QR code) will be replaced by an approval with a verification code in a next task (#183); build what follows so that only the « how » changes later.
+
+1. **Automatic step at sign-in (#182).** When a diver signs in to the Benthic server for the first time on a device that has no data key while the account has one (`keys/account.json`, `MISSING_DATA_KEY`), the pairing step starts by itself, right after the logbook download and before « Votre carnet est prêt ». Phone mock-up: « Benthic+, jumeler cet appareil à la connexion (Benthic+) · Android » (page Pour commencer, Benthic+ group): title « Jumeler cet appareil », the reason, a card « Sur votre autre appareil » with three numbered steps, « Lire le code » (filled), « Saisir la clé de secours » (outlined), « Plus tard » (text), and « Le reste du compte se synchronise déjà. Vous pourrez jumeler plus tard depuis Compte. ». Tablet and desktop: the « Déverrouiller vos données chiffrées » dialog opens by itself at that moment.
+2. **Where to find the code (#180.1).** In « Déverrouiller vos données chiffrées » (all devices), the pairing row's second line reads « Sur l’autre appareil : Compte › Jumeler un nouvel appareil » (phone and tablet), and the note under the rows reads « En attendant, le reste du compte se synchronise. Vous pourrez jumeler plus tard depuis Compte. ».
+3. **Restart later (#180.2).** While the encrypted data is locked on this device, the account sheet shows a row « Jumeler cet appareil » (lock icon, second line « Données chiffrées verrouillées sur cet appareil » in the warning colour #8A5A00) in place of « Jumeler un nouvel appareil ». It opens the pairing step again. Mock-ups: « Feuille du compte, données chiffrées verrouillées (Benthic+) » on phone, tablet and desktop. The « Verrouillé : jumelez cet appareil » card of the profile keeps its two buttons.
+
+## [ ] 2026-11-23-349 Pairing without a QR code: an approval with a verification code (TODO #183; replaces the QR pairing of tasks 338 and 348)
+
+Christian decided this on 23 November 2026. Work in `main`. The QR pairing (338 items 2, 7 and 8; 348's « Lire le code ») is replaced on every device by a request approved on an already paired device, checked with a 6-digit code. No camera; the same path on phone, tablet and desktop. The recovery key stays. Mock-ups: block « Synchronisation du compte (Benthic+) » on each canvas, groups « Nouvel appareil », « Demande d’accès, nouvel appareil » and « Demande d’accès, appareil jumelé »; phone sign-in step « Benthic+, jumeler cet appareil à la connexion (Benthic+) · Android ». The QR boards were deleted.
+
+**Crypto (update `docs/account-sync.md`, section « The data key on a second device »).** The new device makes an ephemeral ECDH P-256 key pair and posts a pairing request through the server (on the `benthic` branch, `keys/requests/<id>.json`: device name, public key, created, expires after 10 minutes). A paired device reads it, derives the shared secret, wraps the account key to it (ECDH, HKDF, AES-GCM, WebCrypto) and commits `keys/pairing/<id>.json`; the new device unwraps and deletes both files. The **verification code** is 6 digits derived on both sides from the hash of both public keys (so a server or anyone else who swaps a key gets a different code). The key is never on the server in clear. A refused or expired request is deleted.
+
+**New device**
+1. Sign-in step (phone page; tablet and desktop: the « Déverrouiller vos données chiffrées » dialog, opened by itself, task 348): « Jumeler cet appareil », the reason, « Vos appareils jumelés » with each paired device's name and when it was last seen, the line « La demande s’affiche sur ces appareils, même si Benthic y est fermé. Il suffit de l’approuver sur l’un d’eux. », « Demander l’accès » (filled), « Saisir la clé de secours » (outlined), « Plus tard ».
+2. In « Déverrouiller vos données chiffrées », the first row reads « Demander l’accès à un appareil jumelé », second line « À approuver sur <names> »; the note: « La demande s’affiche sur vos appareils jumelés. En attendant, le reste du compte se synchronise ; vous pourrez jumeler plus tard depuis Compte. ».
+3. « Demande d’accès envoyée »: the names, the 6-digit code large (« 482 913 », monospace, grouped by 3) labelled « Code de vérification », « En attente d’une réponse… » with the wavy indicator, « La demande expire dans … », « Annuler ».
+4. « Demande refusée » (« L’accès … a été refusé sur « <name> ». Rien n’a été partagé. ») and « Demande expirée » (« Aucun appareil jumelé n’a répondu à temps… »), each with « Fermer » and « Nouvelle demande ».
+5. Approved: « Appareil jumelé » (as before).
+
+**Paired device**
+6. The request reaches every paired device of the account: a **system notification** when the app is in the background or closed (« Donner accès à « <name> » ? », « Code de vérification 482 913. Touchez pour répondre. »; push through the server, or the next sync if push is not available yet: say which in the done note), and the dialog when the app is open.
+7. Dialog « Donner accès à « <name> » ? »: « Cet appareil demande à lire votre profil, vos brevets et vos documents chiffrés. Vérifiez qu’il affiche le même code. », the same code, « Les codes sont différents » (text button, own line), « Refuser », « Autoriser ». Only one paired device needs to answer; the others close their dialog.
+8. « Les codes sont différents »: the request is refused and a dialog says « Demande refusée — Les codes ne correspondaient pas : la demande ne venait peut-être pas de votre appareil. « <name> » n’a pas eu accès, et rien n’a été partagé. » and « Si vous n’avez rien demandé, vérifiez qui peut lire vos courriels : la connexion à Benthic se fait par un code envoyé par courriel. », « OK ».
+9. After « Autoriser »: snackbar « « <name> » a maintenant accès aux données chiffrées. ».
+
+**Removed**
+10. The QR display, the scanner screens, « Lire le code d’un ordinateur », the desktop's « Jumeler cet ordinateur » QR, and the account sheet row « Jumeler un nouvel appareil » (task 345) on every device. While the data is locked, the account sheet keeps « Jumeler cet appareil » (task 348), which now opens step 1.
+
+In the done note, list what was removed and how the request reaches a closed app on each platform.
+
+## [ ] 2026-11-23-350 Addition to task 349: « Plus d’appareil ni de clé ? » where the diver may be stuck
+
+Christian asked for this on 23 November 2026. Work in `main`. A diver can be stuck on a device without the data key while no paired device can answer: the only phone was lost or broken and he signs in on a new one, he reinstalled the app or reset his only device (the key is never backed up off the device), or every device was replaced at once. Without a recovery key, « Repartir sans les données chiffrées » is the only way out, so make it reachable there:
+
+1. Phone sign-in step « Jumeler cet appareil » (mock-up « Benthic+, jumeler cet appareil à la connexion (Benthic+) · Android »): a text button « Plus d’appareil ni de clé ? » under the « Plus tard » note, centred. Tablet and desktop already have it in « Déverrouiller vos données chiffrées ».
+2. « Demande expirée » (task 349 item 4), on every device: the same text button. Phone: on its own line above « Fermer » / « Nouvelle demande »; tablet and desktop: on the left of the button row.
+
+Both open « Repartir sans les données chiffrées » (task 338 item 6), unchanged.

@@ -1,4 +1,5 @@
-// Todo 88: a progress bar while the app exchanges with the server after showing the device's copy.
+// Todo 88 and task 2026-11-23-340: a progress line on the header's profile while the app exchanges with the server after
+// showing the device's copy.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
@@ -6,7 +7,9 @@ import { test } from 'node:test';
 const read = (p) => readFileSync(new URL(`../../app/src/${p}`, import.meta.url), 'utf8');
 const logbook = read('lib/logbook.svelte.js');
 const page = read('pages/Logbook.svelte');
-const bar = read('components/PullProgress.svelte');
+const line = read('components/SyncProfileLine.svelte');
+const backdrop = read('components/BandBackdrop.svelte');
+const band = read('components/SectionBand.svelte');
 
 test('the device copy is shown first, then the pull runs: the flag covers exactly that window', () => {
   // Set when the cached copy is drawn (loading false), before the server's answer is awaited.
@@ -17,14 +20,28 @@ test('the device copy is shown first, then the pull runs: the flag covers exactl
   assert.equal([...logbook.matchAll(/logbook\.pulling = true/g)].length, 1);
 });
 
-test('the Carnet shows the bar only while pulling, with the list on screen', () => {
-  assert.match(page, /\{#if logbook\.pulling && !logbook\.loading && !logbook\.error\}<PullProgress \/>\{\/if\}/);
+test('the Carnet draws the line on its band (Material look) or under its header (iPhone, iPad), not as a bar in the list', () => {
+  // Changed with task 2026-11-23-340: PullProgress (a bar lying over the list) is replaced by the line on the profile.
+  assert.doesNotMatch(page, /PullProgress/);
+  assert.match(page, /<BandBackdrop [^>]*syncLine \/>/);
+  assert.match(page, /<SectionBand [^>]*syncLine=\{theme\.ios\}/);
+  assert.match(backdrop, /\{#if syncLine\}<SyncProfileLine \/>\{\/if\}/);
+  assert.match(band, /\{#if syncLine\}<SyncProfileLine edge \/>\{\/if\}/);
+  // The list shows only while pulling with the list on screen; the line follows that condition.
+  assert.match(line, /logbook\.pulling && !logbook\.loading && !logbook\.error/);
 });
 
-test('Android: the wavy indicator; iPhone: the 8 pt bar; no height taken; the stages feed it', () => {
-  assert.match(bar, /<LinearWavyProgress value=\{fraction\} indeterminate=\{fraction <= 0\} \{label\} \/>/);
-  assert.match(bar, /:global\(\.ios\) & \{\s*height: 8px;/);
-  assert.match(bar, /\.bc-pull-progress \{[^}]*height: 0;/);
-  assert.match(bar, /logbook\.syncProgress\?\.fraction/);
-  assert.doesNotMatch(bar, /#[0-9a-fA-F]{3,6}\b/, 'colours are --bc-* variables');
+test('the line is the progressbar, takes no height, runs on the band profile in pixels, and the stages feed it', () => {
+  assert.match(line, /role="progressbar"/);
+  assert.match(line, /aria-valuenow=\{view\.value\}/);
+  assert.match(line, /pathLength="100"/);
+  assert.match(line, /bandProfileInPixels\(width, HEIGHT\)/);
+  assert.match(line, /stroke-width: 2\.5;/);
+  assert.match(line, /stroke-linecap: round;/);
+  assert.match(line, /drop-shadow\(0 0 3px rgb\(255 255 255 \/ 0\.85\)\) drop-shadow\(0 0 6px rgb\(255 255 255 \/ 0\.45\)\)/);
+  assert.match(line, /animation: bc-sync-line-slide 1\.6s linear infinite/);
+  assert.match(line, /prefers-reduced-motion: reduce/);
+  assert.match(line, /logbook\.syncProgress\?\.fraction/);
+  assert.doesNotMatch(line, /LinearWavyProgress/);
+  assert.doesNotMatch(line, /#[0-9a-fA-F]{3,6}/, 'colours are --bc-* variables');
 });

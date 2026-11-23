@@ -92,7 +92,7 @@ test('the screens, the dialog and the dive menu are wired', () => {
   assert.match(read('lib/backup-nav.js'), /layout\.desktop[\s\S]*navigation\.backupOpen = true/);
   // Browsing holds the core: nothing is saved or synced meanwhile.
   const logbook = read('lib/logbook.svelte.js');
-  assert.match(logbook, /logbook\.autoSync && syncAllowedOnThisNetwork\(\) && !logbook\.browsing/);
+  assert.match(logbook, /return syncAllowedOnThisNetwork\(\) && !logbook\.browsing/);
   assert.match(logbook, /if \(logbook\.browsing\) return \/\*\* @type \{SyncOutcome\} \*\/ \('failed'\)/);
   // Every css class of the screens is prefixed bc- and names its component.
   for (const f of ['BackupMain', 'BackupTimeline', 'BackupVersion', 'BackupDivePick', 'BackupDive', 'BackupDeleted', 'BackupBrowse', 'BackupPanes']) {
