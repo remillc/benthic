@@ -118,7 +118,7 @@ export function createServerApi({ baseUrl, transport }) {
       json = null;
     }
     // A deletion answers with an empty body (204) as well as with a JSON one.
-    if (response.status >= 200 && response.status < 300 && (json || method === 'DELETE')) return json ?? {};
+    if (response.status >= 200 && response.status < 300 && (json || method === 'DELETE' || response.status === 204)) return json ?? {};
     throw errorFromResponse(response.status, json);
   }
 
@@ -222,6 +222,34 @@ export function createServerApi({ baseUrl, transport }) {
      */
     async validationResult(sessionToken, token) {
       return call('POST', '/v1/validations/result', { token }, { Authorization: `Bearer ${sessionToken}` });
+    },
+
+    /**
+     * Registers or refreshes this device's push token (inbox task 2026-11-23-356, part 3): only an access request wakes a
+     * closed app. `deviceId` is the id of the device's `keys/devices/<id>.json` record.
+     * @param {string} sessionToken @param {{ deviceId: string, platform: 'android'|'ios', token: string }} f
+     * @returns {Promise<void>}
+     */
+    async registerPushToken(sessionToken, { deviceId, platform, token }) {
+      await call('POST', '/v1/devices/push-token', { deviceId, platform, token }, { Authorization: `Bearer ${sessionToken}` });
+    },
+
+    /**
+     * Removes this device's push token (sign-out, device unpaired).
+     * @param {string} sessionToken @param {string} deviceId
+     * @returns {Promise<void>}
+     */
+    async removePushToken(sessionToken, deviceId) {
+      await call('DELETE', `/v1/devices/push-token?deviceId=${encodeURIComponent(deviceId)}`, undefined, { Authorization: `Bearer ${sessionToken}` });
+    },
+
+    /**
+     * Ends the session on the server; the tokens registered with it go too.
+     * @param {string} sessionToken
+     * @returns {Promise<void>}
+     */
+    async signOut(sessionToken) {
+      await call('POST', '/v1/auth/sign-out', undefined, { Authorization: `Bearer ${sessionToken}` });
     },
 
     /** @returns {Promise<boolean>} whether the server answers */

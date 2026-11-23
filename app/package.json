@@ -20,6 +20,7 @@
     "@capacitor/local-notifications": "^7.0.7",
     "@capacitor/network": "^7.0.4",
     "@capacitor/preferences": "^7.0.4",
+    "@capacitor/push-notifications": "^7.0.7",
     "@capacitor/share": "^7.0.4",
     "benthic-core": "file:../plugins/benthic-core",
     "framework7": "^9.3.0",

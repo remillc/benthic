@@ -6922,7 +6922,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Correction to task
 
 ## [ ] 2026-11-23-356 Push sync (TODO #185): server notifies devices, no « Synchroniser » button, access requests as push notifications
 
-**Progress: part 2 done in 37e214a6** (no « Synchroniser » button anywhere; parts 1, 3 and 4 are still open).
+**Progress: part 2 done in 37e214a6** (no « Synchroniser » button anywhere). Parts 3 and 4 are built on branch `feature/access-request-notifications` (Android checked on the emulator with a real FCM push; iPhone written by reading, no Mac; the Apple key and Xcode settings are still to do); part 1 is on `feature/push-sync`.
 Christian asked for this on 23 November 2026. Work in `main`. Read TODO #185 in `docs/TODOS.md` first; it goes with #173. Mock-ups are on the canvases (titles below).
 
 **1. Server pushes, devices stop polling.**

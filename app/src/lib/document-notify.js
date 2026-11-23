@@ -8,6 +8,7 @@
 //   « Me le rappeler dans 2 semaines » (the other documents) reminds once more, 2 weeks later.
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { registerActionTypes } from './action-types.js';
 import { diver, loadProfile } from './profile.svelte.js';
 import { settings } from './settings.svelte.js';
 import { documentNotificationPlan, snoozeDay } from './documents.js';
@@ -94,7 +95,7 @@ async function deliver(list) {
   if (Capacitor.getPlatform() === 'android') {
     await LocalNotifications.createChannel({ id: CHANNEL_ID, name: t('docs.notify.channel'), description: t('docs.notify.channelText'), importance: 3, visibility: 1 });
   }
-  await LocalNotifications.registerActionTypes({
+  await registerActionTypes({
     types: [
       { id: TYPE_NEW, actions: [{ id: 'view', title: t('docs.notify.view') }, { id: 'new', title: t('docs.notify.addNew') }] },
       { id: TYPE_SNOOZE, actions: [{ id: 'view', title: t('docs.notify.view') }, { id: 'snooze', title: t('docs.notify.snooze') }] },

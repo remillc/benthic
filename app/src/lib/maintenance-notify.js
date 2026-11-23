@@ -9,6 +9,7 @@
 // The flight reminder is apart (lib/flight-reminder.svelte.js): it comes when the wait ends, not at 9:00.
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { registerActionTypes } from './action-types.js';
 import { setNotificationDeliverer, leadDays, notificationMoment } from './maintenance.js';
 import { gear, scheduleNotifications, evaluations } from './inventory.svelte.js';
 import { settings } from './settings.svelte.js';
@@ -127,7 +128,7 @@ async function deliver(plan) {
     if (Capacitor.getPlatform() === 'android') {
       await LocalNotifications.createChannel({ id: CHANNEL_ID, name: t('maintenance.channel.name'), description: t('maintenance.channel.description'), importance: 3, visibility: 1 });
     }
-    await LocalNotifications.registerActionTypes({
+    await registerActionTypes({
       types: [
         { id: TYPE_DUE, actions: [{ id: 'view', title: t('maintenance.notify.view') }, { id: 'note', title: t('maintenance.notify.note') }] },
         { id: TYPE_LATE, actions: [{ id: 'view', title: t('maintenance.notify.view') }, { id: 'snooze', title: t('maintenance.notify.snooze') }] },

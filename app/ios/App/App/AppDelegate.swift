@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import BenthicCore
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -10,7 +11,60 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Before the end of the launch, or iOS refuses it: resumes an offline map download in the background.
         MapsManager.registerBackgroundTask()
+        registerAccessRequestCategory()
         return true
+    }
+
+    // MARK: - Push notifications of access requests (inbox task 2026-11-23-356)
+    //
+    // The server sends an APNs alert push when a new device asks a paired device for the data key (category ACCESS_REQUEST, thread
+    // access-requests, collapse id = the request id, loc-keys ACCESS_REQUEST_TITLE and ACCESS_REQUEST_BODY of Localizable.strings),
+    // and a background push ({"type": "access-request-done", "requestId": ...}) when it was answered, refused or cleaned up.
+
+    /** The category of the notification, with its one action « Répondre » (it opens the app: no « Autoriser », the code is compared in the app). */
+    private func registerAccessRequestCategory() {
+        let answer = UNNotificationAction(
+            identifier: "answer",
+            title: NSLocalizedString("ACCESS_REQUEST_ACTION", comment: "Answer an access request"),
+            options: [.foreground]
+        )
+        let category = UNNotificationCategory(identifier: "ACCESS_REQUEST", actions: [answer], intentIdentifiers: [], options: [])
+        let center = UNUserNotificationCenter.current()
+        // The categories the web layer registered stay: the list is merged, not replaced (lib/action-types.js does the same).
+        center.getNotificationCategories { existing in
+            var all = existing.filter { $0.identifier != category.identifier }
+            all.insert(category)
+            center.setNotificationCategories(all)
+        }
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // The push plugin turns it into its "registration" event.
+        NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
+    }
+
+    /**
+     * A background push (content-available). « access-request-done »: the request was answered on another device or refused, so its
+     * notification leaves the lock screen and the notification centre. iOS may not wake a force-quit app for it: the notification then
+     * stays until it is touched (the app shows « Cette demande n’existe plus ») or removed by the diver.
+     */
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        guard (userInfo["type"] as? String) == "access-request-done", let requestId = userInfo["requestId"] as? String else {
+            completionHandler(.noData)
+            return
+        }
+        let center = UNUserNotificationCenter.current()
+        center.getDeliveredNotifications { delivered in
+            let ids = delivered
+                .filter { ($0.request.content.userInfo["requestId"] as? String) == requestId || $0.request.identifier == requestId }
+                .map { $0.request.identifier }
+            if !ids.isEmpty { center.removeDeliveredNotifications(withIdentifiers: ids) }
+            completionHandler(ids.isEmpty ? .noData : .newData)
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

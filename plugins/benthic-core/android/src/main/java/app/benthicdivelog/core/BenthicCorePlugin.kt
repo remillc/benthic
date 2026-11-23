@@ -81,6 +81,7 @@ class BenthicCorePlugin : Plugin() {
         CrashReporter.install(context)
         // A file shared with the app before the web layer was up (cold start from « Share to »).
         offerSharedFiles(activity?.intent)
+        offerAccessRequest(activity?.intent)
         // Staged files a killed app left behind (a logbook can be 100 MB): those older than half a day go.
         Thread {
             val limit = System.currentTimeMillis() - 12L * 3600 * 1000
@@ -2144,6 +2145,39 @@ class BenthicCorePlugin : Plugin() {
     override fun handleOnNewIntent(intent: Intent) {
         super.handleOnNewIntent(intent)
         offerSharedFiles(intent)
+        offerAccessRequest(intent)
+    }
+
+    /**
+     * The notification of an access request was touched (AccessRequestNotifier): its intent carries the request id. It goes to the web
+     * layer as the "accessRequestOpened" event ({requestId}), kept until a listener exists (cold start), and is removed from the
+     * intent so that a restart of the activity does not open the request again.
+     */
+    private fun offerAccessRequest(intent: Intent?) {
+        val id = intent?.getStringExtra(AccessRequestNotifier.EXTRA_REQUEST_ID) ?: return
+        intent.removeExtra(AccessRequestNotifier.EXTRA_REQUEST_ID)
+        notifyListeners("accessRequestOpened", JSObject().put("requestId", id), true)
+    }
+
+    /**
+     * Opens the system's notification settings for Benthic (the app's notification page), where the diver turns notifications back
+     * on after refusing them. Falls back to the app's details page.
+     */
+    @PluginMethod
+    fun openNotificationSettings(call: PluginCall) {
+        try {
+            val intent = Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.packageName)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (e2: Exception) {
+                Log.w(TAG, "Opening the notification settings", e2)
+            }
+        }
+        call.resolve()
     }
 
     /**

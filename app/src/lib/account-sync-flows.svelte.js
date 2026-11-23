@@ -14,6 +14,7 @@ import { createRecoveryKey, recoverAccountKey, startOver } from './account-keys.
 import { isKeyPath } from './account-sync.js';
 import { adoptAndReseal as adopt, approveRequest, cancelRequest, checkAnswer, clearAnswer, declineRequest, dropOwnDeviceRecord, finishPairing, ownDeviceId, pairedDevices, pendingRequests, requestAccess, touchDeviceRecord } from './account-pairing.js';
 import { notifyAccessRequest } from './access-request-notify.js';
+import { ensurePushRegistered, pushClient, removePushToken, wirePush } from './push-notifications.svelte.js';
 import { currentDeviceKind, platformOf } from './device-name.js';
 import { showTwoDeviceNotice } from './two-device-notice.js';
 import { accountLock } from './locked-data.svelte.js';
@@ -162,6 +163,12 @@ const dismissed = new Set();
 /** How often a paired device looks for requests while the app is open and in front. */
 export const REQUEST_POLL_MS = 15000;
 
+wirePush({
+  deviceId: async () => ownDeviceId({ store: accountDataDeps().store }),
+  open: (id) => void wantRequest(id),
+  arrived: () => void refreshRequests({ network: true }),
+});
+
 /** This device's name as the other devices read it. */
 const ownName = () => t(`accountSync.device.${currentDeviceKind()}`);
 
@@ -177,6 +184,7 @@ const known = new Set();
 /**
  * Looks for requests: on the server (`network`) or in the working copy the last run left (no network). Never throws.
  * @param {{ network: boolean }} how
+ * @returns {Promise<boolean>} false when the look failed (the list is then left as it was)
  */
 export async function refreshRequests({ network }) {
   try {
@@ -184,12 +192,15 @@ export async function refreshRequests({ network }) {
     const list = await pendingRequests(keys);
     const hidden = typeof document !== 'undefined' && document.visibilityState === 'hidden';
     for (const r of list) {
-      if (!known.has(r.id) && hidden) void notifyAccessRequest(r);
+      // A device that has a push token is told by the system itself, even when closed: no second notification.
+      if (!known.has(r.id) && hidden && !pushClient.registered()) void notifyAccessRequest(r);
       known.add(r.id);
     }
     setRequests(list);
+    return true;
   } catch (e) {
     if (codeOf(e) !== 'UNREACHABLE' && codeOf(e) !== 'NO_WORKING_COPY') console.warn('Looking for access requests', e);
+    return false;
   }
 }
 
@@ -215,6 +226,8 @@ export async function touchDevice() {
   try {
     const { store, box } = accountDataDeps();
     await touchDeviceRecord({ store, box, name: ownName(), platform: platformOf(currentDeviceKind()), commitKeyFiles: commitPairingFiles, fetchKeys: fetchAccountKeys });
+    // The record has its id: this device's push token can be sent under it (never waited for, never fatal).
+    void ensurePushRegistered();
   } catch (e) {
     console.warn('Writing this device’s record', e);
   }
@@ -222,6 +235,8 @@ export async function touchDevice() {
 
 /** A device that does not hold the account key removes the record an earlier run wrote for it. Never throws. */
 export async function dropDeviceRecord() {
+  // Without the key a push is of no use: the token leaves the server too.
+  removePushToken();
   try {
     const { store } = accountDataDeps();
     await dropOwnDeviceRecord({ store, commitKeyFiles: commitPairingFiles, fetchKeys: fetchAccountKeys });
@@ -245,11 +260,31 @@ export async function refreshDevices() {
   }
 }
 
-/** The request to show now: the newest one the diver has not put aside. */
-export const requestDue = () => accountFlow.requests.find((r) => !dismissed.has(r.id)) ?? null;
+/** The request a touched notification names: shown as soon as it is known, even if the diver put it aside before. */
+let wanted = '';
+
+/**
+ * A system notification of an access request was touched (inbox task 2026-11-23-356, part 3): the request is looked for at once
+ * and put in front of the diver (the approval dialog) as soon as this device can answer it; a request that is already answered
+ * or expired says so.
+ * @param {string} id
+ */
+export async function wantRequest(id) {
+  wanted = id;
+  dismissed.delete(id);
+  const looked = await refreshRequests({ network: true });
+  if (looked && wanted === id && !accountFlow.requests.some((r) => r.id === id)) {
+    wanted = '';
+    say('accountSync.pair.requestGone');
+  }
+}
+
+/** The request to show now: the one a notification named, else the newest one the diver has not put aside. */
+export const requestDue = () => (wanted ? accountFlow.requests.find((r) => r.id === wanted) : null) ?? accountFlow.requests.find((r) => !dismissed.has(r.id)) ?? null;
 
 /** @param {{ id: string, deviceName: string, code: string }} request */
 export function askApproval(request) {
+  if (wanted === request.id) wanted = '';
   accountFlow.requestId = request.id;
   accountFlow.deviceName = request.deviceName;
   accountFlow.code = request.code;

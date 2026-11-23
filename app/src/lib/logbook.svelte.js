@@ -29,6 +29,7 @@ import { loadBenthicPlusAccount, benthicPlusAccount, benthicPlusSubscriber, setB
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 import { signalAccountData } from './account-sync-signal.js';
+import { signOutPush } from './push-notifications.svelte.js';
 
 /** @typedef {import('benthic-core').Dive} Dive */
 /** @typedef {import('benthic-core').Prefs} Prefs */
@@ -964,7 +965,11 @@ export async function startApp() {
 export async function signOut({ deleteCopy = false } = {}) {
   await BenthicCore.signOut({ deleteCopy });
   // The Benthic server's session goes with the logbook that was connected through it (the tokens are erased).
-  if (logbook.benthicPlus || benthicPlusAccount.signedIn) await BenthicCore.serverSessionClear();
+  if (logbook.benthicPlus || benthicPlusAccount.signedIn) {
+    // The server ends the session and drops this device's push tokens (never waited for long, never fatal).
+    await signOutPush();
+    await BenthicCore.serverSessionClear();
+  }
   setBenthicPlusAccount({ signedIn: false });
   forgetAccount(true);
 }

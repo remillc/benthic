@@ -135,6 +135,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "grantShareFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "exportDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "htmlToPdf", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "openNotificationSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "mapsFreeSpace", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "mapsTilesStart", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "mapsDownloadPause", returnType: CAPPluginReturnPromise),
@@ -1500,6 +1501,23 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
     /// An integer of the call, whatever form the bridge gives it; nil when absent or not a number.
     private func number(_ call: CAPPluginCall, _ key: String) -> Double? {
         (call.options[key] as? NSNumber)?.doubleValue
+    }
+
+    /// Opens the system's notification settings for Benthic (iOS 16 and later: the app's notification page; before: the app's page in
+    /// Settings), where the diver turns notifications back on after refusing them (inbox task 2026-11-23-356, part 4).
+    @objc func openNotificationSettings(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            let address: String
+            if #available(iOS 16.0, *) {
+                address = UIApplication.openNotificationSettingsURLString
+            } else {
+                address = UIApplication.openSettingsURLString
+            }
+            if let url = URL(string: address) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+            call.resolve()
+        }
     }
 
     @objc func mapsFreeSpace(_ call: CAPPluginCall) {

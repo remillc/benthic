@@ -1054,6 +1054,9 @@ export class BenthicCoreDesktop extends WebPlugin {
 
   // --- Offline maps: the downloads are an Android feature for now ---
 
+  /** The desktop has no push notification: nothing to open. */
+  async openNotificationSettings() {}
+
   async mapsFreeSpace() {
     return { freeBytes: 0, totalBytes: 0 };
   }

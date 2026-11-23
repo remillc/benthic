@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -199,6 +200,12 @@
             </intent-filter>
 
         </activity>
+
+        <!-- The push plugin's service shows nothing for a data message: Benthic's own (BenthicMessagingService, in the plugin) takes
+             its place and extends it, so that the token still reaches the web layer. -->
+        <service
+            android:name="com.capacitorjs.plugins.pushnotifications.MessagingService"
+            tools:node="remove" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

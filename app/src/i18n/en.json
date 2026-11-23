@@ -770,6 +770,7 @@
     "groups": {
       "notifyDocuments": "Certifications and documents",
       "notifyDive": "After the dive",
+      "notifyDevices": "Your devices",
       "notifyMaintenance": "Equipment maintenance",
       "language": "Language and formats",
       "units": "Units",
@@ -2786,6 +2787,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "New device access: Benthic can notify you, even when closed, when a new device asks for access to your encrypted data (Benthic+, phone and tablet). The notification shows the code to compare; touching it opens the request, and it disappears once the request is answered or expires. The permission is asked once, with an explanation; Settings › Notifications shows \"Your devices\" and, when the system refuses notifications, a banner with a button to the system settings.",
       "Account: no « Sync » button anywhere (account sheet, Account, side menu, desktop). The state stays, with a second line: « Synced 2 min ago » and « Automatic, as soon as a change is made », or « 3 changes not sent » and « Sent automatically when the network is back »; on tablet the state is the third line under the account.",
       "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
@@ -4858,6 +4860,7 @@
       "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive or WebDAV",
       "git": "In a git repository",
       "gitHelp": "Your own repository · full history of changes",
+      "answer": "Answer",
       "continue": "Continue",
       "cancel": "Cancel",
       "back": "Back",
@@ -6907,6 +6910,21 @@
     }
   },
   "accountSync": {
+    "push": {
+      "askTitle": "Get notified of access requests",
+      "askText": "When a new device asks for access to your encrypted data, Benthic notifies you on this device, even when it is closed. You compare the code and answer.",
+      "askNote": "The Benthic server sends no other notification.",
+      "later": "Later",
+      "continue": "Continue",
+      "requests": "Access requests from a new device",
+      "requestsIos": "Access requests",
+      "requestsText": "Always on: without them, a new device cannot be paired while Benthic is closed here.",
+      "always": "Always",
+      "refusedTitle": "Notifications are off for Benthic",
+      "refusedText": "Access requests from a new device and reminders will only appear when the app is open.",
+      "openAndroid": "Open Android settings",
+      "openIos": "Open iPhone Settings"
+    },
     "unlock": {
       "title": "Unlock your encrypted data",
       "pair": "Ask a paired device for access",
