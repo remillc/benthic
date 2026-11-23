@@ -80,8 +80,10 @@
       "icon": "resources/icon-round.png"
     },
     "appx": {
-      "identityName": "Benthic",
-      "publisherDisplayName": "Christian Rémillard"
+      "identityName": "ChristianRmillard.BenthicDiveLog",
+      "publisher": "CN=0457F4C1-2E4C-4893-918E-AC855EEC6340",
+      "publisherDisplayName": "Christian Rémillard",
+      "displayName": "Benthic – Dive Log"
     },
     "mac": {
       "target": [
