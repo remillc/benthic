@@ -163,9 +163,11 @@ function mergeMaintenance(base, ours, theirs) {
   const value = /** @type {Record<string, any>} */ (merged.value);
   const preferOurs = String(ours.updatedAt ?? '') >= String(theirs.updatedAt ?? '');
   const history = mergeHistory(base?.history, ours.history, theirs.history, preferOurs);
-  if (history.length || Array.isArray(ours.history) || Array.isArray(theirs.history)) value.history = history;
-  if (history.length) value.lastDoneOn = history[0].doneOn;
-  return { value, conflicts: merged.conflicts };
+  const hasHistory = history.length || Array.isArray(ours.history) || Array.isArray(theirs.history);
+  return {
+    value: { ...value, ...(hasHistory ? { history } : {}), ...(history.length ? { lastDoneOn: history[0].doneOn } : {}) },
+    conflicts: merged.conflicts,
+  };
 }
 
 /**

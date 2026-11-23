@@ -326,10 +326,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
       const known = new Set((r.history ?? []).map(entryKey));
       const history = [...(r.history ?? []), ...(l.history ?? []).filter((/** @type {any} */ h) => !known.has(entryKey(h)))]
         .sort((a, b) => (a.doneOn < b.doneOn ? 1 : a.doneOn > b.doneOn ? -1 : a.id < b.id ? -1 : 1));
-      if (history.length) {
-        merged.history = history;
-        merged.lastDoneOn = history[0].doneOn;
-      }
+      if (history.length) Object.assign(merged, { history, lastDoneOn: history[0].doneOn });
       merged.updatedAt = equal({ ...merged, updatedAt: '' }, { ...r, updatedAt: '' }) ? r.updatedAt : stamp();
       finalFiles.set(pathOf('maintenance', r), merged);
       dropLocal.add(pathOf('maintenance', l.$original));
