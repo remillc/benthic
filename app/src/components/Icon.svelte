@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   name: 'logbook'|'sites'|'profile'|'pinOff'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe'|'trip'|'export'|'columns'|'idCard'|'briefcase'|'phone'|'cloudDownload'|'plusMark'|'bell'|'history'|'trash'|'book'|'cloudCheck'|'archive'|'wrench'|'notebook'|'seal',
+   *   name: 'logbook'|'sites'|'profile'|'pinOff'|'statistics'|'tools'|'plus'|'copy'|'check'|'checkCircle'|'offline'|'device'|'computer'|'desktop'|'expand'|'settings'|'edit'|'more'|'moreCircle'|'plan'|'menu'|'sync'|'close'|'download'|'file'|'account'|'personAdd'|'login'|'logout'|'wristComputer'|'cloud'|'warning'|'lock'|'blank'|'locate'|'fullscreen'|'exitFullscreen'|'place'|'search'|'git'|'openInNew'|'filter'|'info'|'error'|'visibility'|'visibilityOff'|'refresh'|'delete'|'chevron'|'bluetooth'|'bluetoothOff'|'merge'|'split'|'ungroup'|'remove'|'arrowRight'|'arrowBack'|'arrowUp'|'arrowDown'|'undo'|'redo'|'renumber'|'tripRemove'|'mail'|'desaturation'|'depthGauge'|'bestMix'|'blender'|'tune'|'simplifyProfile'|'share'|'image'|'document'|'map'|'calendar'|'clock'|'keyboard'|'camera'|'link'|'lightbulb'|'plane'|'qr'|'cloudUpload'|'tablet'|'folderDownload'|'server'|'upload'|'globe'|'trip'|'export'|'columns'|'idCard'|'briefcase'|'phone'|'cloudDownload'|'plusMark'|'bell'|'history'|'trash'|'book'|'cloudCheck'|'archive'|'wrench'|'notebook'|'seal'|'key',
    *   size?: number,
    *   weight?: number,
    * }}
@@ -154,6 +154,13 @@
     settings: 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z',
   };
 
+  // Material Symbols glyphs (outlined, weight 400, viewBox 0 -960 960 960, filled with currentColor): the rule of
+  // docs/system-design.md, section 8, « Icons ». The recovery key is the first one (task 2026-11-23-352).
+  /** @type {Record<string, string>} */
+  const symbols = {
+    key: 'M280-400q-33 0-56.5-23.5T200-480q0-33 23.5-56.5T280-560q33 0 56.5 23.5T360-480q0 33-23.5 56.5T280-400Zm0 160q-100 0-170-70T40-480q0-100 70-170t170-70q67 0 121.5 33t86.5 87h352l120 120-180 180-80-60-80 60-85-60h-47q-32 54-86.5 87T280-240Zm0-80q56 0 98.5-34t56.5-86h125l58 41 82-61 71 55 75-75-40-40H435q-14-52-56.5-86T280-640q-66 0-113 47t-47 113q0 66 47 113t113 47Z',
+  };
+
   // Lines drawn over the shape: when a filled icon is wanted (the active drawer row), the
   // shape is filled and these stay visible in the background colour.
   /** @type {Record<string, string>} */
@@ -164,6 +171,11 @@
 
 <!-- The dots of ⋮ are drawn by round caps: below a 4 px stroke they shrink to faint specks, so a
      component's own stroke width never applies to them (task 2026-11-14-136). -->
+{#if symbols[name]}
+  <svg class="bc-icon" width={size} height={size} viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true" focusable="false">
+    <path d={symbols[name]} />
+  </svg>
+{:else}
 <svg
   class="bc-icon"
   width={size}
@@ -181,6 +193,7 @@
   <path d={paths[name]} />
   {#if accents[name]}<path class="bc-icon--accent" d={accents[name]} />{/if}
 </svg>
+{/if}
 
 <style>
   @layer bc.components {

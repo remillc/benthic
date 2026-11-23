@@ -33,7 +33,7 @@
       </span>
     </button>
     <button type="button" class="bc-unlock-dialog--row" data-row="recovery-key" onclick={onrecoverykey}>
-      <Icon name="keyboard" size={24} />
+      <Icon name="key" size={24} />
       <span class="bc-unlock-dialog--texts">
         <span class="bc-unlock-dialog--label">{t('accountSync.unlock.recoveryKey')}</span>
       </span>

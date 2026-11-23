@@ -5,6 +5,7 @@
   // `error` is the key module's answer (« wrong ») shown under the field after `onrecoverykey` was refused. `busy` while the
   // key is tried.
   import Md3Dialog from './Md3Dialog.svelte';
+  import Icon from './Icon.svelte';
   import TextField from './TextField.svelte';
   import { t } from '../lib/i18n.js';
   import { normalizeRecoveryKey, recoveryKeyProblem } from '../lib/account-sync-screens.js';
@@ -37,6 +38,7 @@
 </script>
 
 <Md3Dialog title={t('accountSync.key.enterTitle')} class="bc-recovery-enter" {oncancel}>
+  {#snippet icon()}<span class="bc-recovery-key-icon" style="color: var(--bc-secondary)"><Icon name="key" size={32} /></span>{/snippet}
   <form class="bc-recovery-enter--body" onsubmit={(e) => (e.preventDefault(), submit())}>
     <div class="bc-recovery-enter--field" onfocusout={() => (touched = !!value)}>
       <TextField label={t('accountSync.key.field')} bind:value {oninput} invalid={!!message} supporting={message || t('accountSync.key.hint')} autocomplete="off" />

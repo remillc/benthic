@@ -292,6 +292,11 @@
     --bc-code-border: #75787C;
     --bc-code-error: #B3261E;
     /* The window without a logbook (task 2026-11-16-242): the filled action of its dialog, the blue of the panel. */
+    /* The Bluetooth states of the download (task 2026-11-23-351 and 353): the disc behind the white icon, and the filled button. Fixed, light and dark. */
+    --bc-bluetooth-disc: #1F5C99;
+    --bc-on-bluetooth-disc: #FFFFFF;
+    --bc-bluetooth-action: #114477;
+    --bc-on-bluetooth-action: #FFFFFF;
     --bc-start-fill: #1F5C99;
     --bc-on-start-fill: #FFFFFF;
     --bc-start-hover: rgb(31 33 36 / 0.06);

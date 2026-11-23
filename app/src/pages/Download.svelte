@@ -440,7 +440,7 @@
 
   {#snippet bluetoothState()}
     <div class="bc-download--state">
-      <div class="bc-download--state-icon" aria-hidden="true"><Icon name="bluetooth" size={32} /></div>
+      <div class="bc-download--state-icon" aria-hidden="true"><Icon name="bluetooth" size={36} weight={2} /></div>
       <h1>{t(`download.${phase}.title`)}</h1>
       <p>{t(`download.${phase}.text`)}</p>
       <div class="bc-download--state-actions">
@@ -450,7 +450,7 @@
           <button type="button" class="bc-text-button" onclick={askPermission}>{t('download.denied.again')}</button>
           <button type="button" class="bc-download--filled" onclick={() => BenthicCore.openAppSettings()}>{t('download.denied.button')}</button>
         {:else if phase === 'off'}
-          <button type="button" class="bc-download--filled" onclick={turnOn}>{t('download.off.button')}</button>
+          <button type="button" class="bc-download--filled bc-download--filled-blue" onclick={turnOn}>{t('download.off.button')}</button>
         {/if}
       </div>
     </div>
@@ -1150,8 +1150,17 @@
       }
     }
 
+    /* The same on every device: the white icon centred in a 72 dp blue disc, whatever the state. */
     .bc-download--state-icon {
-      color: var(--bc-text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: var(--bc-bluetooth-disc);
+      color: var(--bc-on-bluetooth-disc);
     }
 
     .bc-download--state-actions {
@@ -1182,6 +1191,12 @@
         font-size: 17px;
         font-weight: 600;
       }
+    }
+
+    /* « Activer le Bluetooth »: the blue filled button on every device (task 2026-11-23-353). */
+    .bc-download--filled-blue {
+      background: var(--bc-bluetooth-action);
+      color: var(--bc-on-bluetooth-action);
     }
 
     @keyframes bc-download-spin {

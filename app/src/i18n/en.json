@@ -2786,6 +2786,9 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
+      "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
+      "First launch: the light rays of the blue band are always four, scaled to the width of the band, on tablet and computer as on the phone.",
       "Account: no « Sync » button anywhere (account sheet, Account, side menu, desktop). The state stays, with a second line: « Synced 2 min ago » and « Automatic, as soon as a change is made », or « 3 changes not sent » and « Sent automatically when the network is back »; on tablet the state is the third line under the account.",
       "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",

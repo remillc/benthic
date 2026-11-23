@@ -22,6 +22,7 @@
 </script>
 
 <Md3Dialog title={t('accountSync.key.showTitle')} text={t('accountSync.key.showText')} class="bc-recovery-show" oncancel={() => {}}>
+  {#snippet icon()}<span class="bc-recovery-key-icon" style="color: var(--bc-secondary)"><Icon name="key" size={32} /></span>{/snippet}
   <div class="bc-recovery-show--body">
     <p class="bc-recovery-show--key" aria-label={t('accountSync.key.label')}>
       {#each groups as group, i (i)}<span class="bc-recovery-show--group">{group}</span>{' '}{/each}
