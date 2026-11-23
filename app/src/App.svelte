@@ -414,6 +414,12 @@
     void import('./lib/account-sync.svelte.js').then((m) => m.startAccountSync()).catch((e) => console.error('Account data sync', e));
   });
 
+  // The push channel (to-do #185): the server says when there is something new, so the syncs above run at once; they stay as the fallback.
+  $effect(() => {
+    if (!isRelease || sideWindow || !benthicPlusAccount.signedIn || logbook.loading || logbook.welcome || logbook.error) return;
+    void import('./lib/push-sync.svelte.js').then((m) => m.startPushSync()).catch((e) => console.error('Push channel', e));
+  });
+
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
   $effect(() => {
     document.documentElement.classList.toggle('bc-bottom-nav-on', bottomNav() && navigation.atRoot);

@@ -6,6 +6,7 @@
 // The pairing files, the recovery key and the account key reach the server as commits on the `benthic` branch
 // (`commitAccountKeyFiles`); the keys themselves are held by the box (`adoptAccountKey`), and made the device's own only after the
 // local sealed items are sealed again (`persistAccountKey`), so that a crash in between loses nothing.
+import { pushLive, onPushLive } from './push-state.js';
 import { t } from './i18n.js';
 import { showSnackbar } from './snackbar.js';
 import { deviceStore } from './device-store.js';
@@ -201,10 +202,18 @@ export async function refreshRequests({ network }) {
 export function watchRequests() {
   const look = () => void refreshRequests({ network: true });
   look();
-  const timer = setInterval(look, REQUEST_POLL_MS);
+  // While the push channel is live the server says when a request comes (a `changed` on the account branch looks at once,
+  // lib/push-sync.svelte.js): the 15 s polling rests, and is back as soon as the channel drops (with one look at once).
+  const timer = setInterval(() => {
+    if (!pushLive()) look();
+  }, REQUEST_POLL_MS);
+  const offLive = onPushLive((live) => {
+    if (!live) look();
+  });
   if (typeof document !== 'undefined') document.addEventListener('visibilitychange', look);
   return () => {
     clearInterval(timer);
+    offLive();
     if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', look);
     setRequests([]);
   };

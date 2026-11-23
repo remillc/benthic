@@ -154,7 +154,7 @@ export function createAccountSyncRunner({ engine, state, allowed, afterRun, now 
     state,
     /**
      * Something asked for a sync.
-     * @param {'start'|'edit'|'dives'|'resume'|'network'} kind
+     * @param {'start'|'edit'|'dives'|'resume'|'network'|'push'} kind
      */
     trigger(kind) {
       if (!allowed({ manual: false })) return;

@@ -80,6 +80,20 @@ export function startAccountSync() {
   r.trigger('start');
 }
 
+/**
+ * The account branch's head this device has applied (`meta/sync.json`), '' when none: the push channel compares the server's
+ * head with it (lib/push-sync.svelte.js).
+ */
+export async function accountLocalHead() {
+  const { store } = accountDataDeps();
+  return (await store.read('meta/sync.json'))?.head ?? '';
+}
+
+/** The server says the account branch moved (push channel): the same run as any automatic one, gated the same way. */
+export function triggerAccountSyncFromPush() {
+  build().runner.trigger('push');
+}
+
 /** « Synchroniser maintenant »: at once, whatever the connection setting says. */
 export function syncAccountNow() {
   return build().runner.syncNow();
