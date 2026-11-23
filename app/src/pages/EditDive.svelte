@@ -9,6 +9,7 @@
   // whose text changed are sent; Save applies one undoable step, saves
   // locally and closes; Undo is offered.
   import { onMount, tick } from 'svelte';
+  import { currentDiveId, liveDiveId, onDiveIdsRenumbered } from '../lib/dive-ids.js';
   import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { BenthicCore } from 'benthic-core';
@@ -210,9 +211,25 @@
     };
   }
 
+  // The core read the log again while this form is open (a change from another device): the form keeps what was typed and
+  // saves against the dive's new id; a dive deleted on the other device closes the form.
+  onMount(() =>
+    onDiveIdsRenumbered(() => {
+      if (!dive) return;
+      const now = currentDiveId(dive.id);
+      if (now === dive.id) return;
+      if (now === null) {
+        toast(t('detail.deletedElsewhere'));
+        leave();
+        return;
+      }
+      dive = { ...dive, id: now };
+    }),
+  );
+
   onMount(async () => {
     try {
-      const d = await BenthicCore.getDive({ id: Number(f7route.params.id) });
+      const d = await BenthicCore.getDive({ id: liveDiveId(Number(f7route.params.id)) });
       // Release edition: the inventory is read before the form shows (it awaits).
       if (isRelease) {
         await loadInventory();

@@ -7,6 +7,8 @@ import { untrack } from 'svelte';
 import { deviceStore } from './device-store.js';
 import { syncNetwork, syncAllowedOnThisNetwork, networkKnown, onSyncAllowedAgain } from './sync-network.svelte.js';
 import { invalidateCoreCache, setCacheVersions } from './core-cache.js';
+import { currentDiveIds, noteDiveList } from './dive-ids.js';
+import { forgetAllDives } from './dive-preload.js';
 import { BenthicCore } from 'benthic-core';
 import { runCsvImport } from './csv-import.js';
 import { storedDemo } from './demo.js';
@@ -55,13 +57,24 @@ import { signOutPush } from './push-notifications.svelte.js';
  */
 let diveList = $state.raw([]);
 
+/** The ids held by the logbook store itself move to the dives' new ids, after the core read the log again. */
+function followRenumbering() {
+  logbook.checkedDiveIds = currentDiveIds(untrack(() => logbook.checkedDiveIds));
+  // The last edit's result is for the old id: dropped (the detail screen reads the dive again).
+  logbook.edited = null;
+  forgetAllDives();
+}
+
 export const logbook = $state({
   /** @type {Dive[]} */
   get dives() {
     return diveList;
   },
   set dives(value) {
+    const before = untrack(() => diveList);
     diveList = value;
+    // A list read again from the log has new ids: whatever holds ids follows (lib/dive-ids.js).
+    if (noteDiveList(before, value)) followRenumbering();
   },
   /** Checked dives in the Logbook list, shared with the tablet detail pane. */
   checkedDiveIds: /** @type {number[]} */ ([]),

@@ -14,6 +14,7 @@
   import { chooseSite } from '../lib/site-choice.js';
   import { formatDateTime } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
+  import { liveDiveId } from '../lib/dive-ids.js';
 
   /** @type {{ f7route: { params: { diveId: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -25,7 +26,7 @@
 
   onMount(async () => {
     try {
-      dive = await BenthicCore.getDive({ id: diveId });
+      dive = await BenthicCore.getDive({ id: liveDiveId(diveId) });
       sites = await BenthicCore.siteQuery({ kind: 'list' });
     } catch (e) {
       console.error('Dive without a site', e);

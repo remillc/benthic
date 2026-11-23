@@ -56,6 +56,7 @@
   import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
+  import { currentDiveId, onDiveIdsRenumbered } from '../lib/dive-ids.js';
   import { forgetDive, keepDive, loadDive as readDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
@@ -279,7 +280,35 @@
 
   const uid = $props.id();
   const menuId = `dive-menu-${uid}`;
-  const diveId = $derived(f7route.params.id);
+  // The id of the dive shown. The core numbers its dives again whenever it reads the log again (a change from another
+  // device arrives): `renumbered` holds the new id from that moment, until the route says the same.
+  let renumbered = $state(/** @type {string|null} */ (null));
+  const diveId = $derived(renumbered ?? f7route.params.id);
+
+  /** The dive shown has a new id (the log was read again), or is gone: the route follows in place, with no page change. */
+  function followRenumbering() {
+    if (preview) return;
+    const was = Number(diveId);
+    const now = currentDiveId(was);
+    if (now === was) return;
+    forgetDive(was);
+    // This page is the one the router shows (another page may lie over it).
+    const shown = f7router.currentRoute?.url === f7route.url;
+    const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
+    if (now === null) {
+      showSnackbar(t('detail.deletedElsewhere'));
+      if (!shown) return;
+      if (layout.split) f7router.navigate('/pane/empty', { reloadDetail: true, animate: false });
+      else f7router.back();
+      return;
+    }
+    renumbered = String(now);
+    if (!shown) {
+      loadDive();
+      return;
+    }
+    f7router.navigate(`${base}${now}`, layout.split ? { reloadDetail: true, animate: false } : { reloadCurrent: true, animate: false });
+  }
 
   // "Delete the dive" (⋮ menu, task 2026-11-07-28, to-do #15): the same
   // confirmation as a Logbook selection of one dive, then the core's undoable
@@ -420,7 +449,8 @@
       // The first screen is up: what waited for it starts (lib/startup.svelte.js).
       if (!preview && !f7route.params.trip) startup.detail = true;
     } catch (e) {
-      console.error('Dive detail', e);
+      // A dive that is gone (deleted on another device) is handled by `followRenumbering`, not reported.
+      if (!/dive not found/i.test(String(/** @type {any} */ (e)?.message ?? e))) console.error('Dive detail', e);
       failed = true;
       return;
     }
@@ -440,9 +470,11 @@
   const validationItems = $derived(dive && benthicPlusSubscriber() ? validationsOf(dive) : []);
   onMount(() => {
     if (preview) return;
+    const stopFollowing = onDiveIdsRenumbered(followRenumbering);
     if (benthicPlusSubscriber()) (validations.ready ? Promise.resolve() : loadValidations()).then(refreshPending).catch((e) => console.error('Validations', e));
     if (isRelease) loadInventory();
-    return loadDive();
+    loadDive();
+    return stopFollowing;
   });
 
   /** « Ordinateurs de cette plongée » open (task 2026-11-14-144), and a change of main computer running. */
