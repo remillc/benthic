@@ -49,6 +49,7 @@
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
   import ValidationDialog from '../components/ValidationDialog.svelte';
   import { layout, deviceKind, desktopApp } from '../lib/layout.svelte.js';
+  import FoldingSearch from '../components/FoldingSearch.svelte';
   import { deviceKey } from '../lib/first-launch.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { startup } from '../lib/startup.svelte.js';
@@ -1047,6 +1048,10 @@
   /** The month shown under the top bar, null while the band is fully visible. */
   let sticky = $state(/** @type {string|null} */ (null));
   let stickyFrame = 0;
+  /** Android phone: the search box folds into a magnifier while the list scrolls (task 2026-11-23-339). */
+  const foldSearch = $derived(!theme.ios && layout.phone && !desktopApp);
+  /** The search box is there while the logbook has dives or is loading. */
+  const hasSearch = $derived(logbook.dives.length > 0 || logbook.loading);
   const stickyGroup = $derived(sticky ? monthGroups.find((g) => g.key === sticky) : undefined);
 
   function scheduleSticky() {
@@ -1324,7 +1329,10 @@
       <!-- Scrolled, with the month headers in the band (Android, task 2026-11-14-125): the search
            field has left the screen, a search button takes its place. Then the avatar, and the
            page ⋮ always last. -->
-      {#if !theme.ios && stickyGroup}
+      {#if foldSearch}
+        <!-- Android phone (task 2026-11-23-339): the search box folds into the room kept here. -->
+        {#if hasSearch}<span class="bc-folding-search--target" aria-hidden="true"></span>{/if}
+      {:else if !theme.ios && stickyGroup}
         <Link iconOnly class="bc-logbook--search-button" onClick={openSearch}>
           <Icon name="search" />
           <span class="bc-sr-only">{t('logbook.search')}</span>
@@ -1363,7 +1371,10 @@
         <SyncPill icon="offline" text={t('sync.offlinePending', { n: logbook.pending })} />
       {/if}
     {/if}
-    {#if logbook.dives.length || logbook.loading}
+    {#if hasSearch && foldSearch}
+      <!-- Its place under the summary; the box itself is drawn above the top bar (<FoldingSearch>, below). -->
+      <div class="bc-folding-search--slot"></div>
+    {:else if hasSearch}
       <!-- No backdrop: the list filters as you type, and Framework7's veil stayed over the band
            after the field lost the focus (bug of 13 November 2026). -->
       <Searchbar
@@ -1713,6 +1724,9 @@
   {#if importing}<p class="bc-sr-only" role="status">{t('logbook.importing')}</p>{/if}
 
   {#snippet fixedContent()}
+    {#if foldSearch && hasSearch}
+      <FoldingSearch bind:value={query} label={t('logbook.search')} hidden={selecting} />
+    {/if}
     {#if selecting}
       <!-- Selection mode: the top bar gives way to the number of dives checked. -->
       <div class="bc-logbook--selection-bar" bind:this={selectionBar}>
