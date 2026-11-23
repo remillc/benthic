@@ -101,6 +101,23 @@ Decided: **QR pairing** carried by the `benthic` branch, plus an optional **reco
 - Bug fixed on the way: Android must never replace an unreadable data key silently (exclude `data-key.bin` from backups
   or treat an unreadable key as missing).
 
+### QR payloads and key files
+
+Implemented in `app/src/lib/account-keys.js`. A QR carries one text, `benthic-pair:1:<mode>:<id>:<data>`: `1` is the
+payload version; `id` is 16 random bytes in base64url (22 characters), the name of `keys/pairing/<id>.json`; `mode` is
+`k` (camera: `data` is the one-time key K, 32 bytes in base64url) or `e` (no camera: `data` is the new device's
+ephemeral ECDH P-256 public key, 65 raw bytes in base64url).
+
+- `keys/account.json`: `{ format: 1, kid }`, the id of the account key (first 8 bytes of its SHA-256, in hex).
+- `keys/pairing/<id>.json`, mode `k`: `{ format: 1, mode, id, kid, expiresAt (ms), nonce, ct }`; AES-GCM under K, the
+  authenticated data is `pair|k|<id>|<kid>|<expiresAt>`, so the expiry cannot be extended. Mode `e` adds `epk` (the
+  paired device's ephemeral public key); the key is ECDH, then HKDF-SHA-256 (salt = the id, info
+  `benthic-pair-ecdh-v1`), then AES-256-GCM.
+- `keys/recovery.json`: `{ format: 1, kid, nonce, ct }`; the recovery key is 128 random bits shown as 26 characters of
+  Crockford's base32 (`0-9 A-Z` without I, L, O, U) in groups of four joined by dashes; on input, spaces, dashes and
+  case are ignored, O reads as 0, I and L as 1. HKDF-SHA-256 (salt `benthic-recovery-v1`, info `account key wrap`),
+  then AES-256-GCM.
+
 ## Server and native changes
 
 - Server: nothing required for v1 (pushing a `benthic` branch already works; Forgejo refuses non-fast-forward pushes).
