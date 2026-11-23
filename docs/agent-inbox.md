@@ -7000,3 +7000,9 @@ Christian asked for this on 23 November 2026. Work in `main`. Benthic already ex
 Benthic+ data in the file (profile, certificates, documents, photos) is imported for everyone; what a free user cannot see stays in the logbook, hidden, as for any Benthic+ data. Same on phone (Android and iPhone), tablet and desktop.
 
 **Test:** export a logbook, import it on a fresh install (first launch) and over an existing logbook; corrupt one file in the archive and check the incomplete message and that nothing was imported.
+
+## [ ] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
+
+Christian asked for this on 23 November 2026. Work in `main`. Renumbering the dives is an action on the logbook, not a setting. Remove the row « Renuméroter les plongées » (`id: 'renumber'`) from Réglages › Carnet in `app/src/pages/Settings.svelte`, with its dialog state there, on every device. It stays where the mock-ups already put it: the Carnet ⋮ menu (« Renuméroter les plongées », phone, tablet and the desktop list's ⋮), the selection menu (« Renuméroter à partir d’ici ») and the dive's ⋮ menu (« Renuméroter la plongée »). No mock-up shows it in Réglages. If a search in Réglages finds « renuméroter », point the result to the Carnet menu item or drop it.
+
+**Test:** Réglages › Carnet has no renumber row; the Carnet ⋮ menu still renumbers.
