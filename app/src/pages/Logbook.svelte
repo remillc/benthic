@@ -64,6 +64,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { importProgress } from '../lib/import-progress.svelte.js';
   import { isCancelled } from '../lib/import-progress.js';
+  import { longPressFeedback } from '../lib/haptics.js';
   import { Capacitor } from '@capacitor/core';
   import { BenthicCore } from 'benthic-core';
 
@@ -505,8 +506,13 @@
         startX = e.clientX;
         startY = e.clientY;
         timer = setTimeout(() => {
+          // Selection mode starts here, finger still down; the lift is dropped by `pressed`.
           pressed = true;
           pressedTrip = Number(tripRow.dataset.trip) || 0;
+          if (pressedTrip) {
+            selectTrip(pressedTrip);
+            longPressFeedback();
+          }
         }, LONG_PRESS_MS);
         return;
       }
@@ -516,15 +522,21 @@
       startY = e.clientY;
       const id = Number(row.dataset.dive);
       timer = setTimeout(() => {
-        // A long press lifts the row; what follows decides, as on Android's
-        // home screen: the finger lifted without moving selects the dive
-        // (selection mode, or one more check in it); the finger moving drags
-        // it to a trip or out of its own, and nothing is checked. A checked
+        // A long press lifts the row and selects the dive at once, finger still
+        // down (selection mode, or one more check in it); the lift is dropped
+        // (`pressed`: no toggle, no click). The finger moving afterwards drags
+        // it to a trip or out of its own, as on Android's home screen. A checked
         // dive takes the other checked dives with it, as in Gmail.
         pressed = true;
         dragIds = checked[id] ? Object.keys(checked).filter((k) => checked[Number(k)]).map(Number) : [id];
         dragRow = row.closest('li');
+        if (!selecting) startSelection(id);
+        else {
+          checked[id] = true;
+          logbook.checkedDiveIds = checkedIds;
+        }
         dragRow?.classList.add('bc-logbook--drag-lift');
+        longPressFeedback();
       }, LONG_PRESS_MS);
     }
     /** @param {PointerEvent} e */
@@ -755,17 +767,8 @@
         drop();
       } else {
         if (document.querySelector('.bc-logbook--drag-chip')) endDrag();
-        // A long press let go without moving: the selection.
-        if (dragIds) {
-          dragRow?.classList.remove('bc-logbook--drag-lift');
-          const id = dragIds[0];
-          if (!selecting) startSelection(id);
-          else {
-            checked[id] = true;
-            logbook.checkedDiveIds = checkedIds;
-          }
-        }
-        if (pressedTrip) selectTrip(pressedTrip);
+        // A long press let go without moving: the selection already started when the press was recognised.
+        if (dragIds) dragRow?.classList.remove('bc-logbook--drag-lift');
       }
       dragIds = null;
       pressedTrip = 0;

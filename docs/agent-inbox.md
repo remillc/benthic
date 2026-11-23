@@ -6745,7 +6745,7 @@ Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `
 8. **Collapsed band**: when the band is collapsed during the exchange, the line runs on the collapsed band's profile.
 9. **Every device**: tablet and desktop use their band the same way. Where a device's Carnet header has no band profile (iPhone large title, desktop if it applies), add the same faint profile at the bottom edge of the header and draw the line on it; say in the done note what you did per device. Remove `LinearWavyProgress` from `PullProgress` if nothing else uses it.
 
-## [ ] 2026-11-23-341 Long press on a dive (phone and tablet): selection mode starts while the finger is still down
+## [x] 2026-11-23-341 Long press on a dive (phone and tablet): selection mode starts while the finger is still down
 
 Christian approved this on 23 November 2026 (TODO #159). Work in `main`. No mock-up. On `/` (the Carnet list), on phone and tablet, a long press on a dive row turns the list into the checkbox list (selection mode) only when the finger is lifted. Expected: selection mode starts **as soon as the long press is recognized, while the finger is still down**, with the pressed dive already checked.
 
@@ -6756,3 +6756,5 @@ Christian approved this on 23 November 2026 (TODO #159). Work in `main`. No mock
 - Check both Android and iPhone, phone and tablet.
 
 In the done note, say which event now starts selection mode and how the lift is ignored.
+
+**Done (23 November 2026).** The existing 500 ms timer of the list's `pointerdown` handler (`LONG_PRESS_MS` in `Logbook.svelte`) now starts selection mode itself, finger still down: `startSelection(id)` (or one more check when already selecting) for a dive row, `selectTrip` for a trip row. The lift decides nothing any more: `touchend` only clears the lift style and the drag state, and the `pressed` flag makes the click that follows be dropped before Framework7 opens the dive. A move after the threshold keeps the selection (it still drags the dives to a trip, as before); a move over 10 px before the threshold cancels the press, so a scroll and a short tap are unchanged. Feedback: `lib/haptics.js` calls `navigator.vibrate(15)`; the app has no haptics plugin and no VIBRATE permission, so the real vibration needs Christian's go-ahead for `@capacitor/haptics` (Android and iOS selection haptic). Tests: `tests/app/logbook-long-press.test.mjs`, flow « long press » of `tests/e2e/navigation.mjs` (`--long-press-only`; phone and tablet, Android and iOS look).
