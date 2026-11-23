@@ -253,6 +253,8 @@ Mock-ups: `android-tablette-accueil-{paysage,portrait}.dc.html` (first screen, n
 
 Six components do not exist in Framework7; each is a single Svelte component, shared by iOS and Android, which only changes its colours and sizes with the theme.
 
+**Chevrons (decided on 23 November 2026, task 336).** One chevron drawing: `M9 5l7 7-7 7` (`Icon` `chevron`, the Android list chevron mask in `theme.css`, the Settings rows). Back is the same chevron turned 180°. Out of scope: the up and down chevrons of drop-downs and collapsible sections, and the back arrows of the top bars (Framework7's `arrow_left_md` on Android, `chevron_left_ios` on iOS). The disclosure chevron of iOS list rows stays Framework7's own (iOS look).
+
 **`<DiveProfile>`: the dive profile and its water column.**
 
 - **Line:** depth over time, from the samples of the first dive computer; the surface at the top, depth downwards.
