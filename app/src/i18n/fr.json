@@ -2786,6 +2786,9 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",
+      "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",
+      "Premier lancement : les rayons de lumière de la bande bleue sont toujours quatre, à l’échelle de la largeur de la bande, sur tablette et ordinateur comme sur le téléphone.",
       "Compte : plus de bouton « Synchroniser » nulle part (feuille du compte, Compte, menu latéral, ordinateur). L’état reste, avec une seconde ligne : « Synchronisé il y a 2 min » et « Automatique, dès qu’une modification est faite », ou « 3 modifications non envoyées » et « Envoi automatique au retour du réseau » ; sur tablette, l’état est la troisième ligne sous le compte.",
       "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
