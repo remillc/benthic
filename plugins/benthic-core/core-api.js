@@ -445,7 +445,7 @@ export { waterTypeOf };
 /**
  * One free-filter rule, in the text form of Subsurface's filter presets
  * (benthic.h, filter_rule): type token ("suit", "depth", "dive_mode"…, or
- * the Benthic od_country, od_region, od_trip), modes as tokens or empty,
+ * the Benthic bc_country, bc_region, bc_trip), modes as tokens or empty,
  * data in core units.
  * @typedef {{type: string, stringMode?: ''|'starts_with'|'substring'|'exact',
  *   rangeMode?: ''|'equal'|'less'|'greater'|'range', negate?: boolean, data: string}} FilterRule

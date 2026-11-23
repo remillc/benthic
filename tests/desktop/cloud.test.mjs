@@ -603,10 +603,10 @@ test('« Changer de compte »: the service asks which account again, and the sto
   }
 });
 
-test('the folder is never the diver\'s: OpenDives on Google Drive, the app folder root on OneDrive and Dropbox', async () => {
+test('the folder is never the diver\'s: Benthic on Google Drive, the app folder root on OneDrive and Dropbox', async () => {
   const d = desktop();
   const main = d.wm.openMain();
-  for (const [provider, location] of [['googleDrive', 'OpenDives/Dossier.ssrf'], ['oneDrive', 'Dossier.ssrf'], ['dropbox', 'Dossier.ssrf']]) {
+  for (const [provider, location] of [['googleDrive', 'Benthic/Dossier.ssrf'], ['oneDrive', 'Dossier.ssrf'], ['dropbox', 'Dossier.ssrf']]) {
     await d.wm.handle({ sender: main.webContents }, 'cloudSignIn', { provider });
     const result = await d.wm.handle({ sender: main.webContents }, 'create', { where: 'cloud', name: 'Dossier', provider, folder: '../elsewhere' });
     assert.equal(result.descriptor.location, location, provider);
@@ -624,16 +624,16 @@ test('WebDAV from the dialog: the server, user name and password create the logb
   assert.equal(dav.files.size, 0);
   const result = await d.wm.handle({ sender: main.webContents }, 'create', spec);
   assert.equal(result.descriptor.provider, 'webdav');
-  assert.equal(result.descriptor.location, 'OpenDives/Serveur.ssrf');
-  assert.ok(dav.files.get('OpenDives/Serveur.ssrf').bytes.toString().includes('<dives>'));
+  assert.equal(result.descriptor.location, 'Benthic/Serveur.ssrf');
+  assert.ok(dav.files.get('Benthic/Serveur.ssrf').bytes.toString().includes('<dives>'));
   const status = (await d.wm.handle({ sender: main.webContents }, 'cloudStatus')).find((p) => p.provider === 'webdav');
   assert.equal(status.connected, true);
   assert.ok(!JSON.stringify(status).includes(dav.password));
   // A save goes up with If-Match on the revision this computer knows.
   const win = d.fakeE.created[d.fakeE.created.length - 1];
-  const before = dav.files.get('OpenDives/Serveur.ssrf').etag;
+  const before = dav.files.get('Benthic/Serveur.ssrf').etag;
   await d.bridge.callFor(win.webContents.id, 'saveLocal');
-  assert.notEqual(dav.files.get('OpenDives/Serveur.ssrf').etag, before);
+  assert.notEqual(dav.files.get('Benthic/Serveur.ssrf').etag, before);
   assert.equal(dav.requests.filter((r) => r.method === 'PUT').pop().headers['if-match'], before);
   await d.bridge.stop();
   await dav.close();

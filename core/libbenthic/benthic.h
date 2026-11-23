@@ -510,8 +510,8 @@ int save_plan(const std::string &request, int replace_id, std::string &result_js
 // (core units: mm, seconds, mK, mL/min, mL, permille; strings separated by
 // commas; dive_mode and day_of_week as a bit field). Never accepted: weight,
 // weight_type, water_density, cylinder_n2 (spec). Benthic additions, not in
-// Subsurface's filter: "od_country", "od_region" (the site's taxonomy) and
-// "od_trip" (trip identifiers of the load), with comma-separated values.
+// Subsurface's filter: "bc_country", "bc_region" (the site's taxonomy) and
+// "bc_trip" (trip identifiers of the load), with comma-separated values.
 // Text values may also be given one per line ('\n'): then each is kept
 // whole, commas included (the preset text form splits at every comma).
 struct filter_rule {

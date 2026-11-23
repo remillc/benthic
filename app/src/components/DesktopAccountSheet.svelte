@@ -131,7 +131,6 @@
       <img class="bc-desktop-account--logo bc-desktop-account--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
       <span class="bc-desktop-account--brand-name"><span aria-hidden="true">{t('menu.title')}<span class="bc-desktop-account--dot">+</span></span><span class="bc-sr-only">{t('benthicPlus.chipName')}</span></span>
     </div>
-    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
     <div class="bc-desktop-account--group">
       <div class="bc-desktop-account--identity">
@@ -155,6 +154,7 @@
         </div>
       {/if}
     </div>
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
     <div class="bc-desktop-account--group">
       <button type="button" class="bc-desktop-account--entry" onclick={() => leaveTo(openProfile)}>
@@ -196,7 +196,6 @@
       <img class="bc-desktop-account--logo bc-desktop-account--dark" src="/logo-dark.svg" alt="" width="24" height="24" />
       <span class="bc-desktop-account--brand-name">{t('menu.title')}</span>
     </div>
-    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
     <div class="bc-desktop-account--group">
       <div class="bc-desktop-account--identity">
@@ -219,6 +218,7 @@
         </div>
       {/if}
     </div>
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
 
     <div class="bc-desktop-account--group">
       <button type="button" class="bc-desktop-account--entry" onclick={() => leaveTo(openBackup)}>
@@ -273,7 +273,6 @@
       </span>
     </div>
 
-    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if free}
       <div class="bc-desktop-account--offer">
         <button type="button" class="bc-desktop-account--subscribe" onclick={() => plus('offer')}>{t('benthicPlus.offer.subscribe')}</button>
@@ -317,6 +316,7 @@
     {:else}
       <div class="bc-desktop-account--sync"><button type="button" class="bc-tonal-button" onclick={manage}>{t('desktopSettings.account.manage')}</button></div>
     {/if}
+    {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
     {#if subscriber}
       <div class="bc-desktop-account--divider"></div>
       <button type="button" class="bc-desktop-account--row bc-desktop-account--profile" onclick={() => leaveTo(openProfile)}>

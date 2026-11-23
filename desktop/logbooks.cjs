@@ -14,7 +14,7 @@
 //                service's API (desktop/cloud.cjs); the core works on a git copy built from a local
 //                working copy, <userData>/logbooks/<id>/logbook.ssrf, kept in step with the remote file
 // `location` is the file path, the repository address (without any token), or for a cloud logbook the
-// remote path shown to the diver ("OpenDives/plongees.ssrf"). `provider` is the personal cloud of a
+// remote path shown to the diver ("Benthic/plongees.ssrf"). `provider` is the personal cloud of a
 // cloud logbook (or, in older recent lists, of a file in a synchronised folder).
 'use strict';
 

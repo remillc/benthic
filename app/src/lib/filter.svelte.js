@@ -304,7 +304,7 @@ export function validBound(key, text, prefs) {
 /** Subsurface's tokens for each criterion. */
 const TYPES = /** @type {Record<string, string>} */ ({
   suits: 'suit', computers: 'dive_computer', cylinderTypes: 'cylinder_type', tags: 'tags', people: 'people',
-  sites: 'location', countries: 'od_country', regions: 'od_region', trips: 'od_trip',
+  sites: 'location', countries: 'bc_country', regions: 'bc_region', trips: 'bc_trip',
   year: 'year', date: 'date', timeOfDay: 'time_of_day', depth: 'depth', duration: 'duration', sac: 'sac',
   waterTemp: 'water_temp', airTemp: 'air_temp', cylinderSize: 'cylinder_size', o2: 'cylinder_o2', he: 'cylinder_he',
   rating: 'rating', visibility: 'visibility', current: 'current', wavesize: 'wavesize', surge: 'surge', chill: 'chill',

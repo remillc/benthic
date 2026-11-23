@@ -346,6 +346,6 @@ export function isLogbookFileName(name) {
 export function keptIn(entry, t) {
   if (entry.kind === 'git') return { key: 'whereGit', where: entry.location.replace(/^[a-z]+:\/\//i, '').replace(/\.git$/i, '') };
   const folder = folderOf(entry.location);
-  if (entry.provider) return { key: 'whereCloud', where: `${t(`desktopLogbooks.source.${entry.provider}`)}, ${t('desktopLogbooks.new.folderLabel').toLowerCase()} ${folder || 'OpenDives'}` };
+  if (entry.provider) return { key: 'whereCloud', where: `${t(`desktopLogbooks.source.${entry.provider}`)}, ${t('desktopLogbooks.new.folderLabel').toLowerCase()} ${folder || 'Benthic'}` };
   return { key: 'whereComputer', where: folder };
 }
