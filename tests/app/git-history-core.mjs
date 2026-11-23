@@ -146,3 +146,6 @@ export class GitLogbook {
     rmSync(this.dir, { recursive: true, force: true });
   }
 }
+
+// The bgit* stand-in (clone, pull, push, write, read, diff, files) on a bare remote: tests/app/fake-bgit.mjs.
+export { FakeRemote, FakeBgit } from "./fake-bgit.mjs";

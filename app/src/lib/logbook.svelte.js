@@ -28,6 +28,7 @@ import { sheetVariant } from './account-sheet.js';
 import { loadBenthicPlusAccount, benthicPlusAccount, benthicPlusSubscriber, setBenthicPlusAccount } from './benthic-plus-state.svelte.js';
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
+import { signalAccountData } from './account-sync-signal.js';
 
 /** @typedef {import('benthic-core').Dive} Dive */
 /** @typedef {import('benthic-core').Prefs} Prefs */
@@ -782,7 +783,7 @@ function undoCleared() {
  */
 
 /** Automatic synchronisation is on and the connection allows it (« Seulement sur Wi-Fi ou câble », lib/sync-network.svelte.js). */
-function autoSyncing() {
+export function autoSyncing() {
   return logbook.autoSync && syncAllowedOnThisNetwork() && !logbook.browsing;
 }
 
@@ -826,6 +827,8 @@ async function syncEdits() {
     logbook.sync = 'offline';
   }
   await countPending();
+  // The diver's equipment, profile and the rest follow the dives (lib/account-sync.svelte.js).
+  signalAccountData('dives');
   return outcome;
 }
 

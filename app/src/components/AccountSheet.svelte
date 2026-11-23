@@ -17,6 +17,7 @@
   import { navigation, openOver, openSettings, openMapSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { accountLock } from '../lib/locked-data.svelte.js';
   import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
   import { isRelease } from '../lib/edition.js';
   import { devAccounts } from '../lib/dev-switch.js';
@@ -260,6 +261,16 @@
               </span>
               <Icon name="chevron" size={20} />
             </button>
+            {#if accountLock.canPair}
+              <button type="button" class="bc-account-sheet--ios-row" data-row="pair" onclick={() => go(accountLock.onpairnew)}>
+                <Icon name="qr" />
+                <span class="bc-account-sheet--row-label">
+                  {t('accountSync.pair.entry')}
+                  <span class="bc-account-sheet--row-line">{t('accountSync.pair.entryText')}</span>
+                </span>
+                <Icon name="chevron" size={20} />
+              </button>
+            {/if}
           {/if}
         </div>
       {/if}
@@ -427,6 +438,17 @@
             </span>
             <Icon name="chevron" size={20} />
           </a>
+          {#if accountLock.canPair}
+            <div class="bc-account-sheet--divider bc-account-sheet--margin"></div>
+            <a href="#pair" class="bc-account-sheet--row bc-account-sheet--profile" data-row="pair" onclick={(e) => (e.preventDefault(), go(accountLock.onpairnew))}>
+              <Icon name="qr" />
+              <span class="bc-account-sheet--row-label">
+                {t('accountSync.pair.entry')}
+                <span class="bc-account-sheet--row-line">{t('accountSync.pair.entryText')}</span>
+              </span>
+              <Icon name="chevron" size={20} />
+            </a>
+          {/if}
         {/if}
       </div>
     {/if}
