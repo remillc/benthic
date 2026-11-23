@@ -131,7 +131,7 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 | Languages | JSON translation files (French and English to start) | Simple format for translators |
 | Units | A single conversion module, from the core's SI values | Same rounding rules everywhere |
 
-**Offline maps: a constraint to know.** The [OpenStreetMap Foundation tile usage policy](https://operations.osmfoundation.org/policies/tiles/) forbids offline use on its servers, including "download a city for later" features. It recommends self-hosted tiles or a provider that explicitly allows offline use. Decision C: Benthic hosts its own vector tile packages per region (PMTiles format), built from OpenStreetMap data. The app uses them online and downloads them for offline use, without ever calling the OpenStreetMap Foundation's servers.
+**Offline maps: a constraint to know.** The [OpenStreetMap Foundation tile usage policy](https://operations.osmfoundation.org/policies/tiles/) forbids offline use on its servers, including "download a city for later" features. It recommends self-hosted tiles or a provider that explicitly allows offline use. Decision C: Benthic hosts its own vector tile packages per region (PMTiles format), built from OpenStreetMap data. The app uses them online and downloads them for offline use, without ever calling the OpenStreetMap Foundation's servers. *Offline maps were dropped on 23 November 2026 (TODO #103): Benthic only shows online maps.*
 
 **Tablet.** The same screens adapt to the width: list and detail side by side on tablets, one after the other on phones. Features marked "more complete version" on tablets (statistics, planner, bulk editing) gain extra panels, not different screens.
 
@@ -143,7 +143,6 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 | Gallery photos | Media picker plugin; the capture time places the photo on the profile |
 | Sharing as an image | The profile is rendered to PNG by the interface, then the system share sheet takes over |
 | Home-screen widget | Separate native code (WidgetKit on iOS, Glance on Android), fed by a small summary written by the core |
-| Offline map | PMTiles packages per region hosted by Benthic, downloaded on demand (for example a trip's region) |
 | Reminders | Local notifications computed by the core (end of desaturation, no-fly time), without a server |
 
 ## 8. Repository, build, tests and licence
@@ -177,7 +176,7 @@ The interface is a single-page web app in **modern JavaScript (ES modules) docum
 
 - [x] **A. Interface app framework:** decided on 5 November 2026: Svelte 5 + Framework7 v9. Accepted risk: Framework7 relies mostly on one maintainer; the interface stays thin so it can be replaced. To validate with a one-day trial on a real Android phone and an iPhone.
 - [x] **B. Reusing Subsurface's code:** decided on 5 November 2026: the code coming from Subsurface must be updatable when Subsurface improves. Hence a pinned submodule + `compat/` module, with no modified copy of the code.
-- [x] **C. Tiles for the offline map:** decided on 5 November 2026: PMTiles packages per region, built from OpenStreetMap data and hosted by Benthic, used online and offline. To plan: static file hosting, periodic regeneration of the packages and the "© OpenStreetMap contributors" credit.
+- [x] **C. Tiles for the offline map:** decided on 5 November 2026: PMTiles packages per region, built from OpenStreetMap data and hosted by Benthic, used online and offline. To plan: static file hosting, periodic regeneration of the packages and the "© OpenStreetMap contributors" credit. *Offline download dropped on 23 November 2026 (TODO #103): no per-region download for offline use.*
 
 **Risks**
 
@@ -208,7 +207,7 @@ Benthic also runs on **Windows, macOS and Linux**, as an **Electron** app (task 
 
 **Build.** `native/desktop/build.sh <target>` builds the core's dependencies and `benthic-host` in `build/desktop/<target>/` (`linux-x64`, `win-x64`, `mac-arm64`, `mac-x64`); `npm run dist` in `desktop/` gathers the interface (built without the development switches), the helper, Subsurface's XSLT stylesheets and the sample logbook (`desktop/scripts/prepare.cjs`), then electron-builder makes the packages: NSIS and APPX (Microsoft Store) on Windows, DMG and MAS (Mac App Store) on macOS, AppImage and Flatpak on Linux. The `desktop` GitHub workflow builds the three systems; it is started by hand.
 
-**What the desktop does not have yet.** Offline maps, the gauge camera, QR codes, Apple Health and the Bluetooth download (planned through Chromium's Web Bluetooth, in JavaScript) answer as on a device without them (`desktop.js` lists each one).
+**What the desktop does not have yet.** The gauge camera, QR codes, Apple Health and the Bluetooth download (planned through Chromium's Web Bluetooth, in JavaScript) answer as on a device without them (`desktop.js` lists each one).
 
 **Metered connection (task 2026-11-15-202).** « Seulement sur Wi-Fi ou câble » stops the automatic sync (edits sent after a change, the retry, the exchange at start, the catch-up when the network returns) on a metered or tethered link; « Synchroniser maintenant » always works. Chromium has no such signal on desktop, so the main process asks the system (`desktop/network.cjs`, `window.benthicDesktop.network`): Windows, WinRT `GetConnectionCost()` through PowerShell (Fixed or Variable, or a mobile broadband profile, is metered; a phone's Wi-Fi hotspot is marked so by Windows); Linux, NetworkManager `nmcli ... GENERAL.METERED` (yes or yes (guessed)); macOS, the default route's hardware port (iPhone USB, cellular modem), the iPhone hotspot's gateway 172.20.10.1 or DHCP option ANDROID_METERED (written from the system's documented output, not run on a Mac). When nothing can tell (no `nmcli`, a failed command, a timeout, an unsupported system) the answer is `unknown` and the sync is allowed. The answer is cached, asked again when the network interfaces change (a 15 s in-process check, only while a window watches) or after 5 minutes, and the commands are asynchronous with an 8 s timeout, so the interface never waits on them except the start-up exchange, which waits at most 2.5 s when the switch is on. `BC_NETWORK_COST=metered|unmetered|unknown` forces the answer for checks.
 
