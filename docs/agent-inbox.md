@@ -6711,7 +6711,7 @@ Christian approved this on 23 November 2026. Work in `main`. These are the scree
 
 iPhone and tablet portrait are not drawn: use the same dialogs. In the done note, list the screens built and anything in `docs/account-sync.md` the mock-ups do not cover.
 
-## [ ] 2026-11-23-339 Carnet and Sites (Android phone): the search box folds into a magnifier while scrolling, and keeps a search in progress
+## [x] 2026-11-23-339 Carnet and Sites (Android phone): the search box folds into a magnifier while scrolling, and keeps a search in progress
 
 Christian approved this on 23 November 2026 (TODO #58). Work in `main`. Today the Carnet's search field leaves the screen with the band and a search button appears in the scrolled bar (task 2026-11-14-125, `Logbook.svelte` `openSearch`, `BandBackdrop.svelte`). Mock-ups, phone canvas:
 - Android › Carnet et plongées › Liste du carnet: « Carnet, la boîte de recherche se replie en loupe au défilement (étapes) · Android » and « Carnet, recherche « Lake » en cours, défilé : la boîte repliée garde le texte · Android »;
@@ -6724,6 +6724,13 @@ Christian approved this on 23 November 2026 (TODO #58). Work in `main`. Today th
 5. The collapsed band keeps its faint profile above the wave (the « seconde vague »), as `BandBackdrop` draws it; the mock-ups « Carnet, défilé avec en-têtes collants » and « Carnet, petit carnet … » were missing it and are fixed.
 
 Tablet, desktop and iPhone are not part of this task. In the done note, say how the box is animated and what happens when the keyboard is open and the list is scrolled.
+
+**Done (23 November 2026).** The four mock-up boards named by the task are not in `docs/mockups/` (nothing matches « loupe », « se replie » or « Rechercher un site » there), so this was built from the task text. New component `FoldingSearch.svelte`, used by `Logbook.svelte` and `Sites.svelte` on an Android phone only (`!theme.ios && layout.phone && !desktopApp`); tablet, desktop and iPhone are unchanged.
+- **How the box is animated.** No timer, no spring: each animation frame of a scroll, from the scroll position `s`, `p = min(1, s / T)` (T: the distance from the box's place in the band to the title row, about 88 px). The box is drawn above the top bar (in the page's `fixedContent`) and left, right, height and colours are interpolated with `p`; it rises at the list's speed, then stays on the title row; the summary fades over the first 45 % of T (`--bc-summary-opacity`). The band holds an empty slot (`bc-folding-search--slot`, 56 dp + 8 dp) and the top bar an empty target (`bc-folding-search--target`) that keeps the room of the folded box and gives its final place; a ResizeObserver re-measures them. Back at the top, `p` is 0 and the box is in its place. Reduced motion: the full box scrolls with the list until half of T, then it is the magnifier or the pill (no in-between). The pill is white at 22 % (`--bc-band-chip`), 40 dp, text 15 sp weight 600 (cut at 110 dp), × 40 dp; the plain magnifier is a 48 dp target.
+- **Taps.** Magnifier, pill text or the box scrolled a little: scroll to the top (smooth, instant with reduced motion), then focus the field (keyboard). × clears the search; folded, it keeps the keyboard closed, at the top it keeps the cursor in the field.
+- **Keyboard open and list scrolled.** Dragging the list with the field focused closes the keyboard (the field is folding away; a programmatic scroll or the keyboard's own resize does not), so the keyboard never stays open over a field that is not on screen. The search text stays; the box folds into the pill.
+- **Sites.** Box « Rechercher un site » under the summary, the header's search button and the old open-search overlay are gone on the phone; the summary reads « 1 site correspond à « cole » » while searching, the « à faire » card and the + button give way while a search is typed, the map view comes back when the search is emptied. The full-screen button moves above « Centrer sur ma position » (and above it when a site card is open). On the shared map (« Carte commune ») the box is not shown, as the search looks only through your own sites (choice, the task was silent).
+- **Band profile (point 5).** `BandBackdrop` already draws the faint profile above the wave on the collapsed band; nothing to change in code (the two mock-up boards were the ones to fix).
 
 ## [ ] 2026-11-23-340 Sync progress: the header's pale profile becomes the progress line, on every device (replaces the Material 3 wavy bar of `PullProgress`)
 

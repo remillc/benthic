@@ -2791,6 +2791,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Android phone, Logbook and Sites: the search box sits under the summary and, as the list scrolls, shrinks and rises into the top bar as a magnifier. A search in progress stays there as a pill with its text and a clear button; tapping the text or the magnifier opens the box again. On Sites, the map's full-screen button moves above « Center on my position ».",
       "Export: “Send to divelogs.de” sends the dives of the logbook or of the selection to your divelogs.de account, after the user name and the password, which are not kept. The sending shows its progress and resumes after a lost connection.",
       "Profile: the date of birth is encrypted; existing dates are protected when an editable profile opens.",
       "Desktop: selecting several dives and choosing « Get signed… » in the right-click menu opens the signing window for them (Benthic+).",

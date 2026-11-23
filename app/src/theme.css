@@ -238,6 +238,8 @@
     /* On the header band, whose colours stay light in dark mode too. */
     --bc-band-pending: #8A4B00;
     --bc-band-control: rgb(255 255 255 / 0.9);
+    /* A folded search in progress on the band: the pill (task 2026-11-23-339), white at 22 %. */
+    --bc-band-chip: rgb(255 255 255 / 0.22);
     /* Text and icons on a control placed on the band (white at 90 %): they stay dark. */
     --bc-on-band-control: #1F2124;
     --bc-on-band-control-2: #4B4A47;
