@@ -49,7 +49,6 @@ Next number: 184
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
 - #141 [design] Ajouter l’icône ordinateur de plongée dans /dives/:id sur tablette et desktop.
 - #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
-- #144 [design] /profile/certs/, lorsque vide : refaire la maquette desktop selon ce que Claude VC a fait.
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes, les détendeurs, les recycleurs et les combinaisons étanches (drysuit)
 - #149 [code] remplacer les uuid par des id plus courts
 - #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
