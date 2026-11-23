@@ -6744,3 +6744,15 @@ Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `
 7. **Accessibility**: the line is the `progressbar` (`aria-label` « Synchronisation du carnet », `aria-valuenow` when known); keep announcing the stage, not each percent, as now.
 8. **Collapsed band**: when the band is collapsed during the exchange, the line runs on the collapsed band's profile.
 9. **Every device**: tablet and desktop use their band the same way. Where a device's Carnet header has no band profile (iPhone large title, desktop if it applies), add the same faint profile at the bottom edge of the header and draw the line on it; say in the done note what you did per device. Remove `LinearWavyProgress` from `PullProgress` if nothing else uses it.
+
+## [ ] 2026-11-23-341 Long press on a dive (phone and tablet): selection mode starts while the finger is still down
+
+Christian approved this on 23 November 2026 (TODO #159). Work in `main`. No mock-up. On `/` (the Carnet list), on phone and tablet, a long press on a dive row turns the list into the checkbox list (selection mode) only when the finger is lifted. Expected: selection mode starts **as soon as the long press is recognized, while the finger is still down**, with the pressed dive already checked.
+
+- Trigger on the long-press threshold (Framework7 `taphold` or the existing timer), not on `touchend`/`pointerup`/`click`.
+- Give the usual feedback at that moment: Android haptic (`HapticFeedbackConstants.LONG_PRESS` or the Capacitor haptics equivalent), iOS selection haptic, if the app already has a haptics helper.
+- Lifting the finger afterwards must not toggle the dive again, open its detail, or start a scroll; a move after the threshold must not cancel the selection.
+- A short tap and a scroll keep their current behaviour; a long press on a trip row behaves as today, unless it already selects the trip's dives (then apply the same rule).
+- Check both Android and iPhone, phone and tablet.
+
+In the done note, say which event now starts selection mode and how the lift is ignored.
