@@ -80,6 +80,8 @@
     <PairConfirmDialog deviceName={flow.deviceName} busy={flow.busy} onconfirm={() => void flows.confirmPair()} onrefuse={flows.closeScreen} />
   {:else if flow.screen === 'paired'}
     <PairedDialog onclose={flows.closeScreen} />
+  {:else if flow.screen === 'joined'}
+    <PairedDialog onclose={flows.closeScreen} lines={flow.joinedLines} />
   {:else if flow.screen === 'offer'}
     <RecoveryKeyOffer busy={flow.busy} oncreate={() => void flows.makeRecoveryKey()} onlater={flows.postponeRecoveryKey} />
   {:else if flow.screen === 'show'}

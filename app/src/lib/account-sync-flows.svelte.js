@@ -41,7 +41,7 @@ import {
 } from './account-sync.svelte.js';
 import { desktopApp } from './layout.svelte.js';
 
-/** @typedef {'unlock'|'pairOld'|'pairNew'|'confirm'|'paired'|'offer'|'show'|'enter'|'startOver'|'join'|'different'} AccountScreen */
+/** @typedef {'unlock'|'pairOld'|'pairNew'|'confirm'|'paired'|'joined'|'offer'|'show'|'enter'|'startOver'|'join'|'different'} AccountScreen */
 
 /** The screen open now ('' when none) and what it shows. */
 export const accountFlow = $state({
@@ -60,6 +60,8 @@ export const accountFlow = $state({
   deviceName: '',
   /** @type {{ recognised: number, added: number, matches: import('./account-sync-screens.js').AmbiguousMatch[] }} */
   join: { recognised: 0, added: 0, matches: [] },
+  /** The two lines of the confirmation after the join (« Appareil jumelé »). @type {string[]} */
+  joinedLines: [],
 });
 
 /** Asked once per run of the app; a later manual sync or a button asks again. */
@@ -456,7 +458,16 @@ export async function confirmJoin(answers) {
   const result = await applyJoin(answers.map((a) => ({ key: a.id, choice: a.same ? 'same' : 'two' })));
   if (result.state === 'joined') {
     await loadProfile();
-    closeScreen();
+    const confirmed = accountFlow.join.matches.length;
+    const parts = [
+      result.recognised ? t('accountSync.join.doneRecognised', { n: result.recognised }) : '',
+      result.added ? t('accountSync.join.doneAdded', { n: result.added }) : '',
+      confirmed ? t('accountSync.join.doneConfirmed', { n: confirmed }) : '',
+    ].filter(Boolean);
+    const lines = [parts.length ? t('accountSync.join.doneText', { parts: parts.join(', ') }) : t('accountSync.join.doneTextNone'), t('accountSync.join.doneSync')];
+    // The confirmation replaces the summary; the recovery key offer, when due, follows it (the host asks again once it is closed).
+    open('joined');
+    accountFlow.joinedLines = lines;
   } else {
     accountFlow.busy = false;
     say('accountSync.join.failed');

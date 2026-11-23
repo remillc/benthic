@@ -2791,7 +2791,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by reading a QR code (or by showing its own on a computer) or with a 26-character recovery key; encrypted data stays locked until the device is paired.",
+      "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by reading a QR code (or by showing its own on a computer) or with a 26-character recovery key; encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
       "Logbook: a long press on a dive or a trip starts selection mode as soon as it is recognised, with the finger still down and a short haptic tap on phones and tablets; letting go no longer decides.",
       "Android phone, Logbook and Sites: the search box sits under the summary and, as the list scrolls, shrinks and rises into the top bar as a magnifier. A search in progress stays there as a pill with its text and a clear button; tapping the text or the magnifier opens the box again. On Sites, the map's full-screen button moves above « Center on my position ».",
       "Export: “Send to divelogs.de” sends the dives of the logbook or of the selection to your divelogs.de account, after the user name and the password, which are not kept. The sending shows its progress and resumes after a lost connection.",
@@ -6972,7 +6972,7 @@
       "failed": "Could not finish. Try again."
     },
     "join": {
-      "title": "Join this device",
+      "title": "Pair this device",
       "recognised": "Recognised",
       "added": "New",
       "toConfirm": "To confirm",
@@ -6981,7 +6981,14 @@
       "same": "Same piece",
       "two": "Two pieces",
       "cancel": "Cancel",
-      "join": "Join",
+      "join": "Pair",
+      "intro": "This device already had equipment. Benthic compared it with the equipment of your account.",
+      "doneRecognised": { "one": "{n} piece recognised", "other": "{n} pieces recognised" },
+      "doneAdded": { "one": "{n} new piece added", "other": "{n} new pieces added" },
+      "doneConfirmed": { "one": "{n} confirmed", "other": "{n} confirmed" },
+      "doneText": "The data of this device is merged with that of your account: {parts}.",
+      "doneTextNone": "The data of this device is merged with that of your account.",
+      "doneSync": "It now syncs with your other devices.",
       "failed": "Could not join this device. Try again."
     },
     "locked": {

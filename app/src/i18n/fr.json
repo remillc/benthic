@@ -2791,7 +2791,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
-      "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en lisant un code QR (ou en montrant le sien sur un ordinateur) ou avec une clé de secours de 26 caractères ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé.",
+      "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en lisant un code QR (ou en montrant le sien sur un ordinateur) ou avec une clé de secours de 26 caractères ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
       "Carnet : un appui long sur une plongée ou un voyage démarre la sélection dès qu’il est reconnu, le doigt encore posé, avec un court retour haptique sur téléphone et tablette ; lever le doigt ne décide plus.",
       "Téléphone Android, Carnet et Sites : la boîte de recherche est sous le résumé et, au défilement, rétrécit et monte dans la barre du haut sous forme de loupe. Une recherche en cours y reste sous forme de pastille avec son texte et son bouton d’effacement ; toucher le texte ou la loupe rouvre la boîte. Sur Sites, le bouton plein écran de la carte passe au-dessus de « Centrer sur ma position ».",
       "Exporter : « Envoyer vers divelogs.de » envoie les plongées du carnet ou de la sélection vers votre compte divelogs.de, après le nom d’utilisateur et le mot de passe, qui ne sont pas gardés. L’envoi a sa progression et se reprend après une coupure de connexion.",
@@ -6975,7 +6975,7 @@
       "failed": "Opération impossible. Réessayez."
     },
     "join": {
-      "title": "Joindre cet appareil",
+      "title": "Jumeler cet appareil",
       "recognised": "Reconnues",
       "added": "Nouvelles",
       "toConfirm": "À confirmer",
@@ -6984,7 +6984,14 @@
       "same": "Même pièce",
       "two": "Deux pièces",
       "cancel": "Annuler",
-      "join": "Joindre",
+      "join": "Jumeler",
+      "intro": "Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte.",
+      "doneRecognised": { "one": "{n} pièce reconnue", "other": "{n} pièces reconnues" },
+      "doneAdded": { "one": "{n} nouvelle ajoutée", "other": "{n} nouvelles ajoutées" },
+      "doneConfirmed": { "one": "{n} confirmée", "other": "{n} confirmées" },
+      "doneText": "Les données de cet appareil sont réunies avec celles de votre compte : {parts}.",
+      "doneTextNone": "Les données de cet appareil sont réunies avec celles de votre compte.",
+      "doneSync": "Elles se synchronisent maintenant avec vos autres appareils.",
       "failed": "Impossible de joindre cet appareil. Réessayez."
     },
     "locked": {

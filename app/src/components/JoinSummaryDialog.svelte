@@ -1,8 +1,8 @@
 <script>
   // @ts-check
-  // « Premier envoi, résumé et pièces à confirmer » (inbox task 2026-11-23-338, item 11; Benthic+ only): « Joindre cet
+  // « Premier envoi, résumé et pièces à confirmer » (inbox task 2026-11-23-338, item 11; Benthic+ only): « Jumeler cet
   // appareil », three counters (reconnues, nouvelles, à confirmer), then one card per ambiguous match with « Cet appareil : … »
-  // and « Votre compte : … » over a segmented button « Même pièce | Deux pièces ». « Joindre » calls `onjoin` with
+  // and « Votre compte : … » over a segmented button « Même pièce | Deux pièces ». « Jumeler » calls `onjoin` with
   // `[{ id, same }]` (lib/account-sync-screens.js `joinResolutions`); « Annuler » (`oncancel`) sends nothing. The content
   // scrolls inside the dialog. A match nobody touched answers `defaultChoice`.
   import Md3Dialog from './Md3Dialog.svelte';
@@ -34,6 +34,7 @@
 
 <Md3Dialog title={t('accountSync.join.title')} class="bc-join-summary" {oncancel}>
   <div class="bc-join-summary--body">
+    <p class="bc-join-summary--intro">{t('accountSync.join.intro')}</p>
     <div class="bc-join-summary--counters">
       {#each counters as counter (counter.id)}
         <div class="bc-join-summary--counter" data-counter={counter.id}>
@@ -63,6 +64,13 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+    }
+
+    .bc-join-summary--intro {
+      margin: 4px 0 8px;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--bc-text-2);
     }
 
     .bc-join-summary--counters {

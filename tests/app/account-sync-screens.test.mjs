@@ -104,13 +104,15 @@ test('every accountSync text a screen uses is in fr and en, and every text is us
   }
   const extra = readFileSync(new URL('components/AccountSheet.svelte', app), 'utf8');
   for (const [, key] of extra.matchAll(/'(accountSync\.[A-Za-z.]+)'/g)) used.add(key);
+  /** A text, or its plural forms. @param {any} v */
+  const isText = (v) => typeof v === 'string' || (typeof v === 'object' && v !== null && typeof v.other === 'string');
   for (const key of used) {
-    assert.equal(typeof lookup(fr, key), 'string', `${key} missing in fr.json`);
-    assert.equal(typeof lookup(en, key), 'string', `${key} missing in en.json`);
+    assert.ok(isText(lookup(fr, key)), `${key} missing in fr.json`);
+    assert.ok(isText(lookup(en, key)), `${key} missing in en.json`);
   }
   /** @param {any} node @param {string} prefix @param {string[]} out */
   const leaves = (node, prefix, out = []) => {
-    for (const [k, v] of Object.entries(node)) typeof v === 'string' ? out.push(`${prefix}.${k}`) : leaves(v, `${prefix}.${k}`, out);
+    for (const [k, v] of Object.entries(node)) isText(v) ? out.push(`${prefix}.${k}`) : leaves(v, `${prefix}.${k}`, out);
     return out;
   };
   for (const key of leaves(fr.accountSync, 'accountSync')) assert.ok(used.has(key), `${key} is in fr.json but no screen uses it`);
@@ -119,7 +121,10 @@ test('every accountSync text a screen uses is in fr and en, and every text is us
 
 test('the texts keep the task’s words', () => {
   assert.equal(fr.accountSync.pair.doneTitle, 'Appareil jumelé');
-  assert.equal(fr.accountSync.join.title, 'Joindre cet appareil');
+  assert.equal(fr.accountSync.join.title, 'Jumeler cet appareil');
+  assert.equal(fr.accountSync.join.join, 'Jumeler');
+  assert.equal(fr.accountSync.join.intro, 'Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte.');
+  assert.equal(fr.accountSync.join.doneSync, 'Elles se synchronisent maintenant avec vos autres appareils.');
   assert.equal(fr.accountSync.startOver.confirm, 'Effacer et repartir');
   assert.equal(fr.accountSync.unlock.pairCamera, 'Lire le code affiché sur un appareil déjà jumelé');
   assert.equal(fr.accountSync.unlock.pairDesktop, 'Afficher un code à lire avec votre téléphone');

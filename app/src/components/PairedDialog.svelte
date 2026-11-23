@@ -5,14 +5,14 @@
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
 
-  /** @type {{ onclose: () => void }} */
-  let { onclose } = $props();
+  /** @type {{ onclose: () => void, lines?: string[] }} */
+  let { onclose, lines = [t('accountSync.pair.doneText')] } = $props();
 </script>
 
 <Md3Dialog title={t('accountSync.pair.doneTitle')} class="bc-paired" oncancel={onclose}>
   <div class="bc-paired--body">
     <span class="bc-paired--check" aria-hidden="true"><Icon name="checkCircle" size={56} weight={1.8} /></span>
-    <p class="bc-paired--text">{t('accountSync.pair.doneText')}</p>
+    {#each lines as line (line)}<p class="bc-paired--text">{line}</p>{/each}
   </div>
   {#snippet actions()}
     <button type="button" data-action="ok" onclick={onclose}>{t('dialog.ok')}</button>

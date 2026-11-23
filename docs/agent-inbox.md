@@ -6682,7 +6682,7 @@ The phone mock-up « Carnet, menu ouvert · Android » does not show « Exporter
 - **Network error:** the progress step goes red (« divelogs.de ne répond pas » at the login, « Envoi interrompu » with « N sur M plongées envoyées. Vérifiez la connexion, puis réessayez. » while sending, « divelogs.de a refusé l’envoi » for a server error) with « Annuler » and « Réessayer »; « Réessayer » resumes at the batch that failed, with no new password after the login. These texts are mine (the task draws none); the batch whose answer was lost may be sent twice.
 - **Transport:** desktop through the main process (`server.request` now takes a `raw` text body and a timeout), phones through CapacitorHttp with a text body (multipart written by hand), a plain browser through fetch (tests only). Not verified on a device or against the real divelogs.de; the e2e flow `--divelogs-only` runs everything against a fake server (`tests/e2e/fake-divelogs.mjs`).
 
-## [ ] 2026-11-23-338 Account data sync screens (#179): pairing, recovery key, join summary, locked items, two-device notice, start over
+## [x] 2026-11-23-338 Account data sync screens (#179): pairing, recovery key, join summary, locked items, two-device notice, start over
 
 Christian approved this on 23 November 2026. Work in `main`. These are the screens of step 6 of `docs/account-sync.md` (#164). Mock-ups: a new block « Synchronisation du compte (Benthic+) » on each page, right under the Profil block: « Android · … » on the phone canvas, « Tablette Android · … » and « Bureau · … » on the tablet and desktop canvas. Every screen is a basic dialog over the profile (no ✕), except the phone camera screens. Board titles end in « (Benthic+) · Android », « · tablette Android, paysage » or « · bureau ». The whole section exists only for Benthic+ accounts.
 
@@ -6710,6 +6710,8 @@ Christian approved this on 23 November 2026. Work in `main`. These are the scree
 12. « Avis « modifié sur deux appareils » »: a snackbar « « <name> » a été modifié sur deux appareils. La modification la plus récente est gardée. » with « OK ». Above the FAB on the phone, centered at the bottom (560 dp) on tablet and desktop.
 
 iPhone and tablet portrait are not drawn: use the same dialogs. In the done note, list the screens built and anything in `docs/account-sync.md` the mock-ups do not cover.
+
+**Done (23 November 2026).** Screens wired in `AccountSyncHost.svelte` and `lib/account-sync-flows.svelte.js` (see docs/account-sync.md, « Wiring »); corrections 342 to 345 and the real-device fixes (confirmation shown before any network call, a first push sends the whole profile, a partial first push is repaired) are in the branch `feature/account-sync-integration`.
 
 ## [x] 2026-11-23-339 Carnet and Sites (Android phone): the search box folds into a magnifier while scrolling, and keeps a search in progress
 
@@ -6766,7 +6768,7 @@ In the done note, say which event now starts selection mode and how the lift is 
 
 **Done (23 November 2026).** The existing 500 ms timer of the list's `pointerdown` handler (`LONG_PRESS_MS` in `Logbook.svelte`) now starts selection mode itself, finger still down: `startSelection(id)` (or one more check when already selecting) for a dive row, `selectTrip` for a trip row. The lift decides nothing any more: `touchend` only clears the lift style and the drag state, and the `pressed` flag makes the click that follows be dropped before Framework7 opens the dive. A move after the threshold keeps the selection (it still drags the dives to a trip, as before); a move over 10 px before the threshold cancels the press, so a scroll and a short tap are unchanged. Feedback: `lib/haptics.js` calls `navigator.vibrate(15)`; the app has no haptics plugin and no VIBRATE permission, so the real vibration needs Christian's go-ahead for `@capacitor/haptics` (Android and iOS selection haptic). Tests: `tests/app/logbook-long-press.test.mjs`, flow « long press » of `tests/e2e/navigation.mjs` (`--long-press-only`; phone and tablet, Android and iOS look).
 
-## [ ] 2026-11-23-342 Correction of task 338: the join summary's intro line is missing
+## [x] 2026-11-23-342 Correction of task 338: the join summary's intro line is missing
 
 Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre cet appareil » dialog (task 338, item 11; mock-up « Premier envoi, résumé et pièces à confirmer (Benthic+) · Android » and its tablet and desktop versions), the app does not show the line under the title. Add it, on every device, between the title and the three counters:
 
@@ -6774,14 +6776,18 @@ Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre 
 
 Body text, 14 sp, on-surface-variant colour, 4 dp under the title and 20 dp above the counters, as in the mock-up.
 
-## [ ] 2026-11-23-343 Correction of task 338: the join summary is « Jumeler cet appareil »
+**Done (23 November 2026).** `JoinSummaryDialog.svelte` shows the line « Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte. » (`accountSync.join.intro`, 14 px, `--bc-text-2`, 4 px under the title) above the counters.
+
+## [x] 2026-11-23-343 Correction of task 338: the join summary is « Jumeler cet appareil »
 
 Christian asked for this on 23 November 2026. Work in `main`. In the first-sync summary dialog (task 338, item 11; mock-ups « Premier envoi, résumé et pièces à confirmer (Benthic+) » on phone, tablet and desktop), on every device:
 - the title « Joindre cet appareil » becomes **« Jumeler cet appareil »** (also the dialog's accessible name);
 - the confirm button « Joindre » becomes **« Jumeler »**.
 The git commit message of the join step (`account-sync.md`: « Joindre cet appareil ») may stay as it is; it is not shown to the diver.
 
-## [ ] 2026-11-23-344 Addition to task 338: confirmation after the first-sync summary
+**Done (23 November 2026).** Title « Jumeler cet appareil » (also the dialog's accessible name) and button « Jumeler » (`accountSync.join.title`, `accountSync.join.join`, fr and en). The test that read the old title now expects the new one (task 343).
+
+## [x] 2026-11-23-344 Addition to task 338: confirmation after the first-sync summary
 
 Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler » in the first-sync summary (tasks 338 item 11 and 343), show a confirmation dialog, on every device. Mock-ups: « Premier envoi, appareil jumelé (Benthic+) » (phone, tablet, desktop), right after the summary board.
 
@@ -6792,11 +6798,15 @@ Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler �
 - Shown once the « Jumeler cet appareil » commit is pushed; on a failure, show the usual sync error instead.
 - If the recovery key offer (338 item 9) follows at the first sync, it comes after this dialog.
 
-## [ ] 2026-11-23-345 Account sheet « Jumeler un nouvel appareil »: the mock-ups now show your row
+**Done (23 November 2026).** After a joined result, `flows.confirmJoin` opens the screen `joined` (`PairedDialog` with `lines`): « Appareil jumelé », « Les données de cet appareil sont réunies avec celles de votre compte : n pièces reconnues, n nouvelles ajoutées, n confirmées. » (zero parts dropped), « Elles se synchronisent maintenant avec vos autres appareils. », one OK. A failed join keeps the usual « Impossible de jumeler » snackbar. The recovery key offer comes after it (the host asks again once the dialog is closed). The mock-ups of this board were not compared pixel by pixel; the dialog reuses the « Appareil jumelé » one.
+
+## [x] 2026-11-23-345 Account sheet « Jumeler un nouvel appareil »: the mock-ups now show your row
 
 Christian asked for this on 23 November 2026. Work in `main`. The row you added in `AccountSheet.svelte` and `DesktopAccountSheet.svelte` (QR icon, « Jumeler un nouvel appareil », « Donne accès aux données chiffrées », chevron, only for a subscriber whose device holds the data key, `accountLock.canPair`) is now drawn in the subscriber account sheets: « Feuille du compte, avec « Mon profil de plongeur » · Android », the iPhone subscriber account sheet, the tablet account sheet and the desktop account sheet. It sits right after « Sauvegarde et restauration », in the same group, with a divider like the rows above, and opens « Appareil déjà jumelé, montrer le code ».
 
 Check that the app matches on every device (position, divider, icon, texts, the row hidden when `canPair` is false) and fix any gap. It is not in the free account sheet. In the done note, say what you changed, or that nothing needed to change.
+
+**Done (23 November 2026).** Checked in `AccountSheet.svelte` (Android card with divider; iOS group) and `DesktopAccountSheet.svelte`: the row sits right after « Sauvegarde et restauration », subscriber only, hidden when `accountLock.canPair` is false, QR icon, texts and chevron as described. Nothing needed to change (the mock-ups were not compared pixel by pixel).
 
 ## [ ] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
 
