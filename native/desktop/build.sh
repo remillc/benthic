@@ -10,6 +10,6 @@ source "$(dirname "$0")/env.sh"
 B=$OUT/cmake
 cmake -S "$ROOT/native/desktop" -B "$B" -G Ninja -Wno-dev ${CMAKE_TARGET_ARGS[@]+"${CMAKE_TARGET_ARGS[@]}"} \
   -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DDEPS="$DEPS" -DSS="$SS" \
-  -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY="$OUT/lib" -DOD_BIN_DIR="$OUT/bin"
+  -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY="$OUT/lib" -DBC_BIN_DIR="$OUT/bin"
 cmake --build "$B" -j"$JOBS"
 echo "built $OUT/lib/libbenthic_core.a and the programs in $OUT/bin"
