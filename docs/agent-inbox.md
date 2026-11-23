@@ -6587,3 +6587,18 @@ Christian approved this on 22 November 2026. Work in `main`. **This task correct
 - Everything else in task 332 is unchanged.
 
 Mock-up: `bureau-carnet-onglet-equipement` (updated in `docs/mockups/`, with the red circles).
+
+## [ ] 2026-11-23-334 Equipment fields by type: review every gear form against `docs/equipment-fields.md`
+
+Christian approved this on 23 November 2026. Work in `main`. **`docs/equipment-fields.md` now holds the reference table** (type, photo, identification, fields, maintenance and reminders). Review every screen that shows a piece's fields (« Nouvelle pièce », « Modifier la pièce », the piece's sheet, on phone, tablet and desktop) and `app/src/lib/gear-fields.js` against it. The changes:
+
+1. **Bouteille:** add « Marque » (`brand`) after « Nom ». The cylinder keeps its typed name; the brand does not make the name. Mock-up: `profil-piece-nouvelle-bouteille-android`.
+2. **Recycleur:** add « Cellules O₂ fabriquées le » (`details.o2CellsMadeOn`, a date, the month printed on the cell is enough) before « Cellules O₂ installées le ». Mock-up: `profil-piece-nouvelle-recycleur-android`.
+3. **Recycleur, O₂ cells reminder:** due at the **earlier** of (manufacture date + 18 months) and (installation date + 12 months); with one date only, that date's rule alone. The suggestion line reads « Suggéré : cellules O₂ à 18 mois de fabrication ou 12 mois d’installation, révision chaque année ». The yearly service is unchanged.
+4. **Scooter:** remove « Batterie », « Autonomie » and « Vitesse ».
+5. **Appareil photo:** remove « Profondeur du caisson ».
+6. **Bouée de surface:** remove « Couleur ».
+7. A removed field's value already saved in `details` is kept in the file (unknown keys are kept) but no longer shown.
+8. Reminders only for Bouteille, Veste, Détendeur, Recycleur and Combinaison étanche (#148, if not done yet).
+
+In the done note, list the screens you changed and any field of the app that the table does not have.
