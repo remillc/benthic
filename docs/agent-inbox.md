@@ -6892,11 +6892,13 @@ Both open « Repartir sans les données chiffrées » (task 338 item 6), unchang
 
 **Done (23 November 2026).** « Plus d’appareil ni de clé ? » is a centred text button under the note of the phone step `benthicPlusPair`, and in « Demande expirée » on every device (phone: its own line above « Nouvelle demande » and « Fermer »; tablet and desktop: left of the row). Both open « Repartir sans les données chiffrées » (`openStartOver`), unchanged; once it is done the pairing step goes on. `dialog-fit.js` now also stacks a row whose buttons are pushed past its start edge (a right-aligned row does not report that in `scrollWidth`).
 
-## [ ] 2026-11-23-351 Download, Bluetooth states: the Bluetooth icon centred, white on a blue disc
+## [x] 2026-11-23-351 Download, Bluetooth states: the Bluetooth icon centred, white on a blue disc
 
 Christian asked for this on 23 November 2026. Work in `main`. In the three Bluetooth states of the download from a dive computer, « Autoriser le Bluetooth », « Autorisation refusée » and « Bluetooth désactivé », the Bluetooth icon sits **centred** above the title, **white** (36 dp, stroke 2) in a **72 dp disc filled with #1F5C99** (no more grey icon on the left on the phone, no more pale disc with a coloured icon on the tablet, including the red « refusée » and grey « désactivé » variants). Mock-ups: « Téléchargement, autoriser le Bluetooth · Android », « … autorisation refusée … », « … Bluetooth désactivé … » (phone), and the six tablet boards « Téléchargement … » in paysage and portrait. The title, text and button keep their current layout. iPhone and desktop have no such screen; nothing to change there.
 
-## [ ] 2026-11-23-352 Key icon: use Material Symbols « key »
+**Done (23 November 2026).** The three Bluetooth states of `Download.svelte` show a white Bluetooth icon (36 dp, stroke 2) centred in a 72 dp disc of `--bc-bluetooth-disc` (#1F5C99), on phone and tablet, in every variant; title, text and button are unchanged. The mock-ups were not in `docs/mockups-release/` or `docs/mockups/`: built from the task text.
+
+## [x] 2026-11-23-352 Key icon: use Material Symbols « key »
 
 Christian asked for this on 23 November 2026. Work in `main`. The app has no key icon yet. Add one to `Icon.svelte` using the Material Symbols « key » glyph (outlined, weight 400, viewBox `0 -960 960 960`, filled with `currentColor`):
 
@@ -6906,19 +6908,27 @@ M280-400q-33 0-56.5-23.5T200-480q0-33 23.5-56.5T280-560q33 0 56.5 23.5T360-480q0
 
 Use it wherever the recovery key appears: the recovery-key offer, the « Votre clé de secours » dialog, entering the key, and unlocking the encrypted data, on phone, tablet and desktop. Mock-ups: « Clé de secours, affichée une seule fois (Benthic+) · Android » and the other boards of the « Clé de secours » subgroup on each device, plus the unlock (« déverrouiller ») boards.
 
-## [ ] 2026-11-23-353 Addition to 351: « Activer le Bluetooth » button is blue everywhere
+**Done (23 November 2026).** `Icon.svelte` has a `key` icon, the Material Symbols « key » glyph (viewBox `0 -960 960 960`, `currentColor`; the component draws such glyphs through a new `symbols` table). It marks the recovery-key offer, « Votre clé de secours », the key entry (hero icon) and the unlock row « Clé de secours » (it replaces the keyboard icon). Mock-ups not in the repository: built from the task text.
+
+## [x] 2026-11-23-353 Addition to 351: « Activer le Bluetooth » button is blue everywhere
 
 Christian asked for this on 23 November 2026. Work in `main`. On the « Bluetooth désactivé » state of the download, the « Activer le Bluetooth » button is the blue filled button (#114477, white text) on every device. The phone mock-up « Téléchargement, Bluetooth désactivé · Android » now shows it blue (it was near-black); the tablet already had it blue.
 
-## [ ] 2026-11-23-354 New design rule: prefer Material Symbols icons
+**Done (23 November 2026).** « Activer le Bluetooth » uses `--bc-bluetooth-action` (#114477) with white text, on every device (`bc-download--filled-blue`).
+
+## [x] 2026-11-23-354 New design rule: prefer Material Symbols icons
 
 Christian asked for this on 23 November 2026. Work in `main`. Read the new section « Icons » in `docs/system-design.md` (§ 8). From now on, every icon you add comes from Material Symbols (weight 400, grade 0, optical size 24; the filled variant for an active or selected state). Draw an icon by hand only when Material Symbols has nothing that fits, and then on the same grid and weight. Do not replace the existing icons of `app/src/components/Icon.svelte` in bulk yet: Christian will first compare them with Material Symbols in a mock-up (TODO #184) and send the swaps as tasks. The recovery key (task 352) is the first one.
 
-## [ ] 2026-11-23-355 Light rays: four rays scaled to the band, never repeated
+**Done (23 November 2026).** Rule read (`docs/system-design.md`, § 8, « Icons »); the recovery key (352) is the first Material Symbols icon; existing icons untouched.
+
+## [x] 2026-11-23-355 Light rays: four rays scaled to the band, never repeated
 
 Christian asked for this on 23 November 2026. Work in `main`. Correction to task 320. On tablet and desktop the first-launch band shows too many rays: `FirstLaunchRays.svelte` repeats the 390 px pattern across the width (`TILE`), so a 700 or 800 px band gets 7 or 8 narrow rays. Draw **the same four rays at every width**, as the phone mock-up now shows (`android-premier-lancement-production`: rays from the sun at (760, −900) to the bottom at x −115…0, 80…145, 195…315, 275…390, opacity 3.5 %, 3 %, 4 %, 3.5 %, on a 390 px band): scale the whole drawing, sun included, by the band's width ÷ 390, without repeating it. Same blur (2 px) and the same fade, gone at about 65 % of the band's height. Every band that uses the rays: first launch and its steps, server sign-in, Benthic+ screens, on phone, iPhone, tablet (portrait and landscape) and desktop. Mock-ups: « Premier lancement (production), étape 1, tablette Android, paysage » and the other 145 tablet and desktop boards with this band. `docs/system-design.md` (« Light rays in the first-launch header ») is updated.
 
 **Test:** a tablet band (700 px) and a desktop band (800 px) each show four rays, wider than on the phone, from the top right.
+
+**Done (23 November 2026).** `FirstLaunchRays.svelte` draws the four rays of the 390 px band (sun at (760, -900), bottom ends -115..0, 80..145, 195..315, 275..390, opacity 3.5, 3, 4, 3.5 %) in a viewBox scaled by the band's width / 390, never repeated; blur stays 2 px on screen, fade gone at 65 % of the height. `docs/system-design.md` already describes it.
 
 ## [ ] 2026-11-23-356 Push sync (TODO #185): server notifies devices, no « Synchroniser » button, access requests as push notifications
 
@@ -6950,7 +6960,7 @@ Mock-ups: « Permission de notifier, explication avant la demande d’Android / 
 
 **Test:** with two paired devices and the app open on both, a change on one shows on the other within a few seconds without any tap; the account sheets have no « Synchroniser » button; with Benthic closed on the paired phone, a new device's access request shows as a system notification, and touching it opens the request; cutting the connection falls back to pull without errors.
 
-## [ ] 2026-11-23-357 Download from a dive computer: one tap, one download (TODO #40, Android)
+## [x] 2026-11-23-357 Download from a dive computer: one tap, one download (TODO #40, Android)
 
 Christian asked for this on 23 November 2026. Work in `main`. Divers did not understand that they had to tap a computer to start a download: the rows of the choice screen looked like plain information. The Android phone flow is redrawn on the phone canvas, subgroup « Téléchargement » (page Android), in the order of the flow. The page title becomes « Télécharger des plongées » on every step.
 
@@ -6967,7 +6977,9 @@ Filled buttons are #114477 with white text. Keep the logic as it is (remembered 
 
 **Test:** with a remembered computer in transfer mode, one tap on « Télécharger » starts the download; without one, the search screen shows the three steps; « Tout retélécharger » is only in the ⋮ menu.
 
-## [ ] 2026-11-23-358 Addition to 357: the same download flow on iPhone, tablet and desktop
+**Done (23 November 2026).** Built from the task text (the canvas mock-ups are not in the repository). `app/src/pages/Download.svelte` now draws every step (choice or first-time search, connection, progress ring, connection lost, nothing new, done, done with a new computer); `DownloadRing` and `DownloadDives` are new components. Logic unchanged except what the new screens need: a lost connection stays on the page, keeps the dives received in the logbook and « Réessayer » resumes; the end of a download stays on its screen (« Terminer » runs the quick entry and message as before). `lib/download-history.js` keeps the last download date and last dive date per computer on the device. Not given by the core: the number of a dive being received (rows show the date until the logbook numbers them), the model's menu path for the transfer-mode step (generic text), and any auto-start when the computer is seen (none existed). Checked by `tests/e2e/download-flow.mjs` (`navigation.mjs --download-only`) and `tests/app/download-history.test.mjs`.
+
+## [x] 2026-11-23-358 Addition to 357: the same download flow on iPhone, tablet and desktop
 
 Christian asked for this on 23 November 2026. Work in `main`. Task 357 redrew the Android phone download. The same steps, texts and rules now apply to the other devices; only the frame changes. Mock-ups are in each device's « Téléchargement » subgroup.
 
@@ -6976,6 +6988,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Task 357 redrew th
 - **Desktop** (tablet canvas, page Bureau, subgroup « Téléchargement, partage et voyage »): a 640 px dialog (28 px corners, height follows the content, at most 820 px) with « Télécharger des plongées », ⋮ (on the choice step) and ✕ in its header. The choice step has three sections: « Votre ordinateur » (the remembered one, filled « Télécharger », 48 px), « Branché par USB » (each USB computer with a tonal « Télécharger »), « À proximité, en Bluetooth ». Hint: « Branchez l’ordinateur de plongée en USB, ou mettez-le en mode transfert Bluetooth près de cet ordinateur. » No connection step (pairing goes through the system). Actions sit in a footer at the bottom right: in progress « Arrêter le téléchargement »; connection lost « Fermer » + « Réessayer »; nothing new « Tout retélécharger… » + « Terminer »; done « Terminer » + « Voir dans le carnet »; done with a new computer « Voir dans le carnet ». « Téléchargement échoué » is unchanged.
 
 **Test:** on each device, a remembered computer starts with one click or tap on « Télécharger », and « Tout retélécharger » is only in the menu.
+
+**Done (23 November 2026).** Same page, frame by device (`kind`): iPhone navigation bar with « Annuler » and the « … » menu; Android tablet 640 dp column, 420 dp bottom buttons, 72 dp top bar; desktop 640 px dialog with footer actions. Not given by the core: USB computers, so « Branché par USB » is not shown (the desktop has no Bluetooth yet either, so the dialog only shows with a test core). iPhone and desktop still open « Indisponible » from the + button (route unchanged).
 
 ## [x] 2026-11-23-359 Dive detail, « Photos et vidéos »: Benthic+ only, synced pictures shown as thumbnails
 
@@ -6986,6 +7000,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Photos and videos 
 - The setting « Afficher les champs photos et vidéos » (Réglages › Carnet, `docs/ui-specification.md`) still hides the section when it is off.
 
 Mock-ups: « Détail, équipement déplié · Android » and every other Android phone and tablet dive detail (light and dark); tablet « Carnet d’exemple (mode démo) » and « Feuille du compte, version gratuite » show the detail without the section. iPhone and desktop details had no such section; add it there the same way for subscribers.
+
+**Done (feature/dive-media, not merged: the coordinator checks on devices).** Server (benthic-server `main`, `docs/media-sync.md`): signed upload and download URLs by hash, usage, quota (`MEDIA_QUOTA_BYTES`, 10 GiB by default). App: `lib/dive-media.js` (references `media/<dive start>.json`, merge by hash), `lib/media-sync.js` (uploads wait offline; thumbnails always, originals on Wi-Fi by the choice), plugin `media*` calls (Kotlin, Swift written without a Mac, desktop `media.cjs`), section `DiveMediaSection.svelte` and gallery `DiveGallery.svelte`. No mock-up of the new section is in the repository: built from the text above. The choices live in Réglages › Carnet (« Photos sur cet appareil », « Vidéos sur cet appareil »), next to « Afficher les champs photos et vidéos », for a Benthic+ account only.
 
 **Done (feature/dive-media, not merged: the coordinator checks on devices).** Server (benthic-server `main`, `docs/media-sync.md`): signed upload and download URLs by hash, usage, quota (`MEDIA_QUOTA_BYTES`, 10 GiB by default). App: `lib/dive-media.js` (references `media/<dive start>.json`, merge by hash), `lib/media-sync.js` (uploads wait offline; thumbnails always, originals on Wi-Fi by the choice), plugin `media*` calls (Kotlin, Swift written without a Mac, desktop `media.cjs`), section `DiveMediaSection.svelte` and gallery `DiveGallery.svelte`. No mock-up of the new section is in the repository: built from the text above. The choices live in Réglages › Carnet (« Photos sur cet appareil », « Vidéos sur cet appareil »), next to « Afficher les champs photos et vidéos », for a Benthic+ account only.
 

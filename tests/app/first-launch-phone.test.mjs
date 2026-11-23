@@ -221,3 +221,11 @@ test('first step spacing: the mock-up vertical distances (title, choices, text b
   assert.match(page, /min-height: calc\(330px - 24px \+ var\(--bc-welcome-band-top\)\)/);
   assert.match(page, /\.bc-welcome-release--intro \{[^}]*margin: 8px 0 0;/);
 });
+
+test('task 355: four rays scaled to the band, never repeated', () => {
+  const rays = read('components/FirstLaunchRays.svelte');
+  assert.doesNotMatch(rays, /TILE/);
+  assert.equal((rays.match(/\{ left: /g) ?? []).length, 4);
+  assert.match(rays, /const SUN = \{ x: 760, y: -900 \}/);
+  assert.match(rays, /viewBox="0 0 \{BASE\}/);
+});
