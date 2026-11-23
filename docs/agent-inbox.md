@@ -6922,7 +6922,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Correction to task
 
 ## [ ] 2026-11-23-356 Push sync (TODO #185): server notifies devices, no « Synchroniser » button, access requests as push notifications
 
-**Progress: part 2 done in PENDING_COMMIT** (no « Synchroniser » button anywhere; parts 1, 3 and 4 are still open).
+**Progress: part 2 done in 37e214a6** (no « Synchroniser » button anywhere; parts 1, 3 and 4 are still open).
 Christian asked for this on 23 November 2026. Work in `main`. Read TODO #185 in `docs/TODOS.md` first; it goes with #173. Mock-ups are on the canvases (titles below).
 
 **1. Server pushes, devices stop polling.**
