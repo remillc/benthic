@@ -527,3 +527,59 @@ test('the result of a clean run is stable: a second run changes nothing', async 
     cleanup([a], remote);
   }
 });
+
+/** A profile with a sealed block and a date of birth still in clear (from before the date was sealed), and a certification. */
+async function legacyProfile(d) {
+  await d.profile.saveInfo({ ...emptyInfo(), fullName: 'Tablet Diver' });
+  const cert = await d.profile.saveCertification({ agency: 'PADI', level: 'Open Water' });
+  await d.store.write('profile/diver.json', { ...(await d.store.read('profile/diver.json')), dateOfBirth: '1980-02-03' });
+  return cert;
+}
+
+test('a first device with a clear date of birth and a certification sends both, the date sealed first', async () => {
+  const remote = new FakeRemote();
+  const a = device(remote, 'a');
+  const sealing = createAccountSync({ core: a.core, store: a.store, box: a.box, now, sealClear: () => a.profile.migrateBirthDate() });
+  try {
+    await a.inventory.saveGear({ name: 'Mask', type: 'mask' });
+    const cert = await legacyProfile(a);
+    const result = await sealing.run();
+    assert.equal(result.status, 'synced');
+    assert.deepEqual(result.unsealed, []);
+    const files = remote.files();
+    assert.ok(files['profile/diver.json'], 'the profile went up');
+    assert.ok(files[`certifications/${cert.id}.json`], 'the certification went up');
+    assert.ok(!Object.hasOwn(JSON.parse(files['profile/diver.json']), 'dateOfBirth'), 'no clear date on the server');
+    assert.ok(!files['profile/diver.json'].includes('1980'));
+    assert.equal((await a.profile.readInfo()).dateOfBirth, '1980-02-03');
+  } finally {
+    cleanup([a], remote);
+  }
+});
+
+test('a device that already pushed without its profile and certifications sends them on the next run', async () => {
+  const remote = new FakeRemote();
+  const a = device(remote, 'a');
+  const sealing = createAccountSync({ core: a.core, store: a.store, box: a.box, now, sealClear: () => a.profile.migrateBirthDate() });
+  try {
+    await a.inventory.saveGear({ name: 'Mask', type: 'mask' });
+    assert.equal((await a.sync.run()).status, 'synced');
+    // The partial first push of the real tablet: a sync state of an earlier build, and local files that were never tracked.
+    const state = await a.store.read('meta/sync.json');
+    delete state.seeded;
+    await a.store.write('meta/sync.json', state);
+    const cert = await legacyProfile(a);
+    await a.store.write('meta/pending.json', { format: 1, paths: [] });
+    assert.deepEqual(await pending(a), []);
+    assert.equal(remote.files()['profile/diver.json'], undefined);
+
+    const result = await sealing.run();
+    assert.equal(result.status, 'synced');
+    const files = remote.files();
+    assert.ok(files['profile/diver.json'] && files[`certifications/${cert.id}.json`], 'both reached the server');
+    assert.ok(!files['profile/diver.json'].includes('1980'));
+    assert.equal((await a.store.read('meta/sync.json')).seeded, true);
+  } finally {
+    cleanup([a], remote);
+  }
+});

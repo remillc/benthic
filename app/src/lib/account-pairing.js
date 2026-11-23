@@ -55,6 +55,12 @@ export async function pairWithCode(text, deps) {
   if (!file) throw new Error('PAIRING_EXPIRED');
   const account = await acceptPairing({ payload: text }, file);
   await adoptAndReseal(account, deps);
-  await deps.commitKeyFiles({ deletes: [pairingFilePath(payload.id)], message: 'Benthic: paired' });
+  // The key is held from here on: a pairing file that cannot be deleted now (the server does not answer) never turns the
+  // pairing into a failure; it expires by itself after 10 minutes and the next run deletes it.
+  try {
+    await deps.commitKeyFiles({ deletes: [pairingFilePath(payload.id)], message: 'Benthic: paired' });
+  } catch (e) {
+    console.warn('Deleting the pairing file', e);
+  }
   return account;
 }

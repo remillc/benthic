@@ -126,11 +126,19 @@ async function adoptAndReseal(account) {
   accountSync.locked = [];
 }
 
-/** After the key arrived: the sealed items are sent sealed with it, and read again. */
+/**
+ * After the key arrived: « Appareil jumelé » at once (the key is held, whatever the server does next), then the sealed items
+ * are sent sealed with it and read again in the background. When the sync finds data on both sides the join follows once the
+ * confirmation is closed (components/AccountSyncHost.svelte).
+ */
 async function afterUnlocked() {
-  await syncAccountNow();
-  await loadProfile();
   open('paired');
+  try {
+    await syncAccountNow();
+    await loadProfile();
+  } catch (e) {
+    console.error('Syncing after the key arrived', e);
+  }
 }
 
 /** @param {unknown} e */
@@ -277,7 +285,7 @@ export async function showPairNew() {
         stopWatching();
         const account = await acceptPairing({ id: mine.id, privateKey: mine.privateKey }, found.json);
         await adoptAndReseal(account);
-        await commitAccountKeyFiles({ deletes: [pairingFilePath(mine.id)], message: 'Benthic: paired' });
+        await commitAccountKeyFiles({ deletes: [pairingFilePath(mine.id)], message: 'Benthic: paired' }).catch((e) => console.warn('Deleting the pairing file', e));
         await afterUnlocked();
       } catch (e) {
         console.error('Waiting for the phone', e);
@@ -423,6 +431,11 @@ export async function openJoin() {
   accountFlow.busy = true;
   const analysis = await analyseJoin();
   accountFlow.busy = false;
+  // Another screen opened meanwhile (a button of the diver): the question is asked again after it.
+  if (accountFlow.screen) {
+    asked.join = false;
+    return;
+  }
   if (analysis.state === 'ready') {
     accountFlow.join = {
       recognised: analysis.recognised ?? 0,
@@ -502,6 +515,15 @@ export function unlockDue() {
 export function resetQuestions() {
   asked.join = false;
   asked.different = false;
+}
+
+/**
+ * Whether a modal that is not the account's own is open (the sync failure sheet, any dialog): a question the sync asks by itself
+ * waits for it (components/AccountSyncHost.svelte looks again every second) instead of stacking over it or being lost.
+ */
+export function modalInTheWay() {
+  if (typeof document === 'undefined') return false;
+  return !!document.querySelector('.sheet-modal.modal-in, .popup.modal-in, .actions-modal.modal-in, .dialog.modal-in, .bc-md3-dialog');
 }
 
 export const joinDue = () => !asked.join;

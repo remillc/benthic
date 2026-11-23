@@ -23,7 +23,14 @@
 
   const flow = flows.accountFlow;
 
-  onMount(() => flows.wireLockActions());
+  onMount(() => {
+    flows.wireLockActions();
+    return () => clearTimeout(waiting);
+  });
+
+  /** Counts up while a question waits for another modal to close, so that the effect below looks again. */
+  let recheck = $state(0);
+  let waiting = 0;
 
   // The locked look of the profile and the account sheet's « Jumeler un nouvel appareil » row.
   $effect(() => {
@@ -39,10 +46,16 @@
   $effect(() => {
     // `flow.busy`: a pairing in progress (no screen is open between the scan and « Appareil jumelé »): nothing is asked meanwhile.
     if (!benthicPlusAccount.signedIn || flow.screen || flow.busy) return;
+    void recheck;
     if (accountSync.status === 'syncing') return flows.resetQuestions();
     const { status, differentAccount, keyMissing, joinNeeded, pullOnly } = accountSync;
     untrack(() => {
       const due = dueScreen({ status, differentAccount, keyMissing, joinNeeded, pullOnly }, { different: flows.differentDue(), unlock: flows.unlockDue(), join: flows.joinDue(), recovery: flows.recoveryOfferDue() });
+      if (due && flows.modalInTheWay()) {
+        clearTimeout(waiting);
+        waiting = /** @type {any} */ (setTimeout(() => recheck++, 1000));
+        return;
+      }
       if (due === 'different') flows.askDifferentAccount();
       else if (due === 'unlock') flows.askUnlock();
       else if (due === 'join') void flows.openJoin();

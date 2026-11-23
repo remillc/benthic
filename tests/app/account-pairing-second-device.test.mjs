@@ -150,3 +150,37 @@ test('a scanner closed without a code says nothing; a camera failure still does'
     delete BenthicCore.qrScan;
   }
 });
+
+test('a pairing file that cannot be deleted does not turn a held key into a failure', async () => {
+  const { remote, tablet, phone, account } = await setup();
+  try {
+    const pairing = await createPairing(account);
+    await tablet.sync.commitKeyFiles({ writes: [pairing.file], message: 'Benthic: pairing' });
+    const held = await pairWithCode(pairing.payload, phoneDeps(phone, { commitKeyFiles: async () => { throw new Error('UNREACHABLE'); } }));
+    assert.equal(held.kid, account.kid);
+    assert.equal(phone.box.getAccountKid(), account.kid);
+    assert.deepEqual(phone.writes, [account.key], 'the key is the device key');
+    assert.ok(remote.files()[pairing.file.path], 'the file stays and expires by itself');
+  } finally {
+    dispose(tablet, phone);
+    remote.dispose();
+  }
+});
+
+test('after the pairing the confirmation comes first, then the join when the sync finds data on both sides', async () => {
+  const { remote, tablet, phone, account } = await setup();
+  try {
+    const pairing = await createPairing(account);
+    await tablet.sync.commitKeyFiles({ writes: [pairing.file], message: 'Benthic: pairing' });
+    await pairWithCode(pairing.payload, phoneDeps(phone));
+    const run = await phone.sync.run();
+    assert.equal(run.status, 'joinNeeded');
+    const state = { status: 'idle', differentAccount: false, keyMissing: false, joinNeeded: true, pullOnly: false };
+    assert.equal(dueScreen(state, { different: true, unlock: false, join: true, recovery: true }), 'join');
+    assert.equal(await phone.store.read('meta/sync.json'), null, 'nothing was joined or pushed without the summary');
+    assert.equal(remote.files()['profile/diver.json'] && JSON.parse(remote.files()['profile/diver.json']).enc.kid, account.kid);
+  } finally {
+    dispose(tablet, phone);
+    remote.dispose();
+  }
+});

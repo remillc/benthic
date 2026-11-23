@@ -12,7 +12,7 @@
 import { sortedJson } from './file-store.js';
 import { mergeAccountFile, mergeEncryptedAccountFile } from './account-data-merge.js';
 import { repositoryKey } from './server-logbook.js';
-import { ACCOUNT_KEY_PATH, PAIRING_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile } from './account-keys.js';
+import { ACCOUNT_KEY_PATH, PAIRING_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
 
 /** The branch of the account data. */
 export const BRANCH = 'benthic';
@@ -88,6 +88,7 @@ export const codeOf = (e) => String(/** @type {any} */ (e)?.code ?? /** @type {a
  * @property {import('./file-store.js').FileStore} store
  * @property {import('./secret-box.js').SecretBox} box
  * @property {() => Date} [now]
+ * @property {() => Promise<unknown>} [sealClear] seals what still holds clear sensitive data (the profile's date of birth); called before each pass, once the account key is known, so that a first push sends the profile
  * @property {string} [authorName]
  * @property {string} [authorEmail]
  */
@@ -194,7 +195,7 @@ function mergeMaintenance(base, ours, theirs) {
  * Creates the engine.
  * @param {AccountSyncDeps} deps
  */
-export function createAccountSync({ core, store, box, now = () => new Date(), authorName, authorEmail }) {
+export function createAccountSync({ core, store, box, now = () => new Date(), sealClear, authorName, authorEmail }) {
   const stamp = () => now().toISOString().replace(/\.\d{3}Z$/, 'Z');
   const author = { ...(authorName ? { authorName } : {}), ...(authorEmail ? { authorEmail } : {}) };
 
@@ -429,6 +430,59 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
     return stale.length;
   }
 
+  /**
+   * Local sealed items under another key than the account's, when this device holds both keys: they are sealed again with the
+   * account key (pending writes) so that they can leave. Nothing happens when a key is missing: those items stay locked.
+   * @returns {Promise<number>}
+   */
+  async function resealHeld() {
+    const accountKid = box.getAccountKid();
+    if (!accountKid || !(await box.hasKey(accountKid))) return 0;
+    const paths = ['profile/diver.json', ...(await store.list('certifications/')), ...(await store.list('documents/'))];
+    /** @type {{ path: string, json: any }[]} */
+    const files = [];
+    let other = false;
+    for (const path of paths) {
+      const json = await store.read(path);
+      if (!json) continue;
+      files.push({ path, json });
+      if (json.enc?.kid && json.enc.kid !== accountKid && (await box.hasKey(json.enc.kid))) other = true;
+    }
+    if (!other) return 0;
+    const { writes, deletes } = await resealFiles(files, box);
+    if (writes.length || deletes.length) await store.trackedBatch({ writes: writes.map((w) => [w.path, w.json]), removes: deletes });
+    return writes.length + deletes.length;
+  }
+
+  /** Before a pass: a clear date of birth is sealed, items under an older key are sealed again. Never throws. */
+  async function prepareLocal() {
+    if (sealClear) {
+      try {
+        await sealClear();
+      } catch (e) {
+        // No key here yet (the pairing comes first): nothing is sealed, nothing is reported.
+        if (codeOf(e) !== 'MISSING_DATA_KEY') console.warn('Sealing the profile before the sync', e);
+      }
+    }
+    try {
+      await resealHeld();
+    } catch (e) {
+      if (codeOf(e) !== 'MISSING_DATA_KEY') console.warn('Sealing the local items again before the sync', e);
+    }
+  }
+
+  /**
+   * A device that did a first push before every existing file was tracked (an earlier build, data written untracked): the
+   * local files the working copy does not hold and that are not pending join pending once. `meta/sync.json` `seeded` marks it done.
+   * @param {string} dir
+   */
+  async function seedMissing(dir) {
+    const there = new Set((await core.bgitFiles({ dir })).files);
+    const pendingNow = new Set((await store.snapshotPending()).map(([p]) => p));
+    const missing = (await localSyncedPaths()).filter((p) => !there.has(p) && !pendingNow.has(p));
+    if (missing.length) await markAllPending(missing);
+  }
+
   /** @type {Promise<unknown>} */
   let queue = Promise.resolve();
 
@@ -488,6 +542,8 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
         const local = await localSyncedPaths();
         if (local.length && remote.length) return { status: 'joinNeeded', keyMissing: keys.keyMissing, hasRecovery: !!keys.recovery };
         if (local.length && !pullOnly) await markAllPending(local);
+      } else if (!syncState.seeded && !pullOnly) {
+        await seedMissing(dir);
       }
       // The account has no key yet: this device's key becomes the account's, with its first push.
       if (!keys.kid && !pullOnly && (await createAccountKey(dir))) keys = await readKeyState(dir);
@@ -496,6 +552,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
       let hints = new Map();
       for (let pass = 1; pass <= MAX_PASSES; pass++) {
         // 2. What is not sent yet.
+        if (!pullOnly) await prepareLocal();
         const snapshot = pullOnly ? [] : await store.snapshotPending();
         /** @type {{ path: string, text: string|null }[]} */ const send = [];
         /** @type {[string, string|null][]} */ const acknowledged = [];
@@ -579,7 +636,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
         received += applied.received;
         if (!applied.deferred.length) {
           // 8. The head this device has applied.
-          await store.write('meta/sync.json', { format: 1, accountKey, head: head ?? '', syncedAt: stamp() });
+          await store.write('meta/sync.json', { format: 1, accountKey, head: head ?? '', syncedAt: stamp(), seeded: true });
           return {
             status: 'synced',
             pullOnly,

@@ -49,21 +49,11 @@ function build() {
   if (runner && joiner && syncEngine) return { runner, joiner, engine: syncEngine };
   const { store, box, profile } = accountDataDeps();
   const core = /** @type {any} */ (BenthicCore);
-  const engine = createAccountSync({ core, store, box });
+  // A date of birth still in clear is sealed before anything leaves the device (the engine calls this before each pass).
+  const engine = createAccountSync({ core, store, box, sealClear: () => profile.migrateBirthDate() });
   syncEngine = engine;
   const base = createAccountSyncRunner({
-    engine: {
-      async run() {
-        // A date of birth still in clear is sealed before anything leaves the device.
-        try {
-          await profile.migrateBirthDate();
-        } catch (e) {
-          // No key here yet (the pairing comes first): nothing is sealed, nothing is reported.
-          if (/** @type {Error} */ (e)?.message !== 'MISSING_DATA_KEY') console.warn('Sealing the profile before the sync', e);
-        }
-        return engine.run();
-      },
-    },
+    engine,
     state: accountSync,
     allowed,
     afterRun: async () => {

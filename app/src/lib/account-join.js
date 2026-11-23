@@ -585,7 +585,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
           const acknowledged = snapshot.filter(([p]) => !plan.lockedPaths.has(p));
           const applied = await store.applySyncedIfUnchanged(expected, { writes: localWrites, removes }, acknowledged);
           if (!applied) return { state: 'busy', head };
-          await store.write('meta/sync.json', { format: 1, accountKey: s.accountKey, head: head ?? '', syncedAt: stamp() });
+          await store.write('meta/sync.json', { format: 1, accountKey: s.accountKey, head: head ?? '', syncedAt: stamp(), seeded: true });
           return { state: 'joined', head, recognised: plan.recognised, added: plan.added };
         }
         return { state: 'error', error: 'REJECTED' };
