@@ -827,7 +827,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   /**
    * One HTTP call for the page: https, or http for this machine's development server only. Answers `{ status, text }`;
    * a network failure rejects (the page shows « Le serveur ne répond pas »).
-   * @param {{ method?: string, url?: string, headers?: Record<string, string>, body?: unknown }} request
+   * @param {{ method?: string, url?: string, headers?: Record<string, string>, body?: unknown, raw?: string, timeoutMs?: number }} request
    */
   async function serverRequest(request) {
     let url;
@@ -840,8 +840,12 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     if (url.protocol !== 'https:' && !local) throw new Error('BAD_ARGUMENT: not an allowed address');
     const method = request?.method === 'POST' || request?.method === 'PUT' ? request.method : 'GET';
     const headers = { Accept: request?.binary ? 'image/webp,*/*' : 'application/json', 'User-Agent': 'Benthic', ...(request?.headers ?? {}) };
-    if (request?.body !== undefined) headers['Content-Type'] = 'application/json';
-    const response = await fetch(url, { method, headers, body: request?.body !== undefined ? JSON.stringify(request.body) : undefined, signal: AbortSignal.timeout(20000) });
+    // `raw`: a body already written as text, sent as it is with the caller's own Content-Type (the divelogs.de upload, whose
+    // login is a multipart form); else `body` is JSON.
+    const raw = typeof request?.raw === 'string' ? request.raw : undefined;
+    if (raw === undefined && request?.body !== undefined) headers['Content-Type'] = 'application/json';
+    const timeout = raw !== undefined && Number.isFinite(request?.timeoutMs) ? Math.min(Math.max(request.timeoutMs, 1000), 120000) : 20000;
+    const response = await fetch(url, { method, headers, body: raw ?? (request?.body !== undefined ? JSON.stringify(request.body) : undefined), signal: AbortSignal.timeout(timeout) });
     // `binary`: a picture (the dive computer images, task 2026-11-19-302): the body comes back as base64, 2 MB at most.
     if (request?.binary) {
       const bytes = Buffer.from(await response.arrayBuffer());
