@@ -6773,3 +6773,14 @@ Christian asked for this on 23 November 2026. Work in `main`. In the first-sync 
 - the title « Joindre cet appareil » becomes **« Jumeler cet appareil »** (also the dialog's accessible name);
 - the confirm button « Joindre » becomes **« Jumeler »**.
 The git commit message of the join step (`account-sync.md`: « Joindre cet appareil ») may stay as it is; it is not shown to the diver.
+
+## [ ] 2026-11-23-344 Addition to task 338: confirmation after the first-sync summary
+
+Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler » in the first-sync summary (tasks 338 item 11 and 343), show a confirmation dialog, on every device. Mock-ups: « Premier envoi, appareil jumelé (Benthic+) » (phone, tablet, desktop), right after the summary board.
+
+- Green check disc (40 dp, #1E6B3A, white check), title « Appareil jumelé ».
+- « Les données de cet appareil sont réunies avec celles de votre compte : <n> pièces reconnues, <n> nouvelles ajoutées, <n> confirmées. » with the counts of the join that just ran (drop a part whose count is 0).
+- « Elles se synchronisent maintenant avec vos autres appareils. »
+- One button: « OK ». Basic dialog, no ✕.
+- Shown once the « Jumeler cet appareil » commit is pushed; on a failure, show the usual sync error instead.
+- If the recovery key offer (338 item 9) follows at the first sync, it comes after this dialog.
