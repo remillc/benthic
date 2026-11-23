@@ -234,9 +234,10 @@
     }
 
     .bc-dive-media--line {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: center;
-      gap: 8px;
+      column-gap: 8px;
       padding: 8px 16px 4px;
       font-size: 14px;
       line-height: 20px;
@@ -248,7 +249,6 @@
     }
 
     .bc-dive-media--summary {
-      flex: 1;
       min-width: 0;
       color: var(--bc-text);
     }
@@ -260,7 +260,8 @@
     }
 
     .bc-dive-media--all {
-      flex: none;
+      width: auto;
+      white-space: nowrap;
       padding: 4px 0 4px 8px;
       border: 0;
       background: none;

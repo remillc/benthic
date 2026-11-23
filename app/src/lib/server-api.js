@@ -10,9 +10,9 @@ export const SERVER_ERRORS = /** @type {const} */ (['INVALID_ADDRESS', 'WRONG_CO
 export const VALIDATION_ERRORS = /** @type {const} */ (['TOKEN_UNKNOWN', 'TOKEN_EXPIRED', 'TOKEN_USED', 'OWN_CODE', 'SUBSCRIPTION_REQUIRED', 'TOO_MANY_REQUESTS']);
 
 /** The codes of the photo and video routes (lib/media-sync.js). */
-export const MEDIA_ERRORS = /** @type {const} */ (['QUOTA_EXCEEDED', 'NOT_FOUND']);
+export const MEDIA_ERRORS = /** @type {const} */ (['QUOTA_EXCEEDED']);
 
-/** @typedef {typeof SERVER_ERRORS[number]|typeof VALIDATION_ERRORS[number]|typeof MEDIA_ERRORS[number]} ServerErrorCode */
+/** @typedef {typeof SERVER_ERRORS[number]|typeof VALIDATION_ERRORS[number]|typeof MEDIA_ERRORS[number]|'NOT_FOUND'} ServerErrorCode */
 
 export class ServerError extends Error {
   /**
@@ -40,7 +40,10 @@ export function errorFromResponse(status, body) {
   if (typeof code === 'string' && (/** @type {readonly string[]} */ (SERVER_ERRORS).includes(code) || /** @type {readonly string[]} */ (VALIDATION_ERRORS).includes(code) || /** @type {readonly string[]} */ (MEDIA_ERRORS).includes(code)) && code !== 'UNREACHABLE') {
     return new ServerError(/** @type {ServerErrorCode} */ (code), retry);
   }
-  return new ServerError('UNREACHABLE');
+  const unreachable = new ServerError('UNREACHABLE');
+  // What the server said, for the one caller that tells a missing object from a missing route (mediaDownloadUrl).
+  /** @type {any} */ (unreachable).serverCode = typeof code === 'string' ? code : '';
+  return unreachable;
 }
 
 /**
@@ -245,7 +248,14 @@ export function createServerApi({ baseUrl, transport }) {
      * @param {string} sessionToken @param {string} hash @returns {Promise<{ url: string, size: number|null }>}
      */
     async mediaDownloadUrl(sessionToken, hash) {
-      const r = await call('POST', '/v1/media/download-url', { hash }, { Authorization: `Bearer ${sessionToken}` });
+      let r;
+      try {
+        r = await call('POST', '/v1/media/download-url', { hash }, { Authorization: `Bearer ${sessionToken}` });
+      } catch (e) {
+        // 404 NOT_FOUND from the route itself: the object is not on the server (yet).
+        if (/** @type {any} */ (e)?.serverCode === 'NOT_FOUND') throw new ServerError('NOT_FOUND');
+        throw e;
+      }
       if (typeof r.url !== 'string') throw new ServerError('UNREACHABLE');
       return { url: r.url, size: Number.isFinite(r.size) ? r.size : null };
     },

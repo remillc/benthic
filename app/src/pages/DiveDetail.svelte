@@ -1636,29 +1636,6 @@
       }
     }
 
-    /* A label with a second line under it (computer role, photos). */
-    .bc-dive-detail--stacked {
-      padding: 10px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      :global(.md) & {
-        padding: 0;
-      }
-
-      .bc-dive-detail--sub {
-        font-size: 13px;
-        line-height: 18px;
-        color: var(--bc-text-2);
-
-        :global(.md) & {
-          font-size: 14px;
-          line-height: 20px;
-        }
-      }
-    }
-
     /* Overall rating under the title. */
     .bc-dive-detail--rating {
       margin: 8px 0 0;

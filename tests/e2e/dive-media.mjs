@@ -82,7 +82,7 @@ export async function diveMediaFlows(h) {
         discs: root.querySelectorAll('.bc-dive-media--play').length,
         durations: [...root.querySelectorAll('.bc-dive-media--duration')].map((e) => e.textContent.trim()),
         add: add ? { text: add.textContent.trim(), ...box(add), dashed: getComputedStyle(add).borderTopStyle } : null,
-        summary: root.querySelector('.bc-dive-media--summary')?.firstChild?.textContent.trim() ?? '',
+        summary: (root.querySelector('.bc-dive-media--summary')?.firstChild?.textContent ?? '').replace(/[\s  ]+/g, ' ').trim(),
         all: root.querySelector('.bc-dive-media--all')?.textContent.trim() ?? null,
         old: document.body.textContent.includes('seule leur référence'),
         radius: tiles[0] ? getComputedStyle(tiles[0]).borderTopLeftRadius : '',
@@ -134,6 +134,14 @@ export async function diveMediaFlows(h) {
     tab = await openTab(c.w, c.h, c.mobile, false, c.desktop, { theme: process.env.BC_THEME || 'md' });
     await tab.send('Emulation.setLocaleOverride', { locale: 'fr-FR' }).catch(() => {});
     await makePlus(tab);
+    // The previous device's pictures are forgotten: the page storage is shared by the tabs of this browser.
+    await tab.run(async () => {
+      const { store } = (await import('/src/lib/profile.svelte.js')).accountDataDeps();
+      for (const path of await store.list('media/')) await store.remove(path);
+      const m = await import('/src/lib/dive-media.svelte.js');
+      m.refreshMedia();
+      return 1;
+    });
     await tab.run(async () => (await import('/src/lib/settings.svelte.js')).setAppSetting('showPhotos', false));
     await sleep(500);
     await openDive(tab, c.desktop);
