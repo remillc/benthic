@@ -48,5 +48,14 @@ export function readPairingScan(result) {
  * @returns {Promise<string|null>}
  */
 export async function scanPairingCode(kind) {
-  return readPairingScan(await BenthicCore.qrScan(/** @type {any} */ (pairScanOptions(kind))));
+  try {
+    return readPairingScan(await BenthicCore.qrScan(/** @type {any} */ (pairScanOptions(kind))));
+  } catch (e) {
+    // The screen closed without a code (the diver left, or the app was restarted under it): nothing to say.
+    if (isCancelled(e)) return null;
+    throw e;
+  }
 }
+
+/** @param {unknown} e */
+export const isCancelled = (e) => /cancel/i.test(String(/** @type {any} */ (e)?.code ?? '') + ' ' + String(/** @type {any} */ (e)?.message ?? e ?? ''));

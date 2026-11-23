@@ -229,6 +229,17 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
 
   /** Moves an old clear-text birth date into the sealed block without overwriting a concurrent edit. */
   async function migrateBirthDate() {
+    try {
+      return await migrateBirthDateNow();
+    } catch (e) {
+      // A key this device does not hold yet (the account's, before the pairing) is an expected state: the date stays in
+      // clear until the key is here, and the read goes on with the file as it is.
+      if (/** @type {Error} */ (e)?.message !== 'MISSING_DATA_KEY') throw e;
+      return (await store.readStrict(DIVER)) ?? null;
+    }
+  }
+
+  async function migrateBirthDateNow() {
     for (;;) {
       const { text, value: file } = await store.readSnapshot(DIVER);
       if (!file || !Object.hasOwn(file, 'dateOfBirth')) return file;

@@ -103,3 +103,19 @@ export function joinCounters({ recognised, added, matches }) {
     { id: 'toConfirm', value: matches.length },
   ];
 }
+
+/**
+ * Which screen of the account sync is due now, one at a time and in this order: another account, the missing key (the
+ * pairing), the join, the recovery key. While the account key is missing the join is never offered: it comes after the key is
+ * held (the join seals and merges with it). `due` says which questions were not asked yet in this run.
+ * @param {{ status: string, differentAccount: boolean, keyMissing: boolean, joinNeeded: boolean, pullOnly: boolean }} state
+ * @param {{ different: boolean, unlock: boolean, join: boolean, recovery: boolean }} due
+ * @returns {'different'|'unlock'|'join'|'recovery'|''}
+ */
+export function dueScreen(state, due) {
+  if (state.differentAccount) return due.different ? 'different' : '';
+  if (state.keyMissing) return due.unlock && state.status !== 'error' ? 'unlock' : '';
+  if (state.joinNeeded) return due.join ? 'join' : '';
+  if (state.status === 'synced' && !state.pullOnly && due.recovery) return 'recovery';
+  return '';
+}

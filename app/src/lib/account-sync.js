@@ -732,7 +732,47 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
         const { dir } = await session();
         await core.bgitWrite({ dir, files });
         await core.bgitCommit({ dir, paths: files.map((f) => f.path), message, ...author });
+        if (!(await store.read('meta/sync.json'))) {
+          // No first sync yet (the join is waiting): the next run starts from a fresh clone, so the key files go up now.
+          const { access } = await session();
+          try {
+            await core.bgitPush({ dir, username: access.username, token: access.token, branch: BRANCH });
+          } catch (e) {
+            if (codeOf(e) === 'REJECTED') {
+              try {
+                await core.bgitPull({ dir, username: access.username, token: access.token, branch: BRANCH, ...author });
+                await core.bgitPush({ dir, username: access.username, token: access.token, branch: BRANCH });
+              } catch {
+                // Best effort: an expired pairing file is cleaned by a later run.
+              }
+            } else if (codeOf(e) !== 'UNREACHABLE') throw e;
+          }
+        }
         return runOnce();
+      });
+      queue = next.catch(() => {});
+      return next;
+    },
+    /**
+     * The account's keys, as the server holds them now: the working copy is cloned when this device has none yet (a device whose
+     * first sync stopped at the join or at the missing key), else pulled. Nothing of the diver's data is sent, received or
+     * joined here: the pairing and the recovery key read `keys/` this way before the join. Offline rejects (`UNREACHABLE`).
+     * @returns {Promise<KeyState>}
+     */
+    fetchKeys() {
+      const next = queue.then(async () => {
+        const { access, dir } = await session();
+        const gitAccess = { dir, username: access.username, token: access.token, branch: BRANCH };
+        let present = true;
+        try {
+          await core.bgitHead({ dir, branch: BRANCH });
+        } catch (e) {
+          if (codeOf(e) !== 'NO_WORKING_COPY') throw e;
+          present = false;
+        }
+        if (!present) await core.bgitClone({ ...gitAccess, url: access.repositoryUrl });
+        else await core.bgitPull({ ...gitAccess, ...author });
+        return readKeyState(dir);
       });
       queue = next.catch(() => {});
       return next;

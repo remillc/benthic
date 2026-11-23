@@ -58,7 +58,8 @@ function build() {
         try {
           await profile.migrateBirthDate();
         } catch (e) {
-          console.warn('Sealing the profile before the sync', e);
+          // No key here yet (the pairing comes first): nothing is sealed, nothing is reported.
+          if (/** @type {Error} */ (e)?.message !== 'MISSING_DATA_KEY') console.warn('Sealing the profile before the sync', e);
         }
         return engine.run();
       },
@@ -105,6 +106,14 @@ export function dismissAccountConflicts() {
  */
 export function readAccountKeys() {
   return build().engine.readKeys();
+}
+
+/**
+ * The account's keys as the server holds them now, cloning the working copy first when this device has none (no data is
+ * received or joined). The pairing and the recovery key read the keys this way.
+ */
+export function fetchAccountKeys() {
+  return build().engine.fetchKeys();
 }
 
 /** Every path of the account's working copy (the start-over lists what to drop). */

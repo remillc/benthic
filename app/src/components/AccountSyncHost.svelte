@@ -18,6 +18,7 @@
   import { accountSync } from '../lib/account-sync.svelte.js';
   import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { desktopApp } from '../lib/layout.svelte.js';
+  import { dueScreen } from '../lib/account-sync-screens.js';
   import * as flows from '../lib/account-sync-flows.svelte.js';
 
   const flow = flows.accountFlow;
@@ -36,17 +37,16 @@
   // Which screen is due, one at a time and in this order: another account, the missing key, the join, the recovery key. A
   // manual sync runs again after a screen was closed, so a question left open comes back then.
   $effect(() => {
-    if (!benthicPlusAccount.signedIn || flow.screen) return;
+    // `flow.busy`: a pairing in progress (no screen is open between the scan and « Appareil jumelé »): nothing is asked meanwhile.
+    if (!benthicPlusAccount.signedIn || flow.screen || flow.busy) return;
+    if (accountSync.status === 'syncing') return flows.resetQuestions();
     const { status, differentAccount, keyMissing, joinNeeded, pullOnly } = accountSync;
-    if (status === 'syncing') return flows.resetQuestions();
     untrack(() => {
-      if (differentAccount) return flows.differentDue() ? flows.askDifferentAccount() : undefined;
-      if (keyMissing) {
-        if (flows.unlockDue() && status !== 'error') flows.askUnlock();
-        return;
-      }
-      if (joinNeeded) return flows.joinDue() ? void flows.openJoin() : undefined;
-      if (status === 'synced' && !pullOnly && flows.recoveryOfferDue()) flows.offerRecoveryKey();
+      const due = dueScreen({ status, differentAccount, keyMissing, joinNeeded, pullOnly }, { different: flows.differentDue(), unlock: flows.unlockDue(), join: flows.joinDue(), recovery: flows.recoveryOfferDue() });
+      if (due === 'different') flows.askDifferentAccount();
+      else if (due === 'unlock') flows.askUnlock();
+      else if (due === 'join') void flows.openJoin();
+      else if (due === 'recovery') flows.offerRecoveryKey();
     });
   });
 

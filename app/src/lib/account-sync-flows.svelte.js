@@ -20,10 +20,10 @@ import {
   pairingFilePath,
   parsePairingPayload,
   recoverAccountKey,
-  resealFiles,
   startOver,
 } from './account-keys.js';
 import { isKeyPath } from './account-sync.js';
+import { adoptAndReseal as adopt, pairWithCode } from './account-pairing.js';
 import { scanPairingCode } from './pair-scan.js';
 import { showTwoDeviceNotice } from './two-device-notice.js';
 import { accountLock } from './locked-data.svelte.js';
@@ -35,6 +35,7 @@ import {
   dismissAccountConflicts,
   forgetLastAccount,
   listAccountPaths,
+  fetchAccountKeys,
   readAccountKeys,
   syncAccountNow,
 } from './account-sync.svelte.js';
@@ -120,18 +121,7 @@ const open = (screen) => {
  * @param {{ key: string, kid: string }} account
  */
 async function adoptAndReseal(account) {
-  const { store, box } = accountDataDeps();
-  await box.adoptAccountKey(account.key);
-  const paths = ['profile/diver.json', ...(await store.list('certifications/')), ...(await store.list('documents/'))];
-  /** @type {{ path: string, json: any }[]} */
-  const files = [];
-  for (const path of paths) {
-    const json = await store.read(path);
-    if (json) files.push({ path, json });
-  }
-  const { writes, deletes } = await resealFiles(files, box);
-  if (writes.length || deletes.length) await store.trackedBatch({ writes: writes.map((w) => [w.path, w.json]), removes: deletes });
-  await box.persistAccountKey();
+  await adopt(account, accountDataDeps());
   accountSync.keyMissing = false;
   accountSync.locked = [];
 }
@@ -236,17 +226,6 @@ export async function confirmPair() {
 // ---------------------------------------------------------------------------------------------------------------
 // This device has no key (items 1 to 4)
 
-/** The server's pairing file `id`, after at most a few syncs. @param {string} id */
-async function pairingFile(id) {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    await syncAccountNow();
-    const found = (await readAccountKeys()).pairing.find((f) => f.path === pairingFilePath(id));
-    if (found) return found.json;
-    await new Promise((r) => setTimeout(r, 1500));
-  }
-  return null;
-}
-
 /** @param {unknown} e */
 function pairingFailure(e) {
   const code = codeOf(e);
@@ -265,16 +244,14 @@ export async function pairThisDevice() {
     say('accountSync.pair.failed');
     return;
   }
+  // The scanner closed without a code (the diver left, or the app was restarted under it): nothing to say.
   if (text == null) return;
   try {
-    const payload = parsePairingPayload(text);
-    if (payload.mode !== 'k') throw new Error('PAIRING_PAYLOAD_INVALID');
     accountFlow.busy = true;
-    const file = await pairingFile(payload.id);
-    if (!file) throw new Error('PAIRING_EXPIRED');
-    const account = await acceptPairing({ payload: text }, file);
-    await adoptAndReseal(account);
-    await commitAccountKeyFiles({ deletes: [pairingFilePath(payload.id)], message: 'Benthic: paired' });
+    const { store, box } = accountDataDeps();
+    await pairWithCode(text, { store, box, fetchKeys: fetchAccountKeys, commitKeyFiles: commitAccountKeyFiles });
+    accountSync.keyMissing = false;
+    accountSync.locked = [];
     await afterUnlocked();
   } catch (e) {
     console.error('Pairing this device', e);
@@ -295,8 +272,7 @@ export async function showPairNew() {
       if (!pairing?.privateKey || accountFlow.screen !== 'pairNew') return stopWatching();
       const mine = pairing;
       try {
-        await syncAccountNow();
-        const found = (await readAccountKeys()).pairing.find((f) => f.path === pairingFilePath(mine.id));
+        const found = (await fetchAccountKeys()).pairing.find((f) => f.path === pairingFilePath(mine.id));
         if (!found) return;
         stopWatching();
         const account = await acceptPairing({ id: mine.id, privateKey: mine.privateKey }, found.json);
@@ -327,7 +303,7 @@ export async function enterRecoveryKey(input) {
   accountFlow.busy = true;
   accountFlow.error = '';
   try {
-    const file = (await readAccountKeys()).recovery;
+    const file = (await fetchAccountKeys()).recovery;
     if (!file) throw new Error('RECOVERY_KEY_WRONG');
     const account = await recoverAccountKey(input, file);
     await adoptAndReseal(account);
@@ -442,6 +418,8 @@ function itemLabel(kind, item) {
 /** What joining would do, then the summary. */
 export async function openJoin() {
   asked.join = true;
+  // The pairing comes first: the join seals and merges with the account key.
+  if (accountSync.keyMissing) return;
   accountFlow.busy = true;
   const analysis = await analyseJoin();
   accountFlow.busy = false;
