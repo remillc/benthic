@@ -6766,3 +6766,10 @@ Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre 
 « Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte. »
 
 Body text, 14 sp, on-surface-variant colour, 4 dp under the title and 20 dp above the counters, as in the mock-up.
+
+## [ ] 2026-11-23-343 Correction of task 338: the join summary is « Jumeler cet appareil »
+
+Christian asked for this on 23 November 2026. Work in `main`. In the first-sync summary dialog (task 338, item 11; mock-ups « Premier envoi, résumé et pièces à confirmer (Benthic+) » on phone, tablet and desktop), on every device:
+- the title « Joindre cet appareil » becomes **« Jumeler cet appareil »** (also the dialog's accessible name);
+- the confirm button « Joindre » becomes **« Jumeler »**.
+The git commit message of the join step (`account-sync.md`: « Joindre cet appareil ») may stay as it is; it is not shown to the diver.
