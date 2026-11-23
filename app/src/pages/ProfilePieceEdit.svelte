@@ -27,7 +27,7 @@
   import { SPECS, detailFields, isNamedByHand, derivedName, detailProblems, detailsToKeep, parseStampText, stampText } from '../lib/gear-fields.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { suggestionsFor, ownLeadDays } from '../lib/maintenance.js';
+  import { suggestionsFor, ownLeadDays, o2CellsDue } from '../lib/maintenance.js';
   import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel } from '../lib/maintenance-text.js';
   import { afterReminderSaved } from '../lib/maintenance-notify.js';
@@ -144,6 +144,7 @@
   /** The message of a wrong field, shown once the diver has paused or left it (lib/live-validation.svelte.js). */
   const detailLive = {
     lastInspection: liveError(() => details.lastInspection ?? '', () => (detailWrong.lastInspection ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
+    o2CellsMadeOn: liveError(() => details.o2CellsMadeOn ?? '', () => (detailWrong.o2CellsMadeOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
     o2CellsOn: liveError(() => details.o2CellsOn ?? '', () => (detailWrong.o2CellsOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
     lastService: liveError(() => details.lastService ?? '', () => (detailWrong.lastService ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
     lastHydro: liveError(() => stampTyped, () => (detailWrong.lastHydro ? t('gear.fieldError.stamp') : '')),
@@ -249,7 +250,7 @@
     saving = true;
     try {
       const hydroOn = type === 'cylinder' ? (parseStampText(stampTyped) ?? '') : '';
-      const kept = detailsToKeep(/** @type {any} */ (type), { ...details, lastHydro: hydroOn }, piece?.details ?? {});
+      const kept = detailsToKeep(/** @type {any} */ (type), { ...details, lastHydro: hydroOn }, piece?.details ?? {}, /** @type {any} */ (piece?.type ?? type));
       const saved = await change(async (inv) => {
         let nextPhoto = spec.photo ? photoId : '';
         if (spec.photo && photoChanged) nextPhoto = photoUrl ? await inv.savePhoto(photoUrl) : '';
@@ -258,7 +259,7 @@
           type: /** @type {any} */ (type),
           name: effectiveName,
           brand: spec.brand ? brand : '',
-          model: spec.brand ? model : '',
+          model: spec.brand && !spec.brandOnly ? model : '',
           serial: computer && piece?.computerModel ? piece.serial : spec.serial ? serial : '',
           purchasedOn: purchasedIso,
           note,
@@ -289,6 +290,17 @@
             const known = (await inv.listMaintenance()).find((m) => m.gearId === g.id && m.task === task);
             if (known?.history?.some((h) => h.doneOn === date)) continue;
             await inv.noteMaintenance({ gearId: g.id, task }, { kind, doneOn: date });
+          }
+        }
+        // The O₂ cells fall due at the earlier of manufacture + 18 months and installation + 12 months (task 334).
+        if (type === 'rebreather') {
+          const cells = (await inv.listMaintenance()).find((m) => m.gearId === g.id && m.task === 'o2Cells');
+          if (cells && cells.intervalMonths != null) {
+            const due = o2CellsDue({ madeOn: kept.o2CellsMadeOn, installedOn: kept.o2CellsOn });
+            const wanted = kept.o2CellsMadeOn && due ? due : '';
+            if ((cells.dueOn ?? '') !== wanted || (wanted && cells.dueFrom !== (cells.lastDoneOn ?? ''))) {
+              await inv.saveMaintenance({ id: cells.id, gearId: g.id, task: 'o2Cells', intervalMonths: cells.intervalMonths, intervalDives: cells.intervalDives, dueOn: wanted || undefined, dueFrom: wanted ? (cells.lastDoneOn ?? '') : undefined });
+            }
           }
         }
         return g;
@@ -346,7 +358,7 @@
   {:else if f.kind === 'switch'}
     <SwitchField label={t(`gear.field.${f.key}`)} checked={details[f.key] === 'yes'} onchange={(v) => setDetail(f.key, v ? 'yes' : '')} supporting={f.hint ? t(`gear.fieldHint.${f.key}`) : ''} />
   {:else if f.kind === 'date'}
-    <DateField label={t(`gear.field.${f.key}`)} bind:value={details[f.key]} maxYear={new Date().getFullYear()} supporting={detailLive[/** @type {'lastInspection'|'o2CellsOn'|'lastService'} */ (f.key)]?.error} />
+    <DateField label={t(`gear.field.${f.key}`)} bind:value={details[f.key]} maxYear={new Date().getFullYear()} supporting={detailLive[/** @type {'lastInspection'|'o2CellsMadeOn'|'o2CellsOn'|'lastService'} */ (f.key)]?.error} />
   {:else if f.kind === 'stamp'}
     <TextField
       label={t(`gear.field.${f.key}`)}
@@ -472,11 +484,15 @@
       <TextField label={type === 'other' ? t('gear.pieceNew.otherName') : t('gear.pieceEdit.name')} bind:value={name} supporting={type === 'cylinder' ? t('gear.pieceNew.cylinderNameHint') : ''} />
     {/if}
 
+    {#if spec.brandOnly}
+      <TextField label={t('gear.pieceEdit.brand')} bind:value={brand} />
+    {/if}
+
     {#if type !== 'other'}
       {#each fields.before as f (f.key)}{@render detail(f)}{/each}
     {/if}
 
-    {#if spec.brand}
+    {#if spec.brand && !spec.brandOnly}
       {#if computer}
         <ComboField label={t('gear.pieceEdit.brand')} bind:value={brand} options={lists.vendors} />
       {:else}
