@@ -187,13 +187,14 @@ test('the span a cylinder was breathed', () => {
   assert.equal(cylinderSpan(samples, 2), null);
 });
 
-test('Autre équipement: a seam of three props, no storage of its own, inert in the alpha', () => {
+test('Autre équipement: a seam of three props, no storage of its own, absent without Benthic+', () => {
   const gear = read('app/src/components/DesktopOtherGear.svelte');
   assert.match(gear, /let \{ items = \[\], onadd, onremove, locked = false \} = \$props\(\)/);
   assert.match(gear, /disabled=\{!onadd\}/);
   assert.doesNotMatch(gear, /deviceStore|BenthicCore|localStorage|saveDiveChanges/);
   const fields = read('app/src/components/DesktopDiveFields.svelte');
-  assert.match(fields, /<DesktopOtherGear \/>/); // the alpha edition
+  // Without Benthic+ (and in the alpha) the section is not drawn at all (task 2026-11-22-333).
+  assert.doesNotMatch(fields, /<DesktopOtherGear \/>/);
   assert.match(fields, /<DesktopOtherGear items=\{otherItems\} onadd=\{[^}]*\} onremove=\{removeGear\} \/>/); // the release edition
 });
 

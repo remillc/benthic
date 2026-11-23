@@ -82,12 +82,14 @@ export function isMostRecent(id, dives) {
  * @param {{ id: number, suit: string, waterType: string, cylinders: { sizeMl: number }[] }} current
  * @param {WeightSource[]} dives candidates, any order
  * @param {'kg'|'lbs'} unit
+ * @param {boolean} [corrected] whether « Ce lest était » corrects the weight (Benthic+, task 2026-11-22-333); without it the
+ *   suggestion is the last comparable dive's weight as it is
  * @returns {WeightSuggestion|null}
  */
-export function suggestWeight(current, dives, unit) {
+export function suggestWeight(current, dives, unit, corrected = true) {
   const source = [...dives].sort(mostRecentFirst).find((d) => matches(d, current));
   if (!source) return null;
-  const feedback = feedbackOf(source.tags);
+  const feedback = corrected ? feedbackOf(source.tags) : '';
   const delta = feedback === 'too-light' ? adjustmentGrams(unit) : feedback === 'too-heavy' ? -adjustmentGrams(unit) : 0;
   const weights = source.weights.filter((w) => w.grams > 0).map((w) => ({ description: w.description, grams: w.grams }));
   const base = total(weights);

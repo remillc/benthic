@@ -13,7 +13,6 @@
   import ButtonGroup from './ButtonGroup.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
-  import BenthicPlusChip from './BenthicPlusChip.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
   import DesktopConsumption from './DesktopConsumption.svelte';
@@ -21,8 +20,9 @@
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
   import { isRelease } from '../lib/edition.js';
-  import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap } from '../lib/inventory.svelte.js';
-  import { diveKeyOf, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
+  import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
+  import { applyKit, cloneEquipment, diveKeyOf, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
+  import { openOver } from '../lib/navigation.svelte.js';
   import { siteChange } from '../lib/sites.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
@@ -68,7 +68,52 @@
         ]
       : [],
   );
+  // Benthic+ only (tasks 2026-11-22-332 and 333): without it the kit, the undersuit, « Ce lest était » and « Autre équipement »
+  // are not in the tab at all.
   const plus = $derived(isSubscriber());
+  const undersuits = $derived(visibleGear().filter((g) => g.type === 'undersuit'));
+  const undersuitOptions = $derived(undersuits.map((g) => ({ value: g.id, label: g.name })));
+  const MANAGE_KITS = '__manage__';
+  const kitOptions = $derived([
+    ...gear.kits.map((kit) => ({ value: kit.id, label: `${kit.name} · ${kit.gearIds.length}` })),
+    { value: MANAGE_KITS, label: t('gear.diveGear.manageKits') },
+  ]);
+  const appliedKit = $derived(equipment ? gear.kits.find((kit) => kit.id === equipment.kitId) : undefined);
+
+  /** The undersuit of this dive. @param {string|string[]|number} id */
+  async function saveUndersuit(id) {
+    if (!equipment) return;
+    await saveEquipment({ ...equipment, undersuitGearId: String(id) });
+  }
+
+  /**
+   * A kit chosen: fills the suit, the undersuit and the other gear as the phone's « Remplir avec un kit » does (applyKit); a
+   * message offers « Annuler », which puts the previous equipment and suit back. « Gérer les kits » opens the inventory.
+   * @param {string|string[]|number} id
+   */
+  async function chooseKit(id) {
+    if (id === MANAGE_KITS) {
+      openOver('/profile/gear/');
+      return false;
+    }
+    const kit = gear.kits.find((k) => k.id === id);
+    if (!kit || !equipment) return true;
+    const before = cloneEquipment(equipment);
+    const beforeSuit = dive.suit ?? '';
+    const next = applyKit(equipment, kit, gearMap());
+    await saveEquipment(next);
+    const suit = next.suitGearId && next.suitGearId !== before.suitGearId ? (gearMap().get(next.suitGearId)?.name ?? '') : '';
+    if (suit && suit !== beforeSuit) await save('suit', suit);
+    showSnackbar(t('gear.diveGear.kitApplied', { name: kit.name }), {
+      action: t('edit.undo'),
+      timeout: 8000,
+      onAction: async () => {
+        await saveEquipment(before);
+        if (suit && suit !== beforeSuit) await save('suit', beforeSuit);
+      },
+    });
+    return true;
+  }
   let addingGear = $state(false);
   /** @param {import('../lib/inventory.js').DiveEquipment} next */
   async function saveEquipment(next) {
@@ -385,6 +430,22 @@
     </div>
   {:else if tab === 'equipment'}
     <!-- Équipement (mock-up bureau-carnet-onglet-equipement). -->
+    {#if plus && equipment}
+      <!-- Kit (Benthic+): fills the fields below, each stays editable. -->
+      <DesktopEditField
+        name="kit"
+        kind="choice"
+        label={t('desktopDetail.label.kit')}
+        value={equipment.kitId}
+        display={appliedKit?.name ?? ''}
+        note={appliedKit ? t('desktopDetail.kitPieces', { n: appliedKit.gearIds.length }) : ''}
+        options={kitOptions}
+        invitation={t('desktopDetail.invitation.kit')}
+        showHint={false}
+        onsave={(v) => chooseKit(v)}
+      />
+      <p class="bc-desktop-dive-fields--kit-note">{t('desktopDetail.kitNote')}</p>
+    {/if}
     <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.computers')}</h3>
     {#snippet noComputerPhoto()}{/snippet}
     {#each dive.diveComputers ?? [] as dc, i (i)}
@@ -399,27 +460,24 @@
 
     <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.protection')}</h3>
     <DesktopEditField name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
+    {#if plus && equipment && (undersuits.length || equipment.undersuitGearId)}
+      <DesktopEditField name="undersuit" kind="choice" label={t('desktopDetail.label.undersuit')} value={equipment.undersuitGearId} options={undersuitOptions} invitation={t('desktopDetail.invitation.undersuit')} showHint={false} onsave={(v) => saveUndersuit(v)} />
+    {/if}
     <div class="bc-desktop-dive-fields--row" data-field="weights">
       <span class="bc-desktop-dive-fields--row-label">{t('desktopDetail.label.weights')}</span>
       <DesktopWeights weights={dive.weights ?? []} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
     </div>
-    {#if dive.weights?.some((w) => w.grams > 0)}
+    {#if plus && dive.weights?.some((w) => w.grams > 0)}
       <div class="bc-desktop-dive-fields--row">
         <span class="bc-desktop-dive-fields--row-label" id="bc-df-feedback">{t('weightFeedback.title')}</span>
         <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="bc-df-feedback" clearable rail />
       </div>
     {/if}
 
-    <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}{#if equipment && !plus}<BenthicPlusChip onLight />{/if}</h3>
-    {#if equipment && plus}
+    {#if plus && equipment}
+      <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}</h3>
       <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
       <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
-    {:else if equipment}
-      <!-- Without a Benthic+ account the list shows, with the chip, and cannot change. -->
-      <DesktopOtherGear items={otherItems} locked />
-    {:else}
-      <!-- Alpha edition: the list is not stored anywhere. -->
-      <DesktopOtherGear />
     {/if}
   {:else if tab === 'gas'}
     <!-- Gaz (mock-up bureau-carnet-onglet-gaz): one card per cylinder, the selected one's fields, Consommation. -->
@@ -482,11 +540,12 @@
       color: var(--bc-text-2);
     }
 
-    .bc-desktop-dive-fields--heading :global(.bc-plus-chip) {
-      margin-inline-start: 10px;
-      vertical-align: middle;
-      letter-spacing: 0;
-      text-transform: none;
+    /* The note under the kit row: what applying a kit fills. */
+    .bc-desktop-dive-fields--kit-note {
+      margin: -2px 0 0 152px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
     }
 
     .bc-desktop-dive-fields--stack {

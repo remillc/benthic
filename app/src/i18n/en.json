@@ -3283,7 +3283,11 @@
       "Information (Benthic+): the page is edited in place. The pencil turns the sections into fields, “Save” is in the top bar and Back leaves without saving. An empty value no longer shows any text. On a tablet and the desktop, the sections have a horizontal margin.",
       "Tablet and desktop: the Account button, at the bottom of the sidebar, is larger.",
       "Dive profile: no curve is on by default any more, the water temperature included; turn on the ones you want, the choice is kept.",
-      "Tablet and desktop: at start, the right pane shows the shape of the dive while the logbook is read, instead of “Choose a dive to see it here”."
+      "Tablet and desktop: at start, the right pane shows the shape of the dive while the logbook is read, instead of “Choose a dive to see it here”.",
+      "Tablet and desktop: “Get the dive signed” (Benthic+) opens in a dialog, from the dive’s ⋮ menu on a tablet and from a button in the header on the desktop.",
+      "Desktop: the site’s map fills the whole width of the dive’s header.",
+      "Desktop: with Benthic+, the Equipment tab offers a kit to apply, the undersuit, “This weight was” and “Other gear”; without Benthic+, these fields no longer appear.",
+      "“This weight was” is Benthic+ only on every screen; without Benthic+, the weight suggestion uses the last comparable dive’s weight, with no correction. What is already noted on a dive is kept."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -4932,6 +4936,7 @@
     "enlarge": "Enlarge the profile",
     "enlargeTip": "Enlarge the profile ({shortcut})",
     "plan": "Plan from this dive",
+    "validate": "Get the dive signed… (an instructor’s or a buddy’s signature)",
     "share": "Share…",
     "export": "Export the dive…",
     "delete": "Delete the dive",
@@ -4967,6 +4972,8 @@
       "visibility": "Visibility",
       "rating": "Rating",
       "suit": "Suit",
+      "undersuit": "Undersuit",
+      "kit": "Kit",
       "surfacePressure": "Surface pressure",
       "maxDepth": "Max depth",
       "duration": "Duration",
@@ -4990,7 +4997,14 @@
       "pressure": "Pressure",
       "coordinates": "Coordinates"
     },
+    "kitNote": "Fills the suit, the undersuit, the weights and the other gear. Each field can still be changed.",
+    "kitPieces": {
+      "one": "{n} piece",
+      "other": "{n} pieces"
+    },
     "invitation": {
+      "kit": "Apply a kit",
+      "undersuit": "Choose an undersuit",
       "site": "Site not set",
       "buddies": "Add buddies",
       "guides": "Add a guide",
@@ -6619,6 +6633,7 @@
     "failedNoDives": "The file holds no dive. The current logbook is kept."
   },
   "validation": {
+    "back": "Back",
     "itemName": "{name}, {role}",
     "menuOne": "Get the dive signed",
     "menuMany": "Get the dives signed",

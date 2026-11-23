@@ -6,8 +6,8 @@
   // (offline and never seen), nothing is shown. The map's credits are in About.
   import { DRAW_WIDTH, HALF_HEIGHT, readySiteMap, sharedSiteMap } from '../lib/site-image.js';
 
-  // `desk` (desktop detail pane, task 2026-11-15-193): the picture covers the top 170 dp of the pane,
-  // with no top bar above it.
+  // `desk` (desktop detail pane, tasks 2026-11-15-193 and 2026-11-22-331): the picture covers the top 170 dp of the pane,
+  // across its whole width, with no top bar above it.
   /** @type {{ latUdeg: number, lonUdeg: number, onshown: (shown: boolean) => void, desk?: boolean }} */
   let { latUdeg, lonUdeg, onshown, desk = false } = $props();
 
@@ -42,7 +42,12 @@
 
 <div class="bc-site-header-image bc-site-header-image--image" class:bc-site-header-image--desk={desk} aria-hidden="true">
   {#if src}
-    <img {src} alt="" style:width="{DRAW_WIDTH}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-DRAW_WIDTH / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
+    {#if desk}
+      <!-- Desktop pane: as wide as the pane, never stretched (the picture's own proportions), centred on the pin. -->
+      <img {src} alt="" width={DRAW_WIDTH} height={HALF_HEIGHT * 2} />
+    {:else}
+      <img {src} alt="" style:width="{DRAW_WIDTH}px" style:height="{HALF_HEIGHT * 2}px" style:margin-left="{-DRAW_WIDTH / 2}px" style:margin-top="{-HALF_HEIGHT}px" />
+    {/if}
     <svg class="bc-site-header-image--pin" width="40" height="40" viewBox="-20 -20 40 40">
       <circle class="bc-site-header-image--halo" r="14" />
       <path class="bc-site-header-image--body" d="M0 4 C-2 -1 -8 -5 -8 -11 A8 8 0 1 1 8 -11 C8 -5 2 -1 0 4Z" />
@@ -92,14 +97,19 @@
       height: 170px;
     }
 
+    /* The whole header (task 2026-11-22-331): the picture is cropped to fill the pane, centred on the pin, which sits in the
+       middle of the pane's width. A pane wider than the picture scales it up, keeping its proportions. */
     .bc-site-header-image--desk img,
     .bc-site-header-image--desk .bc-site-header-image--pin {
       top: 62px;
+      left: 50%;
     }
 
-    .bc-site-header-image--desk img,
-    .bc-site-header-image--desk .bc-site-header-image--pin {
-      left: 75%;
+    .bc-site-header-image--desk img {
+      width: max(100%, 1000px);
+      height: auto;
+      aspect-ratio: 1000 / 600;
+      transform: translate(-50%, -50%);
     }
 
     .bc-site-header-image--halo {

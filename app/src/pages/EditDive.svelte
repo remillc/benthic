@@ -56,6 +56,7 @@
   import { loadInventory, change as changeInventory, equipmentOf } from '../lib/inventory.svelte.js';
   import { cloneEquipment, diveKeyOf, emptyEquipment, sameEquipment } from '../lib/inventory.js';
   import ButtonGroup from '../components/ButtonGroup.svelte';
+  import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { FEEDBACK_CHOICES, feedbackOf, isFeedbackTag, toggleFeedback, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import { cylinderKey, isMostRecent, matches, mostRecentFirst, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
@@ -343,7 +344,7 @@
     return () => clearTimeout(timer);
   });
 
-  const suggestion = $derived(suggestWeight(ruleDive, sources, prefs.weight));
+  const suggestion = $derived(suggestWeight(ruleDive, sources, prefs.weight, benthicPlusSubscriber()));
   /** The dive's total weight now, in grams. */
   const weightsNow = $derived(weights.reduce((sum, w) => sum + (Number.isFinite(gramsOf(w)) ? gramsOf(w) : 0), 0));
   const suggestionShown = $derived(suggestionAllowed && showSuggestion(suggestion, weightsNow, prefs.weight));
@@ -1255,17 +1256,20 @@
         <Icon name="plus" />{t('edit.addWeight')}
       </button>
 
-      <p class="bc-edit-dive--feedback-title" id="bc-edit-weight-feedback">{t('weightFeedback.title')}</p>
-      <div class="bc-edit-dive--feedback">
-        <ButtonGroup
-          options={FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) }))}
-          value={feedback}
-          onchange={(v) => (feedback = toggleFeedback(feedback, /** @type {any} */ (v)))}
-          ariaLabelledby="bc-edit-weight-feedback"
-          clearable
-          rail
-        />
-      </div>
+      <!-- Benthic+ only (task 2026-11-22-333): absent otherwise; a tag already on the dive is kept. -->
+      {#if benthicPlusSubscriber()}
+        <p class="bc-edit-dive--feedback-title" id="bc-edit-weight-feedback">{t('weightFeedback.title')}</p>
+        <div class="bc-edit-dive--feedback">
+          <ButtonGroup
+            options={FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) }))}
+            value={feedback}
+            onchange={(v) => (feedback = toggleFeedback(feedback, /** @type {any} */ (v)))}
+            ariaLabelledby="bc-edit-weight-feedback"
+            clearable
+            rail
+          />
+        </div>
+      {/if}
 
       {#if dive.diveComputers.length}
         <h3 class="bc-edit-dive--sub">{t('edit.computersGroup')}</h3>
