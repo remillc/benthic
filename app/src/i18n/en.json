@@ -882,9 +882,6 @@
       "minutes": "Degrees, minutes",
       "seconds": "Degrees, minutes, seconds"
     },
-    "autogroup": {
-      "label": "Group dives into trips"
-    },
     "invalidDives": {
       "label": "Show invalid dives",
       "text": "For example pool dives marked invalid"
@@ -2769,6 +2766,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Trips: « Group dives into trips » is gone from Settings. Benthic never groups dives into trips by itself, whatever a logbook made in Subsurface says: downloads, imports and new dives stay outside any trip until you make or fill one. The trips you made keep working as before.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
@@ -5409,8 +5407,6 @@
       "removeFromTrip": "Remove from the trip",
       "createTrip": "Create the trip",
       "mergeTrips": "Merge the trips",
-      "autogroup": "Group into trips",
-      "ungroup": "Undo automatic trips",
       "mergeSites": "Merge the sites",
       "deleteSites": "Delete the sites",
       "deleteDives": "Delete the dives",

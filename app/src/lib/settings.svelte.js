@@ -3,8 +3,7 @@
 // modelled on Subsurface"). As in Subsurface, they belong to the device, not
 // to the logbook: the values of the core's preferences changed by the diver
 // are kept here and set again in the core at each start (applyDeviceSettings),
-// before the logbook is loaded. Only trip grouping is the logbook's
-// (autogroup), changed through the logbook (logbook.svelte.js).
+// before the logbook is loaded.
 //
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.

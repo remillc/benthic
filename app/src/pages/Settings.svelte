@@ -32,7 +32,7 @@
   import { CATEGORIES, categoryOf, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
   import { STARTUP_MODES } from '../lib/desktop-logbooks.js';
-  import { logbook, setAutogroup } from '../lib/logbook.svelte.js';
+  import { logbook } from '../lib/logbook.svelte.js';
   import {
     settings,
     setCorePrefs,
@@ -524,19 +524,6 @@
       id: 'logbook',
       title: t('settings.groups.logbook'),
       rows: [
-        {
-          kind: 'switch',
-          id: 'autogroup',
-          label: t('settings.autogroup.label'),
-          checked: logbook.prefs.autogroup === true,
-          set: async (v) => {
-            try {
-              await setAutogroup(v);
-            } catch (e) {
-              failed(e);
-            }
-          },
-        },
         { kind: 'switch', id: 'displayInvalidDives', label: t('settings.invalidDives.label'), text: t('settings.invalidDives.text'), checked: p.displayInvalidDives, set: async (v) => {
           await setCore({ displayInvalidDives: v });
           // The core's list leaves invalid dives out unless this is on.

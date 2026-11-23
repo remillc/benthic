@@ -7240,7 +7240,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Same feature as ta
 
 **Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
 
-## [ ] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
+## [x] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
 
 Christian asked for this on 23 November 2026. Work in `main`. Benthic does not use Subsurface's automatic trip grouping (`autogroup`): the value is false, and the setting is not shown anywhere.
 
@@ -7250,3 +7250,5 @@ Christian asked for this on 23 November 2026. Work in `main`. Benthic does not u
 - Docs updated by the design agent: `docs/ui-specification.md` (the settings table and the note on what the logbook stores) and `docs/ui-writing.md` (example changed).
 
 **Test:** Réglages › Carnet has no « Regrouper les plongées en voyages » on any device; download or import several dives from different days: no trip is created; a Subsurface logbook with `autogroup` on keeps its existing trips and gets no new automatic ones from Benthic.
+
+**Done (23 November 2026).** The row, `settings.autogroup`, `desktop.undo.autogroup`, `desktop.undo.ungroup`, the two undo names and `setAutogroup()` are gone; the `autogroup` action of `tripAction` and `benthic::trips_autogroup` are removed on every platform. The core never groups on its own: `load()` reads the logbook's flag into `internal::file_autogroup` and puts `divelog.autogroup` off (so `process_loaded_dives` does not group), `import_log` forces the import log's flag off (a file with autogroup on would group in `process_imported_dives`, downloads included), and `create_dive` no longer passes a trip to AddDive. Every save of the log in memory writes the file's own value back (`KeepFileAutogroup`), so the diver's file is not rewritten for this. Checked by `tests/save_logbook_test.cpp` (load, import of three days, `createDive`, save keeps the `autogroup` line).

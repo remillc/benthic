@@ -882,9 +882,6 @@
       "minutes": "Degrés, minutes",
       "seconds": "Degrés, minutes, secondes"
     },
-    "autogroup": {
-      "label": "Regrouper les plongées en voyages"
-    },
     "invalidDives": {
       "label": "Afficher les plongées invalides",
       "text": "Par exemple les plongées en piscine marquées invalides"
@@ -2769,6 +2766,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Voyages : « Regrouper les plongées en voyages » n’est plus dans Réglages. Benthic ne regroupe jamais les plongées en voyages de lui-même, quoi que dise un carnet fait dans Subsurface : téléchargements, imports et nouvelles plongées restent hors voyage tant que vous n’en faites pas un ou n’en remplissez pas un. Les voyages que vous avez faits fonctionnent comme avant.",
       "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
       "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
       "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
@@ -5409,8 +5407,6 @@
       "removeFromTrip": "Retirer du voyage",
       "createTrip": "Créer le voyage",
       "mergeTrips": "Fusionner les voyages",
-      "autogroup": "Regrouper en voyages",
-      "ungroup": "Défaire les voyages automatiques",
       "mergeSites": "Fusionner les sites",
       "deleteSites": "Supprimer les sites",
       "deleteDives": "Supprimer les plongées",

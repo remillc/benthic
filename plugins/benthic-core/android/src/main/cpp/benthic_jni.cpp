@@ -545,8 +545,6 @@ Java_app_benthicdivelog_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring
 		ret = benthic::trip_ungroup(tripId, json, error);
 	else if (action == "create")
 		ret = benthic::trip_create(ids, json, error);
-	else if (action == "autogroup")
-		ret = benthic::trips_autogroup(value == "on", json, error);
 	else {
 		ret = -1;
 		error = "BAD_REQUEST: unknown action " + action;

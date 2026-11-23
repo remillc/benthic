@@ -524,7 +524,7 @@ static void send_sync_progress(const char *message)
 	return ns(json);
 }
 
-// action: location, notes, remove, split, merge, add, ungroup, create, autogroup.
+// action: location, notes, remove, split, merge, add, ungroup, create.
 + (NSString *)tripAction:(NSString *)actionIn
 		  tripId:(NSInteger)tripId
 		  diveId:(NSInteger)diveId
@@ -551,8 +551,6 @@ static void send_sync_progress(const char *message)
 		ret = benthic::trip_ungroup((int)tripId, json, message);
 	else if (action == "create")
 		ret = benthic::trip_create(ids, json, message);
-	else if (action == "autogroup")
-		ret = benthic::trips_autogroup(value == "on", json, message);
 	else {
 		ret = -1;
 		message = "BAD_REQUEST: unknown action " + action;

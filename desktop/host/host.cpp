@@ -481,7 +481,7 @@ void register_methods()
 		benthic::trip_json(a.i32("id"), json, error);
 		return S(json);
 	});
-	// One trip change: action is location, notes, remove, split, merge, add, ungroup, create or autogroup.
+	// One trip change: action is location, notes, remove, split, merge, add, ungroup, or create.
 	add("tripAction", core, [](const Args &a) {
 		std::string action = a.str("action"), value = a.str("value"), json, error;
 		int tripId = a.i32("tripId"), diveId = a.i32("diveId"), otherId = a.i32("otherId");
@@ -501,8 +501,6 @@ void register_methods()
 			ret = benthic::trip_ungroup(tripId, json, error);
 		else if (action == "create")
 			ret = benthic::trip_create(ids, json, error);
-		else if (action == "autogroup")
-			ret = benthic::trips_autogroup(value == "on", json, error);
 		else {
 			ret = -1;
 			error = "BAD_REQUEST: unknown action " + action;

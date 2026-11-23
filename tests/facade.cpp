@@ -111,9 +111,6 @@ int main(int argc, char **argv)
 		check(0, "planner setup");
 		check(benthic::set_prefs("{\"ascent50MmMin\":500}", error), "planner rate out of range");
 		check(benthic::set_prefs("{\"bottomPo2Mbar\":2500}", error), "planner ppO2 out of range");
-		check(benthic::trips_autogroup(false, json, error), "autogroup off");
-		check(benthic::undo(json, error), "undo");
-		check(benthic::trips_autogroup(true, json, error), "autogroup on");
 		check(benthic::cylinder_type_action("add", "Test 7L", 7000, 300000, json, error), "add type");
 		check(benthic::cylinder_type_action("add", "Test 7L", 7000, 300000, json, error), "add again");
 		check(benthic::cylinder_type_rename("Test 7L", "Test 8L", json, error), "rename");
