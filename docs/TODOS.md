@@ -38,7 +38,6 @@ Next number: 187
 - #101 [site] création d'un site du produit : promotion, information, abonnement, aide. À décider ici : la carte partagée des sites (#76) est-elle réservée à OpenDives+, ouverte aux gratuits en lecture seule, ou publique sur le site ?
 - #103 [design] ré-évaluer la pertinence de la fonction de téléchargement de cartes et les réglages de cartes hors ligne.
 - #112 [beta] Liste des bêta-testeurs : Marc Bélaire, Martin Dupuis, Nicolas Pinsonneault, Julie Cardinal, Cyrill Jouzeau, Véronique Lizy, Benoît Turcotte.
-- #113 [design] On a un export de toutes les données d’un usager : il faut nécessairement une fonction d’importation de ce format. Décidé le 22 nov. 2026 : importer un .benthic crée le carnet (premier lancement) ou remplace le carnet actuel après confirmation, comme « Importer un carnet ».
 - #118 [code] il reste encore le nom OpenDives dans le code source du projet, corriger.
 - #121 [code] Bouton Profile sur Desktop: faire en sorte qu'un click sur le bouton lorsque le menu est ouvert, le ferme.
 - #122 [code] Appliquer l'imbrication css dans les feuilles de style.
