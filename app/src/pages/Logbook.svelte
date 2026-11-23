@@ -47,6 +47,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { filter, loadOptions, applyFilter, isEmpty } from '../lib/filter.svelte.js';
+  import ValidationDialog from '../components/ValidationDialog.svelte';
   import { layout, deviceKind, desktopApp } from '../lib/layout.svelte.js';
   import { deviceKey } from '../lib/first-launch.js';
   import { navigation } from '../lib/navigation.svelte.js';
@@ -377,9 +378,14 @@
     f7router.navigate(`/dives/edit-together?ids=${checkedIds.join(',')}`);
   }
 
-  /** "Faire valider les plongées": the checked dives, one validation (pages/Validate.svelte). */
+  /**
+   * "Faire signer les plongées": the checked dives, one validation. A dialog on a tablet and on the desktop (as from one
+   * dive), the full screen (pages/Validate.svelte) on the phone.
+   */
+  let validating = $state(/** @type {number[]|null} */ (null));
   function validateChecked() {
-    f7router.navigate(`/validate?ids=${checkedIds.join(',')}`);
+    if (layout.split || layout.desktop) validating = [...checkedIds];
+    else f7router.navigate(`/validate?ids=${checkedIds.join(',')}`);
   }
 
   /** "Renumber the dives" of the menu: Subsurface's Renumber dialog, all the dives. */
@@ -1678,6 +1684,10 @@
   {#if renaming}
     <RenameLogbook initialName={logbookName || t('welcomeSteps.defaultName')} onsave={rename} onclose={() => (renaming = false)} />
   {/if}
+  {#if validating}
+    <ValidationDialog ids={validating} onclose={() => (validating = null)} />
+  {/if}
+
   {#if renumbering}
     <RenumberDialog
       ids={selecting ? checkedIds : undefined}

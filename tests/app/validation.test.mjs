@@ -188,6 +188,10 @@ test('every text of the validation screens exists in French and in English', () 
 test('tablets and the desktop open the validation as a dialog, the phone keeps its screen (task 2026-11-22-330)', () => {
   const detail = readFileSync(new URL('../../app/src/pages/DiveDetail.svelte', import.meta.url), 'utf8').split('\r\n').join('\n');
   assert.match(detail, /function startValidation\(\) \{\s*if \(layout\.split \|\| layout\.desktop\) validating = true;\s*else f7router\.navigate\(`\/validate\?ids=\$\{diveId\}`\)/);
+  // The logbook's multi-selection does the same with the checked dives.
+  const logbook = readFileSync(new URL('../../app/src/pages/Logbook.svelte', import.meta.url), 'utf8').split('\r\n').join('\n');
+  assert.match(logbook, /function validateChecked\(\) \{\s*if \(layout\.split \|\| layout\.desktop\) validating = \[\.\.\.checkedIds\];\s*else f7router\.navigate\(`\/validate\?ids=\$\{checkedIds\.join\(','\)\}`\)/);
+  assert.match(logbook, /<ValidationDialog ids={validating}/);
   // The menu item (seal icon, before « Renuméroter ») and the desktop header button (between Plan and Share) are Benthic+ only.
   assert.match(detail, /icon="seal"\s+text=\{t\('validation\.menuOne'\)\}/);
   const header = detail.slice(detail.indexOf('bc-dive-detail--desk-head'));

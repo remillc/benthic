@@ -3287,7 +3287,8 @@
       "Tablette et ordinateur : « Faire signer la plongée » (Benthic+) s’ouvre dans une fenêtre, depuis le menu ⋮ de la plongée sur tablette et depuis un bouton de l’en-tête sur ordinateur.",
       "Ordinateur : la carte du site occupe toute la largeur de l’en-tête de la plongée.",
       "Ordinateur : l’onglet Équipement propose, avec Benthic+, un kit à appliquer, le sous-vêtement, « Ce lest était » et « Autre équipement » ; sans Benthic+, ces champs n’apparaissent plus.",
-      "« Ce lest était » est réservé à Benthic+ sur tous les écrans ; sans Benthic+, la suggestion de lest reprend le poids de la dernière plongée comparable, sans correction. Ce qui est déjà noté sur une plongée est conservé."
+      "« Ce lest était » est réservé à Benthic+ sur tous les écrans ; sans Benthic+, la suggestion de lest reprend le poids de la dernière plongée comparable, sans correction. Ce qui est déjà noté sur une plongée est conservé.",
+      "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

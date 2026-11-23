@@ -3287,7 +3287,8 @@
       "Tablet and desktop: “Get the dive signed” (Benthic+) opens in a dialog, from the dive’s ⋮ menu on a tablet and from a button in the header on the desktop.",
       "Desktop: the site’s map fills the whole width of the dive’s header.",
       "Desktop: with Benthic+, the Equipment tab offers a kit to apply, the undersuit, “This weight was” and “Other gear”; without Benthic+, these fields no longer appear.",
-      "“This weight was” is Benthic+ only on every screen; without Benthic+, the weight suggestion uses the last comparable dive’s weight, with no correction. What is already noted on a dive is kept."
+      "“This weight was” is Benthic+ only on every screen; without Benthic+, the weight suggestion uses the last comparable dive’s weight, with no correction. What is already noted on a dive is kept.",
+      "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
