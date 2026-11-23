@@ -14,6 +14,9 @@
  * @typedef {Object} KeyKeeper
  * @property {() => Promise<string>} read
  * @property {(key: string) => Promise<void>} write
+ * @property {() => Promise<boolean>} [hadKey] true when this device made a key before, or sealed data exists: an empty
+ *   `read` then means the key was lost (a restored backup, a wiped keystore), not that it never existed
+ * @property {() => Promise<void>} [markKey] called after a key is made, so that `hadKey` answers true from then on
  */
 
 const enc = new TextEncoder();
@@ -55,10 +58,12 @@ export function createSecretBox(keeper) {
       let raw = text ? fromBase64(text) : new Uint8Array(0);
       if (text && raw.length !== 32) throw new Error('INVALID_DATA_KEY');
       if (!text) {
-        if (!create) throw new Error('MISSING_DATA_KEY');
+        // An unreadable key is never replaced silently: a new key would make every sealed item unreadable for good.
+        if (!create || (keeper.hadKey && (await keeper.hadKey()))) throw new Error('MISSING_DATA_KEY');
         raw = crypto.getRandomValues(new Uint8Array(32));
         text = toBase64(raw);
         await keeper.write(text);
+        await keeper.markKey?.();
       }
       const key = await crypto.subtle.importKey('raw', /** @type {BufferSource} */ (raw), 'AES-GCM', false, ['encrypt', 'decrypt']);
       return { key, kid: await keyId(raw) };

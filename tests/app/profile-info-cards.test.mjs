@@ -582,3 +582,24 @@ test('the subscription screens continue directly to the ready step', () => {
   assert.match(screen, /benthicPlus\.welcome\.next/);
   assert.doesNotMatch(screen, /benthicPlusHealth/);
 });
+
+test('a key that cannot be read is never replaced once the device had one', async () => {
+  let key = '';
+  let made = false;
+  const keeper = {
+    read: async () => key,
+    write: async (k) => (key = k),
+    hadKey: async () => made,
+    markKey: async () => { made = true; },
+  };
+  const first = createSecretBox(keeper);
+  const block = await first.seal({ x: 1 }, { id: 'one', format: 1 });
+  // A restored backup: the data is there, the key is not.
+  const lost = { ...keeper, read: async () => '', write: async () => { throw new Error('unexpected key write'); } };
+  const after = createSecretBox(lost);
+  await assert.rejects(after.seal({ y: 2 }, { id: 'two', format: 1 }), /MISSING_DATA_KEY/);
+  await assert.rejects(after.sealBytes(new Uint8Array([1]), { id: 'two', format: 1 }), /MISSING_DATA_KEY/);
+  await assert.rejects(after.open(block, { id: 'one', format: 1 }), /MISSING_DATA_KEY/);
+  // The key is still the first one, so the block opens again once it is back.
+  assert.deepEqual(await createSecretBox(keeper).open(block, { id: 'one', format: 1 }), { x: 1 });
+});

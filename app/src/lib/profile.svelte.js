@@ -22,6 +22,9 @@ export const diver = $state({
 /** @type {{ store: ReturnType<typeof createFileStore>, profile: ReturnType<typeof createProfile> }|null} */
 let opened = null;
 
+/** Written when the device makes its key: after that, an empty key read means a lost key (secret-box.js). */
+const KEY_MADE = 'meta/data-key-made.json';
+
 /**
  * The key of the device: the plugin's secure storage. A plain browser (development only) has none: the key is then
  * kept beside the data, which protects nothing there.
@@ -47,6 +50,15 @@ function keeper(store) {
         if (!missing(e)) throw e;
         await store.write('meta/dev-data-key.json', { format: 1, key });
       }
+    },
+    async markKey() {
+      await store.write(KEY_MADE, { format: 1 });
+    },
+    async hadKey() {
+      if (await store.read(KEY_MADE)) return true;
+      // A device from before the marker: sealed data already on it means a key was made.
+      if ((await store.read('profile/diver.json'))?.enc) return true;
+      return (await store.list('certifications/')).length > 0;
     },
   };
 }
