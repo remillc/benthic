@@ -6629,3 +6629,18 @@ Christian approved this on 23 November 2026. Work in `main`. Mock-up: « Benthic
 In the done note, put a screenshot description of before and after for the landscape tablet.
 
 **Done (23 November 2026).** Left panel: `BenthicPlusPanel` takes a `centered` prop, used by the tablet page only (`WelcomeStartRelease.svelte`); the disc, the chip, the title and the line sit in one column on the panel's axis, 176 dp from its top, side padding 48 dp, chip 24 dp under the disc, title 14 dp under the chip, line 8 dp under the title. The wordmark is the compact lockup at 40 dp / 40 dp. The animation and the reduced-motion fallback are untouched. Right side (tablet only, class `bc-plus--screen-ready`): new heading « Votre carnet » (`benthicPlus.ready.heading`, 28 sp, 500), the card across the column (20 dp radius, 52 dp rows), the account line at the left, the button 48 dp high at the end. Nothing had to be removed: the app showed no row, line or button beyond the mock-up's. The figures, the e-mail and the sync wording come from `flow.plus` (real counts); a zero « Équipement » or « Brevets » row stays hidden, as before. Portrait tablet: same layout (same panel), the column centred on the 540 dp band. Phone and desktop: unchanged (checked with screenshots for the phone; the desktop panel does not pass `centered` and its right side is gated by `!desktopApp`). Before (1280 x 800): the logo, title and line left-aligned at x 56 under a large wordmark, no heading, a 280 dp card, a full-width 56 dp button. After: everything centred on the panel's axis (x 350), small wordmark at the top left, heading above a full-width card, a 183 dp button at the right.
+
+## [ ] 2026-11-23-336 Chevrons: one drawing everywhere, as in the mock-ups
+
+Christian approved this on 23 November 2026. Work in `main`. Christian aligned every chevron of the mock-ups (both canvases) on the app's own drawing (TODO #177, closed):
+
+- **forward:** `M9 5l7 7-7 7` (`Icon` `chevron`), the only forward chevron;
+- **back:** the same chevron turned 180°, which is the shape `M15 5l-7 7 7 7` in the mock-ups;
+- **out of scope:** up and down chevrons of drop-downs and collapsible sections, and the back arrows of the top bars (Framework7's `arrow_left_md` on Android, `chevron_left_ios` on iOS).
+
+The app already looks right: `Icon.svelte`, the Android list chevron mask in `theme.css` and the three masks in `Settings.svelte` use the same path. Do this:
+
+1. Search the app for any other forward or back chevron drawing (an inline SVG, a mask, a Framework7 font icon other than the two named above), on every platform, and replace it with `Icon` `chevron` (turned 180° for back). On iOS, check the list rows: Framework7's `chevron_right` font icon is drawn there; make it the same 24 dp chevron as on Android if it differs, unless iOS's own look is wanted, and say which in the done note.
+2. Add one line to `docs/system-design.md`: one chevron drawing (`M9 5l7 7-7 7`); back is the same chevron turned 180°.
+
+In the done note, list what you replaced, or say that nothing needed to change.
