@@ -7262,3 +7262,15 @@ Christian asked for this on 23 November 2026. Work in `main`.
 Docs updated by the design agent: `docs/ui-specification.md` (photos section, About card) and `docs/advanced-settings.md` (row removed).
 
 **Test:** Réglages › Carnet has no photos and videos switch; a subscriber sees the Photos et vidéos section of a dive with pictures, a free user does not; À propos shows « Voir sur GitHub » and « Site Web » centred on one row, and « Site Web » opens benthicdivelog.app.
+
+## [ ] 2026-11-23-371 New `rebreather` drawing in `GearIcon.svelte`
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »).
+
+The rebreather icon used to show three cylinders side by side and read as a twin set. Replace the `rebreather` path in `app/src/components/GearIcon.svelte` with this drawing, modelled on the rebreather silhouette of the Gaz card (« Gaz d’une plongée en recycleur »): two tall narrow cylinders on each side, the scrubber between them sharing their inner edges (one outline, no gaps), starting a little lower, on a trapezoid stand, with the two hoses from the scrubber's top to the cylinders. Stroke 1.8 on the 24 grid like the other gear icons.
+
+```
+M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM16.47 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM9.47 3.89H14.53V19.89H9.47zM10.9 19.89L9.9 22.40H14.1L13.1 19.89M10.74 3.89C10.42 2.63 9.16 2.21 7.89 2.11M13.26 3.89C13.58 2.63 14.84 2.21 16.11 2.11
+```
+
+**Test:** the gear list, the type picker of « Nouvelle pièce » and the kit pages show the new rebreather icon at every size; it no longer looks like a twin set.
