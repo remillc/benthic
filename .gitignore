@@ -40,3 +40,6 @@ plugins/benthic-core/ios/Resources/
 # Desktop: OAuth client ids of the cloud services, kept out of git until they ship (task 173)
 desktop/oauth-clients.local.json
 benthic.code-workspace
+
+# Firebase configuration of the Android app (kept out of git; a copy is in F:\projets\benthic-keys\firebase)
+app/android/app/google-services.json
