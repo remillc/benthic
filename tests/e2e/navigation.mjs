@@ -334,9 +334,13 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
 /** A tab whose account has Benthic+: the Profil section exists (task 2026-11-23-347), the profile flows open its pages. */
 async function openPlusTab(...a) {
   const tab = await openTab(...a);
+  await makePlus(tab);
+  return tab;
+}
+/** The account of a tab has Benthic+ (again after a reload). */
+async function makePlus(tab) {
   await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
   await sleep(1200);
-  return tab;
 }
 
 // --- The invariants ----------------------------------------------------------------------------------------------
@@ -1695,7 +1699,7 @@ async function profileInsetsFlows(expect) {
 async function gearAddFlows(expect) {
   for (const [label, width, height, desktop, theme] of [['Android tablet', 1280, 800, false, 'md'], ['desktop', 1400, 900, true, 'md']]) {
     const tab = await openPlusTab(width, height, false, false, desktop, { theme });
-    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile'));
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/'));
     await sleep(1600);
     const geometry = await tab.run(() => {
       const button = document.querySelector('.page-current .bc-gear-list--add');
@@ -1752,6 +1756,7 @@ async function certsFabFlows(expect) {
     }));
     await tab.send('Page.reload');
     await sleep(2500);
+    await makePlus(tab);
     await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/'));
     await sleep(1600);
     const position = await tab.run(() => {
@@ -2395,7 +2400,8 @@ async function maintenanceEntryFlows(expect) {
     }, `Maintenance ${label}`);
     const profileEntry = async () => tab.run(async () => {
       const { t } = await import('/src/lib/i18n.js');
-      const page = document.querySelector('.page-current.bc-profile');
+      // The home page on a phone; beside the list on a tablet (the Informations pane is the first page there).
+      const page = document.querySelector('.tab-active .page-current.bc-profile') || document.querySelector('.tab-active .page-current:has(.bc-profile-nav)');
       return { profile: !!page, visible: !!page && [...page.querySelectorAll('.bc-profile--row, .bc-profile-nav--row')].some((row) => row.textContent.includes(t('maintenance.entry'))) };
     });
     const gearEntry = async () => tab.run(() => !!document.querySelector('.page-current .bc-gear-page--upkeep, .page-current .bc-gear-list--upkeep'));
@@ -2685,11 +2691,14 @@ async function profileSectionFlows(expect) {
       expect(`${label}: Back from the profile home shows the logbook`, { view: 'view-logbook' }, await where(tab));
     }
     // The account sheet has no profile row.
-    await tab.run(() => document.querySelector('.bc-account-avatar, [aria-label*="ompte"], [aria-label*="ccount"]')?.click());
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).navigation.accountOpen = true; });
     await sleep(900);
     const sheet = await tab.run(() => ({ profile: !!document.querySelector('.bc-account-sheet [href="#profile"], .bc-account-sheet [data-row="profile"], .bc-desktop-account [data-row="profile"]'), text: /Mon profil de plongeur|My diver profile/.test(document.querySelector('.modal-in, .bc-desktop-account')?.textContent ?? ''), open: !!document.querySelector('.modal-in, .bc-desktop-account') }));
-    expect(`${label}: the account sheet has no « Mon profil de plongeur » row`, { profile: false, text: false }, sheet);
+    // The iPad has an Account section instead of a sheet.
+    expect(`${label}: the account sheet has no « Mon profil de plongeur » row`, { open: label !== 'iPad', profile: false, text: false }, sheet);
     if (process.env.BC_SHOTS && sheet.open) await shot(tab, `347-${label.replace(/ /g, '-')}-sheet`);
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).navigation.accountOpen = false; });
+    await sleep(600);
     await subscribe(tab, false);
     await sleep(1200);
     expect(`${label}: ending the subscription removes the entry`, { list: 'logbook,sites,statistics,tools', view: false }, { list: (await entries(tab)).join(','), view: await tab.run(() => !!document.querySelector('#view-profile')) });

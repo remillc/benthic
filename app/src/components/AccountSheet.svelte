@@ -803,6 +803,10 @@
     }
 
     /* « Mon profil de plongeur » of a Benthic+ account: the chip above the title, the overdue pieces in red. */
+    .bc-account-sheet--profile {
+      padding-block: 10px;
+    }
+
     .bc-account-sheet--profile .bc-account-sheet--row-label {
       font-size: 16px;
       gap: 2px;
