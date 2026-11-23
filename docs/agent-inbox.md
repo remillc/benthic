@@ -7308,3 +7308,13 @@ Christian asked for this on 23 November 2026. Work in `main`. The « Vos types �
 Spec updated by the design agent: `docs/ui-specification.md` (settings table, cylinder types sub-screen).
 
 **Test:** a logbook's cylinder types all show in one list with their dive counts; adding a type through a « Tailles courantes » chip fills it; the type appears on a second device signed in to the same logbook before any dive uses it; the default cylinder choice shows the list then the common sizes; Réglages › Équipement has no « Proposer les tailles standard ».
+
+## [ ] 2026-11-23-374 Desktop bug: a trip in the logbook list has no separator after it
+
+Christian reported this on 23 November 2026. Work in `main`. On the desktop, in « Mon carnet », the dive table draws a 1 px #E3E1DC line under each dive row, but a trip row has none after it, so the trip runs into the next dive. Mock-up: « Carnet · bureau (Windows, Linux) » (tablet and desktop canvas, page Bureau), which now shows a closed trip « Voyage du 2025-07-12 · 2 plongées, de 19 à 25 m » between dives 12 and 9: a separator above it (the previous dive's line) and one below it.
+
+- A closed trip row (chevron down, briefcase, « Voyage du … », « · N plongées, de … à … m ») is 48 px high like a dive row and has the same 1 px #E3E1DC bottom line.
+- An open trip keeps its white card with its dives; the row that follows the card (a dive or another trip) is separated from it the same way.
+- No double line where a trip follows a dive that already has its own line.
+
+**Test:** on the desktop, a logbook with a trip between other dives: closed, it shows a line above and below; open, the dive after the trip is clearly separated; nothing changes on the phone or tablet lists.
