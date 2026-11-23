@@ -7023,7 +7023,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Renumbering the di
 
 *Done 23 November 2026: row, dialog state and the unused `renumber.label`/`renumber.text` keys removed; the Carnet, selection and dive menus are unchanged.*
 
-## [ ] 2026-11-23-362 Remove offline maps entirely (TODO #103)
+## [x] 2026-11-23-362 Remove offline maps entirely (TODO #103)
 
 Christian decided this on 23 November 2026. Work in `main`. Benthic drops offline maps. The maps (Sites, site cards, dive detail) stay online maps; everything that downloads, stores, updates or mentions map packages for offline use goes away, on phone (Android, iPhone), tablet and desktop.
 
@@ -7034,6 +7034,8 @@ Christian decided this on 23 November 2026. Work in `main`. Benthic drops offlin
 Mock-ups: the « Cartes hors ligne » subgroups are deleted from the phone and tablet canvases and « Réglages · bureau, cartes hors ligne » from the desktop page; every settings, account sheet and offer board is updated (« Feuille du compte, modifications en attente · Android », « Réglages » overviews, « Tout ce qui est inclus » boards, the desktop « Réglages » boards).
 
 **Test:** no « Cartes hors ligne » anywhere in the app (search the translations too); the account sheet's Réglages row has no badge; the Sites map works online as before; upgrading a device that had downloaded regions frees their space.
+
+*Done 23 November 2026: the settings pages, `offline-maps.svelte.js`, the dialogs, the area screen and their translations are removed; the map tiles are read from OpenFreeMap only (`app/src/lib/map-tiles.js`, the simplified world map still draws when there is no network); native: `MapsManager`, `MapsDownloadWorker` and the plugin methods are removed on Android and iOS (WorkManager, foreground service, BGTask and the `offline-maps` notification channel with them), replaced by `LegacyOfflineMaps`, which deletes the stored packages at every start (a no-op once they are gone). The `bc.offlineMaps*` device keys are no longer read. The « Sites des plongeurs » row of the offer is now listed so that the group « Sites » is not empty.*
 
 ## [ ] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
 

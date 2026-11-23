@@ -8,7 +8,7 @@
 // usual depth, number of dives and of dives in the last 12 months, and the base site it was added from. Never the
 // notes, the description, a buddy, a dive date or the diver's name: `contributionOf` builds each entry field by field.
 
-import { normalizeBbox, normalizeLongitude } from './maps-logic.js';
+import { normalizeBbox, normalizeLongitude } from './geo.js';
 
 /** The reasons of « Signaler », in the order of the dialog (the server's codes). */
 export const REPORT_REASONS = /** @type {const} */ (['wrong_position', 'duplicate', 'wrong_name_or_country', 'closed_or_forbidden', 'other']);

@@ -80,10 +80,9 @@ export const INCLUDED = /** @type {{ key: string, rows: IncludedRow[] }[]} */ ([
     ],
   },
   {
-    key: 'maps',
+    key: 'sites',
     rows: [
-      { key: 'offlineMaps', icon: 'map', tone: 'green', built: true },
-      { key: 'divers', icon: 'sites', tone: 'blue', built: false },
+      { key: 'divers', icon: 'sites', tone: 'blue', built: true },
     ],
   },
   {

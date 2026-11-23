@@ -246,8 +246,6 @@
     /* The simplified offline map (sea, land, land inside a downloaded region, roads). */
     --bc-map-sea: #D3E0EC;
     --bc-map-land-low: #EDECE7;
-    --bc-map-land: #F7F6F2;
-    --bc-map-road: #D9D3C4;
 
     /* QR codes (sharing by QR code): always black on white, whatever the mode, so that a camera reads them. */
     --bc-qr-paper: #FFFFFF;
@@ -529,9 +527,6 @@
     --bc-toolbar-on-container: #F5F4F0;
     --bc-toolbar-primary: #F5F4F0;
     --bc-toolbar-on-primary: #1F2124;
-    /* "Choisir sur la carte": the fixed frame and the 40 % veil outside it. */
-    --bc-area-frame: #1F2124;
-    --bc-area-veil: rgb(31 33 36 / 0.4);
     /* Snackbar (ui-foundations, section 8): surface, text 12.0:1, action 6.3:1. */
     --bc-inverse-surface: #2E3033;
     --bc-inverse-on-surface: #F5F4F0;
@@ -733,8 +728,6 @@
     --bc-row-divider: #3A3C40;
     --bc-map-sea: #1E2A36;
     --bc-map-land-low: #232426;
-    --bc-map-land: #2A2C2F;
-    --bc-map-road: #4A4D52;
     --bc-action: #F4F4F2;
     --bc-on-action: #1F2124;
     --bc-cursor: #F4F4F2;
@@ -800,8 +793,6 @@
     --bc-dialog: var(--f7-md-surface-3);
     --bc-menu: var(--f7-md-surface-2);
     --bc-menu-divider: var(--f7-md-outline-variant);
-    --bc-area-frame: #F4F4F2;
-    --bc-area-veil: rgb(0 0 0 / 0.4);
     /* Snackbar, dark: text 13.1:1; action 4.7:1 (#2F6DB5 of the spec gives 4.3:1, under AA). */
     --bc-inverse-surface: #E8E8E5;
     --bc-inverse-on-surface: #1F2124;

@@ -171,14 +171,6 @@
 	<!-- The file is copied into the app (Inbox) and read once; it is not edited in place. -->
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>processing</string>
-	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>app.benthicdivelog.maps-download</string>
-	</array>
 	<!-- The app's iCloud Drive folder shows in the Files app as « Benthic » (task 2026-11-16-261). -->
 	<key>NSUbiquitousContainers</key>
 	<dict>

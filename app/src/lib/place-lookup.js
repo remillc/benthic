@@ -12,7 +12,7 @@
 // other Nominatim requests of the app (area-search.js).
 
 import { BenthicCore } from 'benthic-core';
-import { takeSlot, NOMINATIM_REVERSE_URL } from './area-search.js';
+import { takeSlot, NOMINATIM_REVERSE_URL } from './nominatim.js';
 import { offlineRegion } from './offline-region.js';
 
 /**

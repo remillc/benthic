@@ -108,7 +108,7 @@ test('the offer opens « Tout ce qui est inclus », which goes back to the offer
 
 test('the list shows only the features that are built, in the four groups of the mock-up', async () => {
   const { INCLUDED, includedGroups } = await import('../../app/src/lib/benthic-plus.js');
-  assert.deepEqual(INCLUDED.map((g) => g.key), ['carnet', 'profile', 'maps', 'friends']);
+  assert.deepEqual(INCLUDED.map((g) => g.key), ['carnet', 'profile', 'sites', 'friends']);
   const shown = includedGroups();
   assert.ok(shown.every((g) => g.rows.length > 0 && g.rows.every((r) => r.built)));
   assert.ok(!shown.some((g) => g.key === 'friends'), 'nothing of « Avec vos compagnons » is built yet: the group is dropped');

@@ -1193,7 +1193,6 @@ async function settingsComputersFlows(expect) {
         expect(`${label}: ${section} remains a settings detail`, { section, detail: true, content: true }, detail);
       }
       for (const [path, selector] of [
-        ['/settings/maps/', '.bc-settings-maps'],
         ['/settings/cylinders/', '.bc-cylinder-types'],
         ['/settings/bailout', '.bc-settings-bailout'],
         ['/settings/planner', '.bc-planner-settings'],

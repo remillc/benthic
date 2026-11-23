@@ -30,7 +30,7 @@
         resetLogbook: (n) => `Your logbook of ${n} dive${n === 1 ? '' : 's'} on this device`, resetSettings: 'Your settings and the choices remembered by the app',
         resetSession: 'Your account session and tokens (the account itself stays on the server)', resetEquipment: 'Equipment, profile, certifications and maintenance',
         resetFiles: 'Staged imports and exports', resetNotifications: 'Scheduled notifications', resetAlpha: 'The copy of the previous version’s logbook',
-        resetKeepAlpha: 'Keep the previous version’s copy', resetExport: 'Export the logbook first', resetAll: 'Erase everything', resetAgain: 'Tap again to erase', resetKept: 'Kept: the development authority and the offline maps. No server is called.',
+        resetKeepAlpha: 'Keep the previous version’s copy', resetExport: 'Export the logbook first', resetAll: 'Erase everything', resetAgain: 'Tap again to erase', resetKept: 'Kept: the development authority. No server is called.',
         statusBusy: 'Working…', statusOk: 'Done. The app restarts.',
         alpha: 'Import the previous version’s logbook', alphaHint: 'Copies, read-only, the logbook left on the device.',
         nav: 'Navigation', navLog: 'Navigation log', navHint: 'The last 200 navigation events (pages, Back, swipes, sheets): copy it or share it when a screen is left in a wrong state.',
