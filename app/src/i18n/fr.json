@@ -2791,7 +2791,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
-      "Profil : la date de naissance est chiffrée ; les dates existantes sont protégées à l’ouverture d’un profil modifiable.",
+      "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en lisant un code QR (ou en montrant le sien sur un ordinateur) ou avec une clé de secours de 26 caractères ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé.",
+    "Profil : la date de naissance est chiffrée ; les dates existantes sont protégées à l’ouverture d’un profil modifiable.",
       "Bureau : en sélectionnant plusieurs plongées, « Faire signer… » du menu contextuel ouvre la fenêtre de signature pour elles (Benthic+).",
       "Bureau : le séparateur entre les volets n’a plus de poignée ; il passe en orange quand le pointeur le survole ou le déplace. Le carnet a sa propre barre de défilement fine, à part. Chaque plongée est séparée de la suivante par une ligne, et la colonne Compagnons n’affiche plus l’initiale.",
       "Tablette, premier lancement : « Votre carnet est prêt » centre le logo, la pastille, le titre et la ligne du panneau bleu, et la colonne de droite reprend la maquette : titre « Votre carnet », fiche des chiffres sur toute la largeur, bouton « Ouvrir mon carnet » à droite.",
@@ -6908,7 +6909,13 @@
       "doneTitle": "Appareil jumelé",
       "doneText": "Les données chiffrées sont déverrouillées sur cet appareil.",
       "entry": "Jumeler un nouvel appareil",
-      "entryText": "Donne accès aux données chiffrées"
+      "entryText": "Donne accès aux données chiffrées",
+      "computerName": "Ordinateur",
+      "failed": "Jumelage impossible. Réessayez.",
+      "failedRead": "Ce n’est pas un code de jumelage de ce compte.",
+      "failedExpired": "Le code a expiré. Affichez un nouveau code.",
+      "keySent": "La clé est envoyée à l’ordinateur.",
+      "otherPaired": "Nouvel appareil jumelé"
     },
     "key": {
       "offerTitle": "Créer une clé de secours",
@@ -6928,7 +6935,8 @@
       "cancel": "Annuler",
       "errorLength": "La clé compte 26 caractères.",
       "errorCharacters": "La clé contient les lettres A à Z et les chiffres 2 à 7.",
-      "errorWrong": "Cette clé ne déverrouille pas ce compte."
+      "errorWrong": "Cette clé ne déverrouille pas ce compte.",
+      "failed": "Opération impossible. Réessayez."
     },
     "join": {
       "title": "Joindre cet appareil",
@@ -6940,7 +6948,8 @@
       "same": "Même pièce",
       "two": "Deux pièces",
       "cancel": "Annuler",
-      "join": "Joindre"
+      "join": "Joindre",
+      "failed": "Impossible de joindre cet appareil. Réessayez."
     },
     "locked": {
       "line": "Verrouillé : jumelez cet appareil",
@@ -6952,8 +6961,17 @@
       "title": "Repartir sans les données chiffrées",
       "text": "Les fiches d’urgence, les brevets et les documents sont effacés du compte, sur tous vos appareils. Le carnet, l’équipement, les kits et l’entretien sont gardés.",
       "cancel": "Annuler",
-      "confirm": "Effacer et repartir"
+      "confirm": "Effacer et repartir",
+      "failed": "Impossible de repartir. Réessayez."
     },
-    "twoDevices": "« {name} » a été modifié sur deux appareils. La modification la plus récente est gardée."
+    "twoDevices": "« {name} » a été modifié sur deux appareils. La modification la plus récente est gardée.",
+    "item": "Un élément",
+    "itemProfile": "Le profil",
+    "different": {
+      "title": "Un autre compte",
+      "text": "Cet appareil a été synchronisé avec un autre compte. « Utiliser ce compte » y ajoute les données de cet appareil ; « Garder séparé » n’envoie rien.",
+      "keep": "Garder séparé",
+      "use": "Utiliser ce compte"
+    }
   }
 }

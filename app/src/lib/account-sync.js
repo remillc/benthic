@@ -737,6 +737,11 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
       queue = next.catch(() => {});
       return next;
     },
+    /** Every path of the working copy as of its last commit (no network). @returns {Promise<string[]>} */
+    async paths() {
+      const { dir } = await session();
+      return (await core.bgitFiles({ dir })).files;
+    },
     /** The commits not sent yet (offline queue). @returns {Promise<number>} */
     async unsent() {
       const { dir } = await session();

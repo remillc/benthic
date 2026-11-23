@@ -2791,7 +2791,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Profile: the date of birth is encrypted; existing dates are protected when an editable profile opens.",
+      "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by reading a QR code (or by showing its own on a computer) or with a 26-character recovery key; encrypted data stays locked until the device is paired.",
+    "Profile: the date of birth is encrypted; existing dates are protected when an editable profile opens.",
       "Desktop: selecting several dives and choosing « Get signed… » in the right-click menu opens the signing window for them (Benthic+).",
       "Desktop: the divider between the panes has no grip; it turns orange when the pointer is over it or drags it. The logbook has its own thin scrollbar, apart from it. Each dive is separated from the next by a line, and the Buddies column no longer shows the initial.",
       "Tablet, first launch: « Your logbook is ready » centres the logo, the chip, the title and the line of the blue panel, and the right column follows the mock-up: the « Your logbook » heading, the figures card across the full width, the « Open my logbook » button at the right.",
@@ -6905,7 +6906,13 @@
       "doneTitle": "Device paired",
       "doneText": "The encrypted data is unlocked on this device.",
       "entry": "Pair a new device",
-      "entryText": "Gives access to the encrypted data"
+      "entryText": "Gives access to the encrypted data",
+      "computerName": "Computer",
+      "failed": "Pairing failed. Try again.",
+      "failedRead": "This is not a pairing code for this account.",
+      "failedExpired": "The code has expired. Show a new one.",
+      "keySent": "The key was sent to the computer.",
+      "otherPaired": "New device paired"
     },
     "key": {
       "offerTitle": "Create a recovery key",
@@ -6925,7 +6932,8 @@
       "cancel": "Cancel",
       "errorLength": "The key has 26 characters.",
       "errorCharacters": "The key has the letters A to Z and the digits 2 to 7.",
-      "errorWrong": "This key does not unlock this account."
+      "errorWrong": "This key does not unlock this account.",
+      "failed": "Could not finish. Try again."
     },
     "join": {
       "title": "Join this device",
@@ -6937,7 +6945,8 @@
       "same": "Same piece",
       "two": "Two pieces",
       "cancel": "Cancel",
-      "join": "Join"
+      "join": "Join",
+      "failed": "Could not join this device. Try again."
     },
     "locked": {
       "line": "Locked: pair this device",
@@ -6949,8 +6958,17 @@
       "title": "Start over without the encrypted data",
       "text": "Emergency sheets, certifications and documents are erased from the account, on all your devices. The logbook, gear, kits and maintenance are kept.",
       "cancel": "Cancel",
-      "confirm": "Erase and start over"
+      "confirm": "Erase and start over",
+      "failed": "Could not start over. Try again."
     },
-    "twoDevices": "“{name}” was changed on two devices. The most recent change is kept."
+    "twoDevices": "“{name}” was changed on two devices. The most recent change is kept.",
+    "item": "An item",
+    "itemProfile": "The profile",
+    "different": {
+      "title": "Another account",
+      "text": "This device last synced with another account. “Use this account” adds this device’s data to it; “Keep separate” sends nothing.",
+      "keep": "Keep separate",
+      "use": "Use this account"
+    }
   }
 }

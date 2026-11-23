@@ -32,6 +32,8 @@ export const accountSync = $state(initialState());
 let runner = null;
 /** @type {ReturnType<typeof createAccountJoin>|null} */
 let joiner = null;
+/** @type {ReturnType<typeof createAccountSync>|null} */
+let syncEngine = null;
 let started = false;
 
 /** Whether this device may sync its account data at all now. @param {{ manual: boolean }} options */
@@ -44,10 +46,11 @@ function allowed({ manual }) {
 
 /** The engine, the join and the runner over the profile's store and box, made once. */
 function build() {
-  if (runner && joiner) return { runner, joiner };
+  if (runner && joiner && syncEngine) return { runner, joiner, engine: syncEngine };
   const { store, box, profile } = accountDataDeps();
   const core = /** @type {any} */ (BenthicCore);
   const engine = createAccountSync({ core, store, box });
+  syncEngine = engine;
   const base = createAccountSyncRunner({
     engine: {
       async run() {
@@ -68,7 +71,7 @@ function build() {
   });
   runner = base;
   joiner = createAccountJoin({ core, store, box });
-  return { runner: base, joiner };
+  return { runner: base, joiner, engine };
 }
 
 /**
@@ -94,6 +97,33 @@ export function syncAccountNow() {
 /** The diver has read the notice « modifié sur deux appareils ». */
 export function dismissAccountConflicts() {
   runner?.dismissConflicts();
+}
+
+/**
+ * The account's keys as the working copy holds them (no network): the account key's id, `keys/recovery.json`, the pairing
+ * files. The key flows (lib/account-sync-flows.svelte.js) read them after a sync.
+ */
+export function readAccountKeys() {
+  return build().engine.readKeys();
+}
+
+/** Every path of the account's working copy (the start-over lists what to drop). */
+export function listAccountPaths() {
+  return build().engine.paths();
+}
+
+/**
+ * Commits key files (`keys/…`) and syncs: a pairing file, the recovery key, the start-over's new account key. The screens
+ * read the result as any other run.
+ * @param {{ writes?: { path: string, json: any }[], deletes?: string[], message?: string }} changes
+ * @returns {Promise<import('./account-sync.js').SyncResult>}
+ */
+export async function commitAccountKeyFiles(changes) {
+  const { engine, runner: r } = build();
+  const result = await engine.commitKeyFiles(changes);
+  r.record(result);
+  if (result.status === 'synced' && (result.received || result.conflicts?.length)) await Promise.all([loadInventory(), loadProfile()]);
+  return result;
 }
 
 /** The join summary: what recognising this device's data would do (nothing is changed). */

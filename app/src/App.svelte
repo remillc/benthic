@@ -53,6 +53,7 @@
   import SharedSitesTerms from './components/SharedSitesTerms.svelte';
   import { startSharedSites } from './lib/shared-sites.svelte.js';
   import ConflictHost from './components/ConflictHost.svelte';
+  import AccountSyncHost from './components/AccountSyncHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import ValidationConfirm from './components/ValidationConfirm.svelte';
   import { connection } from './lib/online.svelte.js';
@@ -509,6 +510,7 @@
   {#if isRelease}<SharedSitesTerms />{/if}
   <ErrorReportHost />
   <ConflictHost />
+  {#if isRelease}<AccountSyncHost />{/if}
   <QrReceived />
   <ValidationConfirm />
   <FileImportProgress />

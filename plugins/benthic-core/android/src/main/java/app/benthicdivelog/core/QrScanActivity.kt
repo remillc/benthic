@@ -65,6 +65,9 @@ import java.util.concurrent.Executors
  * Only the header is read here, to count the codes and show "5 codes lus sur 8"; the contents
  * are checked and decoded by the web layer once every code is in. Nothing is stored and nothing
  * goes over the network. ML Kit's bundled model reads QR codes only.
+ *
+ * Text mode ("mode": "text" in the options, the account pairing screens): no header is read; the first
+ * code, whatever it holds, ends the scan as {action: "done", codes: [text]}. The web layer checks it.
  */
 class QrScanActivity : AppCompatActivity() {
     private class Header(val kind: String, val transfer: String, val index: Int, val total: Int, val label: String)
@@ -365,6 +368,11 @@ class QrScanActivity : AppCompatActivity() {
 
     private fun handleCode(text: String) {
         if (finished || asking) return
+        if (options.optString("mode") == "text") {
+            finished = true
+            finishWith(JSONObject().put("action", "done").put("codes", JSONArray().put(text)))
+            return
+        }
         if (!text.startsWith("OD")) {
             flashMessage(str("foreign"))
             return

@@ -74,6 +74,8 @@ export { waterTypeOf };
  * Every visible text of the QR scanner (it is native: the app passes the translated texts).
  * The panel counts the codes with the header of app/src/lib/qr-transfer.js.
  * @typedef {Object} QrScanOptions
+ * @property {'transfer'|'text'} [mode] 'transfer' (default): the codes of a dive or a plan (`OD1~...`), several of them;
+ *   'text': the first code, whatever it holds, ends the scan (the account pairing codes, which the web layer checks)
  * @property {string} title "Scanner un code QR"
  * @property {string} close accessible name of the close button
  * @property {string} hint "Gardez la caméra sur l'autre écran. ..."

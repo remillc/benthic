@@ -22,6 +22,8 @@ const MAX_RETRIES = 3;
  * @property {string[]} unsealed files withheld until their sensitive data is sealed
  * @property {boolean} joinNeeded this device has data and the account has data: the join step must run before anything is sent
  * @property {boolean} differentAccount this device last synced with another account: nothing is sent
+ * @property {boolean} keyMissing the account has a data key that this device does not hold (the unlock dialog, the locked look)
+ * @property {boolean} hasRecovery the account has a recovery key (`keys/recovery.json`)
  * @property {string} error the code of the last failure, '' when none
  */
 
@@ -35,6 +37,8 @@ export const initialState = () => ({
   unsealed: [],
   joinNeeded: false,
   differentAccount: false,
+  keyMissing: false,
+  hasRecovery: false,
   error: '',
 });
 
@@ -117,6 +121,8 @@ export function createAccountSyncRunner({ engine, state, allowed, afterRun, now 
         state.differentAccount = false;
         state.locked = result.locked ?? [];
         state.unsealed = result.unsealed ?? [];
+        state.keyMissing = !!result.keyMissing;
+        state.hasRecovery = !!result.hasRecovery;
         if (result.conflicts?.length) state.conflicts = [...state.conflicts, ...result.conflicts.filter((c) => !state.conflicts.some((x) => x.path === c.path))];
         break;
       case 'offline':
@@ -125,6 +131,8 @@ export function createAccountSyncRunner({ engine, state, allowed, afterRun, now 
       case 'joinNeeded':
         state.status = 'idle';
         state.joinNeeded = true;
+        state.keyMissing = !!result.keyMissing;
+        state.hasRecovery = !!result.hasRecovery;
         break;
       case 'differentAccount':
         state.status = 'idle';
@@ -153,6 +161,10 @@ export function createAccountSyncRunner({ engine, state, allowed, afterRun, now 
         return;
       }
       schedule(kind === 'edit' ? EDIT_DELAY_MS : 0);
+    },
+    /** The result of a run made outside the runner (a key file committed by the pairing): the screens read it as any other. @param {import('./account-sync.js').SyncResult} result */
+    record(result) {
+      apply(result);
     },
     /** « Synchroniser maintenant »: runs at once, whatever the network setting says. */
     async syncNow() {

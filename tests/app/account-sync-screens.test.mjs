@@ -84,9 +84,12 @@ const screens = [
   'JoinSummaryDialog',
   'LockedDataCard',
   'StartOverDialog',
+  'AccountDifferentDialog',
 ].map((n) => [`components/${n}.svelte`, readFileSync(new URL(`components/${n}.svelte`, app), 'utf8')]);
 const libs = ['lib/two-device-notice.js', 'lib/pair-scan.js', 'lib/account-sync-screens.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
-const everything = [...screens, ...libs];
+// The wiring: the host picks the screen, the flows hold the texts of the snackbars and the names of the items.
+const wiring = ['components/AccountSyncHost.svelte', 'lib/account-sync-flows.svelte.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
+const everything = [...screens, ...libs, ...wiring];
 
 /** @param {any} root @param {string} path */
 const lookup = (root, path) => path.split('.').reduce((node, k) => node?.[k], root);
@@ -142,7 +145,7 @@ test('every class of a screen starts with bc-', () => {
   }
 });
 
-test('the locked state and the account-sheet row stay off until the wiring', () => {
+test('the locked state and the account-sheet row are off by default; the host turns them on', () => {
   const state = readFileSync(new URL('lib/locked-data.svelte.js', app), 'utf8');
   assert.match(state, /locked: false,\s*canPair: false/);
   for (const file of ['components/AccountSheet.svelte', 'components/DesktopAccountSheet.svelte']) assert.match(readFileSync(new URL(file, app), 'utf8'), /\{#if accountLock\.canPair\}/, file);
@@ -150,17 +153,15 @@ test('the locked state and the account-sheet row stay off until the wiring', () 
     assert.match(readFileSync(new URL(file, app), 'utf8'), /accountLock\.locked/, file);
 });
 
-test('the screens are not reachable yet', () => {
-  const names = screens.map(([f]) => f.split('/').pop()).filter((n) => n !== 'LockedDataCard.svelte');
-  const sources = [];
-  /** @param {URL} dir */
-  const walk = (dir) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const path = new URL(entry.name + (entry.isDirectory() ? '/' : ''), dir);
-      if (entry.isDirectory()) walk(path);
-      else if (/\.(svelte|js)$/.test(entry.name)) sources.push(readFileSync(path, 'utf8'));
-    }
-  };
-  walk(app);
-  for (const name of names) assert.ok(!sources.some((s) => s.includes(`./${name}`) || s.includes(`/${name}'`)), `${name} is imported: the wiring step is done, update this test`);
+test('the screens are reached through one host, mounted in App.svelte for Benthic+ builds only', () => {
+  const host = readFileSync(new URL('components/AccountSyncHost.svelte', app), 'utf8');
+  for (const [file] of screens) {
+    const name = file.split('/').pop();
+    if (name === 'LockedDataCard.svelte') continue;
+    assert.ok(host.includes(`./${name}'`), `${name} is not shown by the host`);
+  }
+  const root = readFileSync(new URL('App.svelte', app), 'utf8');
+  assert.match(root, /\{#if isRelease\}<AccountSyncHost \/>\{\/if\}/);
+  // Dialogs own no route: the host never calls a router.
+  assert.doesNotMatch(host + readFileSync(new URL('lib/account-sync-flows.svelte.js', app), 'utf8'), /\.navigate\(|routeTo|f7\.views/);
 });
