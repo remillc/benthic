@@ -6976,3 +6976,13 @@ Christian asked for this on 23 November 2026. Work in `main`. Task 357 redrew th
 - **Desktop** (tablet canvas, page Bureau, subgroup « Téléchargement, partage et voyage »): a 640 px dialog (28 px corners, height follows the content, at most 820 px) with « Télécharger des plongées », ⋮ (on the choice step) and ✕ in its header. The choice step has three sections: « Votre ordinateur » (the remembered one, filled « Télécharger », 48 px), « Branché par USB » (each USB computer with a tonal « Télécharger »), « À proximité, en Bluetooth ». Hint: « Branchez l’ordinateur de plongée en USB, ou mettez-le en mode transfert Bluetooth près de cet ordinateur. » No connection step (pairing goes through the system). Actions sit in a footer at the bottom right: in progress « Arrêter le téléchargement »; connection lost « Fermer » + « Réessayer »; nothing new « Tout retélécharger… » + « Terminer »; done « Terminer » + « Voir dans le carnet »; done with a new computer « Voir dans le carnet ». « Téléchargement échoué » is unchanged.
 
 **Test:** on each device, a remembered computer starts with one click or tap on « Télécharger », and « Tout retélécharger » is only in the menu.
+
+## [ ] 2026-11-23-359 Dive detail, « Photos et vidéos »: Benthic+ only, synced pictures shown as thumbnails
+
+Christian asked for this on 23 November 2026. Work in `main`. Photos and videos are a Benthic+ feature (synced, within the 10 Go of the account).
+
+- **Free user (and demo logbook):** the « Photos et vidéos » section of the dive detail is hidden. The pictures referenced in the logbook stay untouched.
+- **Benthic+ subscriber:** the section shows a horizontal row of 76 dp square thumbnails (12 dp corners) that scrolls sideways: photos, then videos with a play disc and their duration at the bottom right (« 0:42 »), then a dashed 76 dp tile « Ajouter » (plus icon) that adds photos or videos to the dive. Under the row: a cloud-with-check icon (green), « 3 photos et 1 vidéo, sur tous vos appareils », and « Tout voir » at the end (opens the dive's gallery). The old line « Sur un autre appareil : seule leur référence est synchronisée » goes away. Dark mode: the card keeps the dark surface; texts and « Tout voir » use the dark-mode tokens.
+- The setting « Afficher les champs photos et vidéos » (Réglages › Carnet, `docs/ui-specification.md`) still hides the section when it is off.
+
+Mock-ups: « Détail, équipement déplié · Android » and every other Android phone and tablet dive detail (light and dark); tablet « Carnet d’exemple (mode démo) » and « Feuille du compte, version gratuite » show the detail without the section. iPhone and desktop details had no such section; add it there the same way for subscribers.
