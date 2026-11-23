@@ -208,6 +208,14 @@ test('tablets and the desktop open the validation as a dialog, the phone keeps i
   }
 });
 
+test('the desktop selection offers « Faire signer… » to Benthic+ and opens the dialog with the selected dives', () => {
+  const desk = readFileSync(new URL('../../app/src/pages/DesktopLogbook.svelte', import.meta.url), 'utf8').split('\r\n').join('\n');
+  assert.match(desk, /benthicPlusSubscriber\(\) \? new Set\(\[\.\.\.AVAILABLE, 'sign'\]\)/);
+  assert.match(desk, /key === 'sign' && benthicPlusSubscriber\(\)[^\n]*validating = \[\.\.\.desk\.selection\.ids\]/);
+  assert.match(desk, /<ValidationDialog ids=\{validating\}/);
+  for (const l of ['fr', 'en']) assert.ok(JSON.parse(readFileSync(new URL(`../../app/src/i18n/${l}.json`, import.meta.url), 'utf8')).desktop.menu.sign, l);
+});
+
 test('the privacy policy says what is kept about a signer, in both languages', () => {
   for (const [lang, needle] of [['fr', /nom, son rôle, son numéro de moniteur .*signature sont gardés dans votre carnet/], ['en', /name, role, instructor number .*signature are kept in your logbook/]]) {
     assert.match(readFileSync(new URL(`../../app/public/privacy/${lang}.html`, import.meta.url), 'utf8'), needle);

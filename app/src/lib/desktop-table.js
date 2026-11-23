@@ -338,6 +338,9 @@ export function keepSelection(selection, order) {
  *   | {key: 'separator'}} MenuEntry
  */
 
+/** The signing dialog takes at most this many dives (the same limit as the phone's selection). */
+export const MAX_SIGNED = 20;
+
 /**
  * The right-click menu for the selected dives, in order (task 2026-11-15-169): only what
  * applies to them. `shortcut` names the keys in the platform's words (« Ctrl+E », « ⌘E »).
@@ -364,6 +367,9 @@ export function contextMenuEntries(count, { mac, available, mergeable = true }) 
       count > 1
         ? { key: 'editTogether', label: 'desktop.menu.editTogether', icon: 'edit', shortcut: key('E') }
         : { key: 'edit', label: 'desktop.menu.edit', icon: 'edit', shortcut: key('E') },
+      count > 1
+        ? { key: 'sign', label: 'desktop.menu.sign', icon: 'seal', ...(count > MAX_SIGNED ? { disabled: true, hint: 'validation.tooMany' } : {}) }
+        : null,
       count === 1 ? { key: 'renumberFrom', label: 'renumberFrom.title', icon: 'renumber' } : null,
     ].filter((e) => e !== null && available.has(e.key)),
     [

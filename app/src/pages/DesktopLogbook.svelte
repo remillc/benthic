@@ -28,6 +28,8 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, importData, undoLastChange, deleteDives, tripChange, mergeDives } from '../lib/logbook.svelte.js';
+  import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
+  import ValidationDialog from '../components/ValidationDialog.svelte';
   import { canMerge, mergeErrorKey } from '../lib/multi-dive.js';
   import { selectionText, copyDives, clipboardDives, textToBase64 } from '../lib/desktop-clipboard.js';
   import { filter } from '../lib/filter.svelte.js';
@@ -50,6 +52,7 @@
     stepSelect,
     keepSelection,
     contextMenuEntries,
+    MAX_SIGNED,
     emptyAreaMenuEntries,
     clampTableWidth,
     tableWidthFor,
@@ -81,6 +84,8 @@
 
   /** The actions the right-click menu can offer today (the others wait: see the task's notes). */
   const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'renumberFrom', 'copy', 'export', 'share', 'delete']);
+  /** « Faire signer… » is a Benthic+ action, like every signing entry point. */
+  const available = $derived(benthicPlusSubscriber() ? new Set([...AVAILABLE, 'sign']) : AVAILABLE);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
 
   // --- Search: the core's fulltext index, as on the phone (Logbook.svelte). ---------------
@@ -324,7 +329,7 @@
   }
 
   const mergeable = $derived(canMerge(logbook.dives, desk.selection.ids).ok);
-  const menuEntries = $derived(contextMenuEntries(desk.selection.ids.length, { mac: desktopMac, available: AVAILABLE, mergeable }));
+  const menuEntries = $derived(contextMenuEntries(desk.selection.ids.length, { mac: desktopMac, available, mergeable }));
 
   // The right-click menu of the table's empty area: « Coller » (task 2026-11-15-178).
   /** @type {{x: number, y: number, canPaste: boolean}|null} */
@@ -482,12 +487,16 @@
     }
   }
 
+  /** The dives the signing dialog is open for (« Faire signer… »), or null. */
+  let validating = $state(/** @type {number[]|null} */ (null));
+
   /** @param {string} key */
   function act(key) {
     if (key === 'edit') editSelected();
     else if (key === 'delete') deleteSelected();
     else if (key === 'editTogether') editingTogether = true;
     else if (key === 'merge') mergeSelected();
+    else if (key === 'sign' && benthicPlusSubscriber() && desk.selection.ids.length > 1 && desk.selection.ids.length <= MAX_SIGNED) validating = [...desk.selection.ids];
     else if (key === 'renumberFrom' && desk.selection.ids.length === 1) renumberFrom = desk.selection.ids[0];
     else if (key === 'copy') copySelected();
     else if (key === 'export' || key === 'share') exporting = true;
@@ -1184,6 +1193,9 @@
       whole={exportWhole}
       onclose={() => ((exporting = false), (exportWhole = false))}
     />
+  {/if}
+  {#if validating}
+    <ValidationDialog ids={validating} onclose={() => (validating = null)} />
   {/if}
   {#if choosingTrip}
     <ChoiceDialog title={t('desktop.menu.addToTrip')} options={tripOptions} value="new" onselect={addToTrip} oncancel={() => (choosingTrip = false)} />

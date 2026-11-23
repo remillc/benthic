@@ -2792,6 +2792,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Profil : la date de naissance est chiffrée ; les dates existantes sont protégées à l’ouverture d’un profil modifiable.",
+      "Bureau : en sélectionnant plusieurs plongées, « Faire signer… » du menu contextuel ouvre la fenêtre de signature pour elles (Benthic+).",
       "Bureau : le séparateur entre les volets n’a plus de poignée ; il passe en orange quand le pointeur le survole ou le déplace. Le carnet a sa propre barre de défilement fine, à part. Chaque plongée est séparée de la suivante par une ligne, et la colonne Compagnons n’affiche plus l’initiale.",
       "Tablette, premier lancement : « Votre carnet est prêt » centre le logo, la pastille, le titre et la ligne du panneau bleu, et la colonne de droite reprend la maquette : titre « Votre carnet », fiche des chiffres sur toute la largeur, bouton « Ouvrir mon carnet » à droite.",
       "Équipement : une bouteille a une « Marque » après son nom ; un recycleur a « Cellules O₂ fabriquées le » avant « Cellules O₂ installées le », et le rappel des cellules tombe au plus tôt de 18 mois après la fabrication et 12 mois après l’installation.",
@@ -5362,6 +5363,7 @@
       "merge": "Fusionner en une plongée",
       "addToTrip": "Ajouter à un voyage…",
       "editTogether": "Modifier ensemble…",
+      "sign": "Faire signer…",
       "edit": "Modifier",
       "copy": "Copier",
       "export": "Exporter…",
