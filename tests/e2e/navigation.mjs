@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-media-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -23,12 +23,15 @@ import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+import http from 'node:http';
 import { monkeyFlows } from './navigation-monkey.mjs';
 import { gestureFlows } from './navigation-gestures.mjs';
 import { startFakeDivelogs } from './fake-divelogs.mjs';
 import { regressionFlows } from './navigation-regressions.mjs';
 import { syncLineFlows } from './sync-line.mjs';
 import { syncStateFlows } from './sync-state.mjs';
+import { diveMediaFlows } from './dive-media.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -133,6 +136,22 @@ if (args.has('--delete-only')) {
   );
 }
 await core('importFile', { source: seeded, repo: `${path.join(home, 'carnet')}[main]` });
+
+// The desktop's media folder (desktop/media.cjs) for the dive photos and videos, and a small file server standing for
+// the app://media/ address of the desktop app (the page asks the stand-in bridge's `mediaUrl`).
+const mediaFolder = createRequire(import.meta.url)('../../desktop/media.cjs').createMedia({ userData: home, tempDir: temp });
+const mediaServer = http.createServer((req, res) => {
+  const file = mediaFolder.fileFor((req.url ?? '').slice(1).split('?')[0]);
+  if (!file) {
+    res.statusCode = 404;
+    res.end();
+    return;
+  }
+  res.setHeader('Content-Type', new URL(req.url, 'http://x').searchParams.get('type') || 'application/octet-stream');
+  res.end(readFileSync(file));
+});
+await new Promise((resolve) => mediaServer.listen(PORT + 2000, '127.0.0.1', resolve));
+children.push({ kill: () => mediaServer.close() });
 
 // A fake divelogs.de on this machine (tests/e2e/fake-divelogs.mjs): the build under test is pointed at it, never at the real service.
 mkdirSync(path.join(temp, 'share'), { recursive: true });
@@ -259,6 +278,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
       // the app makes at start, and the error report sheet (task #102) opens over the page and takes the taps. The stand-in
       // answers « nothing cached » instead, as the app's own start does without an account.
       if (kind === 'core' && method === 'cloudListCachedDives') reply = { ok: true, v: '' };
+      else if (kind === 'media') reply = { ok: true, v: await mediaFolder.call(method, a) };
       else if (kind === 'core') reply = { ok: true, v: await core(method, a) };
       else if (method === 'writeFile') {
         const p = path.join(temp, a.area, path.basename(a.name));
@@ -280,7 +300,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
     tab.run((t, r) => window.__bcAnswer(t, r), token, reply).catch(() => {});
   };
   await tab.send('Page.addScriptToEvaluateOnNewDocument', {
-    source: `(${function (home, temp, stage, welcome) {
+    source: `(${function (home, temp, stage, welcome, mediaPort) {
       // The very first start (no value) shows the first launch; otherwise the logbook.
       if (welcome) {
         localStorage.removeItem('CapacitorStorage.bc.welcomeBeta');
@@ -320,8 +340,10 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         // The recent logbooks (the desktop layout reads them at start): none, as on a first run.
         logbooks: { recent: async () => [], exists: async () => ({}), forget: async () => [], clearRecent: async () => [] },
         fs: new Proxy({}, { get: (_, op) => (o) => call('fs', op, o) }),
+        media: { call: (op, o) => call('media', op, o) },
+        mediaUrl: (hash, mime) => `http://127.0.0.1:${mediaPort}/${hash}?type=${encodeURIComponent(mime || '')}`,
       };
-    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)})`,
+    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)}, ${PORT + 2000})`,
   });
   await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.BC_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
   for (let i = 0; i < 100; i++) {
@@ -2713,7 +2735,7 @@ async function profileSectionFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-media-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2761,6 +2783,7 @@ try {
     ['settings', '--settings-computers-only', 45, true, () => settingsComputersFlows(expect)],
     ['profile layers', '--profile-layers-only', 5, true, () => profileLayersFlows(expect)],
     ['sync line', '--sync-line-only', '--sync-state-only', 45, !phoneOnly && !tabletOnly && !welcomeOnly, () => syncLineFlows({ ...harness, shot })],
+    ['dive media', '--dive-media-only', 40, !phoneOnly && !tabletOnly && !welcomeOnly, () => diveMediaFlows({ ...harness, openPlusTab, makePlus, shot, mediaFolder })],
     ['sync state', '--sync-state-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => syncStateFlows({ ...harness, shot })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],

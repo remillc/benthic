@@ -104,7 +104,9 @@ export function refreshMedia() {
 
 /** The address a file of the device is shown at (an image or a video tag). @param {{ hash: string, path: string, mime?: string }} o */
 export function mediaSrc({ hash, path, mime = '' }) {
-  if (/** @type {any} */ (globalThis).benthicDesktop) return `app://media/${hash}${mime ? `?type=${encodeURIComponent(mime)}` : ''}`;
+  const desktop = /** @type {any} */ (globalThis).benthicDesktop;
+  // The desktop's main process serves the media folder at app://media/<hash> (desktop/main.cjs); a check may give its own address.
+  if (desktop) return desktop.mediaUrl ? desktop.mediaUrl(hash, mime) : `app://media/${hash}${mime ? `?type=${encodeURIComponent(mime)}` : ''}`;
   return Capacitor.convertFileSrc(`file://${path}`);
 }
 
