@@ -6602,3 +6602,20 @@ Christian approved this on 23 November 2026. Work in `main`. **`docs/equipment-f
 8. Reminders only for Bouteille, Veste, Détendeur, Recycleur and Combinaison étanche (#148, if not done yet).
 
 In the done note, list the screens you changed and any field of the app that the table does not have.
+
+## [ ] 2026-11-23-335 Tablet, landscape: « Votre carnet est prêt » (Benthic+) must match its mock-up
+
+Christian approved this on 23 November 2026. Work in `main`. Mock-up: « Benthic+, votre carnet est prêt · tablette Android, paysage » (`android-tablette-btplus-pret-paysage`), on the tablet canvas. Code: `FirstLaunchBenthicPlus.svelte` (step `benthicPlusReady`), `BenthicPlusReadyLogo.svelte`, the tablet blue panel. Phone and desktop are not part of this task, but check that your changes do not move them.
+
+1. **Left panel content is not centered.** In the blue panel (700 dp wide on a 1280 × 800 screen), the animated logo, the « Benthic+ » chip, the title « Votre carnet est prêt » and the line « Tout est sur cette tablette, et y reste même sans réseau. » sit in one column centered horizontally on the panel (`align-items: center; text-align: center`, side padding 48 dp). The column starts 176 dp from the top of the panel. The small Benthic wordmark stays at the top left (40 dp, 40 dp).
+2. **The animated logo is not aligned.** The 120 dp white disc (the wave that spins twice and turns into a check mark, blue on white) is centered on the same axis as the title and the chip below it, not offset to one side. The chip is 24 dp under the disc, the title 14 dp under the chip. Keep the existing animation and the reduced-motion fallback.
+3. **Right side: show what the mock-up shows, nothing more.** Vertically centered column, padding 24 / 64 / 56 / 64 dp:
+   - heading « Votre carnet » (28 sp, weight 500);
+   - one white card (radius 20 dp, 1 dp border `#E3E1DC`) with four 52 dp rows, label on the left in `#4B4A47`, value on the right in weight 600: « Plongées » 312, « Sites » 48, « Équipement » « 14 articles », « Brevets » 3, divided by 1 dp lines;
+   - under the card, a green check and « <e-mail> · synchronisé à l’instant » (14 sp, `#4B4A47`);
+   - the filled button « Ouvrir mon carnet », aligned to the **right** (end) of the column, 48 dp high;
+   - at the bottom center of the right side, « Une question ? À propos et contact » with the help icon, linking to À propos.
+   Remove any other row, line or button that the app shows here and the mock-up does not, and list them in the done note.
+4. Portrait tablet: apply the same centering in its panel if it has the same layout; say in the done note what you did.
+
+In the done note, put a screenshot description of before and after for the landscape tablet.
