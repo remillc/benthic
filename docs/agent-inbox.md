@@ -7186,3 +7186,30 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet
 - Leave 88 px empty at the end of the pane so the + floating button never covers the last row.
 
 **Test:** on the desktop, open a dive, tab Équipement: five cards; change the kit, a computer, the suit, a weight and an item as before; the « Ce lest était » selector is centred and narrower; scroll to the end: the + button does not hide the last item. A free user does not see the Kit card, « Sous-vêtement », « Ce lest était » or « Autre équipement ».
+
+## [ ] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (the « Photos et vidéos » section of the dive detail). Mock-ups: phone canvas, page Android, subgroup « Photos et vidéos (Benthic+) », just before « Plusieurs ordinateurs »: « Photos et vidéos de la plongée, « Tout voir » », « … sélection », « … retirer de la plongée », « Photo en plein écran », « … menu », « Vidéo en plein écran ». Android phone only for now; the other devices come later.
+
+**Gallery** (opened by « Tout voir », and by touching a thumbnail of the section, which opens the viewer on that item).
+- Top app bar: back arrow, title « Photos et vidéos », subtitle « N° 5 · Lake Coleridge · 2014-04-02 » (number, site, date), ⋮ on the right.
+- Under it, one line: green cloud-with-check icon, « 7 photos et 2 vidéos, sur tous vos appareils · 186 Mo ».
+- A grid of square thumbnails, 3 columns, 3 dp gaps, edge to edge, in the order of the dive (time taken). Bottom left of each thumbnail: the depth of the profile at the moment the picture was taken (« 18,4 m », white, 12 sp semibold, small shadow), from the picture's offset in the dive (Subsurface's picture offset) and the profile; no depth when the offset falls outside the dive. Videos: a play disc in the centre and the duration bottom right (« 0:42 »).
+- « Ajouter » is a FAB at the bottom right (56 dp, same style as the Carnet's +: 16 dp corners, #EBEAE5, small shadow), « Ajouter des photos ou des vidéos »; 96 dp of empty space under the grid so it never hides the last row. Same picker as the section's « Ajouter » tile.
+
+**Selection** (long press on a thumbnail).
+- The top bar turns #D4E2F2: ✕ (« Annuler la sélection »), « 2 sélectionnées », then Partager and Retirer (trash icon) on the right. No FAB while selecting.
+- Each thumbnail shows an empty circle top left; a selected one shrinks slightly with rounded corners and a filled #114477 check.
+- Retirer opens a basic dialog (no ✕): « Retirer 2 photos de la plongée ? » (« 2 vidéos », « 1 photo et 1 vidéo » as the case may be), « Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la galerie de l’appareil où vous les avez prises. », buttons « Annuler » and « Retirer » (#B3261E).
+
+**Photo full screen.**
+- Black background, the photo fitted to the width; swipe left and right to go through the dive's pictures; small page dots under it (the current one longer).
+- Over the top, on a dark gradient: back arrow, « 2 sur 9 », Partager, ⋮. Touching the photo hides and shows the bars.
+- At the bottom, one line in white at 85 %: « mer. 2014-04-02, 10 h 11 · Olympus TG-6 » (date and time taken, camera model when the file says it). No depth, no time in the dive, no temperature, no profile.
+- ⋮ menu: « Remplacer la photo du site » (uses this photo as the site's photo) and « Retirer de la plongée » (same dialog as above, for one item). Saving to the device's gallery goes through Partager; no separate item.
+
+**Video full screen.** Same screen, plus the player controls above the bottom line: a 48 dp round Lecture/Pause button, elapsed time, a seek bar, total time, and a mute button. No big play disc over the video while it plays.
+
+**Free user:** none of these screens (the section is hidden, task 359).
+
+**Test:** from a dive with photos and videos, « Tout voir » shows the grid in dive order with depths; the FAB adds pictures; a long press selects, Partager shares, Retirer asks then removes on every device; touching a photo opens it full screen, swiping changes picture, ⋮ offers the two items; a video plays with its controls.
