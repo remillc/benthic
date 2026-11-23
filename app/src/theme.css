@@ -209,7 +209,8 @@
     --bc-desk-stats-tip-hint: #D4E2F2;
     --bc-menu-danger: #B71C1C;
     /* Desktop table (task 2026-11-15-193): a buddy's initial badge, the trip band. */
-    --bc-buddy-badge: #E3E1DC;
+    --bc-table-divider: #E3E1DC;
+    --bc-scrollbar-thumb: #B8B6AF;
     /* Desktop first launch (task 2026-11-16-246): the thin divider between the help link and the language button. */
     --bc-language-divider: #C8C6BF;
     --bc-trip-band: #ECEAE4;
@@ -659,7 +660,8 @@
     --bc-desk-stats-heat-4: #BFD6F0;
     --bc-desk-stats-tip-hint: #2B66AD;
     --bc-menu-danger: #FF8A80;
-    --bc-buddy-badge: #3A3C40;
+    --bc-table-divider: #3A3C40;
+    --bc-scrollbar-thumb: #5A5C60;
     --bc-trip-band: #26282B;
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185), dark. */
     --bc-field-rest: #2A2D31;

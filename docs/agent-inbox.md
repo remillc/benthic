@@ -6512,7 +6512,7 @@ Mock-ups: `android-tablette-profil-piece-retirer-paysage`, `bureau-profil-piece-
 
 Done on 22 November 2026: `RETIRE_REASONS` gets `other` (« Autre » / « Other », `gear.retire.reason.other`), the chip follows « Hors d’usage » in the dialog (the chips already wrap onto two lines on a phone), the iPhone action sheet gets « Retirer · autre », and « Pièces retirées » and the piece sheet show it through the same key. No text field.
 
-## [ ] 2026-11-22-327 Desktop: the divider between the panes, and the list's scrollbar (#174)
+## [x] 2026-11-22-327 Desktop: the divider between the panes, and the list's scrollbar (#174)
 
 Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS, every desktop page with two panes (Carnet, Sites, Statistiques, Outils, Réglages, Compte, Profil, Sauvegarde, Téléchargement…).
 
@@ -6524,7 +6524,9 @@ Mock-ups: `bureau-carnet-profil-droite` (17 dives, the scrollbar), `bureau-carne
 
 **Test:** no grip on any desktop page; hovering the divider shows the resize cursor and the rust highlight; a logbook longer than the window shows the thin scrollbar next to the list, separate from the divider.
 
-## [ ] 2026-11-22-328 Desktop logbook: a divider between the dives (#150)
+Done: no grip on the divider (logbook and Sites, the two pane pages that have one), rust-on-tertiary hover/drag with col-resize, the logbook list has its own 9 px WebKit scrollbar (6 px thumb, no track, under the headers).
+
+## [x] 2026-11-22-328 Desktop logbook: a divider between the dives (#150)
 
 Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS.
 
@@ -6532,13 +6534,17 @@ In the logbook table of the desktop, every dive row gets a 1 px divider at its b
 
 Mock-ups: `bureau-carnet-profil-droite` (the list scrolled to the bottom so that the trip shows), `bureau-carnets-selecteur`, `bureau-carnets-rail-survol`, updated in `docs/mockups/`.
 
-## [ ] 2026-11-22-329 Desktop logbook: no initial badge in the Compagnons column
+Done: 1 px `--bc-table-divider` under each dive row (none on the last of a trip card nor on the selected pill); only the selected row is rounded.
+
+## [x] 2026-11-22-329 Desktop logbook: no initial badge in the Compagnons column
 
 Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS.
 
 In the Compagnons column of the desktop logbook table, remove the round grey badge (22 px, #ECEAE4) with the buddy's initial in front of the name: the cell shows only the name(s), in the row's text style, cut with an ellipsis when too long. Nothing else changes.
 
 Mock-ups: `bureau-carnet-profil-droite` and the other desktop boards that show the logbook list (28 boards), updated in `docs/mockups/`.
+
+Done: the initial badge is removed (the `--bc-buddy-badge` token became `--bc-table-divider`).
 
 ## [ ] 2026-11-22-330 « Faire valider la plongée » on the tablet and the desktop (#152)
 

@@ -508,9 +508,7 @@
         {/if}
       </div>
 
-      <div class="bc-desktop-sites--handle" role="separator" aria-orientation="vertical" aria-label={t('desktopSites.resize')} aria-valuenow={deskSites.width} tabindex="0" onpointerdown={startResize} onkeydown={resizeKey}>
-        <span class="bc-desktop-sites--grip"></span>
-      </div>
+      <div class="bc-desktop-sites--handle" role="separator" aria-orientation="vertical" aria-label={t('desktopSites.resize')} aria-valuenow={deskSites.width} tabindex="0" onpointerdown={startResize} onkeydown={resizeKey}></div>
 
       <div class="bc-desktop-sites--right">
         <!-- The map stays mounted under the other panes, so that its view is kept. -->
@@ -862,7 +860,7 @@
       text-align: center;
       color: var(--bc-text-2);
     }
-    /* 9 dp handle, a 1 dp line, a 4 × 32 dp grip, as the Carnet's. */
+    /* 9 dp handle, a 1 dp line, no grip; hovered, focused or dragged: tertiary container with a 3 dp rust line (task 2026-11-22-327). */
     .bc-desktop-sites--handle {
       position: relative;
       flex: none;
@@ -875,20 +873,15 @@
         inset: 0 4px;
         background: var(--bc-separator);
       }
-    }
-    .bc-desktop-sites--grip {
-      position: absolute;
-      top: 50%;
-      left: 2.5px;
-      width: 4px;
-      height: 32px;
-      margin-top: -16px;
-      border-radius: 2px;
-      background: var(--bc-outline);
-    }
-    .bc-desktop-sites--handle:focus-visible .bc-desktop-sites--grip,
-    .bc-desktop-sites--handle:hover .bc-desktop-sites--grip {
-      background: var(--bc-text);
+      &:hover,
+      &:focus-visible,
+      &:active {
+        background: var(--bc-tertiary-container);
+        &::before {
+          inset: 0 3px;
+          background: var(--bc-tertiary);
+        }
+      }
     }
     .bc-desktop-sites--right {
       position: relative;
