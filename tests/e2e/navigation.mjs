@@ -1640,7 +1640,7 @@ async function computerPhotoFlows(expect) {
   });
   await sleep(800);
   const state = await tab.run(() => {
-    const row = document.querySelector('.bc-desktop-edit-field[data-field="computer"] .bc-desktop-edit-field--value');
+    const row = document.querySelector('.bc-desktop-dive-fields--computer[data-field="computer"]');
     const image = row?.querySelector('.bc-dc-tile img');
     return { named: !!row?.textContent.includes('Sample'), photo: !!image && image.getAttribute('src')?.startsWith('data:image/svg+xml') };
   });

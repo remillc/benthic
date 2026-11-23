@@ -15,19 +15,31 @@ export async function desktopEquipmentFlows(h) {
   const { openTab, sleep, expect, shot } = h;
   console.log('Desktop, 1400x900: the Équipement tab, one card per section');
   const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
+  // Tabs of earlier blocks stay open in a shard: this one must be the visible one, or the page does not lay out.
+  await tab.send('Page.bringToFront');
+  await tab.send('Emulation.setFocusEmulationEnabled', { enabled: true });
+  await tab.send('Page.setWebLifecycleState', { state: 'active' }).catch(() => {});
   await tab.run(() => !!document.querySelector('.bc-desktop-logbook--table'));
 
+  /** Polls the page until `check` is true (a loaded machine is slower than a quiet one). @param {() => boolean} check */
+  const waitFor = async (check) => {
+    for (let i = 0; i < 100; i++) {
+      if (await tab.run(check).catch(() => false)) return;
+      await sleep(150);
+    }
+  };
   const openEquipment = async () => {
+    // A second click on the selected row would close the pane (and, on a loaded machine, leave it opening): click it once.
     await tab.run(() => {
-      document.querySelector('.bc-desktop-logbook--row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      if (!document.querySelector('.bc-dive-detail')) document.querySelector('.bc-desktop-logbook--row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
       return 1;
     });
-    await sleep(500);
+    await waitFor(() => !!document.querySelector('[role="tab"][data-tab="equipment"]'));
     await tab.run(() => {
       /** @type {HTMLElement|null} */ (document.querySelector('[role="tab"][data-tab="equipment"]'))?.click();
       return 1;
     });
-    await sleep(900);
+    await waitFor(() => (document.querySelector('.bc-desktop-dive-fields--equipment')?.getBoundingClientRect().height ?? 0) > 0);
   };
   /** The cards, their order, and what the tab shows. */
   const read = () =>
@@ -82,9 +94,13 @@ export async function desktopEquipmentFlows(h) {
 
   // --- With Benthic+ ----------------------------------------------------------------------------------------------
   await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
-  await sleep(1200);
   await openEquipment();
+  await waitFor(() => (document.querySelector('[data-card="kit"]')?.getBoundingClientRect().height ?? 0) > 0);
   state = await read();
+  if (!state.headerIcon[0]) {
+    console.log('  debug:', JSON.stringify(await tab.run(() => { const out = []; for (let e = document.querySelector('[data-card="kit"]'); e; e = e.parentElement) { const c = getComputedStyle(e); const r = e.getBoundingClientRect(); out.push(`${e.tagName}.${String(e.className).split(' ')[0]} ${c.display} ${c.visibility} ${Math.round(r.width)}x${Math.round(r.height)}`); } return out.slice(0, 14); })));
+    if (process.env.BC_SHOTS) await shot(tab, 'equipment-debug');
+  }
   expect('Benthic+: five cards in order, 16 px corners, 16 px padding, 14 px apart, 40 px round icons', { names: 'kit,computers,protection,weights,other-gear', radius: '16px', padding: '16px', gaps: '14,14,14,14', headerIcon: '40,40,40,40,40', kit: true, undersuit: state.undersuit }, { ...state, names: state.names.join(','), gaps: state.gaps.join(','), headerIcon: state.headerIcon.join(',') });
   expect('the suit field is 48 px tall; the computers are 64 px rows (at least one)', { suitFieldHeight: 48, rows: true }, { suitFieldHeight: state.suitFieldHeight, rows: state.computerRows.length > 0 && state.computerRows.every((x) => x === 64) });
 
@@ -101,7 +117,7 @@ export async function desktopEquipmentFlows(h) {
     input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
     return 1;
   });
-  await sleep(1200);
+  await waitFor(() => !!document.querySelector('.bc-desktop-dive-fields--feedback-group'));
   state = await read();
   const centred = state.selector && state.weightsCard ? Math.abs((state.selector.left + state.selector.right) / 2 - (state.weightsCard.left + state.weightsCard.right) / 2) < 2 : false;
   expect('a weight: a 5 kg chip, the total in the header, « Ce lest était » narrower than 360 px and centred', { chip: true, total: true, feedbackTitle: true, narrow: true, centred: true }, {
@@ -126,7 +142,7 @@ export async function desktopEquipmentFlows(h) {
     /** @type {HTMLElement|null} */ (document.querySelector('[data-card="other-gear"] .bc-desktop-dive-fields--text-button'))?.click();
     return 1;
   });
-  await sleep(900);
+  await waitFor(() => !!document.querySelector('.bc-add-equipment [role="checkbox"]'));
   await tab.run(() => {
     /** @type {HTMLElement|null} */ (document.querySelector('.bc-add-equipment [role="checkbox"]'))?.click();
     return 1;
@@ -136,7 +152,7 @@ export async function desktopEquipmentFlows(h) {
     /** @type {HTMLElement|null} */ (document.querySelector('.bc-add-equipment--main'))?.click();
     return 1;
   });
-  await sleep(1500);
+  await waitFor(() => !!document.querySelector('.bc-desktop-other-gear--tile'));
   state = await read();
   expect('an item added to the dive: a 56 px grey row with the dive knife drawing', { rows: 1, height: 56, knifeIcon: true }, { rows: state.gearRows.length, height: state.gearRows[0]?.height, knifeIcon: state.knifeIcon });
 
