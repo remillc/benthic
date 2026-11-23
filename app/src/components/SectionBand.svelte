@@ -61,7 +61,7 @@
 
         /* The logbook's search field sits 8 px higher; the band keeps its height (task 284). */
         /* :global: the search field comes from the page (a slot); Svelte would drop the rule otherwise. */
-        &:has(:global(.bc-band-search)) {
+        &:has(:global(.bc-band-search, .bc-folding-search--slot)) {
           padding-bottom: 40px;
         }
       }
@@ -151,6 +151,8 @@
       letter-spacing: 0.25px;
       white-space: pre-line;
       color: var(--bc-on-band-2);
+      /* The folding search box fades it while it rises (FoldingSearch.svelte). */
+      opacity: var(--bc-summary-opacity, 1);
     }
   }
 </style>

@@ -6711,7 +6711,7 @@ Christian approved this on 23 November 2026. Work in `main`. These are the scree
 
 iPhone and tablet portrait are not drawn: use the same dialogs. In the done note, list the screens built and anything in `docs/account-sync.md` the mock-ups do not cover.
 
-## [ ] 2026-11-23-339 Carnet and Sites (Android phone): the search box folds into a magnifier while scrolling, and keeps a search in progress
+## [x] 2026-11-23-339 Carnet and Sites (Android phone): the search box folds into a magnifier while scrolling, and keeps a search in progress
 
 Christian approved this on 23 November 2026 (TODO #58). Work in `main`. Today the Carnet's search field leaves the screen with the band and a search button appears in the scrolled bar (task 2026-11-14-125, `Logbook.svelte` `openSearch`, `BandBackdrop.svelte`). Mock-ups, phone canvas:
 - Android › Carnet et plongées › Liste du carnet: « Carnet, la boîte de recherche se replie en loupe au défilement (étapes) · Android » and « Carnet, recherche « Lake » en cours, défilé : la boîte repliée garde le texte · Android »;
@@ -6724,6 +6724,13 @@ Christian approved this on 23 November 2026 (TODO #58). Work in `main`. Today th
 5. The collapsed band keeps its faint profile above the wave (the « seconde vague »), as `BandBackdrop` draws it; the mock-ups « Carnet, défilé avec en-têtes collants » and « Carnet, petit carnet … » were missing it and are fixed.
 
 Tablet, desktop and iPhone are not part of this task. In the done note, say how the box is animated and what happens when the keyboard is open and the list is scrolled.
+
+**Done (23 November 2026).** The four mock-up boards named by the task are not in `docs/mockups/` (nothing matches « loupe », « se replie » or « Rechercher un site » there), so this was built from the task text. New component `FoldingSearch.svelte`, used by `Logbook.svelte` and `Sites.svelte` on an Android phone only (`!theme.ios && layout.phone && !desktopApp`); tablet, desktop and iPhone are unchanged.
+- **How the box is animated.** No timer, no spring: each animation frame of a scroll, from the scroll position `s`, `p = min(1, s / T)` (T: the distance from the box's place in the band to the title row, about 88 px). The box is drawn above the top bar (in the page's `fixedContent`) and left, right, height and colours are interpolated with `p`; it rises at the list's speed, then stays on the title row; the summary fades over the first 45 % of T (`--bc-summary-opacity`). The band holds an empty slot (`bc-folding-search--slot`, 56 dp + 8 dp) and the top bar an empty target (`bc-folding-search--target`) that keeps the room of the folded box and gives its final place; a ResizeObserver re-measures them. Back at the top, `p` is 0 and the box is in its place. Reduced motion: the full box scrolls with the list until half of T, then it is the magnifier or the pill (no in-between). The pill is white at 22 % (`--bc-band-chip`), 40 dp, text 15 sp weight 600 (cut at 110 dp), × 40 dp; the plain magnifier is a 48 dp target.
+- **Taps.** Magnifier, pill text or the box scrolled a little: scroll to the top (smooth, instant with reduced motion), then focus the field (keyboard). × clears the search; folded, it keeps the keyboard closed, at the top it keeps the cursor in the field.
+- **Keyboard open and list scrolled.** Dragging the list with the field focused closes the keyboard (the field is folding away; a programmatic scroll or the keyboard's own resize does not), so the keyboard never stays open over a field that is not on screen. The search text stays; the box folds into the pill.
+- **Sites.** Box « Rechercher un site » under the summary, the header's search button and the old open-search overlay are gone on the phone; the summary reads « 1 site correspond à « cole » » while searching, the « à faire » card and the + button give way while a search is typed, the map view comes back when the search is emptied. The full-screen button moves above « Centrer sur ma position » (and above it when a site card is open). On the shared map (« Carte commune ») the box is not shown, as the search looks only through your own sites (choice, the task was silent).
+- **Band profile (point 5).** `BandBackdrop` already draws the faint profile above the wave on the collapsed band; nothing to change in code (the two mock-up boards were the ones to fix).
 
 ## [ ] 2026-11-23-340 Sync progress: the header's pale profile becomes the progress line, on every device (replaces the Material 3 wavy bar of `PullProgress`)
 
@@ -6744,3 +6751,61 @@ Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `
 7. **Accessibility**: the line is the `progressbar` (`aria-label` « Synchronisation du carnet », `aria-valuenow` when known); keep announcing the stage, not each percent, as now.
 8. **Collapsed band**: when the band is collapsed during the exchange, the line runs on the collapsed band's profile.
 9. **Every device**: tablet and desktop use their band the same way. Where a device's Carnet header has no band profile (iPhone large title, desktop if it applies), add the same faint profile at the bottom edge of the header and draw the line on it; say in the done note what you did per device. Remove `LinearWavyProgress` from `PullProgress` if nothing else uses it.
+
+## [x] 2026-11-23-341 Long press on a dive (phone and tablet): selection mode starts while the finger is still down
+
+Christian approved this on 23 November 2026 (TODO #159). Work in `main`. No mock-up. On `/` (the Carnet list), on phone and tablet, a long press on a dive row turns the list into the checkbox list (selection mode) only when the finger is lifted. Expected: selection mode starts **as soon as the long press is recognized, while the finger is still down**, with the pressed dive already checked.
+
+- Trigger on the long-press threshold (Framework7 `taphold` or the existing timer), not on `touchend`/`pointerup`/`click`.
+- Give the usual feedback at that moment: Android haptic (`HapticFeedbackConstants.LONG_PRESS` or the Capacitor haptics equivalent), iOS selection haptic, if the app already has a haptics helper.
+- Lifting the finger afterwards must not toggle the dive again, open its detail, or start a scroll; a move after the threshold must not cancel the selection.
+- A short tap and a scroll keep their current behaviour; a long press on a trip row behaves as today, unless it already selects the trip's dives (then apply the same rule).
+- Check both Android and iPhone, phone and tablet.
+
+In the done note, say which event now starts selection mode and how the lift is ignored.
+
+**Done (23 November 2026).** The existing 500 ms timer of the list's `pointerdown` handler (`LONG_PRESS_MS` in `Logbook.svelte`) now starts selection mode itself, finger still down: `startSelection(id)` (or one more check when already selecting) for a dive row, `selectTrip` for a trip row. The lift decides nothing any more: `touchend` only clears the lift style and the drag state, and the `pressed` flag makes the click that follows be dropped before Framework7 opens the dive. A move after the threshold keeps the selection (it still drags the dives to a trip, as before); a move over 10 px before the threshold cancels the press, so a scroll and a short tap are unchanged. Feedback: `lib/haptics.js` calls `navigator.vibrate(15)`; the app has no haptics plugin and no VIBRATE permission, so the real vibration needs Christian's go-ahead for `@capacitor/haptics` (Android and iOS selection haptic). Tests: `tests/app/logbook-long-press.test.mjs`, flow « long press » of `tests/e2e/navigation.mjs` (`--long-press-only`; phone and tablet, Android and iOS look).
+
+## [ ] 2026-11-23-342 Correction of task 338: the join summary's intro line is missing
+
+Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre cet appareil » dialog (task 338, item 11; mock-up « Premier envoi, résumé et pièces à confirmer (Benthic+) · Android » and its tablet and desktop versions), the app does not show the line under the title. Add it, on every device, between the title and the three counters:
+
+« Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte. »
+
+Body text, 14 sp, on-surface-variant colour, 4 dp under the title and 20 dp above the counters, as in the mock-up.
+
+## [ ] 2026-11-23-343 Correction of task 338: the join summary is « Jumeler cet appareil »
+
+Christian asked for this on 23 November 2026. Work in `main`. In the first-sync summary dialog (task 338, item 11; mock-ups « Premier envoi, résumé et pièces à confirmer (Benthic+) » on phone, tablet and desktop), on every device:
+- the title « Joindre cet appareil » becomes **« Jumeler cet appareil »** (also the dialog's accessible name);
+- the confirm button « Joindre » becomes **« Jumeler »**.
+The git commit message of the join step (`account-sync.md`: « Joindre cet appareil ») may stay as it is; it is not shown to the diver.
+
+## [ ] 2026-11-23-344 Addition to task 338: confirmation after the first-sync summary
+
+Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler » in the first-sync summary (tasks 338 item 11 and 343), show a confirmation dialog, on every device. Mock-ups: « Premier envoi, appareil jumelé (Benthic+) » (phone, tablet, desktop), right after the summary board.
+
+- Green check disc (40 dp, #1E6B3A, white check), title « Appareil jumelé ».
+- « Les données de cet appareil sont réunies avec celles de votre compte : <n> pièces reconnues, <n> nouvelles ajoutées, <n> confirmées. » with the counts of the join that just ran (drop a part whose count is 0).
+- « Elles se synchronisent maintenant avec vos autres appareils. »
+- One button: « OK ». Basic dialog, no ✕.
+- Shown once the « Jumeler cet appareil » commit is pushed; on a failure, show the usual sync error instead.
+- If the recovery key offer (338 item 9) follows at the first sync, it comes after this dialog.
+
+## [ ] 2026-11-23-345 Account sheet « Jumeler un nouvel appareil »: the mock-ups now show your row
+
+Christian asked for this on 23 November 2026. Work in `main`. The row you added in `AccountSheet.svelte` and `DesktopAccountSheet.svelte` (QR icon, « Jumeler un nouvel appareil », « Donne accès aux données chiffrées », chevron, only for a subscriber whose device holds the data key, `accountLock.canPair`) is now drawn in the subscriber account sheets: « Feuille du compte, avec « Mon profil de plongeur » · Android », the iPhone subscriber account sheet, the tablet account sheet and the desktop account sheet. It sits right after « Sauvegarde et restauration », in the same group, with a divider like the rows above, and opens « Appareil déjà jumelé, montrer le code ».
+
+Check that the app matches on every device (position, divider, icon, texts, the row hidden when `canPair` is false) and fix any gap. It is not in the free account sheet. In the done note, say what you changed, or that nothing needed to change.
+
+## [ ] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
+
+Christian decided this on 23 November 2026. Work in `main`. The diver can no longer choose a manual sync: the logbook (and the account data) always sync automatically, on every device and in every edition.
+
+1. **Remove the setting** « Synchroniser automatiquement » (`autoSync`, text « À l’ouverture, au retour dans l’app et quelques secondes après une modification ») everywhere it is shown: `Account.svelte`, `AccountSheet.svelte`, `DesktopAccountSheet.svelte`, `SyncControl.svelte`, and any Réglages page. Keep « Seulement sur Wi-Fi ou câble » and « Synchroniser maintenant ».
+2. **Remove the manual mode** in `logbook.svelte.js`, `reconnect.js`, `Logbook.svelte` and wherever `autoSync` gates a sync: treat it as always on. A stored `autoSync: false` from an older version is ignored (and may be deleted from the device's settings at start). The gating by the network (`autoSyncing()` and the metered-connection rule) stays.
+3. **Remove the manual states and menu**: the line « Synchronisation manuelle : {n} modification(s) non envoyée(s) » (`sync.manual`), « Désactivée : rien n'est envoyé ni reçu… » (`autoSyncOff`), and the account sheet's ⋮ menu « Autres options de synchronisation » (`account.syncOptions`, with « Passer en synchronisation automatique » and « Voir les modifications non envoyées »). Remove the now-unused strings in every language file.
+4. Pending changes still show when the device is offline or a sync failed (« 3 modifications non envoyées », the « Synchroniser » button): mock-up « Feuille du compte, modifications en attente et mise à jour de carte · Android » (renamed; its ⋮ is gone). The desktop account sheet mock-up (« Carnet · bureau, … compte ») no longer has the switch. The board « Menu « Autres options de synchronisation » · Android » was deleted.
+5. Update `docs/architecture.md` / `docs/system-design.md` where they describe manual sync, and add a line to the release notes (fr and en).
+
+In the done note, list what was removed.

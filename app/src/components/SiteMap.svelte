@@ -769,6 +769,7 @@
       z-index: 2;
       top: var(--bc-map-button-top, 8px);
       right: var(--bc-map-button-right, 8px);
+      bottom: var(--bc-map-button-bottom, auto);
       width: 40px;
       height: 40px;
       padding: 0;
@@ -796,6 +797,7 @@
       .bc-map-fullscreen & {
         top: calc(var(--f7-safe-area-top, var(--bc-safe-top)) + 8px);
         right: 16px;
+        bottom: auto;
       }
 
       /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */

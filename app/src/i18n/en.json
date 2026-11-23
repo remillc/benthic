@@ -2792,6 +2792,8 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by reading a QR code (or by showing its own on a computer) or with a 26-character recovery key; encrypted data stays locked until the device is paired.",
+      "Logbook: a long press on a dive or a trip starts selection mode as soon as it is recognised, with the finger still down and a short haptic tap on phones and tablets; letting go no longer decides.",
+      "Android phone, Logbook and Sites: the search box sits under the summary and, as the list scrolls, shrinks and rises into the top bar as a magnifier. A search in progress stays there as a pill with its text and a clear button; tapping the text or the magnifier opens the box again. On Sites, the map's full-screen button moves above « Center on my position ».",
       "Export: “Send to divelogs.de” sends the dives of the logbook or of the selection to your divelogs.de account, after the user name and the password, which are not kept. The sending shows its progress and resumes after a lost connection.",
       "Profile: the date of birth is encrypted; existing dates are protected when an editable profile opens.",
       "Desktop: selecting several dives and choosing « Get signed… » in the right-click menu opens the signing window for them (Benthic+).",

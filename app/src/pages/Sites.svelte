@@ -24,7 +24,7 @@
   import { defaultKeeper, sortSitesByName, sortSitesByRecent } from '../lib/site-merge.js';
   import { offerUndo } from '../lib/undo.js';
   import { formatDepth, formatDate, locale } from '../lib/format.js';
-  import { layout, ios, listWidth } from '../lib/layout.svelte.js';
+  import { layout, ios, listWidth, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 import { connection } from '../lib/online.svelte.js';
 import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
@@ -39,6 +39,7 @@ import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared
 import { inYourSites, readAreaSites } from '../lib/shared-sites.js';
 import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
 import { openBenthicPlus } from '../lib/open-offer.svelte.js';
+import FoldingSearch from '../components/FoldingSearch.svelte';
 
   /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
@@ -100,7 +101,31 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   const GROW_MS = 300;
   const FADE_MS = 150;
 
-  const typed = $derived(searching && query.trim() !== '');
+  /**
+   * Android phone (task 2026-11-23-339): the search box is in the band under the summary and folds into a
+   * magnifier while the page scrolls; there is no « open search » state, the box is always there.
+   */
+  const fold = $derived(!theme.ios && layout.phone && !desktopApp);
+  /** The box itself: not on the shared map, which lists other sites than the ones it searches. */
+  const folding = $derived(fold && !common);
+  const typed = $derived((folding || searching) && query.trim() !== '');
+  /** The search takes the page: the list of things to do and the + button give way. */
+  const finding = $derived(fold ? typed : searching);
+
+  // Folded box: the map's view before the search comes back when the search is emptied.
+  let wasTyped = false;
+  $effect(() => {
+    if (!fold) return;
+    const now = typed;
+    untrack(() => {
+      if (now && !wasTyped) viewBeforeSearch = siteMap?.getView() ?? null;
+      else if (!now && wasTyped) {
+        siteMap?.setView(viewBeforeSearch);
+        viewBeforeSearch = null;
+      }
+      wasTyped = now;
+    });
+  });
   const results = $derived(typed ? used.filter((s) => matchesSite(s, query)) : used);
 
   // The list follows the map (task 2026-11-14-150): the sites inside the visible
@@ -588,12 +613,14 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   <SectionBand
     {overMap}
     chip={!connection.online}
-    summaryKey={searching}
+    summaryKey={finding}
+    tall={folding}
     summary={common ? '' : searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
   >
     {#if !connection.online}
       <p class="bc-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
     {/if}
+    {#if folding}<div class="bc-folding-search--slot"></div>{/if}
   </SectionBand>
 {/snippet}
 
@@ -644,7 +671,7 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
   {:else}
   <section class="bc-sites--panel" aria-label={t('sites.listLabel')}>
     {#if withoutSite || unplaced || duplicates || unused}
-     <div class="bc-sites--todo" class:bc-sites--hidden={searching} bind:this={todoEl}>
+     <div class="bc-sites--todo" class:bc-sites--hidden={finding} bind:this={todoEl}>
       <div class="bc-sites--todo-inner">
       <!-- « À faire » (bc-sites-todo), on every device: iPhone and iPad too since task 2026-11-14-148. -->
       <nav class="list bc-sites--links bc-sites--surface bc-sites-todo" aria-label={t('sites.todoLabel')}>
@@ -706,13 +733,16 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 
 {#snippet fab()}
     <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
-    <div class="fab fab-right-bottom bc-fab-add bc-sites--fab" class:bc-sites--hidden={searching} bind:this={fabEl}>
+    <div class="fab fab-right-bottom bc-fab-add bc-sites--fab" class:bc-sites--hidden={finding} bind:this={fabEl}>
       <a href="/sites/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
     </div>
 {/snippet}
 
-<Page class="bc-sites{layout.phone ? '' : ' bc-sites--tablet'}" style="--bc-sites-pane: {listWidth + (ios ? 0 : 20)}px" onPageReinit={load}>
+<Page class="bc-sites{layout.phone ? '' : ' bc-sites--tablet'}{fold ? ' bc-sites--fold' : ''}" style="--bc-sites-pane: {listWidth + (ios ? 0 : 20)}px" onPageReinit={load}>
   {#snippet fixedContent()}
+    {#if folding && !selection.length}
+      <FoldingSearch bind:value={query} label={t('sites.search')} />
+    {/if}
     <!-- The open search: ← and the field take the place of the top bar's items. -->
     <div class="bc-sites--search" class:bc-sites--open={searching} inert={!searching} bind:this={searchEl} role="search">
       <button type="button" class="bc-icon-button bc-sites--search-back" onclick={closeSearch}>
@@ -799,10 +829,14 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
     />
   {/if}
 
-  <Navbar class="bc-band-bar bc-sites--bar{searching ? ' bc-sites--searching' : ''}" title={t('sites.title')}>
+  <Navbar class="bc-band-bar bc-sites--bar{searching ? ' bc-sites--searching' : ''}{folding ? ' bc-band-tall' : ''}" title={t('sites.title')}>
     {#snippet left()}<MenuButton />{/snippet}
     <NavRight>
-      <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="bc-sr-only">{t('sites.search')}</span></Link>
+      {#if fold}
+        {#if folding}<span class="bc-folding-search--target" aria-hidden="true"></span>{/if}
+      {:else}
+        <Link iconOnly onClick={openSearch}><Icon name="search" /><span class="bc-sr-only">{t('sites.search')}</span></Link>
+      {/if}
       {#if !theme.ios}<AccountAvatar />{/if}
       <Link iconOnly popoverOpen=".bc-sites-sort-menu">
         {#if theme.ios}<Icon name="moreCircle" />{:else}<Icon name="more" weight={4} />{/if}
@@ -1214,6 +1248,23 @@ import { openBenthicPlus } from '../lib/open-offer.svelte.js';
         --bc-map-credits-top: 34px;
         --bc-map-credits-bottom: auto;
         --bc-map-button-top: 62px;
+      }
+    }
+
+    /* Android phone (task 2026-11-23-339): the band is taller (it holds the search box), so the full-screen button
+       leaves the top of the map for the bottom right, just above « Centrer sur ma position ». */
+    :global(.bc-sites--fold) .bc-sites--map {
+      --bc-map-button-top: auto;
+      --bc-map-button-bottom: 80px;
+
+      &.bc-sites--card-open {
+        --bc-map-button-bottom: 164px;
+      }
+
+      &.bc-sites--map-offline {
+        --bc-map-credits-top: auto;
+        --bc-map-credits-bottom: 4px;
+        --bc-map-button-top: auto;
       }
     }
 
