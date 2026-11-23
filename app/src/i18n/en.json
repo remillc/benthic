@@ -2787,6 +2787,7 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
+      "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
       "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
       "First launch: the light rays of the blue band are always four, scaled to the width of the band, on tablet and computer as on the phone.",
@@ -5147,6 +5148,11 @@
     "openSiteLink": "See the site in Sites",
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
+    "changeKit": "Change kit",
+    "kitFilled": "Filled the fields below; each can still be changed.",
+    "addSecondComputer": "+ Add a second computer",
+    "addFirstComputer": "+ Add a computer",
+    "removeWeightNamed": "Remove {name}",
     "computerRole": {
       "0": "Main",
       "1": "Second",
@@ -5155,7 +5161,7 @@
     },
     "section": {
       "computers": "Dive computers",
-      "protection": "Protection and weights",
+      "protection": "Thermal protection",
       "otherGear": "Other gear"
     },
     "gasCards": "Cylinders of the dive",

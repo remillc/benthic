@@ -187,15 +187,15 @@ test('the span a cylinder was breathed', () => {
   assert.equal(cylinderSpan(samples, 2), null);
 });
 
-test('Autre équipement: a seam of three props, no storage of its own, absent without Benthic+', () => {
+test('Autre équipement: a seam of two props, no storage of its own, absent without Benthic+', () => {
   const gear = read('app/src/components/DesktopOtherGear.svelte');
-  assert.match(gear, /let \{ items = \[\], onadd, onremove, locked = false \} = \$props\(\)/);
-  assert.match(gear, /disabled=\{!onadd\}/);
+  assert.match(gear, /let \{ items = \[\], onremove \} = \$props\(\)/);
+  assert.doesNotMatch(gear, /bc-desktop-other-gear--add/, 'adding is the button of the card header (task 366)');
   assert.doesNotMatch(gear, /deviceStore|BenthicCore|localStorage|saveDiveChanges/);
   const fields = read('app/src/components/DesktopDiveFields.svelte');
   // Without Benthic+ (and in the alpha) the section is not drawn at all (task 2026-11-22-333).
   assert.doesNotMatch(fields, /<DesktopOtherGear \/>/);
-  assert.match(fields, /<DesktopOtherGear items=\{otherItems\} onadd=\{[^}]*\} onremove=\{removeGear\} \/>/); // the release edition
+  assert.match(fields, /<DesktopOtherGear items=\{otherItems\} onremove=\{removeGear\} \/>/); // the release edition
 });
 
 test('the Carte tab keeps its height and the tab content replaces the old map block', () => {

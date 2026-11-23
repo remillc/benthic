@@ -7176,7 +7176,7 @@ It shows wherever `blender` is used: the « Mélangeur de gaz » tile in Outils 
 
 **Done (23 November 2026).** `blender` stays in `paths` with the cylinder-being-filled drawing of the task, so 89 keys are symbols and 18 stay drawings; checked by `tests/app/icon-sets.test.mjs` and on the Outils tiles, phone and desktop.
 
-## [ ] 2026-11-23-366 Desktop dive detail, « Équipement » tab: one card per section
+## [x] 2026-11-23-366 Desktop dive detail, « Équipement » tab: one card per section
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet · bureau, détail, onglet Équipement » (tablet and desktop canvas, page Bureau, subgroup « Détail d’une plongée »), redrawn. Same data and same editing as today; only the layout changes.
 
@@ -7190,3 +7190,5 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet
 - Leave 88 px empty at the end of the pane so the + floating button never covers the last row.
 
 **Test:** on the desktop, open a dive, tab Équipement: five cards; change the kit, a computer, the suit, a weight and an item as before; the « Ce lest était » selector is centred and narrower; scroll to the end: the + button does not hide the last item. A free user does not see the Kit card, « Sous-vêtement », « Ce lest était » or « Autre équipement ».
+
+**Done (23 November 2026).** Built from the task text (the canvas mock-up is not in the repository; `docs/mockups/bureau-carnet-onglet-equipement.dc.html` is the old layout). `DesktopDiveFields.svelte` draws the tab as five `DesktopEquipmentCard`s (kit, computers, protection thermique, lest, autre équipement) under the hint; `DesktopWeights` has removable 40 px chips, a dashed « + Ajouter » chip and no total (it is in the card header); `DesktopOtherGear` has 56 px grey rows and no add tile (« + Ajouter » is in the card header); `DesktopEditField` has a `tall` 48 px variant with a chevron. « Changer de kit » is a text button with the kit select laid over it. Computers stay read-only and the add button stays disabled, as the old fields were. 64 px + the pane's 24 px margin leave 88 px at the end. `tests/e2e/desktop-equipment.mjs` (`--equipment-only`) checks the free and Benthic+ tabs, the weight chip, total and centred selector, a knife item, and the end of the pane. Also fixed: `DesktopWeights` threw « Cannot read properties of null » when a weight was kept (bindings on `editing`).

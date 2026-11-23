@@ -2787,6 +2787,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Icônes : 89 icônes de l’application passent aux glyphes arrondis de Material Symbols (flèches, nuage, dossier, appareil photo, clé, calendrier, localisation, réglages, etc.) ; le mélangeur de gaz garde un dessin de bouteille que l’on remplit, et le couteau de plongée a un nouveau dessin.",
+      "Ordinateur, détail d’une plongée, onglet Équipement : une carte par section (kit, ordinateurs de plongée, protection thermique, lest, autre équipement), avec le total du lest dans son en-tête, un lest par pastille retirable, « Ce lest était » centré et « + Ajouter » dans la carte de l’autre équipement.",
       "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",
       "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",
       "Premier lancement : les rayons de lumière de la bande bleue sont toujours quatre, à l’échelle de la largeur de la bande, sur tablette et ordinateur comme sur le téléphone.",
@@ -5147,6 +5148,11 @@
     "openSiteLink": "Voir le site dans Sites",
     "serial": "n° {serial}",
     "addComputer": "Ajouter un ordinateur",
+    "changeKit": "Changer de kit",
+    "kitFilled": "A rempli les champs ci-dessous ; chacun reste modifiable.",
+    "addSecondComputer": "+ Ajouter un deuxième ordinateur",
+    "addFirstComputer": "+ Ajouter un ordinateur",
+    "removeWeightNamed": "Retirer {name}",
     "computerRole": {
       "0": "Principal",
       "1": "Deuxième",
@@ -5155,7 +5161,7 @@
     },
     "section": {
       "computers": "Ordinateurs de plongée",
-      "protection": "Protection et lest",
+      "protection": "Protection thermique",
       "otherGear": "Autre équipement"
     },
     "gasCards": "Bouteilles de la plongée",

@@ -2,9 +2,9 @@
   // @ts-check
   // The « Lest » field of the desktop detail's Équipement tab (task 2026-11-16-262; mock-up
   // bureau-carnet-onglet-equipement): every weight of the dive is a chip with its place and its weight
-  // (« Ceinture 5 kg »), then « Ajouter », then the total at the right. The chips wrap on a second line
-  // when there are many. A click on a chip edits it in place (place and weight); Entrée or leaving the
-  // field keeps it and saves it at once, Échap restores it. `onsave` gets the rows of desktop-edit.js
+  // (« Ceinture 5 kg ») with a cross that removes it, then a dashed « + Ajouter » chip; the total is in the card's
+  // header (task 2026-11-23-366). The chips wrap on a second line when there are many. A click on a chip edits it
+  // in place (place and weight); Entrée or leaving the field keeps it and saves it at once, Échap restores it. `onsave` gets the rows of desktop-edit.js
   // weightChanges and returns false when the change could not be saved.
   import { tick } from 'svelte';
   import Icon from './Icon.svelte';
@@ -62,6 +62,16 @@
     if (e.index < 0) return remove || !e.text.trim() ? rows : [...rows, { description: e.description, text: e.text, grams0: -1, text0: '' }];
     return remove ? rows.filter((_, i) => i !== e.index) : rows.map((r, i) => (i === e.index ? { ...r, description: e.description, text: e.text } : r));
   }
+  /** A chip's cross: that weight is removed at once. @param {number} index */
+  async function removeAt(index) {
+    if (saving) return;
+    saving = true;
+    try {
+      await onsave(weights.map((w) => ({ description: w.description, text: weightText(w.grams, prefs), grams0: w.grams, text0: weightText(w.grams, prefs) })).filter((_, i) => i !== index));
+    } finally {
+      saving = false;
+    }
+  }
   /** @param {boolean} [remove] */
   async function keep(remove = false) {
     if (!editing || saving) return;
@@ -100,10 +110,10 @@
   {#if editing}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="bc-desktop-weights--editing" bind:this={box} onfocusout={focusout} onkeydown={keydown}>
-      <select class="bc-desktop-weights--place" aria-label={t('desktopDetail.weightPlace')} bind:value={editing.description}>
+      <select class="bc-desktop-weights--place" aria-label={t('desktopDetail.weightPlace')} value={editing.description} onchange={(e) => editing && (editing.description = e.currentTarget.value)}>
         {#each placeOptions as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
       </select>
-      <input class="bc-desktop-weights--input" type="text" inputmode="decimal" aria-label={label} aria-invalid={!valid} bind:value={editing.text} />
+      <input class="bc-desktop-weights--input" type="text" inputmode="decimal" aria-label={label} aria-invalid={!valid} value={editing.text} oninput={(e) => editing && (editing.text = e.currentTarget.value)} />
       <span class="bc-desktop-weights--unit">{unit}</span>
       {#if editing.index >= 0}
         <button type="button" class="bc-desktop-weights--remove" aria-label={t('desktopDetail.removeWeight')} title={t('desktopDetail.removeWeight')} onmousedown={(e) => e.preventDefault()} onclick={() => keep(true)}><Icon name="delete" size={18} /></button>
@@ -113,13 +123,14 @@
   {:else}
     <div class="bc-desktop-weights--rest">
       {#each shown.chips as chip (chip.index)}
-        <button type="button" class="bc-desktop-weights--chip" aria-label="{chip.place} {chip.weight}" onclick={() => edit(chip.index)}>
-          {chip.place}<span class="bc-desktop-weights--amount">{chip.weight}</span>
-        </button>
+        <span class="bc-desktop-weights--chip">
+          <button type="button" class="bc-desktop-weights--chip-edit" aria-label="{chip.place} {chip.weight}" onclick={() => edit(chip.index)}>
+            {chip.place}<span class="bc-desktop-weights--amount">{chip.weight}</span>
+          </button>
+          <button type="button" class="bc-desktop-weights--chip-x" aria-label={t('desktopDetail.removeWeightNamed', { name: `${chip.place} ${chip.weight}` })} title={t('desktopDetail.removeWeight')} onclick={() => removeAt(chip.index)}><Icon name="close" size={16} /></button>
+        </span>
       {/each}
-      <button type="button" class="bc-desktop-weights--add" onclick={add}>{t('desktopDetail.add')}</button>
-      <span class="bc-desktop-weights--spacer"></span>
-      {#if shown.total}<span class="bc-desktop-weights--total">{t('desktopDetail.weightTotal')} <strong>{shown.total}</strong></span>{/if}
+      <button type="button" class="bc-desktop-weights--add" onclick={add}><Icon name="plus" size={18} />{t('desktopDetail.add')}</button>
     </div>
   {/if}
 </div>
@@ -130,7 +141,15 @@
       min-width: 0;
     }
 
-    .bc-desktop-weights--rest,
+    .bc-desktop-weights--rest {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      color: var(--bc-text);
+    }
+
     .bc-desktop-weights--editing {
       box-sizing: border-box;
       min-height: 40px;
@@ -142,33 +161,54 @@
       border-radius: 8px;
       font-size: 15px;
       color: var(--bc-text);
-    }
-
-    .bc-desktop-weights--rest {
-      background: var(--bc-field-rest);
-    }
-
-    .bc-desktop-weights--editing {
       background: var(--bc-surface);
       box-shadow: inset 0 0 0 2px var(--bc-secondary);
     }
 
+    /* A weight: 40 px tall, 8 px corners, a 1 px border; the cross removes it. */
     .bc-desktop-weights--chip {
+      box-sizing: border-box;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--bc-field-hover);
+      border-radius: 8px;
+      color: var(--bc-text);
+      font-size: 14px;
+    }
+
+    .bc-desktop-weights--chip-edit {
       width: auto;
-      height: 32px;
+      height: 100%;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 0 12px;
-      border: 1px solid var(--bc-field-hover);
-      border-radius: 8px;
+      padding: 0 4px 0 12px;
+      border: 0;
+      border-radius: 7px 0 0 7px;
       background: none;
-      color: var(--bc-text);
+      color: inherit;
       font: inherit;
-      font-size: 14px;
       cursor: pointer;
       &:hover {
         background: color-mix(in srgb, var(--bc-text) 6%, transparent);
+      }
+    }
+
+    .bc-desktop-weights--chip-x {
+      width: 32px;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 0 7px 7px 0;
+      background: none;
+      color: var(--bc-text-2);
+      cursor: pointer;
+      &:hover {
+        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
+        color: var(--bc-text);
       }
     }
 
@@ -179,29 +219,21 @@
 
     .bc-desktop-weights--add {
       width: auto;
-      height: 32px;
-      padding: 0 4px;
-      border: 0;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 12px 0 8px;
+      border: 1.5px dashed var(--bc-gas-card-add-outline);
+      border-radius: 8px;
       background: none;
-      color: var(--bc-text-2);
+      color: var(--bc-on-table-selected);
       font: inherit;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
       &:hover {
-        color: var(--bc-text);
-      }
-    }
-
-    .bc-desktop-weights--spacer {
-      flex: 1;
-    }
-
-    .bc-desktop-weights--total {
-      font-size: 13px;
-      color: var(--bc-text-2);
-      font-variant-numeric: tabular-nums;
-      & strong {
-        font-weight: 600;
-        color: var(--bc-text);
+        background: color-mix(in srgb, var(--bc-text) 6%, transparent);
       }
     }
 
