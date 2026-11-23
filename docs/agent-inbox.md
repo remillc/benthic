@@ -6809,3 +6809,22 @@ Christian decided this on 23 November 2026. Work in `main`. The diver can no lon
 5. Update `docs/architecture.md` / `docs/system-design.md` where they describe manual sync, and add a line to the release notes (fr and en).
 
 In the done note, list what was removed.
+
+## [ ] 2026-11-23-347 « Profil » becomes a main navigation entry (Benthic+), with its own home page; « Mon profil de plongeur » leaves the account sheet
+
+Christian approved this on 23 November 2026. Work in `main`. The diver profile (equipment, kits, maintenance, certifications and documents, information) moves out of the account sheet into the main navigation, **after Sites**, on every device. It exists only for Benthic+ subscribers: for a free account the entry is absent (the red « B+ » circles in the mock-ups are annotations, task 333).
+
+Mock-ups (the reference for the navigation; the other boards still show the older 4-entry navigation and are not to be followed on that point):
+- phone: « Profil de plongeur, page d’accueil de la section (Benthic+) · Android » (block Android › Profil (Benthic+)), and « Proposition · barre de navigation avec Profil (Benthic+) · Android »;
+- iPhone: the profile home in iPhone › Profil (Benthic+) (5th tab « Profil » after Sites);
+- tablet: the profile home in Tablette Android › Profil (Benthic+) (rail item « Profil » after Sites);
+- desktop: « Bureau · Profil (Benthic+) » home (rail item « Profil » after Sites).
+
+1. **Navigation entry.** Label « Profil », person silhouette icon (head and shoulders). Android bottom bar: 5 destinations (Carnet, Sites, Profil, Statistiques, Outils); iPhone tab bar: Profil after Sites; tablet and desktop rail: Profil after Sites. Active state as the other entries.
+2. **Badge.** A red badge with the number of maintenance items that need attention (overdue + due soon, the same count as the « Entretien » row's badge on the profile home; « 2 » in the mock-ups). No badge at 0.
+3. **Profile home page** (the section's first page, `/profile`): title « Profil de plongeur », no back arrow / back link (it is a top-level destination). Identity card (avatar, name, dive count, Benthic+ chip), the red « Fiche d’urgence » card (phone and iPhone), then « Ce que vous gardez ici »: Équipement, Entretien (with its badge), Brevets et documents, Informations. Under Informations the line « Chiffré de bout en bout » with a lock. The old footnote « Gardé sur votre compte Benthic+… » (with its icon) is removed. Tablet and desktop: list on the left, the selected page on the right (Informations by default), as drawn.
+4. **Account sheet.** Remove the « Mon profil de plongeur » row (and its maintenance line and badge) from every account sheet; the sheet keeps « Sauvegarde et restauration » and « Jumeler un nouvel appareil » (tasks 338, 345). Mock-ups updated: « Feuille du compte, abonné (Benthic+) · Android » (renamed), the iPhone, tablet and desktop subscriber sheets.
+5. Links that opened the profile from elsewhere (maintenance notifications, reminders, the emergency sheet shortcut…) now open the Profil destination with the right page selected.
+6. Free account: no Profil entry, no profile pages reachable; the Benthic+ offer stays where it is today.
+
+In the done note, list the devices and files changed, and say what the badge counts in code.
