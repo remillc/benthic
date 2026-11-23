@@ -315,11 +315,11 @@
           {/each}
         </ul>
       {/each}
-      <p class="bc-plus-all--free">{t('benthicPlus.all.free')}</p>
     </div>
     <div class="bc-plus-all--footer">
       {@render priceBlock()}
       <button type="button" class="bc-plus--primary" onclick={subscribe}>{t('benthicPlus.offer.subscribe')}</button>
+      <button type="button" class="bc-plus-all--without" onclick={onwithout}>{t('benthicPlus.offer.without')}</button>
     </div>
   </div>
 {:else if step === 'benthicPlusReady'}
@@ -1271,7 +1271,7 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      padding-bottom: 24px;
+      padding-bottom: 0;
     }
 
     .bc-plus-all--subtitle {
@@ -1375,18 +1375,38 @@
       color: var(--bc-text-2);
     }
 
-    .bc-plus-all--free {
-      margin: 20px 4px 0;
+    /* « Continuer sans abonnement »: a centred text button under « S'abonner », 14 sp semibold, 40 dp high. */
+    .bc-plus-all--without {
+      align-self: center;
+      height: 40px;
+      margin-top: 4px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--bc-release-link);
+      font: inherit;
       font-size: 14px;
       line-height: 20px;
-      color: var(--bc-text-2);
+      font-weight: 600;
+      cursor: pointer;
+
+      @media (hover: hover) {
+        &:hover {
+          background: var(--bc-release-hover);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--bc-release-row-main);
+      }
     }
 
-    /* The price footer stays at the bottom while the list scrolls. */
+    /* The price footer follows the last group, 16 dp below it, and stays at the bottom while the list scrolls. */
     .bc-plus-all--footer {
       position: sticky;
       bottom: 0;
-      margin-top: auto;
+      margin-top: 16px;
       padding: 16px 16px 24px;
       display: flex;
       flex-direction: column;
@@ -1400,10 +1420,9 @@
 
       /* A tablet: the footer is horizontal, the price on the left and the button on the right. */
       @media (min-width: 768px) {
-        flex-direction: row;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        justify-content: space-between;
         gap: 16px;
         padding: 16px 0 24px;
 
@@ -1418,6 +1437,13 @@
         .bc-plus--primary {
           flex: none;
           width: 160px;
+        }
+
+        /* Under the price and the button, on a line of its own. */
+        .bc-plus-all--without {
+          grid-column: 1 / -1;
+          justify-self: center;
+          margin-top: -8px;
         }
       }
     }

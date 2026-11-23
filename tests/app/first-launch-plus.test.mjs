@@ -118,7 +118,7 @@ test('the list shows only the features that are built, in the four groups of the
       assert.ok(all[g.key], `${lang}: group ${g.key}`);
       for (const r of g.rows) assert.ok(all[r.key] && all[`${r.key}Text`], `${lang}: row ${r.key}`);
     }
-    for (const key of ['title', 'subtitle', 'free', 'syncTextPhone', 'syncTextIphone', 'syncTextDesktop']) assert.ok(all[key], `${lang}: ${key}`);
+    for (const key of ['title', 'subtitle', 'syncTextPhone', 'syncTextIphone', 'syncTextDesktop']) assert.ok(all[key], `${lang}: ${key}`);
   }
   assert.equal(langs.fr.benthicPlus.all.subtitle, 'Tout ce qui est inclus dans l’offre Benthic+.');
   assert.equal(langs.fr.benthicPlus.offer.pill, 'L’offre Benthic+');
@@ -136,4 +136,19 @@ test('the offer has the new price block, the « see all » link and 48 dp button
   assert.match(plus, /.bc-plus--price {[^}]*align-items: center;/s, 'plain centred text, not a card');
   assert.doesNotMatch(plus.slice(plus.indexOf('.bc-plus--price {'), plus.indexOf('.bc-plus--price-label')), /background/);
   assert.match(plus, /.bc-plus-all--footer {[^}]*position: sticky;[^}]*bottom: 0;/s);
+});
+
+test('« Tout ce qui est inclus »: « Continuer sans abonnement » under « S’abonner », no « Toujours gratuit » note, no gap before the price', () => {
+  const plus = read('components/FirstLaunchBenthicPlus.svelte');
+  const all = plus.slice(plus.indexOf("{:else if step === 'benthicPlusAll'}"), plus.indexOf("{:else if step === 'benthicPlusReady'}"));
+  assert.doesNotMatch(all, /all\.free|bc-plus-all--free/);
+  assert.ok(all.indexOf("t('benthicPlus.offer.subscribe')") < all.indexOf('bc-plus-all--without'));
+  assert.match(all, /class="bc-plus-all--without" onclick=\{onwithout\}>\{t\('benthicPlus.offer.without'\)\}/);
+  assert.equal(langs.fr.benthicPlus.offer.without, 'Continuer sans abonnement');
+  assert.equal(langs.fr.benthicPlus.all.free, undefined);
+  assert.equal(langs.en.benthicPlus.all.free, undefined);
+  assert.match(plus, /.bc-plus-all--without {[^}]*height: 40px;[^}]*color: var\(--bc-release-link\);[^}]*font-size: 14px;[^}]*font-weight: 600;/s);
+  const footer = plus.slice(plus.indexOf('.bc-plus-all--footer {'), plus.indexOf('.bc-plus-all--footer {') + 200);
+  assert.match(footer, /margin-top: 16px;/);
+  assert.doesNotMatch(footer, /margin-top: auto/);
 });

@@ -7037,7 +7037,7 @@ Mock-ups: the « Cartes hors ligne » subgroups are deleted from the phone and t
 
 *Done 23 November 2026: the settings pages, `offline-maps.svelte.js`, the dialogs, the area screen and their translations are removed; the map tiles are read from OpenFreeMap only (`app/src/lib/map-tiles.js`, the simplified world map still draws when there is no network); native: `MapsManager`, `MapsDownloadWorker` and the plugin methods are removed on Android and iOS (WorkManager, foreground service, BGTask and the `offline-maps` notification channel with them), replaced by `LegacyOfflineMaps`, which deletes the stored packages at every start (a no-op once they are gone). The `bc.offlineMaps*` device keys are no longer read. The « Sites des plongeurs » row of the offer is now listed so that the group « Sites » is not empty.*
 
-## [ ] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
+## [x] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthic+, tout ce qui est inclus · Android » (phone canvas, page « Pour commencer », now right of « Benthic+, l’offre · Android »).
 
@@ -7048,6 +7048,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthi
 Same on the iPhone and tablet versions of this page.
 
 **Test:** open « Tout ce qui est inclus », scroll to the end: no « Toujours gratuit » note, the price block right after the features, and « Continuer sans abonnement » leaves without subscribing.
+
+*Done 23 November 2026: the button reuses the offer's « Continuer sans abonnement » and its exit (`onwithout`: back to where the offer was opened from, no account); the footer follows the last group 16 dp below it (a grid on tablets, the button on its own line); the key `benthicPlus.all.free` is removed. No mock-up file was in the repository: built from the task text.*
 
 ## [ ] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
 

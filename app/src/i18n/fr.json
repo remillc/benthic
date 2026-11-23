@@ -2769,6 +2769,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
       "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
       "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
       "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",
@@ -5661,8 +5662,7 @@
       "verified": "Plongée validée",
       "verifiedText": "Un compagnon ou un moniteur confirme votre plongée, vérifiable plus tard.",
       "publicProfile": "Profil public",
-      "publicProfileText": "Montrez vos brevets et votre nombre de plongées par lien ou code QR, si vous le voulez.",
-      "free": "Toujours gratuit, sans abonnement : le téléchargement des ordinateurs de plongée, le planificateur, les outils de gaz, les statistiques et l’exportation du carnet."
+      "publicProfileText": "Montrez vos brevets et votre nombre de plongées par lien ou code QR, si vous le voulez."
     },
     "ready": {
       "title": "Votre carnet est prêt",

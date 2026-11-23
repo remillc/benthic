@@ -2769,6 +2769,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
@@ -5661,8 +5662,7 @@
       "verified": "Verified dive",
       "verifiedText": "A buddy or an instructor confirms your dive, which can be checked later.",
       "publicProfile": "Public profile",
-      "publicProfileText": "Show your certifications and your number of dives with a link or a QR code, if you want to.",
-      "free": "Always free, without a subscription: downloading from dive computers, the planner, the gas tools, the statistics and exporting the logbook."
+      "publicProfileText": "Show your certifications and your number of dives with a link or a QR code, if you want to."
     },
     "ready": {
       "title": "Your logbook is ready",

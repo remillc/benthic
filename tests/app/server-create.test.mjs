@@ -83,7 +83,8 @@ test('« Continuer sans compte » and « Continuer sans abonnement » create not
   // Outside the menu entry (the free account sheet) it goes back to the first step, as before.
   assert.match(fn.slice(0, 300), /goBackTo\('start'\)/);
   const screen = read('components/FirstLaunchBenthicPlus.svelte');
-  assert.equal([...screen.matchAll(/onclick=\{onwithout\}/g)].length, 2);
+  // The connection screen, the offer and « Tout ce qui est inclus » each have one.
+  assert.equal([...screen.matchAll(/onclick=\{onwithout\}/g)].length, 3);
 });
 
 test('the development switch to « Bienvenue dans Benthic+ » exists in development builds only', () => {
