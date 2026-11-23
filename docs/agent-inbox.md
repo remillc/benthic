@@ -6724,3 +6724,23 @@ Christian approved this on 23 November 2026 (TODO #58). Work in `main`. Today th
 5. The collapsed band keeps its faint profile above the wave (the « seconde vague »), as `BandBackdrop` draws it; the mock-ups « Carnet, défilé avec en-têtes collants » and « Carnet, petit carnet … » were missing it and are fixed.
 
 Tablet, desktop and iPhone are not part of this task. In the done note, say how the box is animated and what happens when the keyboard is open and the list is scrolled.
+
+## [ ] 2026-11-23-340 Sync progress: the header's pale profile becomes the progress line, on every device (replaces the Material 3 wavy bar of `PullProgress`)
+
+Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `PullProgress.svelte` (todo 88) shows the Material 3 Expressive wavy linear indicator (`LinearWavyProgress`) at the top of the Carnet's list while the app exchanges with the server at start, and an 8 pt bar on iOS. Replace it on **every device** (phone, tablet, desktop, iPhone) by a line drawn on the header's own pale profile. Mock-ups, phone canvas, Android › Carnet et plongées › Liste du carnet:
+- « Carnet, échange avec le serveur au démarrage, progression inconnue : un trait glisse sur la vague · Android »
+- « Carnet, échange avec le serveur au démarrage, progression connue (60 %) : la vague se remplit · Android »
+- « Carnet, échange avec le serveur terminé : la vague se complète puis s’efface · Android »
+(the three boards are animated on the canvas.)
+
+1. **The line.** White, 2.5 dp, round caps and joins, with a soft glow (`drop-shadow(0 0 3px rgb(255 255 255 / .85))` and `drop-shadow(0 0 6px rgb(255 255 255 / .45))`), the same style as the profile line of the first launch screen. It runs exactly on the band's faint profile line (`PROFILE` in `BandBackdrop.svelte`, the « ondulation du dessus »), not on the cream wave. No dot at its head. The line takes no height; the list never moves.
+2. **Smoother profile.** The profile's small corners are rounded while its overall shape stays the same: replace the polyline `PROFILE` with this curve (same 300 × 140 box), everywhere the band's profile is drawn (`BandBackdrop`, `SectionBand`, `FirstLaunchBand`, `NavMenu`, `FirstLaunchBenthicPlus`, `WelcomeStartRelease`; check for others):
+   `M0 30 C4 31.6 11 30 20 38 C29 46 35 59.2 45 70 C55 80.8 60 86.8 70 92 C80 97.2 85 96.8 95 96 C105 95.2 111 88.4 120 88 C129 87.6 131 95.6 140 94 C149 92.4 156 86.4 165 80 C174 73.6 176 66.4 185 62 C194 57.6 200 60.4 210 58 C220 55.6 226 52.4 235 50 C244 47.6 247 48 255 46 C263 44 266 42 275 40 C284 38 295 36.8 300 36`
+   Draw the progress line in the band's pixel space (not with a non-uniform `preserveAspectRatio="none"` scale), so its width and dash length stay true (`pathLength="100"`, `stroke-dasharray`).
+3. **Unknown progress** (`fraction <= 0`): a segment of about a quarter of the line slides from left to right, 1.6 s per pass, linear, looping.
+4. **Known progress**: the line is drawn from the left up to `fraction`, following the profile.
+5. **Done**: the line completes to 100 % (about 0.6 s), stays 0.3 s, then fades out in about 1.1 s (ease-in-out). Then nothing is left.
+6. **Reduced motion**: no sliding segment (a still line at half opacity while unknown), no animated completion; the line simply disappears at the end.
+7. **Accessibility**: the line is the `progressbar` (`aria-label` « Synchronisation du carnet », `aria-valuenow` when known); keep announcing the stage, not each percent, as now.
+8. **Collapsed band**: when the band is collapsed during the exchange, the line runs on the collapsed band's profile.
+9. **Every device**: tablet and desktop use their band the same way. Where a device's Carnet header has no band profile (iPhone large title, desktop if it applies), add the same faint profile at the bottom edge of the header and draw the line on it; say in the done note what you did per device. Remove `LinearWavyProgress` from `PullProgress` if nothing else uses it.
