@@ -7032,3 +7032,15 @@ Christian decided this on 23 November 2026. Work in `main`. Benthic drops offlin
 Mock-ups: the « Cartes hors ligne » subgroups are deleted from the phone and tablet canvases and « Réglages · bureau, cartes hors ligne » from the desktop page; every settings, account sheet and offer board is updated (« Feuille du compte, modifications en attente · Android », « Réglages » overviews, « Tout ce qui est inclus » boards, the desktop « Réglages » boards).
 
 **Test:** no « Cartes hors ligne » anywhere in the app (search the translations too); the account sheet's Réglages row has no badge; the Sites map works online as before; upgrading a device that had downloaded regions frees their space.
+
+## [ ] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthic+, tout ce qui est inclus · Android » (phone canvas, page « Pour commencer », now right of « Benthic+, l’offre · Android »).
+
+- The price block stays at the end of the page, sticky at the bottom (« Abonnement Benthic+ », 14,99 $ US par an, soit 1,25 $ par mois, « Résiliable en tout temps », « S’abonner »). It now follows the last group of features directly, 16 dp below it, with no stretch of empty space between them.
+- Under « S’abonner », a centred text button « Continuer sans abonnement » (14 sp, semibold, #1F5C99, 40 dp high): it closes the page and goes on without subscribing (back to Carnet, or to where the offer was opened from), and creates no account.
+- Remove the note « Toujours gratuit, sans abonnement : le téléchargement des ordinateurs de plongée, le planificateur, les outils de gaz, les statistiques et l’exportation du carnet. »
+
+Same on the iPhone and tablet versions of this page.
+
+**Test:** open « Tout ce qui est inclus », scroll to the end: no « Toujours gratuit » note, the price block right after the features, and « Continuer sans abonnement » leaves without subscribing.
