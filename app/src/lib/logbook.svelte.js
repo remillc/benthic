@@ -216,20 +216,6 @@ export async function tripChange(options) {
 }
 
 /**
- * "Group dives into trips" (Settings), the logbook's autogroup: one undoable
- * step, saved and synced like a trip change.
- * @param {boolean} on
- */
-export async function setAutogroup(on) {
-  const result = await BenthicCore.tripAction({ action: 'autogroup', value: on ? 'on' : 'off' });
-  logbook.undoText = result.undo;
-  logbook.redoText = result.redo ?? '';
-  logbook.dives = await BenthicCore.listLoadedDives();
-  logbook.prefs = await prefsAfterLoad();
-  await persistChanges();
-}
-
-/**
  * Renames a cylinder type (Settings, cylinder types): the cylinders of that
  * type in the logbook too, one undoable step, saved and synced like an edit.
  * @param {string} name

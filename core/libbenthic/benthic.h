@@ -333,12 +333,8 @@ int trip_add_dives(int trip_id, const std::vector<int> &dive_ids, std::string &j
 int trip_ungroup(int trip_id, std::string &json, std::string &error);
 // CreateTrip: a new trip holding these dives, taken out of their trips.
 int trip_create(const std::vector<int> &dive_ids, std::string &json, std::string &error);
-// "Group dives into trips" (the log's autogroup), as Subsurface desktop's
-// View > Autogroup: sets the flag, then one undoable step, AutogroupDives when
-// on, RemoveAutogenTrips when off (no step when no dive moves; the flag itself
-// is not undone, as in Subsurface). Writes the trip of the first dive moved,
-// {"tripId":0} when none.
-int trips_autogroup(bool on, std::string &json, std::string &error);
+// There is no "group dives into trips" call: Benthic never groups dives by
+// itself (task 2026-11-23-369; see internal.h, file_autogroup).
 
 // The computers the logbook's dives come from: the core's device list plus
 // the models and serial numbers found in the dives. A JSON array of {model,

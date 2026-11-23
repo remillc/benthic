@@ -801,9 +801,9 @@ export { waterTypeOf };
  *   corrected; it rejects with NO_RESULT when all four are empty.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
  *   "remove" takes diveId, or diveIds for several dives in one step.
- * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
- *   One undoable trip change, as Subsurface's trip commands; "autogroup" (value "on" or
- *   "off") sets the log's trip grouping, as Subsurface's View > Autogroup.
+ * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
+ *   One undoable trip change, as Subsurface's trip commands. Benthic never groups dives
+ *   into trips by itself, so there is no "autogroup" action.
  * @property {(options?: {includeInvalid?: boolean}) => Promise<Dive[]>} listLoadedDives
  *   The dives of the log in memory, without loading anything. includeInvalid also returns hidden invalid dives.
  * @property {(options: {name: string, base64: string}) => Promise<{uri: string}>} writeShareFile

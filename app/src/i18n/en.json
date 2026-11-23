@@ -908,9 +908,6 @@
       "minutes": "Degrees, minutes",
       "seconds": "Degrees, minutes, seconds"
     },
-    "autogroup": {
-      "label": "Group dives into trips"
-    },
     "invalidDives": {
       "label": "Show invalid dives",
       "text": "For example pool dives marked invalid"
@@ -1199,10 +1196,6 @@
       "all": "All",
       "recent": "Those of the last 12 months",
       "onDemand": "On demand"
-    },
-    "showPhotos": {
-      "label": "Show photo and video fields",
-      "text": "In the detail and the editing of a dive"
     }
   },
   "gas": {
@@ -2816,6 +2809,8 @@
       "Gear: the rebreather icon shows two tall cylinders on each side of a scrubber on its stand, joined by two hoses, and no longer looks like a twin set.",
       "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
       "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
+      "Photos and videos: « Show photo and video fields » is gone from Settings. A Benthic+ subscriber always sees the « Photos and videos » section of a dive; a free user never does. About: « Website » (benthicdivelog.app) replaces « Export my logbook » and sits next to « See on GitHub » on one centred row; exporting stays in the logbook menu.",
+      "Trips: « Group dives into trips » is gone from Settings. Benthic never groups dives into trips by itself, whatever a logbook made in Subsurface says: downloads, imports and new dives stay outside any trip until you make or fill one. The trips you made keep working as before.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
@@ -3380,7 +3375,8 @@
       "code": "The base plan always stays free. The apps and their code are on GitHub: anyone can always download the apps there for free, read the code, change it and share it.",
       "logbook": "Exportable at any time, your logbook belongs to you.",
       "github": "See on GitHub",
-      "export": "Export my logbook"
+      "website": "Website",
+      "websiteLabel": "Benthic website (opens in the browser)"
     }
   },
   "bringLogbook": {
@@ -5463,8 +5459,6 @@
       "removeFromTrip": "Remove from the trip",
       "createTrip": "Create the trip",
       "mergeTrips": "Merge the trips",
-      "autogroup": "Group into trips",
-      "ungroup": "Undo automatic trips",
       "mergeSites": "Merge the sites",
       "deleteSites": "Delete the sites",
       "deleteDives": "Delete the dives",

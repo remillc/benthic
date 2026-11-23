@@ -1259,14 +1259,14 @@
       </section>
     {/if}
 
-    <!-- Only with "Afficher les champs photos et vidéos" (task 2026-11-12-65); see the Photos et vidéos section below. -->
+    <!-- The Photos et vidéos section is for Benthic+ subscribers (task 2026-11-23-370); the pictures stay in the logbook. -->
     {#if desk}
       <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
-    <!-- Benthic+ only (task 2026-11-23-359): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
+    <!-- Benthic+ only (tasks 2026-11-23-359 and 370): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
          the line about references on another device is gone. The pictures referenced in the logbook stay untouched. -->
-    {#if settings.showPhotos && diveMediaEnabled() && !preview}
+    {#if diveMediaEnabled() && !preview}
       <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} />
     {/if}
 

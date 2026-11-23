@@ -19,6 +19,19 @@ using fingerprint_table = std::vector<fingerprint_record>; // core/device.h
 
 namespace benthic::internal {
 
+// Benthic never groups dives into trips by itself (task 2026-11-23-369). The
+// core groups tripless dives after a load and in an import when divelog's
+// `autogroup` is on, and AddDive does when it is asked to. The façade keeps
+// the flag off in memory (load() clears it after reading the log) and
+// remembers here what the log's file said, so that a save writes the
+// diver's own value back unchanged: the file is never rewritten for this.
+extern bool file_autogroup;
+// While alive, divelog.autogroup holds the file's value, for a save; off again after.
+struct KeepFileAutogroup {
+	KeepFileAutogroup();
+	~KeepFileAutogroup();
+};
+
 // Reads a file to import into `log`, as Subsurface's desktop import does
 // (MainWindow::importFiles(): it keeps whatever dives parse_file() found):
 // true when the file could not be read. parse_file()'s return value is not a

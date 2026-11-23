@@ -908,9 +908,6 @@
       "minutes": "Degrés, minutes",
       "seconds": "Degrés, minutes, secondes"
     },
-    "autogroup": {
-      "label": "Regrouper les plongées en voyages"
-    },
     "invalidDives": {
       "label": "Afficher les plongées invalides",
       "text": "Par exemple les plongées en piscine marquées invalides"
@@ -1199,10 +1196,6 @@
       "all": "Toutes",
       "recent": "Celles des 12 derniers mois",
       "onDemand": "À la demande"
-    },
-    "showPhotos": {
-      "label": "Afficher les champs photos et vidéos",
-      "text": "Dans le détail et la modification d’une plongée"
     }
   },
   "gas": {
@@ -2816,6 +2809,8 @@
       "Équipement : l’icône du recycleur montre deux grandes bouteilles de part et d’autre d’un épurateur sur son support, reliés par deux tuyaux, et ne ressemble plus à un bi-bouteille.",
       "Icônes : 89 icônes de l’application passent aux glyphes arrondis de Material Symbols (flèches, nuage, dossier, appareil photo, clé, calendrier, localisation, réglages, etc.) ; le mélangeur de gaz garde un dessin de bouteille que l’on remplit, et le couteau de plongée a un nouveau dessin.",
       "Ordinateur, détail d’une plongée, onglet Équipement : une carte par section (kit, ordinateurs de plongée, protection thermique, lest, autre équipement), avec le total du lest dans son en-tête, un lest par pastille retirable, « Ce lest était » centré et « + Ajouter » dans la carte de l’autre équipement.",
+      "Photos et vidéos : « Afficher les champs photos et vidéos » n’est plus dans Réglages. Un abonné Benthic+ voit toujours la section « Photos et vidéos » d’une plongée, un utilisateur gratuit jamais. À propos : « Site Web » (benthicdivelog.app) remplace « Exporter mon carnet » et se place à côté de « Voir sur GitHub » sur une ligne centrée ; l’export reste dans le menu du carnet.",
+      "Voyages : « Regrouper les plongées en voyages » n’est plus dans Réglages. Benthic ne regroupe jamais les plongées en voyages de lui-même, quoi que dise un carnet fait dans Subsurface : téléchargements, imports et nouvelles plongées restent hors voyage tant que vous n’en faites pas un ou n’en remplissez pas un. Les voyages que vous avez faits fonctionnent comme avant.",
       "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
       "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
       "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
@@ -3380,7 +3375,8 @@
       "code": "L’offre de base reste toujours gratuite. Les apps et leur code sont sur GitHub : chacun peut toujours y télécharger les apps gratuitement, lire le code, le modifier et le partager.",
       "logbook": "Exportable en tout temps, votre carnet vous appartient.",
       "github": "Voir sur GitHub",
-      "export": "Exporter mon carnet"
+      "website": "Site Web",
+      "websiteLabel": "Site Web de Benthic (s’ouvre dans le navigateur)"
     }
   },
   "bringLogbook": {
@@ -5463,8 +5459,6 @@
       "removeFromTrip": "Retirer du voyage",
       "createTrip": "Créer le voyage",
       "mergeTrips": "Fusionner les voyages",
-      "autogroup": "Regrouper en voyages",
-      "ungroup": "Défaire les voyages automatiques",
       "mergeSites": "Fusionner les sites",
       "deleteSites": "Supprimer les sites",
       "deleteDives": "Supprimer les plongées",

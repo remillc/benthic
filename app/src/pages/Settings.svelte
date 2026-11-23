@@ -32,7 +32,7 @@
   import { CATEGORIES, categoryOf, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
   import { STARTUP_MODES } from '../lib/desktop-logbooks.js';
-  import { logbook, setAutogroup } from '../lib/logbook.svelte.js';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { diveMediaEnabled } from '../lib/dive-media.svelte.js';
   import { policyOf, DEFAULT_POLICY } from '../lib/dive-media.js';
   import {
@@ -530,19 +530,6 @@
       id: 'logbook',
       title: t('settings.groups.logbook'),
       rows: [
-        {
-          kind: 'switch',
-          id: 'autogroup',
-          label: t('settings.autogroup.label'),
-          checked: logbook.prefs.autogroup === true,
-          set: async (v) => {
-            try {
-              await setAutogroup(v);
-            } catch (e) {
-              failed(e);
-            }
-          },
-        },
         { kind: 'switch', id: 'displayInvalidDives', label: t('settings.invalidDives.label'), text: t('settings.invalidDives.text'), checked: p.displayInvalidDives, set: async (v) => {
           await setCore({ displayInvalidDives: v });
           // The core's list leaves invalid dives out unless this is on.
@@ -553,7 +540,6 @@
           }
         } },
         { kind: 'switch', id: 'extraEnvironmental', label: t('settings.extraConditions.label'), text: t('settings.extraConditions.text'), checked: p.extraEnvironmental, set: (v) => setCore({ extraEnvironmental: v }) },
-        { kind: 'switch', id: 'showPhotos', label: t('settings.showPhotos.label'), text: t('settings.showPhotos.text'), checked: settings.showPhotos, set: (v) => setAppSetting('showPhotos', v) },
         // Benthic+ only (task 2026-11-23-359): which originals of the synced photos and videos this device downloads on Wi-Fi.
         ...(diveMediaEnabled() ? /** @type {const} */ (['mediaPhotos', 'mediaVideos']).map((key) => ({
           kind: /** @type {const} */ ('choice'),
