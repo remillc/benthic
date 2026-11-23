@@ -6790,3 +6790,15 @@ Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler �
 Christian asked for this on 23 November 2026. Work in `main`. The row you added in `AccountSheet.svelte` and `DesktopAccountSheet.svelte` (QR icon, « Jumeler un nouvel appareil », « Donne accès aux données chiffrées », chevron, only for a subscriber whose device holds the data key, `accountLock.canPair`) is now drawn in the subscriber account sheets: « Feuille du compte, avec « Mon profil de plongeur » · Android », the iPhone subscriber account sheet, the tablet account sheet and the desktop account sheet. It sits right after « Sauvegarde et restauration », in the same group, with a divider like the rows above, and opens « Appareil déjà jumelé, montrer le code ».
 
 Check that the app matches on every device (position, divider, icon, texts, the row hidden when `canPair` is false) and fix any gap. It is not in the free account sheet. In the done note, say what you changed, or that nothing needed to change.
+
+## [ ] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
+
+Christian decided this on 23 November 2026. Work in `main`. The diver can no longer choose a manual sync: the logbook (and the account data) always sync automatically, on every device and in every edition.
+
+1. **Remove the setting** « Synchroniser automatiquement » (`autoSync`, text « À l’ouverture, au retour dans l’app et quelques secondes après une modification ») everywhere it is shown: `Account.svelte`, `AccountSheet.svelte`, `DesktopAccountSheet.svelte`, `SyncControl.svelte`, and any Réglages page. Keep « Seulement sur Wi-Fi ou câble » and « Synchroniser maintenant ».
+2. **Remove the manual mode** in `logbook.svelte.js`, `reconnect.js`, `Logbook.svelte` and wherever `autoSync` gates a sync: treat it as always on. A stored `autoSync: false` from an older version is ignored (and may be deleted from the device's settings at start). The gating by the network (`autoSyncing()` and the metered-connection rule) stays.
+3. **Remove the manual states and menu**: the line « Synchronisation manuelle : {n} modification(s) non envoyée(s) » (`sync.manual`), « Désactivée : rien n'est envoyé ni reçu… » (`autoSyncOff`), and the account sheet's ⋮ menu « Autres options de synchronisation » (`account.syncOptions`, with « Passer en synchronisation automatique » and « Voir les modifications non envoyées »). Remove the now-unused strings in every language file.
+4. Pending changes still show when the device is offline or a sync failed (« 3 modifications non envoyées », the « Synchroniser » button): mock-up « Feuille du compte, modifications en attente et mise à jour de carte · Android » (renamed; its ⋮ is gone). The desktop account sheet mock-up (« Carnet · bureau, … compte ») no longer has the switch. The board « Menu « Autres options de synchronisation » · Android » was deleted.
+5. Update `docs/architecture.md` / `docs/system-design.md` where they describe manual sync, and add a line to the release notes (fr and en).
+
+In the done note, list what was removed.
