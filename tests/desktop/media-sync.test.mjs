@@ -23,7 +23,7 @@ import { createSecretBox } from '../../app/src/lib/secret-box.js';
 import { createAccountSync, workingCopyName } from '../../app/src/lib/account-sync.js';
 import { createServerApi } from '../../app/src/lib/server-api.js';
 import { createMediaSync } from '../../app/src/lib/media-sync.js';
-import { mediaPathOf, withItems, itemsOf } from '../../app/src/lib/dive-media.js';
+import { mediaPathOf, withItems, withoutItems, itemsOf } from '../../app/src/lib/dive-media.js';
 
 const require = createRequire(import.meta.url);
 const { createMedia } = require('../../desktop/media.cjs');
@@ -242,6 +242,30 @@ describe('dive photos and videos between two devices against the dev server', { 
     await c.store.trackedBatch({ writes: [[path, withItems(null, '2026-05-02T09:00:00', [{ hash, mime: 'image/jpeg', size, takenAt: new Date().toISOString(), caption: '', thumb: '' }], 't')]] });
     assert.equal((await c.transfers.run()).uploaded, 0, 'the original is on the server already');
     assert.equal((await usage()).objects, before.objects);
+  });
+
+  test('A removes a photo from the dive: B no longer shows it; the objects stay on the server; adding it again brings it back (task 2026-11-23-367)', async () => {
+    const usage = () => json(`${api}/v1/media/usage`, { headers: { Authorization: `Bearer ${sessionToken}` } }).then((r) => r.body);
+    const before = await usage();
+    const path = mediaPathOf(DIVE);
+    const shown = async (d) => itemsOf(await d.store.read(path)).map((i) => i.hash);
+    await a.sync.run();
+    await b.sync.run();
+    assert.ok((await shown(b)).includes(photo.hash), 'B shows it before');
+    await a.store.trackedBatch({ writes: [[path, withoutItems(await a.store.read(path), DIVE, [photo.hash], new Date().toISOString())]] });
+    assert.equal((await a.sync.run()).status, 'synced');
+    assert.equal((await b.sync.run()).status, 'synced');
+    assert.ok(!(await shown(b)).includes(photo.hash), 'B no longer shows the removed photo');
+    assert.ok((await shown(b)).length >= 1, 'the other photo stays');
+    assert.deepEqual((await b.store.read(path)).removed.map((r) => r.hash), [photo.hash], 'the tombstone reached B');
+    const after = await usage();
+    assert.equal(after.objects, before.objects, 'the server objects stay');
+    assert.equal(after.usedBytes, before.usedBytes, 'the quota counting is unchanged');
+    // B adds the same file again: it is back on A.
+    await b.store.trackedBatch({ writes: [[path, withItems(await b.store.read(path), DIVE, [{ hash: photo.hash, mime: 'image/jpeg', size: original.length, takenAt: new Date().toISOString(), caption: '', thumb: photo.thumb }], new Date().toISOString())]] });
+    await b.sync.run();
+    await a.sync.run();
+    assert.ok((await shown(a)).includes(photo.hash), 'back on A');
   });
 
   test('with the account over its quota the file stays on the device and the run says so', { skip: quota ? false : 'BENTHIC_TEST_QUOTA is not set (start the API with MEDIA_QUOTA_BYTES)' }, async () => {

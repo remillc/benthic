@@ -6,18 +6,33 @@
   // appareils » and « Tout voir », which opens the dive's gallery. The free version and the demo logbook never get this component.
   import Icon from './Icon.svelte';
   import DiveGallery from './DiveGallery.svelte';
+  import MediaViewer from './MediaViewer.svelte';
+  import Md3Dialog from './Md3Dialog.svelte';
   import { t } from '../lib/i18n.js';
+  import { ios, layout } from '../lib/layout.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { addDiveMedia, loadDiveMedia, mediaState, runMediaSync } from '../lib/dive-media.svelte.js';
-  import { countsOf, durationText } from '../lib/dive-media.js';
+  import { confirmActionSheet } from '../lib/dialogs.js';
+  import { addDiveMedia, loadDiveMedia, mediaState, openOriginal, removeDiveMedia, runMediaSync, setSitePhoto } from '../lib/dive-media.svelte.js';
+  import { shareMedia } from '../lib/media-share.js';
+  import { countsOf, depthAtOffset, durationText, offsetInDive } from '../lib/dive-media.js';
+  import { countsText } from '../lib/dive-media-text.js';
+  import { formatDate, formatDepth } from '../lib/format.js';
 
-  /** @type {{ diveId: string, readOnly?: boolean }} */
-  let { diveId, readOnly = false } = $props();
+  /**
+   * `dive`: what the gallery says of the dive (its number, site and date, its profile for the depth under each picture) and
+   * `prefs` the units.
+   * @type {{ diveId: string, readOnly?: boolean, dive?: { number?: number, site?: string, date: string, samples?: any, siteCoordinates?: { latUdeg: number, lonUdeg: number }|null }, prefs?: any }}
+   */
+  let { diveId, readOnly = false, dive = undefined, prefs = undefined } = $props();
 
   /** @type {import('../lib/dive-media.svelte.js').DiveMediaItem[]} */
   let items = $state([]);
   let adding = $state(false);
   let gallery = $state(false);
+  /** The picture the viewer shows, or none. @type {number|null} */
+  let viewer = $state(null);
+  /** What a confirmation is about: the hashes to take off the dive. @type {string[]|null} */
+  let removing = $state(null);
   /** @type {HTMLInputElement|undefined} */
   let input = $state();
 
@@ -47,8 +62,73 @@
     const videos = counts.videos ? t('detail.mediaVideos', { n: counts.videos }) : '';
     return t('detail.mediaSynced', { counts: photos && videos ? t('detail.mediaBoth', { photos, videos }) : photos || videos });
   });
-  // Photos first, then videos (the order of the row).
-  const ordered = $derived([...items.filter((i) => i.kind === 'photo'), ...items.filter((i) => i.kind === 'video')]);
+  // The row follows the order of the dive (time taken), as the gallery does.
+  const ordered = $derived(items);
+
+  const title = $derived(t('detail.mediaGallery'));
+  const subtitle = $derived(
+    dive ? (dive.number ? t('detail.mediaDiveLine', { number: dive.number, site: dive.site || t('dive.siteNotSet'), date: formatDate(dive.date) }) : t('detail.mediaDiveLineNoNumber', { site: dive.site || t('dive.siteNotSet'), date: formatDate(dive.date) })) : '',
+  );
+
+  /** The depth of the profile when the picture was taken (its offset in the dive); nothing when it falls outside the dive. @param {import('../lib/dive-media.svelte.js').DiveMediaItem} item */
+  function depthOf(item) {
+    if (!dive?.samples || !prefs) return '';
+    const offset = offsetInDive(item.takenAt, dive.date);
+    const mm = offset === null ? null : depthAtOffset(dive.samples, offset);
+    return mm === null ? '' : formatDepth(mm, prefs);
+  }
+
+  /** @param {string[]} hashes */
+  const picked = (hashes) => items.filter((i) => hashes.includes(i.hash));
+
+  /** @param {string[]} hashes */
+  function askRemove(hashes) {
+    if (readOnly || !hashes.length) return;
+    if (ios && !layout.desktop) {
+      const chosen = picked(hashes);
+      confirmActionSheet({
+        text: t('detail.mediaRemoveTextIos', { n: chosen.length }),
+        action: t('detail.mediaRemoveAction', { counts: countsText(chosen) }),
+        onConfirm: () => doRemove(hashes),
+      });
+    } else removing = hashes;
+  }
+
+  /** @param {string[]} hashes */
+  async function doRemove(hashes) {
+    removing = null;
+    try {
+      await removeDiveMedia(diveId, hashes);
+    } catch (e) {
+      console.error('Removing photos and videos', e);
+      showSnackbar(t('detail.mediaRemoveFailed'));
+    }
+  }
+
+  /** @param {string[]} hashes */
+  async function share(hashes) {
+    try {
+      await shareMedia(picked(hashes), openOriginal);
+    } catch (e) {
+      const message = String(/** @type {any} */ (e)?.message);
+      if (/cancel|abort|dismiss/i.test(message)) return;
+      console.error('Sharing photos and videos', e);
+      showSnackbar(message === 'NOT_ON_SERVER' ? t('detail.mediaNotOnServer') : message === 'OFFLINE' ? t('detail.mediaOffline') : t('detail.mediaShareFailed'));
+    }
+  }
+
+  /** @param {import('../lib/dive-media.svelte.js').DiveMediaItem} item */
+  async function replaceSitePhoto(item) {
+    const c = dive?.siteCoordinates;
+    const key = c ? c.latUdeg + ',' + c.lonUdeg : 'name:' + (dive?.site ?? '');
+    try {
+      await setSitePhoto(key, item);
+      showSnackbar(t('detail.mediaSitePhotoSet'));
+    } catch (e) {
+      console.error('Site photo', e);
+      showSnackbar(t('detail.mediaAddFailed'));
+    }
+  }
 
   /** @param {Event} event */
   async function chosen(event) {
@@ -77,7 +157,7 @@
   <div class="bc-dive-media--card">
     <div class="bc-dive-media--row" role="list">
       {#each ordered as item, index (item.hash)}
-        <button type="button" class="bc-dive-media--tile" role="listitem" aria-label={labelOf(item, index)} onclick={() => (gallery = true)}>
+        <button type="button" class="bc-dive-media--tile" role="listitem" aria-label={labelOf(item, index)} onclick={() => (viewer = index)}>
           {#if item.thumbSrc}
             <img class="bc-dive-media--image" src={item.thumbSrc} alt="" loading="lazy" />
           {:else}
@@ -113,8 +193,19 @@
   </div>
 </section>
 
-{#if gallery}
-  <DiveGallery {items} onclose={() => (gallery = false)} />
+<DiveGallery open={gallery} {items} {title} {subtitle} {depthOf} {readOnly} {adding} onclose={() => (gallery = false)} onopen={(i) => (viewer = i)} onadd={() => input?.click()} onshare={share} onremove={askRemove} />
+
+<MediaViewer open={viewer !== null} start={viewer ?? 0} {items} {readOnly} load={openOriginal} onclose={() => (viewer = null)} onshare={share} onremove={askRemove} onreplace={replaceSitePhoto} />
+
+{#if removing}
+  {@const chosen = picked(removing)}
+  <Md3Dialog title={t('detail.mediaRemoveTitle', { counts: countsText(chosen) })} text={t('detail.mediaRemoveText', { n: chosen.length })} role="alertdialog" class="bc-dive-media-remove" oncancel={() => (removing = null)}>
+    <span></span>
+    {#snippet actions()}
+      <button type="button" onclick={() => (removing = null)}>{t('dialog.cancel')}</button>
+      <button type="button" class="bc-dive-media-remove--confirm" onclick={() => removing && doRemove(removing)}>{t('detail.mediaRemove')}</button>
+    {/snippet}
+  </Md3Dialog>
 {/if}
 
 <style>
@@ -231,6 +322,10 @@
 
     .bc-dive-media--file {
       display: none;
+    }
+
+    :global(.bc-dive-media-remove .bc-md3-dialog--actions .bc-dive-media-remove--confirm) {
+      color: var(--bc-media-danger);
     }
 
     .bc-dive-media--line {

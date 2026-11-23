@@ -1267,7 +1267,7 @@
     <!-- Benthic+ only (tasks 2026-11-23-359 and 370): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
          the line about references on another device is gone. The pictures referenced in the logbook stay untouched. -->
     {#if diveMediaEnabled() && !preview}
-      <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} />
+      <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} dive={{ number: diveNumber, site: dive.site, date: dive.date, samples: dive.samples, siteCoordinates: dive.siteCoordinates }} {prefs} />
     {/if}
 
     <div class="bc-dive-detail--end" aria-hidden="true"></div>

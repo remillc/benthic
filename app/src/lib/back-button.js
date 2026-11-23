@@ -103,6 +103,9 @@ function dispatch(layersOnly) {
   }
   // 3. An open sheet or dialog closes: the topmost one (a dialog or a sheet opened over a popup comes later in the page).
   const modal = topModal();
+  // 3a. The gallery of a dive's photos and videos with a selection: Back clears the selection first (components/DiveGallery.svelte).
+  const gallerySelection = document.querySelector('.bc-dive-gallery--selecting');
+  if (gallerySelection && modal?.classList.contains('bc-dive-gallery')) return cancel(gallerySelection, 'gallery-selection');
   // First launch waits for a choice: its steps are not router pages but a stack (lib/first-launch.svelte.js), so
   // Back goes to the previous step like « Retour » (lib/first-launch-steps.js, systemBack); from the first step
   // it sends the app to the background. Escape leaves it alone.

@@ -19,7 +19,8 @@ import { signalAccountData } from './account-sync-signal.js';
 import { stageFile } from './staged-file.js';
 import { makeThumbnail } from './media-thumb.js';
 import { createMediaSync } from './media-sync.js';
-import { countsOf, itemsOf, kindOf, mediaPathOf, policyOf, withItems, DEFAULT_POLICY } from './dive-media.js';
+import { readExif } from './exif.js';
+import { countsOf, itemsOf, kindOf, mediaPathOf, policyOf, withItems, withoutItems, DEFAULT_POLICY } from './dive-media.js';
 
 /** What the screens read: `rev` changes when the references or the files change; `pending`: objects waiting to leave; `quotaFull`. */
 export const mediaState = $state({ rev: 0, pending: 0, quotaFull: false });
@@ -148,6 +149,7 @@ export async function addDiveMedia(diveId, files) {
   const items = [];
   for (const file of files) {
     const mime = file.type || (/\.(mp4|mov|m4v|webm)$/i.test(file.name) ? 'video/mp4' : 'image/jpeg');
+    const exif = kindOf(mime) === 'photo' ? await readExif(file) : {};
     const staged = await stageFile(core, file, file.name || 'media');
     const { hash, size } = await core.mediaAdopt({ path: staged.path });
     const thumb = await makeThumbnail(file);
@@ -156,7 +158,9 @@ export async function addDiveMedia(diveId, files) {
       hash,
       mime,
       size,
-      takenAt: new Date(file.lastModified || Date.now()).toISOString(),
+      // The camera's clock when the file says it (EXIF), else the file's own date.
+      takenAt: exif.takenAt ?? new Date(file.lastModified || Date.now()).toISOString(),
+      ...(exif.camera ? { camera: exif.camera } : {}),
       caption: '',
       thumb: stored?.hash ?? '',
       ...(thumb?.durationMs ? { durationMs: thumb.durationMs } : {}),
@@ -183,4 +187,40 @@ export async function openOriginal(item) {
   const path = await sync().ensureLocal(item.hash);
   bump();
   return mediaSrc({ hash: item.hash, path, mime: item.mime });
+}
+
+/**
+ * Takes items off a dive (« Retirer de la plongée »): each leaves the dive's reference file and keeps a tombstone, which the
+ * account sync carries to every device (lib/dive-media.js, `withoutItems`). The files stay in the media folder and on the
+ * server, and the storage count does not change; the pictures the diver took stay in the device's own gallery.
+ * @param {string} diveId @param {string[]} hashes @returns {Promise<void>}
+ */
+export async function removeDiveMedia(diveId, hashes) {
+  if (!hashes.length) return;
+  const { store } = accountDataDeps();
+  const path = mediaPathOf(diveId);
+  await store.trackedBatch({ writes: [[path, withoutItems(await store.read(path), diveId, hashes, new Date().toISOString())]] });
+  bump();
+  signalAccountData('edit');
+}
+
+/**
+ * « Remplacer la photo du site »: the picture becomes the site's photo. A site has no photo of its own in the logbook, so
+ * the choice is kept beside the dives' references, as a file of one item (`media/site-<position>.json`): it is synced and
+ * its objects are sent like those of a dive. Nothing reads it yet: the site's header is still its map.
+ * @param {string} siteKey @param {import('./dive-media.js').MediaItem} item @returns {Promise<void>}
+ */
+export async function setSitePhoto(siteKey, item) {
+  const { store } = accountDataDeps();
+  const id = `site:${siteKey}`;
+  const path = mediaPathOf(id);
+  const stamp = new Date().toISOString();
+  const old = await store.read(path);
+  const cleared = withoutItems(old, id, itemsOf(old).map((i) => i.hash).filter((h) => h !== item.hash), stamp);
+  // Only what the file holds: not the screens' own fields.
+  const { addedAt: _a, kind: _k, thumbSrc: _t, hasOriginal: _h, ...bare } = /** @type {any} */ (item);
+  await store.trackedBatch({ writes: [[path, withItems(cleared, id, [bare], stamp)]] });
+  bump();
+  signalAccountData('edit');
+  runMediaSync();
 }

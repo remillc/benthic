@@ -7203,7 +7203,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet
 
 **Done (23 November 2026).** Built from the task text (the canvas mock-up is not in the repository; `docs/mockups/bureau-carnet-onglet-equipement.dc.html` is the old layout). `DesktopDiveFields.svelte` draws the tab as five `DesktopEquipmentCard`s (kit, computers, protection thermique, lest, autre équipement) under the hint; `DesktopWeights` has removable 40 px chips, a dashed « + Ajouter » chip and no total (it is in the card header); `DesktopOtherGear` has 56 px grey rows and no add tile (« + Ajouter » is in the card header); `DesktopEditField` has a `tall` 48 px variant with a chevron. « Changer de kit » is a text button with the kit select laid over it. Computers stay read-only and the add button stays disabled, as the old fields were. 64 px + the pane's 24 px margin leave 88 px at the end. `tests/e2e/desktop-equipment.mjs` (`--equipment-only`) checks the free and Benthic+ tabs, the weight chip, total and centred selector, a knife item, and the end of the pane. Also fixed: `DesktopWeights` threw « Cannot read properties of null » when a weight was kept (bindings on `editing`).
 
-## [ ] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
+## [x] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
 
 Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (the « Photos et vidéos » section of the dive detail). Mock-ups: phone canvas, page Android, subgroup « Photos et vidéos (Benthic+) », just before « Plusieurs ordinateurs »: « Photos et vidéos de la plongée, « Tout voir » », « … sélection », « … retirer de la plongée », « Photo en plein écran », « … menu », « Vidéo en plein écran ». Android phone only for now; the other devices come later.
 
@@ -7230,7 +7230,9 @@ Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (
 
 **Test:** from a dive with photos and videos, « Tout voir » shows the grid in dive order with depths; the FAB adds pictures; a long press selects, Partager shares, Retirer asks then removes on every device; touching a photo opens it full screen, swiping changes picture, ⋮ offers the two items; a video plays with its controls.
 
-## [ ] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
+**Done (branch `feature/dive-gallery`, task 367).** Gallery, selection, Partager (system share sheet; « Enregistrer sous… » on desktop), Retirer with confirmation (tombstones in `media/<dive>.json`, synced; server objects and quota unchanged), photo and video viewers, depth under thumbnails (profile at the picture's offset, worked out from the time taken), time and camera from EXIF (JPEG, HEIC). The mock-ups were not in the repository: built from the text. « Remplacer la photo du site »: the site had no photo mechanism, so the choice is stored and synced as `media/site-<position>.json`; nothing displays it yet (where it shows is for Christian or the design agent to decide).
+
+## [x] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
 
 Christian asked for this on 23 November 2026. Work in `main`. Same feature as task 367 (Android phone): same content, same rules (dive order, depth on thumbnails from the picture's offset, Partager, Retirer with confirmation, « Remplacer la photo du site », the bottom line « date, heure · appareil », no depth or profile in the viewer, nothing for a free user). Only the platform patterns change. Mock-ups, subgroup « Photos et vidéos (Benthic+) » on each page: phone canvas, page iPhone (before « Modifier une plongée »); tablet and desktop canvas, pages Tablette (before « Plusieurs ordinateurs »), iPad (after « Modifier une plongée ») and Bureau (before « Téléchargement, partage et voyage »).
 
@@ -7249,6 +7251,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Same feature as ta
 - Viewer: covers the window under the title bar, dark (#0B0B0C). Top bar: ✕ (« Fermer (Échap) »), « 2 sur 9 · mer. 2014-04-02, 10 h 11 · Olympus TG-6 », then Partager, Retirer de la plongée and ⋮ (« Remplacer la photo du site »). The picture is centred, ‹ › buttons on each side (← and → keys too), and a strip of 64 px thumbnails at the bottom with the current one outlined. Video: the controls appear over the bottom of the video.
 
 **Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
+
+**Done (branch `feature/dive-gallery`, task 368).** Gallery, selection, Partager (system share sheet; « Enregistrer sous… » on desktop), Retirer with confirmation (tombstones in `media/<dive>.json`, synced; server objects and quota unchanged), photo and video viewers, depth under thumbnails (profile at the picture's offset, worked out from the time taken), time and camera from EXIF (JPEG, HEIC). The mock-ups were not in the repository: built from the text. « Remplacer la photo du site »: the site had no photo mechanism, so the choice is stored and synced as `media/site-<position>.json`; nothing displays it yet (where it shows is for Christian or the design agent to decide).
 
 ## [x] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
 
