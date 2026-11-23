@@ -699,6 +699,22 @@ export { waterTypeOf };
  *   Up to 4 MB of a staged file, base64, with the file's size: to look at the start of a logbook or scan it.
  * @property {(options: {name: string, parts: ({path: string, start: number, end: number}|{text: string})[]}) => Promise<{path: string}>} assembleFile
  *   A new staged file made of byte ranges of staged files and literal text, copied in order.
+ * @property {(options: {path: string}) => Promise<{hash: string, size: number}>} mediaAdopt
+ *   Dive photos and videos (docs/architecture.md, 11.6). A staged file (stageImport, in pieces) becomes the object of its
+ *   content: hashed (SHA-256, streamed) and moved into the device's media folder under that hash; if the object is already
+ *   there the staged file is deleted. Never altered or recompressed. Rejects BAD_REQUEST, NOT_FOUND.
+ * @property {(options: {data: string}) => Promise<{hash: string, size: number}>} mediaPutBytes
+ *   The same for small bytes (base64): a thumbnail, a 256 px JPEG, is an object of its own.
+ * @property {(options: {hash: string}) => Promise<{exists: boolean, size: number, path: string}>} mediaStat
+ *   Whether the device holds the object; `path` is its file (for fileUrl / convertFileSrc), '' when absent.
+ * @property {(options: {hash: string, url: string, headers?: Record<string, string>}) => Promise<{status: number}>} mediaUpload
+ *   PUT of the object's file to a signed URL, streamed from the file (never through the bridge). `status` is the
+ *   storage's answer (2xx: stored). Rejects NOT_FOUND (no such object here), NETWORK.
+ * @property {(options: {hash: string, url: string}) => Promise<{size: number}>} mediaDownload
+ *   GET of a signed URL, streamed into the media folder; the SHA-256 of what came is checked against `hash` before the
+ *   object is kept. Rejects HASH_MISMATCH, NETWORK, HTTP_<status>.
+ * @property {(options: {hash: string}) => Promise<void>} mediaDelete
+ *   Forgets the object on this device (the server's copy is untouched).
  * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
  *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
  * @property {(options: {path: string, companionPath?: string, name: string, params: CsvParams, dryRun: boolean}) => Promise<any>} importCsv
@@ -1074,6 +1090,12 @@ export const BenthicCore = {
   stageSharedFile: (options) => native.stageSharedFile(options),
   cancelStage: (options) => native.cancelStage(options),
   readFileChunk: (options) => native.readFileChunk(options),
+  mediaAdopt: (options) => native.mediaAdopt(options),
+  mediaPutBytes: (options) => native.mediaPutBytes(options),
+  mediaStat: (options) => native.mediaStat(options),
+  mediaUpload: (options) => native.mediaUpload(options),
+  mediaDownload: (options) => native.mediaDownload(options),
+  mediaDelete: (options) => native.mediaDelete(options),
   assembleFile: (options) => native.assembleFile(options),
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),

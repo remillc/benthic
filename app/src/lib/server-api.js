@@ -9,7 +9,10 @@ export const SERVER_ERRORS = /** @type {const} */ (['INVALID_ADDRESS', 'WRONG_CO
 /** The codes of the dive validation routes (lib/validation.js); they have no sentence in the dev tools. */
 export const VALIDATION_ERRORS = /** @type {const} */ (['TOKEN_UNKNOWN', 'TOKEN_EXPIRED', 'TOKEN_USED', 'OWN_CODE', 'SUBSCRIPTION_REQUIRED', 'TOO_MANY_REQUESTS']);
 
-/** @typedef {typeof SERVER_ERRORS[number]|typeof VALIDATION_ERRORS[number]} ServerErrorCode */
+/** The codes of the photo and video routes (lib/media-sync.js). */
+export const MEDIA_ERRORS = /** @type {const} */ (['QUOTA_EXCEEDED', 'NOT_FOUND']);
+
+/** @typedef {typeof SERVER_ERRORS[number]|typeof VALIDATION_ERRORS[number]|typeof MEDIA_ERRORS[number]} ServerErrorCode */
 
 export class ServerError extends Error {
   /**
@@ -34,7 +37,7 @@ export class ServerError extends Error {
 export function errorFromResponse(status, body) {
   const code = body?.error?.code;
   const retry = Number.isFinite(body?.error?.retryAfterSeconds) ? Number(body.error.retryAfterSeconds) : undefined;
-  if (typeof code === 'string' && (/** @type {readonly string[]} */ (SERVER_ERRORS).includes(code) || /** @type {readonly string[]} */ (VALIDATION_ERRORS).includes(code)) && code !== 'UNREACHABLE') {
+  if (typeof code === 'string' && (/** @type {readonly string[]} */ (SERVER_ERRORS).includes(code) || /** @type {readonly string[]} */ (VALIDATION_ERRORS).includes(code) || /** @type {readonly string[]} */ (MEDIA_ERRORS).includes(code)) && code !== 'UNREACHABLE') {
     return new ServerError(/** @type {ServerErrorCode} */ (code), retry);
   }
   return new ServerError('UNREACHABLE');
@@ -222,6 +225,29 @@ export function createServerApi({ baseUrl, transport }) {
      */
     async validationResult(sessionToken, token) {
       return call('POST', '/v1/validations/result', { token }, { Authorization: `Bearer ${sessionToken}` });
+    },
+
+    /**
+     * A signed address to upload an object of the account (photos and videos, docs/architecture.md 11.6). `exists`: the
+     * server already holds it, nothing to send. QUOTA_EXCEEDED when the account is full; SUBSCRIPTION_REQUIRED without Benthic+.
+     * @param {string} sessionToken @param {string} hash @param {number} size
+     * @returns {Promise<{ exists: true }|{ exists: false, url: string, headers: Record<string, string> }>}
+     */
+    async mediaUploadUrl(sessionToken, hash, size) {
+      const r = await call('POST', '/v1/media/upload-url', { hash, size }, { Authorization: `Bearer ${sessionToken}` });
+      if (r.exists === true) return { exists: true };
+      if (typeof r.url !== 'string') throw new ServerError('UNREACHABLE');
+      return { exists: false, url: r.url, headers: r.headers && typeof r.headers === 'object' ? r.headers : {} };
+    },
+
+    /**
+     * A signed address to download an object of the account. NOT_FOUND when the server does not hold it (yet).
+     * @param {string} sessionToken @param {string} hash @returns {Promise<{ url: string, size: number|null }>}
+     */
+    async mediaDownloadUrl(sessionToken, hash) {
+      const r = await call('POST', '/v1/media/download-url', { hash }, { Authorization: `Bearer ${sessionToken}` });
+      if (typeof r.url !== 'string') throw new ServerError('UNREACHABLE');
+      return { url: r.url, size: Number.isFinite(r.size) ? r.size : null };
     },
 
     /** @returns {Promise<boolean>} whether the server answers */

@@ -11,6 +11,7 @@
 
 import { sortedJson } from './file-store.js';
 import { mergeAccountFile, mergeEncryptedAccountFile } from './account-data-merge.js';
+import { mergeMediaFile } from './dive-media.js';
 import { repositoryKey } from './server-logbook.js';
 import { ACCOUNT_KEY_PATH, DEVICES_DIR, PAIRING_DIR, REQUESTS_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
 
@@ -19,11 +20,11 @@ export const BRANCH = 'benthic';
 
 /**
  * The folders of the working copy this engine moves between the device's store and the server. `meta/` never syncs,
- * `media/` is reserved for the dives' media (docs/architecture.md, 11.6). `keys/` (the account key's id, the recovery
+ * `media/` holds the references of the dives' photos and videos (docs/architecture.md, 11.6; merged as a union by hash). `keys/` (the account key's id, the recovery
  * key's file, the pairing files) is not in this list on purpose: those files never enter the local store; the engine
  * reads and writes them in the working copy only (`KEYS_PREFIX`, `readKeys`, `commitKeyFiles`).
  */
-export const SYNCED_PREFIXES = ['profile/', 'certifications/', 'documents/', 'gear/', 'gear-photos/', 'kits/', 'maintenance/', 'dive-equipment/', 'dive-validations/'];
+export const SYNCED_PREFIXES = ['profile/', 'certifications/', 'documents/', 'gear/', 'gear-photos/', 'kits/', 'maintenance/', 'dive-equipment/', 'dive-validations/', 'media/'];
 
 /** The folder of the key files in the working copy (docs/account-sync.md, « QR payloads and key files »). */
 export const KEYS_PREFIX = 'keys/';
@@ -244,6 +245,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
         throw e;
       }
     } else if (path.startsWith('maintenance/')) result = mergeMaintenance(base, ours, theirs);
+    else if (path.startsWith('media/')) result = { value: mergeMediaFile(/** @type {any} */ (base), /** @type {any} */ (ours), /** @type {any} */ (theirs)), conflicts: [] };
     else result = mergeGeneric(base, ours, theirs);
     return { text: result.value === null ? null : sortedJson(result.value), keys: result.conflicts.map((c) => c.key), locked: false };
   }

@@ -80,6 +80,7 @@ const readline = require('node:readline');
 const { StringDecoder } = require('node:string_decoder');
 const { isBrokenPipe, safeWrite } = require('./process-errors.cjs');
 const logbooks = require('./logbooks.cjs');
+const { createMedia } = require('./media.cjs');
 
 /** The NativeCore functions the renderer may call (host.cpp), without the ones the bridge runs itself. */
 const CORE_METHODS = new Set([
@@ -342,6 +343,9 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   fs.mkdirSync(userData, { recursive: true });
   // Where imports are staged and shares are written: the core writes there too (divelogs.de, exports).
   for (const area of ['import', 'share']) fs.mkdirSync(path.join(tempDir, area), { recursive: true, mode: 0o700 });
+
+  // Dive photos and videos by hash (media.cjs).
+  const media = createMedia({ userData, tempDir });
 
   const electron_ = () => (electron ? electron() : require('electron'));
   const sendAll = broadcast || ((channel, ...args) => {
@@ -1058,6 +1062,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   }));
   // Release edition: the Benthic server's JSON calls and the repository downloads (no CORS in the main process).
   ipcMain.handle('bc:server', answer((_event, request) => serverRequest(request)));
+  ipcMain.handle('bc:media', answer((_event, op, options) => media.call(op, options)));
   ipcMain.handle('bc:fs', answer((event, op, options) => fsCall(op, options, contextFor(event))));
   ipcMain.handle('bc:htmlToPdf', answer((_event, options) => htmlToPdf(options)));
   ipcMain.handle('bc:placesSearch', answer((_event, options) => placesSearch(options)));
@@ -1136,6 +1141,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     call: (method, args) => coreCall(method, args),
     stop: stopAll,
     paths,
+    media,
     // Windows and logbooks (windows.cjs)
     attach,
     detach,

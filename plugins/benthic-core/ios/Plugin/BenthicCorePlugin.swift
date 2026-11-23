@@ -124,6 +124,12 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "stageSharedFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "cancelStage", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readFileChunk", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaAdopt", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaPutBytes", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaStat", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaUpload", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaDownload", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaDelete", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "assembleFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startBluetoothScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopBluetoothScan", returnType: CAPPluginReturnPromise),
@@ -1332,6 +1338,61 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             }
             try bytes.write(to: file)
             call.resolve(["path": file.path])
+        }
+    }
+
+    // MARK: - Dive photos and videos (DiveMedia.swift; docs/architecture.md, 11.6)
+
+    private let diveMedia = DiveMedia()
+
+    @objc func mediaAdopt(_ call: CAPPluginCall) {
+        let path = call.getString("path") ?? ""
+        onNetworkThread(call) { [self] in
+            guard let staged = stagedImport(path) else { throw Failure("BAD_REQUEST") }
+            let (hash, size) = try diveMedia.adopt(staged)
+            call.resolve(["hash": hash, "size": size])
+        }
+    }
+
+    @objc func mediaPutBytes(_ call: CAPPluginCall) {
+        let data = call.getString("data") ?? ""
+        onNetworkThread(call) { [self] in
+            let (hash, size) = try diveMedia.putBytes(data)
+            call.resolve(["hash": hash, "size": size])
+        }
+    }
+
+    @objc func mediaStat(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        onNetworkThread(call) { [self] in
+            let file = try diveMedia.stat(hash)
+            let size = (try? file.flatMap { try FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int64 }) ?? nil
+            call.resolve(["exists": file != nil, "size": size ?? 0, "path": file?.path ?? ""])
+        }
+    }
+
+    @objc func mediaUpload(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        let url = call.getString("url") ?? ""
+        let headers = (call.getObject("headers") as? [String: String]) ?? [:]
+        onNetworkThread(call) { [self] in
+            call.resolve(["status": try diveMedia.upload(hash, url: url, headers: headers)])
+        }
+    }
+
+    @objc func mediaDownload(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        let url = call.getString("url") ?? ""
+        onNetworkThread(call) { [self] in
+            call.resolve(["size": try diveMedia.download(hash, url: url)])
+        }
+    }
+
+    @objc func mediaDelete(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        onNetworkThread(call) { [self] in
+            try diveMedia.delete(hash)
+            call.resolve()
         }
     }
 

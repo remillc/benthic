@@ -655,7 +655,31 @@
       "one": "{n} photo",
       "other": "{n} photos"
     },
-    "photoNote": "Sur un autre appareil : seule leur référence est synchronisée",
+    "mediaPhotos": {
+      "one": "{n} photo",
+      "other": "{n} photos"
+    },
+    "mediaVideos": {
+      "one": "{n} vidéo",
+      "other": "{n} vidéos"
+    },
+    "mediaBoth": "{photos} et {videos}",
+    "mediaSynced": "{counts}, sur tous vos appareils",
+    "mediaEmpty": "Aucune photo ni vidéo, sur tous vos appareils",
+    "mediaAdd": "Ajouter",
+    "mediaAddLabel": "Ajouter des photos ou des vidéos",
+    "mediaSeeAll": "Tout voir",
+    "mediaPhotoLabel": "Photo {n}",
+    "mediaVideoLabel": "Vidéo {n}, {duration}",
+    "mediaPending": "{n} en attente d’envoi",
+    "mediaFull": "L’espace de 10 Go est plein. Ces fichiers restent sur cet appareil.",
+    "mediaAddFailed": "Les fichiers n’ont pas pu être ajoutés.",
+    "mediaOffline": "Cet original n’est pas sur cet appareil. Reconnectez-vous pour l’ouvrir.",
+    "mediaNotOnServer": "Cet original n’est pas encore sur le serveur. Il arrive quand l’autre appareil l’a envoyé.",
+    "mediaGallery": "Photos et vidéos",
+    "mediaClose": "Fermer",
+    "mediaOnDevice": "Sur cet appareil",
+    "mediaInCloud": "Dans le compte",
     "delete": "Supprimer la plongée",
     "deleteSelected": "Supprimer ces plongées",
     "deleteTitle": "Supprimer la plongée",
@@ -1173,6 +1197,19 @@
         "salt": "1 030 g/L",
         "en13319": "Norme des ordinateurs, 1 020 g/L"
       }
+    },
+    "mediaPhotos": {
+      "label": "Photos sur cet appareil",
+      "text": "Originaux téléchargés en Wi-Fi ; les miniatures sont toujours gardées"
+    },
+    "mediaVideos": {
+      "label": "Vidéos sur cet appareil",
+      "text": "Originaux téléchargés en Wi-Fi ; les miniatures sont toujours gardées"
+    },
+    "mediaChoice": {
+      "all": "Toutes",
+      "recent": "Celles des 12 derniers mois",
+      "onDemand": "À la demande"
     },
     "showPhotos": {
       "label": "Afficher les champs photos et vidéos",
@@ -2786,6 +2823,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Photos et vidéos (Benthic+) : la fiche d’une plongée montre les photos et les vidéos en miniatures, avec « Ajouter », la ligne « sur tous vos appareils » et « Tout voir » qui ouvre la galerie de la plongée. Elles sont envoyées au compte (10 Go) et suivent le plongeur sur ses autres appareils : les miniatures sont toujours gardées, les originaux arrivent en Wi-Fi selon Réglages › Carnet (« Toutes », « Celles des 12 derniers mois », « À la demande ») et s’ouvrent à la demande. Hors ligne, les envois attendent le retour du réseau. La version gratuite ne montre pas la section.",
       "Compte : plus de bouton « Synchroniser » nulle part (feuille du compte, Compte, menu latéral, ordinateur). L’état reste, avec une seconde ligne : « Synchronisé il y a 2 min » et « Automatique, dès qu’une modification est faite », ou « 3 modifications non envoyées » et « Envoi automatique au retour du réseau » ; sur tablette, l’état est la troisième ligne sous le compte.",
       "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",

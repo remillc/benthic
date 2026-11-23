@@ -46,6 +46,8 @@ contextBridge.exposeInMainWorld('benthicDesktop', {
   },
   /** Release edition: a call to the Benthic server (main process, no CORS): resolves { status, text }. */
   server: { request: (options) => invoke('bc:server', options) },
+  /** Dive photos and videos by hash (bridge.cjs, `media`): one call, the operation named. */
+  media: { call: (op, options) => invoke('bc:media', op, options) },
   fs: {
     writeFile: (options) => invoke('bc:fs', 'writeFile', options),
     appendFile: (options) => invoke('bc:fs', 'appendFile', options),

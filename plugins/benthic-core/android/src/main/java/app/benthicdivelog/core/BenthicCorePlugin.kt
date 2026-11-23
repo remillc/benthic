@@ -935,6 +935,66 @@ class BenthicCorePlugin : Plugin() {
         return File(context.cacheDir, "$IMPORT_PREFIX${System.nanoTime()}-$clean")
     }
 
+    // --- Dive photos and videos (DiveMedia.kt; docs/architecture.md, 11.6) ---
+
+    private val diveMedia by lazy { DiveMedia(context) }
+
+    /** Runs a media call off the main thread; a failure rejects with its code. */
+    private fun mediaCall(call: PluginCall, block: () -> JSObject) {
+        Thread {
+            try {
+                call.resolve(block())
+            } catch (e: DiveMedia.Failure) {
+                call.reject(e.code, e.code)
+            } catch (e: Exception) {
+                Log.e(TAG, "media", e)
+                call.reject("FAILED", "FAILED", e)
+            }
+        }.start()
+    }
+
+    /** A staged file becomes the object of its content: {hash, size}. */
+    @PluginMethod
+    fun mediaAdopt(call: PluginCall) = mediaCall(call) {
+        val staged = importFile(call.getString("path").orEmpty()) ?: throw DiveMedia.Failure("BAD_REQUEST")
+        val (hash, size) = diveMedia.adopt(staged)
+        JSObject().put("hash", hash).put("size", size)
+    }
+
+    /** Small bytes (a thumbnail), base64: {hash, size}. */
+    @PluginMethod
+    fun mediaPutBytes(call: PluginCall) = mediaCall(call) {
+        val (hash, size) = diveMedia.putBytes(call.getString("data").orEmpty())
+        JSObject().put("hash", hash).put("size", size)
+    }
+
+    /** {exists, size, path}. */
+    @PluginMethod
+    fun mediaStat(call: PluginCall) = mediaCall(call) {
+        val file = diveMedia.stat(call.getString("hash"))
+        JSObject().put("exists", file != null).put("size", file?.length() ?: 0L).put("path", file?.absolutePath ?: "")
+    }
+
+    /** PUT of the object to a signed URL, streamed from the file: {status}. */
+    @PluginMethod
+    fun mediaUpload(call: PluginCall) = mediaCall(call) {
+        val headers = HashMap<String, String>()
+        call.getObject("headers")?.let { h -> h.keys().forEach { k -> headers[k] = h.getString(k).orEmpty() } }
+        JSObject().put("status", diveMedia.upload(call.getString("hash"), call.getString("url").orEmpty(), headers))
+    }
+
+    /** GET of a signed URL into the media folder, checked against the hash: {size}. */
+    @PluginMethod
+    fun mediaDownload(call: PluginCall) = mediaCall(call) {
+        JSObject().put("size", diveMedia.download(call.getString("hash"), call.getString("url").orEmpty()))
+    }
+
+    @PluginMethod
+    fun mediaDelete(call: PluginCall) = mediaCall(call) {
+        diveMedia.delete(call.getString("hash"))
+        JSObject()
+    }
+
     /**
      * A piece of a staged file, base64 (at most 4 MB): {data, size}. The web layer reads a big logbook this way
      * to look at its beginning or to scan it; the whole file never crosses the bridge.

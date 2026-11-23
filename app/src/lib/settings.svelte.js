@@ -51,6 +51,8 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   plan and the gas calculator start from
  * @property {'none'|'fresh'|'salt'|'en13319'} downloadWater water type written on dives downloaded from a
  *   dive computer that gave none; 'none' (Non précisé) leaves it empty. Per device.
+ * @property {"all"|"recent"|"onDemand"} mediaPhotos "Photos sur cet appareil" (task 2026-11-23-359, Benthic+): which originals of the dives' photos are downloaded on Wi-Fi: all, those of the last 12 months, on demand. Per device.
+ * @property {"all"|"recent"|"onDemand"} mediaVideos "Vidéos sur cet appareil": the same for videos; on demand by default
  * @property {number} defaultAltitudeMm "Conditions par défaut": the altitude a new plan starts from, mm
  * @property {string} defaultDiluent cylinder type added as diluent when a dive becomes CCR or pSCR
  * @property {string} defaultOxygen the same for the oxygen cylinder
@@ -89,6 +91,8 @@ const APP_DEFAULTS = {
   slatePlusDepth: true,
   defaultWater: 'salt',
   downloadWater: 'none',
+  mediaPhotos: 'recent',
+  mediaVideos: 'onDemand',
   defaultAltitudeMm: 0,
   defaultDiluent: '',
   defaultOxygen: '',

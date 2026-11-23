@@ -20,6 +20,7 @@ import { onSyncAllowedAgain } from './sync-network.svelte.js';
 import { accountDataDeps, loadProfile } from './profile.svelte.js';
 import { loadInventory } from './inventory.svelte.js';
 import { sideWindow } from './layout.svelte.js';
+import { refreshMedia } from './dive-media.svelte.js';
 
 /**
  * What the screens read: `status` (idle, syncing, synced, offline, error), `locked` (sealed items waiting for the data
@@ -58,6 +59,8 @@ function build() {
     allowed,
     afterRun: async () => {
       await Promise.all([loadInventory(), loadProfile()]);
+      // Dive photos and videos: new references from another device, uploads waiting (quiet, never blocks).
+      refreshMedia();
     },
   });
   runner = base;
@@ -74,7 +77,10 @@ export function startAccountSync() {
   started = true;
   const { runner: r } = build();
   onAccountData((kind) => r.trigger(kind === 'dives' ? 'dives' : 'edit'));
-  onSyncAllowedAgain(() => r.trigger('network'));
+  onSyncAllowedAgain(() => {
+    r.trigger('network');
+    refreshMedia();
+  });
   if (typeof window !== 'undefined') window.addEventListener('online', () => r.trigger('network'));
   CapacitorApp.addListener('resume', () => r.trigger('resume')).catch((/** @type {unknown} */ e) => console.error('App resume', e));
   r.trigger('start');

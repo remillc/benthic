@@ -622,6 +622,40 @@ export class BenthicCoreDesktop extends WebPlugin {
     return this.bridge.fs.readChunk({ path: options.path, offset: options.offset ?? 0, length: options.length ?? 65536 });
   }
 
+  // --- Dive photos and videos (the objects of docs/architecture.md, 11.6): files in <userData>/media, by hash ---
+
+  /** @param {{path?: string}} options */
+  async mediaAdopt(options) {
+    if (!this.isImportFile(options?.path ?? '')) throw reject('BAD_REQUEST');
+    return this.bridge.media.call('adopt', { path: options.path });
+  }
+
+  /** @param {{data?: string}} options */
+  async mediaPutBytes(options) {
+    if (typeof options?.data !== 'string') throw reject('BAD_REQUEST');
+    return this.bridge.media.call('putBytes', { base64: options.data });
+  }
+
+  /** @param {{hash?: string}} options */
+  async mediaStat(options) {
+    return this.bridge.media.call('stat', { hash: options?.hash });
+  }
+
+  /** @param {{hash?: string, url?: string, headers?: Record<string, string>}} options */
+  async mediaUpload(options) {
+    return this.bridge.media.call('upload', { hash: options?.hash, url: options?.url, headers: options?.headers ?? {} });
+  }
+
+  /** @param {{hash?: string, url?: string}} options */
+  async mediaDownload(options) {
+    return this.bridge.media.call('download', { hash: options?.hash, url: options?.url });
+  }
+
+  /** @param {{hash?: string}} options */
+  async mediaDelete(options) {
+    await this.bridge.media.call('delete', { hash: options?.hash });
+  }
+
   /**
    * A new staged file made of ranges of staged files and literal text.
    * @param {{name?: string, parts?: ({path: string, start: number, end: number}|{text: string})[]}} options

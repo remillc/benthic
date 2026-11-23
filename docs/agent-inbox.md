@@ -6977,7 +6977,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Task 357 redrew th
 
 **Test:** on each device, a remembered computer starts with one click or tap on « Télécharger », and « Tout retélécharger » is only in the menu.
 
-## [ ] 2026-11-23-359 Dive detail, « Photos et vidéos »: Benthic+ only, synced pictures shown as thumbnails
+## [x] 2026-11-23-359 Dive detail, « Photos et vidéos »: Benthic+ only, synced pictures shown as thumbnails
 
 Christian asked for this on 23 November 2026. Work in `main`. Photos and videos are a Benthic+ feature (synced, within the 10 Go of the account).
 
@@ -6986,6 +6986,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Photos and videos 
 - The setting « Afficher les champs photos et vidéos » (Réglages › Carnet, `docs/ui-specification.md`) still hides the section when it is off.
 
 Mock-ups: « Détail, équipement déplié · Android » and every other Android phone and tablet dive detail (light and dark); tablet « Carnet d’exemple (mode démo) » and « Feuille du compte, version gratuite » show the detail without the section. iPhone and desktop details had no such section; add it there the same way for subscribers.
+
+**Done (feature/dive-media, not merged: the coordinator checks on devices).** Server (benthic-server `main`, `docs/media-sync.md`): signed upload and download URLs by hash, usage, quota (`MEDIA_QUOTA_BYTES`, 10 GiB by default). App: `lib/dive-media.js` (references `media/<dive start>.json`, merge by hash), `lib/media-sync.js` (uploads wait offline; thumbnails always, originals on Wi-Fi by the choice), plugin `media*` calls (Kotlin, Swift written without a Mac, desktop `media.cjs`), section `DiveMediaSection.svelte` and gallery `DiveGallery.svelte`. No mock-up of the new section is in the repository: built from the text above. The choices live in Réglages › Carnet (« Photos sur cet appareil », « Vidéos sur cet appareil »), next to « Afficher les champs photos et vidéos », for a Benthic+ account only.
 
 ## [ ] 2026-11-23-360 Import a .benthic file (full export): new logbook or replace the current one (TODO #113)
 

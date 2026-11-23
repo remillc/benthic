@@ -19,7 +19,7 @@ section 11 (11.3 the `benthic` branch and its merge rules, 11.5 encryption) stay
 | Certifications and documents (data) | `certifications/<id>.json` (sealed) | branch |
 | Card photos, scans, PDFs | `documents/<hash>.json` (sealed base64) | branch (v1), encrypted; photos re-encoded at 1024 px, PDFs capped at about 10 MB; object storage with signed URLs later |
 | Gear and invoice photos | `media/<id>.json` | renamed **`gear-photos/<id>.json`** before anything reaches the server (`media/` is reserved for dive media, 11.6) |
-| Dive photos and videos | on the device | synced for Benthic+ (decided on 23 November 2026): objects by hash in object storage, references in `media/<dive id>.json` (architecture 11.6) |
+| Dive photos and videos | on the device (`<media folder>/<sha-256>`) | synced for Benthic+ (decided on 23 November 2026): objects by hash in object storage, references in `media/<dive id>.json` on the branch (architecture 11.6), merged as a union by hash (`lib/dive-media.js`). Until the logbook has a stable dive id, `<dive id>` is the dive’s start time, made safe for a file name (`2026-05-01T10-30-00`), so the same dive on two devices is one file. The transfers are `lib/media-sync.js`, not the git sync. |
 | Diver settings (phase 2): units, cylinder library, planner defaults, dive computer list | `deviceStore` | `settings/units.json`, `settings/planner.json`, `settings/computers.json`, newest file wins |
 | Device settings: language, theme, date/time format, notifications, Bluetooth, paper/slate, autoSync, network, maps, snoozes | `deviceStore` | stay on the device |
 | `meta/*` (pending, state, sync head, consent) | IndexedDB | never synced |

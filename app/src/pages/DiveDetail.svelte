@@ -23,7 +23,8 @@
   import { isRelease } from '../lib/edition.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { loadValidations, refreshPending, removeValidation, validations, validationsOf } from '../lib/validation.svelte.js';
-  import { loadInventory, equipmentOf, gearMap } from '../lib/inventory.svelte.js';
+  import { loadInventory, equipmentOf, gearMap, gear } from '../lib/inventory.svelte.js';
+  import { diveKeyOf } from '../lib/inventory.js';
   import { equipmentIsEmpty } from '../lib/inventory.js';
   import ComputersSheet from '../components/ComputersSheet.svelte';
   import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
@@ -49,6 +50,8 @@
   import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { settings } from '../lib/settings.svelte.js';
+  import DiveMediaSection from '../components/DiveMediaSection.svelte';
+  import { diveMediaEnabled } from '../lib/dive-media.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
@@ -1212,20 +1215,15 @@
       </section>
     {/if}
 
-    <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
+    <!-- Only with "Afficher les champs photos et vidéos" (task 2026-11-12-65); see the Photos et vidéos section below. -->
     {#if desk}
       <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
-    {#if !desk && dive.pictures > 0 && settings.showPhotos}
-      <section class="bc-dive-detail--section">
-        <h2 class="bc-dive-detail--section-title">{t('detail.photos')}</h2>
-        <div class="bc-dive-detail--group">
-          <div class="bc-dive-detail--row">
-            <span class="bc-dive-detail--stacked"><span>{t('detail.photoCount', { n: dive.pictures })}</span><span class="bc-dive-detail--sub">{t('detail.photoNote')}</span></span>
-          </div>
-        </div>
-      </section>
+    <!-- Benthic+ only (task 2026-11-23-359): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
+         the line about references on another device is gone. The pictures referenced in the logbook stay untouched. -->
+    {#if settings.showPhotos && diveMediaEnabled() && !preview}
+      <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} />
     {/if}
 
     <div class="bc-dive-detail--end" aria-hidden="true"></div>

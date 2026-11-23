@@ -655,7 +655,31 @@
       "one": "{n} photo",
       "other": "{n} photos"
     },
-    "photoNote": "On another device: only their reference is synced",
+    "mediaPhotos": {
+      "one": "{n} photo",
+      "other": "{n} photos"
+    },
+    "mediaVideos": {
+      "one": "{n} video",
+      "other": "{n} videos"
+    },
+    "mediaBoth": "{photos} and {videos}",
+    "mediaSynced": "{counts}, on all your devices",
+    "mediaEmpty": "No photos or videos, on all your devices",
+    "mediaAdd": "Add",
+    "mediaAddLabel": "Add photos or videos",
+    "mediaSeeAll": "See all",
+    "mediaPhotoLabel": "Photo {n}",
+    "mediaVideoLabel": "Video {n}, {duration}",
+    "mediaPending": "{n} waiting to upload",
+    "mediaFull": "The 10 GB of storage is full. These files stay on this device.",
+    "mediaAddFailed": "The files could not be added.",
+    "mediaOffline": "This original is not on this device. Reconnect to open it.",
+    "mediaNotOnServer": "This original is not on the server yet. It arrives when the other device has sent it.",
+    "mediaGallery": "Photos and videos",
+    "mediaClose": "Close",
+    "mediaOnDevice": "On this device",
+    "mediaInCloud": "In the account",
     "delete": "Delete the dive",
     "deleteSelected": "Delete these dives",
     "deleteTitle": "Delete the dive",
@@ -1173,6 +1197,19 @@
         "salt": "1,030 g/L",
         "en13319": "Standard used by dive computers, 1,020 g/L"
       }
+    },
+    "mediaPhotos": {
+      "label": "Photos on this device",
+      "text": "Originals downloaded on Wi-Fi; thumbnails are always kept"
+    },
+    "mediaVideos": {
+      "label": "Videos on this device",
+      "text": "Originals downloaded on Wi-Fi; thumbnails are always kept"
+    },
+    "mediaChoice": {
+      "all": "All",
+      "recent": "Those of the last 12 months",
+      "onDemand": "On demand"
     },
     "showPhotos": {
       "label": "Show photo and video fields",
@@ -2786,6 +2823,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Photos and videos (Benthic+): a dive shows its photos and videos as thumbnails, with « Add », the line « on all your devices » and « See all », which opens the dive’s gallery. They are sent to the account (10 GB) and follow the diver to the other devices: thumbnails are always kept, originals arrive on Wi-Fi following Settings › Logbook (All, Those of the last 12 months, On demand) and open on demand. Offline, uploads wait for the network. The free version does not show the section.",
       "Account: no « Sync » button anywhere (account sheet, Account, side menu, desktop). The state stays, with a second line: « Synced 2 min ago » and « Automatic, as soon as a change is made », or « 3 changes not sent » and « Sent automatically when the network is back »; on tablet the state is the third line under the account.",
       "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
