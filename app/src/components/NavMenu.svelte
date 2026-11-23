@@ -15,13 +15,14 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, sections, goToSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
+  import { BAND_PROFILE } from '../lib/band-profile.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { tolerantTaps } from '../lib/tap.js';
 
   /** @type {Record<string, 'logbook'|'sites'|'statistics'|'tools'>} */
   const icons = { logbook: 'logbook', sites: 'sites', statistics: 'statistics', tools: 'tools' };
 
-  const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+  const PROFILE = BAND_PROFILE;
 
   /** @type {HTMLElement|undefined} */
   let menu = $state();

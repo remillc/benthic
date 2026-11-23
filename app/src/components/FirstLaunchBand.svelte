@@ -7,6 +7,7 @@
   // `step`: 140 dp under the status bar, only the brand, a straight bottom edge (no wave, no profile).
   // The status bar is part of the band: its height (at least 24 dp) comes first.
   import { t } from '../lib/i18n.js';
+  import { BAND_PROFILE as BAND_CURVE } from '../lib/band-profile.js';
   import FirstLaunchRays from './FirstLaunchRays.svelte';
   import { decorativeProfilePath } from '../lib/smooth-path.js';
 
@@ -15,7 +16,7 @@
 
   const welcome = $derived(variant === 'welcome');
   /** The faint dive profile and the wave of the section band (SectionBand), for the steps. */
-  const STEP_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+  const STEP_PROFILE = BAND_CURVE;
 
   const WIDTH = 688;
   const HEIGHT = 130;

@@ -10,6 +10,7 @@
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import FirstLaunchRays from './FirstLaunchRays.svelte';
   import BrandLockup from './BrandLockup.svelte';
+  import { BAND_PROFILE as BAND_CURVE } from '../lib/band-profile.js';
   import BenthicPlusReadyLogo from './BenthicPlusReadyLogo.svelte';
   import googleLogo from '../assets/brands/google-g.svg?raw';
   import appleLogoBlack from '../assets/brands/apple-logo-black.svg';
@@ -34,7 +35,7 @@
   let { step, onwithout, onopen } = $props();
 
   /** The section band's faint dive profile (the same path as SectionBand). */
-  const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+  const BAND_PROFILE = BAND_CURVE;
 
   /** The offer header's still bubbles: [cx, cy, r] on the mock-up's 390 × 300 drawing. */
   const OFFER_BUBBLES = [[40, 210, 5], [78, 250, 3], [330, 190, 6], [352, 236, 3.5], [300, 120, 4], [64, 140, 3], [250, 260, 2.5], [120, 300, 4], [346, 300, 3]];
