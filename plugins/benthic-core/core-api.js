@@ -345,6 +345,7 @@ export { waterTypeOf };
  * A planned dive of the logbook (list_plans).
  * @typedef {Object} PlannedDive
  * @property {number} id
+ * @property {string} benthicId the plan's stable id; empty until one is assigned
  * @property {string} date
  * @property {number} when
  * @property {string} site

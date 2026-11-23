@@ -281,3 +281,23 @@ test('the device store moves its own references with the inventory, as tracked c
     remote.dispose();
   }
 });
+
+test('after a reload the dives are found by their Benthic id, whatever their start or number became; the others by the old guesses', async () => {
+  const { matchReload } = await import('../../app/src/lib/dive-ids.js');
+  const before = [
+    { id: 1, benthicId: '0abcdefghj', date: '2026-11-01T10:00:00', number: 1 },
+    { id: 2, benthicId: '7k2m9q4x1d', date: '2026-11-02T09:00:00', number: 2 },
+    { id: 3, benthicId: '', date: '2026-11-03T09:00:00', number: 3 },
+    { id: 4, benthicId: '1bbbbbbbbb', date: '2026-11-04T09:00:00', number: 4 },
+  ];
+  const after = [
+    { id: 11, benthicId: '7k2m9q4x1d', date: '2026-11-02T09:30:00', number: 7 },
+    { id: 12, benthicId: '0abcdefghj', date: '2026-11-01T10:00:00', number: 1 },
+    { id: 13, benthicId: '', date: '2026-11-03T09:00:00', number: 3 },
+  ];
+  const map = matchReload(before, after);
+  assert.equal(map.get(1), 12);
+  assert.equal(map.get(2), 11, 'the start time and the number changed, the id did not');
+  assert.equal(map.get(3), 13, 'a dive with no id is still found by its start');
+  assert.equal(map.get(4), null, 'a dive that is gone');
+});
