@@ -7,9 +7,14 @@ import { BenthicCore } from 'benthic-core';
 import { logbook, replaceDeviceLogbook } from './logbook.svelte.js';
 import { deviceStore } from './device-store.js';
 import { sanitiseLogbookName, logbookExportName, localDay } from './logbook-name.js';
+import { runBenthicImport } from './benthic-import.svelte.js';
+import { BenthicImportError } from './benthic-import.js';
+import { replaceContents } from './benthic-import-text.js';
+import { formatNumber } from './format.js';
+import { desktopApp } from './layout.svelte.js';
 import { exportFile } from './share.js';
 import { importErrorKey } from './deep-link.js';
-import { runReplace } from './replace-logbook.js';
+import { replaceEligibility, runReplace } from './replace-logbook.js';
 import { showSnackbar } from './snackbar.js';
 import { t } from './i18n.js';
 
@@ -125,5 +130,90 @@ function replaceFlow(what, logbookName) {
       },
     },
     { logbook: logbookName, file: what.file, data: what.data, pending: logbook.pending },
+  );
+}
+
+/**
+ * The dialog of a .benthic file that cannot be imported: incomplete (the red banner's words), from a newer version, or not
+ * a file Benthic can read. Nothing was imported.
+ * @param {string} fileName
+ * @param {unknown} error
+ */
+export function benthicProblemDialog(fileName, error) {
+  const e = error instanceof BenthicImportError ? error : null;
+  if (e && (e.code === 'INCOMPLETE' || e.code === 'TOO_NEW')) {
+    const text = e.code === 'TOO_NEW' ? t('benthicImport.tooNew', { file: fileName }) : e.bad ? t('benthicImport.incompleteText', { file: fileName, n: e.bad.length }) : t('benthicImport.incompleteCut', { file: fileName });
+    f7.dialog.create({ title: t('benthicImport.incompleteTitle'), text, buttons: [{ text: t('dialog.ok') }] }).open();
+    return;
+  }
+  f7.dialog.create({ title: t('logbook.importTitle'), text: t('logbook.importFailed'), buttons: [{ text: t('dialog.ok') }] }).open();
+}
+
+/**
+ * « Remplacer ce carnet ? » for a .benthic file (task 2026-11-23-360): the open logbook leaves this device and the file's
+ * logbook, equipment, profile and certifications take its place. The dialog offers « Exporter d’abord ce carnet »; « Remplacer »
+ * opens the progress at once. The import verifies every file first and writes only when all of it succeeded: a failure or a
+ * cancel leaves the open logbook as it was. Only a logbook of this device is replaceable (`replaceEligibility`); the logbook of
+ * an account is never deleted or overwritten from a file.
+ * @param {File} file
+ * @param {import('./benthic-import.js').Inspection} inspection
+ * @returns {Promise<'cancelled'|'replaced'|'failed'>}
+ */
+export async function startBenthicReplace(file, inspection) {
+  const eligibility = replaceEligibility(logbook);
+  const current = openLogbookName();
+  if (eligibility !== 'ok') {
+    await ask({ title: t('benthicImport.replace.title'), text: t(`link.replace_${eligibility}`), buttons: [{ text: t('dialog.ok'), value: 'ok', bold: true }] });
+    return 'cancelled';
+  }
+  const personal = t(desktopApp ? 'benthicImport.replace.personalDesktop' : 'benthicImport.replace.personal');
+  const contents = replaceContents(inspection.counts, t, (n) => formatNumber(n));
+  return runReplace(
+    {
+      explain: async ({ pending, exported }) =>
+        /** @type {'export'|'replace'|'cancel'} */ (
+          await ask({
+            title: t('benthicImport.replace.title'),
+            text: [
+              t('benthicImport.replace.text', { logbook: current, dives: t('welcomeSteps.summaryDives', { n: logbook.dives.length }), file: file.name, contents }),
+              inspection.sensitive ? personal : '',
+              pending > 0 ? t('replace.pending', { n: pending }) : '',
+              exported ? t('replace.exported') : '',
+            ]
+              .filter(Boolean)
+              .join('\n\n'),
+            buttons: [
+              { text: t('replace.exportFirst'), value: 'export', bold: !exported },
+              { text: t('dialog.cancel'), value: 'cancel' },
+              { text: t('replace.action'), value: 'replace', bold: exported },
+            ],
+          })
+        ),
+      exportCurrent: exportOpenLogbook,
+      // The dialog already said what leaves; no second question and no name step: the file's name is the logbook's.
+      confirmRemoval: async () => true,
+      askName: async (suggested) => sanitiseLogbookName(suggested) || t('welcomeSteps.defaultName'),
+      replace: async (name) => {
+        const result = await runBenthicImport(inspection, {
+          fileName: file.name,
+          overlay: true,
+          applyLogbook: async (staged) => {
+            // A file without a logbook leaves the dives of this device alone.
+            if (staged) await replaceDeviceLogbook(name, { path: staged.path }, 'logbook.ssrf');
+          },
+        });
+        if (result.skipped) showSnackbar(t('benthicImport.mediaSkipped', { n: result.skipped }));
+        return result.dives;
+      },
+      done: (name, n) => showSnackbar(t(n ? 'benthicImport.done' : 'benthicImport.doneNoDives', { name, n })),
+      failed: (e) => {
+        if (e instanceof BenthicImportError && e.code === 'CANCELLED') return void showSnackbar(t('benthicImport.cancelled'));
+        if (e instanceof BenthicImportError && (e.code === 'INCOMPLETE' || e.code === 'TOO_NEW')) return benthicProblemDialog(file.name, e);
+        const code = e instanceof BenthicImportError ? e.code : String(/** @type {any} */ (e)?.message ?? '');
+        console.error('Replace from a .benthic file', code, /** @type {any} */ (e)?.cause?.message ?? '');
+        f7.dialog.create({ title: t('benthicImport.failedTitle'), text: t(code === 'BAD_LOGBOOK' ? 'benthicImport.badLogbook' : 'benthicImport.failed'), buttons: [{ text: t('dialog.ok') }] }).open();
+      },
+    },
+    { logbook: current, file: file.name, data: { path: '' }, pending: logbook.pending },
   );
 }

@@ -25,6 +25,11 @@
   import FirstLaunchServer from './FirstLaunchServer.svelte';
   import FirstLaunchServerCreate from './FirstLaunchServerCreate.svelte';
   import FirstLaunchBenthicPlus from './FirstLaunchBenthicPlus.svelte';
+  import FirstLaunchBenthic from './FirstLaunchBenthic.svelte';
+  import BenthicFileCard from './BenthicFileCard.svelte';
+  import BenthicContents from './BenthicContents.svelte';
+  import { isBenthicName, openBenthicFile, runBenthicImport } from '../lib/benthic-import.svelte.js';
+  import { BenthicImportError } from '../lib/benthic-import.js';
   import { flow, go, goBack, goBackTo, editName, currentStep, importIsRead, resetFlow } from '../lib/first-launch.svelte.js';
   import { navigation } from '../lib/navigation.svelte.js';
   import { CLOUD_CONNECTION_AVAILABLE, connectionNext } from '../lib/cloud-connection.js';
@@ -87,8 +92,13 @@
   let busy = $state(false);
   /** The name of the file the core could not read: the error block of « Importer un carnet » (task 223). */
   let unreadable = $state('');
+  /** A .benthic file that is incomplete (task 2026-11-23-360): the red banner of « Importer un carnet ». `bad`: how many files differ from their hash (null: the archive stops before its end). */
+  let incomplete = $state(/** @type {{ file: string, bad: number|null, newer: boolean }|null} */ (null));
   $effect(() => {
-    if (step !== 'import') unreadable = '';
+    if (step !== 'import') {
+      unreadable = '';
+      incomplete = null;
+    }
   });
   /** @type {HTMLInputElement|undefined} */
   let fileInput = $state();
@@ -243,6 +253,7 @@
   function importer() {
     const source = flow.source;
     if (!source) return null;
+    if (source.kind === 'benthic') return null;
     if (source.kind === 'file') return source.csv ? () => importCsvFile(source.file, source.csv.params, source.csv.companion) : () => importFile(source.file);
     // Already in the app's cache: the core reads it where it is (and deletes it).
     if (source.kind === 'staged') return () => importData(source.fileName, { path: source.path });
@@ -343,6 +354,7 @@
   /** « Seulement sur cette tablette »: the logbook is created on the device and opened, no extra screen. */
   async function createOnDevice() {
     if (busy) return;
+    if (flow.source?.kind === 'benthic' && !windowTakes) return void runBenthicNew();
     busy = true;
     if (windowTakes) {
       try {
@@ -369,6 +381,78 @@
       resetFlow();
     } catch (e) {
       failed(e);
+    } finally {
+      busy = false;
+    }
+  }
+
+  /**
+   * « Importer le carnet » for a .benthic file (task 2026-11-23-360): its progress screen, then the device's logbook made through
+   * the same path as any import. All or nothing: a file that is incomplete goes back to « Importer un carnet » with the red
+   * banner, « Annuler » goes back to « Nouveau carnet », and nothing was imported in either case.
+   */
+  async function runBenthicNew() {
+    const source = flow.source;
+    if (source?.kind !== 'benthic' || busy) return;
+    busy = true;
+    go('benthic');
+    try {
+      const result = await runBenthicImport(source.inspection, {
+        fileName: source.file.name,
+        applyLogbook: async (staged) => {
+          rememberName();
+          await createDeviceLogbook(
+            {
+              deviceLogExists: async () => (await BenthicCore.listDives()).exists,
+              start: startWithoutAccount,
+              sampleIds: () => logbook.dives.map((d) => d.id),
+              remove: deleteDives,
+            },
+            staged ? () => importData('logbook.ssrf', { path: staged.path }) : null,
+          );
+        },
+      });
+      resetFlow();
+      const name = sanitiseLogbookName(source.name);
+      showSnackbar(t(result.dives ? 'benthicImport.done' : 'benthicImport.doneNoDives', { name, n: result.dives }));
+      if (result.skipped) showSnackbar(t('benthicImport.mediaSkipped', { n: result.skipped }));
+    } catch (e) {
+      const code = e instanceof BenthicImportError ? e.code : 'FAILED';
+      console.error('Import a .benthic file', code, /** @type {any} */ (e)?.cause?.message ?? '');
+      if (code === 'INCOMPLETE' || code === 'TOO_NEW') {
+        goBackTo('import');
+        incomplete = { file: source.file.name, bad: e instanceof BenthicImportError && e.bad ? e.bad.length : null, newer: code === 'TOO_NEW' };
+      } else if (code === 'CANCELLED') {
+        goBack();
+        showSnackbar(t('benthicImport.cancelled'));
+      } else {
+        goBack();
+        f7.dialog.create({ title: t('benthicImport.failedTitle'), text: t(code === 'BAD_LOGBOOK' ? 'benthicImport.badLogbook' : 'benthicImport.failed'), buttons: [{ text: t('dialog.ok') }] }).open();
+      }
+    } finally {
+      busy = false;
+    }
+  }
+
+  /**
+   * A .benthic file brought for the import: its end and its manifest are read (no file is checked yet), then « Nouveau carnet »
+   * shows what it holds. A file that stops before its end, or comes from a newer version, gets the red banner.
+   * @param {File} file
+   */
+  async function bringBenthic(file) {
+    busy = true;
+    unreadable = '';
+    incomplete = null;
+    try {
+      const inspection = await openBenthicFile(file);
+      const name = nameFromFile(file.name, t('welcomeSteps.defaultName'));
+      flow.source = { kind: 'benthic', file, inspection, name, summary: { dives: inspection.counts.dives, sites: inspection.counts.sites, firstYear: null, lastYear: null } };
+      flow.name = name;
+      go('file');
+    } catch (e) {
+      if (e instanceof BenthicImportError && (e.code === 'INCOMPLETE' || e.code === 'TOO_NEW')) incomplete = { file: file.name, bad: e.bad ? e.bad.length : null, newer: e.code === 'TOO_NEW' };
+      else if (iphone) unreadableAlert(file.name);
+      else unreadable = file.name;
     } finally {
       busy = false;
     }
@@ -579,6 +663,7 @@
    * @param {File[]} files
    */
   async function bring(files) {
+    if (files.length === 1 && isBenthicName(files[0].name) && !busy) return bringBenthic(files[0]);
     const picked = files.length ? pickCsvFiles(files) : null;
     const file = picked?.csv ?? files[0];
     if (!file || busy) return;
@@ -639,6 +724,7 @@
     import: 'welcomeSteps.importTitle',
     importDivelogs: 'welcomeSteps.divelogsFormTitle',
     importProgress: 'welcomeSteps.divelogsFormTitle',
+    importBenthic: 'welcomeSteps.importTitle',
     open: 'welcomeSteps.openTitle',
     openCloudService: 'welcomeSteps.openTitle',
     openCloudConnect: 'welcomeSteps.openTitle',
@@ -855,11 +941,16 @@
 {/snippet}
 
 {#snippet nameStep()}
-  {#if flow.source}
+  {#if flow.source?.kind === 'benthic'}
+    <div class="bc-first-launch--benthic">
+      <BenthicFileCard name={flow.source.file.name} exportedAt={flow.source.inspection.exportedAt} />
+      <BenthicContents counts={flow.source.inspection.counts} sensitive={flow.source.inspection.sensitive} {kind} />
+    </div>
+  {:else if flow.source}
     <div class="bc-first-launch--summary">
       <span class="bc-first-launch--summary-icon"><Icon name="file" size={20} /></span>
       <span class="bc-first-launch--summary-text">
-        <span class="bc-first-launch--summary-name">{flow.source.kind === 'file' ? flow.source.file.name : flow.source.kind === 'staged' ? flow.source.fileName : t('welcomeSteps.divelogsTitle')}</span>
+        <span class="bc-first-launch--summary-name">{flow.source.kind === 'file' || flow.source.kind === 'benthic' ? flow.source.file.name : flow.source.kind === 'staged' ? flow.source.fileName : t('welcomeSteps.divelogsTitle')}</span>
         <span class="bc-first-launch--summary-detail">{summaryText(flow.source.summary, t)}</span>
       </span>
     </div>
@@ -935,6 +1026,16 @@
           <FirstLaunchGit create router={f7router} afterConnect={afterGit} onswitch={() => go('openLink')} onconnect={windowTakes ? createGit : undefined} />
         {:else if step === 'import'}
           <p class="bc-first-launch--lead">{t('welcomeSteps.importQuestion')}</p>
+          {#if incomplete}
+            <!-- A .benthic file that is incomplete (task 2026-11-23-360): nothing was imported. -->
+            <div class="bc-first-launch--error" role="alert" data-error="benthic-incomplete">
+              <span class="bc-first-launch--error-icon"><Icon name="error" size={22} /></span>
+              <span class="bc-first-launch--error-text">
+                <span class="bc-first-launch--error-title">{t('benthicImport.incompleteTitle')}</span>
+                <span class="bc-first-launch--error-detail">{incomplete.newer ? t('benthicImport.tooNew', { file: incomplete.file }) : incomplete.bad === null ? t('benthicImport.incompleteCut', { file: incomplete.file }) : t('benthicImport.incompleteText', { file: incomplete.file, n: incomplete.bad })}</span>
+              </span>
+            </div>
+          {/if}
           {#if unreadable}
             <div class="bc-first-launch--error" role="alert">
               <span class="bc-first-launch--error-icon"><Icon name="error" size={22} /></span>
@@ -958,6 +1059,8 @@
           {#if csv}
             <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={(e) => { const file = csv?.file; csv = null; failed(e, file); }} />
           {/if}
+        {:else if step === 'importBenthic'}
+          <FirstLaunchBenthic />
         {:else if step === 'importDivelogs' || step === 'importProgress'}
           <FirstLaunchDivelogs {step} onread={divelogsRead} />
         {:else if step === 'open'}
@@ -1757,6 +1860,14 @@
         outline: 2px solid var(--bc-release-row-main);
         outline-offset: 2px;
       }
+    }
+
+    /* A .benthic file: its card, then what it holds (task 2026-11-23-360). */
+    .bc-first-launch--benthic {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 8px;
     }
 
     /* The summary of an imported file. */

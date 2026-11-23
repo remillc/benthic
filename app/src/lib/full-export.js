@@ -80,7 +80,7 @@ const enc = new TextEncoder();
  * @property {import('./profile.js').Profile} profile the diver profile and the certifications, with their key
  * @property {string} appVersion
  * @property {() => Date} [now]
- * @property {{ diveCount: () => Promise<number>, read?: () => Promise<Uint8Array|null>, open?: () => Promise<LogbookFile|null> }} logbook
+ * @property {{ diveCount: () => Promise<number>, siteCount?: () => Promise<number>, read?: () => Promise<Uint8Array|null>, open?: () => Promise<LogbookFile|null> }} logbook
  *   `open` is the `.ssrf` as a file in the app's cache that is read in pieces (a logbook can be 100 MB: it never
  *   crosses the plugin's bridge as one string); `read` is the same in memory, for a small one (the tests); null when there is no logbook
  * @property {() => Promise<Record<string, unknown>>} settings the device's settings and the core's preferences
@@ -399,6 +399,8 @@ export async function buildExport({ withMedia = false, onProgress, signal, zip64
       containsSensitive: sensitive,
       sensitiveInClear: sensitive,
       dives: await deps.logbook.diveCount(),
+      // What the file holds that the manifest's file list does not say: the import shows it before it reads anything else.
+      ...(deps.logbook.siteCount && hasLogbook ? { counts: { sites: await deps.logbook.siteCount() } } : {}),
       files: files.sort((a, b) => a.path.localeCompare(b.path)),
       skipped,
     };
@@ -518,6 +520,9 @@ export async function defaultDeps(overrides = {}) {
         return exists ? dives.length : 0;
       },
       // The core writes the .ssrf to a file of the cache; the archive reads it in pieces of 3 MB.
+      async siteCount() {
+        return (/** @type {unknown[]} */ (await BenthicCore.siteQuery({ kind: 'list' }))).length;
+      },
       async open() {
         const { exists, dives } = await BenthicCore.listDives();
         if (!exists || !dives.length) return null;

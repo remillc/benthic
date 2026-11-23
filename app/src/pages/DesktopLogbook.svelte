@@ -29,6 +29,8 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, importData, undoLastChange, deleteDives, tripChange, mergeDives } from '../lib/logbook.svelte.js';
+  import { benthicProblemDialog, startBenthicReplace } from '../lib/replace-logbook-ui.js';
+  import { isBenthicName, openBenthicFile } from '../lib/benthic-import.svelte.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import ValidationDialog from '../components/ValidationDialog.svelte';
   import { canMerge, mergeErrorKey } from '../lib/multi-dive.js';
@@ -726,6 +728,15 @@
 
   /** @param {File} file */
   async function importOne(file) {
+    // A .benthic file (the full export): « Remplacer ce carnet ? », then the progress (task 2026-11-23-360).
+    if (isBenthicName(file.name)) {
+      try {
+        await startBenthicReplace(file, await openBenthicFile(file));
+      } catch (e) {
+        benthicProblemDialog(file.name, e);
+      }
+      return;
+    }
     try {
       const n = await importFile(file);
       offerUndo(t('logbook.importedFrom', { n, name: file.name }));

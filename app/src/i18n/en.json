@@ -2786,6 +2786,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Importing a .benthic file: “A file” in “Import a logbook” and the logbook menu accept the full export. The file is first checked, file by file, against its fingerprints; if it is incomplete, nothing is imported. Otherwise the logbook, equipment, profile and certifications are imported in one go, and personal information is encrypted on this device. To replace a logbook, “Replace this logbook?” offers “Export this logbook first”.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
       "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
       "First launch: the light rays of the blue band are always four, scaled to the width of the band, on tablet and computer as on the phone.",
@@ -6743,6 +6744,87 @@
     "failedTitle": "Replace this logbook",
     "failed": "The logbook could not be replaced. The current logbook is kept.",
     "failedNoDives": "The file holds no dive. The current logbook is kept."
+  },
+  "benthicImport": {
+    "fileCardDetail": "Full Benthic export, {date}",
+    "contentsTitle": "What the file contains",
+    "rowDives": "Dives and sites",
+    "rowEquipment": "Equipment, kits and maintenance",
+    "rowProfile": "Profile, certifications and documents",
+    "rowMedia": "Dive photos and videos",
+    "pieces": {
+      "one": "{n} item",
+      "other": "{n} items"
+    },
+    "kits": {
+      "one": "{n} kit",
+      "other": "{n} kits"
+    },
+    "certs": {
+      "one": "{n} certification",
+      "other": "{n} certifications"
+    },
+    "documents": {
+      "one": "{n} document",
+      "other": "{n} documents"
+    },
+    "profileOnly": "Profile",
+    "note": "This file holds personal information in clear text. Benthic encrypts it on this tablet. Keep the file somewhere safe or delete it.",
+    "notePhone": "This file holds personal information in clear text. Benthic encrypts it on this phone. Keep the file somewhere safe or delete it.",
+    "noteIphone": "This file holds personal information in clear text. Benthic encrypts it on this iPhone. Keep the file somewhere safe or delete it.",
+    "noteDesktop": "This file holds personal information in clear text. Benthic encrypts it on this computer. Keep the file somewhere safe or delete it.",
+    "progress": {
+      "group": ".benthic file import progress",
+      "verify": "Checking the file",
+      "verifyCount": "{done} of {total} files",
+      "verifyDone": {
+        "one": "{n} file, intact",
+        "other": "{n} files, all intact"
+      },
+      "dives": "Dives and sites",
+      "data": "Equipment, profile and certifications",
+      "media": "Photos and videos, {size}",
+      "count": "{done} of {total}",
+      "write": "Saving…",
+      "help": "Keep the app open until the end. If the import stops, nothing is added.",
+      "helpDesktop": "Keep Benthic open until the end. If the import stops, nothing is added.",
+      "cancel": "Cancel",
+      "cancelling": "Cancelling…"
+    },
+    "size": {
+      "kb": "{n} KB",
+      "mb": "{n} MB",
+      "gb": "{n} GB"
+    },
+    "incompleteTitle": "This .benthic file is incomplete",
+    "incompleteText": {
+      "one": "In “{file}”, {n} file does not match its fingerprint. Nothing was imported. Export again on the original device.",
+      "other": "In “{file}”, {n} files do not match their fingerprint. Nothing was imported. Export again on the original device."
+    },
+    "incompleteCut": "“{file}” stops before its end. Nothing was imported. Export again on the original device.",
+    "tooNew": "“{file}” comes from a newer version of Benthic. Update Benthic, then try again.",
+    "failedTitle": "Import failed",
+    "failed": "The file could not be imported. Nothing was changed.",
+    "badLogbook": "The logbook in this file could not be read. Nothing was changed.",
+    "cancelled": "Import cancelled. Nothing was changed.",
+    "done": "Logbook “{name}” imported: {n} dives.",
+    "doneNoDives": "Logbook “{name}” imported.",
+    "mediaSkipped": {
+      "one": "{n} photo or video of the file was not imported: this device does not keep them yet.",
+      "other": "{n} photos and videos of the file were not imported: this device does not keep them yet."
+    },
+    "replace": {
+      "title": "Replace this logbook?",
+      "text": "This device keeps one logbook only. “{logbook}” ({dives}) leaves this device and is replaced by “{file}”: {contents}.",
+      "personal": "The personal information in the file will be encrypted on this device.",
+      "personalDesktop": "The personal information in the file will be encrypted on this computer.",
+      "equipment": "the equipment",
+      "profile": "the profile",
+      "certs": "the certifications",
+      "documents": "the documents",
+      "media": "{size} of photos and videos",
+      "and": " and "
+    }
   },
   "validation": {
     "back": "Back",

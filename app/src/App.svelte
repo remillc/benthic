@@ -60,6 +60,7 @@
   import { flushQueue, loadValidations, refreshPending } from './lib/validation.svelte.js';
   import { benthicPlusAccount } from './lib/benthic-plus-state.svelte.js';
   import FileImportProgress from './components/FileImportProgress.svelte';
+  import BenthicImportOverlay from './components/BenthicImportOverlay.svelte';
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
   import { accountGuard } from './lib/demo.svelte.js';
@@ -523,6 +524,7 @@
   <QrReceived />
   <ValidationConfirm />
   <FileImportProgress />
+  <BenthicImportOverlay />
   <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   {#if devAccounts}{#await import('./components/DevToolsHost.svelte') then { default: DevToolsHost }}<DevToolsHost />{/await}{/if}

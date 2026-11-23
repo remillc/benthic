@@ -2786,6 +2786,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Importer un fichier .benthic : « Un fichier » de « Importer un carnet » et le menu du carnet acceptent l’export complet. Le fichier est d’abord vérifié, fichier par fichier, contre ses empreintes ; s’il est incomplet, rien n’est importé. Sinon le carnet, l’équipement, le profil et les brevets sont importés d’un coup, et les informations personnelles sont chiffrées sur cet appareil. Pour remplacer un carnet, « Remplacer ce carnet ? » propose « Exporter d’abord ce carnet ».",
       "Téléchargement : dans les états du Bluetooth (autoriser, autorisation refusée, Bluetooth désactivé), l’icône Bluetooth est centrée, blanche sur un disque bleu, et « Activer le Bluetooth » est un bouton bleu sur tous les appareils.",
       "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",
       "Premier lancement : les rayons de lumière de la bande bleue sont toujours quatre, à l’échelle de la largeur de la bande, sur tablette et ordinateur comme sur le téléphone.",
@@ -6746,6 +6747,87 @@
     "failedTitle": "Remplacer ce carnet",
     "failed": "Le carnet n’a pas pu être remplacé. Le carnet actuel est conservé.",
     "failedNoDives": "Le fichier ne contient aucune plongée. Le carnet actuel est conservé."
+  },
+  "benthicImport": {
+    "fileCardDetail": "Export complet de Benthic, {date}",
+    "contentsTitle": "Ce que le fichier contient",
+    "rowDives": "Plongées et sites",
+    "rowEquipment": "Équipement, kits et entretien",
+    "rowProfile": "Profil, brevets et documents",
+    "rowMedia": "Photos et vidéos des plongées",
+    "pieces": {
+      "one": "{n} pièce",
+      "other": "{n} pièces"
+    },
+    "kits": {
+      "one": "{n} kit",
+      "other": "{n} kits"
+    },
+    "certs": {
+      "one": "{n} brevet",
+      "other": "{n} brevets"
+    },
+    "documents": {
+      "one": "{n} document",
+      "other": "{n} documents"
+    },
+    "profileOnly": "Profil",
+    "note": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur cette tablette. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "notePhone": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur ce téléphone. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "noteIphone": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur cet iPhone. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "noteDesktop": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur cet ordinateur. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "progress": {
+      "group": "Progression de l’import du fichier .benthic",
+      "verify": "Vérification du fichier",
+      "verifyCount": "{done} sur {total} fichiers",
+      "verifyDone": {
+        "one": "{n} fichier, intact",
+        "other": "{n} fichiers, tous intacts"
+      },
+      "dives": "Plongées et sites",
+      "data": "Équipement, profil et brevets",
+      "media": "Photos et vidéos, {size}",
+      "count": "{done} sur {total}",
+      "write": "Enregistrement…",
+      "help": "Gardez l’app ouverte jusqu’à la fin. Si l’import s’arrête, rien n’est ajouté.",
+      "helpDesktop": "Gardez Benthic ouvert jusqu’à la fin. Si l’import s’arrête, rien n’est ajouté.",
+      "cancel": "Annuler",
+      "cancelling": "Annulation…"
+    },
+    "size": {
+      "kb": "{n} Ko",
+      "mb": "{n} Mo",
+      "gb": "{n} Go"
+    },
+    "incompleteTitle": "Ce fichier .benthic est incomplet",
+    "incompleteText": {
+      "one": "Dans « {file} », {n} fichier ne correspond pas à son empreinte. Rien n’a été importé. Refaites l’export sur l’appareil d’origine.",
+      "other": "Dans « {file} », {n} fichiers ne correspondent pas à leur empreinte. Rien n’a été importé. Refaites l’export sur l’appareil d’origine."
+    },
+    "incompleteCut": "« {file} » s’arrête avant la fin. Rien n’a été importé. Refaites l’export sur l’appareil d’origine.",
+    "tooNew": "« {file} » vient d’une version plus récente de Benthic. Mettez Benthic à jour, puis réessayez.",
+    "failedTitle": "Import impossible",
+    "failed": "Le fichier n’a pas pu être importé. Rien n’a été modifié.",
+    "badLogbook": "Le carnet de ce fichier n’a pas pu être lu. Rien n’a été modifié.",
+    "cancelled": "Import annulé. Rien n’a été modifié.",
+    "done": "Carnet « {name} » importé : {n} plongées.",
+    "doneNoDives": "Carnet « {name} » importé.",
+    "mediaSkipped": {
+      "one": "{n} photo ou vidéo du fichier n’a pas été importée : cet appareil ne les garde pas encore.",
+      "other": "{n} photos et vidéos du fichier n’ont pas été importées : cet appareil ne les garde pas encore."
+    },
+    "replace": {
+      "title": "Remplacer ce carnet ?",
+      "text": "Cet appareil ne garde qu’un carnet. « {logbook} » ({dives}) quitte cet appareil et est remplacé par « {file} » : {contents}.",
+      "personal": "Les informations personnelles du fichier seront chiffrées sur cet appareil.",
+      "personalDesktop": "Les informations personnelles du fichier seront chiffrées sur cet ordinateur.",
+      "equipment": "l’équipement",
+      "profile": "le profil",
+      "certs": "les brevets",
+      "documents": "les documents",
+      "media": "{size} de photos et vidéos",
+      "and": " et "
+    }
   },
   "validation": {
     "back": "Retour",
