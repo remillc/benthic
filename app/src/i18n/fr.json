@@ -2782,6 +2782,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
       "Carnet : pendant l’échange avec le serveur au démarrage, un trait blanc se dessine sur le profil pâle de l’en-tête, sur tous les appareils : un segment glisse tant que la progression est inconnue, puis le trait se remplit, se complète et s’efface. Il remplace la barre ondulée.",
       "Synchronisation : elle est toujours automatique. Le réglage « Synchroniser automatiquement » et le mode manuel n’existent plus ; « Seulement sur Wi-Fi ou câble » et « Synchroniser maintenant » restent, et les modifications non envoyées s’affichent toujours quand l’appareil est hors ligne.",
       "Carnet : un appui long sur une plongée ou un voyage démarre la sélection dès qu’il est reconnu, le doigt encore posé, avec un court retour haptique sur téléphone et tablette ; lever le doigt ne décide plus.",
@@ -6901,6 +6902,151 @@
       "sent": "Signalement envoyé",
       "tooMany": "Trop de signalements aujourd’hui. Réessayez demain.",
       "failed": "Signalement non envoyé. Vérifiez la connexion, puis réessayez."
+    }
+  },
+  "accountSync": {
+    "unlock": {
+      "title": "Déverrouiller vos données chiffrées",
+      "pair": "Demander l’accès à un appareil jumelé",
+      "pairLine": "À approuver sur {names}",
+      "pairLineNone": "À approuver sur un de vos appareils jumelés",
+      "recoveryKey": "Saisir la clé de secours",
+      "meanwhile": "La demande s’affiche sur vos appareils jumelés. En attendant, le reste du compte se synchronise ; vous pourrez jumeler plus tard depuis Compte.",
+      "later": "Plus tard",
+      "lost": "Plus d’appareil ni de clé ?"
+    },
+    "device": {
+      "androidPhone": "Téléphone Android",
+      "androidTablet": "Tablette Android",
+      "iphone": "iPhone",
+      "ipad": "iPad",
+      "windows": "Ordinateur Windows",
+      "mac": "Ordinateur Mac",
+      "linux": "Ordinateur Linux",
+      "unknown": "Autre appareil"
+    },
+    "pair": {
+      "askTitle": "Demande d’accès envoyée",
+      "askNames": "À approuver sur {names}",
+      "askHint": "Ouvrez Benthic sur un appareil déjà jumelé et autorisez cet appareil.",
+      "waiting": "En attente d’une réponse…",
+      "codeLabel": "Code de vérification",
+      "expires": "La demande expire dans {time}",
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "again": "Nouvelle demande",
+      "declinedTitle": "Demande refusée",
+      "declinedText": "L’accès a été refusé sur « {name} ». Rien n’a été partagé.",
+      "declinedTextAnon": "L’accès a été refusé. Rien n’a été partagé.",
+      "expiredTitle": "Demande expirée",
+      "expiredText": "Aucun appareil jumelé n’a répondu à temps. Rien n’a été partagé.",
+      "endedTitle": "Jumelage impossible",
+      "endedText": "La réponse n’a pas pu être lue. Demandez de nouveau.",
+      "approveTitle": "Donner accès à « {name} » ?",
+      "approveText": "Cet appareil demande à lire votre profil, vos brevets et vos documents chiffrés. Vérifiez qu’il affiche le même code.",
+      "mismatch": "Les codes sont différents",
+      "refuse": "Refuser",
+      "allow": "Autoriser",
+      "mismatchTitle": "Demande refusée",
+      "mismatchText": "Les codes ne correspondaient pas : la demande ne venait peut-être pas de votre appareil. « {name} » n’a pas eu accès, et rien n’a été partagé.",
+      "mismatchAdvice": "Si vous n’avez rien demandé, vérifiez qui peut lire vos courriels : la connexion à Benthic se fait par un code envoyé par courriel.",
+      "doneTitle": "Appareil jumelé",
+      "doneText": "Les données chiffrées sont déverrouillées sur cet appareil.",
+      "lockedEntry": "Jumeler cet appareil",
+      "lockedLine": "Données chiffrées verrouillées sur cet appareil",
+      "approved": "« {name} » a maintenant accès aux données chiffrées.",
+      "requestGone": "La demande a expiré ou a été retirée.",
+      "offline": "Aucune connexion. Réessayez.",
+      "failed": "Jumelage impossible. Réessayez."
+    },
+    "notify": {
+      "title": "Donner accès à « {name} » ?",
+      "body": "Code de vérification {code}. Touchez pour répondre."
+    },
+    "devices": {
+      "title": "Vos appareils jumelés",
+      "seenToday": "vu aujourd’hui",
+      "seenYesterday": "vu hier",
+      "seenDays": { "one": "vu il y a {n} jour", "other": "vu il y a {n} jours" },
+      "line": "La demande s’affiche sur ces appareils dès que Benthic y est ouvert. Il suffit de l’approuver sur l’un d’eux.",
+      "none": "Aucun appareil jumelé n’est connu. Utilisez la clé de secours, ou repartez sans les données chiffrées."
+    },
+    "pairStep": {
+      "title": "Jumeler cet appareil",
+      "reason": "Votre compte a des données chiffrées : profil, brevets et documents. Cet appareil n’a pas encore la clé pour les lire.",
+      "ask": "Demander l’accès",
+      "later": "Plus tard",
+      "note": "Le reste du compte se synchronise déjà. Vous pourrez jumeler plus tard depuis Compte."
+    },
+    "key": {
+      "offerTitle": "Créer une clé de secours",
+      "offerText": "Elle déverrouille les données chiffrées si vous n’avez plus aucun appareil jumelé. Sans elle, elles sont perdues.",
+      "later": "Plus tard",
+      "create": "Créer la clé",
+      "showTitle": "Votre clé de secours",
+      "showText": "Notez-la sur papier, loin de cet appareil. Elle ne s’affiche qu’une fois.",
+      "label": "Clé de secours",
+      "copy": "Copier",
+      "copied": "Copié",
+      "done": "Je l’ai notée",
+      "enterTitle": "Saisir la clé de secours",
+      "field": "Clé de secours",
+      "hint": "Espaces et tirets facultatifs.",
+      "unlock": "Déverrouiller",
+      "cancel": "Annuler",
+      "errorLength": "La clé compte 26 caractères.",
+      "errorCharacters": "La clé contient les lettres A à Z et les chiffres 2 à 7.",
+      "errorWrong": "Cette clé ne déverrouille pas ce compte.",
+      "failed": "Opération impossible. Réessayez."
+    },
+    "join": {
+      "title": "Jumeler cet appareil",
+      "recognised": "Reconnues",
+      "added": "Nouvelles",
+      "toConfirm": "À confirmer",
+      "thisDevice": "Cet appareil : {name}",
+      "account": "Votre compte : {name}",
+      "same": "Même pièce",
+      "two": "Deux pièces",
+      "cancel": "Annuler",
+      "join": "Jumeler",
+      "intro": "Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte.",
+      "doneRecognised": { "one": "{n} pièce reconnue", "other": "{n} pièces reconnues" },
+      "doneAdded": { "one": "{n} nouvelle ajoutée", "other": "{n} nouvelles ajoutées" },
+      "doneConfirmed": { "one": "{n} confirmée", "other": "{n} confirmées" },
+      "doneText": "Les données de cet appareil sont réunies avec celles de votre compte : {parts}.",
+      "doneTextNone": "Les données de cet appareil sont réunies avec celles de votre compte.",
+      "doneSync": "Elles se synchronisent maintenant avec vos autres appareils.",
+      "failed": "Impossible de joindre cet appareil. Réessayez."
+    },
+    "locked": {
+      "line": "Verrouillé : jumelez cet appareil",
+      "title": "Données chiffrées verrouillées",
+      "pair": "Jumeler cet appareil",
+      "recoveryKey": "Saisir la clé de secours"
+    },
+    "startOver": {
+      "title": "Repartir sans les données chiffrées",
+      "text": "Les fiches d’urgence, les brevets et les documents sont effacés du compte, sur tous vos appareils. Le carnet, l’équipement, les kits et l’entretien sont gardés.",
+      "cancel": "Annuler",
+      "confirm": "Effacer et repartir",
+      "failed": "Impossible de repartir. Réessayez."
+    },
+    "orphans": {
+      "title": "Données chiffrées illisibles",
+      "text": "Des données chiffrées avec une ancienne clé ne peuvent plus être ouvertes. Effacer les supprime du compte : les brevets et documents concernés, et les informations chiffrées du profil. Le reste est gardé.",
+      "later": "Plus tard",
+      "erase": "Effacer",
+      "failed": "Impossible d’effacer. Réessayez."
+    },
+    "twoDevices": "« {name} » a été modifié sur deux appareils. La modification la plus récente est gardée.",
+    "item": "Un élément",
+    "itemProfile": "Le profil",
+    "different": {
+      "title": "Un autre compte",
+      "text": "Cet appareil a été synchronisé avec un autre compte. « Utiliser ce compte » y ajoute les données de cet appareil ; « Garder séparé » n’envoie rien.",
+      "keep": "Garder séparé",
+      "use": "Utiliser ce compte"
     }
   }
 }

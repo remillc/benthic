@@ -6,6 +6,7 @@ import { BenthicCore } from 'benthic-core';
 import { createFileStore, indexedDbBackend, memoryBackend } from './file-store.js';
 import { createSecretBox } from './secret-box.js';
 import { createProfile, emptyInfo } from './profile.js';
+import { signalAccountData } from './account-sync-signal.js';
 
 /** @typedef {import('./profile.js').DiverInfo} DiverInfo */
 /** @typedef {import('./profile.js').Certification} Certification */
@@ -19,7 +20,7 @@ export const diver = $state({
   certs: [],
 });
 
-/** @type {{ store: ReturnType<typeof createFileStore>, profile: ReturnType<typeof createProfile> }|null} */
+/** @type {{ store: ReturnType<typeof createFileStore>, profile: ReturnType<typeof createProfile>, box: import('./secret-box.js').SecretBox }|null} */
 let opened = null;
 
 /** Written when the device makes its key: after that, an empty key read means a lost key (secret-box.js). */
@@ -66,14 +67,21 @@ function keeper(store) {
 function open() {
   if (!opened) {
     const store = createFileStore(typeof globalThis.indexedDB === 'undefined' ? memoryBackend() : indexedDbBackend());
-    const profile = createProfile(store, createSecretBox(keeper(store)));
-    opened = { store, profile };
+    const box = createSecretBox(keeper(store));
+    const profile = createProfile(store, box);
+    opened = { store, profile, box };
   }
   return opened;
 }
 
 /** The profile service, for the screens that write. */
 export const services = () => open();
+
+/** The store and the data key's box, for the account data sync (lib/account-sync.svelte.js). */
+export const accountDataDeps = () => {
+  const { store, box, profile } = open();
+  return { store, box, profile };
+};
 
 /** Reads everything again from the store. */
 export async function loadProfile() {
@@ -98,5 +106,6 @@ export async function changeProfile(work) {
     return await work(profile);
   } finally {
     await loadProfile();
+    signalAccountData('edit');
   }
 }

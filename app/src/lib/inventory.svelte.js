@@ -12,6 +12,7 @@ import { logbook } from './logbook.svelte.js';
 import { evaluateAll, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
 import { settings } from './settings.svelte.js';
 import { readSnoozed } from './maintenance-snooze.js';
+import { signalAccountData } from './account-sync-signal.js';
 
 /** @typedef {import('./inventory.js').Gear} Gear */
 /** @typedef {import('./inventory.js').DiveEquipment} DiveEquipment */
@@ -108,6 +109,7 @@ export async function change(work) {
     return await work(inv);
   } finally {
     await loadInventory();
+    signalAccountData('edit');
   }
 }
 

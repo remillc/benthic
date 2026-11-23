@@ -652,7 +652,7 @@
   });
 
   /** The steps that draw their own heading (the server's, the Benthic+ screens and the two stops of an upload). */
-  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'benthicPlusConnect', 'benthicPlusOffer', 'benthicPlusAll', 'benthicPlusReady', 'benthicPlusWelcome'];
+  const OWN_HEADING = ['server', 'serverCode', 'serverDownload', 'serverOffline', 'createInterrupted', 'createOffline', 'benthicPlusConnect', 'benthicPlusOffer', 'benthicPlusAll', 'benthicPlusReady', 'benthicPlusWelcome', 'benthicPlusPair'];
 
   /**
    * « Ouvrir mon carnet » of « Votre carnet est prêt »: the core downloaded the logbook through the git sync (mobile), so
@@ -1020,7 +1020,7 @@
           <FirstLaunchServer {step} />
         {:else if step === 'createChoice' || step === 'createName' || step === 'createSend' || step === 'createInterrupted' || step === 'createOffline'}
           <FirstLaunchServerCreate {step} {openInWindow} onfinished={serverCreated} onlater={serverLater} />
-        {:else if step === 'benthicPlusConnect' || step === 'benthicPlusOffer' || step === 'benthicPlusAll' || step === 'benthicPlusReady' || step === 'benthicPlusWelcome'}
+        {:else if step === 'benthicPlusConnect' || step === 'benthicPlusOffer' || step === 'benthicPlusAll' || step === 'benthicPlusReady' || step === 'benthicPlusWelcome' || step === 'benthicPlusPair'}
           <FirstLaunchBenthicPlus {step} onwithout={withoutAccount} onopen={serverOpened} />
         {/if}
       </section>

@@ -6682,7 +6682,7 @@ The phone mock-up « Carnet, menu ouvert · Android » does not show « Exporter
 - **Network error:** the progress step goes red (« divelogs.de ne répond pas » at the login, « Envoi interrompu » with « N sur M plongées envoyées. Vérifiez la connexion, puis réessayez. » while sending, « divelogs.de a refusé l’envoi » for a server error) with « Annuler » and « Réessayer »; « Réessayer » resumes at the batch that failed, with no new password after the login. These texts are mine (the task draws none); the batch whose answer was lost may be sent twice.
 - **Transport:** desktop through the main process (`server.request` now takes a `raw` text body and a timeout), phones through CapacitorHttp with a text body (multipart written by hand), a plain browser through fetch (tests only). Not verified on a device or against the real divelogs.de; the e2e flow `--divelogs-only` runs everything against a fake server (`tests/e2e/fake-divelogs.mjs`).
 
-## [ ] 2026-11-23-338 Account data sync screens (#179): pairing, recovery key, join summary, locked items, two-device notice, start over
+## [x] 2026-11-23-338 Account data sync screens (#179): pairing, recovery key, join summary, locked items, two-device notice, start over
 
 Christian approved this on 23 November 2026. Work in `main`. These are the screens of step 6 of `docs/account-sync.md` (#164). Mock-ups: a new block « Synchronisation du compte (Benthic+) » on each page, right under the Profil block: « Android · … » on the phone canvas, « Tablette Android · … » and « Bureau · … » on the tablet and desktop canvas. Every screen is a basic dialog over the profile (no ✕), except the phone camera screens. Board titles end in « (Benthic+) · Android », « · tablette Android, paysage » or « · bureau ». The whole section exists only for Benthic+ accounts.
 
@@ -6710,6 +6710,8 @@ Christian approved this on 23 November 2026. Work in `main`. These are the scree
 12. « Avis « modifié sur deux appareils » »: a snackbar « « <name> » a été modifié sur deux appareils. La modification la plus récente est gardée. » with « OK ». Above the FAB on the phone, centered at the bottom (560 dp) on tablet and desktop.
 
 iPhone and tablet portrait are not drawn: use the same dialogs. In the done note, list the screens built and anything in `docs/account-sync.md` the mock-ups do not cover.
+
+**Done (23 November 2026).** Screens wired in `AccountSyncHost.svelte` and `lib/account-sync-flows.svelte.js` (see docs/account-sync.md, « Wiring »); corrections 342 to 345 and the real-device fixes (confirmation shown before any network call, a first push sends the whole profile, a partial first push is repaired) are in the branch `feature/account-sync-integration`.
 
 ## [x] 2026-11-23-339 Carnet and Sites (Android phone): the search box folds into a magnifier while scrolling, and keeps a search in progress
 
@@ -6768,7 +6770,7 @@ In the done note, say which event now starts selection mode and how the lift is 
 
 **Done (23 November 2026).** The existing 500 ms timer of the list's `pointerdown` handler (`LONG_PRESS_MS` in `Logbook.svelte`) now starts selection mode itself, finger still down: `startSelection(id)` (or one more check when already selecting) for a dive row, `selectTrip` for a trip row. The lift decides nothing any more: `touchend` only clears the lift style and the drag state, and the `pressed` flag makes the click that follows be dropped before Framework7 opens the dive. A move after the threshold keeps the selection (it still drags the dives to a trip, as before); a move over 10 px before the threshold cancels the press, so a scroll and a short tap are unchanged. Feedback: `lib/haptics.js` calls `navigator.vibrate(15)`; the app has no haptics plugin and no VIBRATE permission, so the real vibration needs Christian's go-ahead for `@capacitor/haptics` (Android and iOS selection haptic). Tests: `tests/app/logbook-long-press.test.mjs`, flow « long press » of `tests/e2e/navigation.mjs` (`--long-press-only`; phone and tablet, Android and iOS look).
 
-## [ ] 2026-11-23-342 Correction of task 338: the join summary's intro line is missing
+## [x] 2026-11-23-342 Correction of task 338: the join summary's intro line is missing
 
 Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre cet appareil » dialog (task 338, item 11; mock-up « Premier envoi, résumé et pièces à confirmer (Benthic+) · Android » and its tablet and desktop versions), the app does not show the line under the title. Add it, on every device, between the title and the three counters:
 
@@ -6776,14 +6778,18 @@ Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre 
 
 Body text, 14 sp, on-surface-variant colour, 4 dp under the title and 20 dp above the counters, as in the mock-up.
 
-## [ ] 2026-11-23-343 Correction of task 338: the join summary is « Jumeler cet appareil »
+**Done (23 November 2026).** `JoinSummaryDialog.svelte` shows the line « Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte. » (`accountSync.join.intro`, 14 px, `--bc-text-2`, 4 px under the title) above the counters.
+
+## [x] 2026-11-23-343 Correction of task 338: the join summary is « Jumeler cet appareil »
 
 Christian asked for this on 23 November 2026. Work in `main`. In the first-sync summary dialog (task 338, item 11; mock-ups « Premier envoi, résumé et pièces à confirmer (Benthic+) » on phone, tablet and desktop), on every device:
 - the title « Joindre cet appareil » becomes **« Jumeler cet appareil »** (also the dialog's accessible name);
 - the confirm button « Joindre » becomes **« Jumeler »**.
 The git commit message of the join step (`account-sync.md`: « Joindre cet appareil ») may stay as it is; it is not shown to the diver.
 
-## [ ] 2026-11-23-344 Addition to task 338: confirmation after the first-sync summary
+**Done (23 November 2026).** Title « Jumeler cet appareil » (also the dialog's accessible name) and button « Jumeler » (`accountSync.join.title`, `accountSync.join.join`, fr and en). The test that read the old title now expects the new one (task 343).
+
+## [x] 2026-11-23-344 Addition to task 338: confirmation after the first-sync summary
 
 Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler » in the first-sync summary (tasks 338 item 11 and 343), show a confirmation dialog, on every device. Mock-ups: « Premier envoi, appareil jumelé (Benthic+) » (phone, tablet, desktop), right after the summary board.
 
@@ -6794,11 +6800,15 @@ Christian asked for this on 23 November 2026. Work in `main`. After « Jumeler �
 - Shown once the « Jumeler cet appareil » commit is pushed; on a failure, show the usual sync error instead.
 - If the recovery key offer (338 item 9) follows at the first sync, it comes after this dialog.
 
-## [ ] 2026-11-23-345 Account sheet « Jumeler un nouvel appareil »: the mock-ups now show your row
+**Done (23 November 2026).** After a joined result, `flows.confirmJoin` opens the screen `joined` (`PairedDialog` with `lines`): « Appareil jumelé », « Les données de cet appareil sont réunies avec celles de votre compte : n pièces reconnues, n nouvelles ajoutées, n confirmées. » (zero parts dropped), « Elles se synchronisent maintenant avec vos autres appareils. », one OK. A failed join keeps the usual « Impossible de jumeler » snackbar. The recovery key offer comes after it (the host asks again once the dialog is closed). The mock-ups of this board were not compared pixel by pixel; the dialog reuses the « Appareil jumelé » one.
+
+## [x] 2026-11-23-345 Account sheet « Jumeler un nouvel appareil »: the mock-ups now show your row
 
 Christian asked for this on 23 November 2026. Work in `main`. The row you added in `AccountSheet.svelte` and `DesktopAccountSheet.svelte` (QR icon, « Jumeler un nouvel appareil », « Donne accès aux données chiffrées », chevron, only for a subscriber whose device holds the data key, `accountLock.canPair`) is now drawn in the subscriber account sheets: « Feuille du compte, avec « Mon profil de plongeur » · Android », the iPhone subscriber account sheet, the tablet account sheet and the desktop account sheet. It sits right after « Sauvegarde et restauration », in the same group, with a divider like the rows above, and opens « Appareil déjà jumelé, montrer le code ».
 
 Check that the app matches on every device (position, divider, icon, texts, the row hidden when `canPair` is false) and fix any gap. It is not in the free account sheet. In the done note, say what you changed, or that nothing needed to change.
+
+**Done (23 November 2026).** Checked in `AccountSheet.svelte` (Android card with divider; iOS group) and `DesktopAccountSheet.svelte`: the row sits right after « Sauvegarde et restauration », subscriber only, hidden when `accountLock.canPair` is false, QR icon, texts and chevron as described. Nothing needed to change (the mock-ups were not compared pixel by pixel).
 
 ## [x] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
 
@@ -6833,7 +6843,7 @@ Mock-ups (the reference for the navigation; the other boards still show the olde
 
 In the done note, list the devices and files changed, and say what the badge counts in code.
 
-## [ ] 2026-11-23-348 Pairing starts by itself at sign-in on a device without the data key, says where to go on the other device, and can be restarted (TODO #180, #182)
+## [x] 2026-11-23-348 Pairing starts by itself at sign-in on a device without the data key, says where to go on the other device, and can be restarted (TODO #180, #182)
 
 Christian approved this on 23 November 2026. Work in `main`. Note: the pairing **method** (QR code) will be replaced by an approval with a verification code in a next task (#183); build what follows so that only the « how » changes later.
 
@@ -6841,7 +6851,9 @@ Christian approved this on 23 November 2026. Work in `main`. Note: the pairing *
 2. **Where to find the code (#180.1).** In « Déverrouiller vos données chiffrées » (all devices), the pairing row's second line reads « Sur l’autre appareil : Compte › Jumeler un nouvel appareil » (phone and tablet), and the note under the rows reads « En attendant, le reste du compte se synchronise. Vous pourrez jumeler plus tard depuis Compte. ».
 3. **Restart later (#180.2).** While the encrypted data is locked on this device, the account sheet shows a row « Jumeler cet appareil » (lock icon, second line « Données chiffrées verrouillées sur cet appareil » in the warning colour #8A5A00) in place of « Jumeler un nouvel appareil ». It opens the pairing step again. Mock-ups: « Feuille du compte, données chiffrées verrouillées (Benthic+) » on phone, tablet and desktop. The « Verrouillé : jumelez cet appareil » card of the profile keeps its two buttons.
 
-## [ ] 2026-11-23-349 Pairing without a QR code: an approval with a verification code (TODO #183; replaces the QR pairing of tasks 338 and 348)
+**Done (23 November 2026).** (1) Sign-in step (#182): `FirstLaunchServer` calls `probeSignInKeys` right after the logbook download (it clones the working copy of the `benthic` branch and reads `keys/account.json`, nothing of the data). Device without the key while the account has one: a phone goes to the new step `benthicPlusPair` (`FirstLaunchBenthicPlus`: title, reason, « Vos appareils jumelés », « Demander l’accès », « Saisir la clé de secours », « Plus tard », the note) before « Votre carnet est prêt »; a tablet and a desktop go to « Votre carnet est prêt » and « Déverrouiller vos données chiffrées » opens by itself over it. The step goes on by itself when the key arrives. (2) Where to find it (#180.1): replaced by task 349's wording: the first row's second line is « À approuver sur <names> » and the note is « La demande s’affiche sur vos appareils jumelés. En attendant, le reste du compte se synchronise ; vous pourrez jumeler plus tard depuis Compte. » (3) Restart (#180.2): while the data is locked the account sheet shows « Jumeler cet appareil » (lock icon, « Données chiffrées verrouillées sur cet appareil » in the pending colour `--bc-pending`, #8A4B00, not #8A5A00: no variable has that value), on the Android, iPhone and desktop sheets; it opens the request. The « Verrouillé » card keeps its two buttons. The mock-ups are not in the repository: built from the task's text.
+
+## [x] 2026-11-23-349 Pairing without a QR code: an approval with a verification code (TODO #183; replaces the QR pairing of tasks 338 and 348)
 
 Christian decided this on 23 November 2026. Work in `main`. The QR pairing (338 items 2, 7 and 8; 348's « Lire le code ») is replaced on every device by a request approved on an already paired device, checked with a 6-digit code. No camera; the same path on phone, tablet and desktop. The recovery key stays. Mock-ups: block « Synchronisation du compte (Benthic+) » on each canvas, groups « Nouvel appareil », « Demande d’accès, nouvel appareil » and « Demande d’accès, appareil jumelé »; phone sign-in step « Benthic+, jumeler cet appareil à la connexion (Benthic+) · Android ». The QR boards were deleted.
 
@@ -6865,7 +6877,9 @@ Christian decided this on 23 November 2026. Work in `main`. The QR pairing (338 
 
 In the done note, list what was removed and how the request reaches a closed app on each platform.
 
-## [ ] 2026-11-23-350 Addition to task 349: « Plus d’appareil ni de clé ? » where the diver may be stuck
+**Done (23 November 2026).** Protocol and code derivation: `docs/account-sync.md`, « Pairing by approval » (`account-keys.js`, `account-pairing.js`). **The code is derived from the request's id, the device name and the new device's public key, not from both public keys**: the new device shows it before the paired device has a key; the paired device's key is bound by the ECDH itself. A swapped key, name or id gives a different code. Residual limit written down: 6 digits are 20 bits, so a server that grinds keys could match one; a longer code or a commit step would close it (decision for you). New device: « Demande d’accès envoyée » (names, code « 482 913 » in monospace, « En attente d’une réponse… » with the wavy line, countdown, « Annuler »), « Demande refusée » (names who refused: the refusing device leaves a marker `keys/pairing/<id>.json` with its name and no secret), « Demande expirée », each with « Fermer » and « Nouvelle demande »; « Appareil jumelé ». Paired device: the dialog « Donner accès à « <name> » ? » with « Les codes sont différents », « Refuser », « Autoriser »; the mismatch dialog « Demande refusée »; the snackbar « « <name> » a maintenant accès aux données chiffrées. ». Only one device needs to answer: the others' dialog closes at their next look. **How the request reaches a device:** the paired device polls the branch every 15 s while the app runs (and after each sync run, and when it comes back to the front); a system notification (« Donner accès à « <name> » ? ») is shown if the app is in the background and the notification permission is already granted (local notifications on phone and tablet, `Notification` on the desktop). **A closed app is not woken: no push through the server exists yet**; the request waits for the next start of the app. The line « même si Benthic y est fermé » therefore reads « dès que Benthic y est ouvert ». The paired devices list uses `keys/devices/<id>.json` records (name, last seen) written by each paired device after a sync, at most every 6 hours. Removed: the QR display (`PairShowCode`), the scanner use (`lib/pair-scan.js`; the native `mode: 'text'` stays, unused), « Lire le code d’un ordinateur », the desktop QR, the QR payload and the camera pairing in `account-keys.js`, and the account sheet row « Jumeler un nouvel appareil » on every device (`accountLock.canPair`, `onpairnew`). Tests: `tests/app/account-keys.test.mjs`, `account-pairing-second-device.test.mjs`, `account-sync-keys.test.mjs`, `account-sync-screens.test.mjs`; `tests/desktop/account-sync.test.mjs` updated (dev stack, skipped without it). The mock-ups are not in the repository: built from the text.
+
+## [x] 2026-11-23-350 Addition to task 349: « Plus d’appareil ni de clé ? » where the diver may be stuck
 
 Christian asked for this on 23 November 2026. Work in `main`. A diver can be stuck on a device without the data key while no paired device can answer: the only phone was lost or broken and he signs in on a new one, he reinstalled the app or reset his only device (the key is never backed up off the device), or every device was replaced at once. Without a recovery key, « Repartir sans les données chiffrées » is the only way out, so make it reachable there:
 
@@ -6873,6 +6887,8 @@ Christian asked for this on 23 November 2026. Work in `main`. A diver can be stu
 2. « Demande expirée » (task 349 item 4), on every device: the same text button. Phone: on its own line above « Fermer » / « Nouvelle demande »; tablet and desktop: on the left of the button row.
 
 Both open « Repartir sans les données chiffrées » (task 338 item 6), unchanged.
+
+**Done (23 November 2026).** « Plus d’appareil ni de clé ? » is a centred text button under the note of the phone step `benthicPlusPair`, and in « Demande expirée » on every device (phone: its own line above « Nouvelle demande » and « Fermer »; tablet and desktop: left of the row). Both open « Repartir sans les données chiffrées » (`openStartOver`), unchanged; once it is done the pairing step goes on. `dialog-fit.js` now also stacks a row whose buttons are pushed past its start edge (a right-aligned row does not report that in `scrollWidth`).
 
 ## [ ] 2026-11-23-351 Download, Bluetooth states: the Bluetooth icon centred, white on a blue disc
 

@@ -26,6 +26,8 @@
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { t } from '../lib/i18n.js';
+  import { isRelease } from '../lib/edition.js';
+  import { askUnlock, probeSignInKeys } from '../lib/account-sync-flows.svelte.js';
 
   /** @type {{ step: 'server'|'serverCode'|'serverOffline'|'serverDownload' }} */
   let { step } = $props();
@@ -230,7 +232,16 @@
         return;
       }
       Object.assign(flow.plus.counts, opened.counts);
+      // A device without the account's data key is paired before « Votre carnet est prêt »: a phone has its own step, a tablet and a
+      // computer open « Déverrouiller vos données chiffrées » by themselves (task 2026-11-23-348).
+      const probe = isRelease ? await probeSignInKeys() : { pairNeeded: false };
+      if (cancelled) return;
+      if (probe.pairNeeded && layout.phone && !desktopApp) {
+        go('pair');
+        return;
+      }
       go('ready');
+      if (probe.pairNeeded) askUnlock();
     } catch (e) {
       if (cancelled) return;
       if (e instanceof ServerLogbookError && e.code === 'REFUSED') {

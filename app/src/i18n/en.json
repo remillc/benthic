@@ -2782,6 +2782,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
       "Logbook: while the app exchanges with the server at start, a white line is drawn on the faint profile of the header, on every device: a segment slides while the progress is unknown, then the line fills up, completes and fades. It replaces the wavy bar.",
       "Sync: synchronisation is always automatic. The « Sync automatically » switch and the manual mode are gone; « Wi-Fi or cable only » and « Sync now » stay, and changes not sent still show when the device is offline.",
       "Logbook: a long press on a dive or a trip starts selection mode as soon as it is recognised, with the finger still down and a short haptic tap on phones and tablets; letting go no longer decides.",
@@ -6898,6 +6899,151 @@
       "sent": "Report sent",
       "tooMany": "Too many reports today. Try again tomorrow.",
       "failed": "Report not sent. Check the connection, then try again."
+    }
+  },
+  "accountSync": {
+    "unlock": {
+      "title": "Unlock your encrypted data",
+      "pair": "Ask a paired device for access",
+      "pairLine": "To approve on {names}",
+      "pairLineNone": "To approve on one of your paired devices",
+      "recoveryKey": "Enter the recovery key",
+      "meanwhile": "The request shows on your paired devices. Meanwhile, the rest of the account syncs; you can pair later from Account.",
+      "later": "Later",
+      "lost": "No device or key left?"
+    },
+    "device": {
+      "androidPhone": "Android phone",
+      "androidTablet": "Android tablet",
+      "iphone": "iPhone",
+      "ipad": "iPad",
+      "windows": "Windows computer",
+      "mac": "Mac computer",
+      "linux": "Linux computer",
+      "unknown": "Other device"
+    },
+    "pair": {
+      "askTitle": "Access request sent",
+      "askNames": "To approve on {names}",
+      "askHint": "Open Benthic on a device that is already paired and approve this device.",
+      "waiting": "Waiting for an answer…",
+      "codeLabel": "Verification code",
+      "expires": "The request expires in {time}",
+      "cancel": "Cancel",
+      "close": "Close",
+      "again": "New request",
+      "declinedTitle": "Request declined",
+      "declinedText": "Access was declined on “{name}”. Nothing was shared.",
+      "declinedTextAnon": "Access was declined. Nothing was shared.",
+      "expiredTitle": "Request expired",
+      "expiredText": "No paired device answered in time. Nothing was shared.",
+      "endedTitle": "Pairing failed",
+      "endedText": "The answer could not be read. Ask again.",
+      "approveTitle": "Give access to “{name}”?",
+      "approveText": "This device asks to read your profile, certifications and encrypted documents. Check that it shows the same code.",
+      "mismatch": "The codes are different",
+      "refuse": "Decline",
+      "allow": "Approve",
+      "mismatchTitle": "Request declined",
+      "mismatchText": "The codes did not match: the request may not have come from your device. “{name}” did not get access, and nothing was shared.",
+      "mismatchAdvice": "If you did not ask for anything, check who can read your e-mail: signing in to Benthic uses a code sent by e-mail.",
+      "doneTitle": "Device paired",
+      "doneText": "The encrypted data is unlocked on this device.",
+      "lockedEntry": "Pair this device",
+      "lockedLine": "Encrypted data locked on this device",
+      "approved": "“{name}” now has access to the encrypted data.",
+      "requestGone": "The request has expired or was withdrawn.",
+      "offline": "No connection. Try again.",
+      "failed": "Pairing failed. Try again."
+    },
+    "notify": {
+      "title": "Give access to “{name}”?",
+      "body": "Verification code {code}. Tap to answer."
+    },
+    "devices": {
+      "title": "Your paired devices",
+      "seenToday": "seen today",
+      "seenYesterday": "seen yesterday",
+      "seenDays": { "one": "seen {n} day ago", "other": "seen {n} days ago" },
+      "line": "The request shows on these devices as soon as Benthic is open on them. Approving it on one of them is enough.",
+      "none": "No paired device is known. Use the recovery key, or start over without the encrypted data."
+    },
+    "pairStep": {
+      "title": "Pair this device",
+      "reason": "Your account has encrypted data: profile, certifications and documents. This device does not have the key to read them yet.",
+      "ask": "Request access",
+      "later": "Later",
+      "note": "The rest of the account is already syncing. You can pair later from Account."
+    },
+    "key": {
+      "offerTitle": "Create a recovery key",
+      "offerText": "It unlocks the encrypted data if you have no paired device left. Without it, the data is lost.",
+      "later": "Later",
+      "create": "Create the key",
+      "showTitle": "Your recovery key",
+      "showText": "Write it on paper, away from this device. It is shown only once.",
+      "label": "Recovery key",
+      "copy": "Copy",
+      "copied": "Copied",
+      "done": "I wrote it down",
+      "enterTitle": "Enter the recovery key",
+      "field": "Recovery key",
+      "hint": "Spaces and dashes are optional.",
+      "unlock": "Unlock",
+      "cancel": "Cancel",
+      "errorLength": "The key has 26 characters.",
+      "errorCharacters": "The key has the letters A to Z and the digits 2 to 7.",
+      "errorWrong": "This key does not unlock this account.",
+      "failed": "Could not finish. Try again."
+    },
+    "join": {
+      "title": "Pair this device",
+      "recognised": "Recognised",
+      "added": "New",
+      "toConfirm": "To confirm",
+      "thisDevice": "This device: {name}",
+      "account": "Your account: {name}",
+      "same": "Same piece",
+      "two": "Two pieces",
+      "cancel": "Cancel",
+      "join": "Pair",
+      "intro": "This device already had equipment. Benthic compared it with the equipment of your account.",
+      "doneRecognised": { "one": "{n} piece recognised", "other": "{n} pieces recognised" },
+      "doneAdded": { "one": "{n} new piece added", "other": "{n} new pieces added" },
+      "doneConfirmed": { "one": "{n} confirmed", "other": "{n} confirmed" },
+      "doneText": "The data of this device is merged with that of your account: {parts}.",
+      "doneTextNone": "The data of this device is merged with that of your account.",
+      "doneSync": "It now syncs with your other devices.",
+      "failed": "Could not join this device. Try again."
+    },
+    "locked": {
+      "line": "Locked: pair this device",
+      "title": "Encrypted data locked",
+      "pair": "Pair this device",
+      "recoveryKey": "Enter the recovery key"
+    },
+    "startOver": {
+      "title": "Start over without the encrypted data",
+      "text": "Emergency sheets, certifications and documents are erased from the account, on all your devices. The logbook, gear, kits and maintenance are kept.",
+      "cancel": "Cancel",
+      "confirm": "Erase and start over",
+      "failed": "Could not start over. Try again."
+    },
+    "orphans": {
+      "title": "Unreadable encrypted data",
+      "text": "Data encrypted with an old key can no longer be opened. Erasing removes it from the account: the certifications and documents concerned, and the profile’s encrypted information. Everything else is kept.",
+      "later": "Later",
+      "erase": "Erase",
+      "failed": "Could not erase. Try again."
+    },
+    "twoDevices": "“{name}” was changed on two devices. The most recent change is kept.",
+    "item": "An item",
+    "itemProfile": "The profile",
+    "different": {
+      "title": "Another account",
+      "text": "This device last synced with another account. “Use this account” adds this device’s data to it; “Keep separate” sends nothing.",
+      "keep": "Keep separate",
+      "use": "Use this account"
     }
   }
 }

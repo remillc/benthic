@@ -218,6 +218,12 @@ final class QrScanController: UIViewController, AVCaptureMetadataOutputObjectsDe
 
     private func handle(_ value: String) {
         if finished || asking { return }
+        // Text mode (the account pairing screens): the first code, whatever it holds, ends the scan; the web layer checks it.
+        if options["mode"] as? String == "text" {
+            finished = true
+            complete([value])
+            return
+        }
         guard value.hasPrefix("OD") else { return flash(text("foreign")) }
         guard let head = parseHeader(value) else {
             let magic = value.components(separatedBy: "~")[0]

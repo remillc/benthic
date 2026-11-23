@@ -15,6 +15,8 @@
   import { t } from '../lib/i18n.js';
   import { documentsLine } from '../lib/documents-text.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
+  import LockedDataCard from '../components/LockedDataCard.svelte';
+  import { accountLock } from '../lib/locked-data.svelte.js';
   import { profileWide } from '../lib/profile-frame.js';
   import { desktopApp, layout } from '../lib/layout.svelte.js';
 
@@ -45,7 +47,7 @@
     <span class="bc-profile--emergency-icon"><Icon name="warning" size={22} weight={1.8} /></span>
     <span class="bc-profile--texts">
       <span class="bc-profile--emergency-label">{t('emergency.entry')}</span>
-      <span class="bc-profile--emergency-text">{t('emergency.entryText')}</span>
+      <span class="bc-profile--emergency-text">{accountLock.locked ? t('accountSync.locked.line') : t('emergency.entryText')}</span>
     </span>
     <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
   </a>
@@ -74,7 +76,7 @@
       <span class="bc-profile--tile bc-profile--tile-violet"><Icon name="idCard" size={22} weight={1.8} /></span>
       <span class="bc-profile--texts">
         <span class="bc-profile--label">{t('gear.profile.certifications')}</span>
-        <span class="bc-profile--supporting">{certsLine}</span>
+        <span class="bc-profile--supporting">{accountLock.locked ? t('accountSync.locked.line') : certsLine}</span>
       </span>
       <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
@@ -82,11 +84,13 @@
       <span class="bc-profile--tile bc-profile--tile-red"><Icon name="account" size={22} weight={1.8} /></span>
       <span class="bc-profile--texts">
         <span class="bc-profile--label">{t('gear.profile.information')}</span>
-        <span class="bc-profile--supporting">{t('gear.profile.informationLine')}</span>
+        <span class="bc-profile--supporting">{accountLock.locked ? t('accountSync.locked.line') : t('gear.profile.informationLine')}</span>
       </span>
       <span class="bc-profile--chevron"><Icon name="chevron" size={20} /></span>
     </a>
   </div>
+
+  {#if accountLock.locked}<LockedDataCard />{/if}
 
   <p class="bc-profile--note"><Icon name="info" size={18} /><span>{t('gear.profile.kept')}</span></p>
 {/snippet}

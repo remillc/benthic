@@ -25,6 +25,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { t } from '../lib/i18n.js';
+  import { accountLock } from '../lib/locked-data.svelte.js';
 
   const email = $derived(emailOfAccount(benthicPlusAccount, logbook));
   // A Benthic+ account shows the diver's full name first and the e-mail under it (task 2026-11-19-312).
@@ -326,6 +327,13 @@
         <span class="bc-desktop-account--row-texts"><span>{t('account.sheet.backup')}</span><span class="bc-desktop-account--row-line">{t('account.sheet.backupText')}</span></span>
         <Icon name="chevron" size={20} />
       </button>
+      {#if accountLock.locked}
+        <button type="button" class="bc-desktop-account--row bc-desktop-account--profile" data-row="pair" onclick={() => leaveTo(accountLock.onpair)}>
+          <Icon name="lock" size={22} />
+          <span class="bc-desktop-account--row-texts"><span>{t('accountSync.pair.lockedEntry')}</span><span class="bc-desktop-account--row-line bc-desktop-account--row-line-locked">{t('accountSync.pair.lockedLine')}</span></span>
+          <Icon name="chevron" size={20} />
+        </button>
+      {/if}
     {/if}
     {#if free || subscriber}
       <div class="bc-desktop-account--divider"></div>
@@ -527,6 +535,11 @@
 
       &.bc-desktop-account--late-line {
         color: var(--bc-late-text);
+      }
+
+      /* « Données chiffrées verrouillées sur cet appareil »: the warning colour (pending). */
+      &.bc-desktop-account--row-line-locked {
+        color: var(--bc-pending);
       }
     }
     .bc-desktop-account--late-badge {

@@ -53,6 +53,7 @@
   import SharedSitesTerms from './components/SharedSitesTerms.svelte';
   import { startSharedSites } from './lib/shared-sites.svelte.js';
   import ConflictHost from './components/ConflictHost.svelte';
+  import AccountSyncHost from './components/AccountSyncHost.svelte';
   import QrReceived from './components/QrReceived.svelte';
   import ValidationConfirm from './components/ValidationConfirm.svelte';
   import { connection } from './lib/online.svelte.js';
@@ -406,6 +407,13 @@
     void loadValidations().then(() => (online ? Promise.all([flushQueue(), refreshPending()]) : undefined)).catch((e) => console.error('Validations', e));
   });
 
+  // The diver's account data (profile, equipment, kits, maintenance, certifications) is synced with the Benthic server once the
+  // logbook is open and a Benthic+ session exists (docs/account-sync.md); the triggers live in lib/account-sync.svelte.js.
+  $effect(() => {
+    if (!isRelease || sideWindow || !benthicPlusAccount.signedIn || logbook.loading || logbook.welcome || logbook.error) return;
+    void import('./lib/account-sync.svelte.js').then((m) => m.startAccountSync()).catch((e) => console.error('Account data sync', e));
+  });
+
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
   $effect(() => {
     document.documentElement.classList.toggle('bc-bottom-nav-on', bottomNav() && navigation.atRoot);
@@ -502,6 +510,7 @@
   {#if isRelease}<SharedSitesTerms />{/if}
   <ErrorReportHost />
   <ConflictHost />
+  {#if isRelease}<AccountSyncHost />{/if}
   <QrReceived />
   <ValidationConfirm />
   <FileImportProgress />

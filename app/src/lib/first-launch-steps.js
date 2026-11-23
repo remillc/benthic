@@ -30,7 +30,7 @@
  *   |'import'|'importDivelogs'|'importProgress'|'importNew'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
  *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
- *   |'benthicPlusConnect'|'benthicPlusOffer'|'benthicPlusAll'|'benthicPlusReady'|'benthicPlusWelcome'
+ *   |'benthicPlusConnect'|'benthicPlusOffer'|'benthicPlusAll'|'benthicPlusReady'|'benthicPlusWelcome'|'benthicPlusPair'
  *   |'createChoice'|'createName'|'createSend'|'createInterrupted'|'createOffline'} Step
  */
 
@@ -72,6 +72,9 @@ const FORWARD = {
   'benthicPlusOffer:signIn': 'benthicPlusConnect',
   'benthicPlusWelcome:next': 'benthicPlusReady',
   'serverDownload:ready': 'benthicPlusReady',
+  // A device without the account's data key (task 2026-11-23-348): the pairing step comes before « Votre carnet est prêt ».
+  'serverDownload:pair': 'benthicPlusPair',
+  'benthicPlusPair:ready': 'benthicPlusReady',
   'createChoice:blank': 'createName',
   'createChoice:send': 'createSend',
   'createName:offline': 'createOffline',
@@ -171,7 +174,7 @@ export function hasBack(step, leavable = false) {
  * (« Annuler l'envoi », « Reprendre l'envoi », « Revenir à l'accueil »), and the end of the Benthic+ screens, which
  * leave through their own buttons.
  */
-const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'benthicPlusOffer', 'benthicPlusReady', 'benthicPlusWelcome']);
+const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'benthicPlusOffer', 'benthicPlusReady', 'benthicPlusWelcome', 'benthicPlusPair']);
 
 /**
  * What the system Back (Android back key and gesture, predictive back; the iOS left-edge swipe) does on a step. It does

@@ -158,14 +158,15 @@ test('migration retries if the profile changes during encryption', async () => {
   assert.equal((await store.read('profile/diver.json')).future, 'newer');
 });
 
-test('migration with an unavailable key keeps the old profile unchanged', async () => {
+test('migration with an unavailable key keeps the old profile unchanged and reads without error', async () => {
   const original = setup();
   const enc = await original.box.seal({ fullName: 'Diver' }, { id: 'profile', format: 1 });
   const file = { format: 1, dateOfBirth: '1980-01-02', enc };
   await original.store.write('profile/diver.json', file);
   const foreignBox = createSecretBox({ read: async () => '', write: async () => { throw new Error('unexpected key write'); } });
   const foreign = createProfile(original.store, foreignBox);
-  await assert.rejects(foreign.readInfo(), /MISSING_DATA_KEY/);
+  // A missing key is an expected state (the account's key before the pairing): the read gives what is in clear and seals nothing.
+  assert.equal((await foreign.readInfo()).dateOfBirth, '1980-01-02');
   assert.deepEqual(await original.store.read('profile/diver.json'), file);
 });
 

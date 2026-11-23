@@ -2049,6 +2049,21 @@ html.md {
       }
     }
 
+    /* The notice « modifié sur deux appareils » (task 2026-11-23-338): centred, 560 dp, on a tablet and the desktop. */
+    @media (min-width: 768px) {
+      &.bc-snackbar-center {
+        width: min(560px, calc(100% - 32px));
+        max-width: none;
+        margin: 0 auto;
+      }
+    }
+
+    /* Three lines for a notice that names an item. */
+    &.bc-snackbar-long .toast-text {
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+    }
+
     /* A FAB is 56 dp at 16 dp from the bottom: 16 dp of air above it. */
     &.bc-snackbar-above-fab {
       --bc-snackbar-bottom: calc(88px + var(--bc-bottom-nav-room, 0px));
