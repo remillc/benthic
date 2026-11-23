@@ -7036,3 +7036,54 @@ Christian decided this on 23 November 2026. Work in `main`. Benthic drops offlin
 Mock-ups: the « Cartes hors ligne » subgroups are deleted from the phone and tablet canvases and « Réglages · bureau, cartes hors ligne » from the desktop page; every settings, account sheet and offer board is updated (« Feuille du compte, modifications en attente · Android », « Réglages » overviews, « Tout ce qui est inclus » boards, the desktop « Réglages » boards).
 
 **Test:** no « Cartes hors ligne » anywhere in the app (search the translations too); the account sheet's Réglages row has no badge; the Sites map works online as before; upgrading a device that had downloaded regions frees their space.
+
+## [x] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (the « Photos et vidéos » section of the dive detail). Mock-ups: phone canvas, page Android, subgroup « Photos et vidéos (Benthic+) », just before « Plusieurs ordinateurs »: « Photos et vidéos de la plongée, « Tout voir » », « … sélection », « … retirer de la plongée », « Photo en plein écran », « … menu », « Vidéo en plein écran ». Android phone only for now; the other devices come later.
+
+**Gallery** (opened by « Tout voir », and by touching a thumbnail of the section, which opens the viewer on that item).
+- Top app bar: back arrow, title « Photos et vidéos », subtitle « N° 5 · Lake Coleridge · 2014-04-02 » (number, site, date), ⋮ on the right.
+- Under it, one line: green cloud-with-check icon, « 7 photos et 2 vidéos, sur tous vos appareils · 186 Mo ».
+- A grid of square thumbnails, 3 columns, 3 dp gaps, edge to edge, in the order of the dive (time taken). Bottom left of each thumbnail: the depth of the profile at the moment the picture was taken (« 18,4 m », white, 12 sp semibold, small shadow), from the picture's offset in the dive (Subsurface's picture offset) and the profile; no depth when the offset falls outside the dive. Videos: a play disc in the centre and the duration bottom right (« 0:42 »).
+- « Ajouter » is a FAB at the bottom right (56 dp, same style as the Carnet's +: 16 dp corners, #EBEAE5, small shadow), « Ajouter des photos ou des vidéos »; 96 dp of empty space under the grid so it never hides the last row. Same picker as the section's « Ajouter » tile.
+
+**Selection** (long press on a thumbnail).
+- The top bar turns #D4E2F2: ✕ (« Annuler la sélection »), « 2 sélectionnées », then Partager and Retirer (trash icon) on the right. No FAB while selecting.
+- Each thumbnail shows an empty circle top left; a selected one shrinks slightly with rounded corners and a filled #114477 check.
+- Retirer opens a basic dialog (no ✕): « Retirer 2 photos de la plongée ? » (« 2 vidéos », « 1 photo et 1 vidéo » as the case may be), « Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la galerie de l’appareil où vous les avez prises. », buttons « Annuler » and « Retirer » (#B3261E).
+
+**Photo full screen.**
+- Black background, the photo fitted to the width; swipe left and right to go through the dive's pictures; small page dots under it (the current one longer).
+- Over the top, on a dark gradient: back arrow, « 2 sur 9 », Partager, ⋮. Touching the photo hides and shows the bars.
+- At the bottom, one line in white at 85 %: « mer. 2014-04-02, 10 h 11 · Olympus TG-6 » (date and time taken, camera model when the file says it). No depth, no time in the dive, no temperature, no profile.
+- ⋮ menu: « Remplacer la photo du site » (uses this photo as the site's photo) and « Retirer de la plongée » (same dialog as above, for one item). Saving to the device's gallery goes through Partager; no separate item.
+
+**Video full screen.** Same screen, plus the player controls above the bottom line: a 48 dp round Lecture/Pause button, elapsed time, a seek bar, total time, and a mute button. No big play disc over the video while it plays.
+
+**Free user:** none of these screens (the section is hidden, task 359).
+
+**Test:** from a dive with photos and videos, « Tout voir » shows the grid in dive order with depths; the FAB adds pictures; a long press selects, Partager shares, Retirer asks then removes on every device; touching a photo opens it full screen, swiping changes picture, ⋮ offers the two items; a video plays with its controls.
+
+**Done (branch `feature/dive-gallery`, task 367).** Gallery, selection, Partager (system share sheet; « Enregistrer sous… » on desktop), Retirer with confirmation (tombstones in `media/<dive>.json`, synced; server objects and quota unchanged), photo and video viewers, depth under thumbnails (profile at the picture's offset, worked out from the time taken), time and camera from EXIF (JPEG, HEIC). The mock-ups were not in the repository: built from the text. « Remplacer la photo du site »: the site had no photo mechanism, so the choice is stored and synced as `media/site-<position>.json`; nothing displays it yet (where it shows is for Christian or the design agent to decide).
+
+## [x] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Same feature as task 367 (Android phone): same content, same rules (dive order, depth on thumbnails from the picture's offset, Partager, Retirer with confirmation, « Remplacer la photo du site », the bottom line « date, heure · appareil », no depth or profile in the viewer, nothing for a free user). Only the platform patterns change. Mock-ups, subgroup « Photos et vidéos (Benthic+) » on each page: phone canvas, page iPhone (before « Modifier une plongée »); tablet and desktop canvas, pages Tablette (before « Plusieurs ordinateurs »), iPad (after « Modifier une plongée ») and Bureau (before « Téléchargement, partage et voyage »).
+
+**iPhone.**
+- Gallery: navigation bar with the back chevron on the left and, on the right, « Sélectionner » and + (« Ajouter des photos ou des vidéos »); below it, the large title « Photos et vidéos », then « N° 5 · Lake Coleridge · 2014-04-02 », the cloud line (13 pt), and the 3-column grid with 2 pt gaps.
+- Selection (« Sélectionner »): « Annuler » on the left, « 2 sélectionnées » as title; thumbnails show an empty circle top right, a selected one a blue border and a filled check. A bottom toolbar: Partager on the left, « 2 photos sélectionnées » in the middle, the trash on the right.
+- The trash opens an action sheet: the explanation (« Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la photothèque où vous les avez prises. »), the destructive « Retirer 2 photos de la plongée », then « Annuler ».
+- Viewer: black; translucent navigation bar with « ‹ Photos », the title « 2 sur 9 » with the date and time under it, and the « … » button whose pull-down menu has « Remplacer la photo du site ». Translucent bottom toolbar: Partager on the left, the camera model in the middle, the trash (« Retirer de la plongée ») on the right. Swipe to change picture. Video: the player controls sit above the toolbar.
+
+**Android tablet** (landscape mock-ups; portrait follows the same layout). Same as the phone (task 367) with a 6-column grid with 4 dp gaps and 8 dp corners inside 24 dp margins, the FAB at 24 dp from the corner; the viewer centres the picture and adds 56 dp round ‹ › buttons on each side (Précédente, Suivante); the bottom line and the video controls sit under the picture, 120 dp from the sides. Selection and the Retirer dialog are as on the phone.
+
+**iPad.** Like the iPhone, with « ‹ Plongée » as back label, a 6-column grid, and the ‹ › buttons on each side of the viewer.
+
+**Desktop.**
+- « Tout voir » opens a 960 px dialog over the window (28 px corners): « Photos et vidéos » with the dive under it, a filled « + Ajouter » button and ✕ in the header, the cloud line, a 5-column grid (6 px gaps, 8 px corners), and the hint « Double-clic pour ouvrir · Ctrl+clic pour sélectionner plusieurs éléments ». Selected items show the check; with a selection, Partager and Retirer replace « Ajouter » in the header; Suppr also removes (with the confirmation dialog).
+- Viewer: covers the window under the title bar, dark (#0B0B0C). Top bar: ✕ (« Fermer (Échap) »), « 2 sur 9 · mer. 2014-04-02, 10 h 11 · Olympus TG-6 », then Partager, Retirer de la plongée and ⋮ (« Remplacer la photo du site »). The picture is centred, ‹ › buttons on each side (← and → keys too), and a strip of 64 px thumbnails at the bottom with the current one outlined. Video: the controls appear over the bottom of the video.
+
+**Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
+
+**Done (branch `feature/dive-gallery`, task 368).** Gallery, selection, Partager (system share sheet; « Enregistrer sous… » on desktop), Retirer with confirmation (tombstones in `media/<dive>.json`, synced; server objects and quota unchanged), photo and video viewers, depth under thumbnails (profile at the picture's offset, worked out from the time taken), time and camera from EXIF (JPEG, HEIC). The mock-ups were not in the repository: built from the text. « Remplacer la photo du site »: the site had no photo mechanism, so the choice is stored and synced as `media/site-<position>.json`; nothing displays it yet (where it shows is for Christian or the design agent to decide).

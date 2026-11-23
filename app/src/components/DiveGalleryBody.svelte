@@ -367,6 +367,8 @@
     }
 
     .bc-dive-gallery--nav-title {
+      flex: 1;
+      text-align: center;
       margin: 0;
       font-size: 17px;
       font-weight: 600;
@@ -392,6 +394,8 @@
     }
 
     .bc-dive-gallery--nav-right {
+      min-width: 64px;
+      justify-content: flex-end;
       display: flex;
       align-items: center;
     }

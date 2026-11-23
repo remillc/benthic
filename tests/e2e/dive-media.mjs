@@ -502,15 +502,10 @@ export async function diveMediaFlows(h) {
     // Free: the demo and the free version never see the section, whatever the setting says.
     let tab = await openTab(c.w, c.h, c.mobile, false, c.desktop, { theme: process.env.BC_THEME || 'md' });
     await tab.send('Emulation.setLocaleOverride', { locale: 'fr-FR' }).catch(() => {});
-    await tab.run(async () => {
-      const s = await import('/src/lib/settings.svelte.js');
-      s.setAppSetting('showPhotos', true);
-      return 1;
-    });
     await sleep(800);
     await openDive(tab, c.desktop);
     await scrollToSection(tab);
-    expect(`${c.name}: free account, the section is hidden even with the setting on`, { present: false }, await read(tab));
+    expect(`${c.name}: free account, the section is hidden`, { present: false }, await read(tab));
     if (process.env.BC_SHOTS) await shot(tab, `359-${c.name}-${suffix}-free`);
     tab.ws.close();
 
@@ -526,11 +521,8 @@ export async function diveMediaFlows(h) {
       m.refreshMedia();
       return 1;
     });
-    await tab.run(async () => (await import('/src/lib/settings.svelte.js')).setAppSetting('showPhotos', false));
     await sleep(500);
     await openDive(tab, c.desktop);
-    expect(`${c.name}: Benthic+ with « Afficher les champs photos et vidéos » off, the section is hidden`, { present: false }, await read(tab));
-    await tab.run(async () => (await import('/src/lib/settings.svelte.js')).setAppSetting('showPhotos', true));
     await sleep(800);
     await scrollToSection(tab);
     await sleep(500);

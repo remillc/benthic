@@ -451,6 +451,7 @@
 
     .bc-media-viewer--icon {
       flex: none;
+      justify-self: end;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -587,7 +588,9 @@
 
     /* ---------- iPhone and iPad ---------- */
     :global(.bc-media-viewer--ios) .bc-media-viewer--top {
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
       padding: var(--f7-safe-area-top, 0px) 8px 0;
       min-height: 52px;
       box-sizing: content-box;
@@ -601,6 +604,7 @@
     }
 
     .bc-media-viewer--back {
+      justify-self: start;
       display: inline-flex;
       align-items: center;
       min-height: 44px;
@@ -612,6 +616,7 @@
     }
 
     .bc-media-viewer--ios-title {
+      white-space: nowrap;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -624,6 +629,10 @@
     }
 
     .bc-media-viewer--ios-date {
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
       font-size: 11px;
       color: rgb(255 255 255 / 75%);
     }
