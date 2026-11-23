@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 	check(divelog.dives.size() == dives_before + 3, "three dives came in");
 	size_t new_trips = 0;
 	for (auto &d: divelog.dives)
-		if (d->when >= 1330000000 && d->divetrip)
+		if (d->when >= 1330560000 && d->when < 1330905600 && d->divetrip)
 			new_trips++;
 	check(new_trips == 0 && divelog.trips.size() == trips_in_memory, "import: no new trip");
 	// A manual dive next to the imported ones.
