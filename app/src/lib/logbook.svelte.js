@@ -821,6 +821,8 @@ async function syncEdits() {
   let outcome = 'failed';
   try {
     const status = await BenthicCore.syncChanges();
+    // The sync does not say which commit the log is now at: the push channel will find out by syncing.
+    knownHead = '';
     if (status.reloaded) {
       // The cloud brought changes: the merged log was read again, its dives
       // are new objects and the undo history is gone (lib/undo.js).
@@ -1177,11 +1179,20 @@ export async function syncNow() {
   return syncEdits();
 }
 
-/** The head of the dives' branch this device has (its copy of the log, no network): the push channel compares it with the server's. */
+/**
+ * The commit of the dives' branch the shown logbook was read from, when it is known ('' after a sync, which does not
+ * say). Kept here so that nothing has to ask the core: `listCloudDives({ cached: true })` reads the whole log again
+ * and gives every dive a new id, which left the list on screen pointing at dives the core no longer had.
+ */
+let knownHead = '';
+
+/**
+ * The head of the dives' branch this device has, as last known (no core call, no network): the push channel compares
+ * it with the server's. Unknown ('') means « sync to find out »: a fetch, and nothing read again when nothing changed.
+ */
 export async function divesLocalHead() {
   if (!logbook.email || logbook.browsing) return '';
-  const copy = await BenthicCore.listCloudDives({ cached: true });
-  return copy.head ?? '';
+  return knownHead;
 }
 
 /**
@@ -1404,6 +1415,7 @@ async function loadCloud(force, pre = null) {
       if (cached.dives) {
         if (cached.server) logbook.server = cached.server;
         logbook.dives = cached.dives;
+        knownHead = cached.head ?? '';
         logbook.prefs = await prefsAfterLoad();
         logbook.sync = 'cloud';
         await countPending();
@@ -1434,6 +1446,7 @@ async function loadCloud(force, pre = null) {
       logbook.pulling = true;
       logbook.loading = false;
       shownHead = cached.head ?? '';
+      knownHead = shownHead;
     }
   } catch (e) {
     // An unreadable copy is not fatal: the sync below reads the log again.
@@ -1462,6 +1475,8 @@ async function loadCloud(force, pre = null) {
       logbook.dives = fresh.dives;
       logbook.prefs = await prefsAfterLoad();
     }
+    // The server's head when the log is in step with it; otherwise unknown.
+    knownHead = fresh.synced && fresh.head ? fresh.head : '';
     if (fresh.server) logbook.server = fresh.server;
     logbook.sync = fresh.synced ? 'cloud' : 'offline';
     if (fresh.synced) markSynced();

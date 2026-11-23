@@ -66,3 +66,11 @@ test('the wiring closes on pause only on a phone or a tablet; the desktop keeps 
   assert.match(src, /if \(Capacitor\.isNativePlatform\(\)\) \{\s*CapacitorApp\.addListener\('pause', \(\) => gate\.toBack\(\)\)/);
   assert.match(src, /addListener\('resume', \(\) => gate\.toFront\(\)\)/);
 });
+
+test('the push channel learns the local head without asking the core: reading the log again would renumber every dive', () => {
+  const src = readFileSync(new URL('../../app/src/lib/logbook.svelte.js', import.meta.url), 'utf8').split('\r\n').join('\n');
+  const body = src.slice(src.indexOf('export async function divesLocalHead()'));
+  const fn = body.slice(0, body.indexOf('\n}\n') + 2);
+  assert.doesNotMatch(fn, /BenthicCore\./, 'divesLocalHead never calls the core');
+  assert.match(fn, /return knownHead;/);
+});
