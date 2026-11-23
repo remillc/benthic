@@ -362,7 +362,7 @@ media/<dive id>.json               photos and videos of a dive, by hash (section
 dive-validations/<id>.json        validation of one or several dives by a buddy or an instructor (#37, task 309): signer, role, instructor number, method, date, signature PNG, and for each dive its start key and a hash of the dive at the time of signing ("modified after the validation"); one record may hold several dives. Never written into the Subsurface dive file: the façade has no generic door for a dive's extra data, so the record sits beside the logbook keyed like `dive-equipment/` (by start time until dives have their own UUID)
 ```
 
-- **`<id>` is a random UUID (version 4), created once on the device that creates the item, never recomputed, never reused.** It is a field of the file (`"id"`) and the file name.
+- **`<id>` is a short id (10 characters of lowercase Crockford base32, 50 random bits), created once on the device that creates the item, never recomputed, never reused.** It is a field of the file (`"id"`) and the file name. (Before 24 November 2026 it was a UUID v4; the old ids are rewritten deterministically, see docs/account-sync.md, « Short ids ». The *dive's* stable identifier above is a different thing.)
 - A maintenance item holds the `gearId` of its item; a link to a dive is `"diveId": "<dive id from the extra data>"`.
 - JSON is written with sorted keys, two-space indent and a final newline, so that equal data gives equal files and text diffs stay readable.
 - Commits on this branch are made by the app, signed "Benthic", one per validated action.
@@ -427,7 +427,7 @@ dive-validations/<id>.json        validation of one or several dives by a buddy 
   2. Two devices that changed **the same file**: the app does a three-way merge of the JSON objects (base = common ancestor, ours, theirs), key by key, instead of git's text merge. A key changed on one side only takes that change. Arrays (`tags`, `documents`, ...) are one value: changed on one side only, taken; changed on both, a conflict on that key. A key changed on both sides to the same value is not a conflict.
   3. A conflict on a key goes to the choice screen already built for the cloud conflicts (the "sync conflict" state, version choice). Until the person chooses, the later `updatedAt` is kept in the working copy and the other version stays in the history, so nothing is lost and a silent sync never blocks.
   4. Deleting an item deletes its file (git keeps the history). Deleted on one side and changed on the other: the change wins and the file stays; the person can delete it again.
-  5. Two devices that **create** items never collide: the ids are random UUIDs, so the paths differ.
+  5. Two devices that **create** items never collide: the ids are random (50 bits), so the paths differ.
   6. For an encrypted file the app decrypts base, ours and theirs, merges the plaintext objects, and encrypts the result with a fresh nonce.
 
 The merge of these JSON files is JavaScript in `app/src/lib`, tested in `tests/app`; it only needs the files, which the façade's git calls hand over.

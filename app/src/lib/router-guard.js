@@ -21,6 +21,7 @@
 // The system Back (lib/back-button.js), the navbar's arrow and the swipe back (lib/swipe-back.js) all end on
 // `router.back`, so all go through here. Each decision is written to the navigation trace (lib/nav-trace.js).
 import { trace, pathOf } from './nav-trace.js';
+import { resolveUrl } from './short-id.js';
 
 /** The longest a navigation waits before it is dropped (ms): a page change that never ends must not queue for ever. */
 const MAX_WAIT = 3000;
@@ -72,6 +73,19 @@ export function lockRouter(router, why = '', clock = {}) {
   // Node (the tests): the limit must not keep the process alive.
   if (timer && typeof timer === 'object' && typeof timer.unref === 'function') timer.unref();
   return () => release('unlock');
+}
+
+/**
+ * The arguments of a navigate call with the old ids of its address (UUIDs) replaced by the short ids they became, so that a link, a
+ * notification or a screen that still holds an old id lands on the right page (to-do #149).
+ * @param {any[]} args
+ */
+export function withShortIds(args) {
+  const first = args[0];
+  if (typeof first === 'string') return [resolveUrl(first), ...args.slice(1)];
+  if (first && typeof first === 'object' && typeof first.url === 'string') return [{ ...first, url: resolveUrl(first.url) }, ...args.slice(1)];
+  if (first && typeof first === 'object' && typeof first.path === 'string') return [{ ...first, path: resolveUrl(first.path) }, ...args.slice(1)];
+  return args;
 }
 
 /** The address of a navigate call: `navigate('/x')` or `navigate({ url })`. @param {any} target */
@@ -206,8 +220,9 @@ export function guardRouter(router, clock = {}) {
     trace('back', `${nameOf(router)} from ${pathOf(currentUrl(router))}`);
     return raw.back(...args);
   };
-  router.navigate = function (...args) {
+  router.navigate = function (...given) {
     reopenIfStuck();
+    const args = withShortIds(given);
     const url = urlOf(args[0]);
     if (!isBusy(router)) {
       trace('nav', `${nameOf(router)} ${pathOf(url)}`);
@@ -269,7 +284,8 @@ export function guardRouter(router, clock = {}) {
  * @param {GuardedRouter} router
  * @param {...any} args as `router.navigate`
  */
-export function heldNavigate(router, ...args) {
+export function heldNavigate(router, ...given) {
+  const args = withShortIds(given);
   trace('nav', `${nameOf(router)} ${pathOf(urlOf(args[0]))} held`);
   return navigateKeepingMaster(router, (router.bcRaw ?? router).navigate, args);
 }

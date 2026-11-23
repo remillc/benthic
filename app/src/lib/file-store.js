@@ -13,6 +13,7 @@
 //  - apply(writes, removes): all the changes or none (one transaction), so a crash never leaves half a change.
 //  - applyTracked(writes, removes): apply changes and add their paths to meta/pending.json in the same transaction.
 //  - applyTrackedIfUnchanged(expected, writes, removes): the same, only if all files still match expected.
+//  - applyIfUnchanged(expected, writes, removes): apply, without tracking, only if all files still match expected.
 //  - snapshotPending() / acknowledgePending(snapshot): capture and acknowledge unchanged pending files atomically.
 //  - applySyncedIfUnchanged(expected, writes, removes, acknowledged): apply a confirmed server state and acknowledge
 //    the sent versions in one transaction, without overwriting a newer or unsent local change.
@@ -24,6 +25,7 @@
  * @property {(writes: [string, string][], removes: string[]) => Promise<void>} apply
  * @property {(writes: [string, string][], removes: string[]) => Promise<void>} applyTracked
  * @property {(expected: [string, string|null][], writes: [string, string][], removes: string[]) => Promise<boolean>} applyTrackedIfUnchanged
+ * @property {(expected: [string, string|null][], writes: [string, string][], removes: string[]) => Promise<boolean>} applyIfUnchanged
  * @property {() => Promise<[string, string|null][]>} snapshotPending
  * @property {(snapshot: [string, string|null][]) => Promise<void>} acknowledgePending
  * @property {(expected: [string, string|null][], writes: [string, string][], removes: string[], acknowledged: [string, string|null][]) => Promise<boolean>} applySyncedIfUnchanged
@@ -130,6 +132,12 @@ export function memoryBackend() {
       for (const [p, text] of writes) files.set(p, text);
       for (const p of removes) files.delete(p);
       files.set(PENDING, pending);
+      return true;
+    },
+    async applyIfUnchanged(expected, writes, removes) {
+      if (expected.some(([path, text]) => (files.get(path) ?? null) !== text)) return false;
+      for (const [p, text] of writes) files.set(p, text);
+      for (const p of removes) files.delete(p);
       return true;
     },
     async snapshotPending() {
@@ -320,6 +328,33 @@ export function indexedDbBackend(factory = globalThis.indexedDB) {
         tx.onabort = () => reject(failure ?? tx.error);
       });
     },
+    async applyIfUnchanged(expected, writes, removes) {
+      const db = await open();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        const store = tx.objectStore(STORE);
+        let matches = true;
+        let changed = false;
+        let left = expected.length;
+        const apply = () => {
+          if (!matches) return;
+          for (const [p, text] of writes) store.put(text, p);
+          for (const p of removes) store.delete(p);
+          changed = true;
+        };
+        if (!left) apply();
+        for (const [path, text] of expected) {
+          const current = store.get(path);
+          current.onsuccess = () => {
+            if ((current.result ?? null) !== text) matches = false;
+            if (--left === 0) apply();
+          };
+        }
+        tx.oncomplete = () => resolve(changed);
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+    },
     async snapshotPending() {
       const db = await open();
       return new Promise((resolve, reject) => {
@@ -462,6 +497,8 @@ export function createFileStore(backend) {
     /** @param {[string, string|null][]} expected @param {{ writes?: [string, unknown][], removes?: string[] }} changes */
     trackedBatchIfUnchanged: (expected, { writes = [], removes = [] }) =>
       backend.applyTrackedIfUnchanged(expected, writes.map(([p, v]) => [p, sortedJson(v)]), removes),
+    /** Several changes, all or none, only if the files still hold the texts read. Nothing is added to the pending list. @param {[string, string|null][]} expected @param {{ writes?: [string, unknown][], removes?: string[] }} changes */
+    batchIfUnchanged: (expected, { writes = [], removes = [] }) => backend.applyIfUnchanged(expected, writes.map(([p, v]) => [p, sortedJson(v)]), removes),
     snapshotPending: () => backend.snapshotPending(),
     /** @param {[string, string|null][]} snapshot */
     acknowledgePending: (snapshot) => backend.acknowledgePending(snapshot),

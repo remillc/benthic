@@ -163,10 +163,12 @@ export class FakeBgit {
     if (mergeParent) {
       const saved = paths.map((p) => [p, existsSync(join(this.root, dir, p)) ? readFileSync(join(this.root, dir, p), 'utf8') : null]);
       this.git(dir, ['reset', '-q', '--hard', 'HEAD']);
+      // A resolved file that HEAD does not hold (the path of a rename) is written again below: out of the way of the merge.
+      for (const [p] of saved) if (this.tryGit(dir, ['cat-file', '-e', `HEAD:${p}`]) === null) rmSync(join(this.root, dir, p), { force: true });
       try {
         this.git(dir, ['merge', '-q', '--no-commit', '--no-ff', '--allow-unrelated-histories', mergeParent]);
-      } catch {
-        // The conflicts are resolved below.
+      } catch (e) {
+        if (process.env.FAKE_BGIT_DEBUG) console.log('merge threw', String(e.stderr), String(e.stdout));
       }
       for (const [p, text] of saved) {
         if (text === null) {

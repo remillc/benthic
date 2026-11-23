@@ -212,7 +212,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
 
   /** The sealed payload of a profile or certification file; null when its key is missing here. @param {string} path @param {Record<string, any>} file */
   async function open(path, file) {
-    const item = path.startsWith('profile/') ? { id: 'profile', format: Number(file.format ?? 1) } : { id: String(file.id), format: Number(file.format ?? 1) };
+    const item = path.startsWith('profile/') ? { id: 'profile', format: Number(file.format ?? 1) } : { id: String(file.sealId ?? file.id), format: Number(file.format ?? 1) };
     let payload = {};
     if (file.enc) {
       try {
@@ -432,13 +432,13 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
     };
     const certPairs = pair('certification', 'certifications', openLocals, openRemotes, certCompare, (c) => c.payload);
     const certMatch = new Map(certPairs.map(([l, r]) => [l.id, r]));
-    /** @type {{ path: string, from: string, to: string, file: Record<string, any>, payload: Record<string, any>, remotePayload: Record<string, any>|null, localNewer: boolean }[]} */
+    /** @type {{ path: string, from: string, to: string, seal: string, file: Record<string, any>, payload: Record<string, any>, remotePayload: Record<string, any>|null, localNewer: boolean }[]} */
     const certWork = [];
     for (const l of openLocals) {
       handled.add(l.path);
       const r = certMatch.get(l.id);
       if (r) dropLocal.add(l.path);
-      certWork.push({ path: r ? r.path : l.path, from: l.id, to: r ? r.id : l.id, file: r ? r.file : l.file, payload: l.payload, remotePayload: r ? r.payload : null, localNewer: String(l.file.updatedAt ?? '') > String(r?.file.updatedAt ?? '') });
+      certWork.push({ path: r ? r.path : l.path, from: String(l.file.sealId ?? l.id), to: r ? r.id : l.id, seal: String((r ? r.file : l.file).sealId ?? (r ? r.id : l.id)), file: r ? r.file : l.file, payload: l.payload, remotePayload: r ? r.payload : null, localNewer: String(l.file.updatedAt ?? '') > String(r?.file.updatedAt ?? '') });
     }
 
     // Local files no rule above covered (photos, documents, other kinds) go as they are.
@@ -476,7 +476,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
             docs.push(d);
             continue;
           }
-          const sealed = await box.sealBytes(bytes, { id: w.to, format: 1 });
+          const sealed = await box.sealBytes(bytes, { id: w.seal, format: 1 });
           const hash = await sha256Hex(fromBase64(sealed.ct));
           finalFiles.set(`documents/${hash}.json`, { format: 1, enc: sealed });
           dropLocal.add(`documents/${d.hash}.json`);
@@ -485,7 +485,7 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
         const merged = w.remotePayload ? fillMerge(w.remotePayload, w.payload, w.localNewer, new Set(['documents'])) : { ...w.payload };
         const allDocs = [...remoteDocs, ...docs];
         if (allDocs.length) merged.documents = allDocs;
-        const enc = await box.seal(merged, { id: w.to, format: Number(w.file.format ?? 1) });
+        const enc = await box.seal(merged, { id: w.seal, format: Number(w.file.format ?? 1) });
         const changed = !w.remotePayload || !equal(merged, w.remotePayload);
         finalFiles.set(w.path, { ...w.file, id: w.to, enc, updatedAt: changed ? stamp() : w.file.updatedAt });
       }

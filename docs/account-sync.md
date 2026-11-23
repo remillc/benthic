@@ -212,6 +212,64 @@ device already holds the account key, and no other device or recovery key has th
   reference any document), and it never removes a document still waiting to be sent. It is what deletes the card photos of the
   erased certifications.
 
+## Short ids (to-do #149)
+
+Decided on 23 November 2026. Benthic's own ids (pieces, kits, reminders and their history entries, photos, what a dive used and its
+pieces outside the inventory, certifications, validations, the device) are **10 characters of lowercase Crockford base32**
+(`0123456789abcdefghjkmnpqrstvwxyz`, 50 random bits from `crypto.getRandomValues`, no prefix, e.g. `7k2m9q4x1d`):
+`newId()` in `app/src/lib/short-id.js`, re-exported by `inventory.js`. Never touched: the dive ids and the logbook's git format (branch `main`).
+
+**Kept as they are.** The data key's `kid` (derived from key material); the pairing request and answer ids (`keys/requests`, `keys/pairing`:
+22 characters of base64url, ten minutes long, bound into the HKDF salt, the authenticated data and the 6-digit code, whose formula does not
+change; an updated device must still be able to approve a request from a device that has not been updated, and the reverse); nonces and keys;
+`documents/<hash>.json` (named by a hash); a validation's `token`; the Subsurface site uuids.
+
+**Mapping of the old ids** (`shortFromUuid`): the first 50 bits of SHA-256(`benthic-id-v1|` + the UUID in lowercase), five bits per character
+of the same alphabet. No state and no key: every device rewrites on its own and gets the same result, an offline device with edits on old ids
+included. Test vectors: `123e4567-e89b-42d3-a456-426614174000` gives `zqzxj1nyds`; `00000000-0000-4000-8000-000000000000` gives `vxed0vf3ve`
+(checked with Python's hashlib too). The device ids of the first sync build (22 characters of base64url) go through the same function
+(`deriveId`). `resolveId(id)` accepts an old UUID anywhere an id is read and gives the new one: the router guard rewrites every address
+(`/profile/gear/<uuid>/maintenance/note?item=<uuid>`), notification extras (maintenance and documents), the snooze tables of the device store, and
+the profile's card lookups. No other id format exists in the data (every id came from `newId()`, a UUID v4).
+
+**Collisions.** Two old ids with one new id are detected by the planner; the smaller old id keeps the first answer and the other takes the next
+attempt of the same mapping (`benthic-id-v1|<uuid>|1`, `|2`…), so the devices still agree; the answer is recorded in `meta/id-map.json`
+(`{ map: { <uuid>: <short> } }`) and the resolver reads it. (Decision: a counter instead of a fresh random id, because a random id would make two
+devices diverge. A real collision on 50 bits is not expected; the mechanism is tested by forcing one.) A short id that already exists is not counted as
+a collision: if it is what an old id maps to, it is that file's twin (the other device got there first) and the two files are merged.
+
+**Sealed cards.** A sealed block is authenticated with its item's id, and `certifications/<id>.json` plus its photos (`documents/<hash>.json`) use the card's
+id. Rewriting the id must not need the key, and two devices must write the same bytes, so the card is not opened: it gets `sealId` = its old id
+(in clear, next to `id`), and every open or seal of the card and of its photos uses `sealId ?? id` (`sealIdOf`). The ciphertext is untouched; `sealId` stays for
+the card's life. Trade-off: a server could move a card's block and its `sealId` to another card file; it could already copy any file, and all cards
+share one key.
+
+**Local store** (`short-id-migration.js`, `ensureShortIds`): run by `loadInventory` and at the start of each sync run. Once `meta/ids-v1.json`
+exists, a look at the file names is enough (an old id can only come back as a name, e.g. a restored backup). One transaction
+(`batchIfUnchanged`: it retries if a file changed meanwhile) renames the files, rewrites `id` and every reference (`gearIds`, `*GearId`, `kitId`,
+`gearId`, `photoId`, `invoicePhotoId`, history and ad hoc piece ids), adds `sealId` to cards, writes the marker (with the full old-to-new map), the
+backup, and puts every rewritten path, and the old names (as removals), in `meta/pending.json`, next to the pending edits already there. Dates are not
+touched, so the files are the same bytes as another device's. No key is needed. **Rollback:** `meta/backup-short-ids.json` holds the text of every
+file as it was (except `gear-photos/`, which only changes `id`); to go back, write those files, delete the short-named ones, delete `meta/ids-v1.json`
+and the backup (or use the map in the marker, which is a bijection), and publish the old build. On the server the git history of the `benthic` branch
+holds the old tree (`git revert` of the « Short ids » commit).
+
+**The branch** (`shortIdPass` in `account-sync.js`): a commit « Short ids » renames the files of the working copy that carry a UUID and rewrites the references,
+at each run before the local edits are written and after each pull (looking inside the short-named files too after a pull that changed something). Two
+devices doing it at the same time produce the same tree, so git merges the two commits without a conflict. A file that an updated device finds with an old
+name later (a device that has not updated the app pushed it, or an edit made offline on an old id) is mapped by the next run; when its new name is taken, the two
+are merged (a reminder with `mergeMaintenance`, so its history entries are joined by their mapped ids; the other files by the later `updatedAt`). The old build
+keeps working: it does not read short ids as UUIDs anywhere and shows the migrated files as extra files until it is updated. Not done during a pull-only run
+(subscription ended) nor on a first sync (the join comes first).
+
+**Known limit.** A piece deleted offline by a device that still runs the old build, while another device migrates before it syncs, comes back (git sees the
+other device's rename as a new file that the deletion never met). Nothing is lost; deleting it again, now on short ids, is final.
+
+**The device id** (`deviceId`, `ownDeviceId`, `ownLegacyDeviceId` in `account-pairing.js`): one source of truth, `meta/device.json` `id`. An existing id is replaced by
+`deriveId(old id)` and the old one stays in `legacyId` until the next `touchDeviceRecord`, which writes `keys/devices/<new>.json` and deletes
+`keys/devices/<old>.json` in the same commit. Whatever registered the old id elsewhere (the server's `push_tokens.device_id`) registers the new one and removes
+the old (`ownLegacyDeviceId`).
+
 ## Server and native changes
 
 - Server: nothing required for v1 (pushing a `benthic` branch already works; Forgejo refuses non-fast-forward pushes).

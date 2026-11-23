@@ -13,6 +13,8 @@ import { sortedJson } from './file-store.js';
 import { mergeAccountFile, mergeEncryptedAccountFile } from './account-data-merge.js';
 import { mergeMediaFile } from './dive-media.js';
 import { repositoryKey } from './server-logbook.js';
+import { ALIASES_PATH, ensureShortIds, isOldIdPath, newestWins, planShortIds, splitPath } from './short-id-migration.js';
+import { setIdAliases } from './short-id.js';
 import { ACCOUNT_KEY_PATH, DEVICES_DIR, PAIRING_DIR, REQUESTS_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
 
 /** The branch of the account data. */
@@ -114,8 +116,8 @@ const sameFile = (a, b) => (a === null || b === null ? a === b : sortedJson(a) =
 /** The ids of a sealed file's item: the profile is `profile`, a certification its own id. @param {string} path @param {Record<string, any>|null} file */
 function sealedItem(path, file) {
   if (path.startsWith('profile/')) return { id: 'profile', format: Number(file?.format ?? 1) };
-  const id = file?.id ?? path.slice(path.lastIndexOf('/') + 1, -'.json'.length);
-  return { id: String(id), format: Number(file?.format ?? 1) };
+  const id = file?.sealId ?? file?.id ?? path.slice(path.lastIndexOf('/') + 1, -'.json'.length);
+  return { id: String(id), format: Number(file?.format ?? 1), ...(file?.id ? { fileId: String(file.id) } : {}) };
 }
 
 /** A profile file that still holds its date of birth in clear: it is sealed on the device before it may leave (docs/architecture.md, 11.5). @param {string} path @param {Record<string, any>|null} file */
@@ -324,6 +326,53 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
     await core.bgitWrite({ dir, files: writes });
     await core.bgitCommit({ dir, paths: writes.map((w) => w.path), message: 'Benthic: clean-up', ...author });
     return writes.length;
+  }
+
+  /**
+   * « Short ids » (to-do #149): the files of the working copy that still carry a UUID are renamed and their references rewritten, in one
+   * commit. The mapping is a function of the old id (lib/short-id.js), so two devices that do it at once write the same tree. A file
+   * pushed later by a device that has not updated the app (an old id again) is mapped by the next pass; if its new name is taken, the
+   * two files are merged (`mergeMaintenance` for a reminder, the later `updatedAt` for the others). `deep`: also read the files of the
+   * short names for a reference to an old id (after a pull that changed something).
+   * @param {string} dir @param {boolean} deep
+   * @returns {Promise<number>} the files written or removed
+   */
+  async function shortIdPass(dir, deep) {
+    const { files } = await core.bgitFiles({ dir });
+    const old = files.filter(isOldIdPath);
+    if (!old.length && !deep) return 0;
+    const wanted = files.filter((p) => splitPath(p) && (!p.startsWith('gear-photos/') || isOldIdPath(p)));
+    if (!wanted.length) return 0;
+    const { texts } = await core.bgitRead({ dir, paths: wanted });
+    /** @type {Map<string, Record<string, any>>} */
+    const tree = new Map();
+    wanted.forEach((path, i) => {
+      try {
+        const value = parse(texts[i]);
+        if (value && typeof value === 'object') tree.set(path, value);
+      } catch {
+        // An unreadable file is left as it is.
+      }
+    });
+    const aliases = (await store.read(ALIASES_PATH))?.map ?? {};
+    const plan = planShortIds({
+      files: tree,
+      aliases,
+      merge: (folder, a, b) => {
+        if (folder === 'certifications/') return newestWins(a, b);
+        const merged = folder === 'maintenance/' ? mergeMaintenance(null, a, b) : mergeGeneric(null, a, b);
+        return /** @type {Record<string, any>} */ (merged.value ?? a);
+      },
+    });
+    if (!plan.writes.size && !plan.removes.length) return 0;
+    const changes = [...[...plan.writes].map(([path, value]) => ({ path, text: /** @type {string|null} */ (sortedJson(value)) })), ...plan.removes.map((path) => ({ path, text: /** @type {string|null} */ (null) }))];
+    await core.bgitWrite({ dir, files: changes });
+    await core.bgitCommit({ dir, paths: changes.map((c) => c.path), message: 'Short ids', ...author });
+    if (plan.collisions.length) {
+      await store.write(ALIASES_PATH, { format: 1, map: { ...aliases, ...plan.aliases } });
+      setIdAliases({ ...aliases, ...plan.aliases });
+    }
+    return changes.length;
   }
 
   /**
@@ -583,6 +632,11 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
     const dir = workingCopyName(access.repositoryUrl);
     const gitAccess = { dir, username: access.username, token: access.token, branch: BRANCH };
 
+    try {
+      await ensureShortIds(store, { now });
+    } catch (e) {
+      console.warn('Rewriting the ids as short ids', e);
+    }
     const syncState = await store.read('meta/sync.json');
     if (syncState?.accountKey && syncState.accountKey !== accountKey) return { status: 'differentAccount' };
     const pullOnly = !!(await store.read('meta/state.json'))?.readOnlyFrom;
@@ -610,6 +664,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
       if (!present) await core.bgitClone({ ...gitAccess, url: access.repositoryUrl });
 
       let keys = await readKeyState(dir);
+      if (!pullOnly && syncState) await shortIdPass(dir, false);
       if (!syncState) {
         const remote = (await core.bgitFiles({ dir })).files.filter(isSyncedPath);
         const local = await localSyncedPaths();
@@ -685,6 +740,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
             await core.bgitWrite({ dir, files: writes });
             await core.bgitCommit({ dir, paths: writes.map((w) => w.path), message: 'Benthic: merge', mergeParent: pull.theirs, ...author });
           }
+          if (!pullOnly && syncState) await shortIdPass(dir, pull.result !== 'upToDate' && pull.result !== 'empty');
           if (pull.result !== 'upToDate' && pull.result !== 'empty') {
             await cleanUp({ dir });
             keys = await readKeyState(dir);

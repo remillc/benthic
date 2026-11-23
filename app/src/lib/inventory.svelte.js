@@ -13,6 +13,7 @@ import { evaluateAll, todayIso, notificationPlan, applyNotificationPlan, section
 import { settings } from './settings.svelte.js';
 import { readSnoozed } from './maintenance-snooze.js';
 import { signalAccountData } from './account-sync-signal.js';
+import { ensureShortIds } from './short-id-migration.js';
 
 /** @typedef {import('./inventory.js').Gear} Gear */
 /** @typedef {import('./inventory.js').DiveEquipment} DiveEquipment */
@@ -53,6 +54,12 @@ function open() {
 export async function loadInventory() {
   const inv = open();
   await inv.migrateGearPhotos();
+  // The UUID ids of the first builds become short ids, once, before anything reads them (to-do #149).
+  try {
+    await ensureShortIds(inv.store);
+  } catch (e) {
+    console.error('Rewriting the ids as short ids', e);
+  }
   const [pieces, kits, records, state, pending, maintenance] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths(), inv.listMaintenance()]);
   gear.maintenance = maintenance;
   gear.pieces = pieces;

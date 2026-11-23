@@ -5,6 +5,7 @@
 // (`fetchKeys` clones when needed) and nothing but key files is committed (`commitKeyFiles` with `keysOnly`), so no sync, hence
 // no join of data, runs before the key is held. No camera call anywhere.
 import { DEVICES_DIR, PAIRING_TTL_MS, accessRequestPath, acceptApproval, approveAccessRequest, createAccessRequest, declineAccessRequest, deviceRecordFile, parseDevices, readAccessRequest, readDeclined, resealFiles } from './account-keys.js';
+import { deriveId, isLegacyDeviceId, isShortId, newShortId } from './short-id.js';
 
 /**
  * @typedef {Object} PairingDeps
@@ -172,11 +173,12 @@ const ids = new WeakMap();
 /** One touch at a time per store. @type {WeakMap<object, Promise<unknown>>} */
 const touching = new WeakMap();
 
-const ID_RE = /^[A-Za-z0-9_-]{22}$/;
-
 /**
- * This device's record id: read from `meta/device.json` (never synced), or made and written there at once, and kept. Concurrent
- * first callers get the same id.
+ * This device's record id, the one source of truth for it (the push token's `device_id` is this id): a short id (lib/short-id.js)
+ * read from `meta/device.json` (never synced), or made and written there at once, and kept. Concurrent first callers get the same
+ * id. A device that made its id with the first sync build (22 characters of base64url) gets `deriveId(that id)`, the same way every
+ * time, and `meta/device.json` then holds the old one in `legacyId` until its record on the server is deleted (`touchDeviceRecord`);
+ * whatever registered the old id elsewhere (the server's push tokens) registers the new one: `ownDeviceId` and `ownLegacyDeviceId`.
  * @param {{ store: any, name?: string }} deps @returns {Promise<string>}
  */
 export function deviceId({ store, name = '' }) {
@@ -184,8 +186,13 @@ export function deviceId({ store, name = '' }) {
   if (!p) {
     p = (async () => {
       const current = (await store.read('meta/device.json')) ?? {};
-      if (typeof current.id === 'string' && ID_RE.test(current.id)) return current.id;
-      const id = toId();
+      if (isShortId(current.id)) return current.id;
+      if (isLegacyDeviceId(current.id)) {
+        const id = deriveId(current.id);
+        await store.write('meta/device.json', { ...current, format: 1, id, legacyId: current.id, touchedAt: 0 });
+        return id;
+      }
+      const id = newShortId();
       await store.write('meta/device.json', { format: 1, id, name, touchedAt: 0 });
       return id;
     })();
@@ -220,18 +227,26 @@ async function touchOnce({ store, box, name, platform = '', now = Date.now, comm
   const file = deviceRecordFile({ id, name, platform }, { now });
   /** @type {string[]} */
   const deletes = [];
+  /** @type {Set<string>|null} the record paths the server holds, when it was read */
+  let onServer = null;
   if (fetchKeys) {
     try {
+      onServer = new Set();
       for (const f of (await fetchKeys()).devices ?? []) {
+        onServer.add(f.path);
         const j = f.json;
         const stale = !j || !Number.isFinite(j.lastSeenAt) || now() - j.lastSeenAt > DEVICE_PRUNE_MS;
         const twin = j && j.id !== id && j.name === name && (j.platform ?? '') === platform && now() - j.lastSeenAt > DEVICE_TWIN_MS;
         if (f.path !== file.path && (stale || twin)) deletes.push(f.path);
       }
     } catch (e) {
+      onServer = null;
       console.warn('Reading the device records', e);
     }
   }
+  // The record the first sync build wrote under the old id goes with this commit.
+  const legacy = typeof current.legacyId === 'string' ? `${DEVICES_DIR}${current.legacyId}.json` : '';
+  if (legacy && !deletes.includes(legacy) && (!onServer || onServer.has(legacy))) deletes.push(legacy);
   const result = await commitKeyFiles({ writes: [file], deletes, message: 'Benthic: device seen' });
   if (result.status !== 'synced') return false;
   await store.write('meta/device.json', { format: 1, id, name, touchedAt: now() });
@@ -245,24 +260,27 @@ async function touchOnce({ store, box, name, platform = '', now = Date.now, comm
  */
 export async function dropOwnDeviceRecord({ store, commitKeyFiles, fetchKeys }) {
   const current = await store.read('meta/device.json');
-  if (!current || typeof current.id !== 'string' || !ID_RE.test(current.id)) return false;
-  const path = `${DEVICES_DIR}${current.id}.json`;
-  if (!((await fetchKeys()).devices ?? []).some((f) => f.path === path)) return false;
-  const result = await commitKeyFiles({ deletes: [path], message: 'Benthic: device record removed' });
+  if (!current || (!isShortId(current.id) && !isLegacyDeviceId(current.id))) return false;
+  const mine = [`${DEVICES_DIR}${current.id}.json`, ...(typeof current.legacyId === 'string' ? [`${DEVICES_DIR}${current.legacyId}.json`] : [])];
+  const found = ((await fetchKeys()).devices ?? []).map((f) => f.path).filter((p) => mine.includes(p));
+  if (!found.length) return false;
+  const result = await commitKeyFiles({ deletes: found, message: 'Benthic: device record removed' });
   if (result.status !== 'synced') return false;
   await store.write('meta/device.json', { ...current, touchedAt: 0 });
   return true;
 }
 
-/** @returns {string} 16 random bytes, base64url */
-function toId() {
-  const bytes = crypto.getRandomValues(new Uint8Array(16));
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
 /** This device's record id, for `pairedDevices` ('' when none was made yet). @param {{ store: any }} deps @returns {Promise<string>} */
 export async function ownDeviceId({ store }) {
-  return (await store.read('meta/device.json'))?.id ?? '';
+  const id = (await store.read('meta/device.json'))?.id;
+  return typeof id === 'string' && isShortId(id) ? id : isLegacyDeviceId(id) ? deriveId(id) : '';
+}
+
+/** The id this device's record had before the short ids, while it may still be registered somewhere (a push token), else ''. @param {{ store: any }} deps @returns {Promise<string>} */
+export async function ownLegacyDeviceId({ store }) {
+  const current = await store.read('meta/device.json');
+  if (typeof current?.legacyId === 'string') return current.legacyId;
+  return isLegacyDeviceId(current?.id) ? current.id : '';
 }
 
 /** New device, « Annuler »: its request is deleted (best effort). @param {AccessRequest} request @param {PairingDeps} deps */

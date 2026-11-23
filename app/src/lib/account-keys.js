@@ -407,10 +407,10 @@ export async function resealFiles(files, box, d = {}) {
   const certs = files.filter((f) => /^certifications\/[^/]+\.json$/.test(f.path) && f.json?.enc);
   for (const f of certs) {
     try {
-      const item = { id: f.json.id, format: f.json.format ?? 1 };
+      const item = { id: f.json.sealId ?? f.json.id, format: f.json.format ?? 1 };
       const payload = await box.open(f.json.enc, item);
       payloads.set(f.path, payload);
-      for (const doc of payload?.documents ?? []) if (typeof doc?.hash === 'string') owners.set(doc.hash, f.json.id);
+      for (const doc of payload?.documents ?? []) if (typeof doc?.hash === 'string') owners.set(doc.hash, item.id);
     } catch (e) {
       if (!isKeyProblem(e)) throw e;
       locked.push(f.path);
@@ -436,7 +436,7 @@ export async function resealFiles(files, box, d = {}) {
   for (const f of certs) {
     const payload = payloads.get(f.path);
     if (!payload) continue;
-    const item = { id: f.json.id, format: f.json.format ?? 1 };
+    const item = { id: f.json.sealId ?? f.json.id, format: f.json.format ?? 1 };
     const kidNow = f.json.enc.kid;
     const resealed = await box.reseal(f.json.enc, item);
     const changedDocs = (payload.documents ?? []).some((/** @type {any} */ x) => renamed.has(x?.hash));
