@@ -1350,7 +1350,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 }
                 // `Documents` is the part of the container the Files app shows.
                 let folder = container.appendingPathComponent("Documents", isDirectory: true)
-                    .appendingPathComponent("OpenDives", isDirectory: true)
+                    .appendingPathComponent("Benthic", isDirectory: true)
                     .appendingPathComponent(name, isDirectory: true)
                 let existed = FileManager.default.fileExists(atPath: folder.path)
                 if !existed {

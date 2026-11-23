@@ -27,7 +27,7 @@ const OAUTH_PROVIDERS = ['googleDrive', 'oneDrive', 'dropbox'];
 const PROVIDERS = [...OAUTH_PROVIDERS, 'webdav'];
 
 /** The folder every new cloud logbook goes into: the app's folder root (OneDrive, Dropbox), an « OpenDives » folder (Google Drive, WebDAV). */
-const DEFAULT_FOLDER = { googleDrive: 'OpenDives', oneDrive: '', dropbox: '', webdav: 'OpenDives' };
+const DEFAULT_FOLDER = { googleDrive: 'Benthic', oneDrive: '', dropbox: '', webdav: 'Benthic' };
 
 /** The key of each service in oauth-clients.local.json. */
 const CLIENT_KEY = { googleDrive: 'google', oneDrive: 'microsoft', dropbox: 'dropbox' };

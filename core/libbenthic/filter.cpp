@@ -276,9 +276,9 @@ int parse_rules(const std::string &fulltext_mode, const std::vector<filter_rule>
 		std::string &error)
 {
 	for (const filter_rule &r: rules) {
-		if (r.type == "od_country" || r.type == "od_region" || r.type == "od_trip") {
-			ExtraRule::Kind kind = r.type == "od_country" ? ExtraRule::COUNTRY
-					       : r.type == "od_region" ? ExtraRule::REGION
+		if (r.type == "bc_country" || r.type == "bc_region" || r.type == "bc_trip") {
+			ExtraRule::Kind kind = r.type == "bc_country" ? ExtraRule::COUNTRY
+					       : r.type == "bc_region" ? ExtraRule::REGION
 								     : ExtraRule::TRIP;
 			extras.push_back({ kind, split_values(r.data), r.negate });
 			continue;

@@ -961,7 +961,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 		// Refused: Benthic criteria and values with commas cannot be kept in the log.
-		if (!filter_preset_save("x", "", "", { { "od_country", "", "", "France", false } }, json, error) ||
+		if (!filter_preset_save("x", "", "", { { "bc_country", "", "", "France", false } }, json, error) ||
 		    !filter_preset_save("x", "", "", { { "suit", "exact", "", "wet, 3mm\n", false } }, json, error)) {
 			printf("error=a preset the log cannot keep was accepted\n");
 			return 1;
