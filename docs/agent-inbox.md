@@ -7044,3 +7044,116 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthi
 Same on the iPhone and tablet versions of this page.
 
 **Test:** open « Tout ce qui est inclus », scroll to the end: no « Toujours gratuit » note, the price block right after the features, and « Continuer sans abonnement » leaves without subscribing.
+
+## [ ] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-ups: « Icônes de Icon.svelte · Android » and « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »). Christian handles the licence question himself.
+
+**Style.** Material Symbols **Rounded** only (not Outlined), weight 400, grade 0, optical size 24, unfilled. Source of each glyph: `https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/<name>/materialsymbolsrounded/<name>_24px.svg` (viewBox `0 -960 960 960`).
+
+**`app/src/components/Icon.svelte`.** For each key below, remove its stroke path from `paths` and put the Rounded glyph's path in `symbols` under the **same key** (callers do not change; the right column is the Material Symbols name). `key` is already in `symbols`: replace its Outlined path with the Rounded one. Then remove the special cases that no longer apply (the 4 px stroke of `more`, any per-key stroke tweak for a key that is now a symbol). The `weight` prop has no effect on a symbol; that is expected.
+
+| Key in Icon.svelte | Material Symbols (Rounded) |
+| --- | --- |
+| `archive` | `archive` |
+| `arrowBack` | `arrow_back` |
+| `arrowDown` | `arrow_downward` |
+| `arrowRight` | `arrow_forward` |
+| `arrowUp` | `arrow_upward` |
+| `bell` | `notifications` |
+| `blender` | `blender` |
+| `bluetooth` | `bluetooth` |
+| `bluetoothOff` | `bluetooth_disabled` |
+| `book` | `book` |
+| `briefcase` | `work` |
+| `calendar` | `calendar_today` |
+| `camera` | `photo_camera` |
+| `check` | `check` |
+| `checkCircle` | `check_circle` |
+| `chevron` | `chevron_right` |
+| `clock` | `schedule` |
+| `close` | `close` |
+| `cloud` | `cloud` |
+| `cloudCheck` | `cloud_done` |
+| `cloudDownload` | `cloud_download` |
+| `cloudUpload` | `cloud_upload` |
+| `columns` | `view_column` |
+| `copy` | `content_copy` |
+| `delete` | `delete` |
+| `desaturation` | `timer` |
+| `device` | `smartphone` |
+| `document` | `description` |
+| `download` | `download` |
+| `edit` | `edit` |
+| `error` | `error` |
+| `exitFullscreen` | `fullscreen_exit` |
+| `expand` | `expand_more` |
+| `export` | `upload` |
+| `file` | `draft` |
+| `filter` | `filter_list` |
+| `folder` | `folder` |
+| `fullscreen` | `fullscreen` |
+| `globe` | `language` |
+| `history` | `history` |
+| `idCard` | `id_card` |
+| `image` | `image` |
+| `info` | `info` |
+| `key` | `key` |
+| `keyboard` | `keyboard` |
+| `lightbulb` | `lightbulb` |
+| `link` | `link` |
+| `locate` | `my_location` |
+| `lock` | `lock` |
+| `login` | `login` |
+| `logout` | `logout` |
+| `mail` | `mail` |
+| `map` | `map` |
+| `menu` | `menu` |
+| `merge` | `merge` |
+| `more` | `more_vert` |
+| `moreCircle` | `pending` |
+| `offline` | `cloud_off` |
+| `openInNew` | `open_in_new` |
+| `personAdd` | `person_add` |
+| `phone` | `smartphone` |
+| `pinOff` | `location_off` |
+| `place` | `location_on` |
+| `plane` | `flight` |
+| `plus` | `add` |
+| `profile` | `person` |
+| `qr` | `qr_code_2` |
+| `redo` | `redo` |
+| `refresh` | `refresh` |
+| `remove` | `do_not_disturb_on` |
+| `renumber` | `tag` |
+| `seal` | `verified` |
+| `search` | `search` |
+| `server` | `dns` |
+| `settings` | `settings` |
+| `share` | `share` |
+| `sites` | `location_on` |
+| `split` | `call_split` |
+| `statistics` | `bar_chart` |
+| `sync` | `sync` |
+| `tablet` | `tablet_android` |
+| `tools` | `tune` |
+| `trash` | `delete` |
+| `tune` | `tune` |
+| `undo` | `undo` |
+| `upload` | `upload` |
+| `visibility` | `visibility` |
+| `visibilityOff` | `visibility_off` |
+| `warning` | `warning` |
+| `wrench` | `build` |
+
+90 keys. Several keys now share a glyph on purpose: `delete` and `trash` (delete), `place` and `sites` (location_on), `device` and `phone` (smartphone), `export` and `upload` (upload), `tools` and `tune` (tune).
+
+**Kept as Benthic drawings** (no faithful equivalent; unchanged): account, bestMix, computer, depthGauge, desktop, diveComputer, folderDownload, git, logbook, notebook, plan, plusMark, simplifyProfile, trip, tripRemove, ungroup, wristComputer.
+
+**`app/src/components/GearIcon.svelte`.** Replace the `diveKnife` path (a dive knife on the diagonal: pointed blade with a serrated back, guard, rounded handle with two grip lines; stroke 1.8 on the 24 grid like the other gear icons):
+
+```
+M10.9 15.8L18.3 8.4L20.4 5.6L21.1 2.0L17.0 4.3L14.5 6.8L14.5 8.0L13.3 8.0L13.4 9.2L12.2 9.1L12.3 10.3L11.1 10.2L8.2 13.1zM7.0 11.9L12.1 17.0M8.4 13.3L2.9 18.8L2.7 20.2L3.8 21.3L5.2 21.1L10.7 15.6M6.6 15.1L8.9 17.4M4.8 16.9L7.1 19.2
+```
+
+**Test:** every screen with icons (Carnet, détail, Sites, Profil, Réglages, the account sheet, the download flow, the desktop table) shows the Rounded glyphs at the same sizes and colours, nothing missing or blank; ⋮ is clearly visible; the gear list shows the new knife.
