@@ -149,6 +149,17 @@
 
   // --- Windowing: only the rows in view (plus a margin) are in the DOM; two spacer rows hold the rest's height. ---
   let scrollTop = $state(0);
+  /** The pointer is over the list's vertical scroll bar: its thumb widens (CSS cannot tell when the bar's gutter is hovered). */
+  let barHover = $state(false);
+  /** The width of the scroll bar's gutter, as in the CSS of `.bc-desktop-logbook--scroll`. */
+  const BAR_WIDTH = 12;
+  /** @param {PointerEvent} e */
+  function trackBar(e) {
+    const el = /** @type {HTMLElement} */ (e.currentTarget);
+    const overflows = el.scrollHeight > el.clientHeight;
+    const right = el.getBoundingClientRect().right;
+    barHover = overflows && e.clientX >= right - BAR_WIDTH;
+  }
   let viewHeight = $state(0);
   const offsets = $derived(rowOffsets(rows));
   // The sticky year line sits under the header when the rows follow the dates (task 2026-11-18-279).
@@ -1028,7 +1039,7 @@
         <p class="bc-desktop-logbook--drop-note">{t('desktop.dropNote')}</p>
       </div>
     {:else}
-      <div class="bc-desktop-logbook--scroll" data-bc-scroll bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)}>
+      <div class="bc-desktop-logbook--scroll" data-bc-scroll class:bc-desktop-logbook--scroll-bar-hover={barHover} bind:this={tableEl} onscroll={(e) => (scrollTop = e.currentTarget.scrollTop)} onpointermove={trackBar} onpointerleave={() => (barHover = false)}>
         <table class="bc-desktop-logbook--table" style={tableStyle} aria-multiselectable="true" aria-rowcount={rows.length + 1}>
           <thead>
             <tr aria-rowindex="1">
@@ -1329,14 +1340,18 @@
     .bc-desktop-logbook--scroll {
       flex: 1;
       overflow: auto;
+      /* The divider's 9 dp hit area sits on the pane's right edge (.bc-desktop-logbook--handle): the list stops before it,
+         so that its scroll bar can be grabbed with the mouse instead of the divider. */
+      margin-right: 9px;
       /* The spacer rows change height as the window moves: the browser must not shift the scroll to follow them. */
       overflow-anchor: none;
-      /* The list's own thin bar (task 2026-11-22-327): 9 dp wide, 6 dp thumb, no track, from under the column headers. */
+      /* The list's own thin bar (task 2026-11-22-327): no track, from under the column headers; a 6 dp thumb that widens to
+         10 dp while the pointer is over the bar or drags it (the bar is 12 dp, the thumb's transparent border makes it thin). */
       scrollbar-width: auto;
       scrollbar-color: auto;
       &::-webkit-scrollbar {
-        width: 9px;
-        height: 9px;
+        width: 12px;
+        height: 12px;
         background: transparent;
       }
       &::-webkit-scrollbar-track {
@@ -1344,9 +1359,14 @@
         margin-top: 38px;
       }
       &::-webkit-scrollbar-thumb {
-        border: 1.5px solid transparent;
-        border-radius: 9px;
+        border: 3px solid transparent;
+        border-radius: 12px;
         background: var(--bc-scrollbar-thumb) padding-box;
+      }
+      &.bc-desktop-logbook--scroll-bar-hover::-webkit-scrollbar-thumb,
+      &::-webkit-scrollbar-thumb:hover,
+      &::-webkit-scrollbar-thumb:active {
+        border-width: 1px;
       }
       &::-webkit-scrollbar-corner {
         background: transparent;
