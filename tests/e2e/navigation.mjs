@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--desktop-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -1139,6 +1139,51 @@ async function desktopFlows() {
     } else console.log(`  ok   ${path} over Réglages: ${room.width} px`);
     await tab.run(() => { document.querySelector('.view.tab-active').f7View.router.back({ animate: false }); return 1; });
     await sleep(600);
+  }
+  // « Faire signer… » of a selection (Benthic+): two dives selected with Ctrl+click, the right-click menu offers it with the
+  // seal icon, and it opens the signing dialog for them. Without Benthic+ the menu does not offer it.
+  console.log('Desktop, 1400x900: « Faire signer… » of a selection');
+  await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/'); return 1; }).catch(() => {});
+  await sleep(600);
+  const menuKeys = async () => {
+    await tab.run(() => {
+      const rows = [...document.querySelectorAll('.bc-desktop-logbook--row')];
+      rows[0].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      rows[1].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, ctrlKey: true }));
+      const r = rows[1].getBoundingClientRect();
+      rows[1].dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: r.x + 40, clientY: r.y + 10 }));
+      return 1;
+    });
+    await sleep(400);
+    return tab.run(() => [...document.querySelectorAll('.bc-context-menu--item')].map((b) => ({ text: b.textContent.trim(), icon: !!b.querySelector('svg') })));
+  };
+  const signLabel = /^(Faire signer|Get signed)/;
+  const without = await menuKeys();
+  checks++;
+  if (without.some((i) => signLabel.test(i.text))) {
+    failures.push({ label: 'desktop selection: « Faire signer… » without Benthic+', problems: ['offered'], without });
+    console.log('  FAIL « Faire signer… » offered without Benthic+');
+  } else console.log('  ok   not offered without Benthic+');
+  await tab.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+  await tab.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
+  await sleep(800);
+  const withPlus = await menuKeys();
+  checks++;
+  const sign = withPlus.find((i) => signLabel.test(i.text));
+  if (!sign || !sign.icon) {
+    failures.push({ label: 'desktop selection: « Faire signer… » for Benthic+', problems: ['missing or without its icon'], withPlus });
+    console.log('  FAIL « Faire signer… » missing for Benthic+');
+  } else {
+    await tab.run(() => [...document.querySelectorAll('.bc-context-menu--item')].find((b) => /^(Faire signer|Get signed)/.test(b.textContent.trim())).click());
+    await sleep(1200);
+    const dialog = await tab.run(() => ({ open: !!document.querySelector('.bc-validation-dialog'), title: document.querySelector('.bc-validation-dialog')?.textContent.slice(0, 80) ?? '' }));
+    checks++;
+    if (!dialog.open || !/2/.test(dialog.title)) {
+      failures.push({ label: 'desktop selection: the signing dialog for the two dives', problems: [`dialog ${JSON.stringify(dialog)}`] });
+      console.log(`  FAIL the dialog: ${JSON.stringify(dialog)}`);
+    } else console.log(`  ok   dialog opened: ${dialog.title}`);
+    if (process.env.BC_SHOTS) await shot(tab, 'desktop-multi-sign');
   }
   tab.ws.close();
 }
@@ -2307,7 +2352,7 @@ async function profileLayersFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2355,7 +2400,7 @@ try {
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],
-    ['desktop', '', 10, !phoneOnly && !tabletOnly, () => desktopFlows()],
+    ['desktop', '--desktop-only', 10, !phoneOnly && !tabletOnly, () => desktopFlows()],
     // The touches the system takes away (tests/e2e/navigation-gestures.mjs).
     ['gestures', '--gestures-only', 18, !tabletOnly && !welcomeOnly, () => gestureFlows(harness)],
     // The faults the random sequences found (tests/e2e/navigation-regressions.mjs).

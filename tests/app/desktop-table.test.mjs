@@ -179,6 +179,13 @@ test('right-click menu for one dive and for several', () => {
   // Only what the app can do: no empty group, no separator at either end.
   assert.deepEqual(keys(contextMenuEntries(2, { mac: false, available: new Set(['export', 'delete']) })), ['export', 'separator', 'delete']);
   assert.deepEqual(contextMenuEntries(0, { mac: false, available }), []);
+  // « Faire signer… » (Benthic+): several dives, seal icon, after « Modifier ensemble », disabled above 20.
+  const signable = new Set([...available, 'sign']);
+  assert.deepEqual(keys(contextMenuEntries(2, { mac: false, available: signable })).slice(0, 4), ['merge', 'addToTrip', 'editTogether', 'sign']);
+  assert.equal(contextMenuEntries(2, { mac: false, available: signable }).find((e) => e.key === 'sign').icon, 'seal');
+  assert.ok(!keys(contextMenuEntries(1, { mac: false, available: signable })).includes('sign'));
+  assert.ok(!keys(contextMenuEntries(2, { mac: false, available })).includes('sign'));
+  assert.equal(contextMenuEntries(21, { mac: false, available: signable }).find((e) => e.key === 'sign').disabled, true);
 });
 
 test('merge stays in the menu, disabled with its reason, when the dives cannot be merged (task 178)', () => {

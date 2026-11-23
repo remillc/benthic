@@ -2791,6 +2791,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop: selecting several dives and choosing « Get signed… » in the right-click menu opens the signing window for them (Benthic+).",
       "Desktop: the divider between the panes has no grip; it turns orange when the pointer is over it or drags it. The logbook has its own thin scrollbar, apart from it. Each dive is separated from the next by a line, and the Buddies column no longer shows the initial.",
       "Tablet, first launch: « Your logbook is ready » centres the logo, the chip, the title and the line of the blue panel, and the right column follows the mock-up: the « Your logbook » heading, the figures card across the full width, the « Open my logbook » button at the right.",
       "Equipment: a cylinder has a “Brand” after its name; a rebreather has “O₂ cells made on” before “O₂ cells installed on”, and the cells reminder falls due at the earlier of 18 months after manufacture and 12 months after installation.",
@@ -5361,6 +5362,7 @@
       "merge": "Merge into one dive",
       "addToTrip": "Add to a trip…",
       "editTogether": "Edit together…",
+      "sign": "Get signed…",
       "edit": "Edit",
       "copy": "Copy",
       "export": "Export…",
