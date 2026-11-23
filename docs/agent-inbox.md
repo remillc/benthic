@@ -7239,3 +7239,14 @@ Christian asked for this on 23 November 2026. Work in `main`. Same feature as ta
 - Viewer: covers the window under the title bar, dark (#0B0B0C). Top bar: ✕ (« Fermer (Échap) »), « 2 sur 9 · mer. 2014-04-02, 10 h 11 · Olympus TG-6 », then Partager, Retirer de la plongée and ⋮ (« Remplacer la photo du site »). The picture is centred, ‹ › buttons on each side (← and → keys too), and a strip of 64 px thumbnails at the bottom with the current one outlined. Video: the controls appear over the bottom of the video.
 
 **Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
+
+## [ ] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
+
+Christian asked for this on 23 November 2026. Work in `main`. Benthic does not use Subsurface's automatic trip grouping (`autogroup`): the value is false, and the setting is not shown anywhere.
+
+- **Settings:** remove the row « Regrouper les plongées en voyages » from Réglages › Carnet on every device (`pages/Settings.svelte`, id `autogroup`), with its strings (`settings.autogroup`, `desktop.undo.autogroup`, the « Regrouper en voyages » menu label if it is still used, the undo name in `lib/undo-name.js`) and `setAutogroup()` in `lib/logbook.svelte.js` once nothing calls it. Mock-ups updated: « Réglages, Carnet » on Android, iPhone, Android tablet (landscape and portrait) and desktop, and the bottle-choice board that shows the same list.
+- **Behaviour:** Benthic never creates trips by itself. Downloads, imports and new logbooks must not group dives into trips automatically, whatever the logbook says. A logbook made in Subsurface may have `autogroup` on: do not rewrite the diver's file just for this if Benthic can ignore the flag on its side (pass « off » to the core's import and download path); if the core can only read it from the logbook, tell Christian before writing it.
+- Unchanged: the trips themselves (make, rename, add to, remove from, « Défaire le voyage »), and the trips already in a logbook.
+- Docs updated by the design agent: `docs/ui-specification.md` (the settings table and the note on what the logbook stores) and `docs/ui-writing.md` (example changed).
+
+**Test:** Réglages › Carnet has no « Regrouper les plongées en voyages » on any device; download or import several dives from different days: no trip is created; a Subsurface logbook with `autogroup` on keeps its existing trips and gets no new automatic ones from Benthic.
