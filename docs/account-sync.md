@@ -125,3 +125,78 @@ Decided: **QR pairing** carried by the `benthic` branch, plus an optional **reco
    from Claude Conception's mock-ups (to-do in `docs/TODOS.md`).
 7. Two-device integration test against the dev server; then a check on the real tablet and phone.
 8. Phase 2: diver settings; later object storage for documents.
+
+## Screens (step 6, inbox task 2026-11-23-338)
+
+Built on 23 November 2026 as components driven only by props and callbacks. They import neither the engine nor the key
+modules, and nothing in the app reaches them yet: the wiring step opens them. Every screen is Benthic+ only. All are basic
+dialogs (`Md3Dialog.svelte`: Material 3 on Android, the system's corners on iOS) with no ✕, except the two camera screens.
+Texts are under `accountSync.*` in `fr.json` and `en.json`. The pure rules (recovery key groups, countdown, join answers)
+are in `app/src/lib/account-sync-screens.js`, tested by `tests/app/account-sync-screens.test.mjs`.
+
+| Component (`app/src/components/`) | Item | Props | Callbacks |
+|---|---|---|---|
+| `AccountUnlockDialog` | 1 | `camera` (false on a computer: the row reads « Afficher un code à lire avec votre téléphone ») | `onpair`, `onrecoverykey`, `onlater` (also Back and the scrim), `onlost` (opens `StartOverDialog`) |
+| `PairShowCode` | 2, 7 | `variant` (`'old'`: paired device, QR with K; `'new'`: computer without a camera, QR with its ECDH key), `payload` (the QR text), `expiresAt` (ms since 1970), `now` (clock, tests) | `oncancel`, `onscan` (phone and tablet, old variant: the « Lire le code d’un ordinateur » button on the left), `onrenew` (« Nouveau code » once expired) |
+| `PairConfirmDialog` | 8 | `deviceName`, `busy` | `onconfirm` (« Jumeler »: only now is anything committed), `onrefuse` (« Refuser », Back, scrim) |
+| `PairedDialog` | 4 | none | `onclose` |
+| `RecoveryKeyOffer` | 9 | `busy` | `oncreate`, `onlater` |
+| `RecoveryKeyShow` | 10 | `recoveryKey` (the 26 characters, any grouping) | `oncopy(text)` (the key in groups of four), `ondone`; Back and the scrim do nothing: the key is never shown again |
+| `RecoveryKeyEnter` | 3 | `error` (`''` or `'wrong'`, after a refusal), `busy` | `onrecoverykey(key)` (26 upper-case characters, separators removed), `oncancel` |
+| `JoinSummaryDialog` | 11 | `recognised`, `added`, `matches` (`[{ id, thisDevice, account }]`), `defaultChoice` (`'same'`), `busy` | `onjoin([{ id, same }])`, `oncancel` |
+| `LockedDataCard` | 5 | none | `onpair`, `onrecoverykey` (default: the actions in `locked-data.svelte.js`) |
+| `StartOverDialog` | 6 | `busy` | `onstartover`, `oncancel` |
+
+Not components:
+
+- `lib/pair-scan.js`: the two camera screens (« Jumeler cet appareil », « Lire le code d’un ordinateur ») are the native scanner.
+  `scanPairingCode('new-device' | 'computer')` gives it its texts and resolves to the code's text, or `null` when closed.
+- `lib/two-device-notice.js`: `showTwoDeviceNotice(name)` (item 12), the app's snackbar with « OK ». It uses two new options of
+  `showSnackbar`: `placement: 'center'` (560 dp, centred at the bottom on a tablet and the desktop) and `long` (three lines).
+  Above the FAB on the phone as for every snackbar.
+- `lib/locked-data.svelte.js`: `accountLock` `{ locked, canPair, onpair, onpairnew, onrecoverykey }`, all off by default.
+  `locked` turns on the item 5 look: the subtitles of « Fiche d’urgence », « Brevets et documents » and « Informations »
+  read « Verrouillé : jumelez cet appareil » (phone page and the wide left pane), `LockedDataCard` appears under the phone
+  list and replaces the Informations pane and the Brevets pane on a wide screen, and the Brevets « + » and the Informations
+  pencil are hidden. `canPair` shows the account sheet's « Jumeler un nouvel appareil » row (Android, iPhone and desktop
+  sheets), which calls `onpairnew` (show the code, `PairShowCode variant="old"`).
+
+### What the wiring step must do
+
+1. Set `accountLock.locked` from `MISSING_DATA_KEY`, `accountLock.canPair` when the device holds the key, and the three actions.
+2. Open `AccountUnlockDialog` when the key is missing and `keys/account.json` exists. `onpair`: on a phone or tablet, the
+   scanner (`scanPairingCode('new-device')`) then `PairedDialog`; on a computer, `PairShowCode variant="new"`, then `PairedDialog`
+   once the phone has answered. `onrecoverykey`: `RecoveryKeyEnter`, then `PairedDialog` (pass `error="wrong"` on a refusal).
+   `onlost`: `StartOverDialog`.
+3. On the paired device: the account sheet row opens `PairShowCode variant="old"` (give `onscan` on a phone or tablet, which
+   calls `scanPairingCode('computer')`), then `PairConfirmDialog` when the request arrives.
+4. Open `RecoveryKeyOffer` at the first sync, `RecoveryKeyShow` right after « Créer la clé », `JoinSummaryDialog` from
+   `account-join.js`, and call `showTwoDeviceNotice` from the merge.
+5. The pairing code's text is the key module's: nothing here parses it.
+6. Native: the scanner accepts only dive and plan transfer codes (`OD1~d|p~…`, Kotlin `QrScanActivity.parseHeader` and its Swift
+   twin) and answers « Code inconnu » to anything else. Add a `mode: 'text'` that returns the first code as it is (what
+   `pair-scan.js` already sends), or wrap the pairing payload in the transfer header with a third kind. The desktop shows
+   codes only, so it needs no scanner.
+7. Add the release-notes line (`about.releaseNotes`) when the screens become reachable, and update `tests/app/account-sync-screens.test.mjs`
+   (its last test checks that the screens are not imported yet).
+
+### Not covered by the mock-ups (the task asks to list it)
+
+The mock-ups of the block « Synchronisation du compte (Benthic+) » are not in `docs/mockups/` of the repository, so the screens
+were built from the task's text and the app's existing dialogs, and have not been compared with the drawings. To check
+against them: the texts the task does not give (the help lines under the QR codes, the dialog bodies, the field's hints and
+errors, the scanner hints, the account sheet row's second line), the buttons of the pairing dialogs, and the segmented
+button's default. Questions the mock-ups do not answer:
+
+- Join summary: should « Même pièce » or « Deux pièces » be preselected for an ambiguous match? Built with « Même pièce » (the
+  matcher's best guess; `defaultChoice` changes it). A wrong merge loses a distinction, a wrong split only duplicates.
+- A pairing code that expired: built as « Le code a expiré » with « Nouveau code »; the key rotation (new K, new file) is the engine's.
+- Wrong recovery key, and a code the new device cannot read or that expired: built as a line under the field for the key;
+  for pairing, no screen yet (a snackbar would do).
+- The « Fiche d’urgence » page itself (`/profile/emergency`) when locked: only its entry row is changed; the page should
+  not open, or should show `LockedDataCard`.
+- Device name on `PairConfirmDialog`: where it comes from (the new device announces it in the request) is not specified.
+- Item 12: several items changed by one sync show one notice at a time (the snackbar replaces the previous one).
+- The iPhone and iPad portrait boards are not drawn: the same dialogs are used (checked on the iPhone look).
+- Not in the plan: what the paired device does with a pairing request it did not start, an expired request, or two requests.
+- Not in the plan: the recovery key's visibility to screen capture (Android `FLAG_SECURE`) while `RecoveryKeyShow` is open.

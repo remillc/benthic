@@ -15,6 +15,8 @@
   import DateField from '../components/DateField.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import ProfileFrame from '../components/ProfileFrame.svelte';
+  import LockedDataCard from '../components/LockedDataCard.svelte';
+  import { accountLock } from '../lib/locked-data.svelte.js';
   import { diver, loadProfile, changeProfile } from '../lib/profile.svelte.js';
   import { gear, loadInventory } from '../lib/inventory.svelte.js';
   import { BLOOD_GROUPS, UNKNOWN_BLOOD, infoProblems } from '../lib/profile.js';
@@ -202,13 +204,15 @@
     {#snippet right()}
       {#if editing}
         <button type="button" class="bc-profile-info--save" disabled={!canSave} onclick={save}>{t('diverProfile.info.save')}</button>
-      {:else}
+      {:else if !accountLock.locked}
         <a href="#edit" class="link icon-only external bc-profile-info--edit-button" role="button" aria-label={t('diverProfile.info.edit')} onclick={(e) => (e.preventDefault(), startEdit())}><Icon name="edit" /></a>
       {/if}
     {/snippet}
   </Navbar>
   {#if profileWide()}
-    <ProfileFrame section="info"><div class="bc-profile-info--wide">{@render body()}</div></ProfileFrame>
+    <ProfileFrame section="info">{#if accountLock.locked}<LockedDataCard />{:else}<div class="bc-profile-info--wide">{@render body()}</div>{/if}</ProfileFrame>
+  {:else if accountLock.locked}
+    <LockedDataCard />
   {:else}
     {@render body()}
   {/if}

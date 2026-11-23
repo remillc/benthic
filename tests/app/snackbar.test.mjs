@@ -64,3 +64,7 @@ test('no code opens a Framework7 toast except lib/snackbar.js', () => {
     assert.ok(!/f7\.toast\.(create|show)/.test(source), `${file} opens a toast itself`);
   }
 });
+
+test('the two-device notice is centred and may take three lines', () => {
+  assert.equal(snackbarClasses({ placement: 'center', long: true }), 'bc-snackbar bc-snackbar-center bc-snackbar-long');
+});

@@ -13,6 +13,7 @@
   import { profileWindow } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
   import { documentsLine } from '../lib/documents-text.js';
+  import { accountLock } from '../lib/locked-data.svelte.js';
 
   /** @type {{ section: keyof typeof PROFILE_SECTIONS }} */
   let { section } = $props();
@@ -34,8 +35,8 @@
   const lines = $derived({
     gear: gear.ready && visibleGear().length ? `${t('gear.inventory.pieces', { n: visibleGear().length })} · ${t('gear.inventory.kitCount', { n: gear.kits.length })}` : t('gear.profile.noPiece'),
     maintenance: '',
-    certs: documentsLine(diver.certs),
-    info: t('gear.profile.informationLine'),
+    certs: accountLock.locked ? t('accountSync.locked.line') : documentsLine(diver.certs),
+    info: accountLock.locked ? t('accountSync.locked.line') : t('gear.profile.informationLine'),
   });
   const entries = /** @type {const} */ ([
     { id: 'gear', icon: 'briefcase', tone: 'blue', label: 'gear.profile.equipment' },

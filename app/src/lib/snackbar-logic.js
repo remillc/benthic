@@ -23,12 +23,14 @@ export function snackbarTimeout(requested, hasAction) {
 
 /**
  * The CSS classes of the snackbar's element.
- * @param {{ hasFab?: boolean, undoable?: boolean, placement?: 'start' }} [options]
+ * @param {{ hasFab?: boolean, undoable?: boolean, placement?: 'start'|'center', long?: boolean }} [options]
  *   hasFab: the screen has a FAB, the snackbar floats above it;
  *   undoable: the undo history can clear it (see undo.js)
  *   placement 'start': on a tablet, at the bottom left, 24 dp from the content's edge (the first launch, task 239)
+ *   placement 'center': on a tablet and the desktop, centred at the bottom, 560 dp wide (the « modifié sur deux appareils » notice, task 338)
+ *   long: up to three lines instead of two (the same notice, which names the item)
  * @returns {string}
  */
-export function snackbarClasses({ hasFab = false, undoable = false, placement } = {}) {
-  return ['bc-snackbar', hasFab ? 'bc-snackbar-above-fab' : '', undoable ? 'bc-undo-toast' : '', placement === 'start' ? 'bc-snackbar-start' : ''].filter(Boolean).join(' ');
+export function snackbarClasses({ hasFab = false, undoable = false, placement, long = false } = {}) {
+  return ['bc-snackbar', hasFab ? 'bc-snackbar-above-fab' : '', undoable ? 'bc-undo-toast' : '', placement === 'start' ? 'bc-snackbar-start' : '', placement === 'center' ? 'bc-snackbar-center' : '', long ? 'bc-snackbar-long' : ''].filter(Boolean).join(' ');
 }

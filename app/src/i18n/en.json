@@ -6870,5 +6870,85 @@
       "tooMany": "Too many reports today. Try again tomorrow.",
       "failed": "Report not sent. Check the connection, then try again."
     }
+  },
+  "accountSync": {
+    "unlock": {
+      "title": "Unlock the encrypted data",
+      "pair": "Pair with another device",
+      "pairCamera": "Scan the code shown on a device that is already paired",
+      "pairDesktop": "Show a code to scan with your phone",
+      "recoveryKey": "Enter the recovery key",
+      "meanwhile": "Meanwhile, the rest of the account syncs. The encrypted data stays locked.",
+      "later": "Later",
+      "lost": "No device or key left?"
+    },
+    "pair": {
+      "newTitle": "Pair this device",
+      "newHint": "Scan this code with a device that is already paired: Account, then “Pair a new device”.",
+      "oldTitle": "Pair a new device",
+      "oldHint": "On the new device, choose “Pair with another device”.",
+      "codeLabel": "Pairing code",
+      "expires": "The code expires in {time}",
+      "expired": "The code has expired",
+      "renew": "New code",
+      "cancel": "Cancel",
+      "scanComputer": "Scan a computer’s code",
+      "scanTitle": "Pair this device",
+      "scanHint": "Frame the code shown on the other device.",
+      "scanComputerHint": "Frame the code shown by the computer.",
+      "confirmTitle": "Pair “{name}”?",
+      "confirmText": "This device will receive the key to the encrypted data.",
+      "refuse": "Refuse",
+      "confirm": "Pair",
+      "doneTitle": "Device paired",
+      "doneText": "The encrypted data is unlocked on this device.",
+      "entry": "Pair a new device",
+      "entryText": "Gives access to the encrypted data"
+    },
+    "key": {
+      "offerTitle": "Create a recovery key",
+      "offerText": "It unlocks the encrypted data if you have no paired device left. Without it, the data is lost.",
+      "later": "Later",
+      "create": "Create the key",
+      "showTitle": "Your recovery key",
+      "showText": "Write it on paper, away from this device. It is shown only once.",
+      "label": "Recovery key",
+      "copy": "Copy",
+      "copied": "Copied",
+      "done": "I wrote it down",
+      "enterTitle": "Enter the recovery key",
+      "field": "Recovery key",
+      "hint": "Spaces and dashes are optional.",
+      "unlock": "Unlock",
+      "cancel": "Cancel",
+      "errorLength": "The key has 26 characters.",
+      "errorCharacters": "The key has the letters A to Z and the digits 2 to 7.",
+      "errorWrong": "This key does not unlock this account."
+    },
+    "join": {
+      "title": "Join this device",
+      "recognised": "Recognised",
+      "added": "New",
+      "toConfirm": "To confirm",
+      "thisDevice": "This device: {name}",
+      "account": "Your account: {name}",
+      "same": "Same piece",
+      "two": "Two pieces",
+      "cancel": "Cancel",
+      "join": "Join"
+    },
+    "locked": {
+      "line": "Locked: pair this device",
+      "title": "Encrypted data locked",
+      "pair": "Pair this device",
+      "recoveryKey": "Enter the recovery key"
+    },
+    "startOver": {
+      "title": "Start over without the encrypted data",
+      "text": "Emergency sheets, certifications and documents are erased from the account, on all your devices. The logbook, gear, kits and maintenance are kept.",
+      "cancel": "Cancel",
+      "confirm": "Erase and start over"
+    },
+    "twoDevices": "“{name}” was changed on two devices. The most recent change is kept."
   }
 }

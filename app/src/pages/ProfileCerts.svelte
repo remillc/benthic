@@ -22,6 +22,8 @@
   import { formatDate } from '../lib/profile-format.js';
   import { t } from '../lib/i18n.js';
   import ProfileFrame from '../components/ProfileFrame.svelte';
+  import LockedDataCard from '../components/LockedDataCard.svelte';
+  import { accountLock } from '../lib/locked-data.svelte.js';
   import { profileWide } from '../lib/profile-frame.js';
 
   onMount(() => Promise.all([loadProfile(), loadInventory()]));
@@ -139,12 +141,14 @@
     {/snippet}
   </Navbar>
   {#if profileWide()}
-    <ProfileFrame section="certs">{@render body()}</ProfileFrame>
+    <ProfileFrame section="certs">{#if accountLock.locked}<LockedDataCard />{:else}{@render body()}{/if}</ProfileFrame>
+  {:else if accountLock.locked}
+    <LockedDataCard />
   {:else}
     {@render body()}
   {/if}
   {#snippet fixedContent()}
-    <div class="fab fab-right-bottom fab-extended bc-fab-add bc-docs--fab" style:display={gear.readOnly ? 'none' : null}>
+    <div class="fab fab-right-bottom fab-extended bc-fab-add bc-docs--fab" style:display={gear.readOnly || accountLock.locked ? 'none' : null}>
       <a href="#add" class="external" role="button" onclick={(e) => (e.preventDefault(), (choosing = true))}>
         <i class="icon"><Icon name="plus" /></i>
         <div class="fab-text">{t('docs.add')}</div>
