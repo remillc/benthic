@@ -6540,7 +6540,7 @@ In the Compagnons column of the desktop logbook table, remove the round grey bad
 
 Mock-ups: `bureau-carnet-profil-droite` and the other desktop boards that show the logbook list (28 boards), updated in `docs/mockups/`.
 
-## [ ] 2026-11-22-330 « Faire valider la plongée » on the tablet and the desktop (#152)
+## [x] 2026-11-22-330 « Faire valider la plongée » on the tablet and the desktop (#152)
 
 Christian approved this on 22 November 2026. Work in `main`. Validation (a signature by an instructor or a buddy) exists on the phone: « Faire valider la plongée » is the first item of the ⋮ menu of the detail's floating bar (`validation-menu-android`). Bring it to the tablet and the desktop, with the same flow behind it (the method choice of `validation-choix-android`, then QR code or signature on this device), shown as a dialog on these screens.
 
@@ -6551,7 +6551,9 @@ Benthic+ only, as on the phone. Mock-ups updated in `docs/mockups/`.
 
 **Test:** on the tablet the ⋮ of the detail and on the desktop the header button open the validation flow; a validation added there shows in the detail's Validations group.
 
-## [ ] 2026-11-22-331 Desktop dive detail: the map across the whole header (#153)
+Done 23 November 2026. Tablet: the ⋮ menu of the detail's floating bar holds « Faire signer la plongée » first (Benthic+), with the seal icon (also on the phone now); desktop: a 44 px seal button between Plan and Share in the detail header (tooltip « Faire signer la plongée… (signature d’un moniteur ou d’un compagnon) », accessible name « Faire signer la plongée »). The app's wording stays « Faire signer » (decided earlier, « Faire signer » replaces « Faire valider »), not the mock-ups' « valider ». The flow (choice, signature, QR) is `ValidationSteps.svelte`, shown by `Validate.svelte` on the phone and by `ValidationDialog.svelte` on tablet and desktop; « + Faire signer » of the Validations group opens the same dialog. The logbook's selection menu still opens the full screen.
+
+## [x] 2026-11-22-331 Desktop dive detail: the map across the whole header (#153)
 
 Christian approved this on 22 November 2026. Work in `main`. Windows, Linux and macOS.
 
@@ -6559,7 +6561,9 @@ In the detail pane of the desktop logbook (`/dives/:id`), the map of the dive's 
 
 Mock-up: `bureau-carnet-profil-droite` and the other desktop boards with the detail pane (already in `docs/mockups/`).
 
-## [ ] 2026-11-22-332 Desktop dive detail, Équipement tab: kit, undersuit, « Ce lest était » in Benthic+, and a new Benthic+ badge
+Done 23 November 2026. `SiteHeaderImage` (desk) fills the pane's whole header width, 170 px, centred on the pin at 50 % of the width, scaled up (never stretched) for a pane wider than the 1000 px picture; fade unchanged (45 / 70 / 100 % of the page colour, dark mode through `--bc-background`); the profile card is drawn above the faded bottom. No site position: no map.
+
+## [x] 2026-11-22-332 Desktop dive detail, Équipement tab: kit, undersuit, « Ce lest était » in Benthic+, and a new Benthic+ badge
 
 Christian approved this on 22 November 2026. Work in `main`. Mock-up: `bureau-carnet-onglet-equipement` (updated in `docs/mockups/`). The computers section already matches the app (the model's tile before the name): keep it.
 
@@ -6575,7 +6579,9 @@ Christian approved this on 22 November 2026. Work in `main`. Mock-up: `bureau-ca
 
 **Test:** applying a kit fills computer, suit, undersuit, weights and other gear; without Benthic+ the kit, the undersuit, « Ce lest était » and the other gear are visible with the badge and cannot change; the badge has 4.5:1 contrast.
 
-## [ ] 2026-11-22-333 Correction of task 332: the Benthic+ mark in the mock-ups is an annotation, not part of the app
+Done 23 November 2026 (with 333). Desktop Équipement tab, Benthic+ only: a Kit row (dropdown of the kits with their piece count, « Gérer les kits », « Appliquer un kit » when empty, note under it) that fills suit, undersuit and other gear like `applyKit` and shows « Kit « {name} » appliqué » with « Annuler »; a Sous-vêtement row under Combinaison (shown when the inventory has an undersuit); « Ce lest était » and « Autre équipement ». Point 5 (new badge) cancelled by 333. `BenthicPlusChip` is used in: AccountManage, AccountSheet, BenthicPlusPanel, DesktopAccountSheet, DevToolsMenu, DiveGearBlock, DiveGearOther, FirstLaunchBenthicPlus, FirstLaunchServer, ProfileNav, ReleaseChoiceRow, ProfileDiver, WelcomeStartRelease; all left as is. Only the desktop tab's use (« Autre équipement » title) was removed, with the section itself for free accounts.
+
+## [x] 2026-11-22-333 Correction of task 332: the Benthic+ mark in the mock-ups is an annotation, not part of the app
 
 Christian approved this on 22 November 2026. Work in `main`. **This task corrects task 332; where they disagree, this one wins.**
 
@@ -6587,6 +6593,8 @@ Christian approved this on 22 November 2026. Work in `main`. **This task correct
 - Everything else in task 332 is unchanged.
 
 Mock-up: `bureau-carnet-onglet-equipement` (updated in `docs/mockups/`, with the red circles).
+
+Done 23 November 2026 (with 332). For free accounts the kit, undersuit, « Ce lest était » and « Autre équipement » are absent from the desktop tab (no disabled state, no badge). « Ce lest était » is Benthic+ on every platform: absent from the phone's editor (`EditDive`) and the detail's equipment card, and the weight suggestion's correction is off without Benthic+ (`suggestWeight(..., corrected)`); tags already written are kept. Phone « Autre équipement » (DiveGearBlock, DiveGearOther) unchanged: the tasks name the desktop tab only.
 
 ## [ ] 2026-11-23-334 Equipment fields by type: review every gear form against `docs/equipment-fields.md`
 

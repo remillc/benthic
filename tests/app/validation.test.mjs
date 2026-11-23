@@ -169,7 +169,7 @@ test('every text of the validation screens exists in French and in English', () 
   /** @param {any} o @param {string} prefix */
   const keys = (o, prefix = '') => Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' ? keys(v, `${prefix}${k}.`) : [`${prefix}${k}`]));
   assert.deepEqual(keys(fr.validation).sort(), keys(en.validation).sort());
-  const files = ['pages/Validate.svelte', 'components/ValidationConfirm.svelte', 'pages/DiveDetail.svelte', 'pages/Logbook.svelte', 'components/DiveRow.svelte', 'lib/share.js', 'lib/qr-receive.svelte.js'];
+  const files = ['pages/Validate.svelte', 'components/ValidationSteps.svelte', 'components/ValidationDialog.svelte', 'components/ValidationConfirm.svelte', 'pages/DiveDetail.svelte', 'pages/Logbook.svelte', 'components/DiveRow.svelte', 'lib/share.js', 'lib/qr-receive.svelte.js'];
   const have = new Set(keys(fr.validation));
   for (const f of files) {
     const src = readFileSync(new URL(`../../app/src/${f}`, import.meta.url), 'utf8');
@@ -183,6 +183,25 @@ test('every text of the validation screens exists in French and in English', () 
   // The release notes carry this task's line (later tasks append theirs after it).
   assert.ok(fr.about.releaseNotes.some((n) => /Faire signer la plongée/.test(n)));
   assert.ok(en.about.releaseNotes.some((n) => /Get the dive signed/.test(n)));
+});
+
+test('tablets and the desktop open the validation as a dialog, the phone keeps its screen (task 2026-11-22-330)', () => {
+  const detail = readFileSync(new URL('../../app/src/pages/DiveDetail.svelte', import.meta.url), 'utf8').split('\r\n').join('\n');
+  assert.match(detail, /function startValidation\(\) \{\s*if \(layout\.split \|\| layout\.desktop\) validating = true;\s*else f7router\.navigate\(`\/validate\?ids=\$\{diveId\}`\)/);
+  // The menu item (seal icon, before « Renuméroter ») and the desktop header button (between Plan and Share) are Benthic+ only.
+  assert.match(detail, /icon="seal"\s+text=\{t\('validation\.menuOne'\)\}/);
+  const header = detail.slice(detail.indexOf('bc-dive-detail--desk-head'));
+  const at = (key) => header.indexOf(key);
+  assert.ok(at('desktopDetail.plan') < at('desktopDetail.validate') && at('desktopDetail.validate') < at('desktopDetail.share'));
+  assert.match(detail, /\{#if benthicPlusSubscriber\(\)\}\s+<button[^\n]*desk-action[^\n]*desktopDetail\.validate/);
+  assert.match(detail, /<ValidationDialog ids=\{\[dive\.id\]\}/);
+  const dialog = readFileSync(new URL('../../app/src/components/ValidationDialog.svelte', import.meta.url), 'utf8');
+  assert.match(dialog, /<ValidationSteps /);
+  for (const l of ['fr', 'en']) {
+    const json = JSON.parse(readFileSync(new URL(`../../app/src/i18n/${l}.json`, import.meta.url), 'utf8'));
+    assert.ok(json.desktopDetail.validate, l);
+    assert.ok(json.validation.back, l);
+  }
 });
 
 test('the privacy policy says what is kept about a signer, in both languages', () => {

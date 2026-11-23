@@ -178,3 +178,13 @@ test('only the most recent dive gets the suggestion', async () => {
   assert.equal(isMostRecent(7, [{ id: 6, date: '2026-11-14T13:00:00', number: 10 }, { id: 7, date: '2026-11-14T13:00:00', number: 11 }]), true);
   assert.equal(isMostRecent(1, []), false);
 });
+
+test('without Benthic+ the last comparable dive gives its weight with no correction (task 2026-11-22-333)', () => {
+  const light = dive({ tags: [FEEDBACK_TAGS['too-light']] });
+  const corrected = suggestWeight(current, [light], 'lbs');
+  assert.equal(corrected.adjusted, 'too-light');
+  const plain = suggestWeight(current, [light], 'lbs', false);
+  assert.equal(plain.adjusted, '');
+  assert.equal(Math.round(plain.grams / LB), 6);
+  assert.equal(suggestWeight(current, [light], 'lbs', true).grams, corrected.grams);
+});

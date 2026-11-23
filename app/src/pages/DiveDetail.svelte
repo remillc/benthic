@@ -69,6 +69,7 @@
     formatTimeOfDay,
   } from '../lib/format.js';
   import DesktopDiveFields from '../components/DesktopDiveFields.svelte';
+  import ValidationDialog from '../components/ValidationDialog.svelte';
   import DiveDetailSkeleton from '../components/DiveDetailSkeleton.svelte';
   import { deviceStore } from '../lib/device-store.js';
   import { readTab, saveTab, stepTab, DETAIL_TABS } from '../lib/detail-tab.js';
@@ -465,6 +466,16 @@
   function renameComputer(c) {
     computersOpen = false;
     f7router.navigate(`/settings/computers/edit?model=${encodeURIComponent(c.model)}&serial=${encodeURIComponent(c.serial)}`);
+  }
+
+  /**
+   * « Faire signer la plongée » (task 2026-11-22-330): a dialog on a tablet and on the desktop, the full screen of the
+   * phone elsewhere. The steps are the same (components/ValidationSteps.svelte).
+   */
+  let validating = $state(false);
+  function startValidation() {
+    if (layout.split || layout.desktop) validating = true;
+    else f7router.navigate(`/validate?ids=${diveId}`);
   }
 
   /** "Renuméroter la plongée" open. */
@@ -904,11 +915,11 @@
       {/if}
       {#if benthicPlusSubscriber()}
         <MenuItem
-          icon="edit"
+          icon="seal"
           text={t('validation.menuOne')}
           onclick={() => {
             f7.popover.close(`#${menuId}`);
-            f7router.navigate(`/validate?ids=${diveId}`);
+            startValidation();
           }}
         />
       {/if}
@@ -984,6 +995,9 @@
           <p class="bc-dive-detail--desk-sub bc-value">{[formatDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
         </div>
         <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
+        {#if benthicPlusSubscriber()}
+          <button type="button" class="bc-dive-detail--desk-action" aria-label={t('validation.menuOne')} title={t('desktopDetail.validate')} onclick={startValidation}><Icon name="seal" size={22} /></button>
+        {/if}
         <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.share')} title={t('desktopDetail.share')} onclick={() => deskCommand('share')}><Icon name="share" size={22} /></button>
         <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.export')} title="{t('desktopDetail.export')} ({desktopMac ? '⇧⌘E' : 'Ctrl+Maj+E'})" onclick={() => deskCommand('export')}><Icon name="export" size={22} /></button>
         <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.delete')} title="{t('desktopDetail.delete')} ({desktopMac ? '⌫' : 'Suppr'})" onclick={() => deskCommand('delete')}><Icon name="delete" size={22} /></button>
@@ -1080,7 +1094,7 @@
               </button>
             </div>
           {/each}
-          <button type="button" class="bc-dive-validations--add" onclick={() => f7router.navigate(`/validate?ids=${diveId}`)}>
+          <button type="button" class="bc-dive-validations--add" onclick={startValidation}>
             <Icon name="plus" /><span>{t('validation.add')}</span>
           </button>
         </div>
@@ -1148,7 +1162,7 @@
           open={equipmentOpen}
           ontoggle={() => (equipmentOpen = !equipmentOpen)}
           {feedback}
-          onfeedback={setFeedback}
+          onfeedback={benthicPlusSubscriber() ? setFeedback : undefined}
           oncomputers={() => (computersOpen = true)}
         />
         {#if inventoryEquipment}<DiveGearBlock equipment={inventoryEquipment} />{/if}
@@ -1241,6 +1255,10 @@
 
 {#if qrSharing && dive}
   <QrShare id={dive.id} kind="d" summary={qrSummary(dive, prefs)} onclose={() => (qrSharing = false)} />
+{/if}
+
+{#if validating && dive}
+  <ValidationDialog ids={[dive.id]} onclose={() => (validating = false)} />
 {/if}
 
 {#if renumbering && dive}
@@ -1338,7 +1356,9 @@
         background: color-mix(in srgb, var(--bc-text) 8%, transparent);
       }
     }
+    /* The profile card starts over the faded bottom of the map (task 2026-11-22-331): it is drawn above it. */
     .bc-dive-detail--desk-card {
+      position: relative;
       margin: 8px 24px 0;
       padding: 8px 0 12px;
       border-radius: 16px;

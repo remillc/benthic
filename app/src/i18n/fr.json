@@ -3279,7 +3279,11 @@
       "Informations (Benthic+) : la page se modifie directement. Le crayon transforme les sections en champs, « Enregistrer » est dans la barre du haut et Retour quitte sans enregistrer. Une valeur vide n’affiche plus de texte. Sur tablette et ordinateur, les sections ont une marge horizontale.",
       "Tablette et ordinateur : le bouton Compte, en bas de la barre latérale, est plus grand.",
       "Profil de plongée : aucune courbe n’est affichée au départ, la température de l’eau comprise ; activez celles que vous voulez, le choix est gardé.",
-      "Tablette et ordinateur : au démarrage, le panneau de droite montre la forme de la plongée pendant la lecture du carnet, au lieu de « Choisissez une plongée pour la voir ici »."
+      "Tablette et ordinateur : au démarrage, le panneau de droite montre la forme de la plongée pendant la lecture du carnet, au lieu de « Choisissez une plongée pour la voir ici ».",
+      "Tablette et ordinateur : « Faire signer la plongée » (Benthic+) s’ouvre dans une fenêtre, depuis le menu ⋮ de la plongée sur tablette et depuis un bouton de l’en-tête sur ordinateur.",
+      "Ordinateur : la carte du site occupe toute la largeur de l’en-tête de la plongée.",
+      "Ordinateur : l’onglet Équipement propose, avec Benthic+, un kit à appliquer, le sous-vêtement, « Ce lest était » et « Autre équipement » ; sans Benthic+, ces champs n’apparaissent plus.",
+      "« Ce lest était » est réservé à Benthic+ sur tous les écrans ; sans Benthic+, la suggestion de lest reprend le poids de la dernière plongée comparable, sans correction. Ce qui est déjà noté sur une plongée est conservé."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -4928,6 +4932,7 @@
     "enlarge": "Agrandir le profil",
     "enlargeTip": "Agrandir le profil ({shortcut})",
     "plan": "Planifier depuis cette plongée",
+    "validate": "Faire signer la plongée… (signature d’un moniteur ou d’un compagnon)",
     "share": "Partager…",
     "export": "Exporter la plongée…",
     "delete": "Supprimer la plongée",
@@ -4963,6 +4968,8 @@
       "visibility": "Visibilité",
       "rating": "Évaluation",
       "suit": "Combinaison",
+      "undersuit": "Sous-vêtement",
+      "kit": "Kit",
       "surfacePressure": "Pression en surface",
       "maxDepth": "Profondeur max.",
       "duration": "Durée",
@@ -4986,7 +4993,14 @@
       "pressure": "Pression",
       "coordinates": "Coordonnées"
     },
+    "kitNote": "Remplit la combinaison, le sous-vêtement, le lest et l’autre équipement. Chaque champ reste modifiable.",
+    "kitPieces": {
+      "one": "{n} pièce",
+      "other": "{n} pièces"
+    },
     "invitation": {
+      "kit": "Appliquer un kit",
+      "undersuit": "Choisir un sous-vêtement",
       "site": "Site à préciser",
       "buddies": "Ajouter des compagnons",
       "guides": "Ajouter un guide",
@@ -6621,6 +6635,7 @@
     "failedNoDives": "Le fichier ne contient aucune plongée. Le carnet actuel est conservé."
   },
   "validation": {
+    "back": "Retour",
     "itemName": "{name}, {role}",
     "menuOne": "Faire signer la plongée",
     "menuMany": "Faire signer les plongées",
