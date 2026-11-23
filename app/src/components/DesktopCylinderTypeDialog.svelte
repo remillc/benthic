@@ -16,7 +16,7 @@
   import { liveError } from '../lib/live-validation.svelte.js';
   import { formatNumber, locale } from '../lib/format.js';
   import { logbook, renameCylinderType, previewCylinderTypeDeletion, deleteCylinderType } from '../lib/logbook.svelte.js';
-  import { deletable, deletionSentences, sizeFields, typedSize, parseSizeNumber as parse } from '../lib/cylinder-types.js';
+  import { deletable, deletionSentences, sizeFields, sizeErrorKey, typedSize, parseSizeNumber as parse } from '../lib/cylinder-types.js';
   import { keepCylinderLibrary } from '../lib/settings.svelte.js';
 
   /**
@@ -94,9 +94,11 @@
       error = t('settings.cylinders.nameMissing');
       return;
     }
-    const size = typedSize(volume, pressure, { cuft, psi });
+    // A type being renamed keeps its size when the size fields were not touched (a type read from a dive may have no
+    // working pressure, which cubic feet cannot show).
+    const size = type && volume === start.volume && pressure === start.pressure ? { ml: type.ml, mbar: type.mbar } : typedSize(volume, pressure, { cuft, psi });
     if ('invalid' in size) {
-      error = t(size.invalid === 'pressure' ? 'settings.cylinders.pressureInvalid' : 'settings.cylinders.volumeInvalid');
+      error = t(sizeErrorKey(size.invalid));
       return;
     }
     saving = true;

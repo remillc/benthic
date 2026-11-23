@@ -1113,6 +1113,7 @@
       "nameInUse": "Ce nom est déjà celui d’un type",
       "nameMissing": "Indiquez un nom",
       "volumeInvalid": "Indiquez un volume plus grand que 0",
+      "pressureNeeded": "En pieds cubes, le volume dépend de la pression de service : indiquez-la",
       "pressureInvalid": "Indiquez une pression valide",
       "renamed": "Type renommé",
       "nameHelp": "Le nom affiché dans le choix du type d’une bouteille",
@@ -2769,6 +2770,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Types de bouteille : un type sans pression de service (venu d’une plongée) n’affiche plus « 0 » en pieds cubes et se renomme sans erreur ; un volume saisi sans pression demande la pression de service.",
       "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
       "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
       "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
