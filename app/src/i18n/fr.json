@@ -2791,6 +2791,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Carnet : un appui long sur une plongée ou un voyage démarre la sélection dès qu’il est reconnu, le doigt encore posé, avec une courte vibration si l’appareil en a une ; lever le doigt ne décide plus.",
       "Exporter : « Envoyer vers divelogs.de » envoie les plongées du carnet ou de la sélection vers votre compte divelogs.de, après le nom d’utilisateur et le mot de passe, qui ne sont pas gardés. L’envoi a sa progression et se reprend après une coupure de connexion.",
       "Profil : la date de naissance est chiffrée ; les dates existantes sont protégées à l’ouverture d’un profil modifiable.",
       "Bureau : en sélectionnant plusieurs plongées, « Faire signer… » du menu contextuel ouvre la fenêtre de signature pour elles (Benthic+).",
