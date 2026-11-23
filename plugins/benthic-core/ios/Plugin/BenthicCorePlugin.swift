@@ -62,6 +62,8 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionAccess", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionClear", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pushStreamOpen", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pushStreamClose", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "devResetApp", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "dataKeyRead", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "dataKeyWrite", returnType: CAPPluginReturnPromise),
@@ -1196,7 +1198,32 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// Signs out of the Benthic server: the tokens are erased from this device.
     @objc func serverSessionClear(_ call: CAPPluginCall) {
+        pushStream.close()
         serverStore.delete()
+        call.resolve()
+    }
+
+    /// The push channel (lib/push-events.js): its lines and endings reach the page as `pushStream` events.
+    private lazy var pushStream = PushStream { [weak self] id, kind, line, status, message in
+        var data: [String: Any] = ["id": id, "kind": kind, "status": status]
+        if let line = line { data["line"] = line }
+        if let message = message { data["message"] = message }
+        self?.notifyListeners("pushStream", data: data)
+    }
+
+    /// Opens the Server-Sent Events stream and returns at once (`id`, `url`, `token`).
+    @objc func pushStreamOpen(_ call: CAPPluginCall) {
+        guard let id = call.getInt("id"), let address = call.getString("url"), let url = URL(string: address),
+              url.scheme == "https" || url.scheme == "http", let token = call.getString("token"), !token.isEmpty else {
+            call.reject("An id, an address and a token are needed", "BAD_ARGUMENT")
+            return
+        }
+        pushStream.open(id: id, url: url, token: token)
+        call.resolve()
+    }
+
+    @objc func pushStreamClose(_ call: CAPPluginCall) {
+        pushStream.close(id: call.getInt("id"))
         call.resolve()
     }
 

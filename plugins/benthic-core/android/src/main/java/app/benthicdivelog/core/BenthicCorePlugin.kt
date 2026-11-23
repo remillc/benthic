@@ -759,7 +759,36 @@ class BenthicCorePlugin : Plugin() {
     /** Signs out of the Benthic server: the tokens are erased from this device. */
     @PluginMethod
     fun serverSessionClear(call: PluginCall) {
+        pushStream.close()
         serverStore.delete()
+        call.resolve()
+    }
+
+    /** The push channel (lib/push-events.js): its lines and endings reach the page as `pushStream` events. */
+    private val pushStream = PushStream { id, kind, line, status, message ->
+        val data = JSObject().put("id", id).put("kind", kind).put("status", status)
+        if (line != null) data.put("line", line)
+        if (message != null) data.put("message", message)
+        notifyListeners("pushStream", data)
+    }
+
+    /** Opens the Server-Sent Events stream on a background thread and returns at once (`id`, `url`, `token`). */
+    @PluginMethod
+    fun pushStreamOpen(call: PluginCall) {
+        val id = call.getInt("id")
+        val url = call.getString("url")
+        val token = call.getString("token")
+        if (id == null || url.isNullOrEmpty() || token.isNullOrEmpty() || !(url.startsWith("https://") || url.startsWith("http://"))) {
+            call.reject("An id, an address and a token are needed", "BAD_ARGUMENT")
+            return
+        }
+        pushStream.open(id, url, token)
+        call.resolve()
+    }
+
+    @PluginMethod
+    fun pushStreamClose(call: PluginCall) {
+        pushStream.close(call.getInt("id"))
         call.resolve()
     }
 
@@ -1313,6 +1342,7 @@ class BenthicCorePlugin : Plugin() {
     private val mapsIo: ExecutorService = Executors.newSingleThreadExecutor()
 
     override fun handleOnDestroy() {
+        pushStream.close()
         MapsManager.listener = null
         super.handleOnDestroy()
     }
