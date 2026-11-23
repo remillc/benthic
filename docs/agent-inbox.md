@@ -6756,3 +6756,11 @@ Christian approved this on 23 November 2026 (TODO #159). Work in `main`. No mock
 - Check both Android and iPhone, phone and tablet.
 
 In the done note, say which event now starts selection mode and how the lift is ignored.
+
+## [ ] 2026-11-23-342 Correction of task 338: the join summary's intro line is missing
+
+Christian asked for this on 23 November 2026. Work in `main`. In the « Joindre cet appareil » dialog (task 338, item 11; mock-up « Premier envoi, résumé et pièces à confirmer (Benthic+) · Android » and its tablet and desktop versions), the app does not show the line under the title. Add it, on every device, between the title and the three counters:
+
+« Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte. »
+
+Body text, 14 sp, on-surface-variant colour, 4 dp under the title and 20 dp above the counters, as in the mock-up.
