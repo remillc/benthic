@@ -4,9 +4,9 @@
 // front), whether or not changes are waiting to be sent.
 
 /**
- * @param {{ email: string|null|undefined, autoSync: boolean, sync: string, loading: boolean, error: unknown, conflict: unknown }} state
+ * @param {{ email: string|null|undefined, sync: string, loading: boolean, error: unknown, conflict: unknown }} state
  * @returns {boolean}
  */
 export function shouldReconnect(state) {
-  return !!state.email && state.autoSync && state.sync === 'offline' && !state.loading && !state.error && !state.conflict;
+  return !!state.email && state.sync === 'offline' && !state.loading && !state.error && !state.conflict;
 }

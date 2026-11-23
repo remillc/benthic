@@ -11,7 +11,7 @@
   import { logbook, syncNow } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
 
-  /** filled: changes wait to be sent (the account sheet in manual sync, task 2026-11-14-126).
+  /** filled: changes wait to be sent (the account sheet, task 2026-11-14-126).
       label: another text than « Synchroniser » (the desktop account sheet, task 2026-11-15-202). */
   let { filled = false, label = '' } = $props();
 

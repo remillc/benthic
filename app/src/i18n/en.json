@@ -442,10 +442,6 @@
     "syncedAgo": "Synced {ago}",
     "offline": "Offline: no changes waiting",
     "local": "Logbook stored on this device only",
-    "manual": {
-      "one": "Manual sync: {n} change not sent",
-      "other": "Manual sync: {n} changes not sent"
-    },
     "offlinePending": {
       "one": "Offline: {n} change will be sent when the network is back",
       "other": "Offline: {n} changes will be sent when the network is back"
@@ -1493,16 +1489,11 @@
     "title": "Account",
     "cloudLine": "Subsurface cloud",
     "syncGroup": "Synchronisation",
-    "autoSync": "Sync automatically",
-    "autoSyncText": "When the app opens, when you come back to it and a few seconds after a change",
     "lastSync": "Last synchronisation",
     "lastSyncNever": "Never",
     "todayAt": "today, {time}",
     "cloudDives": "Dives in the cloud",
     "syncNow": "Sync",
-    "syncOptions": "More sync options",
-    "syncGoAuto": "Switch to automatic sync",
-    "syncShowPending": "See changes not sent yet",
     "subsurfaceGroup": "Subsurface account",
     "changePassword": "Change password",
     "changePasswordText": "A link is sent to your email",
@@ -1544,7 +1535,6 @@
       "other": "Instead of an account, a repository of yours (GitHub, Gitea…). Your {n} dives are sent there"
     },
     "notAvailable": "Not available yet",
-    "autoSyncOff": "Off: nothing is sent or received until you sync.",
     "pending": "Changes not sent",
     "bandSignedIn": "Your logbook in the cloud",
     "bandNone": "No account connected",
@@ -2791,6 +2781,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Sync: synchronisation is always automatic. The « Sync automatically » switch and the manual mode are gone; « Wi-Fi or cable only » and « Sync now » stay, and changes not sent still show when the device is offline.",
       "Logbook: a long press on a dive or a trip starts selection mode as soon as it is recognised, with the finger still down and a short haptic tap on phones and tablets; letting go no longer decides.",
       "Android phone, Logbook and Sites: the search box sits under the summary and, as the list scrolls, shrinks and rises into the top bar as a magnifier. A search in progress stays there as a pill with its text and a clear button; tapping the text or the magnifier opens the box again. On Sites, the map's full-screen button moves above « Center on my position ».",
       "Export: “Send to divelogs.de” sends the dives of the logbook or of the selection to your divelogs.de account, after the user name and the password, which are not kept. The sending shows its progress and resumes after a lost connection.",
@@ -5152,8 +5143,6 @@
     "account": {
       "sheet": "Account",
       "syncNow": "Sync now",
-      "auto": "Sync automatically",
-      "autoText": "At startup and after each change",
       "unmetered": "Only on Wi-Fi or cable",
       "unmeteredText": "Never on a tethered connection",
       "manage": "Manage account"

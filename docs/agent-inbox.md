@@ -6798,7 +6798,7 @@ Christian asked for this on 23 November 2026. Work in `main`. The row you added 
 
 Check that the app matches on every device (position, divider, icon, texts, the row hidden when `canPair` is false) and fix any gap. It is not in the free account sheet. In the done note, say what you changed, or that nothing needed to change.
 
-## [ ] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
+## [x] 2026-11-23-346 Sync is always automatic: remove manual sync (TODO #181)
 
 Christian decided this on 23 November 2026. Work in `main`. The diver can no longer choose a manual sync: the logbook (and the account data) always sync automatically, on every device and in every edition.
 
@@ -6809,6 +6809,8 @@ Christian decided this on 23 November 2026. Work in `main`. The diver can no lon
 5. Update `docs/architecture.md` / `docs/system-design.md` where they describe manual sync, and add a line to the release notes (fr and en).
 
 In the done note, list what was removed.
+
+**Done (23 November 2026).** Removed: the `autoSync` setting and its storage (`readAutoSync`, `setAutoSync`, `logbook.autoSync`; the stored `bc.autoSync` is deleted at start); the switch in `Account.svelte` and `DesktopAccountSheet.svelte` (none in `AccountSheet.svelte` or Réglages); the `manual` sync state and its `SyncStatus` line; the account sheet's ⋮ menu and iPhone action sheet; `SyncControl.svelte` and `SplitButton.svelte` (plain `SyncButton` everywhere); the `autoSync` test in `reconnect.js`; the keys `account.autoSync`, `autoSyncText`, `autoSyncOff`, `syncOptions`, `syncGoAuto`, `syncShowPending`, `sync.manual`, `desktopSettings.account.auto`, `autoText` (fr and en). `autoSyncing()` is exported and now returns `syncAllowedOnThisNetwork() && !logbook.browsing`. The account sheet shows « N modifications non envoyées » with a filled « Synchroniser » when the device is offline or on a metered link with changes waiting. Docs: system-design.md and ui-specification.md updated; release note added (fr, en).
 
 ## [ ] 2026-11-23-347 « Profil » becomes a main navigation entry (Benthic+), with its own home page; « Mon profil de plongeur » leaves the account sheet
 

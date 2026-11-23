@@ -12,7 +12,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import SyncButton from './SyncButton.svelte';
   import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
-  import { logbook, setAutoSync, signOut } from '../lib/logbook.svelte.js';
+  import { logbook, signOut } from '../lib/logbook.svelte.js';
   import { navigation, openOver, openProfile, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
   import { openBenthicPlus } from '../lib/open-offer.svelte.js';
@@ -148,7 +148,7 @@
           {#if logbook.syncFailure}
             <SyncFailureRow />
           {:else}
-            <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
           {/if}
           <SyncButton />
         </div>
@@ -212,7 +212,7 @@
           {#if logbook.syncFailure}
             <SyncFailureRow />
           {:else}
-            <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
           {/if}
           <SyncButton />
         </div>
@@ -262,7 +262,7 @@
             {#if logbook.syncFailure}
               <SyncFailureRow />
             {:else}
-              <SyncStatus sync={logbook.sync === 'manual' ? 'cloud' : logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+              <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
             {/if}
           </span>
         {:else if free}
@@ -294,13 +294,6 @@
         {#if subscriber}<button type="button" class="bc-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>{/if}
         <SyncButton label={t('desktopSettings.account.syncNow')} />
       </div>
-      <label class="bc-desktop-account--switch">
-        <span class="bc-desktop-account--switch-texts">
-          <span class="bc-desktop-account--switch-label">{t('desktopSettings.account.auto')}</span>
-          <span class="bc-desktop-account--switch-text">{t('desktopSettings.account.autoText')}</span>
-        </span>
-        <span class="toggle"><input type="checkbox" checked={logbook.autoSync} onchange={(e) => setAutoSync(e.currentTarget.checked)} /><span class="toggle-icon"></span></span>
-      </label>
       <label class="bc-desktop-account--switch">
         <span class="bc-desktop-account--switch-texts">
           <span class="bc-desktop-account--switch-label">{t('desktopSettings.account.unmetered')}</span>

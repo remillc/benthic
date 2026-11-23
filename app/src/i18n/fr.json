@@ -442,10 +442,6 @@
     "syncedAgo": "Synchronisé {ago}",
     "offline": "Hors ligne : aucune modification en attente",
     "local": "Carnet enregistré sur cet appareil seulement",
-    "manual": {
-      "one": "Synchronisation manuelle : {n} modification non envoyée",
-      "other": "Synchronisation manuelle : {n} modifications non envoyées"
-    },
     "offlinePending": {
       "one": "Hors ligne : {n} modification sera envoyée au retour du réseau",
       "other": "Hors ligne : {n} modifications seront envoyées au retour du réseau"
@@ -1493,16 +1489,11 @@
     "title": "Compte",
     "cloudLine": "Cloud Subsurface",
     "syncGroup": "Synchronisation",
-    "autoSync": "Synchroniser automatiquement",
-    "autoSyncText": "À l'ouverture, au retour dans l'app et quelques secondes après une modification",
     "lastSync": "Dernière synchronisation",
     "lastSyncNever": "Jamais",
     "todayAt": "aujourd’hui, {time}",
     "cloudDives": "Plongées dans le cloud",
     "syncNow": "Synchroniser",
-    "syncOptions": "Autres options de synchronisation",
-    "syncGoAuto": "Passer en synchronisation automatique",
-    "syncShowPending": "Voir les modifications non envoyées",
     "subsurfaceGroup": "Compte Subsurface",
     "changePassword": "Changer le mot de passe",
     "changePasswordText": "Un lien est envoyé à votre adresse e-mail",
@@ -1544,7 +1535,6 @@
       "other": "Au lieu d’un compte, un dépôt à vous (GitHub, Gitea…). Vos {n} plongées y sont envoyées"
     },
     "notAvailable": "Pas encore disponible",
-    "autoSyncOff": "Désactivée : rien n'est envoyé ni reçu tant que vous ne synchronisez pas.",
     "pending": "Modifications non envoyées",
     "bandSignedIn": "Votre carnet dans le cloud",
     "bandNone": "Aucun compte connecté",
@@ -2791,6 +2781,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Synchronisation : elle est toujours automatique. Le réglage « Synchroniser automatiquement » et le mode manuel n’existent plus ; « Seulement sur Wi-Fi ou câble » et « Synchroniser maintenant » restent, et les modifications non envoyées s’affichent toujours quand l’appareil est hors ligne.",
       "Carnet : un appui long sur une plongée ou un voyage démarre la sélection dès qu’il est reconnu, le doigt encore posé, avec un court retour haptique sur téléphone et tablette ; lever le doigt ne décide plus.",
       "Téléphone Android, Carnet et Sites : la boîte de recherche est sous le résumé et, au défilement, rétrécit et monte dans la barre du haut sous forme de loupe. Une recherche en cours y reste sous forme de pastille avec son texte et son bouton d’effacement ; toucher le texte ou la loupe rouvre la boîte. Sur Sites, le bouton plein écran de la carte passe au-dessus de « Centrer sur ma position ».",
       "Exporter : « Envoyer vers divelogs.de » envoie les plongées du carnet ou de la sélection vers votre compte divelogs.de, après le nom d’utilisateur et le mot de passe, qui ne sont pas gardés. L’envoi a sa progression et se reprend après une coupure de connexion.",
@@ -5152,8 +5143,6 @@
     "account": {
       "sheet": "Compte",
       "syncNow": "Synchroniser maintenant",
-      "auto": "Synchroniser automatiquement",
-      "autoText": "À l’ouverture et après chaque modification",
       "unmetered": "Seulement sur Wi-Fi ou câble",
       "unmeteredText": "Jamais sur un partage de connexion",
       "manage": "Gérer le compte"
