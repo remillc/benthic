@@ -6655,7 +6655,7 @@ In the done note, list what you replaced, or say that nothing needed to change.
 
 **Done (23 November 2026).** Nothing needed to change in the code. Searched `app/src` (inline SVGs, masks, Framework7 font icons, `Icon` uses) on every platform: every forward chevron already uses `M9 5l7 7-7 7` (`Icon` `chevron`, the Android list mask in `theme.css`, the three Settings inline SVGs); no other forward or back chevron drawing exists (`arrowRight` is an arrow with a shaft, not a chevron; the top-bar back arrows and drop-down chevrons are out of scope). iOS list rows: Framework7's `chevron_right` font icon (`--f7-list-chevron-icon-right`) stays, as the iOS disclosure indicator (iOS's own look is wanted there; only Android replaces it with the 24 dp chevron). Added the line to `docs/system-design.md`, section 8 (« Chevrons »). No visible change, so no release note and no screenshots.
 
-## [ ] 2026-11-23-337 « Envoyer vers divelogs.de »: connection, progress, done and error screens, on phone, tablet and desktop
+## [x] 2026-11-23-337 « Envoyer vers divelogs.de »: connection, progress, done and error screens, on phone, tablet and desktop
 
 Christian approved this on 23 November 2026. Work in `main`. The row « Envoyer vers divelogs.de » of the « Exporter le carnet » dialog (task 324) shows « pas encore disponible » today. Make it work. Mock-ups, each in a subgroup « Exporter le carnet et envoyer vers divelogs.de » (phone, desktop) or « Envoyer vers divelogs.de » (tablet):
 
@@ -6674,6 +6674,13 @@ The flow, the same on every device, all in basic dialogs over the logbook (no �
 Check before you write the texts of steps 3 and 4: what divelogs.de does with dives already in the account (duplicates, updates). If the upload does not end with a check by divelogs.de, drop that step and tell Christian. A network error during the upload is not drawn: show the progress dialog's step in error with « Réessayer » and « Annuler », and say what you did in the done note.
 
 The phone mock-up « Carnet, menu ouvert · Android » does not show « Exporter le carnet » in the ⋮ menu yet; the app's menu is the reference. iPhone is not drawn: apply the same flow with the iOS dialogs if the export exists there.
+
+**Done (23 November 2026).** The row works on phone, tablet and desktop (`ExportSheet.svelte`, `DesktopExportDialog.svelte` then `DivelogsUploadDialog.svelte`, `DivelogsSteps.svelte`); iPhone and iPad get the same dialogs (they are the app's own Md3Dialog, which has its iOS look). The phone's export is now a basic dialog, 16 dp from the screen sides with the footer line above the buttons (it was a bottom sheet); Md3Dialog gained an `icon` and a `footer` slot for this.
+- **Upload (port of Subsurface's, in JavaScript):** `POST /api/login` (multipart `user`, `pass`) gives a `bearer_token`; `POST /api/dives` with the bearer token and a JSON array of dives. The dives are the .ssrf the core already exports (`exportDives`, format ssrf, text), turned into divelogs.de's JSON by `lib/divelogs-format.js`, a port of `divelogs-export.xslt` + `xml2json.xslt`; it matches libxslt's output on 13 Subsurface sample files and a hand-written one (`tests/divelogs_oracle.py` made the references, `tests/app/divelogs-format.test.mjs`). No C++ was added. Subsurface sends all dives in one request; Benthic sends 25 at a time so the progress is real and a retry resumes. Geocoding categories are none, as in Subsurface's defaults.
+- **Existing dives in the account:** neither Subsurface's code nor any public divelogs.de documentation I could find says what divelogs.de does with dives already in the account (duplicates or updates); the screens therefore say nothing about it. The reply is only a status code, so there is no check by divelogs.de after the upload: the third step « Vérification par divelogs.de » is dropped (two steps: connection, sending), and the done line is shown when every batch got a 2xx.
+- **Credentials:** never stored (no store, no setting). They live in the dialog's fields; the password is emptied once divelogs.de accepted it (the bearer token stays in memory for « Réessayer »); user name and password go with the dialog. Wrong credentials (401 or a reply without token) bring back the connection dialog with the password field in error.
+- **Network error:** the progress step goes red (« divelogs.de ne répond pas » at the login, « Envoi interrompu » with « N sur M plongées envoyées. Vérifiez la connexion, puis réessayez. » while sending, « divelogs.de a refusé l’envoi » for a server error) with « Annuler » and « Réessayer »; « Réessayer » resumes at the batch that failed, with no new password after the login. These texts are mine (the task draws none); the batch whose answer was lost may be sent twice.
+- **Transport:** desktop through the main process (`server.request` now takes a `raw` text body and a timeout), phones through CapacitorHttp with a text body (multipart written by hand), a plain browser through fetch (tests only). Not verified on a device or against the real divelogs.de; the e2e flow `--divelogs-only` runs everything against a fake server (`tests/e2e/fake-divelogs.mjs`).
 
 ## [ ] 2026-11-23-338 Account data sync screens (#179): pairing, recovery key, join summary, locked items, two-device notice, start over
 
@@ -6717,3 +6724,23 @@ Christian approved this on 23 November 2026 (TODO #58). Work in `main`. Today th
 5. The collapsed band keeps its faint profile above the wave (the « seconde vague »), as `BandBackdrop` draws it; the mock-ups « Carnet, défilé avec en-têtes collants » and « Carnet, petit carnet … » were missing it and are fixed.
 
 Tablet, desktop and iPhone are not part of this task. In the done note, say how the box is animated and what happens when the keyboard is open and the list is scrolled.
+
+## [ ] 2026-11-23-340 Sync progress: the header's pale profile becomes the progress line, on every device (replaces the Material 3 wavy bar of `PullProgress`)
+
+Christian approved this on 23 November 2026 (TODO #139). Work in `main`. Today `PullProgress.svelte` (todo 88) shows the Material 3 Expressive wavy linear indicator (`LinearWavyProgress`) at the top of the Carnet's list while the app exchanges with the server at start, and an 8 pt bar on iOS. Replace it on **every device** (phone, tablet, desktop, iPhone) by a line drawn on the header's own pale profile. Mock-ups, phone canvas, Android › Carnet et plongées › Liste du carnet:
+- « Carnet, échange avec le serveur au démarrage, progression inconnue : un trait glisse sur la vague · Android »
+- « Carnet, échange avec le serveur au démarrage, progression connue (60 %) : la vague se remplit · Android »
+- « Carnet, échange avec le serveur terminé : la vague se complète puis s’efface · Android »
+(the three boards are animated on the canvas.)
+
+1. **The line.** White, 2.5 dp, round caps and joins, with a soft glow (`drop-shadow(0 0 3px rgb(255 255 255 / .85))` and `drop-shadow(0 0 6px rgb(255 255 255 / .45))`), the same style as the profile line of the first launch screen. It runs exactly on the band's faint profile line (`PROFILE` in `BandBackdrop.svelte`, the « ondulation du dessus »), not on the cream wave. No dot at its head. The line takes no height; the list never moves.
+2. **Smoother profile.** The profile's small corners are rounded while its overall shape stays the same: replace the polyline `PROFILE` with this curve (same 300 × 140 box), everywhere the band's profile is drawn (`BandBackdrop`, `SectionBand`, `FirstLaunchBand`, `NavMenu`, `FirstLaunchBenthicPlus`, `WelcomeStartRelease`; check for others):
+   `M0 30 C4 31.6 11 30 20 38 C29 46 35 59.2 45 70 C55 80.8 60 86.8 70 92 C80 97.2 85 96.8 95 96 C105 95.2 111 88.4 120 88 C129 87.6 131 95.6 140 94 C149 92.4 156 86.4 165 80 C174 73.6 176 66.4 185 62 C194 57.6 200 60.4 210 58 C220 55.6 226 52.4 235 50 C244 47.6 247 48 255 46 C263 44 266 42 275 40 C284 38 295 36.8 300 36`
+   Draw the progress line in the band's pixel space (not with a non-uniform `preserveAspectRatio="none"` scale), so its width and dash length stay true (`pathLength="100"`, `stroke-dasharray`).
+3. **Unknown progress** (`fraction <= 0`): a segment of about a quarter of the line slides from left to right, 1.6 s per pass, linear, looping.
+4. **Known progress**: the line is drawn from the left up to `fraction`, following the profile.
+5. **Done**: the line completes to 100 % (about 0.6 s), stays 0.3 s, then fades out in about 1.1 s (ease-in-out). Then nothing is left.
+6. **Reduced motion**: no sliding segment (a still line at half opacity while unknown), no animated completion; the line simply disappears at the end.
+7. **Accessibility**: the line is the `progressbar` (`aria-label` « Synchronisation du carnet », `aria-valuenow` when known); keep announcing the stage, not each percent, as now.
+8. **Collapsed band**: when the band is collapsed during the exchange, the line runs on the collapsed band's profile.
+9. **Every device**: tablet and desktop use their band the same way. Where a device's Carnet header has no band profile (iPhone large title, desktop if it applies), add the same faint profile at the bottom edge of the header and draw the line on it; say in the done note what you did per device. Remove `LinearWavyProgress` from `PullProgress` if nothing else uses it.

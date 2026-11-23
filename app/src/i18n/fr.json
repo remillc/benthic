@@ -2792,7 +2792,8 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en lisant un code QR (ou en montrant le sien sur un ordinateur) ou avec une clé de secours de 26 caractères ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé.",
-    "Profil : la date de naissance est chiffrée ; les dates existantes sont protégées à l’ouverture d’un profil modifiable.",
+      "Exporter : « Envoyer vers divelogs.de » envoie les plongées du carnet ou de la sélection vers votre compte divelogs.de, après le nom d’utilisateur et le mot de passe, qui ne sont pas gardés. L’envoi a sa progression et se reprend après une coupure de connexion.",
+      "Profil : la date de naissance est chiffrée ; les dates existantes sont protégées à l’ouverture d’un profil modifiable.",
       "Bureau : en sélectionnant plusieurs plongées, « Faire signer… » du menu contextuel ouvre la fenêtre de signature pour elles (Benthic+).",
       "Bureau : le séparateur entre les volets n’a plus de poignée ; il passe en orange quand le pointeur le survole ou le déplace. Le carnet a sa propre barre de défilement fine, à part. Chaque plongée est séparée de la suivante par une ligne, et la colonne Compagnons n’affiche plus l’initiale.",
       "Tablette, premier lancement : « Votre carnet est prêt » centre le logo, la pastille, le titre et la ligne du panneau bleu, et la colonne de droite reprend la maquette : titre « Votre carnet », fiche des chiffres sur toute la largeur, bouton « Ouvrir mon carnet » à droite.",
@@ -4141,7 +4142,40 @@
     "footnoteTablet": "Le fichier s’ouvre ensuite dans le partage de la tablette.",
     "withMedia": "Inclure les photos et vidéos",
     "withMediaText": "Le fichier peut devenir beaucoup plus gros",
-    "divelogsSoon": "L’envoi vers divelogs.de n’est pas encore disponible."
+    "divelogsFootnote": "Vous vous connecterez ensuite à divelogs.de.",
+    "continue": "Continuer"
+  },
+  "divelogsUpload": {
+    "title": "Envoyer vers divelogs.de",
+    "text": {
+      "one": "{name} · {n} plongée. Connectez-vous à votre compte divelogs.de.",
+      "other": "{name} · {n} plongées. Connectez-vous à votre compte divelogs.de."
+    },
+    "user": "Nom d’utilisateur",
+    "password": "Mot de passe",
+    "note": "Benthic ne garde pas ces identifiants.",
+    "send": "Envoyer",
+    "denied": "Nom d’utilisateur ou mot de passe incorrect.",
+    "progressTitle": "Envoi vers divelogs.de",
+    "stepConnect": "Connexion à divelogs.de",
+    "stepAccount": "Compte « {user} »",
+    "stepSend": "Envoi des plongées",
+    "count": "{done} sur {total}",
+    "help": "Gardez l’app ouverte jusqu’à la fin. Vos plongées restent dans votre carnet.",
+    "unreachable": "divelogs.de ne répond pas",
+    "unreachableDetail": "Vérifiez la connexion, puis réessayez.",
+    "interrupted": "Envoi interrompu",
+    "interruptedDetail": "{done} sur {total} plongées envoyées. Vérifiez la connexion, puis réessayez.",
+    "refused": "divelogs.de a refusé l’envoi",
+    "refusedDetail": "{done} sur {total} plongées envoyées. Réessayez plus tard.",
+    "retry": "Réessayer",
+    "doneTitle": "Plongées envoyées",
+    "doneText": {
+      "one": "La plongée de {name} est maintenant dans le compte divelogs.de « {user} ».",
+      "other": "Les {n} plongées de {name} sont maintenant dans le compte divelogs.de « {user} »."
+    },
+    "open": "Ouvrir divelogs.de",
+    "ok": "OK"
   },
   "plans": {
     "title": "Plongées planifiées",

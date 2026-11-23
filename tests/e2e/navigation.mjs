@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--desktop-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { monkeyFlows } from './navigation-monkey.mjs';
 import { gestureFlows } from './navigation-gestures.mjs';
+import { startFakeDivelogs } from './fake-divelogs.mjs';
 import { regressionFlows } from './navigation-regressions.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -131,10 +132,15 @@ if (args.has('--delete-only')) {
 }
 await core('importFile', { source: seeded, repo: `${path.join(home, 'carnet')}[main]` });
 
+// A fake divelogs.de on this machine (tests/e2e/fake-divelogs.mjs): the build under test is pointed at it, never at the real service.
+mkdirSync(path.join(temp, 'share'), { recursive: true });
+const divelogs = await startFakeDivelogs(PORT + 1000);
+children.push({ kill: () => divelogs.close() });
+
 // The app's development server.
 const vite = spawn(process.execPath, [path.join(root, 'app/node_modules/vite/bin/vite.js'), '--config', 'vite.e2e.config.js'], {
   cwd: path.join(root, 'app'),
-  env: { ...process.env, BC_E2E_PORT: String(PORT) },
+  env: { ...process.env, BC_E2E_PORT: String(PORT), VITE_DIVELOGS_URL: divelogs.url },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 children.push(vite);
@@ -258,6 +264,12 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         writeFileSync(p, Buffer.from(a.base64, 'base64'));
         reply = { ok: true, v: { path: p } };
       } else if (method === 'exists') reply = { ok: true, v: existsSync(a.path) };
+      // The export read back as text (the divelogs.de upload): what desktop/bridge.cjs answers.
+      else if (method === 'readChunk') {
+        const buffer = readFileSync(a.path);
+        reply = { ok: true, v: { data: buffer.subarray(a.offset || 0, (a.offset || 0) + (a.length || 0)).toString('base64'), size: buffer.length } };
+      } else if (method === 'readFile') reply = { ok: true, v: readFileSync(a.path).toString('base64') };
+      else if (method === 'remove') reply = { ok: true, v: (rmSync(a.path, { force: true }), true) };
       else if (method === 'readDevEnv') reply = { ok: true, v: '' };
       else reply = { ok: true, v: null };
     } catch (e) {
@@ -292,7 +304,17 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         paths: { userData: home, temp, resourcesDir: stage, xsltDir: `${stage}/xslt`, caFile: `${temp}/ca.pem` },
         core: (m, a) => call('core', m, a),
         onCoreEvent: () => () => {},
-        credentials: { get: async () => null, set: async () => {}, clear: async () => {} },
+        // The secure storage of the bridge (safeStorage in the real app): kept for the page, so that the data key written
+        // when a sensitive item is first sealed is found again (the app never makes a second key over sealed data).
+        // Kept in the page storage (not in memory): the flows reload the page, and IndexedDB, which holds the sealed items, stays.
+        credentials: (() => {
+          const key = (kind) => `__bcTestCredential.${kind}`;
+          return {
+            get: async (kind) => JSON.parse(localStorage.getItem(key(kind)) ?? "null"),
+            set: async (kind, value) => localStorage.setItem(key(kind), JSON.stringify(value)),
+            clear: async (kind) => localStorage.removeItem(key(kind)),
+          };
+        })(),
         // The recent logbooks (the desktop layout reads them at start): none, as on a first run.
         logbooks: { recent: async () => [], exists: async () => ({}), forget: async () => [], clearRecent: async () => [] },
         fs: new Proxy({}, { get: (_, op) => (o) => call('fs', op, o) }),
@@ -1264,6 +1286,159 @@ async function exportFlows(expect) {
   }
 }
 
+/** « Envoyer vers divelogs.de » (task 2026-11-23-337) against the fake divelogs.de: choice, connection, refused password, progress, done, lost connection. */
+async function divelogsFlows(expect) {
+  const waitFor = async (tab, fn, arg, tries = 60) => {
+    for (let i = 0; i < tries; i++) {
+      if (await tab.run(fn, arg).catch(() => false)) return true;
+      await sleep(150);
+    }
+    return false;
+  };
+  const press = (tab, pattern) => tab.run((pattern) => {
+    const button = [...document.querySelectorAll('.bc-divelogs-upload button, .bc-divelogs-upload a')].find((b) => new RegExp(pattern).test(b.textContent.trim()));
+    if (!button) throw new Error(`button ${pattern} missing`);
+    button.click();
+  }, pattern);
+  const type = (tab, index, value) => tab.run((index, value) => {
+    const input = document.querySelectorAll('.bc-divelogs-upload .bc-release-field--input')[index];
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }, index, value);
+  /** The export dialog of the whole logbook, divelogs.de chosen, « Continuer » pressed. */
+  const openConnection = async (tab, desktop, dialog) => {
+    await tab.run((desktop) => {
+      document.querySelector(desktop ? '.bc-logbook-selector--pill' : '.page-current [data-popover=".bc-logbook-menu"], .page-master [data-popover=".bc-logbook-menu"]').click();
+    }, desktop);
+    await sleep(500);
+    await tab.run((desktop) => {
+      const menu = document.querySelector(desktop ? '.bc-logbook-selector--menu' : '.bc-logbook-menu');
+      [...menu.querySelectorAll('a, button')].find((el) => /Exporter le carnet|Export the logbook/.test(el.textContent)).click();
+    }, desktop);
+    await sleep(600);
+  };
+  const choose = async (tab, dialog) => {
+    await tab.run((dialog) => document.querySelector(`${dialog} [data-format="divelogs"] [role="radio"]`).click(), dialog);
+    await sleep(300);
+  };
+  const confirm = (tab, dialog) => tab.run((dialog) => [...document.querySelectorAll(`${dialog} button`)].filter((b) => b.getAttribute('role') !== 'radio' && !b.closest('[role="radiogroup"]')).at(-1).click(), dialog);
+  for (const kind of ['phone', 'tablet', 'desktop']) {
+    const desktop = kind === 'desktop';
+    const tab = await openTab(desktop ? 1400 : kind === 'tablet' ? 1280 : 390, desktop ? 900 : kind === 'tablet' ? 800 : 844, kind === 'phone', false, desktop, { theme: 'md' });
+    const total = await tab.run(async () => (await import('/src/lib/logbook.svelte.js')).logbook.dives.length);
+    divelogs.requests.length = 0;
+    divelogs.dives.length = 0;
+    divelogs.control.delayMs = 0;
+    divelogs.control.dropDives = false;
+    await sleep(500);
+    const dialog = desktop ? '.bc-desktop-export' : '.bc-export-sheet';
+    await openConnection(tab, desktop, dialog);
+    if (process.env.BC_SHOTS) await shot(tab, `divelogs-0-export-${kind}`);
+    // 1. The choice.
+    await choose(tab, dialog);
+    const choice = await tab.run((dialog) => {
+      const el = document.querySelector(dialog);
+      const buttons = [...el.querySelectorAll('button')].filter((b) => b.getAttribute('role') !== 'radio' && !b.closest('[role="radiogroup"]'));
+      const box = el.querySelector('.bc-md3-dialog--surface').getBoundingClientRect();
+      return {
+        footnote: /Vous vous connecterez ensuite à divelogs\.de\.|You will then sign in to divelogs\.de\./.test(el.innerText),
+        confirm: buttons.at(-1)?.textContent.trim() ?? '',
+        side: Math.round(box.left),
+        anonymize: /Anonymiser|Anonymize/.test(el.innerText),
+      };
+    }, dialog);
+    if (process.env.BC_SHOTS) await shot(tab, `divelogs-1-choice-${kind}`);
+    expect(`${kind} divelogs.de chosen: the line about the connection, « Continuer », no anonymise switch`, { footnote: true, confirm: /^(Continuer|Continue)$/.test(choice.confirm) ? choice.confirm : 'Continuer', anonymize: false }, { footnote: choice.footnote, confirm: choice.confirm, anonymize: choice.anonymize });
+    if (kind === 'phone') expect('phone export dialog is 16 dp from the screen sides', { side: 16 }, { side: choice.side });
+    await confirm(tab, dialog);
+    await sleep(500);
+    // 2. The connection.
+    const connection = await tab.run(() => {
+      const el = document.querySelector('.bc-divelogs-upload');
+      return { fields: el?.querySelectorAll('.bc-release-field--input').length ?? 0, focus: document.activeElement === el?.querySelector('.bc-release-field--input'), password: el?.querySelectorAll('.bc-release-field--input')[1]?.type };
+    });
+    expect(`${kind} connection dialog: user name focused, password field`, { fields: 2, focus: true, password: 'password' }, connection);
+    if (process.env.BC_SHOTS) await shot(tab, `divelogs-2-connection-${kind}`);
+    const sendDisabled = await tab.run(() => [...document.querySelectorAll('.bc-divelogs-upload button')].find((b) => /^(Envoyer|Send)$/.test(b.textContent.trim()))?.disabled);
+    expect(`${kind} « Envoyer » waits for both fields`, { disabled: true }, { disabled: sendDisabled });
+    // 3. A wrong password.
+    await type(tab, 0, 'christian');
+    await type(tab, 1, 'wrong');
+    await press(tab, '^(Envoyer|Send)$');
+    await waitFor(tab, () => /incorrect/i.test(document.querySelector('.bc-divelogs-upload .bc-release-field--note-error')?.textContent ?? ''));
+    const refused = await tab.run(() => ({ error: /Nom d’utilisateur ou mot de passe incorrect\.|Incorrect user name or password\./.test(document.querySelector('.bc-divelogs-upload .bc-release-field--note-error')?.textContent ?? ''), title: /^(Envoyer vers divelogs\.de|Send to divelogs\.de)$/.test(document.querySelector('.bc-divelogs-upload h2')?.textContent ?? '') }));
+    expect(`${kind} refused credentials: the connection dialog with the error under the password`, { error: true, title: true }, refused);
+    if (process.env.BC_SHOTS) await shot(tab, `divelogs-3-refused-${kind}`);
+    expect(`${kind} no dive was sent with a wrong password`, { sent: 0 }, { sent: divelogs.dives.length });
+    // 4. The right password; the progress is slow enough to be seen.
+    divelogs.control.delayMs = 1200;
+    await type(tab, 1, 'secret');
+    await press(tab, '^(Envoyer|Send)$');
+    await waitFor(tab, () => /Compte|Account/.test(document.querySelector('.bc-divelogs-upload')?.innerText ?? ''));
+    await sleep(300);
+    const progress = await tab.run(() => {
+      const el = document.querySelector('.bc-divelogs-upload');
+      return { steps: [...el.querySelectorAll('[role="listitem"]')].map((s) => s.dataset.state).join(','), account: /christian/.test(el.innerText), count: /\d+\s+(sur|of)\s+\d+/.test(el.innerText), inputs: el.querySelectorAll('input').length };
+    });
+    expect(`${kind} progress dialog: connection done, sending current, the count, the account, no field left`, { steps: 'done,current', account: true, count: true, inputs: 0 }, progress);
+    if (process.env.BC_SHOTS) await shot(tab, `divelogs-4-progress-${kind}`);
+    divelogs.control.delayMs = 0;
+    await waitFor(tab, () => /^(Plongées envoyées|Dives sent)/.test(document.querySelector('.bc-divelogs-upload h2')?.textContent ?? ''), undefined, 80);
+    const done = await tab.run(() => {
+      const el = document.querySelector('.bc-divelogs-upload');
+      return {
+        title: /^(Plongées envoyées|Dives sent)$/.test(el.querySelector('h2')?.textContent ?? ''),
+        text: el.querySelector('.bc-md3-dialog--text')?.textContent ?? '',
+        href: el.querySelector('a')?.getAttribute('href') ?? '',
+        ok: /^OK$/.test([...el.querySelectorAll('button')].at(-1)?.textContent.trim() ?? ''),
+      };
+    });
+    expect(`${kind} done dialog: title, the dives and the account, the link, OK`, { title: true, account: true, href: 'https://divelogs.de', ok: true }, { title: done.title, account: /christian/.test(done.text) && done.text.includes(String(total)), href: done.href, ok: done.ok });
+    if (process.env.BC_SHOTS) await shot(tab, `divelogs-5-done-${kind}`);
+    const login = divelogs.requests.find((r) => r.url === '/api/login' && /secret/.test(r.body));
+    const posts = divelogs.requests.filter((r) => r.url === '/api/dives');
+    expect(`${kind} the fake divelogs.de got every dive in batches with the token, the credentials only in the login`, { dives: total, batches: Math.ceil(total / 25), token: 'Bearer e2e-token', leaked: false, form: true }, {
+      dives: divelogs.dives.length,
+      batches: posts.length,
+      token: posts[0]?.headers.authorization,
+      leaked: posts.some((r) => /secret|christian/.test(r.body)),
+      form: /^multipart\/form-data; boundary=/.test(login?.headers['content-type'] ?? ''),
+    });
+    expect(`${kind} a dive sent has the divelogs.de fields`, { fields: true }, { fields: ['date', 'time', 'duration', 'tanks', 'sampledata', 'divesite'].every((k) => k in (divelogs.dives[0] ?? {})) });
+    await press(tab, '^OK$');
+    await sleep(400);
+    expect(`${kind} OK closes the dialog`, { open: false }, { open: await tab.run(() => !!document.querySelector('.bc-divelogs-upload')) });
+    // 5. A lost connection in the middle of the sending, then « Réessayer ».
+    divelogs.requests.length = 0;
+    divelogs.dives.length = 0;
+    await openConnection(tab, desktop, dialog);
+    await choose(tab, dialog);
+    await confirm(tab, dialog);
+    await sleep(500);
+    await type(tab, 0, 'christian');
+    await type(tab, 1, 'secret');
+    divelogs.control.dropDives = true;
+    await press(tab, '^(Envoyer|Send)$');
+    await waitFor(tab, () => document.querySelector('.bc-divelogs-upload [data-state="failed"]'), undefined, 80);
+    const lost = await tab.run(() => {
+      const el = document.querySelector('.bc-divelogs-upload');
+      return {
+        steps: [...el.querySelectorAll('[role="listitem"]')].map((s) => s.dataset.state).join(','),
+        buttons: /^(Annuler\|Réessayer|Cancel\|Try again)$/.test([...el.querySelectorAll('.bc-md3-dialog--actions button')].map((b) => b.textContent.trim()).join('|')),
+        inputs: el.querySelectorAll('input').length,
+      };
+    });
+    expect(`${kind} lost connection: the sending step in error, « Annuler » and « Réessayer »`, { steps: 'done,failed', buttons: true, inputs: 0 }, lost);
+    if (process.env.BC_SHOTS) await shot(tab, `divelogs-6-lost-${kind}`);
+    divelogs.control.dropDives = false;
+    await press(tab, '^(Réessayer|Try again)$');
+    await waitFor(tab, () => /^(Plongées envoyées|Dives sent)/.test(document.querySelector('.bc-divelogs-upload h2')?.textContent ?? ''), undefined, 80);
+    expect(`${kind} « Réessayer » sends the dives, without a new password`, { dives: total, logins: 1 }, { dives: divelogs.dives.length, logins: divelogs.requests.filter((r) => r.url === '/api/login').length });
+    await press(tab, '^OK$');
+    tab.ws.close();
+  }
+}
+
 async function unitsMenuFlows(expect) {
   for (const [width, height, mobile] of [[390, 844, true], [1280, 800, false]]) {
     const tab = await openTab(width, height, mobile, false, false, { theme: 'md' });
@@ -1488,6 +1663,21 @@ async function certsFabFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [['Android phone', 390, 844, true, false, 'md'], ['tablet landscape', 1280, 800, false, false, 'md']]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     await tab.send('Page.bringToFront');
+    // Each device starts with no certification: the tabs share the browser storage, and the phone adds one further down.
+    await tab.run(() => new Promise((resolve) => {
+      const open = indexedDB.open('benthic-files');
+      open.onerror = () => resolve(null);
+      open.onsuccess = () => {
+        const db = open.result;
+        const names = [...db.objectStoreNames];
+        if (!names.length) return (db.close(), resolve(null));
+        const tx = db.transaction(names, 'readwrite');
+        for (const name of names) tx.objectStore(name).clear();
+        tx.oncomplete = tx.onerror = () => (db.close(), resolve(null));
+      };
+    }));
+    await tab.send('Page.reload');
+    await sleep(2500);
     await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/'));
     await sleep(1600);
     const position = await tab.run(() => {
@@ -2352,7 +2542,7 @@ async function profileLayersFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2385,6 +2575,7 @@ try {
   const all = [
     ['delete responsiveness', '--delete-only', 60, false, () => deleteFlows(expect)],
     ['export', '--export-only', 17, true, () => exportFlows(expect)],
+    ['divelogs upload', '--divelogs-only', 30, true, () => divelogsFlows(expect)],
     ['computer photo', '--computer-photo-only', 10, !phoneOnly && !tabletOnly && !welcomeOnly, () => computerPhotoFlows(expect)],
     ['units', '--units-only', 2, true, () => unitsMenuFlows(expect)],
     ['profile insets', '--profile-insets-only', 19, !phoneOnly && !welcomeOnly, () => profileInsetsFlows(expect)],

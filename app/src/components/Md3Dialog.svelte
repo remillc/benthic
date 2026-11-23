@@ -18,12 +18,14 @@
    *   eyebrow?: string,
    *   onclose?: () => void,
    *   closeLabel?: string,
+   *   icon?: import('svelte').Snippet,
+   *   footer?: import('svelte').Snippet,
    * }}
    */
   import { fitButtons } from '../lib/dialog-fit.js';
   import Icon from './Icon.svelte';
 
-  let { title, text = '', oncancel, children, actions, class: extraClass = '', role = 'dialog', eyebrow = '', onclose, closeLabel = '' } = $props();
+  let { title, text = '', oncancel, children, actions, class: extraClass = '', role = 'dialog', eyebrow = '', onclose, closeLabel = '', icon, footer } = $props();
 
   const id = `bc-dialog-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -82,9 +84,11 @@
     {#if onclose}
       <button type="button" class="bc-md3-dialog--close" aria-label={closeLabel} onclick={onclose}><Icon name="close" size={22} /></button>
     {/if}
-    <h2 {id}>{title}</h2>
-    {#if text}<p class="bc-md3-dialog--text">{text}</p>{/if}
+    {#if icon}<div class="bc-md3-dialog--icon">{@render icon()}</div>{/if}
+    <h2 {id} class:bc-md3-dialog--centered={!!icon}>{title}</h2>
+    {#if text}<p class="bc-md3-dialog--text" class:bc-md3-dialog--centered={!!icon}>{text}</p>{/if}
     <div class="bc-md3-dialog--content" data-bc-scroll>{@render children()}</div>
+    {#if footer}<div class="bc-md3-dialog--footer">{@render footer()}</div>{/if}
     <div class="bc-md3-dialog--actions">{@render actions()}</div>
   </div>
 </div>
@@ -178,6 +182,17 @@
       }
     }
 
+    /* A hero icon above the title (the done dialogs): icon, title and line are centred. */
+    .bc-md3-dialog--icon {
+      display: flex;
+      justify-content: center;
+      margin: 0 24px 16px;
+    }
+
+    .bc-md3-dialog--centered {
+      text-align: center;
+    }
+
     h2 {
       margin: 0 24px 16px;
       font-size: 24px;
@@ -196,6 +211,15 @@
       flex: 1;
       min-height: 0;
       overflow-y: auto;
+    }
+
+    /* A line under the content that does not scroll with it, above the buttons. */
+    .bc-md3-dialog--footer {
+      flex: none;
+      margin: 12px 24px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
     }
 
     .bc-md3-dialog--actions {

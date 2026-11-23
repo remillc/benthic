@@ -1,0 +1,24 @@
+<divelog><divesites><site uuid='ab12' name='France/Nice/Plage Rauba' gps='43.69 7.28'/><site uuid='cd34' name='Lac' gps='1.5 -2.25'/></divesites><dives>
+    <dive number='3' date='2025-06-01' time='10:15:00' duration='45:30 min' divesiteid='ab12'>
+      <buddy>Ana, "Bo"</buddy><notes>Line 1
+Line 2 \ back</notes>
+      <cylinder size='24.0 l' workpressure='200.0 bar' description='D12 200 bar' o2='32.0%' he='10.0%' />
+      <cylinder size='12.0 l' description='AL80' />
+      <weightsystem weight='4.0 kg' description='belt' /><weightsystem weight='2.5 kg' description='ankle' /><weightsystem weight='0.125 kg' />
+      <divecomputer model='Test'><depth max='30.5 m' mean='15.2 m'/><temperature water='18.0 C' air='22.0 C'/>
+        <sample time='0:00 min' depth='0.0 m' pressure='200.0 bar'/><sample time='0:10 min' depth='3.2 m' temp='18.0 C' pressure='190.0 bar'/>
+      </divecomputer>
+    </dive>
+    <dive date='2025-06-02' time='09:00:00' duration='30:00 min' divesiteid='cd34'>
+      <divecomputer model='manually added dive'><depth max='20.0 m' mean='10.0 m'/>
+        <sample time='0:00 min' depth='0.0 m'/><sample time='4:00 min' depth='18.005 m'/><sample time='30:00 min' depth='0.0 m'/>
+      </divecomputer>
+    </dive>
+    <dive date='2025-06-03' time='09:00:00' duration='40:00 min'>
+      <divecomputer model='Suunto EON Steel'>
+        <sample time='0:00 min' depth='0.0 m'/><sample time='0:04 min' depth='1.0 m'/><sample time='0:08 min' depth='2.0 m'/><sample time='0:20 min' depth='3.0 m' temp='20.0 C'/><sample time='0:40 min' depth='4.0 m'/>
+      </divecomputer>
+      <divecomputer model=''><sample time='0:00 min' depth='0.0 m'/></divecomputer>
+    </dive>
+    <dive date='2025-06-04' time='09:00:00' duration='40:00 min'><notes>true</notes><buddy>7</buddy></dive>
+</dives></divelog>
