@@ -64,7 +64,12 @@ test('the logbook follows the window: its table pane, its columns, its header', 
   const page = read('app/src/pages/DesktopLogbook.svelte');
   assert.match(page, /new ResizeObserver\(place\)/);
   assert.match(page, /fittingColumns\(columns, tableRoom, desk\.columnWidths\)/);
-  assert.match(page, /\.bc-desktop-logbook--titles \{[^}]*flex: 1 0\.2 auto/);
+  // The header measures its own width: under NARROW_BAR the search is a magnifier button (task 2026-11-23-372).
+  assert.match(page, /\.bc-desktop-logbook--titles \{[^}]*flex: 1 1 auto/);
+  assert.match(page, /const NARROW_BAR = 560;/);
+  assert.match(page, /const narrow = \$derived\(barWidth < NARROW_BAR\)/);
+  assert.match(page, /desktop\.openSearch/);
+  assert.match(page, /desktop\.closeSearch/);
   assert.match(read('app/src/components/DiveProfile.svelte'), /flex-wrap: wrap;\s*overflow-x: visible;/);
 });
 

@@ -2770,6 +2770,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Ordinateur, liste du carnet : dans une colonne étroite, la recherche devient une loupe à gauche du bouton des colonnes et de ⋮, qui restent visibles à toute largeur ; la loupe ou Ctrl+F ouvre le champ sur toute la largeur de l’en-tête, ✕ ou Échap le ferme, et la ligne de résumé est coupée par une ellipse.",
       "Types de bouteille : un type sans pression de service (venu d’une plongée) n’affiche plus « 0 » en pieds cubes et se renomme sans erreur ; un volume saisi sans pression demande la pression de service.",
       "Équipement : l’icône du recycleur montre deux grandes bouteilles de part et d’autre d’un épurateur sur son support, reliés par deux tuyaux, et ne ressemble plus à un bi-bouteille.",
       "Icônes : 89 icônes de l’application passent aux glyphes arrondis de Material Symbols (flèches, nuage, dossier, appareil photo, clé, calendrier, localisation, réglages, etc.) ; le mélangeur de gaz garde un dessin de bouteille que l’on remplit, et le couteau de plongée a un nouveau dessin.",
@@ -5408,6 +5409,8 @@
     "noMap": "Le site de cette plongée n’a pas de coordonnées.",
     "columnsShown": "Colonnes affichées",
     "moreLogbook": "Plus d'options du carnet",
+    "openSearch": "Rechercher dans le carnet (Ctrl+F)",
+    "closeSearch": "Fermer la recherche (Échap)",
     "undo": {
       "editDive": "Modifier la plongée",
       "editTrip": "Modifier le voyage",
