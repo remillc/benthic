@@ -6891,3 +6891,7 @@ Use it wherever the recovery key appears: the recovery-key offer, the « Votre c
 ## [ ] 2026-11-23-353 Addition to 351: « Activer le Bluetooth » button is blue everywhere
 
 Christian asked for this on 23 November 2026. Work in `main`. On the « Bluetooth désactivé » state of the download, the « Activer le Bluetooth » button is the blue filled button (#114477, white text) on every device. The phone mock-up « Téléchargement, Bluetooth désactivé · Android » now shows it blue (it was near-black); the tablet already had it blue.
+
+## [ ] 2026-11-23-354 New design rule: prefer Material Symbols icons
+
+Christian asked for this on 23 November 2026. Work in `main`. Read the new section « Icons » in `docs/system-design.md` (§ 8). From now on, every icon you add comes from Material Symbols (weight 400, grade 0, optical size 24; the filled variant for an active or selected state). Draw an icon by hand only when Material Symbols has nothing that fits, and then on the same grid and weight. Do not replace the existing icons of `app/src/components/Icon.svelte` in bulk yet: Christian will first compare them with Material Symbols in a mock-up (TODO #184) and send the swaps as tasks. The recovery key (task 352) is the first one.
