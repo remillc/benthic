@@ -12,15 +12,24 @@
 import { sortedJson } from './file-store.js';
 import { mergeAccountFile, mergeEncryptedAccountFile } from './account-data-merge.js';
 import { repositoryKey } from './server-logbook.js';
+import { ACCOUNT_KEY_PATH, PAIRING_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile } from './account-keys.js';
 
 /** The branch of the account data. */
 export const BRANCH = 'benthic';
 
 /**
- * The folders of the working copy this engine moves between the device and the server. `meta/` never syncs, `media/` is
- * reserved for the dives' media (docs/architecture.md, 11.6), `keys/` belongs to the pairing code.
+ * The folders of the working copy this engine moves between the device's store and the server. `meta/` never syncs,
+ * `media/` is reserved for the dives' media (docs/architecture.md, 11.6). `keys/` (the account key's id, the recovery
+ * key's file, the pairing files) is not in this list on purpose: those files never enter the local store; the engine
+ * reads and writes them in the working copy only (`KEYS_PREFIX`, `readKeys`, `commitKeyFiles`).
  */
 export const SYNCED_PREFIXES = ['profile/', 'certifications/', 'documents/', 'gear/', 'gear-photos/', 'kits/', 'maintenance/', 'dive-equipment/', 'dive-validations/'];
+
+/** The folder of the key files in the working copy (docs/account-sync.md, « QR payloads and key files »). */
+export const KEYS_PREFIX = 'keys/';
+
+/** @param {unknown} path */
+export const isKeyPath = (path) => typeof path === 'string' && path.startsWith(KEYS_PREFIX) && path.endsWith('.json') && !path.includes('..');
 
 /** Folders whose files carry a sealed `enc` block (docs/architecture.md, 11.5). */
 const SEALED = ['profile/', 'certifications/'];
@@ -67,6 +76,8 @@ export const codeOf = (e) => String(/** @type {any} */ (e)?.code ?? /** @type {a
  * @property {{ path: string, keys: string[] }[]} [conflicts] files two devices changed in the same field: the later `updatedAt` was kept
  * @property {string[]} [locked] sealed files whose data key is missing here: neither sent nor overwritten
  * @property {string[]} [unsealed] files withheld because they still hold clear sensitive data
+ * @property {boolean} [keyMissing] the account has a data key (`keys/account.json`) that this device does not hold: sealed items stay locked
+ * @property {boolean} [hasRecovery] `keys/recovery.json` exists on the server
  * @property {boolean} [retry] an edit made during the run, or a rejected push, is left for the next run
  * @property {string} [error] the core's error code
  */
@@ -171,6 +182,15 @@ function mergeMaintenance(base, ours, theirs) {
 }
 
 /**
+ * What the working copy holds of the keys.
+ * @typedef {Object} KeyState
+ * @property {string|null} kid the account key's id (`keys/account.json`), null when the account has none yet
+ * @property {boolean} keyMissing the account has a key this device does not hold
+ * @property {any|null} recovery the content of `keys/recovery.json`
+ * @property {{ path: string, json: any }[]} pairing the pairing files on the branch
+ */
+
+/**
  * Creates the engine.
  * @param {AccountSyncDeps} deps
  */
@@ -185,6 +205,9 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
    * @returns {Promise<{ text: string|null, keys: string[], locked: boolean }>}
    */
   async function resolveFile(path, baseText, oursText, theirsText) {
+    // Key files: the server's side wins (the first device to write `keys/account.json` stays the account's key; a pairing
+    // file deleted on one side is gone).
+    if (isKeyPath(path)) return { text: theirsText, keys: [], locked: false };
     /** @type {Record<string, any>|null} */ let base;
     /** @type {Record<string, any>|null} */ let ours;
     /** @type {Record<string, any>|null} */ let theirs;
@@ -310,12 +333,100 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
       return false;
     }
     if (!file?.enc) return false;
+    // An item sealed with another key than the account's cannot be read by the account's other devices: it waits (the
+    // device's own items until the pairing re-seals them) rather than going up under a key nobody else holds.
+    const accountKid = box.getAccountKid();
+    if (accountKid && file.enc.kid && file.enc.kid !== accountKid) return true;
     try {
       await box.open(file.enc, sealedItem(path, file));
       return false;
     } catch (e) {
       return codeOf(e) === 'MISSING_DATA_KEY';
     }
+  }
+
+  /**
+   * What the working copy holds of the keys (`keys/`), and the account key's id into the box. Nothing is made here.
+   * @param {string} dir
+   * @returns {Promise<KeyState>}
+   */
+  async function readKeyState(dir) {
+    const { files } = await core.bgitFiles({ dir });
+    const keyPaths = files.filter(isKeyPath);
+    const { texts } = keyPaths.length ? await core.bgitRead({ dir, paths: keyPaths }) : { texts: [] };
+    /** @type {Map<string, any>} */
+    const byPath = new Map();
+    keyPaths.forEach((path, i) => {
+      try {
+        if (texts[i] != null) byPath.set(path, JSON.parse(/** @type {string} */ (texts[i])));
+      } catch {
+        // An unreadable key file is left alone.
+      }
+    });
+    /** @type {string|null} */
+    let kid = null;
+    try {
+      if (byPath.has(ACCOUNT_KEY_PATH)) kid = parseAccountKeyFile(byPath.get(ACCOUNT_KEY_PATH));
+    } catch {
+      kid = null;
+    }
+    let keyMissing = false;
+    if (kid) {
+      box.setAccountKid(kid);
+      keyMissing = !(await box.hasKey(kid));
+    }
+    return {
+      kid,
+      keyMissing,
+      recovery: byPath.get(RECOVERY_PATH) ?? null,
+      pairing: [...byPath].filter(([path]) => path.startsWith(PAIRING_DIR)).map(([path, json]) => ({ path, json })),
+    };
+  }
+
+  /**
+   * The first push of a device to a server that has no account key yet: this device's own key becomes the account key
+   * (nothing is re-sealed), or a new one is made when the device has none. `keys/account.json` is committed, with the data.
+   * A key the device made once and lost is never replaced silently.
+   * @param {string} dir
+   * @returns {Promise<string|null>} the account key's id, or null when none could be set
+   */
+  async function createAccountKey(dir) {
+    let kid = await box.deviceKid();
+    if (!kid) {
+      if (await box.hadKey()) return null;
+      const made = await newAccountKey();
+      await box.adoptAccountKey(made.key);
+      await box.persistAccountKey();
+      kid = made.kid;
+    }
+    box.setAccountKid(kid);
+    const file = accountKeyFile(kid);
+    await core.bgitWrite({ dir, files: [{ path: file.path, text: sortedJson(file.json) }] });
+    await core.bgitCommit({ dir, paths: [file.path], message: 'Benthic: account key', ...author });
+    return kid;
+  }
+
+  /**
+   * Deletes the pairing files past their time (a pairing is 10 minutes); one commit.
+   * @param {string} dir
+   * @returns {Promise<number>}
+   */
+  async function cleanPairing(dir) {
+    const { files } = await core.bgitFiles({ dir });
+    const paths = files.filter((p) => p.startsWith(PAIRING_DIR) && p.endsWith('.json'));
+    if (!paths.length) return 0;
+    const { texts } = await core.bgitRead({ dir, paths });
+    const stale = paths.filter((_, i) => {
+      try {
+        return isPairingExpired(texts[i] == null ? null : JSON.parse(texts[i]), { now: () => now().getTime() });
+      } catch {
+        return true;
+      }
+    });
+    if (!stale.length) return 0;
+    await core.bgitWrite({ dir, files: stale.map((path) => ({ path, text: null })) });
+    await core.bgitCommit({ dir, paths: stale, message: 'Benthic: expired pairing', ...author });
+    return stale.length;
   }
 
   /** @type {Promise<unknown>} */
@@ -371,12 +482,15 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
       }
       if (!present) await core.bgitClone({ ...gitAccess, url: access.repositoryUrl });
 
+      let keys = await readKeyState(dir);
       if (!syncState) {
         const remote = (await core.bgitFiles({ dir })).files.filter(isSyncedPath);
         const local = await localSyncedPaths();
-        if (local.length && remote.length) return { status: 'joinNeeded' };
+        if (local.length && remote.length) return { status: 'joinNeeded', keyMissing: keys.keyMissing, hasRecovery: !!keys.recovery };
         if (local.length && !pullOnly) await markAllPending(local);
       }
+      // The account has no key yet: this device's key becomes the account's, with its first push.
+      if (!keys.kid && !pullOnly && (await createAccountKey(dir))) keys = await readKeyState(dir);
 
       /** @type {Map<string, string|null>} the text each path had when it was sent, to merge an edit made meanwhile */
       let hints = new Map();
@@ -441,7 +555,11 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
             await core.bgitWrite({ dir, files: writes });
             await core.bgitCommit({ dir, paths: writes.map((w) => w.path), message: 'Benthic: merge', mergeParent: pull.theirs, ...author });
           }
-          if (pull.result !== 'upToDate' && pull.result !== 'empty') await cleanUp({ dir });
+          if (pull.result !== 'upToDate' && pull.result !== 'empty') {
+            await cleanUp({ dir });
+            keys = await readKeyState(dir);
+          }
+          if (!pullOnly) await cleanPairing(dir);
           if (pullOnly) break;
           try {
             await core.bgitPush(gitAccess);
@@ -471,17 +589,19 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
             conflicts: conflictList(conflictKeys),
             locked: [...lockedPaths],
             unsealed: [...unsealedPaths],
+            keyMissing: keys.keyMissing,
+            hasRecovery: !!keys.recovery,
             retry: false,
           };
         }
         hints = new Map(applied.deferred.map((path) => [path, new Map(snapshot).get(path) ?? null]));
         if (pullOnly) {
           retry = false;
-          return { status: 'synced', pullOnly, sent, received, head, conflicts: conflictList(conflictKeys), locked: [...lockedPaths], unsealed: [...unsealedPaths], retry: false };
+          return { status: 'synced', pullOnly, sent, received, head, conflicts: conflictList(conflictKeys), locked: [...lockedPaths], unsealed: [...unsealedPaths], keyMissing: keys.keyMissing, hasRecovery: !!keys.recovery, retry: false };
         }
       }
       retry = true;
-      return { status: 'synced', pullOnly, sent, received, conflicts: conflictList(conflictKeys), locked: [...lockedPaths], unsealed: [...unsealedPaths], retry };
+      return { status: 'synced', pullOnly, sent, received, conflicts: conflictList(conflictKeys), locked: [...lockedPaths], unsealed: [...unsealedPaths], keyMissing: keys.keyMissing, hasRecovery: !!keys.recovery, retry };
     } catch (e) {
       const code = codeOf(e);
       if (code === 'UNREACHABLE' || code === 'CANCELLED') return { status: 'offline', error: code, sent, retry: true };
@@ -581,12 +701,46 @@ export function createAccountSync({ core, store, box, now = () => new Date(), au
     return { received: 0, deferred: [...deferred, ...expected.map(([p]) => p)] };
   }
 
+  /** The working copy's folder and the git access of the signed-in account. */
+  async function session() {
+    const access = await core.serverSessionAccess();
+    if (!access?.repositoryUrl || !access.token) throw new Error('NOT_SIGNED_IN');
+    return { access, dir: workingCopyName(access.repositoryUrl) };
+  }
+
   return {
     run,
+    /**
+     * The keys of the account as the working copy holds them as of the last run (no network): the account key's id, the
+     * recovery key's file and the pairing files. Also tells the box which key the account uses.
+     * @returns {Promise<KeyState>}
+     */
+    async readKeys() {
+      const { dir } = await session();
+      return readKeyState(dir);
+    },
+    /**
+     * Commits key files into the working copy (written and deleted paths under `keys/`) and syncs, so that they reach the
+     * server and the other devices: a pairing file, `keys/recovery.json`, the start-over's `keys/account.json`.
+     * @param {{ writes?: { path: string, json: any }[], deletes?: string[], message?: string }} changes
+     * @returns {Promise<SyncResult>}
+     */
+    commitKeyFiles({ writes = [], deletes = [], message = 'Benthic: keys' }) {
+      const files = [...writes.map((w) => ({ path: w.path, text: /** @type {string|null} */ (sortedJson(w.json)) })), ...deletes.map((path) => ({ path, text: /** @type {string|null} */ (null) }))];
+      if (!files.length || !files.every((f) => isKeyPath(f.path))) return Promise.reject(new Error('BAD_PATH'));
+      const next = queue.then(async () => {
+        const { dir } = await session();
+        await core.bgitWrite({ dir, files });
+        await core.bgitCommit({ dir, paths: files.map((f) => f.path), message, ...author });
+        return runOnce();
+      });
+      queue = next.catch(() => {});
+      return next;
+    },
     /** The commits not sent yet (offline queue). @returns {Promise<number>} */
     async unsent() {
-      const access = await core.serverSessionAccess();
-      const { ahead } = await core.bgitUnpushed({ dir: workingCopyName(access.repositoryUrl), branch: BRANCH });
+      const { dir } = await session();
+      const { ahead } = await core.bgitUnpushed({ dir, branch: BRANCH });
       return ahead;
     },
   };

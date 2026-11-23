@@ -20,24 +20,23 @@ const boxOf = (byte) => {
   return createSecretBox({ read: async () => key, write: async () => { throw new Error('unexpected key write'); } });
 };
 
-/** A keyring: the account key seals, both keys open. */
+/**
+ * A real keyring (secret-box.js): the device's own key (`ownByte`, from its keeper) and the account key adopted as the one
+ * that seals, as after a pairing. The earlier fake tried one box after the other, which the kid-aware `open` no longer allows.
+ */
 function keyring(accountByte, ownByte) {
-  const account = boxOf(accountByte);
-  const own = boxOf(ownByte);
-  const either = async (call) => {
-    try {
-      return await call(account);
-    } catch (e) {
-      if (e?.code === 'MISSING_DATA_KEY' || e?.message === 'MISSING_DATA_KEY') throw e;
-      return call(own);
-    }
-  };
-  return {
-    seal: (v, item) => account.seal(v, item),
-    sealBytes: (b, item) => account.sealBytes(b, item),
-    open: (block, item) => either((box) => box.open(block, item)),
-    openBytes: (block, item) => either((box) => box.openBytes(block, item)),
-  };
+  const box = boxOf(ownByte);
+  const ready = box.adoptAccountKey(toBase64(new Uint8Array(32).fill(accountByte)));
+  return new Proxy(box, {
+    get(target, name) {
+      const member = target[name];
+      if (typeof member !== 'function' || ['setAccountKid', 'getAccountKid', 'heldKids'].includes(String(name))) return typeof member === 'function' ? member.bind(target) : member;
+      return async (...args) => {
+        await ready;
+        return member.apply(target, args);
+      };
+    },
+  });
 }
 
 function device(remote, name, box) {

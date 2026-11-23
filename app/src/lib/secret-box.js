@@ -175,6 +175,24 @@ export function createSecretBox(keeper) {
     getAccountKid: () => accountKid,
 
     /**
+     * The id of this device's own key, read from the keeper (nothing is made); null when the device has none.
+     * @returns {Promise<string|null>}
+     */
+    async deviceKid() {
+      try {
+        return (await load(false)).kid;
+      } catch (e) {
+        if (/** @type {Error} */ (e).message === 'MISSING_DATA_KEY') return null;
+        throw e;
+      }
+    },
+
+    /** True when this device made a key before (so an empty read means it was lost, not that it never existed). */
+    async hadKey() {
+      return keeper.hadKey ? keeper.hadKey() : false;
+    },
+
+    /**
      * Holds the account key, received by pairing or recovery, and makes it the key that seals. The device's own key stays
      * in the ring (memory) to open the local items until they are re-sealed.
      * @param {string} base64Key 32 bytes in base64

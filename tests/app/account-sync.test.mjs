@@ -42,6 +42,8 @@ function cleanup(devices, remote) {
   remote.dispose();
 }
 
+/** The synced files on the server: the key files (`keys/`) are the key flows' own. */
+const dataCount = (remote) => Object.keys(remote.files()).filter((p) => !p.startsWith('keys/')).length;
 const pending = async (d) => (await d.store.read('meta/pending.json'))?.paths ?? [];
 const names = async (d) => (await d.inventory.listGear()).map((g) => g.name).sort();
 
@@ -55,7 +57,8 @@ test('the first device sends everything to an empty branch; a second, empty devi
     const first = await a.sync.run();
     assert.equal(first.status, 'synced');
     assert.equal(first.sent, 2);
-    assert.deepEqual(Object.keys(remote.files()).sort(), [`gear/${mask.id}.json`, `kits/${(await a.inventory.listKits())[0].id}.json`].sort());
+    assert.deepEqual(Object.keys(remote.files()).sort(), [`gear/${mask.id}.json`, 'keys/account.json', `kits/${(await a.inventory.listKits())[0].id}.json`].sort());
+    assert.deepEqual(JSON.parse(remote.files()['keys/account.json']), { format: 1, kid: await a.box.deviceKid() }, 'the device own key is the account key, nothing re-sealed');
     assert.deepEqual(await pending(a), [], 'what was sent is acknowledged');
     assert.equal((await a.store.read('meta/sync.json')).head, remote.head());
 
@@ -186,7 +189,7 @@ test('a rejected push is retried after a new pull; three retries at most', async
     };
     const result = await b.sync.run();
     assert.equal(result.status, 'synced');
-    assert.deepEqual(Object.keys(remote.files()).length, 3);
+    assert.deepEqual(dataCount(remote), 3);
     assert.ok(b.core.calls.filter((c) => c === 'bgitPush').length >= 2, 'pushed again after the rejection');
     await a.sync.run();
     assert.deepEqual(await names(a), ['One', 'Three', 'Two']);
@@ -283,12 +286,12 @@ test('offline: edits wait in the pending list and in local commits, then go out'
     assert.equal(off.status, 'offline');
     assert.equal((await pending(a)).length, 1, 'the edit is still pending');
     assert.equal(await a.sync.unsent(), 1, 'its commit waits in the working copy');
-    assert.equal(Object.keys(remote.files()).length, 1);
+    assert.equal(dataCount(remote), 1);
     a.core.before.bgitPull = undefined;
     const on = await a.sync.run();
     assert.equal(on.status, 'synced');
     assert.deepEqual(await pending(a), []);
-    assert.equal(Object.keys(remote.files()).length, 2);
+    assert.equal(dataCount(remote), 2);
     assert.equal(await a.sync.unsent(), 0);
   } finally {
     cleanup([a], remote);
@@ -467,7 +470,7 @@ test('after the subscription ended the device only pulls: nothing is sent, the s
     assert.equal(run.status, 'synced');
     assert.equal(run.pullOnly, true);
     assert.deepEqual(await names(b), ['Fins', 'Mask', 'Unsent']);
-    assert.equal(Object.keys(remote.files()).length, 2, 'the unsent piece did not go');
+    assert.equal(dataCount(remote), 2, 'the unsent piece did not go');
     assert.equal((await pending(b)).length, 1);
   } finally {
     cleanup([a, b], remote);
@@ -484,7 +487,7 @@ test('a device signed in to a different account is not synced; a device with dat
     await b.inventory.saveGear({ name: 'My own mask', type: 'mask' });
     const join = await b.sync.run();
     assert.equal(join.status, 'joinNeeded');
-    assert.equal(Object.keys(remote.files()).length, 1, 'nothing was uploaded');
+    assert.equal(dataCount(remote), 1, 'nothing was uploaded');
     assert.deepEqual(await names(b), ['My own mask'], 'nothing was changed here');
 
     await a.store.write('meta/sync.json', { format: 1, accountKey: 'someone-else/repo', head: '' });
