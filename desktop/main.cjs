@@ -230,7 +230,7 @@ app.whenReady().then(async () => {
       const type = new URL(request.url).searchParams.get('type') || '';
       return net.fetch(pathToFileURL(file).toString(), { headers: request.headers.has('range') ? { range: request.headers.get('range') } : {} }).then((r) => {
         const headers = new Headers(r.headers);
-        if (/^(image|video)/[a-z0-9.+-]+$/i.test(type)) headers.set('content-type', type);
+        if (/^(image|video)\/[a-z0-9.+-]+$/i.test(type)) headers.set('content-type', type);
         return new Response(r.body, { status: r.status, headers });
       });
     }
