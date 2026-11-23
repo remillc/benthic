@@ -7,28 +7,31 @@ Decided by Christian on 19 November 2026 (Benthic+, « Mon profil de plongeur �
 - **Storage:** the equipment inventory, maintenance and certifications are kept on the Benthic server, next to the logbook (decision of 19 November 2026; closes #42 and #61). Nothing is written into the Subsurface logbook.
 - **Wording:** fr-CA. The buoyancy compensator is « Veste » (fr-FR would say « Gilet stabilisateur »).
 
-| Type (fr) | Fields besides purchase date and notes |
-|---|---|
-| Ordinateur | Model photo (image database, idea #65), brand, model, serial number, firmware (read at download), linked logbook computer (by serial number) |
-| Détendeur | Photo, brand, model, serial number of each stage, connection (DIN or yoke), number of second stages, nitrox compatible, cold water |
-| Combinaison | Brand, model, serial number (optional, some drysuits have one), type (Humide, Semi-étanche, Étanche), thickness, size, material. No photo |
-| Sous-vêtement | Brand, model, size |
-| Bouteille | Name, cylinder type from Réglages › Équipement (gives volume and working pressure, not typed again), material (Aluminium, Acier), valve (DIN, Étrier), serial number, O₂ clean, last visual inspection, last hydrostatic test (the date stamped on the cylinder). Both dates can carry a reminder (task 308) |
-| Veste | Photo, brand, model, serial number, type (veste, wing, side-mount), lift, integrated weight capacity, size |
-| Lampe | Photo, brand, model, output (lumens), battery, burn time |
-| Ceinture de lest | Name, type (à plombs, à poches, harnais) |
-| Masque | Brand, model, corrective lenses (yes or no) |
-| Palmes | Brand, model, type (chausson, réglables), size |
-| Scooter | Photo, brand, model, serial number, battery, burn time, speed |
-| Caméra | Photo, brand, model, serial number, housing depth rating |
-| Parachute de palier | Brand, model, volume or lift |
-| Bouée de surface | Brand, model, colour |
-| Coupe-ligne | Brand, model |
-| Couteau | Brand, model |
-| Boussole | Brand, model |
-| Autre | Piece name, photo; type name (free text) on existing pieces only |
+Updated by Christian on 23 November 2026 (task 334). Labels as the app shows them in French. Every type also has « Date d’achat » and « Notes ».
 
-Suggested maintenance reminders by type: Détendeur every year or 100 dives; Bouteille visual inspection every year and hydrostatic test every 5 years; Veste every year; Combinaison (Étanche only) service, including its valves, every year; Ordinateur none (a battery reminder waits for after the launch, `docs/POST-LAUNCH.md` #104); the other types none.
+| Type | Photo | Identification | Fields of the type | Maintenance and reminders |
+|---|---|---|---|---|
+| Ordinateur | ✓ | Marque, modèle, n° de série | Micrologiciel (read at download, never typed) | None |
+| Détendeur | ✓ | Marque, modèle, n° de série | N° de série du deuxième étage · Raccord (DIN / Étrier) · Nombre de deuxièmes étages · Compatible nitrox · Eau froide | Révision every 12 months or 100 dives, whichever comes first |
+| Combinaison | — | Marque, modèle, n° de série | Type (Humide / Semi-étanche / Étanche) · Épaisseur · Taille · Matériau (Néoprène / Néoprène compressé / Trilaminé / Autre) | Étanche only: révision every 12 months |
+| Sous-vêtement | — | Marque, modèle | Taille | None |
+| Bouteille | — | Nom (« AL80 jaune »), **marque** (new) | Type de bouteille · Matériau (Aluminium / Acier) · Robinet (DIN / Étrier) · n° de série · Propre O₂ · Dernière inspection visuelle · Dernier test hydrostatique (« 03/22 ») | Inspection visuelle every 12 months · test hydrostatique every 5 years |
+| Recycleur | ✓ | Marque, modèle, n° de série | **Cellules O₂ fabriquées le** (new) · Cellules O₂ installées le · Dernière révision | Cellules O₂: due at the **earlier** of manufacture date + 18 months and installation date + 12 months · révision every 12 months |
+| Veste | ✓ | Marque, modèle, n° de série | Type de veste (Veste / Wing / Side-mount) · Portance · Lest intégré · Taille | Révision every 12 months |
+| Lampe | ✓ | Marque, modèle | Puissance (lumens) · Batterie · Autonomie | None |
+| Lest | — | Nom | Type (À plombs / À poches / Harnais) | None |
+| Masque | — | Marque, modèle | Verres correcteurs | None |
+| Palmes | — | Marque, modèle | Type (Chausson / Réglables) · Taille | None |
+| Scooter | ✓ | Marque, modèle, n° de série | — (**removed:** Batterie, Autonomie, Vitesse) | None |
+| Appareil photo | ✓ | Marque, modèle, n° de série | — (**removed:** Profondeur du caisson) | None |
+| Parachute de palier | — | Marque, modèle | Portance | None |
+| Bouée de surface | — | Marque, modèle | — (**removed:** Couleur) | None |
+| Coupe-ligne | — | Marque, modèle | — | None |
+| Couteau | — | Marque, modèle | — | None |
+| Compas | — | Marque, modèle | — | None |
+| Autre | ✓ | Nom de la pièce | Type de pièce (free text, before the name) | None |
+
+Reminders exist only for Bouteille, Veste, Détendeur, Recycleur and Combinaison étanche (to-do #148): no free reminder on the other types. A piece whose name is not typed is named « Marque Modèle », else the type's name; the name is typed by hand only for Bouteille, Lest and Autre (the cylinder's brand does not make its name).
 
 The original `knife` type is displayed as « Coupe-ligne »; `diveKnife` is the distinct « Couteau » type. Existing pieces retain their original type and are therefore displayed as line cutters.
 
