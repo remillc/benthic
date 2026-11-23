@@ -120,7 +120,7 @@ async function fixture({ media } = {}) {
   await store.write('kits/k1.json', { format: 1, id: 'k1', name: 'Cold water', gearIds: ['g1'] });
   await store.write('maintenance/m1.json', { format: 1, id: 'm1', gearId: 'g1', history: [] });
   await store.write('dive-equipment/e1.json', { format: 1, diveKey: { start: '2026-01-01 10:00:00' }, gear: { gearIds: ['g1'] } });
-  await store.write('media/p1.json', { format: 1, id: 'p1', dataUrl: `data:image/jpeg;base64,${toBase64(jpeg(300, 1))}` });
+  await store.write('gear-photos/p1.json', { format: 1, id: 'p1', dataUrl: `data:image/jpeg;base64,${toBase64(jpeg(300, 1))}` });
   await store.write('meta/dev-data-key.json', { format: 1, key: 'SECRET-KEY' });
   await store.write('meta/pending.json', { format: 1, paths: [] });
   await store.write('meta/health-consent.json', { format: 1, consent: true, at: '2026-11-01T00:00:00Z', synced: true });
@@ -209,7 +209,7 @@ test('the archive holds the logbook, the Benthic data, a README and a manifest t
         'benthic/dive-equipment/e1.json',
         'benthic/kits/k1.json',
         'benthic/maintenance/m1.json',
-        'benthic/media/p1.jpg',
+        'benthic/gear-photos/p1.jpg',
         'benthic/profile/diver.json',
         'benthic/settings.json',
       ].sort(),
@@ -217,7 +217,7 @@ test('the archive holds the logbook, the Benthic data, a README and a manifest t
     assert.deepEqual(zip.get('logbook/logbook.ssrf').data, Buffer.from(ssrf));
     assert.deepEqual(zip.get(`benthic/certifications/photos/${cert.id}-front.jpg`).data, Buffer.from(front));
     assert.deepEqual(zip.get(`benthic/certifications/photos/${cert.id}-back.jpg`).data, Buffer.from(back));
-    assert.deepEqual(zip.get('benthic/media/p1.jpg').data, Buffer.from(jpeg(300, 1)));
+    assert.deepEqual(zip.get('benthic/gear-photos/p1.jpg').data, Buffer.from(jpeg(300, 1)));
     // Stored as they are, unknown fields kept.
     assert.equal(JSON.parse(zip.get('benthic/gear/g1.json').data).futureField.keep, true);
     assert.deepEqual(JSON.parse(zip.get('benthic/settings.json').data), { format: 1, app: { 'bc.theme': 'dark' }, logbook: { unitSystem: 'metric' } });

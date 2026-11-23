@@ -387,3 +387,28 @@ test('isBuoyName recognises the surface marker buoy by its names', async () => {
   for (const n of ['Saucisse', 'saucisse orange', 'Parachute de palier', 'Surface marker buoy', 'DSMB', 'Bouée']) assert.ok(isBuoyName(n), n);
   for (const n of ['Détendeur', 'Gilet', '', undefined]) assert.ok(!isBuoyName(n), String(n));
 });
+
+test('photos of pieces and invoices live in gear-photos/ and go with the piece', async () => {
+  const { inventory, store } = setup();
+  const photoId = await inventory.savePhoto('data:image/jpeg;base64,AAAA');
+  assert.deepEqual(await store.list('gear-photos/'), [`gear-photos/${photoId}.json`]);
+  assert.deepEqual(await store.list('media/'), []);
+  assert.equal(await inventory.readPhoto(photoId), 'data:image/jpeg;base64,AAAA');
+  const reg = await inventory.saveGear(piece('regulator', 'Apeks', { photoId }));
+  await inventory.deleteGear(reg.id);
+  assert.deepEqual(await store.list('gear-photos/'), []);
+});
+
+test('the photos kept in media/ move to gear-photos/ once; dive media and a file already moved stay as they are', async () => {
+  const { inventory, store } = setup();
+  await store.write('media/a.json', { format: 1, id: 'a', dataUrl: 'data:image/jpeg;base64,OLD' });
+  await store.write('media/b.json', { format: 1, id: 'b', dataUrl: 'data:image/jpeg;base64,OLDB' });
+  await store.write('gear-photos/b.json', { format: 1, id: 'b', dataUrl: 'data:image/jpeg;base64,NEWB' });
+  await store.write('media/dive-1.json', { format: 1, diveId: 'dive-1', items: [] });
+  assert.equal(await inventory.migrateGearPhotos(), 2);
+  assert.equal(await inventory.readPhoto('a'), 'data:image/jpeg;base64,OLD');
+  assert.equal(await inventory.readPhoto('b'), 'data:image/jpeg;base64,NEWB');
+  assert.deepEqual(await store.list('media/'), ['media/dive-1.json']);
+  assert.ok((await inventory.pendingPaths()).includes('gear-photos/a.json'));
+  assert.equal(await inventory.migrateGearPhotos(), 0);
+});

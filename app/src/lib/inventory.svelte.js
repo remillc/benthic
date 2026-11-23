@@ -51,6 +51,7 @@ function open() {
 /** Reads everything again from the store. */
 export async function loadInventory() {
   const inv = open();
+  await inv.migrateGearPhotos();
   const [pieces, kits, records, state, pending, maintenance] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths(), inv.listMaintenance()]);
   gear.maintenance = maintenance;
   gear.pieces = pieces;

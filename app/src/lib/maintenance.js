@@ -36,7 +36,7 @@
  * @property {string} [doneBy] the shop or person
  * @property {number} [cost] in the diver's currency, as typed
  * @property {string} [notes]
- * @property {string} [invoicePhotoId] a file of media/
+ * @property {string} [invoicePhotoId] a file of gear-photos/
  */
 
 /**
