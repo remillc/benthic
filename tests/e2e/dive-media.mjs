@@ -249,7 +249,9 @@ export async function diveMediaFlows(h) {
       const { store } = (await import('/src/lib/profile.svelte.js')).accountDataDeps();
       const [path] = await store.list('media/');
       const file = await store.read(path);
-      const start = new Date(file.diveId);
+      // The reference file is named by the dive's Benthic id (the start time before the migration): the dive gives the start.
+      const dv = (await import('/src/lib/logbook.svelte.js')).logbook.dives.find((d) => d.benthicId === file.diveId || d.date === file.diveId);
+      const start = new Date(dv ? dv.date : file.diveId);
       const naive = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
       const inside = file.items.find((i) => i.mime.startsWith('image/') && !i.name.includes('exif'));
       inside.takenAt = naive(new Date(start.getTime() + 5 * 60000));
