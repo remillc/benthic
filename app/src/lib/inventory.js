@@ -4,15 +4,16 @@
 //
 // Subsurface does not store any of it. The data follows the Benthic logbook format (docs/architecture.md,
 // section 11.3) so that it can later be synchronised file by file with the Benthic server:
-//   gear/<uuid>.json            one piece
-//   kits/<uuid>.json            one kit: a name and the ids of its pieces
-//   dive-equipment/<uuid>.json  what one dive used (the on-device logbook has no stable id yet, see `diveKeyOf`)
+//   gear/<id>.json              one piece
+//   kits/<id>.json              one kit: a name and the ids of its pieces
+//   dive-equipment/<id>.json    what one dive used (the on-device logbook has no stable id yet, see `diveKeyOf`)
 //   meta/state.json             this device's state of the inventory: read only after a subscription ends
 //   meta/pending.json           the files changed here and not sent yet
 // Everything is read and written through a FileStore (lib/file-store.js). An unknown field of a file is kept: a
 // file is read as an object, the keys the app owns are changed, and the object is written back.
 
 import { sameComputer } from './dc-model.js';
+import { newId } from './short-id.js';
 
 import { ruleProblems } from './maintenance.js';
 import { rekey as rekeyValidations } from './validation.js';
@@ -26,7 +27,7 @@ import { rekey as rekeyValidations } from './validation.js';
  * One piece of the inventory.
  * @typedef {Object} Gear
  * @property {number} format
- * @property {string} id UUID version 4
+ * @property {string} id short id (lib/short-id.js)
  * @property {string} createdAt
  * @property {string} updatedAt
  * @property {GearType} type
@@ -84,21 +85,8 @@ export class ReadOnlyError extends Error {
   }
 }
 
-/** A random UUID version 4. @returns {string} */
-export function newId() {
-  const c = /** @type {any} */ (globalThis).crypto;
-  if (c?.randomUUID) return c.randomUUID();
-  const b = new Uint8Array(16);
-  if (c?.getRandomValues) c.getRandomValues(b);
-  else for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
-  b[6] = (b[6] & 0x0f) | 0x40;
-  b[8] = (b[8] & 0x3f) | 0x80;
-  const h = [...b].map((x) => x.toString(16).padStart(2, '0'));
-  return `${h.slice(0, 4).join('')}-${h.slice(4, 6).join('')}-${h.slice(6, 8).join('')}-${h.slice(8, 10).join('')}-${h.slice(10).join('')}`;
-}
-
-/** @param {string} id */
-export const isUuid = (id) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+// The ids of the data are short ids (lib/short-id.js: 10 characters of lowercase Crockford base32, 50 random bits).
+export { newId, isUuid } from './short-id.js';
 
 /**
  * The key of a dive in the inventory. The on-device logbook is the Subsurface core's, whose numeric ids are valid

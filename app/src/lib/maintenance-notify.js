@@ -19,6 +19,7 @@ import { formatDate } from './format.js';
 import { openOver } from './navigation.svelte.js';
 import { setDesktopNotifications, desktopBridge } from './desktop-notifications.js';
 import { t } from './i18n.js';
+import { resolveId } from './short-id.js';
 
 const CHANNEL_ID = 'maintenance';
 /** The ids of this feature live in this range, apart from the flight reminder's. */
@@ -156,6 +157,8 @@ async function deliver(plan) {
  */
 export function onNotificationAction(actionId, extra) {
   if (typeof extra?.gearId !== 'string') return;
+  // A notification scheduled before the short ids carries the old ids.
+  extra = { ...extra, gearId: resolveId(extra.gearId), itemId: typeof extra.itemId === 'string' ? resolveId(extra.itemId) : extra.itemId };
   const itemId = typeof extra.itemId === 'string' ? extra.itemId : '';
   if (actionId === 'snooze' && itemId) {
     snoozeOneWeek(itemId);

@@ -3,13 +3,13 @@
 // of dives, or both: the first reached wins), when it falls due, and the notifications that go with it.
 //
 // Everything here is pure: dates are 'YYYY-MM-DD' strings and `today` is given by the caller, so the tests set the
-// clock. The records live in the inventory (maintenance/<uuid>.json, lib/inventory.js).
+// clock. The records live in the inventory (maintenance/<id>.json, lib/inventory.js).
 
 /**
  * One reminder of a piece, with its history.
  * @typedef {Object} MaintenanceItem
  * @property {number} format
- * @property {string} id UUID version 4
+ * @property {string} id short id
  * @property {string} createdAt
  * @property {string} updatedAt
  * @property {string} gearId

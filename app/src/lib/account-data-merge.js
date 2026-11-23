@@ -98,13 +98,13 @@ function mergeObjects(base, ours, theirs, oursUpdatedAt, theirsUpdatedAt, metada
  * @param {Record<string, unknown>|null} ours
  * @param {Record<string, unknown>|null} theirs
  * @param {import('./secret-box.js').SecretBox} box
- * @param {{ id: string, format: number }} item
+ * @param {{ id: string, format: number, fileId?: string }} item `id` is the id the block is sealed under (`sealId` of a rewritten card), `fileId` the file's own
  * @returns {Promise<{ value: Record<string, unknown>|null, conflicts: FieldConflict[], sealedConflicts: import('./secret-box.js').SealedBlock|null }>}
  */
 export async function mergeEncryptedAccountFile(base, ours, theirs, box, item) {
   for (const file of [base, ours, theirs]) {
     if (file === null) continue;
-    if (!isObject(file) || file.format !== item.format || ('id' in file && file.id !== item.id)) {
+    if (!isObject(file) || file.format !== item.format || ('id' in file && file.id !== (item.fileId ?? item.id))) {
       throw new Error('INVALID_ACCOUNT_FILE');
     }
   }

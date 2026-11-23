@@ -3,12 +3,13 @@
 // blood group) and the certification cards, in the same local store as the equipment (lib/file-store.js), in the
 // layout of the Benthic logbook (docs/architecture.md, section 11.3):
 //   profile/diver.json          sealed block `enc`: fullName, dateOfBirth, emergencyContact, bloodGroup
-//   certifications/<uuid>.json  the whole payload sealed: agency, level, number, issuedOn, instructor, photos
+//   certifications/<id>.json  the whole payload sealed: agency, level, number, issuedOn, instructor, photos
 //   documents/<hash>.json       one sealed card photo, named by the hash of its ciphertext (section 11.6)
 //   meta/health-consent.json    legacy health-data consent, retained for export
 // Sensitive data is sealed on the device (lib/secret-box.js, section 11.5). Unknown fields of a file are kept.
 
 import { newId, ReadOnlyError } from './inventory.js';
+import { resolveId, sealIdOf } from './short-id.js';
 import { CERT_AGENCIES } from './cert-agencies.js';
 import { CERT_LEVELS } from './cert-levels.js';
 import { fromBase64 } from './secret-box.js';
@@ -202,6 +203,14 @@ async function sha256Hex(bytes) {
 export function createProfile(store, box, { now = () => new Date(), id = newId } = {}) {
   const stamp = () => now().toISOString().replace(/\.\d{3}Z$/, 'Z');
   const DIVER = 'profile/diver.json';
+
+  /** A card's file by the id the caller holds; an old UUID is looked up under the id it became when the file is not found as given. @param {string} certId @param {boolean} [strict] */
+  async function cardFile(certId, strict = false) {
+    const read = (/** @type {string} */ k) => (strict ? store.readStrict(`certifications/${k}.json`) : store.read(`certifications/${k}.json`));
+    const file = await read(certId);
+    if (file || resolveId(certId) === certId) return file;
+    return read(resolveId(certId));
+  }
   const CONSENT = 'meta/health-consent.json';
 
   /** Same rules as the inventory: refused while read only, and recorded as not sent yet. @param {[string, unknown][]} writes @param {string[]} [removes] */
@@ -338,7 +347,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     async openCertification(file, strict = false) {
       if (!file?.enc || typeof file.id !== 'string') return null;
       try {
-        const p = await box.open(file.enc, { id: file.id, format: file.format ?? 1 });
+        const p = await box.open(file.enc, { id: sealIdOf(file), format: file.format ?? 1 });
         return {
           id: file.id,
           kind: DOCUMENT_KINDS.includes(p.kind) ? p.kind : 'certification',
@@ -371,7 +380,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
 
     /** @param {string} certId @returns {Promise<Certification|null>} */
     async getCertification(certId) {
-      return api.openCertification(await store.read(`certifications/${certId}.json`));
+      return api.openCertification(await cardFile(certId));
     },
 
     /**
@@ -396,10 +405,12 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const kind = DOCUMENT_KINDS.includes(f.kind) ? f.kind : 'certification';
       const problems = documentProblems(kind, { ...f, agency: f.agency ?? '', level: f.level ?? '', number: f.number ?? '' }, now().toISOString().slice(0, 10));
       if (Object.keys(problems).length) throw new Error(`INVALID_CERTIFICATION:${Object.keys(problems).join(',')}`);
-      const existingFile = f.id ? await store.readStrict(`certifications/${f.id}.json`) : null;
+      const existingFile = f.id ? await cardFile(f.id, true) : null;
       const existing = existingFile ? await api.openCertification(existingFile, true) : null;
       if (existingFile && !existing) throw new Error('INVALID_CERTIFICATION_FILE');
       const certId = existing?.id ?? id();
+      // A card whose id was rewritten (lib/short-id-migration.js) is still sealed under its old id, kept in `sealId`: its photos too.
+      const sealId = existingFile ? sealIdOf(existingFile) : certId;
       const before = existing?.documents ?? [];
       /** The list to keep or to write, before sealing. @type {{ side: 'front'|'back'|'page', page?: number, hash?: string, bytes?: Uint8Array, mime?: string }[]} */
       let wanted;
@@ -423,7 +434,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
           if (kept) documents.push({ ...kept, side: w.side, ...(w.page ? { page: w.page } : {}) });
         } else if (w.bytes) {
           const mime = w.mime === 'application/pdf' ? 'application/pdf' : 'image/jpeg';
-          const sealed = await box.sealBytes(w.bytes, { id: certId, format: 1 });
+          const sealed = await box.sealBytes(w.bytes, { id: sealId, format: 1 });
           const hash = await sha256Hex(fromBase64(sealed.ct));
           writes.push([`documents/${hash}.json`, { format: 1, enc: sealed }]);
           documents.push({ hash, mime, size: w.bytes.length, side: w.side, ...(w.page ? { page: w.page } : {}) });
@@ -451,14 +462,15 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
         ...(!card && text(f.expiresOn) && EXPIRY_LEAD_CHOICES.includes(/** @type {any} */ (f.notifyDays)) ? { notifyDays: f.notifyDays } : {}),
         documents,
       };
-      const file = { ...(existingFile ?? { format: 1, createdAt: stamp() }), id: certId, updatedAt: stamp(), enc: await box.seal(payload, { id: certId, format: existingFile?.format ?? 1 }) };
+      const file = { ...(existingFile ?? { format: 1, createdAt: stamp() }), id: certId, updatedAt: stamp(), enc: await box.seal(payload, { id: sealId, format: existingFile?.format ?? 1 }) };
       await commit([...writes, [`certifications/${certId}.json`, file]], removes);
       return /** @type {Certification} */ (await api.openCertification(file));
     },
 
     /** @param {string} certId */
     async deleteCertification(certId) {
-      const file = await store.readStrict(`certifications/${certId}.json`);
+      const file = await cardFile(certId, true);
+      certId = file?.id ?? certId;
       const c = file ? await api.openCertification(file, true) : null;
       if (file && !c) throw new Error('INVALID_CERTIFICATION_FILE');
       await commit([], [`certifications/${certId}.json`, ...(c?.documents ?? []).map((d) => `documents/${d.hash}.json`)]);
@@ -469,7 +481,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const file = await store.read(`documents/${hash}.json`);
       if (!file?.enc) return null;
       try {
-        return await box.openBytes(file.enc, { id: certId, format: 1 });
+        const card = await cardFile(certId);
+        return await box.openBytes(file.enc, { id: card ? sealIdOf(card) : certId, format: 1 });
       } catch {
         return null;
       }

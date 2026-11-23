@@ -19,6 +19,7 @@ import { formatDate } from './format.js';
 import { openOver } from './navigation.svelte.js';
 import { showSnackbar } from './snackbar.js';
 import { t } from './i18n.js';
+import { resolveId } from './short-id.js';
 
 const CHANNEL_ID = 'documents';
 const SNOOZE_KEY = 'bc.documentSnooze';
@@ -31,7 +32,8 @@ const native = () => Capacitor.isNativePlatform();
 export function readDocumentSnoozed() {
   try {
     const value = JSON.parse(deviceStore.getItem(SNOOZE_KEY) ?? '{}');
-    return value && typeof value === 'object' ? value : {};
+    // A snooze made before the short ids is kept under the old id of its document.
+    return value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([id, day]) => [resolveId(id), day])) : {};
   } catch {
     return {};
   }
@@ -122,6 +124,7 @@ export const documentPath = (docKind, docId) => (docKind === 'certification' ? `
  */
 export function onDocumentAction(actionId, extra) {
   if (typeof extra?.docId !== 'string') return;
+  extra = { ...extra, docId: resolveId(extra.docId) };
   const kind = typeof extra.docKind === 'string' ? extra.docKind : 'other';
   if (actionId === 'snooze') {
     snoozeDocument(extra.docId);
