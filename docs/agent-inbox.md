@@ -6864,3 +6864,12 @@ Christian decided this on 23 November 2026. Work in `main`. The QR pairing (338 
 10. The QR display, the scanner screens, « Lire le code d’un ordinateur », the desktop's « Jumeler cet ordinateur » QR, and the account sheet row « Jumeler un nouvel appareil » (task 345) on every device. While the data is locked, the account sheet keeps « Jumeler cet appareil » (task 348), which now opens step 1.
 
 In the done note, list what was removed and how the request reaches a closed app on each platform.
+
+## [ ] 2026-11-23-350 Addition to task 349: « Plus d’appareil ni de clé ? » where the diver may be stuck
+
+Christian asked for this on 23 November 2026. Work in `main`. A diver can be stuck on a device without the data key while no paired device can answer: the only phone was lost or broken and he signs in on a new one, he reinstalled the app or reset his only device (the key is never backed up off the device), or every device was replaced at once. Without a recovery key, « Repartir sans les données chiffrées » is the only way out, so make it reachable there:
+
+1. Phone sign-in step « Jumeler cet appareil » (mock-up « Benthic+, jumeler cet appareil à la connexion (Benthic+) · Android »): a text button « Plus d’appareil ni de clé ? » under the « Plus tard » note, centred. Tablet and desktop already have it in « Déverrouiller vos données chiffrées ».
+2. « Demande expirée » (task 349 item 4), on every device: the same text button. Phone: on its own line above « Fermer » / « Nouvelle demande »; tablet and desktop: on the left of the button row.
+
+Both open « Repartir sans les données chiffrées » (task 338 item 6), unchanged.
