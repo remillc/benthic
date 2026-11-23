@@ -7318,3 +7318,29 @@ Christian reported this on 23 November 2026. Work in `main`. On the desktop, in 
 - No double line where a trip follows a dive that already has its own line.
 
 **Test:** on the desktop, a logbook with a trip between other dives: closed, it shows a line above and below; open, the dive after the trip is clearly separated; nothing changes on the phone or tablet lists.
+
+## [ ] 2026-11-23-375 Desktop dive detail: clean up the right pane to match the mock-up
+
+Christian reported this on 23 November 2026. Work in `main`. On the desktop, the dive detail (right pane of « Mon carnet ») does not match the mock-up « Carnet · bureau (Windows, Linux) » and the « Carnet · bureau, détail, onglet … » boards (tablet and desktop canvas, page Bureau). Screenshot: `docs/screenshots/2026-11-23-bureau-detail-panneau-blanc.png` (the red circle).
+
+1. **Bug, the extra white panel:** a white rectangle with square corners sits under the profile chart, between the splitter and the chart's card, and runs down past the chart. It must go: the pane's background is the page colour (#F5F4F0) and the only white surface around the profile is the chart's own card (16 px corners, 16 px margin from the pane's edges, as in the mock-up). Look for a wrapper that also paints `--bc-surface` (a section, the chart container or a scroll container) and remove its background.
+2. **Fidelity pass:** compare the whole right pane with the mock-ups, side by side at the same window size, and fix what differs, in particular:
+   - the profile's axes: depth labels and ticks on the left at regular steps, time labels under it (« 0 min … 70 min »), the average-depth dashed line with its label, as drawn;
+   - the curve chips under the chart (« Température », « Gaz », « ppO₂ », « Plafond », « Tissus »): the mock-up's outlined chips, the selected one with its check, and the expand button on the right;
+   - the spacing of the header (number, site, date line, actions), the summary figures and the tabs.
+   Where the app is right and the mock-up is out of date, say so in the task's done note instead of changing the app.
+
+**Test:** at 1440 × 900, the desktop detail looks like the mock-up: no white block outside the chart's card, same axes, chips and spacing; resizing the splitter keeps it clean.
+
+## [ ] 2026-11-23-376 Desktop dive detail, « Informations » tab: one card per group, people as chips, stars for rating and visibility
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet · bureau (Windows, Linux) » (tablet and desktop canvas, page Bureau), now 1 560 px high to show the whole tab. Same data and editing as today; the layout follows the « Équipement » tab (task 366): the hint « Les champs gris se modifient d’un clic et s’enregistrent tout de suite. », then white cards (16 px corners, 16 px padding, 14 px apart), each with a 40 px round #D4E2F2 icon and a 16 px semibold title.
+
+1. **Site** (pin icon): one 56 px grey row with the site's name (medium), « Région, Pays · latitude, longitude » under it, and a chevron; a click changes the site, as today.
+2. **Personnes** (people icon): « Guide de palanquée » and « Compagnons » are multi-value fields. Each person is a 36 px chip (#ECEAE4) with a 28 px round #114477 initial, the name and a ✕ « Retirer … » ; then a dashed chip « + Ajouter » that opens the people picker (names already in the logbook first). Several guides are allowed, as in the core (comma-separated).
+3. **Appréciation** (star icon): « Note » and « Visibilité » are 5 clickable stars each (26 px, filled #114477, empty outlined #8F8D86, 36 px targets), with « N sur 5 » after them; clicking the current star again clears it. A `radiogroup` per row.
+4. **Conditions** (waves icon): « Type d’eau » (select) and « Air » (temperature) side by side.
+5. **Étiquettes** (tag icon): one outlined chip per tag, then « + Ajouter ».
+- Leave 88 px empty at the end so the + floating button never covers the last card.
+
+**Test:** on the desktop, a dive's Informations tab shows the five cards; add and remove a buddy and a guide through the chips; set and clear the rating and the visibility with the stars; the values are saved as before and show in the other views (list columns, phone detail).
