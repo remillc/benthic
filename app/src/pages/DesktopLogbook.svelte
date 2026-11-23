@@ -11,6 +11,7 @@
   import { Page, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import SearchClear from '../components/SearchClear.svelte';
+  import SyncProfileLine from '../components/SyncProfileLine.svelte';
   import FabMenu from '../components/FabMenu.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
@@ -1004,6 +1005,8 @@
       <button type="button" class="bc-desktop-logbook--icon-button" aria-label={t('desktop.moreLogbook')} title={t('desktop.moreLogbook')} aria-haspopup="menu" onclick={openMore}>
         <Icon name="more" size={22} />
       </button>
+      <!-- The exchange with the server at start: the line on a faint profile under the header (task 2026-11-23-340). -->
+      <SyncProfileLine edge />
     </header>
 
     <FlightBanner />
@@ -1212,6 +1215,9 @@
       background: var(--bc-background);
     }
     .bc-desktop-logbook--bar {
+      position: relative;
+      /* Above the table: the sync line is drawn just under the header. */
+      z-index: 2;
       display: flex;
       align-items: center;
       gap: 12px;
