@@ -4,7 +4,7 @@
   // and a side menu with the four sections and Settings. Tablet layout: the
   // iPad sidebar or the Android rail and, in the Logbook, the list and the
   // dive side by side from `splitBreakpoint` (Framework7's master-detail).
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { App, Views, View, f7, f7ready } from 'framework7-svelte';
   import Logbook from './pages/Logbook.svelte';
   import DiveDetail from './pages/DiveDetail.svelte';
@@ -71,7 +71,7 @@
   import { startDesktopShell } from './lib/desktop-shell.js';
   import { navigation } from './lib/navigation.svelte.js';
   import { enableRouterGuard } from './lib/router-guard.js';
-  import { trackSection, enableSectionSwipes } from './lib/navigation.svelte.js';
+  import { trackSection, enableSectionSwipes, showSection } from './lib/navigation.svelte.js';
   import { enableSwipeBack } from './lib/swipe-back.js';
   import { enablePageOrder } from './lib/page-order.js';
   import { startNavHealth, watchNavigation } from './lib/nav-health.js';
@@ -426,6 +426,15 @@
     document.documentElement.classList.toggle('bc-bottom-nav', bottomNav());
   });
 
+  // The Profil section exists for a Benthic+ account only; when the subscription ends while it is shown, the logbook comes back.
+  $effect(() => {
+    const on = isRelease && isSubscriber();
+    untrack(() => {
+      navigation.profile = on;
+      if (!on && navigation.section === 'profile') showSection('logbook');
+    });
+  });
+
   // The Mac's menu item « Mon profil de plongeur… » is on while the diver has Benthic+; the separate profile window
   // reads the diver's line from the device's store (task 2026-11-18-277).
   $effect(() => {
@@ -544,6 +553,8 @@
       {/if}
     </View>
     <View id="view-sites" tab url="/sites/" />
+    <!-- Profil (Benthic+, task 2026-11-23-347): the diver profile, after Sites; it exists only for a subscriber. -->
+    {#if navigation.profile}<View id="view-profile" tab url="/profile" />{/if}
     <View
       id="view-statistics"
       tab

@@ -6,18 +6,20 @@ import { horizontalSwipe, swipeGoesThrough, settle } from './swipe.js';
 import { isBusy } from './router-guard.js';
 import { trace } from './nav-trace.js';
 
-/** @typedef {'logbook'|'sites'|'statistics'|'tools'|'account'} Section */
+/** @typedef {'logbook'|'sites'|'profile'|'statistics'|'tools'|'account'} Section */
 
-/** The four main sections, in the order of the menu. */
+/** The main sections, in the order of the menu, Profil (Benthic+) after Sites (task 2026-11-23-347). */
 /** @type {Section[]} */
-export const sections = ['logbook', 'sites', 'statistics', 'tools'];
+export const sectionOrder = ['logbook', 'sites', 'profile', 'statistics', 'tools'];
 
 /** Every section shown by the menu: the main ones, then Account after the separator. */
-const allSections = [...sections, 'account'];
+const allSections = [...sectionOrder, 'account'];
 
 export const navigation = $state({
   /** @type {Section} */
   section: 'logbook',
+  /** The diver has Benthic+: the Profil section exists (the entry, its view and its pages). Set from App.svelte. */
+  profile: false,
   menuOpen: false,
   /** Settings or About when shown over a section, else empty: the row lit in the menu. */
   page: /** @type {''|'settings'|'about'} */ (''),
@@ -46,11 +48,18 @@ export const navigation = $state({
   backupOpen: false,
 });
 
+/**
+ * The main sections the navigation shows: Profil only for a Benthic+ account. A free account has no Profil entry and
+ * its pages cannot be reached.
+ * @returns {Section[]}
+ */
+export const sections = () => sectionOrder.filter((s) => s !== 'profile' || navigation.profile);
+
 /** Whether the current view shows its first page, for the bottom navigation bar. */
 function updateAtRoot() {
   const view = f7.views.current;
   const id = view?.el?.id?.replace('view-', '');
-  navigation.atRoot = sections.includes(/** @type {Section} */ (id)) && (view?.router?.history?.length ?? 1) <= 1;
+  navigation.atRoot = sectionOrder.includes(/** @type {Section} */ (id)) && (view?.router?.history?.length ?? 1) <= 1;
   navigation.over = isOverPath(String(view?.router?.currentRoute?.path ?? ''));
 }
 
@@ -117,7 +126,7 @@ export async function backToFirstScreen(router) {
  * Whether a route is one of the screens opened over a section.
  * @param {string} path
  */
-export const isOverPath = (path) => path.startsWith('/settings/') || path === '/about' || path === '/profile' || path.startsWith('/profile/');
+export const isOverPath = (path) => path.startsWith('/settings/') || path === '/about';
 
 /**
  * A section chosen in the side menu or the navigation rail: Settings or About
@@ -140,6 +149,11 @@ export function goToSection(section) {
  * @param {{ animate?: boolean }} [options] passed to the router
  */
 export function openOver(path, options) {
+  // The diver profile is a section of its own (Profil, Benthic+), not a screen over the current one.
+  if (path === '/profile' || path.startsWith('/profile/')) {
+    void openProfilePath(path, options);
+    return;
+  }
   let view = f7.views.current;
   // Réglages on a tablet: always in the Account view, where its overview and a subpage sit
   // side by side (task 2026-11-13-111).
@@ -153,14 +167,33 @@ export function openOver(path, options) {
   if (router && open !== path && !(path === '/settings/' && open === '/pane/empty')) router.navigate(path, options);
 }
 
-/** « Mon profil de plongeur »: the Mac opens its own window (task 2026-11-18-277); elsewhere it opens over the section. */
-export function openProfile() {
-  const desk = /** @type {any} */ (typeof window === 'undefined' ? null : window).benthicDesktop;
-  if (desktopMac && desk?.openProfileWindow) {
-    desk.openProfileWindow().catch((/** @type {unknown} */ e) => console.error('Profile window', e));
+/**
+ * A page of the diver profile (task 2026-11-23-347): the Profil section shows, then the page opens in its view. Pages
+ * opened by a notification, the dive's equipment menu or the emergency shortcut come through here. A free account has
+ * no Profil section: nothing opens. The section's view may still be starting (a notification at launch): it is awaited.
+ * @param {string} [path] a route under /profile (the section's home by default)
+ * @param {{ animate?: boolean }} [options] passed to the router
+ * @returns {Promise<void>}
+ */
+export async function openProfilePath(path = '/profile', options) {
+  if (!navigation.profile) return;
+  const start = Date.now();
+  while (!f7.views.get('#view-profile')?.router && Date.now() - start < 2000) await new Promise((resolve) => setTimeout(resolve, 30));
+  const view = f7.views.get('#view-profile');
+  const router = view?.router;
+  if (!router || !navigation.profile) return;
+  closeOverPages(f7.views.current);
+  showSection('profile');
+  if (path === '/profile') {
+    if (router.history.length > 1) await backToFirstScreen(router);
     return;
   }
-  openOver('/profile');
+  if (router.currentRoute?.path !== path) router.navigate(path, options);
+}
+
+/** The Profil section's first screen. */
+export function openProfile() {
+  void openProfilePath('/profile');
 }
 
 /** « Gérer le compte » (a Benthic+ account): a page on the phone, a two-column dialog on a tablet and on the desktop. */
@@ -256,7 +289,7 @@ export function restoreFocus() {
 export function enableSectionSwipes() {
   /** The menu entries a swipe goes through, in order: the sections are tabs. */
   /** On Android phones Account is not a section: it opens from the account sheet. */
-  const swipeOrder = () => (bottomNav() ? [...sections] : [...sections, 'account']);
+  const swipeOrder = () => (bottomNav() ? [...sections()] : [...sections(), 'account']);
 
   /** Where the swipe started: a section's first screen, or the Settings page. */
   /** @type {null|{ kind: 'tab', section: string }|{ kind: 'settings' }} */

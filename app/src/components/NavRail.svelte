@@ -8,6 +8,7 @@
   // (NavigationBar.svelte on Android, NavMenu.svelte on iPhone).
   import Icon from './Icon.svelte';
   import NavIcon from './NavIcon.svelte';
+  import NavBadge from './NavBadge.svelte';
   import AccountAvatar from './AccountAvatar.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -30,7 +31,7 @@
   {#if ios}
     <p class="bc-nav-rail--title">{t('menu.title')}</p>
   {/if}
-  {#each sections as section (section)}
+  {#each sections() as section (section)}
     <a
       href="#{section}"
       class="bc-nav-rail--item"
@@ -39,6 +40,7 @@
     >
       <span class="bc-nav-rail--icon">
         {#if ios}<Icon name={section} size={22} />{:else}<NavIcon {section} active={navigation.section === section} />{/if}
+        {#if section === 'profile'}<NavBadge />{/if}
       </span>
       <span class="bc-nav-rail--label">{t(`tabs.${section}`)}</span>
     </a>
@@ -120,6 +122,7 @@
       text-decoration: none;
 
       .bc-nav-rail--icon {
+        position: relative;
         width: 56px;
         height: 32px;
         border-radius: 16px;

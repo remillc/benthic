@@ -225,6 +225,7 @@
   "tabs": {
     "logbook": "Logbook",
     "sites": "Sites",
+    "profile": "Profile",
     "statistics": "Statistics",
     "statisticsShort": "Stats",
     "tools": "Tools"
@@ -2782,6 +2783,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
       "Logbook: while the app exchanges with the server at start, a white line is drawn on the faint profile of the header, on every device: a segment slides while the progress is unknown, then the line fills up, completes and fades. It replaces the wavy bar.",
       "Sync: synchronisation is always automatic. The « Sync automatically » switch and the manual mode are gone; « Wi-Fi or cable only » and « Sync now » stay, and changes not sent still show when the device is offline.",
@@ -5977,10 +5979,10 @@
         "one": "{n} dive since {year}",
         "other": "{n} dives since {year}"
       },
+      "home": "Diver profile",
       "noDive": "No dive yet",
       "defaultName": "Diver",
       "keep": "What you keep here",
-      "kept": "Kept on this phone, even without a network.",
       "equipment": "Equipment",
       "certifications": "Certifications and documents",
       "information": "Information",
@@ -5989,7 +5991,7 @@
       "informationLine": "Emergency contact, health",
       "certificationsLine": "{n} certifications",
       "noCertification": "No certification",
-      "keptWide": "Kept on your Benthic+ account and on this device, even without a network.",
+      "encrypted": "Encrypted end to end",
       "paneEmpty": "Choose an item to see it here"
     },
     "inventory": {

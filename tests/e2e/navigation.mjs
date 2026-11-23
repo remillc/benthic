@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -329,6 +329,18 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
   }
   await sleep(500);
   return tab;
+}
+
+/** A tab whose account has Benthic+: the Profil section exists (task 2026-11-23-347), the profile flows open its pages. */
+async function openPlusTab(...a) {
+  const tab = await openTab(...a);
+  await makePlus(tab);
+  return tab;
+}
+/** The account of a tab has Benthic+ (again after a reload). */
+async function makePlus(tab) {
+  await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
+  await sleep(1200);
 }
 
 // --- The invariants ----------------------------------------------------------------------------------------------
@@ -887,10 +899,10 @@ async function phoneFlows() {
     await settled(tab, `${row}: logbook after the sheet`, { route: '/' });
   }
 
-  console.log(' subscriber with the logbook still on the device: the profile and the backup page open, never the offer');
+  console.log(' subscriber with the logbook still on the device: the backup page opens, never the offer; the profile is the Profil tab');
   // What the development menu's « Abonné » does (lib/dev-tools.js): the account state, with no restart and the logbook untouched.
   await tab.run(() => window.__benthicPlusAccount({ signedIn: true, email: 'essai@benthic.test', subscribed: true }));
-  for (const [row, route, page] of [['#profile', '/profile', '.bc-profile, .bc-profile-page, .page-current'], ['#backup', '/account/backup', '.bc-backup-not-on-server']]) {
+  for (const [row, route, page] of [['#backup', '/account/backup', '.bc-backup-not-on-server']]) {
     await tapText(tab, '^\s*Compte', '.page-current .navbar, .page-current');
     await sleep(800);
     const rows = await tab.run((r) => ({ row: !!document.querySelector(`a[href="${r}"], [data-row="${r.slice(1)}"]`), offer: !!document.querySelector('a[href^="#offer-"], [data-row^="offer-"]') }), row);
@@ -1199,7 +1211,7 @@ async function settingsComputersFlows(expect) {
   }
 }
 
-/** Pages opened over a section (the profile, an equipment piece) must have room in the desktop layout, with Settings opened before. */
+/** Pages opened over a section (À propos' pages) must have room in the desktop layout, with Settings opened before. */
 async function desktopFlows() {
   console.log('Desktop, 1400x900: pages opened over Réglages');
   const tab = await openTab(1400, 900, false, false, true, { theme: 'md' });
@@ -1207,7 +1219,8 @@ async function desktopFlows() {
   const open = (path) => tab.run(async (p) => { (await import('/src/lib/navigation.svelte.js')).openOver(p); return 1; }, path);
   await open('/settings/');
   await sleep(1200);
-  for (const path of ['/profile/gear/new', '/about/libraries']) {
+  // The profile is no longer opened over Réglages (it has its own section, task 2026-11-23-347): « À propos » pages remain.
+  for (const path of ['/about/libraries']) {
     await open(path);
     await sleep(1200);
     const room = await tab.run((path) => {
@@ -1635,7 +1648,7 @@ async function computerPhotoFlows(expect) {
 async function profileInsetsFlows(expect) {
   for (const [label, width, height] of [['landscape narrow', 1000, 700], ['landscape', 1280, 800], ['portrait', 800, 1280]]) {
     for (const [route, bar] of [['/profile', 'none'], ['/profile/maintenance/', 'none'], ['/profile/certs/', 'main'], ['/profile/gear/new', 'steps']]) {
-      const tab = await openTab(width, height, false, false, false, { theme: 'md' });
+      const tab = await openPlusTab(width, height, false, false, false, { theme: 'md' });
       await tab.run(async (path) => {
         window.__bcSetInsets({ top: 24, bottom: 48, left: 0, right: 0 });
         (await import('/src/lib/navigation.svelte.js')).openOver(path);
@@ -1686,8 +1699,8 @@ async function profileInsetsFlows(expect) {
 
 async function gearAddFlows(expect) {
   for (const [label, width, height, desktop, theme] of [['Android tablet', 1280, 800, false, 'md'], ['desktop', 1400, 900, true, 'md']]) {
-    const tab = await openTab(width, height, false, false, desktop, { theme });
-    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile'));
+    const tab = await openPlusTab(width, height, false, false, desktop, { theme });
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/'));
     await sleep(1600);
     const geometry = await tab.run(() => {
       const button = document.querySelector('.page-current .bc-gear-list--add');
@@ -1727,7 +1740,7 @@ async function gearAddFlows(expect) {
 
 async function certsFabFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [['Android phone', 390, 844, true, false, 'md'], ['tablet landscape', 1280, 800, false, false, 'md']]) {
-    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    const tab = await openPlusTab(width, height, mobile, false, desktop, { theme });
     await tab.send('Page.bringToFront');
     // Each device starts with no certification: the tabs share the browser storage, and the phone adds one further down.
     await tab.run(() => new Promise((resolve) => {
@@ -1744,6 +1757,7 @@ async function certsFabFlows(expect) {
     }));
     await tab.send('Page.reload');
     await sleep(2500);
+    await makePlus(tab);
     await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/'));
     await sleep(1600);
     const position = await tab.run(() => {
@@ -1838,7 +1852,7 @@ async function certsFabFlows(expect) {
 async function certificationAgencyFlows(expect) {
   // The agencies and their levels are in tests/app/cert-agencies.test.mjs; one layout shows that the form uses them.
   for (const [label, width, height, mobile, desktop] of [['phone', 390, 844, true, false]]) {
-    const tab = await openTab(width, height, mobile, false, desktop, { theme: 'md' });
+    const tab = await openPlusTab(width, height, mobile, false, desktop, { theme: 'md' });
     await tab.send('Page.bringToFront');
     await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/new'); });
     await sleep(1600);
@@ -1931,7 +1945,7 @@ async function gearTypeDialogFlows(expect) {
     ['Android tablet', 1280, 800, false, false, 'md'],
     ['desktop', 1400, 900, false, true, 'md'],
   ]) {
-    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    const tab = await openPlusTab(width, height, mobile, false, desktop, { theme });
     await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
     await sleep(1400);
     const initial = await tab.run(() => {
@@ -2220,7 +2234,7 @@ async function profileInfoWidthsFlows(expect) {
     ['tablet portrait', 800, 1280, false, false, 'md'],
     ['desktop', 1400, 900, false, true, 'md'],
   ]) {
-    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    const tab = await openPlusTab(width, height, mobile, false, desktop, { theme });
     const state = () => tab.run(() => {
       const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
       return { route: view?.f7View?.router?.currentRoute?.url, editing: !!document.querySelector('.page-current .bc-profile-info--editing') };
@@ -2380,14 +2394,15 @@ async function maintenanceEntryFlows(expect) {
     ['phone', 390, 844, true, false],
     ['tablet', 1280, 800, false, false],
   ]) {
-    const tab = await openTab(width, height, mobile, false, desktop, { theme: 'md' });
+    const tab = await openPlusTab(width, height, mobile, false, desktop, { theme: 'md' });
     const id = await tab.run(async (name) => {
       const { change } = await import('/src/lib/inventory.svelte.js');
       return (await change((inv) => inv.saveGear({ type: 'regulator', name }))).id;
     }, `Maintenance ${label}`);
     const profileEntry = async () => tab.run(async () => {
       const { t } = await import('/src/lib/i18n.js');
-      const page = document.querySelector('.page-current.bc-profile');
+      // The home page on a phone; beside the list on a tablet (the Informations pane is the first page there).
+      const page = document.querySelector('.tab-active .page-current.bc-profile') || document.querySelector('.tab-active .page-current:has(.bc-profile-nav)');
       return { profile: !!page, visible: !!page && [...page.querySelectorAll('.bc-profile--row, .bc-profile-nav--row')].some((row) => row.textContent.includes(t('maintenance.entry'))) };
     });
     const gearEntry = async () => tab.run(() => !!document.querySelector('.page-current .bc-gear-page--upkeep, .page-current .bc-gear-list--upkeep'));
@@ -2426,7 +2441,7 @@ async function gearDeleteFlows(expect) {
     ['Android phone', 390, 844, true, false, 'md'],
     ['Android tablet', 1280, 800, false, false, 'md'],
   ]) {
-    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    const tab = await openPlusTab(width, height, mobile, false, desktop, { theme });
     const fixture = await tab.run(async (name) => {
       const { change } = await import('/src/lib/inventory.svelte.js');
       return change(async (inv) => {
@@ -2604,11 +2619,100 @@ async function profileLayersFlows(expect) {
   }
 }
 
+
+/**
+ * Task 2026-11-23-347: « Profil » is a main navigation entry after Sites, for a Benthic+ account only; its home page has no
+ * back arrow; the red badge counts the overdue maintenance reminders; the account sheet has no « Mon profil de plongeur ».
+ * With BC_SHOTS set, a screenshot of each device is kept.
+ */
+async function profileSectionFlows(expect) {
+  const subscribe = (tab, on) => tab.run((v) => window.__benthicPlusAccount(v ? { signedIn: true, subscribed: true, email: 'diver@benthic.test' } : { signedIn: false, subscribed: false }), on);
+  const entries = (tab) => tab.run(() => [...document.querySelectorAll('.bc-navigation-bar--item, .bc-nav-rail--item[href^="#"]')].map((a) => a.getAttribute('href').slice(1)).filter((h) => ['logbook', 'sites', 'profile', 'statistics', 'tools'].includes(h)));
+  const where = (tab) => tab.run(() => {
+    const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active');
+    const profile = view?.querySelector(':scope > .page-current .navbar .left .back');
+    return {
+      view: view?.id ?? '',
+      route: (view?.f7View?.router?.currentRoute?.url ?? '').replace(/\?.*$/, ''),
+      back: !!profile && profile.getBoundingClientRect().width > 0,
+      bar: !!document.querySelector('.bc-navigation-bar'),
+      badge: document.querySelector('[href="#profile"] .bc-nav-badge')?.textContent ?? '',
+    };
+  });
+  // The tabs share the browser's storage: reminders left by an earlier run would count in the badge.
+  for (const [label, width, height, mobile, desktop, theme, phone] of [
+    ['Android phone', 390, 844, true, false, 'md', true],
+    ['iPhone', 390, 844, true, false, 'ios', true],
+    ['Android tablet', 1280, 800, false, false, 'md', false],
+    ['iPad', 1280, 800, false, false, 'ios', false],
+    ['desktop', 1400, 900, false, true, 'md', false],
+  ]) {
+    const tab = await openTab(width, height, mobile, false, desktop, { theme });
+    await sleep(500);
+    expect(`${label}: a free account has no Profil entry`, { list: 'logbook,sites,statistics,tools', view: false }, { list: (await entries(tab)).join(','), view: await tab.run(() => !!document.querySelector('#view-profile')) });
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile'));
+    await sleep(500);
+    expect(`${label}: a free account reaches no profile page`, { view: 'view-logbook' }, await where(tab));
+    await subscribe(tab, true);
+    await sleep(1200);
+    expect(`${label}: a Benthic+ account has Profil after Sites`, { list: 'logbook,sites,profile,statistics,tools' }, { list: (await entries(tab)).join(',') });
+    expect(`${label}: no badge without an overdue reminder`, { badge: '' }, await where(tab));
+    const gear = await tab.run(async () => {
+      const { change } = await import('/src/lib/inventory.svelte.js');
+      return change(async (inv) => {
+        const piece = await inv.saveGear({ type: 'regulator', name: 'Badge regulator' });
+        await inv.saveMaintenance({ gearId: piece.id, task: 'service', intervalMonths: 12, intervalDives: null, startOn: '2020-01-01' });
+        return piece.id;
+      });
+    });
+    await sleep(800);
+    expect(`${label}: the badge counts the overdue reminders`, { badge: '1' }, await where(tab));
+    if (process.env.BC_SHOTS) await shot(tab, `347-${label.replace(/ /g, '-')}-logbook`);
+    await tab.run(() => document.querySelector('[href="#profile"]').click());
+    await sleep(1500);
+    const home = await where(tab);
+    const wide = !phone && (desktop || width > height);
+    expect(`${label}: Profil opens its own view${wide ? ' on a pane (Informations)' : ''}`, { view: 'view-profile', route: wide ? '/profile/info' : '/profile', back: false }, home);
+    if (phone) expect(`${label}: the bottom bar stays on the profile home`, { bar: true, badge: '1' }, home);
+    await settled(tab, `${label}: the profile home is a sound page stack`, { setup: false });
+    if (process.env.BC_SHOTS) await shot(tab, `347-${label.replace(/ /g, '-')}-profile`);
+    // A page opened over the home (the equipment) is reached from a notification-like call, and the system Back leaves it.
+    await tab.run(async (id) => (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/gear/${id}`), gear);
+    await sleep(1300);
+    const piece = await where(tab);
+    expect(`${label}: an equipment page opens in the Profil view`, { view: 'view-profile', route: `/profile/gear/${gear}` }, piece);
+    if (phone) expect(`${label}: the bottom bar steps aside on a pushed page`, { bar: false }, piece);
+    await hardwareBack(tab);
+    await sleep(1200);
+    // From the first screen of Profil, Back leads to the logbook.
+    if (phone) {
+      expect(`${label}: Back returns to the profile home`, { view: 'view-profile', route: '/profile' }, await where(tab));
+      await hardwareBack(tab);
+      await sleep(1000);
+      expect(`${label}: Back from the profile home shows the logbook`, { view: 'view-logbook' }, await where(tab));
+    }
+    // The account sheet has no profile row.
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).navigation.accountOpen = true; });
+    await sleep(900);
+    const sheet = await tab.run(() => ({ profile: !!document.querySelector('.bc-account-sheet [href="#profile"], .bc-account-sheet [data-row="profile"], .bc-desktop-account [data-row="profile"]'), text: /Mon profil de plongeur|My diver profile/.test(document.querySelector('.modal-in, .bc-desktop-account')?.textContent ?? ''), open: !!document.querySelector('.modal-in, .bc-desktop-account') }));
+    // The iPad has an Account section instead of a sheet.
+    expect(`${label}: the account sheet has no « Mon profil de plongeur » row`, { open: label !== 'iPad', profile: false, text: false }, sheet);
+    if (process.env.BC_SHOTS && sheet.open) await shot(tab, `347-${label.replace(/ /g, '-')}-sheet`);
+    await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).navigation.accountOpen = false; });
+    await sleep(600);
+    await subscribe(tab, false);
+    await sleep(1200);
+    expect(`${label}: ending the subscription removes the entry`, { list: 'logbook,sites,statistics,tools', view: false }, { list: (await entries(tab)).join(','), view: await tab.run(() => !!document.querySelector('#view-profile')) });
+    await tab.run(async (id) => { await (await import('/src/lib/inventory.svelte.js')).change((inv) => inv.deleteGear(id)); }, gear);
+    tab.ws.close();
+  }
+}
+
 /** What each block of flows made and how long it took, for the summary at the end. @type {{ name: string, checks: number, seconds: number }[]} */
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2644,6 +2748,7 @@ try {
     ['divelogs upload', '--divelogs-only', 30, true, () => divelogsFlows(expect)],
     ['computer photo', '--computer-photo-only', 10, !phoneOnly && !tabletOnly && !welcomeOnly, () => computerPhotoFlows(expect)],
     ['units', '--units-only', 2, true, () => unitsMenuFlows(expect)],
+    ['profile section', '--profile-section-only', 40, true, () => profileSectionFlows(expect)],
     ['profile insets', '--profile-insets-only', 19, !phoneOnly && !welcomeOnly, () => profileInsetsFlows(expect)],
     ['profile info', '--profile-info-widths-only', 20, true, () => profileInfoWidthsFlows(expect)],
     ['maintenance entry', '--maintenance-entry-only', 15, true, () => maintenanceEntryFlows(expect)],

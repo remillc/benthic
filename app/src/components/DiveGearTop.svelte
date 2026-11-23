@@ -18,7 +18,7 @@
   import { logbook } from '../lib/logbook.svelte.js';
   import { BenthicCore } from 'benthic-core';
   import { equipmentOf } from '../lib/inventory.svelte.js';
-  import { f7 } from 'framework7-svelte';
+  import { openOver } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /**
@@ -94,7 +94,7 @@
       onclick: () => useKit(kit),
     }));
     if (!items.length) items.push({ label: t('gear.diveGear.noKits'), onclick: () => {}, disabled: true });
-    items.push({ label: t('gear.diveGear.manageKits'), onclick: () => f7.views.current.router.navigate('/profile/gear/'), divider: true });
+    items.push({ label: t('gear.diveGear.manageKits'), onclick: () => openOver('/profile/gear/'), divider: true });
     openPopupMenu(/** @type {HTMLElement} */ (e.currentTarget), items, t('gear.diveGear.kitMenu'));
   }
 

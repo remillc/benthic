@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // Android phone: the Material 3 Expressive navigation bar at the bottom, four destinations
+  // Android phone: the Material 3 Expressive navigation bar at the bottom, five destinations (Profil after Sites for a Benthic+ account)
   // (task 2026-11-14-120, docs/mockups/nav-barre-android.dc.html). Shown only on the first
   // page of a section; every other page has its back arrow and no bar. The active item has a
   // 56 × 32 dp pill in the primary container and a filled icon. Tapping the current section
@@ -8,6 +8,7 @@
   import { t } from '../lib/i18n.js';
   import { navigation, goToSection, sections } from '../lib/navigation.svelte.js';
   import NavIcon from './NavIcon.svelte';
+  import NavBadge from './NavBadge.svelte';
   import { ios } from '../lib/layout.svelte.js';
 
   /**
@@ -26,13 +27,14 @@
   }
 </script>
 
-<!-- iPhone (task 2026-11-14-127): the same four destinations as a tab bar, in iOS form. -->
+<!-- iPhone (task 2026-11-14-127): the same five destinations (Profil after Sites for a Benthic+ account) as a tab bar, in iOS form. -->
 <nav class="bc-navigation-bar" class:ios aria-label={t('menu.sections')}>
-  {#each sections as section (section)}
+  {#each sections() as section (section)}
     {@const active = navigation.section === section}
     <a href="#{section}" class="bc-navigation-bar--item" class:bc-navigation-bar--active={active} aria-current={active ? 'page' : undefined} onclick={(e) => choose(e, section)}>
       <span class="bc-navigation-bar--pill">
         <NavIcon {section} {active} />
+        {#if section === 'profile'}<NavBadge />{/if}
       </span>
       <span class="bc-navigation-bar--label">{t(`tabs.${section}`)}</span>
     </a>
@@ -69,6 +71,7 @@
     }
 
     .bc-navigation-bar--pill {
+      position: relative;
       width: 56px;
       height: 32px;
       border-radius: 16px;

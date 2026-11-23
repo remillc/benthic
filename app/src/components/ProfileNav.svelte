@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // The left pane of « Mon profil de plongeur » on a wide screen (tasks 2026-11-18-275 and 277): the diver
+  // The left pane of The Profil section on a wide screen (tasks 2026-11-18-275 and 277): the diver
   // (avatar, name, Benthic+ chip) and the four entries; the chosen one is lit.
   import Icon from './Icon.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
@@ -48,7 +48,7 @@
 
 <nav class="bc-profile-nav" aria-label={t('gear.profile.title')}>
   <div class="bc-profile-nav--head">
-    <h1 class="bc-profile-nav--title">{t('gear.profile.title')}</h1>
+    <h1 class="bc-profile-nav--title">{t('gear.profile.home')}</h1>
   </div>
   <div class="bc-profile-nav--hero">
     <span class="bc-profile-nav--initial" aria-hidden="true">{initial}</span>
@@ -67,13 +67,13 @@
           <span class="bc-profile-nav--texts">
             <span class="bc-profile-nav--label">{t(e.label)}</span>
             {#if lines[e.id]}<span class="bc-profile-nav--supporting">{lines[e.id]}</span>{/if}
+            {#if e.id === 'info'}<span class="bc-profile-nav--encrypted"><Icon name="lock" size={14} />{t('gear.profile.encrypted')}</span>{/if}
           </span>
           {#if e.id === 'maintenance' && overdue > 0}<span class="bc-profile-nav--badge" role="status" aria-label={t('maintenance.badge', { n: overdue })}>{overdue}</span>{/if}
         </button>
       {/if}
     {/each}
   </div>
-  <p class="bc-profile-nav--note"><Icon name="lock" size={16} /><span>{t('gear.profile.keptWide')}</span></p>
 </nav>
 
 <style>
@@ -226,12 +226,10 @@
       font-size: 13px;
       font-weight: 600;
     }
-    .bc-profile-nav--note {
-      margin: auto 8px 0;
-      padding-top: 16px;
+    .bc-profile-nav--encrypted {
       display: flex;
-      gap: 8px;
-      align-items: flex-start;
+      align-items: center;
+      gap: 4px;
       color: var(--bc-text-2);
       font-size: 13px;
     }

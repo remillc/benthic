@@ -312,7 +312,7 @@ export function dropPreviousPage(router, pageEl) {
 export function enableRouterGuard(f7) {
   /** @param {any} view */
   const guard = (view) => view?.router && guardRouter(view.router);
-  for (const id of ['logbook', 'sites', 'statistics', 'tools', 'account']) guard(f7.views.get(`#view-${id}`));
+  for (const id of ['logbook', 'sites', 'profile', 'statistics', 'tools', 'account']) guard(f7.views.get(`#view-${id}`));
   guard(f7.views.main);
   f7.on('viewInit', guard);
 }

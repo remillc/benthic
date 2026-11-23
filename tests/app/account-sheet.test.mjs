@@ -141,7 +141,7 @@ test('the desktop subscriber account initial has no plus badge', () => {
   assert.match(desktopSheet, /bc-desktop-account--brand-name.*bc-desktop-account--dot/);
 });
 
-test('« Mon profil de plongeur »: the badge and the red line only for overdue pieces, with the count of the Entretien row', () => {
+test('the Profil entry: the badge counts the overdue pieces, with the count of the Entretien row', () => {
   assert.deepEqual(profileRow(0), { badge: 0, late: false });
   assert.deepEqual(profileRow(1), { badge: 1, late: true });
   assert.deepEqual(profileRow(3), { badge: 3, late: true });
@@ -159,25 +159,16 @@ test('« Mon profil de plongeur »: the badge and the red line only for overdue 
   assert.equal(profileRow(overdueCount(evals)).badge, 1);
   assert.equal(profileRow(overdueCount(evals.slice(1))).late, false, 'none overdue: neither the badge nor the red line');
   assert.match(todayIso(new Date(2026, 10, 18)), /^2026-11-18$/);
-  // The sheets read the same function as the profile screen.
-  assert.match(sheet, /overdueBadge\(\)/);
+  // The navigation badge reads the same function as the profile screen (task 2026-11-23-347).
+  assert.match(read('components/NavBadge.svelte'), /profileRow\(overdueBadge\(\)\)/);
   assert.match(read('pages/ProfileDiver.svelte'), /overdueBadge\(\)/);
 });
 
-test('the profile row shows the badge and the red subtitle only when a piece is late; the line otherwise stays', () => {
-  const row = sheet.slice(sheet.indexOf('bc-account-sheet--profile"'), sheet.indexOf('{/if}\n    {/if}\n\n    <!-- Desktop'));
-  // A subscriber sees no Benthic+ chip next to a menu entry (task 290): the chips sell the offer in the free version.
-  assert.doesNotMatch(row, /BenthicPlusChip/);
-  assert.match(row, /\{#if late\.late\}\s*<span class="bc-account-sheet--row-line bc-account-sheet--late-line">\{t\('account\.sheet\.maintenanceLate'/);
-  assert.match(row, /\{:else\}\s*<span class="bc-account-sheet--row-line">\{t\('gear\.profile\.cardLine'\)\}/);
-  assert.match(row, /\{#if late\.late\}<span class="bc-account-sheet--late-badge"/);
-  assert.equal(langs.fr.gear.profile.cardLine, 'Équipement, brevets, informations');
+test('the Profil badge is red with white text, hidden at 0, and labelled with the count', () => {
+  const badge = read('components/NavBadge.svelte');
+  assert.match(badge, /\{#if late\.late\}<span class="bc-nav-badge" role="status" aria-label=\{t\('maintenance\.badge'/);
+  assert.match(badge, /\.bc-nav-badge \{[^}]*background: var\(--bc-alarm\);[^}]*color: #FFFFFF;/);
   assert.equal(langs.fr.account.sheet.maintenanceLate.one, 'Entretien : {n} pièce en retard');
-  assert.equal(langs.fr.account.sheet.maintenanceLate.other, 'Entretien : {n} pièces en retard');
-  // The red of the mock-up, white text on the badge.
-  const theme = read('theme.css');
-  assert.match(theme, /--bc-late: #A1372B;/);
-  assert.match(sheet, /\.bc-account-sheet--late-badge \{[^}]*background: var\(--bc-late\);[^}]*color: #FFFFFF;/);
 });
 
 test('Android phone: the ✕ of the sheet is on the right at the logo’s height, none on the left', () => {
@@ -348,10 +339,9 @@ test('the free sheet opens the offer for both Benthic+ rows; the subscriber shee
   assert.match(desktopSheet, /plus-row" onclick=\{\(\) => plus\('offer'\)\}[\s\S]*plus-row" onclick=\{\(\) => plus\('offer'\)\}/);
   // Subscriber: the backup row opens the backup page (the three sheets), the profile row the profile.
   assert.equal((sheet.match(/go\(openBackup\)/g) ?? []).length, 2, 'Android and iPhone');
-  assert.match(sheet, /\{#if subscriber\}\s*<div class="bc-account-sheet--divider bc-account-sheet--margin"><\/div>\s*<a href="#backup"/);
-  assert.match(sheet, /go\(\(\) => openOver\('\/profile'\)\)/);
+  assert.match(sheet, /\{#if subscriber\}\s*<a href="#backup"/);
   assert.match(desktopSheet, /leaveTo\(openBackup\)/);
-  assert.match(desktopSheet, /leaveTo\(openProfile\)/);
+  assert.doesNotMatch(desktopSheet, /leaveTo\(openProfile\)/);
   assert.match(read('lib/navigation.svelte.js'), /export function openBackup\(\) \{\s*if \(layout\.desktop\) navigation\.backupOpen = true;\s*else openOver\('\/account\/backup'\);/);
   // The subscriber's entries carry no chip, whatever the platform; the history icon and the new texts are on all three sheets.
   for (const [name, source] of [['Android', sheet.slice(sheet.indexOf('<div class="bc-account-sheet--content">'))], ['iPhone', sheet.slice(0, sheet.indexOf('<div class="bc-account-sheet--content">'))], ['desktop', desktopSheet]]) {
@@ -384,20 +374,12 @@ test('the backup and restore screens are routes of the account: the choices, a v
 });
 
 
-test('the subscriber sheet lists « Mon profil de plongeur » first, then « Sauvegarde et restauration », on every platform (task 291)', () => {
-  const android = sheet.slice(sheet.indexOf('<div class="bc-account-sheet--content">'));
-  const iphone = sheet.slice(0, sheet.indexOf('<div class="bc-account-sheet--content">'));
-  for (const [name, source, profile, backup] of [
-    ['Android phone and tablet', android, 'href="#profile"', 'href="#backup"'],
-    ['iPhone', iphone, "openOver('/profile')", 'go(openBackup)'],
-    ['desktop', desktopSheet, "leaveTo(openProfile)", 'leaveTo(openBackup)'],
-  ]) {
-    const p = source.indexOf(profile, source.indexOf('{#if subscriber}') >= 0 ? 0 : 0);
-    const b = source.indexOf(backup);
-    assert.ok(p >= 0 && b >= 0, name);
-    assert.ok(p < b, `${name}: the profile comes before the backup`);
-    // Nothing else sits between them but the row's own markup and a divider.
-    assert.doesNotMatch(source.slice(p, b), /Settings|settings\.title|about\.title/, name);
+test('no account sheet has « Mon profil de plongeur » any more: the diver profile is the Profil destination (task 2026-11-23-347)', () => {
+  for (const [name, source] of [['Android and iPhone', sheet], ['desktop', desktopSheet]]) {
+    assert.doesNotMatch(source, /openOver\('\/profile'\)|openProfile|href="#profile"|data-row="profile"/, name);
+    assert.doesNotMatch(source, /maintenanceLate|late-badge|overdueBadge/, name);
+    // « Sauvegarde et restauration » stays.
+    assert.match(source, /account\.sheet\.backup/, name);
   }
 });
 

@@ -225,6 +225,7 @@
   "tabs": {
     "logbook": "Carnet",
     "sites": "Sites",
+    "profile": "Profil",
     "statistics": "Statistiques",
     "statisticsShort": "Stats",
     "tools": "Outils"
@@ -2782,6 +2783,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
       "Carnet : pendant l’échange avec le serveur au démarrage, un trait blanc se dessine sur le profil pâle de l’en-tête, sur tous les appareils : un segment glisse tant que la progression est inconnue, puis le trait se remplit, se complète et s’efface. Il remplace la barre ondulée.",
       "Synchronisation : elle est toujours automatique. Le réglage « Synchroniser automatiquement » et le mode manuel n’existent plus ; « Seulement sur Wi-Fi ou câble » et « Synchroniser maintenant » restent, et les modifications non envoyées s’affichent toujours quand l’appareil est hors ligne.",
@@ -5980,10 +5982,10 @@
         "one": "{n} plongée depuis {year}",
         "other": "{n} plongées depuis {year}"
       },
+      "home": "Profil de plongeur",
       "noDive": "Aucune plongée",
       "defaultName": "Plongeur",
       "keep": "Ce que vous gardez ici",
-      "kept": "Gardé sur ce téléphone, même sans réseau.",
       "equipment": "Équipement",
       "certifications": "Brevets et documents",
       "information": "Informations",
@@ -5992,7 +5994,7 @@
       "informationLine": "Contact d’urgence, santé",
       "certificationsLine": "{n} brevets",
       "noCertification": "Aucun brevet",
-      "keptWide": "Gardé sur votre compte Benthic+ et sur cet appareil, même sans réseau.",
+      "encrypted": "Chiffré de bout en bout",
       "paneEmpty": "Choisissez un élément pour le voir ici"
     },
     "inventory": {
