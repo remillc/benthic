@@ -1120,7 +1120,7 @@
                       {:else if column.key === 'profile'}
                         <span class="bc-desktop-logbook--profile"><ProfileThumbnail profile={dive.profile ?? []} maxDepthMm={dive.maxDepthMm} prefs={logbook.prefs} wide /></span>
                       {:else if column.key === 'buddies'}
-                        {#each desk.extras.get(dive.id)?.buddies ?? [] as name, i (i)}<span class="bc-desktop-logbook--buddy"><span class="bc-desktop-logbook--initial" aria-hidden="true">{name.charAt(0).toLocaleUpperCase()}</span>{name}</span>{/each}
+                        {#each desk.extras.get(dive.id)?.buddies ?? [] as name, i (i)}<span class="bc-desktop-logbook--buddy">{name}</span>{/each}
                       {:else}{cell(column.key, dive)}{/if}
                     </td>
                   {/each}
@@ -1143,9 +1143,7 @@
       tabindex="0"
       onpointerdown={startResize}
       onkeydown={resizeKey}
-    >
-      <span class="bc-desktop-logbook--grip"></span>
-    </div>
+    ></div>
 
     {#if dropping}<div class="bc-desktop-logbook--drop" aria-hidden="true"><p>{t('desktop.dropHere')}</p></div>{/if}
     {#if dragging}
@@ -1315,7 +1313,26 @@
       overflow: auto;
       /* The spacer rows change height as the window moves: the browser must not shift the scroll to follow them. */
       overflow-anchor: none;
-      padding-right: 9px;
+      /* The list's own thin bar (task 2026-11-22-327): 9 dp wide, 6 dp thumb, no track, from under the column headers. */
+      scrollbar-width: auto;
+      scrollbar-color: auto;
+      &::-webkit-scrollbar {
+        width: 9px;
+        height: 9px;
+        background: transparent;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        margin-top: 38px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border: 1.5px solid transparent;
+        border-radius: 9px;
+        background: var(--bc-scrollbar-thumb) padding-box;
+      }
+      &::-webkit-scrollbar-corner {
+        background: transparent;
+      }
     }
     /* The table (task 2026-11-15-193): no lines, 48 dp rows 2 dp apart, the selected row a pill. */
     .bc-desktop-logbook--table {
@@ -1436,14 +1453,8 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-
-        &:first-child {
-          border-radius: 12px 0 0 12px;
-        }
-
-        &:last-child {
-          border-radius: 0 12px 12px 0;
-        }
+        /* A 1 dp divider under each dive (task 2026-11-22-328), inside the 48 dp. */
+        border-bottom: 1px solid var(--bc-table-divider);
 
         &[data-col='number'] {
           font-weight: 600;
@@ -1469,6 +1480,13 @@
     .bc-desktop-logbook--selected td,
     .bc-desktop-logbook--selected:hover td {
       background: var(--bc-table-selected);
+      border-bottom-color: transparent;
+    }
+    .bc-desktop-logbook--selected td:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+    .bc-desktop-logbook--selected td:last-child {
+      border-radius: 0 12px 12px 0;
     }
     .bc-desktop-logbook--selected td[data-col='number'],
     .bc-desktop-logbook--selected td[data-col='site'] {
@@ -1511,6 +1529,7 @@
     }
     .bc-desktop-logbook--trip-end td {
       box-shadow: none;
+      border-bottom: 0;
 
       &:first-child {
         border-radius: 0 0 0 20px;
@@ -1524,21 +1543,7 @@
       background: color-mix(in srgb, var(--bc-text) 4%, var(--bc-surface));
     }
     .bc-desktop-logbook--buddy {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
       margin-inline-end: 8px;
-    }
-    .bc-desktop-logbook--initial {
-      display: inline-grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--bc-buddy-badge);
-      color: var(--bc-text);
-      font-size: 11px;
-      font-weight: 600;
     }
     /* The windowing counts on these heights (ROW_HEIGHT and TRIP_HEIGHT in the script). */
     .bc-desktop-logbook--trip {
@@ -1610,7 +1615,8 @@
       font: inherit;
       cursor: pointer;
     }
-    /* 9 dp handle, a 1 dp line, a 4 × 32 dp grip (task 2026-11-15-169). */
+    /* The divider (task 2026-11-22-327): a 9 dp hit area, a 1 dp line, no grip; hovered, focused or dragged, the area
+       turns tertiary container and the line a 3 dp rust. */
     .bc-desktop-logbook--handle {
       position: absolute;
       top: 64px;
@@ -1625,20 +1631,15 @@
         inset: 0 4px;
         background: var(--bc-separator);
       }
-    }
-    .bc-desktop-logbook--grip {
-      position: absolute;
-      top: 50%;
-      left: 2.5px;
-      width: 4px;
-      height: 32px;
-      margin-top: -16px;
-      border-radius: 2px;
-      background: var(--bc-outline);
-    }
-    .bc-desktop-logbook--handle:focus-visible .bc-desktop-logbook--grip,
-    .bc-desktop-logbook--handle:hover .bc-desktop-logbook--grip {
-      background: var(--bc-text);
+      &:hover,
+      &:focus-visible,
+      &:active {
+        background: var(--bc-tertiary-container);
+        &::before {
+          inset: 0 3px;
+          background: var(--bc-tertiary);
+        }
+      }
     }
     /* Moving a column (task 181): the slot it leaves, the floating header, the insertion bar. */
     .bc-desktop-logbook--head {

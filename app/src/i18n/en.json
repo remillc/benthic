@@ -2791,6 +2791,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Desktop: the divider between the panes has no grip; it turns orange when the pointer is over it or drags it. The logbook has its own thin scrollbar, apart from it. Each dive is separated from the next by a line, and the Buddies column no longer shows the initial.",
       "Settings: the icon is a cog, as in the mock-ups.",
       "Tablet and desktop: the dive beside the list is drawn at once when the app starts, as the list is; the Statistics, Sites and Tools data is read once the first dive is shown.",
       "Equipment: retiring a piece offers a fourth reason, « Other », beside Sold, Lost and Worn out. It shows in « Retired pieces ».",
