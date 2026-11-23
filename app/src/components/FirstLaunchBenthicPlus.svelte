@@ -49,6 +49,8 @@
 
   /** On a tablet and the desktop, the blue panel carries the ready header; only a phone draws it here. */
   const panelless = $derived(layout.phone && !desktopApp);
+  /** A tablet (task 2026-11-23-335): the ready step follows its mock-up, the desktop and the phone keep theirs. */
+  const tablet = $derived(!layout.phone && !desktopApp);
   const kind = $derived(deviceKind({ phone: layout.phone, ios, desktop: desktopApp }));
 
   let continuing = $state(false);
@@ -313,8 +315,9 @@
     </div>
   </div>
 {:else if step === 'benthicPlusReady'}
-  <div class="bc-plus--screen">
+  <div class="bc-plus--screen" class:bc-plus--screen-ready={tablet}>
     {#if panelless}{@render hero('ready')}{/if}
+    {#if tablet}<h2 class="bc-plus--ready-heading">{t('benthicPlus.ready.heading')}</h2>{/if}
     {#if summaryRows(flow.plus.counts).length}
     <dl class="bc-plus--summary">
       {#each summaryRows(flow.plus.counts) as row (row.key)}
@@ -998,6 +1001,52 @@
 
       :global(svg) {
         color: var(--bc-release-ok);
+      }
+    }
+
+    /* « Votre carnet est prêt » on a tablet (task 2026-11-23-335; mock-up android-tablette-odplus-pret-paysage): a heading, the
+       figures in a card across the column, the account line at the left, the button 48 dp high at the end. */
+    .bc-plus--screen-ready {
+      gap: 0;
+      max-width: none;
+
+      & .bc-plus--ready-heading {
+        margin: 0 0 16px;
+        font-size: 28px;
+        line-height: 36px;
+        font-weight: 500;
+      }
+
+      & .bc-plus--summary {
+        width: auto;
+        margin: 0;
+        padding: 4px 20px;
+        border-radius: 20px;
+      }
+
+      & .bc-plus--summary-row {
+        box-sizing: border-box;
+        height: 52px;
+        align-items: center;
+        padding: 0;
+
+        & dd {
+          font-size: 17px;
+        }
+      }
+
+      & .bc-plus--account {
+        justify-content: flex-start;
+        margin: 14px 0 24px;
+      }
+
+      & .bc-plus--primary {
+        align-self: flex-end;
+        width: auto;
+        height: 48px;
+        padding: 0 28px;
+        border-radius: 24px;
+        font-size: 15px;
       }
     }
 

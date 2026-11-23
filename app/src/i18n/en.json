@@ -2791,6 +2791,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Tablet, first launch: « Your logbook is ready » centres the logo, the chip, the title and the line of the blue panel, and the right column follows the mock-up: the « Your logbook » heading, the figures card across the full width, the « Open my logbook » button at the right.",
       "Settings: the icon is a cog, as in the mock-ups.",
       "Tablet and desktop: the dive beside the list is drawn at once when the app starts, as the list is; the Statistics, Sites and Tools data is read once the first dive is shown.",
       "Equipment: retiring a piece offers a fourth reason, « Other », beside Sold, Lost and Worn out. It shows in « Retired pieces ».",
@@ -5690,6 +5691,7 @@
       "leadPhone": "Everything is on this phone, and stays there even without a network.",
       "leadIphone": "Everything is on this iPhone, and stays there even without a network.",
       "leadDesktop": "Everything is on this computer, and stays there even without a network.",
+      "heading": "Your logbook",
       "dives": "Dives",
       "sites": "Sites",
       "gear": "Gear",
