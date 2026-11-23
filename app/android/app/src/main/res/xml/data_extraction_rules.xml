@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android 12 and later (android:dataExtractionRules): neither cloud backup nor
      device-to-device transfer carries the repository access (address, user
-     name, encrypted token). -->
+     name, encrypted token) nor the other Keystore-sealed files (data-key.bin,
+     cloud-account.bin): a restore would bring back bytes that no key opens. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="file" path="git-remote.bin" />
         <exclude domain="file" path="git-remote.bin.tmp" />
         <exclude domain="file" path="server-session.bin" />
         <exclude domain="file" path="server-session.bin.tmp" />
+        <exclude domain="file" path="data-key.bin" />
+        <exclude domain="file" path="data-key.bin.tmp" />
+        <exclude domain="file" path="cloud-account.bin" />
+        <exclude domain="file" path="cloud-account.bin.tmp" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="git-remote.bin" />
         <exclude domain="file" path="git-remote.bin.tmp" />
         <exclude domain="file" path="server-session.bin" />
         <exclude domain="file" path="server-session.bin.tmp" />
+        <exclude domain="file" path="data-key.bin" />
+        <exclude domain="file" path="data-key.bin.tmp" />
+        <exclude domain="file" path="cloud-account.bin" />
+        <exclude domain="file" path="cloud-account.bin.tmp" />
     </device-transfer>
 </data-extraction-rules>

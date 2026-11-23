@@ -62,6 +62,71 @@ test('the IndexedDB backend has the same contract when IndexedDB exists', async 
   await store.write('gear/z.json', { id: 'z' });
   assert.deepEqual(await store.read('gear/z.json'), { id: 'z' });
   await store.remove('gear/z.json');
+  await Promise.all([
+    store.trackedBatch({ writes: [['gear/a.json', { version: 1 }]] }),
+    store.trackedBatch({ removes: ['gear/deleted.json'] }),
+  ]);
+  const snapshot = await store.snapshotPending();
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 2 }]] });
+  await store.acknowledgePending(snapshot);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/a.json']);
+});
+
+test('concurrent tracked changes preserve both pending paths and deletions', async () => {
+  const { store } = setup();
+  await Promise.all([
+    store.trackedBatch({ writes: [['gear/a.json', { id: 'a' }]] }),
+    store.trackedBatch({ writes: [['profile/diver.json', { format: 1 }]] }),
+    store.trackedBatch({ removes: ['kits/deleted.json'] }),
+  ]);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/a.json', 'kits/deleted.json', 'profile/diver.json']);
+});
+
+test('a corrupt pending list cannot be replaced by a tracked write', async () => {
+  const { backend, store } = setup();
+  await backend.apply([['meta/pending.json', '{invalid']], []);
+  await assert.rejects(store.trackedBatch({ writes: [['gear/a.json', { id: 'a' }]] }));
+  assert.equal(await store.read('gear/a.json'), null);
+  assert.equal(await backend.get('meta/pending.json'), '{invalid');
+});
+
+test('acknowledging a snapshot keeps files changed during synchronization pending', async () => {
+  const { store } = setup();
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 1 }], ['gear/b.json', { version: 1 }]], removes: ['kits/deleted.json'] });
+  const snapshot = await store.snapshotPending();
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 2 }], ['kits/deleted.json', { restored: true }], ['profile/diver.json', { format: 1 }]] });
+  await store.acknowledgePending(snapshot);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/a.json', 'kits/deleted.json', 'profile/diver.json']);
+});
+
+async function exerciseSyncedApply(store) {
+  await store.trackedBatch({ writes: [['gear/a.json', { version: 1 }], ['gear/b.json', { version: 1 }]], removes: ['kits/deleted.json'] });
+  const sent = await store.snapshotPending();
+  await store.trackedBatch({ writes: [['gear/b.json', { version: 2 }], ['kits/deleted.json', { restored: true }], ['gear/c.json', { version: 1 }]] });
+  const a = sent.find(([path]) => path === 'gear/a.json');
+  const b = sent.find(([path]) => path === 'gear/b.json');
+  const deleted = sent.find(([path]) => path === 'kits/deleted.json');
+  assert.equal(await store.applySyncedIfUnchanged([a, b], { writes: [['gear/a.json', { version: 3 }], ['gear/b.json', { version: 3 }]] }, sent), false);
+  assert.equal((await store.read('gear/a.json')).version, 1);
+  assert.equal(await store.applySyncedIfUnchanged([['gear/b.json', sortedJson({ version: 2 })]], { removes: ['gear/b.json'] }, sent), false);
+  assert.equal(await store.applySyncedIfUnchanged([deleted], { removes: ['kits/deleted.json'] }, sent), false);
+  assert.equal(await store.applySyncedIfUnchanged([a, ['meta/account-base.json', null]], {
+    writes: [['gear/a.json', { version: 3 }], ['meta/account-base.json', { head: 'confirmed' }]],
+  }, sent), true);
+  assert.deepEqual(await store.read('gear/a.json'), { version: 3 });
+  assert.deepEqual(await store.read('meta/account-base.json'), { head: 'confirmed' });
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['gear/b.json', 'gear/c.json', 'kits/deleted.json']);
+  await assert.rejects(store.applySyncedIfUnchanged([], { removes: ['gear/b.json'] }, []), /INVALID_SYNC_BATCH/);
+}
+
+test('a confirmed server state is applied and acknowledged atomically without overwriting newer edits', async () => {
+  await exerciseSyncedApply(setup().store);
+});
+
+test('IndexedDB applies a confirmed server state with the same concurrent-edit protection', async (t) => {
+  if (!globalThis.indexedDB) return t.skip('no IndexedDB in this Node');
+  const store = createFileStore(indexedDbBackend());
+  await exerciseSyncedApply(store);
 });
 
 test('a piece gets a UUID v4, is written under gear/<id>.json and keeps unknown fields', async () => {
@@ -321,4 +386,29 @@ test('isBuoyName recognises the surface marker buoy by its names', async () => {
   const { isBuoyName } = await import('../../app/src/lib/inventory.js');
   for (const n of ['Saucisse', 'saucisse orange', 'Parachute de palier', 'Surface marker buoy', 'DSMB', 'Bouée']) assert.ok(isBuoyName(n), n);
   for (const n of ['Détendeur', 'Gilet', '', undefined]) assert.ok(!isBuoyName(n), String(n));
+});
+
+test('photos of pieces and invoices live in gear-photos/ and go with the piece', async () => {
+  const { inventory, store } = setup();
+  const photoId = await inventory.savePhoto('data:image/jpeg;base64,AAAA');
+  assert.deepEqual(await store.list('gear-photos/'), [`gear-photos/${photoId}.json`]);
+  assert.deepEqual(await store.list('media/'), []);
+  assert.equal(await inventory.readPhoto(photoId), 'data:image/jpeg;base64,AAAA');
+  const reg = await inventory.saveGear(piece('regulator', 'Apeks', { photoId }));
+  await inventory.deleteGear(reg.id);
+  assert.deepEqual(await store.list('gear-photos/'), []);
+});
+
+test('the photos kept in media/ move to gear-photos/ once; dive media and a file already moved stay as they are', async () => {
+  const { inventory, store } = setup();
+  await store.write('media/a.json', { format: 1, id: 'a', dataUrl: 'data:image/jpeg;base64,OLD' });
+  await store.write('media/b.json', { format: 1, id: 'b', dataUrl: 'data:image/jpeg;base64,OLDB' });
+  await store.write('gear-photos/b.json', { format: 1, id: 'b', dataUrl: 'data:image/jpeg;base64,NEWB' });
+  await store.write('media/dive-1.json', { format: 1, diveId: 'dive-1', items: [] });
+  assert.equal(await inventory.migrateGearPhotos(), 2);
+  assert.equal(await inventory.readPhoto('a'), 'data:image/jpeg;base64,OLD');
+  assert.equal(await inventory.readPhoto('b'), 'data:image/jpeg;base64,NEWB');
+  assert.deepEqual(await store.list('media/'), ['media/dive-1.json']);
+  assert.ok((await inventory.pendingPaths()).includes('gear-photos/a.json'));
+  assert.equal(await inventory.migrateGearPhotos(), 0);
 });

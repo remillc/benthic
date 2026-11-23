@@ -51,6 +51,10 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "bgitUnpushed", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "bgitHead", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "bgitListFiles", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitWrite", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitRead", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitDiff", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "bgitFiles", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "bgitRemove", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "bgitCancel", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "gitConfig", returnType: CAPPluginReturnPromise),
@@ -1041,10 +1045,24 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         var args: [String: Any] = [:]
-        for key in ["url", "branch", "username", "token", "message", "mergeParent", "prefix", "authorName", "authorEmail"] {
+        for key in ["url", "branch", "username", "token", "message", "mergeParent", "prefix", "authorName", "authorEmail", "fromCommit", "toCommit"] {
             if let value = call.getString(key) { args[key] = value }
         }
         args["paths"] = (call.getArray("paths") ?? []).compactMap { $0 as? String }
+        // bgitWrite: [{path, text|null}] as parallel arrays; "" in `removed` marks a deleted file (text null).
+        var writePaths: [String] = []
+        var writeTexts: [String] = []
+        var writeRemoved: [Bool] = []
+        for item in (call.getArray("files") ?? []) {
+            guard let file = item as? [String: Any] else { continue }
+            writePaths.append(file["path"] as? String ?? "")
+            let text = file["text"] as? String
+            writeTexts.append(text ?? "")
+            writeRemoved.append(text == nil)
+        }
+        args["filePaths"] = writePaths
+        args["fileTexts"] = writeTexts
+        args["fileRemoved"] = writeRemoved
         args["dir"] = bgitRoot.appendingPathComponent(name).path
         #if DEBUG
         args["allowHttp"] = true // the development server is plain http
@@ -1075,6 +1093,10 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func bgitUnpushed(_ call: CAPPluginCall) { bgit(call, "unpushed") }
     @objc func bgitHead(_ call: CAPPluginCall) { bgit(call, "head") }
     @objc func bgitListFiles(_ call: CAPPluginCall) { bgit(call, "listFiles") }
+    @objc func bgitWrite(_ call: CAPPluginCall) { bgit(call, "write") }
+    @objc func bgitRead(_ call: CAPPluginCall) { bgit(call, "read") }
+    @objc func bgitDiff(_ call: CAPPluginCall) { bgit(call, "diff") }
+    @objc func bgitFiles(_ call: CAPPluginCall) { bgit(call, "files") }
     @objc func bgitRemove(_ call: CAPPluginCall) { bgit(call, "remove") }
     @objc func bgitCancel(_ call: CAPPluginCall) { bgit(call, "cancel") }
 

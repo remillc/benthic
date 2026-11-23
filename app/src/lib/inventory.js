@@ -41,7 +41,7 @@ import { rekey as rekeyValidations } from './validation.js';
  * @property {string} [purchasedOn] YYYY-MM-DD
  * @property {string} [note] the line under the name
  * @property {Record<string, string>} [details] the fields of the piece's type besides these (lib/gear-fields.js)
- * @property {string} [photoId] a file of media/: the piece's photo
+ * @property {string} [photoId] a file of gear-photos/: the piece's photo
  * @property {string[]} [tags]
  * @property {boolean} retired retired from the equipment (task 2026-11-19-308): out of the lists, the kits and the reminders; its
  *   maintenance history and its dives stay, and it shows in « Pièces retirées »
@@ -388,11 +388,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
    */
   async function commit(writes, removes = []) {
     if ((await readState()).readOnlyFrom) throw new ReadOnlyError();
-    const pending = (await store.read('meta/pending.json')) ?? { format: 1, paths: [] };
-    const paths = new Set(/** @type {string[]} */ (pending.paths));
-    for (const [p] of writes) paths.add(p);
-    for (const p of removes) paths.add(p);
-    await store.batch({ writes: [...writes, ['meta/pending.json', { ...pending, format: 1, paths: [...paths].sort() }]], removes });
+    await store.trackedBatch({ writes, removes });
   }
 
   return {
@@ -514,11 +510,11 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       /** @type {string[]} */
       const removes = [`gear/${gearId}.json`];
       const piece = await store.read(`gear/${gearId}.json`);
-      if (piece?.photoId) removes.push(`media/${piece.photoId}.json`);
+      if (piece?.photoId) removes.push(`gear-photos/${piece.photoId}.json`);
       for (const m of await store.readAll('maintenance/')) {
         if (m.gearId !== gearId) continue;
         removes.push(`maintenance/${m.id}.json`);
-        for (const h of m.history ?? []) if (h.invoicePhotoId) removes.push(`media/${h.invoicePhotoId}.json`);
+        for (const h of m.history ?? []) if (h.invoicePhotoId) removes.push(`gear-photos/${h.invoicePhotoId}.json`);
       }
       await commit(writes, removes);
     },
@@ -680,13 +676,35 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
     /** A photo (a piece's, an invoice's) as a data URL, in its own file. @param {string} dataUrl @returns {Promise<string>} its id */
     async savePhoto(dataUrl) {
       const photoId = id();
-      await commit([[`media/${photoId}.json`, { format: 1, id: photoId, createdAt: stamp(), dataUrl }]]);
+      await commit([[`gear-photos/${photoId}.json`, { format: 1, id: photoId, createdAt: stamp(), dataUrl }]]);
       return photoId;
+    },
+
+    /**
+     * One-time move of the photos of pieces and invoices from `media/<id>.json` to `gear-photos/<id>.json` (`media/` is
+     * kept for the dives' photos). Only the files that hold a `dataUrl` move; a file already at its new place wins.
+     * Not blocked by the read-only state: it moves data, it does not change the diver's logbook.
+     * @returns {Promise<number>} how many files moved
+     */
+    async migrateGearPhotos() {
+      /** @type {[string, unknown][]} */
+      const writes = [];
+      /** @type {string[]} */
+      const removes = [];
+      for (const path of await store.list('media/')) {
+        const file = await store.read(path);
+        if (!file || typeof file.dataUrl !== 'string') continue;
+        const target = `gear-photos/${path.slice('media/'.length)}`;
+        if (!(await store.read(target))) writes.push([target, file]);
+        removes.push(path);
+      }
+      if (writes.length || removes.length) await store.trackedBatch({ writes, removes });
+      return removes.length;
     },
 
     /** @param {string} photoId @returns {Promise<string>} the data URL, '' when the file is gone */
     async readPhoto(photoId) {
-      return (await store.read(`media/${photoId}.json`))?.dataUrl ?? '';
+      return (await store.read(`gear-photos/${photoId}.json`))?.dataUrl ?? '';
     },
 
     /** @returns {Promise<(DiveEquipment & { id: string, diveKey: { start: string } })[]>} */

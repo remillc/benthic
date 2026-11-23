@@ -1117,6 +1117,55 @@ Java_app_benthicdivelog_core_NativeCore_bgitListFiles(JNIEnv *env, jobject, jstr
 	return json_or_throw(env, ret, json, error);
 }
 
+// The account data branch: files written into and read from a working copy. A null text means "delete the file".
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_bgitWrite(JNIEnv *env, jobject, jstring dir, jobjectArray paths, jobjectArray texts)
+{
+	std::vector<benthic::BgitFile> files;
+	jsize n = paths ? env->GetArrayLength(paths) : 0;
+	for (jsize i = 0; i < n; i++) {
+		benthic::BgitFile file;
+		auto path = static_cast<jstring>(env->GetObjectArrayElement(paths, i));
+		auto text = texts && i < env->GetArrayLength(texts) ? static_cast<jstring>(env->GetObjectArrayElement(texts, i)) : nullptr;
+		file.path = path ? to_string(env, path) : std::string();
+		file.remove = text == nullptr;
+		if (text)
+			file.text = to_string(env, text);
+		if (path)
+			env->DeleteLocalRef(path);
+		if (text)
+			env->DeleteLocalRef(text);
+		files.push_back(std::move(file));
+	}
+	std::string json, error;
+	int ret = benthic::bgit_write(to_string(env, dir), files, json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_bgitRead(JNIEnv *env, jobject, jstring dir, jobjectArray paths)
+{
+	std::string json, error;
+	int ret = benthic::bgit_read(to_string(env, dir), string_array(env, paths), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_bgitDiff(JNIEnv *env, jobject, jstring dir, jstring from, jstring to)
+{
+	std::string json, error;
+	int ret = benthic::bgit_diff(to_string(env, dir), to_string(env, from), to_string(env, to), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_bgitFiles(JNIEnv *env, jobject, jstring dir)
+{
+	std::string json, error;
+	int ret = benthic::bgit_files(to_string(env, dir), json, error);
+	return json_or_throw(env, ret, json, error);
+}
+
 // History of the configured logbook (benthic.h, history_call).
 JNIEXPORT jstring JNICALL
 Java_app_benthicdivelog_core_NativeCore_history(JNIEnv *env, jobject, jstring action, jobjectArray args)

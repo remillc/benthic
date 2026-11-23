@@ -140,6 +140,10 @@ test('path arguments of core calls: userData and temp only, resources to read, n
 test('git working copies: the page names a folder under userData/bgit, nothing else', async () => {
   assert.equal(await invoke('bc:core', 'bgitStatus', { dir: 'server/main' }), 'bgitStatus');
   assert.equal(await invoke('bc:core', 'bgitCancel', {}), 'bgitCancel');
+  for (const method of ['bgitWrite', 'bgitRead', 'bgitDiff', 'bgitFiles']) {
+    assert.equal(await invoke('bc:core', method, { dir: 'benthic/account' }), method);
+    assert.match((await rejection(invoke('bc:core', method, { dir: '../x' }))).message, /BAD_PATH/, method);
+  }
   for (const dir of ['', '..', '../carnet', 'a/../../x', '/etc', 'a\\b', undefined]) {
     assert.match((await rejection(invoke('bc:core', 'bgitStatus', { dir }))).message, /BAD_PATH/, String(dir));
   }

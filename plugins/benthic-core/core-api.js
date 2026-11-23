@@ -604,6 +604,15 @@ export { waterTypeOf };
  *   The commits the server does not have, as of the last fetch or push.
  * @property {(options: {dir: string, branch: string}) => Promise<{head: string|null, remote: string|null}>} bgitHead
  * @property {(options: {dir: string, prefix?: string}) => Promise<{files: string[]}>} bgitListFiles
+ * @property {(options: {dir: string, files: {path: string, text: string|null}[]}) => Promise<{written: number, deleted: number}>} bgitWrite
+ *   Writes (text) or deletes (text = null) files in the working copy, nothing staged or committed. Rejects with
+ *   BAD_PATH (absolute, `..`, `.git`, empty part, a symbolic link on the way) before any file is touched.
+ * @property {(options: {dir: string, paths: string[]}) => Promise<{texts: (string|null)[]}>} bgitRead
+ *   The text of each path as of HEAD, in order (null: absent or not UTF-8 text). BAD_PATH. No network.
+ * @property {(options: {dir: string, fromCommit: string, toCommit?: string}) => Promise<{changes: {path: string, state: 'new'|'modified'|'deleted'}[]}>} bgitDiff
+ *   Between two commits; an empty `fromCommit` lists everything at `toCommit` (empty or 'HEAD': HEAD). UNKNOWN_COMMIT.
+ * @property {(options: {dir: string}) => Promise<{files: string[]}>} bgitFiles
+ *   The paths of every file as of HEAD (the committed tree, unlike bgitListFiles' index).
  * @property {(options: {dir: string}) => Promise<void>} bgitRemove
  * @property {() => Promise<void>} bgitCancel
  *   Stops the running git call, which rejects with CANCELLED.
@@ -999,6 +1008,18 @@ export const BenthicCore = {
   },
   async bgitListFiles(options) {
     return JSON.parse((await native.bgitListFiles({ prefix: '', ...options })).json);
+  },
+  async bgitWrite(options) {
+    return JSON.parse((await native.bgitWrite(options)).json);
+  },
+  async bgitRead(options) {
+    return JSON.parse((await native.bgitRead(options)).json);
+  },
+  async bgitDiff(options) {
+    return JSON.parse((await native.bgitDiff({ toCommit: '', ...options })).json);
+  },
+  async bgitFiles(options) {
+    return JSON.parse((await native.bgitFiles(options)).json);
   },
   bgitRemove: (options) => native.bgitRemove(options),
   bgitCancel: () => native.bgitCancel(),

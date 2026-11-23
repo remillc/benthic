@@ -2,7 +2,7 @@
 // « Mon profil de plongeur » (Benthic+, task 2026-11-18-272): the Informations (date of birth, emergency contact,
 // blood group) and the certification cards, in the same local store as the equipment (lib/file-store.js), in the
 // layout of the Benthic logbook (docs/architecture.md, section 11.3):
-//   profile/diver.json          plain: dateOfBirth; sealed block `enc`: emergencyContact, bloodGroup
+//   profile/diver.json          sealed block `enc`: fullName, dateOfBirth, emergencyContact, bloodGroup
 //   certifications/<uuid>.json  the whole payload sealed: agency, level, number, issuedOn, instructor, photos
 //   documents/<hash>.json       one sealed card photo, named by the hash of its ciphertext (section 11.6)
 //   meta/health-consent.json    legacy health-data consent, retained for export
@@ -207,11 +207,7 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
   /** Same rules as the inventory: refused while read only, and recorded as not sent yet. @param {[string, unknown][]} writes @param {string[]} [removes] */
   async function commit(writes, removes = []) {
     if ((await store.read('meta/state.json'))?.readOnlyFrom) throw new ReadOnlyError();
-    const pending = (await store.read('meta/pending.json')) ?? { format: 1, paths: [] };
-    const paths = new Set(/** @type {string[]} */ (pending.paths));
-    for (const [p] of writes) paths.add(p);
-    for (const p of removes) paths.add(p);
-    await store.batch({ writes: [...writes, ['meta/pending.json', { ...pending, format: 1, paths: [...paths].sort() }]], removes });
+    await store.trackedBatch({ writes, removes });
   }
 
   /** @returns {Promise<{ consent: boolean, at: string, synced: boolean }>} */
@@ -220,25 +216,54 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     return { consent: c?.consent === true, at: typeof c?.at === 'string' ? c.at : '', synced: c?.synced !== false };
   }
 
-  /** The sealed block of the diver file, opened; {} when none or unreadable. @returns {Promise<any>} */
-  async function readSealed() {
-    const file = await store.read(DIVER);
+  /** @param {any} file @param {boolean} [strict] @returns {Promise<any>} */
+  async function readSealed(file, strict = false) {
     if (!file?.enc) return {};
     try {
       return await box.open(file.enc, { id: 'profile', format: 1 });
-    } catch {
+    } catch (error) {
+      if (strict) throw error;
       return {};
+    }
+  }
+
+  /** Moves an old clear-text birth date into the sealed block without overwriting a concurrent edit. */
+  async function migrateBirthDate() {
+    for (;;) {
+      const { text, value: file } = await store.readSnapshot(DIVER);
+      if (!file || !Object.hasOwn(file, 'dateOfBirth')) return file;
+      if (typeof file.dateOfBirth !== 'string') throw new Error('INVALID_BIRTH_DATE');
+      const state = await store.readSnapshot('meta/state.json');
+      if (state.value?.readOnlyFrom) throw new ReadOnlyError();
+      const sealed = await readSealed(file, true);
+      if (!sealed || typeof sealed !== 'object' || Array.isArray(sealed)) throw new Error('INVALID_PROFILE_DATA');
+      if (Object.hasOwn(sealed, 'dateOfBirth') && sealed.dateOfBirth !== file.dateOfBirth) {
+        throw new Error('CONFLICTING_BIRTH_DATE');
+      }
+      const next = { ...sealed };
+      if (file.dateOfBirth) next.dateOfBirth = file.dateOfBirth;
+      const updated = { ...file, enc: await box.seal(next, { id: 'profile', format: 1 }) };
+      delete updated.dateOfBirth;
+      if (await store.trackedBatchIfUnchanged([[DIVER, text], ['meta/state.json', state.text]], { writes: [[DIVER, updated]] })) return updated;
     }
   }
 
   const api = {
     readConsent,
+    migrateBirthDate,
+
+    /** Whether a legacy profile still has a clear-text birth date. */
+    async hasClearBirthDate() {
+      const file = await store.readStrict(DIVER);
+      return !!file && Object.hasOwn(file, 'dateOfBirth');
+    },
 
     /** Removes the blood group from the sealed block; the rest of the file stays. */
     async deleteBloodGroup() {
-      const file = await store.read(DIVER);
+      await migrateBirthDate();
+      const file = await store.readStrict(DIVER);
       if (!file?.enc) return;
-      const sealed = await readSealed();
+      const sealed = await readSealed(file, true);
       if (!('bloodGroup' in sealed)) return;
       const rest = { ...sealed };
       delete rest.bloodGroup;
@@ -248,10 +273,13 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
 
     /** @returns {Promise<DiverInfo>} */
     async readInfo() {
-      const file = await store.read(DIVER);
-      const sealed = await readSealed();
+      let file = await store.readStrict(DIVER);
+      if (file && Object.hasOwn(file, 'dateOfBirth') && !(await store.readStrict('meta/state.json'))?.readOnlyFrom) {
+        file = await migrateBirthDate();
+      }
+      const sealed = await readSealed(file);
       const info = emptyInfo();
-      info.dateOfBirth = typeof file?.dateOfBirth === 'string' ? file.dateOfBirth : '';
+      info.dateOfBirth = typeof sealed.dateOfBirth === 'string' ? sealed.dateOfBirth : typeof file?.dateOfBirth === 'string' ? file.dateOfBirth : '';
       info.fullName = typeof sealed.fullName === 'string' ? sealed.fullName : '';
       const e = sealed.emergencyContact;
       if (e) info.emergency = { name: e.name ?? '', relation: e.relation ?? '', phone: { country: e.phone?.country ?? 'CA', number: e.phone?.number ?? '' } };
@@ -263,8 +291,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
     async saveInfo(info) {
       const problems = infoProblems(info, now().toISOString().slice(0, 10));
       if (Object.keys(problems).length) throw new Error(`INVALID_INFO:${Object.keys(problems).join(',')}`);
-      const file = (await store.read(DIVER)) ?? { format: 1 };
-      const sealed = await readSealed();
+      const file = (await store.readStrict(DIVER)) ?? { format: 1 };
+      const sealed = await readSealed(file, true);
       const phone = { country: info.emergency.phone.country, number: nationalDigits(info.emergency.phone.number, info.emergency.phone.country) };
       const next = {
         ...sealed,
@@ -275,10 +303,12 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const fullName = cleanFullName(info.fullName ?? '');
       if (fullName) next.fullName = fullName;
       else delete next.fullName;
+      const dob = info.dateOfBirth.trim();
+      if (dob) next.dateOfBirth = dob;
+      else delete next.dateOfBirth;
       const restOfFile = { ...file };
       delete restOfFile.dateOfBirth;
-      const dob = info.dateOfBirth.trim();
-      await commit([[DIVER, { ...restOfFile, format: 1, ...(dob ? { dateOfBirth: dob } : {}), enc: await box.seal(next, { id: 'profile', format: 1 }), updatedAt: stamp() }]]);
+      await commit([[DIVER, { ...restOfFile, format: 1, enc: await box.seal(next, { id: 'profile', format: 1 }), updatedAt: stamp() }]]);
     },
 
     // ---- Certification cards ----
@@ -293,8 +323,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       return out.sort((a, b) => (b.issuedOn || '').localeCompare(a.issuedOn || '') || b.updatedAt.localeCompare(a.updatedAt));
     },
 
-    /** @param {any} file @returns {Promise<Certification|null>} */
-    async openCertification(file) {
+    /** @param {any} file @param {boolean} [strict] @returns {Promise<Certification|null>} */
+    async openCertification(file, strict = false) {
       if (!file?.enc || typeof file.id !== 'string') return null;
       try {
         const p = await box.open(file.enc, { id: file.id, format: file.format ?? 1 });
@@ -322,7 +352,8 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
           documents: Array.isArray(p.documents) ? p.documents : [],
           updatedAt: file.updatedAt ?? '',
         };
-      } catch {
+      } catch (error) {
+        if (strict) throw error;
         return null;
       }
     },
@@ -354,8 +385,9 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
       const kind = DOCUMENT_KINDS.includes(f.kind) ? f.kind : 'certification';
       const problems = documentProblems(kind, { ...f, agency: f.agency ?? '', level: f.level ?? '', number: f.number ?? '' }, now().toISOString().slice(0, 10));
       if (Object.keys(problems).length) throw new Error(`INVALID_CERTIFICATION:${Object.keys(problems).join(',')}`);
-      const existingFile = f.id ? await store.read(`certifications/${f.id}.json`) : null;
-      const existing = existingFile ? await api.openCertification(existingFile) : null;
+      const existingFile = f.id ? await store.readStrict(`certifications/${f.id}.json`) : null;
+      const existing = existingFile ? await api.openCertification(existingFile, true) : null;
+      if (existingFile && !existing) throw new Error('INVALID_CERTIFICATION_FILE');
       const certId = existing?.id ?? id();
       const before = existing?.documents ?? [];
       /** The list to keep or to write, before sealing. @type {{ side: 'front'|'back'|'page', page?: number, hash?: string, bytes?: Uint8Array, mime?: string }[]} */
@@ -415,7 +447,9 @@ export function createProfile(store, box, { now = () => new Date(), id = newId }
 
     /** @param {string} certId */
     async deleteCertification(certId) {
-      const c = await api.getCertification(certId);
+      const file = await store.readStrict(`certifications/${certId}.json`);
+      const c = file ? await api.openCertification(file, true) : null;
+      if (file && !c) throw new Error('INVALID_CERTIFICATION_FILE');
       await commit([], [`certifications/${certId}.json`, ...(c?.documents ?? []).map((d) => `documents/${d.hash}.json`)]);
     },
 

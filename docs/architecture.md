@@ -358,6 +358,7 @@ settings/units.json                the units, each measure separately
 settings/planner.json              planner defaults
 settings/computers.json            dive computers list (nicknames, serials)
 keys/wrapped.json                  data key wrapped for the optional recovery phrase (section 11.5)
+gear-photos/<id>.json              a photo of a piece or of an invoice, as a data URL (`photoId`, `invoicePhotoId`); moved from `media/` by a one-time migration
 media/<dive id>.json               photos and videos of a dive, by hash (section 11.6)
 dive-validations/<id>.json        validation of one or several dives by a buddy or an instructor (#37, task 309): signer, role, instructor number, method, date, signature PNG, and for each dive its start key and a hash of the dive at the time of signing ("modified after the validation"); one record may hold several dives. Never written into the Subsurface dive file: the façade has no generic door for a dive's extra data, so the record sits beside the logbook keyed like `dive-equipment/` (by start time until dives have their own UUID)
 ```
@@ -396,7 +397,7 @@ dive-validations/<id>.json        validation of one or several dives by a buddy 
 // profile/diver.json   (plain fields + one encrypted block)
 { "format": 1, "updatedAt": "...", "displayName": "...", "homeAirport": "...",
   "enc": { "v": 1, "alg": "A256GCM", "kid": "...", "nonce": "...", "ct": "..." } }
-// plaintext of enc: bloodGroup, allergies, medicalNotes, emergencyContact { name, phone }
+// plaintext of enc: fullName, dateOfBirth, bloodGroup, allergies, medicalNotes, emergencyContact { name, phone }
 ```
 
 #### Kits and what a dive used (added on 17 November 2026, task 267)
@@ -462,7 +463,7 @@ Using the dives in Subsurface desktop is supported **through this export**. Open
 
 - `manifest.json` at the root: format version, app version, export date, whether the media are in it, whether it holds sensitive data, and every file with its size and SHA-256 (the files not fetched are listed under `skipped`);
 - `logbook/logbook.ssrf`: the logbook in Subsurface's format, written by the core's own export;
-- `benthic/`: what only Benthic keeps, as JSON: `gear/`, `kits/`, `maintenance/`, `dive-equipment/` (as stored, unknown fields kept), `profile/diver.json`, `certifications/<id>.json` with their card photos in `certifications/photos/`, `media/` (photos of pieces and invoices), `settings.json` (the device's settings and the core's preferences). The device's own state (`meta/`: data key, pending list) and the account's credentials are never exported;
+- `benthic/`: what only Benthic keeps, as JSON: `gear/`, `kits/`, `maintenance/`, `dive-equipment/` (as stored, unknown fields kept), `profile/diver.json`, `certifications/<id>.json` with their card photos in `certifications/photos/`, `gear-photos/` (photos of pieces and invoices), `settings.json` (the device's settings and the core's preferences). The device's own state (`meta/`: data key, pending list) and the account's credentials are never exported;
 - `dive-media/`: the original photos and videos of the dives, **only when the diver chooses it at export time** (the screen shows the size with and without them; originals only on the Benthic server count as « to download »);
 - the **sensitive items are in clear text** in the archive (date of birth, emergency contact, blood group, certifications and their photos): the device opens them with its key before writing. An explicit warning screen comes before the export. The archive is not encrypted. Legacy health-consent metadata remains in the export for compatibility and no longer controls the blood group.
 
@@ -470,7 +471,9 @@ It is written chunk by chunk (a streaming ZIP writer, stored or deflated entries
 
 ### 11.5 Sensitive data: encrypted on the device
 
-The server and its operator must not be able to read the **sensitive items**: documents and certifications (#48), blood group, allergies, medical notes and emergency contact (#63). The rest of the logbook is readable by the server; the app and the privacy policy say this plainly. Because the sensitive items are encrypted on the device, the physical location of the object storage does not matter for them: they are unreadable wherever they are stored.
+The server and its operator must not be able to read the **sensitive items**: documents and certifications (#48), the profile's full name, date of birth, blood group, allergies, medical notes and emergency contact (#63). The rest of the logbook is readable by the server; the app and the privacy policy say this plainly. Because the sensitive items are encrypted on the device, the physical location of the object storage does not matter for them: they are unreadable wherever they are stored.
+
+An older profile with a clear-text date of birth is migrated to the encrypted block when read, preserving its other fields and retrying if another edit changed it. Read-only profiles are not written: migration waits until writes are allowed. Such a legacy file must not be uploaded before migration. When merging a historical legacy profile, the date is treated as an encrypted field and never returned in clear text; a conflicting clear and encrypted date is rejected. This does not erase any clear text already present in Git history.
 
 1. **Data key.** At first use, the device creates a random 256-bit key. It lives in the platform's secure storage and never reaches the server in clear.
 2. **Encryption.** Sensitive payloads are encrypted on the device with AES-256-GCM (a fresh random nonce each time, the item id and `format` as authenticated data) before the commit or the upload. The file keeps `enc: { v, alg, kid, nonce, ct }`; `kid` names the key so that it can be rotated.
@@ -588,7 +591,7 @@ A catalog of normalized pictures of dive computers (512 and 128 px, one per libd
 
 App behaviour (built in tasks 2026-11-19-302 and 303; `app/src/lib/dc-model.js`, `dc-images.js`, `dc-image-state.js`, `components/DcTile.svelte`): the model text Subsurface keeps ("Shearwater Perdix AI") is matched to a catalog entry by vendor and product, ignoring case, spacing and "+"/"plus" (the product alone is accepted when it is unique). The catalog is fetched without an account, kept on the device and refreshed at most once a day when online; a picture is fetched the first time a model needs it and kept for good (Android and iOS: `@capacitor/filesystem`, `Directory.Data/dc-images/`, shown through `Capacitor.convertFileSrc`; desktop and browser: IndexedDB, shown as data addresses; the desktop main process fetches the bytes, `server.request` with `binary: true`). Nothing is bundled. A tile shows the generic icon while the picture loads or when it cannot be fetched (no message), asks again when the device is back online or at the next display after five minutes, and fades the picture in only when it came from the network. A model without a picture, or a download that fails, shows the usual placeholder; the picture is never required. Pictures whose catalog entry has `approx: true` are of a close model (low confidence).
 
-The diver's own photo of a computer ("Changer d'image" in "Modifier l'ordinateur de plongée") is **account data, not shared data**: it belongs to that inventory piece, is kept compressed (longest side 1024 px, JPEG 80 %) in the inventory store (`media/<id>.json`, with the piece's other Benthic data, which will sync with the account's `benthic` data), and is never uploaded to `/v1/dc-images` nor added to the catalog or to the device's picture cache. The piece's own photo, when set, wins over the catalog photo wherever that piece is shown.
+The diver's own photo of a computer ("Changer d'image" in "Modifier l'ordinateur de plongée") is **account data, not shared data**: it belongs to that inventory piece, is kept compressed (longest side 1024 px, JPEG 80 %) in the inventory store (`gear-photos/<id>.json`, with the piece's other Benthic data, which will sync with the account's `benthic` data), and is never uploaded to `/v1/dc-images` nor added to the catalog or to the device's picture cache. The piece's own photo, when set, wins over the catalog photo wherever that piece is shown.
 
 ## 13. Navigation (decided on 19 November 2026)
 

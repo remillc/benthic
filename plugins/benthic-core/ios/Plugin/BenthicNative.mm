@@ -408,6 +408,24 @@ static void send_sync_progress(const char *message)
 	if ([list isKindOfClass:[NSArray class]])
 		for (id item in (NSArray *)list)
 			paths.push_back([item isKindOfClass:[NSString class]] ? str((NSString *)item) : std::string());
+	std::vector<benthic::BgitFile> files;
+	{
+		id filePaths = args[@"filePaths"], fileTexts = args[@"fileTexts"], fileRemoved = args[@"fileRemoved"];
+		if ([filePaths isKindOfClass:[NSArray class]])
+			for (NSUInteger i = 0; i < [(NSArray *)filePaths count]; i++) {
+				benthic::BgitFile file;
+				id p = [(NSArray *)filePaths objectAtIndex:i];
+				file.path = [p isKindOfClass:[NSString class]] ? str((NSString *)p) : std::string();
+				id r = [fileRemoved isKindOfClass:[NSArray class]] && i < [(NSArray *)fileRemoved count]
+					? [(NSArray *)fileRemoved objectAtIndex:i] : nil;
+				file.remove = [r boolValue];
+				id t = [fileTexts isKindOfClass:[NSArray class]] && i < [(NSArray *)fileTexts count]
+					? [(NSArray *)fileTexts objectAtIndex:i] : nil;
+				if (!file.remove && [t isKindOfClass:[NSString class]])
+					file.text = str((NSString *)t);
+				files.push_back(std::move(file));
+			}
+	}
 	benthic::BgitAuthor author;
 	if (!text(@"authorName").empty() && !text(@"authorEmail").empty()) {
 		author.name = text(@"authorName");
@@ -442,6 +460,14 @@ static void send_sync_progress(const char *message)
 		ret = benthic::bgit_head(text(@"dir"), text(@"branch"), json, message);
 	else if (op == "listFiles")
 		ret = benthic::bgit_list_files(text(@"dir"), text(@"prefix"), json, message);
+	else if (op == "write")
+		ret = benthic::bgit_write(text(@"dir"), files, json, message);
+	else if (op == "read")
+		ret = benthic::bgit_read(text(@"dir"), paths, json, message);
+	else if (op == "diff")
+		ret = benthic::bgit_diff(text(@"dir"), text(@"fromCommit"), text(@"toCommit"), json, message);
+	else if (op == "files")
+		ret = benthic::bgit_files(text(@"dir"), json, message);
 	else if (op == "remove") {
 		ret = benthic::bgit_remove(text(@"dir"), message);
 		json = "{}";

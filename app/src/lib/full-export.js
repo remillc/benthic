@@ -18,7 +18,7 @@
 //   benthic/profile/diver.json                    decrypted: dateOfBirth, emergencyContact, bloodGroup, healthConsent
 //   benthic/certifications/<id>.json              decrypted, `documents` point at the photos
 //   benthic/certifications/photos/<id>-<side>.jpg   (<id>-page-<n>.jpg for the pages of a document, .pdf for a PDF)
-//   benthic/media/<id>.jpg                         the photos of pieces and invoices
+//   benthic/gear-photos/<id>.jpg                    the photos of pieces and invoices
 //   benthic/settings.json                          the device's settings and the core's preferences
 //   dive-media/<name>                                the dives' original photos and videos (only when asked)
 // Everything the engine needs from the platform is given in `deps` (the tests give fakes); `defaultDeps()` wires
@@ -117,7 +117,7 @@ function decodeDataUrl(dataUrl) {
 }
 
 /** Folders of the store that are not exported as they are: the device's own state, or handled apart. */
-const HANDLED_APART = ['meta/', 'documents/', 'profile/', 'certifications/', 'media/'];
+const HANDLED_APART = ['meta/', 'documents/', 'profile/', 'certifications/', 'media/', 'gear-photos/'];
 
 /**
  * Every file of the Benthic data, the sealed items opened. Sizes are exact; bytes are read when written.
@@ -139,11 +139,11 @@ export async function collectData(deps) {
   }
 
   // Photos of pieces and invoices (data URLs in the store): real image files.
-  for (const path of await store.list('media/')) {
+  for (const path of await store.list('gear-photos/')) {
     const file = await store.read(path);
     if (!file || typeof file.dataUrl !== 'string') continue;
     const { bytes, ext } = decodeDataUrl(file.dataUrl);
-    out.push({ path: `benthic/media/${file.id ?? path.slice(6, -5)}.${ext}`, area: 'media', size: bytes.length, sensitive: false, data: async () => bytes });
+    out.push({ path: `benthic/gear-photos/${file.id ?? path.slice('gear-photos/'.length, -5)}.${ext}`, area: 'media', size: bytes.length, sensitive: false, data: async () => bytes });
   }
 
   // The diver profile, opened.
@@ -258,7 +258,7 @@ manifest.json              every file of this archive with its size and its SHA-
 logbook/logbook.ssrf       the dive log in Subsurface's format (open it with Subsurface)
 benthic/                 what only Benthic keeps, as JSON: gear, kits, maintenance, what each dive used,
                            the diver profile, the certifications, the settings of the device
-benthic/media/           the photos of pieces and of invoices
+benthic/gear-photos/     the photos of pieces and of invoices
 dive-media/                the original photos and videos of the dives (only when they were asked for)
 
 This archive is NOT encrypted. The date of birth, the emergency contact, the blood group and the

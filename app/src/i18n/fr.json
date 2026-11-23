@@ -2791,6 +2791,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Profil : la date de naissance est chiffrée ; les dates existantes sont protégées à l’ouverture d’un profil modifiable.",
       "Bureau : le séparateur entre les volets n’a plus de poignée ; il passe en orange quand le pointeur le survole ou le déplace. Le carnet a sa propre barre de défilement fine, à part. Chaque plongée est séparée de la suivante par une ligne, et la colonne Compagnons n’affiche plus l’initiale.",
       "Tablette, premier lancement : « Votre carnet est prêt » centre le logo, la pastille, le titre et la ligne du panneau bleu, et la colonne de droite reprend la maquette : titre « Votre carnet », fiche des chiffres sur toute la largeur, bouton « Ouvrir mon carnet » à droite.",
       "Équipement : une bouteille a une « Marque » après son nom ; un recycleur a « Cellules O₂ fabriquées le » avant « Cellules O₂ installées le », et le rappel des cellules tombe au plus tôt de 18 mois après la fabrication et 12 mois après l’installation.",
@@ -6535,7 +6536,8 @@
       "blood": "Groupe sanguin",
       "clearBlood": "Effacer le groupe sanguin",
       "onlyYou": "Vous seul",
-      "lockNoteNoDate": "Le groupe sanguin est chiffré sur votre compte Benthic+ et n’est visible que par vous.",
+      "lockNoteNoDate": "Toutes les informations de cette section sont chiffrées sur cet appareil.",
+      "lockNoteLegacyBirthDate": "La date de naissance n’est pas encore chiffrée. Les autres informations de cette section sont chiffrées sur cet appareil.",
       "cancel": "Annuler",
       "saved": "Informations enregistrées",
       "saveFailed": "Les informations n’ont pas pu être enregistrées.",

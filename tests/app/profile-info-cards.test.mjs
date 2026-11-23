@@ -11,7 +11,7 @@ import { createServerApi } from '../../app/src/lib/server-api.js';
 import { formatNational, formatInternational, nationalDigits, isCompletePhone } from '../../app/src/lib/phone-format.js';
 import { parseCardText, findDate, scanCard } from '../../app/src/lib/card-scan.js';
 import { blank, warpPerspective, detectCard, removeGlare, orderCorners, homography, cardSize } from '../../app/src/lib/card-image.js';
-import { ReadOnlyError } from '../../app/src/lib/inventory.js';
+import { createInventory, ReadOnlyError } from '../../app/src/lib/inventory.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
@@ -63,6 +63,136 @@ test('raw bytes (a card photo) round trip', async () => {
   const bytes = new Uint8Array([0xff, 0xd8, 0, 1, 2, 3, 250]);
   const block = await box.sealBytes(bytes, { id: 'c', format: 1 });
   assert.deepEqual([...(await box.openBytes(block, { id: 'c', format: 1 }))], [...bytes]);
+});
+
+test('opening encrypted data without a key never creates or replaces one', async () => {
+  const { box } = setup();
+  const block = await box.seal({ x: 1 }, { id: 'one', format: 1 });
+  let writes = 0;
+  const missing = createSecretBox({ read: async () => '', write: async () => { writes++; } });
+  await assert.rejects(missing.open(block, { id: 'one', format: 1 }), /MISSING_DATA_KEY/);
+  const invalid = createSecretBox({ read: async () => 'AQID', write: async () => { writes++; } });
+  await assert.rejects(invalid.seal({}, { id: 'one', format: 1 }), /INVALID_DATA_KEY/);
+  assert.equal(writes, 0);
+});
+
+test('an unreadable profile or certification cannot be overwritten or deleted', async () => {
+  const original = setup();
+  const info = emptyInfo();
+  info.fullName = 'Test diver';
+  await original.profile.saveInfo(info);
+  const cert = await original.profile.saveCertification({ agency: 'PADI', level: 'Rescue Diver' });
+  const diverFile = await original.store.read('profile/diver.json');
+  const certFile = await original.store.read(`certifications/${cert.id}.json`);
+  const foreignBox = createSecretBox({ read: async () => '', write: async () => {} });
+  const foreign = createProfile(original.store, foreignBox);
+  await assert.rejects(foreign.saveInfo(info), /MISSING_DATA_KEY/);
+  await assert.rejects(foreign.deleteBloodGroup(), /MISSING_DATA_KEY/);
+  await assert.rejects(foreign.saveCertification({ id: cert.id, agency: 'PADI', level: 'Rescue Diver' }), /MISSING_DATA_KEY/);
+  await assert.rejects(foreign.deleteCertification(cert.id), /MISSING_DATA_KEY/);
+  assert.deepEqual(await original.store.read('profile/diver.json'), diverFile);
+  assert.deepEqual(await original.store.read(`certifications/${cert.id}.json`), certFile);
+});
+
+test('corrupt sensitive files cannot be overwritten or deleted', async () => {
+  const { backend, profile } = setup();
+  await backend.apply([['profile/diver.json', '{invalid'], ['certifications/bad.json', '{invalid']], []);
+  await assert.rejects(profile.saveInfo(emptyInfo()));
+  await assert.rejects(profile.deleteBloodGroup());
+  await assert.rejects(profile.saveCertification({ id: 'bad', agency: 'PADI', level: 'Rescue Diver' }));
+  await assert.rejects(profile.deleteCertification('bad'));
+  assert.equal(await backend.get('profile/diver.json'), '{invalid');
+  assert.equal(await backend.get('certifications/bad.json'), '{invalid');
+});
+
+test('concurrent profile and inventory writes both remain pending', async () => {
+  const { store, profile } = setup();
+  const inventory = createInventory(store);
+  const [, gear] = await Promise.all([
+    profile.saveInfo({ ...emptyInfo(), fullName: 'Test diver' }),
+    inventory.saveGear({ name: 'Test gear', type: 'other' }),
+  ]);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, [`gear/${gear.id}.json`, 'profile/diver.json']);
+});
+
+test('birth dates are sealed, can be removed, and are not present in the stored file', async () => {
+  const { profile, backend, store, box } = setup();
+  const info = { ...emptyInfo(), dateOfBirth: '1980-01-02' };
+  await profile.saveInfo(info);
+  const file = await store.read('profile/diver.json');
+  assert.equal('dateOfBirth' in file, false);
+  assert.equal(await profile.hasClearBirthDate(), false);
+  assert.equal((await box.open(file.enc, { id: 'profile', format: 1 })).dateOfBirth, info.dateOfBirth);
+  assert.doesNotMatch(await backend.get('profile/diver.json'), /1980-01-02/);
+  assert.equal((await profile.readInfo()).dateOfBirth, info.dateOfBirth);
+  await profile.saveInfo({ ...info, dateOfBirth: '' });
+  assert.equal((await profile.readInfo()).dateOfBirth, '');
+});
+
+test('reading an old profile seals its birth date and keeps its other fields', async () => {
+  const { profile, store, backend, box } = setup();
+  const enc = await box.seal({ fullName: 'Diver', future: 'keep' }, { id: 'profile', format: 1 });
+  await store.write('profile/diver.json', { format: 1, dateOfBirth: '1980-01-02', future: 'keep', enc });
+  assert.equal((await profile.readInfo()).dateOfBirth, '1980-01-02');
+  const file = await store.read('profile/diver.json');
+  assert.equal(file.future, 'keep');
+  assert.equal('dateOfBirth' in file, false);
+  assert.deepEqual(await box.open(file.enc, { id: 'profile', format: 1 }), { fullName: 'Diver', future: 'keep', dateOfBirth: '1980-01-02' });
+  assert.doesNotMatch(await backend.get('profile/diver.json'), /1980-01-02/);
+  assert.deepEqual((await store.read('meta/pending.json')).paths, ['profile/diver.json']);
+});
+
+test('migration retries if the profile changes during encryption', async () => {
+  const { profile, backend, store } = setup();
+  await store.write('profile/diver.json', { format: 1, dateOfBirth: '1980-01-02', future: 'first' });
+  const compareAndWrite = backend.applyTrackedIfUnchanged.bind(backend);
+  let first = true;
+  backend.applyTrackedIfUnchanged = async (...args) => {
+    if (first) {
+      first = false;
+      await store.trackedBatch({ writes: [['profile/diver.json', { format: 1, dateOfBirth: '1981-02-03', future: 'newer' }]] });
+    }
+    return compareAndWrite(...args);
+  };
+  assert.equal((await profile.readInfo()).dateOfBirth, '1981-02-03');
+  assert.equal((await store.read('profile/diver.json')).future, 'newer');
+});
+
+test('migration with an unavailable key keeps the old profile unchanged', async () => {
+  const original = setup();
+  const enc = await original.box.seal({ fullName: 'Diver' }, { id: 'profile', format: 1 });
+  const file = { format: 1, dateOfBirth: '1980-01-02', enc };
+  await original.store.write('profile/diver.json', file);
+  const foreignBox = createSecretBox({ read: async () => '', write: async () => { throw new Error('unexpected key write'); } });
+  const foreign = createProfile(original.store, foreignBox);
+  await assert.rejects(foreign.readInfo(), /MISSING_DATA_KEY/);
+  assert.deepEqual(await original.store.read('profile/diver.json'), file);
+});
+
+test('migration does not write if the profile becomes read only during encryption', async () => {
+  const { profile, backend, store } = setup();
+  const file = { format: 1, dateOfBirth: '1980-01-02' };
+  await store.write('profile/diver.json', file);
+  const compareAndWrite = backend.applyTrackedIfUnchanged.bind(backend);
+  backend.applyTrackedIfUnchanged = async (...args) => {
+    await store.write('meta/state.json', { format: 1, readOnlyFrom: '2026-01-01T00:00:00Z' });
+    return compareAndWrite(...args);
+  };
+  await assert.rejects(profile.readInfo(), ReadOnlyError);
+  assert.deepEqual(await store.read('profile/diver.json'), file);
+});
+
+test('migration refuses conflicting dates and does not change read-only profiles', async () => {
+  const { profile, store, box } = setup();
+  const enc = await box.seal({ dateOfBirth: '1981-02-03' }, { id: 'profile', format: 1 });
+  const file = { format: 1, dateOfBirth: '1980-01-02', enc };
+  await store.write('profile/diver.json', file);
+  assert.equal(await profile.hasClearBirthDate(), true);
+  await assert.rejects(profile.readInfo(), /CONFLICTING_BIRTH_DATE/);
+  assert.deepEqual(await store.read('profile/diver.json'), file);
+  await store.write('meta/state.json', { format: 1, readOnlyFrom: '2026-01-01T00:00:00Z' });
+  await assert.rejects(profile.migrateBirthDate(), ReadOnlyError);
+  assert.deepEqual(await store.read('profile/diver.json'), file);
 });
 
 test('the sensitive data is not readable in the files of the store', async () => {
@@ -425,10 +555,15 @@ test('the texts of the new screens exist in French and English', () => {
   const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(read(`i18n/${l}.json`))]));
   const get = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
   for (const l of ['fr', 'en']) {
-    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'diverProfile.info.clearBlood']) {
+    for (const key of ['diverProfile.info.title', 'diverProfile.info.edit', 'diverProfile.certs.title', 'diverProfile.cert.new', 'diverProfile.info.clearBlood', 'diverProfile.info.lockNoteNoDate', 'diverProfile.info.lockNoteLegacyBirthDate']) {
       assert.ok(get(langs[l], key), `${l}: ${key}`);
     }
   }
+});
+
+test('the information page distinguishes an unmigrated birth date from encrypted information', () => {
+  const page = read('pages/ProfileInfo.svelte');
+  assert.match(page, /diver\.legacyBirthDate \? 'diverProfile\.info\.lockNoteLegacyBirthDate' : 'diverProfile\.info\.lockNoteNoDate'/);
 });
 
 test('the information page is edited in place: no edit route, and Back stops the editing', () => {
@@ -446,4 +581,25 @@ test('the subscription screens continue directly to the ready step', () => {
   const screen = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(screen, /benthicPlus\.welcome\.next/);
   assert.doesNotMatch(screen, /benthicPlusHealth/);
+});
+
+test('a key that cannot be read is never replaced once the device had one', async () => {
+  let key = '';
+  let made = false;
+  const keeper = {
+    read: async () => key,
+    write: async (k) => (key = k),
+    hadKey: async () => made,
+    markKey: async () => { made = true; },
+  };
+  const first = createSecretBox(keeper);
+  const block = await first.seal({ x: 1 }, { id: 'one', format: 1 });
+  // A restored backup: the data is there, the key is not.
+  const lost = { ...keeper, read: async () => '', write: async () => { throw new Error('unexpected key write'); } };
+  const after = createSecretBox(lost);
+  await assert.rejects(after.seal({ y: 2 }, { id: 'two', format: 1 }), /MISSING_DATA_KEY/);
+  await assert.rejects(after.sealBytes(new Uint8Array([1]), { id: 'two', format: 1 }), /MISSING_DATA_KEY/);
+  await assert.rejects(after.open(block, { id: 'one', format: 1 }), /MISSING_DATA_KEY/);
+  // The key is still the first one, so the block opens again once it is back.
+  assert.deepEqual(await createSecretBox(keeper).open(block, { id: 'one', format: 1 }), { x: 1 });
 });

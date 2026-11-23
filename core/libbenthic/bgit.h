@@ -143,6 +143,33 @@ int bgit_history_restore(const std::string &dir, const std::string &branch, cons
 int bgit_history_borrow(const std::string &dir, const std::string &commit, const std::string &into, std::string &json,
 			 std::string &error);
 
+// --- The working copy of an account's data branch (docs/account-sync.md): plain files in, plain files out. ---
+
+// One file to write into the working copy: `remove` deletes it, else `text` becomes its whole content.
+struct BgitFile {
+	std::string path;
+	bool remove = false;
+	std::string text;
+};
+
+// Writes or deletes files inside the working copy, creating folders as needed (a deleted file leaves no empty
+// folder behind). The same path checks as bgit_commit(): BAD_PATH for an absolute path, "..", ".git" or an empty
+// part, checked for all the files before any is touched. Nothing is staged or committed (bgit_commit does that).
+// {"written":n,"deleted":m}.
+int bgit_write(const std::string &dir, const std::vector<BgitFile> &files, std::string &json, std::string &error);
+
+// The text of each path as of HEAD, in the same order: {"texts":[text|null,…]} (null: absent, or not UTF-8 text; a
+// working copy with no commit yet gives nulls). BAD_PATH. No network.
+int bgit_read(const std::string &dir, const std::vector<std::string> &paths, std::string &json, std::string &error);
+
+// {"changes":[{"path","state":"new"|"modified"|"deleted"}]} from commit `from` ("" = nothing, so everything at `to`)
+// to commit `to` ("" or "HEAD" = HEAD). UNKNOWN_COMMIT. No network.
+int bgit_diff(const std::string &dir, const std::string &from, const std::string &to, std::string &json,
+	       std::string &error);
+
+// The paths of every file as of HEAD: {"files":[…]} (empty with no commit yet). No network.
+int bgit_files(const std::string &dir, std::string &json, std::string &error);
+
 // Removes the working copy's folder and everything in it. No error when it is already gone.
 int bgit_remove(const std::string &dir, std::string &error);
 

@@ -7,10 +7,16 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 BIN=${1:-$ROOT/build/poc/bgit-test}
 W=$(mktemp -d); trap 'kill $SRV 2>/dev/null; rm -rf "$W"' EXIT
 mkdir -p "$W/srv/owner"; git init -q --bare -b main "$W/srv/owner/repo.git"
+# "empty": a repository that has only main (an account's repository before any Benthic data)
+git init -q --bare -b main "$W/srv/owner/empty.git"
+git init -q -b main "$W/seed"; git -C "$W/seed" config user.email t@t; git -C "$W/seed" config user.name T
+echo "subsurface log" > "$W/seed/00-Subsurface"; git -C "$W/seed" add -A; git -C "$W/seed" commit -q -m "main"
+git -C "$W/seed" push -q "$W/srv/owner/empty.git" main
 python3 "$ROOT/tests/bgit_server.py" "$W/srv" tok > "$W/port" & SRV=$!
 for _ in $(seq 50); do grep -q PORT "$W/port" && break; sleep 0.1; done
 URL=http://127.0.0.1:$(awk '{print $2}' "$W/port")/owner/repo.git
-T() { "$BIN" --http "$@" 2>/dev/null; }
+EURL=${URL%repo.git}empty.git
+T(){ "$BIN" --http "$@" 2>/dev/null; }
 pass=0; fail=0
 ok() { if [ "$1" = 0 ]; then pass=$((pass+1)); echo "ok   $2"; else fail=$((fail+1)); echo "FAIL $2"; fi; }
 has() { case "$1" in *"$2"*) return 0;; esac; return 1; }
@@ -151,5 +157,55 @@ done
 r=$(T hlog "$A" main 0 10 0); has "$r" '"summary":"device v1"'; ok $? "legacy refs: the log still lists the device history"
 [ "$(git -C "$A" for-each-ref refs/benthic/device | wc -l)" = 2 ] && [ "$(git -C "$A" for-each-ref refs/opendives/device | wc -l)" = 0 ]; ok $? "legacy refs: opening renamed them to refs/benthic/device/"
 git -C "$A" cat-file -e $DV2 2>/dev/null; ok $? "legacy refs: the commits are still there"
+
+# the account data branch "benthic" of a repository that has only main (docs/account-sync.md)
+MAIN0=$(git -C "$W/srv/owner/empty.git" rev-parse main)
+has "$(T clone "$EURL" "$W/e1" benthic u tok)" '"result":"empty"'; ok $? "benthic: cloning a branch the repository lacks gives an empty working copy"
+has "$(T files "$W/e1")" '"files":[]'; ok $? "benthic: no commit yet, no files"
+has "$(T read "$W/e1" benthic.json)" '"texts":[null]'; ok $? "benthic: no commit yet, reads give null"
+has "$(T write "$W/e1" 'benthic.json={"v":1}' 'inventory/gear.json={"g":1}' 'notes/é.json=ünï "q"')" '"written":3,"deleted":0'; ok $? "write: files and folders are created"
+[ "$(cat "$W/e1/inventory/gear.json")" = '{"g":1}' ] && [ "$(cat "$W/e1/notes/é.json")" = 'ünï "q"' ]; ok $? "write: the content is on disk"
+has "$(T write "$W/e1" ../evil=x)" "BAD_PATH" && has "$(T write "$W/e1" /abs=x)" "BAD_PATH" && has "$(T write "$W/e1" .git/config=x)" "BAD_PATH" \
+  && has "$(T write "$W/e1" a/.GIT/x=x)" "BAD_PATH" && has "$(T write "$W/e1" a/../b=x)" "BAD_PATH"; ok $? "write: bad paths refused"
+r=$(T write "$W/e1" ok.json=1 ../evil=x); has "$r" BAD_PATH && [ ! -e "$W/e1/ok.json" ]; ok $? "write: one bad path stops the whole call before any change"
+[ ! -e "$W/evil" ]; ok $? "write: nothing outside the working copy"
+has "$(T write "$W/nowhere" a.json=1)" "NO_WORKING_COPY"; ok $? "write: not a working copy refused"
+has "$(T commit "$W/e1" "First benthic" - benthic.json inventory/gear.json "notes/é.json")" '"commit":"'; ok $? "benthic: commit"
+has "$(T read "$W/e1" benthic.json inventory/gear.json missing.json "notes/é.json")" '"texts":["{\"v\":1}","{\"g\":1}",null,"ünï \"q\""]'; ok $? "read: HEAD texts in order, null when absent"
+has "$(T read "$W/e1" ../x)" BAD_PATH; ok $? "read: bad path refused"
+T write "$W/e1" 'benthic.json={"v":2}' >/dev/null
+has "$(T read "$W/e1" benthic.json)" '{\"v\":1}'; ok $? "read: HEAD, not the working copy"
+has "$(T files "$W/e1")" '"benthic.json"' && has "$(T files "$W/e1")" '"inventory/gear.json"'; ok $? "files: the paths at HEAD"
+r=$(T diff "$W/e1" - HEAD); has "$r" '"path":"benthic.json","state":"new"' || has "$r" '"state":"new","path":"benthic.json"'; ok $? "diff: from empty lists everything"
+E1=$(T head "$W/e1" benthic | sed -E 's/.*"head":"([0-9a-f]{40})".*/\1/')
+has "$(T push "$W/e1" benthic u tok)" '"result":"pushed"'; ok $? "benthic: push creates the branch"
+[ "$(git -C "$W/srv/owner/empty.git" rev-parse main)" = "$MAIN0" ] && [ "$(git -C "$W/srv/owner/empty.git" rev-parse benthic)" = "$E1" ]; ok $? "benthic: main stays untouched on the server"
+[ "$(git -C "$W/srv/owner/empty.git" show benthic:benthic.json)" = '{"v":1}' ]; ok $? "benthic: the server has the file"
+# a second device
+has "$(T clone "$EURL" "$W/e2" benthic u tok)" '"result":"cloned"'; ok $? "benthic: second device clones the branch"
+[ "$(cat "$W/e2/benthic.json")" = '{"v":1}' ] && [ ! -e "$W/e2/00-Subsurface" ]; ok $? "benthic: only the branch's files"
+# first device: change, delete, add; diff between two commits
+T write "$W/e1" 'benthic.json={"v":2}' inventory/gear.json 'logs/new.json={"n":1}' >/dev/null
+[ ! -e "$W/e1/inventory" ]; ok $? "write: deleting the last file of a folder removes the folder"
+has "$(T commit "$W/e1" "Second" - benthic.json inventory/gear.json logs/new.json)" '"commit":"'; ok $? "benthic: second commit"
+E2=$(T head "$W/e1" benthic | sed -E 's/.*"head":"([0-9a-f]{40})".*/\1/')
+r=$(T diff "$W/e1" $E1 $E2); has "$r" 'benthic.json' && has "$r" '"state":"modified"' && has "$r" 'inventory/gear.json' && has "$r" '"state":"deleted"' \
+  && has "$r" 'logs/new.json' && has "$r" '"state":"new"'; ok $? "diff: between two commits"
+has "$(T diff "$W/e1" $E1 -)" '"state":"deleted"'; ok $? "diff: an empty target is HEAD"
+has "$(T diff "$W/e1" 0000000000000000000000000000000000000000 $E2)" UNKNOWN_COMMIT; ok $? "diff: unknown commit refused"
+r=$(T files "$W/e1"); has "$r" '"logs/new.json"' && ! has "$r" 'inventory'; ok $? "files: follows HEAD after a deletion"
+T push "$W/e1" benthic u tok >/dev/null
+# a conflict on a JSON file of benthic: both devices edit benthic.json
+echo '{"v":"fromE2"}' > "$W/e2/benthic.json"; T commit "$W/e2" "E2 edit" - benthic.json >/dev/null
+before=$(cat "$W/e2/benthic.json")
+r=$(T pull "$W/e2" benthic u tok)
+has "$r" '"result":"conflict"' && has "$r" '"path":"benthic.json"' && has "$r" '"base":"{\"v\":1}' && has "$r" '"ours":"{\"v\":\"fromE2\"}' \
+  && has "$r" '"theirs":"{\"v\":2}'; ok $? "benthic: a conflict lists base, ours and theirs"
+[ "$(cat "$W/e2/benthic.json")" = "$before" ] && [ -z "$(git -C "$W/e2" status --porcelain)" ]; ok $? "benthic: a conflict changes nothing on disk"
+theirs=$(echo "$r" | sed -E 's/.*"theirs":"([0-9a-f]{40})","files".*/\1/')
+T write "$W/e2" 'benthic.json={"v":"merged"}' >/dev/null
+has "$(T commit "$W/e2" "Resolve" "$theirs" benthic.json)" '"commit":"'; ok $? "benthic: the resolution commits as a merge"
+has "$(T push "$W/e2" benthic u tok)" '"result":"pushed"'; ok $? "benthic: the resolution is pushed"
+[ -f "$W/e2/logs/new.json" ] && [ "$(git -C "$W/srv/owner/empty.git" rev-parse main)" = "$MAIN0" ]; ok $? "benthic: the other files merged, main still untouched"
 
 echo "$pass passed, $fail failed"; [ "$fail" = 0 ]

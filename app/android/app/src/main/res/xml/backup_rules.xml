@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android 11 and earlier (android:fullBackupContent). The repository access
      (address, user name, encrypted token) never leaves the device in a
-     backup; see plugins/benthic-core, GitRemoteStore. -->
+     backup; see plugins/benthic-core, GitRemoteStore. Every file sealed with a Keystore key
+     (data-key.bin, cloud-account.bin) is excluded too: a restore would bring back bytes
+     that no key opens (lib/secret-box.js). -->
 <full-backup-content>
     <exclude domain="file" path="git-remote.bin" />
     <exclude domain="file" path="git-remote.bin.tmp" />
     <exclude domain="file" path="server-session.bin" />
     <exclude domain="file" path="server-session.bin.tmp" />
+    <exclude domain="file" path="data-key.bin" />
+    <exclude domain="file" path="data-key.bin.tmp" />
+    <exclude domain="file" path="cloud-account.bin" />
+    <exclude domain="file" path="cloud-account.bin.tmp" />
 </full-backup-content>

@@ -13,6 +13,8 @@
 //        bgit-test hfiles <dir> <commit> [prefix]
 //        bgit-test hrestore <dir> <branch> <commit> <message> [path...]   bgit-test hborrow <dir> <commit> <into>
 //        bgit-test hadopt <dir> <source-dir> <source-branch>
+//        bgit-test write <dir> <path=text|path>...   (a path without "=" is deleted)   bgit-test read <dir> <path>...
+//        bgit-test diff <dir> <from|-> <to|->   bgit-test files <dir>
 #include "core/libbenthic/bgit.h"
 
 #include <cstdio>
@@ -83,6 +85,28 @@ int main(int argc, char **argv)
 		rc = bgit_history_borrow(arg(0), arg(1), arg(2), json, error);
 	else if (cmd == "hadopt")
 		rc = bgit_history_adopt(arg(0), arg(1), arg(2), json, error);
+	else if (cmd == "write") {
+		std::vector<BgitFile> files;
+		for (int i = 1; a + i < argc; i++) {
+			std::string item = argv[a + i];
+			size_t eq = item.find('=');
+			BgitFile f;
+			f.path = item.substr(0, eq);
+			f.remove = eq == std::string::npos;
+			if (!f.remove)
+				f.text = item.substr(eq + 1);
+			files.push_back(f);
+		}
+		rc = bgit_write(arg(0), files, json, error);
+	} else if (cmd == "read") {
+		std::vector<std::string> paths;
+		for (int i = 1; a + i < argc; i++)
+			paths.push_back(argv[a + i]);
+		rc = bgit_read(arg(0), paths, json, error);
+	} else if (cmd == "diff")
+		rc = bgit_diff(arg(0), arg(1) == "-" ? "" : arg(1), arg(2) == "-" ? "" : arg(2), json, error);
+	else if (cmd == "files")
+		rc = bgit_files(arg(0), json, error);
 	if (rc) {
 		printf("ERROR %s\n", error.c_str());
 		return 1;

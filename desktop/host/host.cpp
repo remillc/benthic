@@ -411,6 +411,36 @@ void register_methods()
 		std::string json, error;
 		return json_or_fail(benthic::bgit_list_files(a.str("dir"), a.str("prefix"), json, error), json, error);
 	});
+	add("bgitWrite", Lane::Git, [](const Args &a) {
+		std::vector<benthic::BgitFile> files;
+		const Json *list = a.get("files");
+		if (list && list->type == Json::Array)
+			for (const Json &item : list->items) {
+				benthic::BgitFile file;
+				if (const Json *p = item.find("path"))
+					file.path = p->type == Json::String ? p->text : std::string();
+				const Json *t = item.find("text");
+				file.remove = !t || t->type != Json::String;
+				if (!file.remove)
+					file.text = t->text;
+				files.push_back(std::move(file));
+			}
+		std::string json, error;
+		return json_or_fail(benthic::bgit_write(a.str("dir"), files, json, error), json, error);
+	});
+	add("bgitRead", Lane::Git, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(benthic::bgit_read(a.str("dir"), a.strs("paths"), json, error), json, error);
+	});
+	add("bgitDiff", Lane::Git, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(benthic::bgit_diff(a.str("dir"), a.str("fromCommit"), a.str("toCommit"), json, error),
+				    json, error);
+	});
+	add("bgitFiles", Lane::Git, [](const Args &a) {
+		std::string json, error;
+		return json_or_fail(benthic::bgit_files(a.str("dir"), json, error), json, error);
+	});
 	add("bgitRemove", Lane::Git, [](const Args &a) {
 		std::string error;
 		if (benthic::bgit_remove(a.str("dir"), error))
