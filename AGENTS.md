@@ -13,7 +13,7 @@ Benthic is a full dive log app for mobile. It improves on Subsurface-mobile, but
 - **Data:** the Subsurface cloud (git repositories on `ssrf-cloud-*.subsurface-divelog.org`) is **the only synchronised data source**. We connect to it; we do not replace it. No other providers.
 - **GeoNames and divelogs.de** work as in Subsurface: one-off import or upload, no synchronisation.
 - **Local mode** without an account is supported.
-- **Photos** stay on the device.
+- **Photos and videos** of dives are synced like the rest of the logbook (decided on 23 November 2026): Benthic+ only, within the account's storage (10 GB), stored by hash in object storage (docs/architecture.md, section 11.6). Free and local-mode logbooks keep them on the device.
 - **Coexistence:** desktop Subsurface reads and writes the same cloud log; never do anything that breaks a log read by Subsurface. Subsurface-mobile is left out of our reasoning (decided on 8 November 2026): it is neither a reference nor a case to handle.
 - **Subsurface maintainers:** no contact for now.
 

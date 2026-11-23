@@ -492,7 +492,7 @@ Until the key routes are built, the single-device case works with the device's o
 
 ### 11.6 Photos and videos: by hash
 
-- Photos stay on the device by default (unchanged). Uploading the photos or videos of a dive is **opt-in**, per dive or album.
+- **Synced like the rest (decided on 23 November 2026, replaces the opt-in).** For a Benthic+ account, the photos and videos of every dive are uploaded and synced to the diver's other devices, within the account's storage (10 GB). Free and local-mode logbooks keep them on the device; their references in the logbook are never touched.
 - An uploaded file is stored once, under the **SHA-256 of its content** (`media/<hash>`), so the same photo uploaded twice, or from two devices, is one object.
 - The reference lives in `media/<dive id>.json` on the `benthic` branch: `{ "format": 1, "diveId": "<dive id>", "items": [ { "hash": "...", "mime": "image/jpeg", "size": 0, "takenAt": "...", "caption": "" } ] }`. Merge: `items` are merged by `hash` (union); the caption is a field of the item.
 - The app holds no storage credentials: it asks the API for short-lived signed URLs to upload or download an object. The API only signs for objects the person owns or that were shared with them (section 11.7).
