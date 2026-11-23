@@ -6703,3 +6703,17 @@ Christian approved this on 23 November 2026. Work in `main`. These are the scree
 12. « Avis « modifié sur deux appareils » »: a snackbar « « <name> » a été modifié sur deux appareils. La modification la plus récente est gardée. » with « OK ». Above the FAB on the phone, centered at the bottom (560 dp) on tablet and desktop.
 
 iPhone and tablet portrait are not drawn: use the same dialogs. In the done note, list the screens built and anything in `docs/account-sync.md` the mock-ups do not cover.
+
+## [ ] 2026-11-23-339 Carnet and Sites (Android phone): the search box folds into a magnifier while scrolling, and keeps a search in progress
+
+Christian approved this on 23 November 2026 (TODO #58). Work in `main`. Today the Carnet's search field leaves the screen with the band and a search button appears in the scrolled bar (task 2026-11-14-125, `Logbook.svelte` `openSearch`, `BandBackdrop.svelte`). Mock-ups, phone canvas:
+- Android › Carnet et plongées › Liste du carnet: « Carnet, la boîte de recherche se replie en loupe au défilement (étapes) · Android » and « Carnet, recherche « Lake » en cours, défilé : la boîte repliée garde le texte · Android »;
+- Android › Sites et cartes › Carte: « Sites · Android » (updated), « Sites, en haut : la boîte de recherche sous le résumé · Android » and « Sites, recherche « cole » en cours : la boîte repliée garde le texte · Android ».
+
+1. **One movement.** While the list scrolls, the summary fades, and the search box shrinks and rises to the title row, right of the title and left of the avatar, then ends as the magnifier (48 dp target). The movement follows the scroll position (no timer). Back at the top of the list, the box is back in its place. With reduced motion, no in-between: full box, then magnifier.
+2. **Tap on the magnifier**: the box opens with the keyboard (as `openSearch` does now).
+3. **A search in progress is kept when folded.** Instead of the plain magnifier, a pill in the bar shows the magnifier, the typed text (« Lake ») and its × (rule of task 113): tapping the text reopens the box with the text and the keyboard; × clears the search. Pill: 40 dp high, radius 20 dp, white at 22 % on the band, text 15 sp weight 600; × target 40 dp.
+4. **Sites gets the same behaviour.** At the top, a full-width box « Rechercher un site » under « 3 sites · 9 plongées », the header's search button removed; the map's full-screen button moves next to « Centrer sur ma position » so it stays visible under the taller band. Scrolled, the box folds into the magnifier; a search in progress shows the pill (« cole » ×) and the summary reads « 1 site correspond à « cole » ». The search itself (sites, regions and countries) is unchanged.
+5. The collapsed band keeps its faint profile above the wave (the « seconde vague »), as `BandBackdrop` draws it; the mock-ups « Carnet, défilé avec en-têtes collants » and « Carnet, petit carnet … » were missing it and are fixed.
+
+Tablet, desktop and iPhone are not part of this task. In the done note, say how the box is animated and what happens when the keyboard is open and the list is scrolled.
