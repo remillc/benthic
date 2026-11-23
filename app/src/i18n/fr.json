@@ -441,6 +441,9 @@
     },
     "cloud": "Synchronisé avec le cloud Subsurface",
     "syncedAgo": "Synchronisé {ago}",
+    "syncedAutomatically": "Synchronisé {ago}, automatiquement",
+    "autoLine": "Automatique, dès qu’une modification est faite",
+    "autoWaiting": "Envoi automatique au retour du réseau",
     "offline": "Hors ligne : aucune modification en attente",
     "local": "Carnet enregistré sur cet appareil seulement",
     "offlinePending": {
@@ -1495,7 +1498,6 @@
     "lastSyncNever": "Jamais",
     "todayAt": "aujourd’hui, {time}",
     "cloudDives": "Plongées dans le cloud",
-    "syncNow": "Synchroniser",
     "subsurfaceGroup": "Compte Subsurface",
     "changePassword": "Changer le mot de passe",
     "changePasswordText": "Un lien est envoyé à votre adresse e-mail",
@@ -1562,6 +1564,7 @@
     "sheet": {
       "backup": "Sauvegarde et restauration",
       "backupText": "Revenir à une version du carnet ou d’une plongée",
+      "syncFootnote": "La synchronisation est automatique : chaque modification part dès que le réseau le permet.",
       "plusDives": {"one": "Benthic+ · {n} plongée", "other": "Benthic+ · {n} plongées"},
       "gitTitle": "Dépôt git personnel",
       "gitLine": {"one":"{repository} · {n} plongée","other":"{repository} · {n} plongées"},
@@ -2783,10 +2786,11 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Compte : plus de bouton « Synchroniser » nulle part (feuille du compte, Compte, menu latéral, ordinateur). L’état reste, avec une seconde ligne : « Synchronisé il y a 2 min » et « Automatique, dès qu’une modification est faite », ou « 3 modifications non envoyées » et « Envoi automatique au retour du réseau » ; sur tablette, l’état est la troisième ligne sous le compte.",
       "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
       "Carnet : pendant l’échange avec le serveur au démarrage, un trait blanc se dessine sur le profil pâle de l’en-tête, sur tous les appareils : un segment glisse tant que la progression est inconnue, puis le trait se remplit, se complète et s’efface. Il remplace la barre ondulée.",
-      "Synchronisation : elle est toujours automatique. Le réglage « Synchroniser automatiquement » et le mode manuel n’existent plus ; « Seulement sur Wi-Fi ou câble » et « Synchroniser maintenant » restent, et les modifications non envoyées s’affichent toujours quand l’appareil est hors ligne.",
+      "Synchronisation : elle est toujours automatique. Le réglage « Synchroniser automatiquement » et le mode manuel n’existent plus ; « Seulement sur Wi-Fi ou câble » reste, et les modifications non envoyées s’affichent toujours quand l’appareil est hors ligne.",
       "Carnet : un appui long sur une plongée ou un voyage démarre la sélection dès qu’il est reconnu, le doigt encore posé, avec un court retour haptique sur téléphone et tablette ; lever le doigt ne décide plus.",
       "Téléphone Android, Carnet et Sites : la boîte de recherche est sous le résumé et, au défilement, rétrécit et monte dans la barre du haut sous forme de loupe. Une recherche en cours y reste sous forme de pastille avec son texte et son bouton d’effacement ; toucher le texte ou la loupe rouvre la boîte. Sur Sites, le bouton plein écran de la carte passe au-dessus de « Centrer sur ma position ».",
       "Exporter : « Envoyer vers divelogs.de » envoie les plongées du carnet ou de la sélection vers votre compte divelogs.de, après le nom d’utilisateur et le mot de passe, qui ne sont pas gardés. L’envoi a sa progression et se reprend après une coupure de connexion.",
@@ -5147,7 +5151,6 @@
     },
     "account": {
       "sheet": "Compte",
-      "syncNow": "Synchroniser maintenant",
       "unmetered": "Seulement sur Wi-Fi ou câble",
       "unmeteredText": "Jamais sur un partage de connexion",
       "manage": "Gérer le compte"

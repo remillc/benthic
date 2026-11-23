@@ -11,7 +11,6 @@
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
-  import SyncButton from './SyncButton.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, sections, goToSection, closeMenu, restoreFocus, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -123,8 +122,6 @@
     <div class="bc-nav-menu--spacer"></div>
     {#if !logbook.loading && !logbook.error}
       <div class="bc-nav-menu--status">
-        <!-- The button stays in place while it runs and shows its progress (to-do #2). -->
-        {#if logbook.email}<SyncButton />{/if}
         {#if logbook.syncFailure}
           <SyncFailureRow />
         {:else if logbook.conflict && logbook.conflictLater}
