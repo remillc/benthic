@@ -6877,3 +6877,17 @@ Both open « Repartir sans les données chiffrées » (task 338 item 6), unchang
 ## [ ] 2026-11-23-351 Download, Bluetooth states: the Bluetooth icon centred, white on a blue disc
 
 Christian asked for this on 23 November 2026. Work in `main`. In the three Bluetooth states of the download from a dive computer, « Autoriser le Bluetooth », « Autorisation refusée » and « Bluetooth désactivé », the Bluetooth icon sits **centred** above the title, **white** (36 dp, stroke 2) in a **72 dp disc filled with #1F5C99** (no more grey icon on the left on the phone, no more pale disc with a coloured icon on the tablet, including the red « refusée » and grey « désactivé » variants). Mock-ups: « Téléchargement, autoriser le Bluetooth · Android », « … autorisation refusée … », « … Bluetooth désactivé … » (phone), and the six tablet boards « Téléchargement … » in paysage and portrait. The title, text and button keep their current layout. iPhone and desktop have no such screen; nothing to change there.
+
+## [ ] 2026-11-23-352 Key icon: use Material Symbols « key »
+
+Christian asked for this on 23 November 2026. Work in `main`. The app has no key icon yet. Add one to `Icon.svelte` using the Material Symbols « key » glyph (outlined, weight 400, viewBox `0 -960 960 960`, filled with `currentColor`):
+
+```
+M280-400q-33 0-56.5-23.5T200-480q0-33 23.5-56.5T280-560q33 0 56.5 23.5T360-480q0 33-23.5 56.5T280-400Zm0 160q-100 0-170-70T40-480q0-100 70-170t170-70q67 0 121.5 33t86.5 87h352l120 120-180 180-80-60-80 60-85-60h-47q-32 54-86.5 87T280-240Zm0-80q56 0 98.5-34t56.5-86h125l58 41 82-61 71 55 75-75-40-40H435q-14-52-56.5-86T280-640q-66 0-113 47t-47 113q0 66 47 113t113 47Z
+```
+
+Use it wherever the recovery key appears: the recovery-key offer, the « Votre clé de secours » dialog, entering the key, and unlocking the encrypted data, on phone, tablet and desktop. Mock-ups: « Clé de secours, affichée une seule fois (Benthic+) · Android » and the other boards of the « Clé de secours » subgroup on each device, plus the unlock (« déverrouiller ») boards.
+
+## [ ] 2026-11-23-353 Addition to 351: « Activer le Bluetooth » button is blue everywhere
+
+Christian asked for this on 23 November 2026. Work in `main`. On the « Bluetooth désactivé » state of the download, the « Activer le Bluetooth » button is the blue filled button (#114477, white text) on every device. The phone mock-up « Téléchargement, Bluetooth désactivé · Android » now shows it blue (it was near-black); the tablet already had it blue.
