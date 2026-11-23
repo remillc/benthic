@@ -19,9 +19,9 @@
   let { equipment = $bindable() } = $props();
 
   let adding = $state(false);
-  /** Only a Benthic+ account changes the equipment of a dive; without one the block shows and stays inert. */
+  /** Only a Benthic+ account has « Autre équipement »; without one the section is absent (no disabled state, no badge). */
   const plus = $derived(isSubscriber());
-  const locked = $derived(gear.readOnly || !plus);
+  const locked = $derived(gear.readOnly);
 
   /** The pieces of the dive that still exist in the inventory. */
   const pieces = $derived(equipment.gearIds.map((id) => gearMap().get(id)).filter((g) => !!g));
@@ -38,6 +38,7 @@
   }
 </script>
 
+{#if plus}
 <h3 class="bc-dive-gear--sub bc-dive-gear--other-head">
   {t('gear.diveGear.other')}<BenthicPlusChip onLight />
 </h3>
@@ -73,12 +74,13 @@
   </ul>
 {/if}
 
-<button type="button" class="bc-dive-gear--add" disabled={!plus} onclick={openAdd}>
+<button type="button" class="bc-dive-gear--add" onclick={openAdd}>
   <Icon name="plus" size={20} />{t('gear.diveGear.add')}
 </button>
-{#if !plus}<p class="bc-dive-gear--locked">{t('gear.diveGear.plusOnly')}</p>{:else if gear.readOnly}<p class="bc-dive-gear--locked">{t('gear.diveGear.locked')}</p>{/if}
+{#if gear.readOnly}<p class="bc-dive-gear--locked">{t('gear.diveGear.locked')}</p>{/if}
 
 <AddEquipmentSheet opened={adding} {equipment} onclose={() => (adding = false)} onadd={(next) => (equipment = next)} />
+{/if}
 
 <style>
   @layer bc.components {

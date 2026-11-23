@@ -1,5 +1,4 @@
-// « Autre équipement » of a dive belongs to Benthic+. On the phone's editor it shows, with the chip, and cannot change without an
-// account; in the desktop tab it is absent without Benthic+ (task 2026-11-22-333: the mock-ups' red « B+ » circle is an annotation).
+// « Autre équipement » of a dive belongs to Benthic+. Without Benthic+ it is absent from the phone's detail and editor and from the desktop tab (task 2026-11-22-333: the mock-ups' red « B+ » circle is an annotation).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -36,15 +35,14 @@ test('the desktop and the phone editor gate adding and removing on the subscript
   assert.match(desktop, /\{#if plus && equipment\}\n\s+<h3[^\n]*otherGear[^\n]*\n\s+<DesktopOtherGear items=\{otherItems\} onadd=/);
   assert.doesNotMatch(desktop, /locked|BenthicPlusChip/, 'no disabled state and no badge on the desktop');
   const phone = read('components/DiveGearOther.svelte');
-  assert.match(phone, /disabled=\{!plus\} onclick=\{openAdd\}/);
-  assert.match(phone, /disabled=\{locked\}/);
-  assert.match(phone, /gear\.diveGear\.plusOnly/);
+  assert.match(phone, /^\{#if plus\}\n<h3/m, 'the whole section is absent without Benthic+');
+  assert.doesNotMatch(phone, /disabled=\{!plus\}|plusOnly/, 'no inert state on the phone either');
+  assert.match(read('components/DiveGearBlock.svelte'), /\{#if isSubscriber\(\) && /, 'the detail block is absent too');
 });
 
 test('the new texts exist in both languages', () => {
   for (const l of ['fr', 'en']) {
     const json = JSON.parse(read(`i18n/${l}.json`));
     assert.ok(json.desktopDetail.otherGearPlusOnly, l);
-    assert.ok(json.gear.diveGear.plusOnly, l);
   }
 });
