@@ -9,8 +9,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Before the end of the launch, or iOS refuses it: resumes an offline map download in the background.
-        MapsManager.registerBackgroundTask()
         registerAccessRequestCategory()
         return true
     }

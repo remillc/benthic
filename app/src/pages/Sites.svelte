@@ -27,8 +27,7 @@
   import { layout, ios, listWidth, desktopApp } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
 import { connection } from '../lib/online.svelte.js';
-import { offlineMaps, downloadRegionAt } from '../lib/offline-maps.svelte.js';
-import { distanceKm, inBbox, normalizeBbox } from '../lib/maps-logic.js';
+import { distanceKm, inBbox, normalizeBbox } from '../lib/geo.js';
 import { matchesSite, highlightParts } from '../lib/site-search.js';
 import MapStackSheet from '../components/MapStackSheet.svelte';
 import MapSiteCard from '../components/MapSiteCard.svelte';
@@ -55,13 +54,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   );
   /** @type {SiteMap|undefined} */
   let siteMap = $state();
-
-  // "Voir sur la carte" of the offline maps screen.
-  $effect(() => {
-    if (!offlineMaps.viewBbox || !siteMap) return;
-    siteMap.fitBbox(offlineMaps.viewBbox);
-    offlineMaps.viewBbox = null;
-  });
 
   const SORT_KEY = 'bc.sitesSort';
   /** The order of the list, a setting of this device. */
@@ -321,49 +313,12 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
     if (done) offerUndo(t('sites.done'), undefined, 6000, done);
   }
 
-  // Offline, a hint when the map looks mostly outside the downloaded regions
-  // (spec, "Sites map offline"): once per area, an area being a tile of zoom 7.
-  const HINT_MIN_ZOOM = 7;
-  const HINT_AREA_ZOOM = 7;
   /** @type {{ center: [number, number], bounds: [number, number, number, number], zoom: number }|undefined} */
   let view = $state.raw();
-  const hinted = new Set();
-
-  /** Share (0 to 1) of the visible area inside a downloaded region, by sampling. */
-  function coveredShare(/** @type {[number, number, number, number]} */ [w, s, e, n]) {
-    const regions = offlineMaps.regions.filter((r) => r.status === 'ready' || r.status === 'updating');
-    const N = 8;
-    let inside = 0;
-    for (let i = 0; i < N; i++) {
-      for (let j = 0; j < N; j++) {
-        const lng = w + ((e - w) * (i + 0.5)) / N;
-        const lat = s + ((n - s) * (j + 0.5)) / N;
-        if (regions.some((r) => inBbox(lng, lat, r.bbox))) inside++;
-      }
-    }
-    return inside / (N * N);
-  }
-
-  function hintIfNotDownloaded() {
-    if (connection.online || !view || view.zoom < HINT_MIN_ZOOM || coveredShare(view.bounds) >= 0.5) return;
-    const [lng, lat] = view.center;
-    const n = 2 ** HINT_AREA_ZOOM;
-    const x = Math.floor(((lng + 180) / 360) * n);
-    const y = Math.floor(((1 - Math.asinh(Math.tan((lat * Math.PI) / 180)) / Math.PI) / 2) * n);
-    const area = `${x}/${y}`;
-    if (hinted.has(area)) return;
-    hinted.add(area);
-    showSnackbar(t('sites.areaNotDownloaded'), {
-      action: t('sites.downloadArea'),
-      timeout: 6000,
-      onAction: () => downloadRegionAt(lng, lat),
-    });
-  }
 
   /** @param {{ center: [number, number], bounds: [number, number, number, number], zoom: number }} v */
   function onview(v) {
     view = v;
-    hintIfNotDownloaded();
   }
 
   // « Mes sites | Carte commune » (task 2026-11-19-315, docs/mockups/sites-commun-android.dc.html): a signed-in Benthic+
@@ -517,11 +472,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   /** @param {string} id */
   const openBase = (id) => f7.views.current?.router.navigate(`/sites/base/${encodeURIComponent(id)}`);
 
-  // The device goes offline with the map already in view.
-  $effect(() => {
-    if (!connection.online) hintIfNotDownloaded();
-  });
-
   async function load() {
     try {
       sites = await cachedSites();
@@ -555,7 +505,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
 
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length || canCommon}
-    <div class="bc-sites--map" class:bc-sites--map-offline={!connection.online} class:bc-sites--card-open={!!selectedSite || !!baseSelected}>
+    <div class="bc-sites--map" class:bc-sites--card-open={!!selectedSite || !!baseSelected}>
       <!-- Full screen keeps the pins and its own locate button. A tapped pin shows its card;
            several under the finger open a sheet. The shared map shows names from zoom 13. -->
       <SiteMap
@@ -612,14 +562,10 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
 {#snippet band(/** @type {boolean} */ overMap)}
   <SectionBand
     {overMap}
-    chip={!connection.online}
     summaryKey={finding}
     tall={folding}
     summary={common ? '' : searchCount || (used.length ? [t('band.sites', { n: used.length }), t('band.dives', { n: diveCount })].join(' · ') : '')}
   >
-    {#if !connection.online}
-      <p class="bc-sites--offline-chip" role="status"><Icon name="offline" size={16} weight={2} />{t('sites.offline')}</p>
-    {/if}
     {#if folding}<div class="bc-folding-search--slot"></div>{/if}
   </SectionBand>
 {/snippet}
@@ -924,22 +870,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
       position: absolute;
     }
 
-    /* "Offline" (android-sites-hors-ligne.dc.html): 28 dp, translucent white, under the summary. */
-    .bc-sites--offline-chip {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 28px;
-      margin: 6px 0 0 12px;
-      padding: 0 12px 0 8px;
-      border-radius: 14px;
-      background: var(--bc-band-control);
-      color: var(--bc-on-band-control);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
     /* The open search, in the top bar's place (spec, "Sites, search open and its
        animation"). Closed, the field is clipped to the size of the magnifier
        button, at its place on the right: opening grows it to full width from
@@ -1242,13 +1172,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
       position: relative;
       --bc-map-button-top: 34px;
       --bc-map-button-right: 16px;
-
-      /* Offline (android-sites-hors-ligne): the credits at the top, the button under them. */
-      &.bc-sites--map-offline {
-        --bc-map-credits-top: 34px;
-        --bc-map-credits-bottom: auto;
-        --bc-map-button-top: 62px;
-      }
     }
 
     /* Android phone (task 2026-11-23-339): the band is taller (it holds the search box), so the full-screen button
@@ -1259,12 +1182,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
 
       &.bc-sites--card-open {
         --bc-map-button-bottom: 164px;
-      }
-
-      &.bc-sites--map-offline {
-        --bc-map-credits-top: auto;
-        --bc-map-credits-bottom: 4px;
-        --bc-map-button-top: auto;
       }
     }
 

@@ -64,6 +64,7 @@
   import DemoHost from './components/DemoHost.svelte';
   import { accountGuard } from './lib/demo.svelte.js';
   import { layout, ios, listWidth, splitBreakpoint, bottomNav, desktopApp, desktopMac, settingsWindow, profileWindow, sideWindow } from './lib/layout.svelte.js';
+  import { deviceStore } from './lib/device-store.js';
   import { logbooks, noLogbook, enableLogbookCommands, renameLogbook } from './lib/desktop-logbooks.svelte.js';
   import { displayName } from './lib/desktop-logbooks.js';
   import DesktopAccountSheet from './components/DesktopAccountSheet.svelte';
@@ -98,14 +99,12 @@
   import { lazyRoute, safeAsync, stylesheetsReady } from './lib/lazy-route.js';
   import { mark } from './lib/perf.js';
   import { settings } from './lib/settings.svelte.js';
-  import MapsDialogs from './components/MapsDialogs.svelte';
   import ErrorReportHost from './components/ErrorReportHost.svelte';
   import DiveDetailSkeleton from './components/DiveDetailSkeleton.svelte';
   import { watchStartup } from './lib/startup.svelte.js';
   import { orderOf, previewFirst, snapshotIsOf, startSnapshot } from './lib/detail-snapshot.js';
   import { desk } from './lib/desktop-logbook.svelte.js';
   import { noteLog } from './lib/error-report.js';
-  import { startOfflineMaps } from './lib/offline-maps.svelte.js';
 
   /**
    * A route whose page is its own chunk, loaded when the route is first opened (not with the first screen).
@@ -146,8 +145,6 @@
     { path: '/settings/cylinders/new', ...lazy(() => import('./pages/CylinderType.svelte')) },
     { path: '/settings/cylinders/type', ...lazy(() => import('./pages/CylinderType.svelte')) },
     // Offline maps: the list, adding a region (a rectangle drawn on the map).
-    { path: '/settings/maps/', ...lazy(() => import('./pages/SettingsMaps.svelte')) },
-    { path: '/settings/maps/area', ...lazy(() => import('./pages/SettingsMapsArea.svelte')) },
     // Release edition: « Mon profil de plongeur » and the equipment inventory (task 2026-11-17-267).
     ...(isRelease
       ? [
@@ -497,8 +494,9 @@
     // The settings are applied and the logbook is loaded from main.js, before
     // the screens are built.
     mark('onMount');
-    // Offline maps: follows the downloads and checks for updates (at most once a day).
-    startOfflineMaps();
+    // The list and settings of the removed offline maps (the files themselves are deleted by the plugin at start).
+    deviceStore.removeItem('bc.offlineMaps');
+    deviceStore.removeItem('bc.offlineMapsSettings');
     // Several logbooks (task 2026-11-15-173): new, open, close and save a copy, from the keyboard and the Mac's menu bar.
     return enableLogbookCommands();
   });
@@ -529,7 +527,6 @@
   <QrReceived />
   <ValidationConfirm />
   <FileImportProgress />
-  <MapsDialogs />
   {#if showRoute}<RouteBadge />{/if}
   {#if devAccounts}{#await import('./components/DevToolsHost.svelte') then { default: DevToolsHost }}<DevToolsHost />{/await}{/if}
   <Welcome />

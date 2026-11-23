@@ -332,7 +332,7 @@ export function setAppSetting(key, value) {
  * default (the core's `defaults`) and the app's own. The planner's own
  * parameters (core values of SETTING_KEYS, "Conditions par défaut") and trip
  * grouping (the logbook's) are not touched; nor are the diver's list of
- * cylinder types, the offline maps (bc.offlineMaps*), the account or the logbook.
+ * cylinder types, the account or the logbook.
  * @param {Partial<CorePrefValues>} defaults
  */
 export async function resetAllSettings(defaults) {

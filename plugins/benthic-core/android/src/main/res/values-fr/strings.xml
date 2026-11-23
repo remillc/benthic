@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bc_maps_channel">Cartes hors ligne</string>
     <!-- The system notification of an access request (inbox task 2026-11-23-356): the same texts as accountSync.notify in the app. -->
     <string name="bc_access_channel">Demandes d’accès</string>
     <string name="bc_access_channel_description">Un nouvel appareil demande l’accès à vos données chiffrées.</string>

@@ -78,7 +78,7 @@ test('« Commencer sans compte »: three rows, then « Commencer » creates the 
   // Tablet (task 239): « cette tablette » in the rows, a tablet icon.
   assert.equal(fr.phoneOnlyTablet, 'Sur cette tablette seulement');
   assert.equal(fr.noBackupTextTablet, 'Si vous perdez ou changez de tablette, le carnet est perdu.');
-  assert.match(read('components/Icon.svelte'), /\btablet: 'M5 4h14/);
+  assert.match(read('components/Icon.svelte'), /\btablet: '[^']+', \/\/ tablet_android/);
 });
 
 test('task 239: the tablet texts say « cette tablette », picked by deviceKey', () => {

@@ -54,22 +54,29 @@ export const parseSizeNumber = (text) => (text.trim() === '' ? 0 : Number(text.t
 export function sizeFields(type, { cuft, psi }, format) {
   return {
     pressure: type.mbar ? format(psi ? type.mbar / PSI_MBAR : type.mbar / 1000, 0) : '',
-    volume: type.ml ? format(cuft ? (type.ml / CUFT_ML) * (type.mbar / 1013.25) : type.ml / 1000, cuft ? 0 : 1) : '',
+    // In cubic feet the volume is the gas at the working pressure: without one (a type read from a dive) it cannot be
+    // shown, and the field stays empty rather than saying 0.
+    volume: type.ml && (!cuft || type.mbar) ? format(cuft ? (type.ml / CUFT_ML) * (type.mbar / 1013.25) : type.ml / 1000, cuft ? 0 : 1) : '',
   };
 }
+
+/** The message key of an invalid size. @param {'volume'|'pressure'|'pressureNeeded'} what */
+export const sizeErrorKey = (what) => `settings.cylinders.${what === 'pressureNeeded' ? 'pressureNeeded' : what === 'pressure' ? 'pressureInvalid' : 'volumeInvalid'}`;
 
 /**
  * The size typed, in ml and mbar; the field that is wrong when invalid.
  * @param {string} volume
  * @param {string} pressure
  * @param {{ cuft: boolean, psi: boolean }} units
- * @returns {{ ml: number, mbar: number }|{ invalid: 'volume'|'pressure' }}
+ * @returns {{ ml: number, mbar: number }|{ invalid: 'volume'|'pressure'|'pressureNeeded' }}
  */
 export function typedSize(volume, pressure, { cuft, psi }) {
   const p = parseSizeNumber(pressure);
   const v = parseSizeNumber(volume);
   if (Number.isNaN(p) || p < 0) return { invalid: 'pressure' };
   const mbar = Math.round(psi ? p * PSI_MBAR : p * 1000);
-  if (Number.isNaN(v) || v <= 0 || (cuft && !mbar)) return { invalid: 'volume' };
+  if (Number.isNaN(v) || v <= 0) return { invalid: 'volume' };
+  // Cubic feet are gas at the working pressure: without the pressure there is no water volume to keep.
+  if (cuft && !mbar) return { invalid: 'pressureNeeded' };
   return { ml: Math.round(cuft ? (v * CUFT_ML) / (mbar / 1013.25) : v * 1000), mbar };
 }

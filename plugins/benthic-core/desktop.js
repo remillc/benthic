@@ -1098,39 +1098,8 @@ export class BenthicCoreDesktop extends WebPlugin {
     await this.core('downloadCancel');
   }
 
-  // --- Offline maps: the downloads are an Android feature for now ---
-
   /** The desktop has no push notification: nothing to open. */
   async openNotificationSettings() {}
-
-  async mapsFreeSpace() {
-    return { freeBytes: 0, totalBytes: 0 };
-  }
-  async mapsDownloads() {
-    return { downloads: [] };
-  }
-  async mapsFiles() {
-    return { files: [] };
-  }
-  async mapsTilesStart() {
-    throw unavailable('Offline maps');
-  }
-  async mapsDownloadPause() {
-    throw unavailable('Offline maps');
-  }
-  async mapsDownloadResume() {
-    throw unavailable('Offline maps');
-  }
-  async mapsDownloadCancel() {
-    throw unavailable('Offline maps');
-  }
-  async mapsDelete() {
-    throw unavailable('Offline maps');
-  }
-  /** No region is ever ready, so no tile is stored. */
-  async mapsReadTile() {
-    throw reject('No such tile', 'NOT_FOUND');
-  }
 
   // --- What belongs to a phone ---
 

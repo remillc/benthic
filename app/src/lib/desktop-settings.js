@@ -22,7 +22,6 @@ export const CATEGORIES = [
   { id: 'gases', icon: 'M8 21V9a4 4 0 0 1 8 0v12z M12 5V3 M8 14h8', groups: ['partialPressures'] },
   { id: 'rebreather', icon: 'M4 12a8 8 0 0 1 14-5 M20 4v4h-4 M20 12a8 8 0 0 1-14 5 M4 20v-4h4', groups: ['rebreather'] },
   { id: 'devices', icon: 'M7 4h10v16H7z M10 8h4 M12 16h.01', groups: ['computers', 'download', 'computersKnown'] },
-  { id: 'maps', icon: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z M9 4v14 M15 6v14', groups: ['maps'] },
   { id: 'advanced', icon: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19 12l2-1-1-3-2 .5-1.5-1.5.5-2-3-1-1 2h-2l-1-2-3 1 .5 2L6 7.5 4 7 3 10l2 1v2l-2 1 1 3 2-.5 1.5 1.5-.5 2 3 1 1-2h2l1 2 3-1-.5-2 1.5-1.5 2 .5 1-3-2-1z', groups: ['reset'] },
 ];
 

@@ -13,7 +13,6 @@
   /** rail: at the bottom of the Android tablet rail (task 2026-11-14-126), a 64 dp circle. */
   let { rail = false } = $props();
   const shown = $derived(rail ? layout.rail && !ios : bottomNav());
-  import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
   import { isRelease } from '../lib/edition.js';
   import { accountEmail, sheetVariant } from '../lib/account-sheet.js';
@@ -22,14 +21,10 @@
   const initial = $derived(email.trim().charAt(0).toLocaleUpperCase());
   /** '' when nothing waits; else the badge's role. */
   const badge = $derived(
-    logbook.syncFailure || (logbook.conflict && logbook.conflictLater) ? 'alarm' : logbook.pending > 0 || updatesCount() > 0 ? 'waiting' : '',
+    logbook.syncFailure || (logbook.conflict && logbook.conflictLater) ? 'alarm' : logbook.pending > 0 ? 'waiting' : '',
   );
-  /** What waits, in words, after the account (task 2026-11-14-126): « 3 modifications non envoyées, 1 mise à jour de carte ». */
-  const waiting = $derived(
-    [logbook.pending > 0 ? t('nav.pendingChanges', { n: logbook.pending }) : '', updatesCount() > 0 ? t('nav.mapUpdates', { n: updatesCount() }) : '']
-      .filter(Boolean)
-      .join(', '),
-  );
+  /** What waits, in words, after the account (task 2026-11-14-126): « 3 modifications non envoyées ». */
+  const waiting = $derived(logbook.pending > 0 ? t('nav.pendingChanges', { n: logbook.pending }) : '');
   // Free version (task 2026-11-18-281): the silhouette in the same disc, named by what the sheet holds.
   const free = $derived(sheetVariant({ release: isRelease, subscriber: benthicPlusSubscriber(), email: logbook.email }) === 'free');
   const label = $derived(

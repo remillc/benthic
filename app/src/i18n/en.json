@@ -811,7 +811,6 @@
       "computers": "Dive computers",
       "download": "Download",
       "display": "Display",
-      "maps": "Offline maps",
       "advanced": "Advanced"
     },
     "sections": {
@@ -828,7 +827,6 @@
       "gases": "Gases and rebreather",
       "tools": "Tools",
       "download": "Computers and download",
-      "maps": "Offline maps",
       "advanced": "Advanced",
       "about": "About",
       "privacy": "Privacy"
@@ -1100,23 +1098,11 @@
       "light": "Light",
       "dark": "Dark"
     },
-    "maps": {
-      "regions": "Downloaded regions",
-      "none": "None",
-      "count": {
-        "one": "{n} region",
-        "other": "{n} regions"
-      },
-      "updates": {
-        "one": "{n} update",
-        "other": "{n} updates"
-      }
-    },
     "advanced": {
       "resetText": "Goes back to the default values for every setting of this device",
       "reset": "Reset all settings",
       "resetTitle": "Reset all settings?",
-      "resetConfirm": "The settings of this device go back to their default values: units, display, logbook. Your dives, sites, account, downloaded maps and list of cylinders do not change, nor do the planner settings and trip grouping.",
+      "resetConfirm": "The settings of this device go back to their default values: units, display, logbook. Your dives, sites, account and list of cylinders do not change, nor do the planner settings and trip grouping.",
       "resetAction": "Reset",
       "note": "Planning parameters (rates, reserve, SAC, ppO₂, deco) and trip grouping are not changed.",
       "resetDone": "Settings reset"
@@ -1153,6 +1139,7 @@
       "nameInUse": "This name is already a type",
       "nameMissing": "Enter a name",
       "volumeInvalid": "Enter a volume greater than 0",
+      "pressureNeeded": "In cubic feet the volume depends on the working pressure: enter it",
       "pressureInvalid": "Enter a valid pressure",
       "renamed": "Type renamed",
       "nameHelp": "The name shown when choosing the type of a cylinder",
@@ -1636,6 +1623,8 @@
       "storeNoteDesktop": "Payment method, receipts and renewal are managed in {store}, on the phone used to buy.",
       "space": "Space",
       "photosVideos": "Photos and videos",
+      "sizeMb": "{value} MB",
+      "sizeGb": "{value} GB",
       "spaceOf": "{used} of {limit}",
       "spaceUnknown": "{limit} of space, usage not available",
       "spaceUsed": "Space used, {n} %",
@@ -2398,9 +2387,6 @@
       "other": "The {n} dives that use it stay in the logbook, without a site. It can be undone."
     },
     "deleteSiteTextUnused": "No dive uses it. It can be undone.",
-    "offline": "Offline",
-    "areaNotDownloaded": "This area is not downloaded",
-    "downloadArea": "Download",
     "selected": {
       "one": "{n} site selected",
       "other": "{n} sites selected"
@@ -2428,8 +2414,6 @@
       "one": "The checked dive gets the number below. Its current number is replaced, in the logbook and in Subsurface. You can undo it right after.",
       "other": "The {count} checked dives get consecutive numbers, in date order, from the number below. Their current numbers are replaced, in the logbook and in Subsurface. You can undo it right after."
     },
-    "label": "Renumber dives",
-    "text": "Consecutive numbers in date order",
     "title": "Renumber all dives?",
     "dialogText": "All {count} dives get consecutive numbers in date order, from the number below. The numbers they have now are replaced, in the logbook and in Subsurface. You can undo it right after.",
     "start": "First number",
@@ -2828,6 +2812,13 @@
       "Dives: when a change made on another device reaches this one while a dive is open, the dive stays open, its neighbours still open, and an edit in progress is kept; a dive deleted on the other device closes with a short message. This no longer produces an error report.",
       "Logbook: a dive dragged and dropped back on its own place, or on a year header, changes nothing and no longer shows an error.",
       "Photos and videos (Benthic+): a dive shows its photos and videos as thumbnails, with « Add », the line « on all your devices » and « See all », which opens the dive’s gallery. They are sent to the account (10 GB) and follow the diver to the other devices: thumbnails are always kept, originals arrive on Wi-Fi following Settings › Logbook (All, Those of the last 12 months, On demand) and open on demand. Offline, uploads wait for the network. The free version does not show the section.",
+      "Cylinder types: a type without a working pressure (read from a dive) no longer shows « 0 » in cubic feet and can be renamed without an error; a volume typed without a pressure asks for the working pressure.",
+      "Gear: the rebreather icon shows two tall cylinders on each side of a scrubber on its stand, joined by two hoses, and no longer looks like a twin set.",
+      "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
+      "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
+      "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
+      "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
+      "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
       "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
       "First launch: the light rays of the blue band are always four, scaled to the width of the band, on tablet and computer as on the phone.",
@@ -4425,133 +4416,6 @@
     },
     "hosts": "Hosts"
   },
-  "maps": {
-    "title": "Offline maps",
-    "units": {
-      "mb": "{value} MB",
-      "gb": "{value} GB"
-    },
-    "summary": {
-      "regions": {
-        "one": "{n} region",
-        "other": "{n} regions"
-      },
-      "maps": "Maps",
-      "other": "Other data",
-      "freeOf": "{free} free of {total}",
-      "storageLabel": "Device storage: maps {maps}, {free} free of {total}"
-    },
-    "sections": {
-      "downloads": "Downloads",
-      "regions": "Downloaded regions",
-      "settings": "Settings"
-    },
-    "updateAll": "Update all",
-    "noNetwork": "No network. Downloaded regions stay available. Downloads will resume when the network is back.",
-    "add": "Add a region",
-    "empty": {
-      "title": "No region downloaded",
-      "text": "Download the region of your next trip. Its map will stay visible on the boat, even without a network."
-    },
-    "cellular": {
-      "label": "Download on mobile data",
-      "labelShort": "Mobile data",
-      "text": "Otherwise, downloads wait for Wi-Fi"
-    },
-    "region": {
-      "sizeDate": "{size} · {date}",
-      "updateAvailable": "Update available",
-      "update": "Update",
-      "options": "Options for {name}",
-      "swipeHint": "Swipe a region to the left to delete it."
-    },
-    "menu": {
-      "update": "Update",
-      "view": "Show on the map",
-      "delete": "Delete"
-    },
-    "download": {
-      "progress": "{done} of {total} tiles · {percent}%",
-      "waitingWifi": "Waiting for Wi-Fi · {total} tiles",
-      "queued": "Waiting · {total} tiles",
-      "now": "Download now",
-      "stop": "Stop the download",
-      "background": "The download continues if you leave the app.",
-      "pausedAt": "Paused at {done} of {total} tiles",
-      "noSpace": "Not enough space on the device",
-      "resumesWhen": "Will resume when {floor} is free.",
-      "manage": "Manage space",
-      "interrupted": "Interrupted at {done} of {total} tiles",
-      "resumesOnline": "Will resume when the network is back",
-      "updating": "Update · {done} of {total} tiles",
-      "updatingWifi": "Update waiting for Wi-Fi",
-      "oldStays": "The old map stays usable until the end.",
-      "progressLabel": "Downloading {name}"
-    },
-    "failure": {
-      "title": "Download failed",
-      "network": "The connection was lost",
-      "space": "Not enough space on the device",
-      "server": "The server did not answer correctly",
-      "retry": "Try again",
-      "remove": "Remove",
-      "limit": "This region is over the 50 MB OpenFreeMap allows for a download. Choose a smaller area or less detail."
-    },
-    "updateFailed": "The update of {name} failed. The old map stays usable.",
-    "deleted": "{name} deleted",
-    "dialogs": {
-      "cellular": {
-        "title": "Download on mobile data?",
-        "text": "{name} can take up to {size}. Without Wi-Fi, this data comes out of your plan.",
-        "wait": "Wait for Wi-Fi",
-        "go": "Download"
-      },
-      "space": {
-        "title": "Not enough space",
-        "text": "{name} can take up to {size}. Only {remaining} would be left, below the {floor} minimum Benthic keeps free. Delete a region or free up space."
-      },
-      "manage": {
-        "title": "Space on the device",
-        "text": "{free} is free on the device. Benthic always keeps at least {floor} free so that the phone keeps working well. Delete regions or free space on the device: the download will resume by itself."
-      },
-      "replace": {
-        "title": "Replace the map?",
-        "text": "The update can take up to {size} more. For lack of space, the old map is deleted first. {name} stays unavailable without a network until the download ends.",
-        "confirm": "Replace"
-      },
-      "delete": {
-        "title": "Delete {name}?",
-        "text": "Its map will no longer be visible without a network. This frees {size}. Your sites and dives do not change.",
-        "confirm": "Delete"
-      }
-    },
-    "area": {
-      "title": "Choose on the map",
-      "name": "Region name",
-      "nameHelp": "Suggested from the nearest site",
-      "around": "Around {site}",
-      "aroundHere": "Chosen area",
-      "estimate": "about {size} to download (estimate)",
-      "needNetwork": "Choosing on the map needs the network.",
-      "download": "Download",
-      "unavailable": "The map server could not be reached. Try again with a network.",
-      "choose": "Choose on the map",
-      "size": "About {width} × {height} km",
-      "tooBig": "This area is too large to download. Zoom in a little.",
-      "search": {
-        "label": "Search for a place or a site",
-        "offline": "Search unavailable without a network",
-        "sites": "From your logbook",
-        "places": "Places",
-        "searchPlaces": "Search places for \"{query}\"",
-        "searching": "Searching…",
-        "none": "No place found.",
-        "error": "Search is not possible right now. Try again.",
-        "attribution": "Places: data © OpenStreetMap contributors, via Nominatim"
-      },
-      "mapLabel": "Map under a fixed frame. Move and zoom the map to choose the area to download."
-    }
-  },
   "datePicker": {
     "title": "Select date",
     "titleInput": "Enter date",
@@ -4718,11 +4582,6 @@
       "one": "{n} change not sent",
       "other": "{n} changes not sent"
     },
-    "mapUpdates": {
-      "one": "{n} map update",
-      "other": "{n} map updates"
-    },
-    "mapUpdateWaiting": "Map update available",
     "accountLabelFree": "Account, settings and about"
   },
   "health": {
@@ -5190,6 +5049,11 @@
     "openSiteLink": "See the site in Sites",
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
+    "changeKit": "Change kit",
+    "kitFilled": "Filled the fields below; each can still be changed.",
+    "addSecondComputer": "+ Add a second computer",
+    "addFirstComputer": "+ Add a computer",
+    "removeWeightNamed": "Remove {name}",
     "computerRole": {
       "0": "Main",
       "1": "Second",
@@ -5198,7 +5062,7 @@
     },
     "section": {
       "computers": "Dive computers",
-      "protection": "Protection and weights",
+      "protection": "Thermal protection",
       "otherGear": "Other gear"
     },
     "gasCards": "Cylinders of the dive",
@@ -5250,7 +5114,6 @@
       "gases": "Gases and partial pressures",
       "rebreather": "Rebreather",
       "devices": "Computers and download",
-      "maps": "Offline maps",
       "advanced": "Advanced"
     },
     "notes": {
@@ -5819,7 +5682,7 @@
       "subtitle": "Everything included in the Benthic+ plan.",
       "carnet": "Your logbook",
       "profile": "Your diver profile",
-      "maps": "Sites and maps",
+      "sites": "Sites",
       "friends": "With your buddies",
       "sync": "Synced",
       "syncText": "No longer only on this tablet: the same logbook on all your devices.",
@@ -5846,8 +5709,6 @@
       "gasAnalysisText": "The measured mix is noted with the dive, instead of on a scrap of paper.",
       "gaugePhoto": "Pressure read from a photo",
       "gaugePhotoText": "A photo of the gauge, instead of typing it by hand.",
-      "offlineMaps": "Offline maps",
-      "offlineMapsText": "As many regions as you want, instead of a single one.",
       "divers": "Divers’ sites",
       "diversText": "On top of your sites, the ones noted by other subscribers.",
       "buddies": "Buddies",
@@ -5855,8 +5716,7 @@
       "verified": "Verified dive",
       "verifiedText": "A buddy or an instructor confirms your dive, which can be checked later.",
       "publicProfile": "Public profile",
-      "publicProfileText": "Show your certifications and your number of dives with a link or a QR code, if you want to.",
-      "free": "Always free, without a subscription: downloading from dive computers, the planner, the gas tools, the statistics and exporting the logbook."
+      "publicProfileText": "Show your certifications and your number of dives with a link or a QR code, if you want to."
     },
     "ready": {
       "title": "Your logbook is ready",

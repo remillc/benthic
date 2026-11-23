@@ -7019,13 +7019,15 @@ Benthic+ data in the file (profile, certificates, documents, photos) is imported
 
 **Test:** export a logbook, import it on a fresh install (first launch) and over an existing logbook; corrupt one file in the archive and check the incomplete message and that nothing was imported.
 
-## [ ] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
+## [x] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
 
 Christian asked for this on 23 November 2026. Work in `main`. Renumbering the dives is an action on the logbook, not a setting. Remove the row « Renuméroter les plongées » (`id: 'renumber'`) from Réglages › Carnet in `app/src/pages/Settings.svelte`, with its dialog state there, on every device. It stays where the mock-ups already put it: the Carnet ⋮ menu (« Renuméroter les plongées », phone, tablet and the desktop list's ⋮), the selection menu (« Renuméroter à partir d’ici ») and the dive's ⋮ menu (« Renuméroter la plongée »). No mock-up shows it in Réglages. If a search in Réglages finds « renuméroter », point the result to the Carnet menu item or drop it.
 
 **Test:** Réglages › Carnet has no renumber row; the Carnet ⋮ menu still renumbers.
 
-## [ ] 2026-11-23-362 Remove offline maps entirely (TODO #103)
+*Done 23 November 2026: row, dialog state and the unused `renumber.label`/`renumber.text` keys removed; the Carnet, selection and dive menus are unchanged.*
+
+## [x] 2026-11-23-362 Remove offline maps entirely (TODO #103)
 
 Christian decided this on 23 November 2026. Work in `main`. Benthic drops offline maps. The maps (Sites, site cards, dive detail) stay online maps; everything that downloads, stores, updates or mentions map packages for offline use goes away, on phone (Android, iPhone), tablet and desktop.
 
@@ -7036,3 +7038,263 @@ Christian decided this on 23 November 2026. Work in `main`. Benthic drops offlin
 Mock-ups: the « Cartes hors ligne » subgroups are deleted from the phone and tablet canvases and « Réglages · bureau, cartes hors ligne » from the desktop page; every settings, account sheet and offer board is updated (« Feuille du compte, modifications en attente · Android », « Réglages » overviews, « Tout ce qui est inclus » boards, the desktop « Réglages » boards).
 
 **Test:** no « Cartes hors ligne » anywhere in the app (search the translations too); the account sheet's Réglages row has no badge; the Sites map works online as before; upgrading a device that had downloaded regions frees their space.
+
+*Done 23 November 2026: the settings pages, `offline-maps.svelte.js`, the dialogs, the area screen and their translations are removed; the map tiles are read from OpenFreeMap only (`app/src/lib/map-tiles.js`, the simplified world map still draws when there is no network); native: `MapsManager`, `MapsDownloadWorker` and the plugin methods are removed on Android and iOS (WorkManager, foreground service, BGTask and the `offline-maps` notification channel with them), replaced by `LegacyOfflineMaps`, which deletes the stored packages at every start (a no-op once they are gone). The `bc.offlineMaps*` device keys are no longer read. The « Sites des plongeurs » row of the offer is now listed so that the group « Sites » is not empty.*
+
+## [x] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthic+, tout ce qui est inclus · Android » (phone canvas, page « Pour commencer », now right of « Benthic+, l’offre · Android »).
+
+- The price block stays at the end of the page, sticky at the bottom (« Abonnement Benthic+ », 14,99 $ US par an, soit 1,25 $ par mois, « Résiliable en tout temps », « S’abonner »). It now follows the last group of features directly, 16 dp below it, with no stretch of empty space between them.
+- Under « S’abonner », a centred text button « Continuer sans abonnement » (14 sp, semibold, #1F5C99, 40 dp high): it closes the page and goes on without subscribing (back to Carnet, or to where the offer was opened from), and creates no account.
+- Remove the note « Toujours gratuit, sans abonnement : le téléchargement des ordinateurs de plongée, le planificateur, les outils de gaz, les statistiques et l’exportation du carnet. »
+
+Same on the iPhone and tablet versions of this page.
+
+**Test:** open « Tout ce qui est inclus », scroll to the end: no « Toujours gratuit » note, the price block right after the features, and « Continuer sans abonnement » leaves without subscribing.
+
+*Done 23 November 2026: the button reuses the offer's « Continuer sans abonnement » and its exit (`onwithout`: back to where the offer was opened from, no account); the footer follows the last group 16 dp below it (a grid on tablets, the button on its own line); the key `benthicPlus.all.free` is removed. No mock-up file was in the repository: built from the task text.*
+
+## [x] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-ups: « Icônes de Icon.svelte · Android » and « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »). Christian handles the licence question himself.
+
+**Style.** Material Symbols **Rounded** only (not Outlined), weight 400, grade 0, optical size 24, unfilled. Source of each glyph: `https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/<name>/materialsymbolsrounded/<name>_24px.svg` (viewBox `0 -960 960 960`).
+
+**`app/src/components/Icon.svelte`.** For each key below, remove its stroke path from `paths` and put the Rounded glyph's path in `symbols` under the **same key** (callers do not change; the right column is the Material Symbols name). `key` is already in `symbols`: replace its Outlined path with the Rounded one. Then remove the special cases that no longer apply (the 4 px stroke of `more`, any per-key stroke tweak for a key that is now a symbol). The `weight` prop has no effect on a symbol; that is expected.
+
+| Key in Icon.svelte | Material Symbols (Rounded) |
+| --- | --- |
+| `archive` | `archive` |
+| `arrowBack` | `arrow_back` |
+| `arrowDown` | `arrow_downward` |
+| `arrowRight` | `arrow_forward` |
+| `arrowUp` | `arrow_upward` |
+| `bell` | `notifications` |
+| `blender` | `blender` |
+| `bluetooth` | `bluetooth` |
+| `bluetoothOff` | `bluetooth_disabled` |
+| `book` | `book` |
+| `briefcase` | `work` |
+| `calendar` | `calendar_today` |
+| `camera` | `photo_camera` |
+| `check` | `check` |
+| `checkCircle` | `check_circle` |
+| `chevron` | `chevron_right` |
+| `clock` | `schedule` |
+| `close` | `close` |
+| `cloud` | `cloud` |
+| `cloudCheck` | `cloud_done` |
+| `cloudDownload` | `cloud_download` |
+| `cloudUpload` | `cloud_upload` |
+| `columns` | `view_column` |
+| `copy` | `content_copy` |
+| `delete` | `delete` |
+| `desaturation` | `timer` |
+| `device` | `smartphone` |
+| `document` | `description` |
+| `download` | `download` |
+| `edit` | `edit` |
+| `error` | `error` |
+| `exitFullscreen` | `fullscreen_exit` |
+| `expand` | `expand_more` |
+| `export` | `upload` |
+| `file` | `draft` |
+| `filter` | `filter_list` |
+| `folder` | `folder` |
+| `fullscreen` | `fullscreen` |
+| `globe` | `language` |
+| `history` | `history` |
+| `idCard` | `id_card` |
+| `image` | `image` |
+| `info` | `info` |
+| `key` | `key` |
+| `keyboard` | `keyboard` |
+| `lightbulb` | `lightbulb` |
+| `link` | `link` |
+| `locate` | `my_location` |
+| `lock` | `lock` |
+| `login` | `login` |
+| `logout` | `logout` |
+| `mail` | `mail` |
+| `map` | `map` |
+| `menu` | `menu` |
+| `merge` | `merge` |
+| `more` | `more_vert` |
+| `moreCircle` | `pending` |
+| `offline` | `cloud_off` |
+| `openInNew` | `open_in_new` |
+| `personAdd` | `person_add` |
+| `phone` | `smartphone` |
+| `pinOff` | `location_off` |
+| `place` | `location_on` |
+| `plane` | `flight` |
+| `plus` | `add` |
+| `profile` | `person` |
+| `qr` | `qr_code_2` |
+| `redo` | `redo` |
+| `refresh` | `refresh` |
+| `remove` | `do_not_disturb_on` |
+| `renumber` | `tag` |
+| `seal` | `verified` |
+| `search` | `search` |
+| `server` | `dns` |
+| `settings` | `settings` |
+| `share` | `share` |
+| `sites` | `location_on` |
+| `split` | `call_split` |
+| `statistics` | `bar_chart` |
+| `sync` | `sync` |
+| `tablet` | `tablet_android` |
+| `tools` | `tune` |
+| `trash` | `delete` |
+| `tune` | `tune` |
+| `undo` | `undo` |
+| `upload` | `upload` |
+| `visibility` | `visibility` |
+| `visibilityOff` | `visibility_off` |
+| `warning` | `warning` |
+| `wrench` | `build` |
+
+90 keys. Several keys now share a glyph on purpose: `delete` and `trash` (delete), `place` and `sites` (location_on), `device` and `phone` (smartphone), `export` and `upload` (upload), `tools` and `tune` (tune).
+
+**Kept as Benthic drawings** (no faithful equivalent; unchanged): account, bestMix, computer, depthGauge, desktop, diveComputer, folderDownload, git, logbook, notebook, plan, plusMark, simplifyProfile, trip, tripRemove, ungroup, wristComputer.
+
+**`app/src/components/GearIcon.svelte`.** Replace the `diveKnife` path (a dive knife on the diagonal: pointed blade with a serrated back, guard, rounded handle with two grip lines; stroke 1.8 on the 24 grid like the other gear icons):
+
+```
+M10.9 15.8L18.3 8.4L20.4 5.6L21.1 2.0L17.0 4.3L14.5 6.8L14.5 8.0L13.3 8.0L13.4 9.2L12.2 9.1L12.3 10.3L11.1 10.2L8.2 13.1zM7.0 11.9L12.1 17.0M8.4 13.3L2.9 18.8L2.7 20.2L3.8 21.3L5.2 21.1L10.7 15.6M6.6 15.1L8.9 17.4M4.8 16.9L7.1 19.2
+```
+
+**Test:** every screen with icons (Carnet, détail, Sites, Profil, Réglages, the account sheet, the download flow, the desktop table) shows the Rounded glyphs at the same sizes and colours, nothing missing or blank; ⋮ is clearly visible; the gear list shows the new knife.
+
+**Done (23 November 2026).** Built from the task text (the canvas mock-ups are not in the repository). 89 keys of `Icon.svelte` are Material Symbols Rounded glyphs in `symbols` under the same keys (`key` too: Outlined replaced by Rounded); their strokes are gone from `paths`, with the `more` 4 px stroke special case. `tools/build-icon-symbols.mjs` fetches each glyph from the raw GitHub URL and rewrites the `symbols` block (run it again to regenerate). `diveKnife` of `GearIcon.svelte` has the new drawing. `tests/app/icon-sets.test.mjs` checks the 89 symbols, the 18 drawings, shared glyphs and that every `<Icon name>` exists; the tests that read the old paths (`first-launch`, `icons-mockups`) follow. `app/src/pages/Settings.svelte` still has its own inline copy of the old delete icon in the computer menu (not touched here).
+
+## [x] 2026-11-23-365 Correction to task 364: `blender` stays a Benthic drawing (a cylinder being filled)
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de Icon.svelte · Android » (phone canvas, page « Thème et couleurs »).
+
+In task 364, `blender` was listed as Material Symbols `blender`: drop that line. Material's `blender` is a kitchen blender, which reads oddly for gas blending. `blender` stays in `paths` (stroke drawing, not in `symbols`) with this new drawing: two lines from the left merging into one arrow that points at a dive cylinder with its valve.
+
+```
+M13.5 10a3.5 3.5 0 0 1 7 0v9.5a1.5 1.5 0 0 1-1.5 1.5h-4a1.5 1.5 0 0 1-1.5-1.5zM17 6.5V3.5M15 3.5h4M2.5 6c3 0 3.5 6 6 6M2.5 18c3 0 3.5-6 6-6h2.5M9.5 9.5L12 12l-2.5 2.5
+```
+
+It shows wherever `blender` is used: the « Mélangeur de gaz » tile in Outils and the desktop tools menu, « Préparer ce mélange » in Meilleur mélange (phone and desktop), and « Analyse des gaz » in the Benthic+ offer. So 89 keys become Material Symbols, not 90; 18 stay Benthic drawings.
+
+**Test:** Outils shows the cylinder icon on the « Mélangeur de gaz » tile; « Préparer ce mélange » shows it too.
+
+**Done (23 November 2026).** `blender` stays in `paths` with the cylinder-being-filled drawing of the task, so 89 keys are symbols and 18 stay drawings; checked by `tests/app/icon-sets.test.mjs` and on the Outils tiles, phone and desktop.
+
+## [x] 2026-11-23-366 Desktop dive detail, « Équipement » tab: one card per section
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet · bureau, détail, onglet Équipement » (tablet and desktop canvas, page Bureau, subgroup « Détail d’une plongée »), redrawn. Same data and same editing as today; only the layout changes.
+
+- Keep the hint « Les champs gris se modifient d’un clic et s’enregistrent tout de suite. » at the top.
+- Below it, five white cards (16 px corners, 16 px padding, 14 px apart, the pane's usual gap). Each card has a header: a 40 px round icon in #D4E2F2 with the icon in #114477 (stroke 1.8), the title (16 px, semibold, #1F2124) and, where noted, an action on the right. The old 140 px label column and the small uppercase section titles go away.
+  1. **Kit** (Benthic+). Header action: text button « Changer de kit » with a chevron, which opens the kit list as today. Under the header, aligned with the title: the kit's name (17 px, medium) followed by « · 6 pièces » (14 px, grey), then one line « A rempli les champs ci-dessous ; chacun reste modifiable. » (13 px, grey). Icon: `briefcase`.
+  2. **Ordinateurs de plongée**. Each computer is a 64 px grey row (#ECEAE4, 12 px corners): its photo (48 px, white tile), the name (15 px, medium) and « Principal · n° 3A2F1C07 » below (13 px, grey). Click to change it, as today. The old « Deuxième » field becomes a text button « + Ajouter un deuxième ordinateur ». Icon: `diveComputer`.
+  3. **Protection thermique** (was « Protection et lest »). « Combinaison » and « Sous-vêtement » (Benthic+) side by side in two equal columns, label above each field (13 px, grey), 48 px grey fields with a chevron. Icon: the gear `suit` icon.
+  4. **Lest**. Header action: the total, « total » (13 px, grey) then « 8 kg » (22 px, semibold, tabular figures). Under it, one chip per weight (40 px, 8 px corners, 1 px #8F8D86 border: « Ceinture 5 kg » with a ✕ to remove it), then a dashed chip « + Ajouter ». Then « Ce lest était » (Benthic+), label aligned left with the chips, and under it the three-way selector (Trop léger, Juste, Trop lourd), 360 px wide, centred in the card. Icon: the gear `weights` icon.
+  5. **Autre équipement** (Benthic+). Header action: text button « + Ajouter » (it replaces the dashed « Ajouter de l’équipement » tile). Items in two columns, 56 px grey rows: a 36 px white round tile with the gear icon, the name, and a 48 px ✕ « Retirer … de cette plongée ». Icon: the gear `bcd` icon. A knife uses the new `diveKnife` drawing (task 364).
+- Leave 88 px empty at the end of the pane so the + floating button never covers the last row.
+
+**Test:** on the desktop, open a dive, tab Équipement: five cards; change the kit, a computer, the suit, a weight and an item as before; the « Ce lest était » selector is centred and narrower; scroll to the end: the + button does not hide the last item. A free user does not see the Kit card, « Sous-vêtement », « Ce lest était » or « Autre équipement ».
+
+**Done (23 November 2026).** Built from the task text (the canvas mock-up is not in the repository; `docs/mockups/bureau-carnet-onglet-equipement.dc.html` is the old layout). `DesktopDiveFields.svelte` draws the tab as five `DesktopEquipmentCard`s (kit, computers, protection thermique, lest, autre équipement) under the hint; `DesktopWeights` has removable 40 px chips, a dashed « + Ajouter » chip and no total (it is in the card header); `DesktopOtherGear` has 56 px grey rows and no add tile (« + Ajouter » is in the card header); `DesktopEditField` has a `tall` 48 px variant with a chevron. « Changer de kit » is a text button with the kit select laid over it. Computers stay read-only and the add button stays disabled, as the old fields were. 64 px + the pane's 24 px margin leave 88 px at the end. `tests/e2e/desktop-equipment.mjs` (`--equipment-only`) checks the free and Benthic+ tabs, the weight chip, total and centred selector, a knife item, and the end of the pane. Also fixed: `DesktopWeights` threw « Cannot read properties of null » when a weight was kept (bindings on `editing`).
+
+## [ ] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (the « Photos et vidéos » section of the dive detail). Mock-ups: phone canvas, page Android, subgroup « Photos et vidéos (Benthic+) », just before « Plusieurs ordinateurs »: « Photos et vidéos de la plongée, « Tout voir » », « … sélection », « … retirer de la plongée », « Photo en plein écran », « … menu », « Vidéo en plein écran ». Android phone only for now; the other devices come later.
+
+**Gallery** (opened by « Tout voir », and by touching a thumbnail of the section, which opens the viewer on that item).
+- Top app bar: back arrow, title « Photos et vidéos », subtitle « N° 5 · Lake Coleridge · 2014-04-02 » (number, site, date), ⋮ on the right.
+- Under it, one line: green cloud-with-check icon, « 7 photos et 2 vidéos, sur tous vos appareils · 186 Mo ».
+- A grid of square thumbnails, 3 columns, 3 dp gaps, edge to edge, in the order of the dive (time taken). Bottom left of each thumbnail: the depth of the profile at the moment the picture was taken (« 18,4 m », white, 12 sp semibold, small shadow), from the picture's offset in the dive (Subsurface's picture offset) and the profile; no depth when the offset falls outside the dive. Videos: a play disc in the centre and the duration bottom right (« 0:42 »).
+- « Ajouter » is a FAB at the bottom right (56 dp, same style as the Carnet's +: 16 dp corners, #EBEAE5, small shadow), « Ajouter des photos ou des vidéos »; 96 dp of empty space under the grid so it never hides the last row. Same picker as the section's « Ajouter » tile.
+
+**Selection** (long press on a thumbnail).
+- The top bar turns #D4E2F2: ✕ (« Annuler la sélection »), « 2 sélectionnées », then Partager and Retirer (trash icon) on the right. No FAB while selecting.
+- Each thumbnail shows an empty circle top left; a selected one shrinks slightly with rounded corners and a filled #114477 check.
+- Retirer opens a basic dialog (no ✕): « Retirer 2 photos de la plongée ? » (« 2 vidéos », « 1 photo et 1 vidéo » as the case may be), « Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la galerie de l’appareil où vous les avez prises. », buttons « Annuler » and « Retirer » (#B3261E).
+
+**Photo full screen.**
+- Black background, the photo fitted to the width; swipe left and right to go through the dive's pictures; small page dots under it (the current one longer).
+- Over the top, on a dark gradient: back arrow, « 2 sur 9 », Partager, ⋮. Touching the photo hides and shows the bars.
+- At the bottom, one line in white at 85 %: « mer. 2014-04-02, 10 h 11 · Olympus TG-6 » (date and time taken, camera model when the file says it). No depth, no time in the dive, no temperature, no profile.
+- ⋮ menu: « Remplacer la photo du site » (uses this photo as the site's photo) and « Retirer de la plongée » (same dialog as above, for one item). Saving to the device's gallery goes through Partager; no separate item.
+
+**Video full screen.** Same screen, plus the player controls above the bottom line: a 48 dp round Lecture/Pause button, elapsed time, a seek bar, total time, and a mute button. No big play disc over the video while it plays.
+
+**Free user:** none of these screens (the section is hidden, task 359).
+
+**Test:** from a dive with photos and videos, « Tout voir » shows the grid in dive order with depths; the FAB adds pictures; a long press selects, Partager shares, Retirer asks then removes on every device; touching a photo opens it full screen, swiping changes picture, ⋮ offers the two items; a video plays with its controls.
+
+## [ ] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Same feature as task 367 (Android phone): same content, same rules (dive order, depth on thumbnails from the picture's offset, Partager, Retirer with confirmation, « Remplacer la photo du site », the bottom line « date, heure · appareil », no depth or profile in the viewer, nothing for a free user). Only the platform patterns change. Mock-ups, subgroup « Photos et vidéos (Benthic+) » on each page: phone canvas, page iPhone (before « Modifier une plongée »); tablet and desktop canvas, pages Tablette (before « Plusieurs ordinateurs »), iPad (after « Modifier une plongée ») and Bureau (before « Téléchargement, partage et voyage »).
+
+**iPhone.**
+- Gallery: navigation bar with the back chevron on the left and, on the right, « Sélectionner » and + (« Ajouter des photos ou des vidéos »); below it, the large title « Photos et vidéos », then « N° 5 · Lake Coleridge · 2014-04-02 », the cloud line (13 pt), and the 3-column grid with 2 pt gaps.
+- Selection (« Sélectionner »): « Annuler » on the left, « 2 sélectionnées » as title; thumbnails show an empty circle top right, a selected one a blue border and a filled check. A bottom toolbar: Partager on the left, « 2 photos sélectionnées » in the middle, the trash on the right.
+- The trash opens an action sheet: the explanation (« Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la photothèque où vous les avez prises. »), the destructive « Retirer 2 photos de la plongée », then « Annuler ».
+- Viewer: black; translucent navigation bar with « ‹ Photos », the title « 2 sur 9 » with the date and time under it, and the « … » button whose pull-down menu has « Remplacer la photo du site ». Translucent bottom toolbar: Partager on the left, the camera model in the middle, the trash (« Retirer de la plongée ») on the right. Swipe to change picture. Video: the player controls sit above the toolbar.
+
+**Android tablet** (landscape mock-ups; portrait follows the same layout). Same as the phone (task 367) with a 6-column grid with 4 dp gaps and 8 dp corners inside 24 dp margins, the FAB at 24 dp from the corner; the viewer centres the picture and adds 56 dp round ‹ › buttons on each side (Précédente, Suivante); the bottom line and the video controls sit under the picture, 120 dp from the sides. Selection and the Retirer dialog are as on the phone.
+
+**iPad.** Like the iPhone, with « ‹ Plongée » as back label, a 6-column grid, and the ‹ › buttons on each side of the viewer.
+
+**Desktop.**
+- « Tout voir » opens a 960 px dialog over the window (28 px corners): « Photos et vidéos » with the dive under it, a filled « + Ajouter » button and ✕ in the header, the cloud line, a 5-column grid (6 px gaps, 8 px corners), and the hint « Double-clic pour ouvrir · Ctrl+clic pour sélectionner plusieurs éléments ». Selected items show the check; with a selection, Partager and Retirer replace « Ajouter » in the header; Suppr also removes (with the confirmation dialog).
+- Viewer: covers the window under the title bar, dark (#0B0B0C). Top bar: ✕ (« Fermer (Échap) »), « 2 sur 9 · mer. 2014-04-02, 10 h 11 · Olympus TG-6 », then Partager, Retirer de la plongée and ⋮ (« Remplacer la photo du site »). The picture is centred, ‹ › buttons on each side (← and → keys too), and a strip of 64 px thumbnails at the bottom with the current one outlined. Video: the controls appear over the bottom of the video.
+
+**Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
+
+## [ ] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
+
+Christian asked for this on 23 November 2026. Work in `main`. Benthic does not use Subsurface's automatic trip grouping (`autogroup`): the value is false, and the setting is not shown anywhere.
+
+- **Settings:** remove the row « Regrouper les plongées en voyages » from Réglages › Carnet on every device (`pages/Settings.svelte`, id `autogroup`), with its strings (`settings.autogroup`, `desktop.undo.autogroup`, the « Regrouper en voyages » menu label if it is still used, the undo name in `lib/undo-name.js`) and `setAutogroup()` in `lib/logbook.svelte.js` once nothing calls it. Mock-ups updated: « Réglages, Carnet » on Android, iPhone, Android tablet (landscape and portrait) and desktop, and the bottle-choice board that shows the same list.
+- **Behaviour:** Benthic never creates trips by itself. Downloads, imports and new logbooks must not group dives into trips automatically, whatever the logbook says. A logbook made in Subsurface may have `autogroup` on: do not rewrite the diver's file just for this if Benthic can ignore the flag on its side (pass « off » to the core's import and download path); if the core can only read it from the logbook, tell Christian before writing it.
+- Unchanged: the trips themselves (make, rename, add to, remove from, « Défaire le voyage »), and the trips already in a logbook.
+- Docs updated by the design agent: `docs/ui-specification.md` (the settings table and the note on what the logbook stores) and `docs/ui-writing.md` (example changed).
+
+**Test:** Réglages › Carnet has no « Regrouper les plongées en voyages » on any device; download or import several dives from different days: no trip is created; a Subsurface logbook with `autogroup` on keeps its existing trips and gets no new automatic ones from Benthic.
+
+## [ ] 2026-11-23-370 Remove the « Afficher les champs photos et vidéos » setting; About: « Site Web » replaces « Exporter mon carnet » (TODO #191, #192)
+
+Christian asked for this on 23 November 2026. Work in `main`.
+
+**1. Photos and videos setting (TODO #191).** Remove « Afficher les champs photos et vidéos » from Réglages › Carnet on every device (`pages/Settings.svelte`, id `showPhotos`), the `showPhotos` setting in `lib/settings.svelte.js` (drop the stored value too) and its strings (`settings.showPhotos`). The « Photos et vidéos » section of the dive detail, and any photo field of « Modifier la plongée », now depend on the subscription alone: always shown for a Benthic+ subscriber, never for a free user or the demo logbook (task 359). Replace `settings.showPhotos` in `pages/DiveDetail.svelte` (and anywhere else) with the Benthic+ check. Mock-ups updated: « Réglages, Carnet » on Android, iPhone, Android tablet (landscape and portrait) and desktop, and the bottle-choice board.
+
+**2. About (TODO #192).** In the card « Libre, et votre carnet aussi » of À propos, remove « Exporter mon carnet ». In its place, « Site Web »: outlined button, globe icon, opens `https://benthicdivelog.app/` in the browser (aria-label « Site Web de Benthic (s’ouvre dans le navigateur) »). « Voir sur GitHub » and « Site Web » sit side by side on one row, centred horizontally, each as wide as its label (no longer full width on phones), on every device; they wrap only if the screen is too narrow. The sentence « Exportable en tout temps, votre carnet vous appartient » stays; exporting stays in the logbook's menu. Mock-ups: « À propos » on Android, iPhone, Android tablet (landscape and portrait) and desktop.
+
+Docs updated by the design agent: `docs/ui-specification.md` (photos section, About card) and `docs/advanced-settings.md` (row removed).
+
+**Test:** Réglages › Carnet has no photos and videos switch; a subscriber sees the Photos et vidéos section of a dive with pictures, a free user does not; À propos shows « Voir sur GitHub » and « Site Web » centred on one row, and « Site Web » opens benthicdivelog.app.
+
+## [x] 2026-11-23-371 New `rebreather` drawing in `GearIcon.svelte`
+
+Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »).
+
+The rebreather icon used to show three cylinders side by side and read as a twin set. Replace the `rebreather` path in `app/src/components/GearIcon.svelte` with this drawing, modelled on the rebreather silhouette of the Gaz card (« Gaz d’une plongée en recycleur »): two tall narrow cylinders on each side, the scrubber between them sharing their inner edges (one outline, no gaps), starting a little lower, on a trapezoid stand, with the two hoses from the scrubber's top to the cylinders. Stroke 1.8 on the 24 grid like the other gear icons.
+
+```
+M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM16.47 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM9.47 3.89H14.53V19.89H9.47zM10.9 19.89L9.9 22.40H14.1L13.1 19.89M10.74 3.89C10.42 2.63 9.16 2.21 7.89 2.11M13.26 3.89C13.58 2.63 14.84 2.21 16.11 2.11
+```
+
+**Test:** the gear list, the type picker of « Nouvelle pièce » and the kit pages show the new rebreather icon at every size; it no longer looks like a twin set.
+
+**Done (23 November 2026).** The `rebreather` path of `GearIcon.svelte` is the given drawing, stroke 1.8 on the 24 grid like the others. No test read the old path. Checked at 24 px on the gear list and the type picker of « Nouvelle pièce » (desktop).
+
+## [ ] 2026-11-23-372 Desktop: the logbook list header adapts to the column's width (TODO #155)
+
+Christian asked for this on 23 November 2026. Work in `main`. It is mostly a bug (in a dive's detail, the first column's header squeezes the search box and the ⋮ menu disappears when space runs out), with a small design part. Mock-up: « En-tête de la liste du carnet, selon la largeur · bureau » (tablet and desktop canvas, page Bureau, under « Carnet · bureau, détail, onglet Notes »).
+
+1. **Wide column (520 px and more, to be tuned):** unchanged: title « Carnet » with its summary line, the search box (Ctrl+F), the columns button, ⋮.
+2. **Narrow column (under the threshold):** the search box becomes a 40 px icon button `search` (« Rechercher dans le carnet (Ctrl+F) ») placed left of the columns button, then ⋮. The summary line under « Carnet » truncates with an ellipsis. The three buttons never disappear, whatever the width.
+3. **Narrow column, search open:** a click on the search button, or Ctrl+F, opens the field across the whole header in place of the title (focused, 2 px #114477 outline), with ✕ (`close`, « Fermer la recherche (Échap) ») at its end; the columns button and ⋮ stay on its right. ✕ closes it and clears the search; Échap closes it when the field is empty. While a search is active the field stays open.
+
+Icons: Material Symbols Rounded `search`, `view_column` (key `columns`), `more_vert`, `close` (task 364). Pick the threshold from the real header (title, summary and the three buttons must fit without overlap); 520 px is the mock-up's value.
+
+**Test:** on the desktop, open a dive and narrow the window: below the threshold the search box turns into the magnifier, ⋮ and the columns button stay visible at every width; the magnifier and Ctrl+F open the field over the title; ✕ and Échap close it; the search results are unchanged.

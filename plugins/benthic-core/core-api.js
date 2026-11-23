@@ -26,18 +26,6 @@ export { waterTypeOf };
  */
 
 /**
- * An offline map region download (Android; the screens read it with mapsDownloads and the
- * "mapsDownload" event).
- * @typedef {Object} MapDownload
- * @property {string} id
- * @property {"queued"|"waiting-wifi"|"downloading"|"paused"|"failed"|"ready"} status
- * @property {number} tilesDone
- * @property {number} tilesTotal
- * @property {number} bytesReceived
- * @property {"network"|"space"|"server"|"limit"} [error] with status "failed"; "limit" is the 50 MiB stop
- */
-
-/**
  * @typedef {Object} LogbookComputer
  * @property {string} model
  * @property {string} serial empty string when unknown
@@ -641,7 +629,7 @@ export { waterTypeOf };
  *   DEVELOPMENT ONLY (debug builds: rejects NOT_DEBUG otherwise): the app's own data is erased as on a first install. The
  *   core closes its log; the device logbook, the working copies of the server, every credential and the data key, the
  *   staged imports and exports go. Kept: the alpha's cache (`.subsurface`) unless `keepAlpha` is false, the development
- *   authority file, the offline maps. No server is called.
+ *   authority file. No server is called.
  * @property {() => Promise<{key: string}>} dataKeyRead
  *   Release edition (docs/architecture.md, section 11.5): the device's data key for the sensitive items (blood group,
  *   emergency contact, certifications), 32 random bytes as base64, from the platform's secure storage (Android
@@ -851,33 +839,6 @@ export { waterTypeOf };
  * @property {() => Promise<{level: number}>} contrastLevel
  *   The system contrast level: Android 14+ UiModeManager.getContrast() (0 by default, up to 1),
  *   iOS 1 with « Augmenter le contraste », else 0.
- * @property {() => Promise<{freeBytes: number, totalBytes: number}>} mapsFreeSpace
- *   Free and total space of the storage that holds the offline maps.
- * @property {(options: {id: string, bbox: number[], maxZoom: 12|14, urlTemplate: string, version: string, allowCellular: boolean, title: string}) => Promise<void>} mapsTilesStart
- *   Queues a region: the rectangle `bbox` = [west, south, east, north] in degrees (west > east
- *   crosses the antimeridian), tiles of zooms 0 to `maxZoom`, fetched one by one from
- *   `urlTemplate` (https, with {z}, {x}, {y}); `version` is kept with the region. Native code
- *   enforces the terms of the tile server, whatever the caller does: it counts the tiles itself
- *   and rejects with TOO_MANY_TILES above 3,000 (BAD_ARGUMENT for a malformed request; `id` is
- *   letters, digits, ".", "-", "_"); it sends at most 4 requests at a time, each with the
- *   User-Agent `Benthic/<versionName> (dive log app; https://github.com/remillc/benthic)`;
- *   it stops at 50 MiB with status "failed", error "limit", and removes the tiles. One region
- *   runs at a time, in the background with a notification titled `title`. Wi-Fi (an unmetered
- *   network) only unless `allowCellular`: status "waiting-wifi" meanwhile. The same request
- *   again resumes (tiles already on disk are skipped); an update of a ready id downloads aside
- *   and swaps when complete, so the old tiles stay readable. A tile answered 204 or 404 is an
- *   empty tile. Asks for the notification permission (Android 13+). Ready regions stay in
- *   mapsDownloads until mapsDelete. Status "failed" with error "space" when storage is short.
- * @property {(options: {id: string}) => Promise<void>} mapsDownloadPause keeps the tiles already downloaded
- * @property {(options: {id: string, allowCellular: boolean}) => Promise<void>} mapsDownloadResume
- *   Also retries a failed download.
- * @property {(options: {id: string}) => Promise<void>} mapsDownloadCancel removes the unfinished tiles
- * @property {() => Promise<{downloads: MapDownload[]}>} mapsDownloads
- * @property {() => Promise<{files: {id: string, sizeBytes: number, version: string, maxZoom: number}[]}>} mapsFiles ready regions on disk
- * @property {(options: {id: string}) => Promise<void>} mapsDelete the region, its unfinished tiles and its entry
- * @property {(options: {id: string, z: number, x: number, y: number}) => Promise<{base64: string}>} mapsReadTile
- *   One tile of a ready region, base64 ('' for an empty tile). Rejects with NOT_FOUND when the
- *   region or the tile is absent.
  * @property {() => Promise<PlannedDive[]>} listPlans
  * @property {(options: {request: PlanRequest, replaceId?: number, title?: string}) => Promise<EditResult>} savePlan
  *   Saves the plan as a planned dive, or replaces one: one undoable step. `title` is kept
@@ -941,9 +902,8 @@ export { waterTypeOf };
  * @property {() => Promise<void>} cancelDownload
  * @property {() => Promise<void>} openNotificationSettings opens the system's notification settings for Benthic (Android: the app's
  *   notification page; iOS: the app's page in Settings); the desktop has none. Inbox task 2026-11-23-356, part 4.
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile'|'stageProgress'|'pushStream'|'accessRequestOpened', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'sharedFile'|'stageProgress'|'pushStream'|'accessRequestOpened', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
- *   mapsDownload a MapDownload (progress at most twice a second, and every status change),
  *   accessRequestOpened {requestId} (Android): the system notification of an access request was touched, kept until a listener exists
  *   (cold start); iOS gets the same through the push plugin's pushNotificationActionPerformed.
  *   syncProgress {message}: each message of the core's git work while the cloud log syncs (benthic.h,
@@ -1242,16 +1202,7 @@ export const BenthicCore = {
   clearCrashReport: () => native.clearCrashReport(),
   networkStatus: () => native.networkStatus(),
   contrastLevel: () => native.contrastLevel(),
-  mapsFreeSpace: () => native.mapsFreeSpace(),
   placesSearch: (options) => native.placesSearch(options),
-  mapsTilesStart: (options) => native.mapsTilesStart(options),
-  mapsDownloadPause: (options) => native.mapsDownloadPause(options),
-  mapsDownloadResume: (options) => native.mapsDownloadResume(options),
-  mapsDownloadCancel: (options) => native.mapsDownloadCancel(options),
-  mapsDownloads: () => native.mapsDownloads(),
-  mapsFiles: () => native.mapsFiles(),
-  mapsDelete: (options) => native.mapsDelete(options),
-  mapsReadTile: (options) => native.mapsReadTile(options),
   bluetoothStatus: () => native.bluetoothStatus(),
   requestBluetoothPermission: () => native.requestBluetoothPermission(),
   enableBluetooth: () => native.enableBluetooth(),

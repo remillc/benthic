@@ -2,7 +2,7 @@
 // « Où je plonge le plus » (task 2026-11-14-152): the dives of the Statistics filter
 // counted per site and the area that holds most of them; the heat itself is a density
 // (lib/heat-density.js, task 2026-11-14-154).
-import { distanceKm } from './maps-logic.js';
+import { distanceKm } from './geo.js';
 
 /** Sites within this distance of the busiest place make up the area shown. */
 export const AREA_KM = 150;

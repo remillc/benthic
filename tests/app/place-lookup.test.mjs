@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, test } from 'node:test';
 import { placeAt, parseAddress, reverseAddressUrl, resetPlaceLookup } from '../../app/src/lib/place-lookup.js';
-import { resetPlacesSearch } from '../../app/src/lib/area-search.js';
+import { resetSlot } from '../../app/src/lib/nominatim.js';
 
 const answer = (address) => ({ status: 200, body: JSON.stringify({ name: 'x', address }) });
 const offlineHit = async () => ({ country: 'Canada', region: 'Ontario' });
@@ -11,7 +11,7 @@ const noOffline = async () => null;
 
 beforeEach(() => {
   resetPlaceLookup();
-  resetPlacesSearch();
+  resetSlot();
 });
 
 test('the request: reverse address lookup with six decimals, the language and address details', () => {

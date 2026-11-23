@@ -76,5 +76,23 @@ test('a size with a wrong volume or pressure names the field that is wrong', asy
   const metric = { cuft: false, psi: false };
   assert.deepEqual(typedSize('0', '200', metric), { invalid: 'volume' });
   assert.deepEqual(typedSize('3', 'x', metric), { invalid: 'pressure' });
-  assert.deepEqual(typedSize('80', '', { cuft: true, psi: false }), { invalid: 'volume' });
+  assert.deepEqual(typedSize('80', '', { cuft: true, psi: false }), { invalid: 'pressureNeeded' });
+});
+
+test('a type with no working pressure in cubic feet: no « 0 » shown, and a volume typed without the pressure asks for the pressure', async () => {
+  const { sizeFields, typedSize, sizeErrorKey } = await import('../../app/src/lib/cylinder-types.js');
+  const imperial = { cuft: true, psi: true };
+  const format = (v, d) => v.toFixed(d);
+  assert.deepEqual(sizeFields({ ml: 15000, mbar: 0 }, imperial, format), { volume: '', pressure: '' });
+  assert.deepEqual(typedSize('120', '', imperial), { invalid: 'pressureNeeded' });
+  assert.equal(sizeErrorKey('pressureNeeded'), 'settings.cylinders.pressureNeeded');
+  assert.equal(sizeErrorKey('volume'), 'settings.cylinders.volumeInvalid');
+  assert.deepEqual(typedSize('', '', { cuft: false, psi: false }), { invalid: 'volume' });
+});
+
+test('renaming a type keeps its size when the size fields were not touched, on the phone page and the desktop dialog', () => {
+  const page = readFileSync(new URL('../../app/src/pages/CylinderType.svelte', import.meta.url), 'utf8');
+  const dialog = readFileSync(new URL('../../app/src/components/DesktopCylinderTypeDialog.svelte', import.meta.url), 'utf8');
+  assert.match(page, /sizeUntouched && type \? \{ ml: type\.ml, mbar: type\.mbar \}/);
+  assert.match(dialog, /volume === start\.volume && pressure === start\.pressure \? \{ ml: type\.ml, mbar: type\.mbar \}/);
 });

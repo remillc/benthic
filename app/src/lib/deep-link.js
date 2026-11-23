@@ -16,7 +16,7 @@
 //   /plan/new, /plans/         Planner, saved plans
 //   /tools/, /tools/<tool>     Tools: desaturation, ead-mod, best-mix, blender
 //   /statistics/               Statistics
-//   /settings/, /settings/planner, /settings/maps/, /about
+//   /settings/, /settings/planner, /about
 //
 // The stable key of a dive. The core's dive id is a runtime id, numbered again
 // at each load, and the dive number can be changed by renumbering. Subsurface
@@ -60,7 +60,6 @@ const ROUTES = {
   '/plans/': { section: 'tools' },
   '/settings/': { section: 'account', over: true },
   '/settings/planner': { section: 'account', over: true },
-  '/settings/maps/': { section: 'account', over: true },
   '/about': { section: 'account', over: true },
 };
 

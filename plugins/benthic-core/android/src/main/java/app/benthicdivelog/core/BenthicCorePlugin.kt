@@ -42,8 +42,6 @@ import java.util.concurrent.Executors
     permissions = [
         Permission(strings = [Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT], alias = "bluetooth"),
         Permission(strings = [Manifest.permission.ACCESS_FINE_LOCATION], alias = "bluetoothLocation"),
-        // Android 13 and later: the notification of an offline map download.
-        Permission(strings = [Manifest.permission.POST_NOTIFICATIONS], alias = "notifications"),
     ],
 )
 class BenthicCorePlugin : Plugin() {
@@ -87,8 +85,8 @@ class BenthicCorePlugin : Plugin() {
             val limit = System.currentTimeMillis() - 12L * 3600 * 1000
             context.cacheDir.listFiles { f -> f.isFile && f.name.startsWith(IMPORT_PREFIX) && f.lastModified() < limit }?.forEach { it.delete() }
         }.start()
-        MapsManager.init(context)
-        MapsManager.listener = { event -> notifyListeners("mapsDownload", JSObject(event.toString())) }
+        // The regions of the removed offline maps: their files and notification channel go.
+        Thread { LegacyOfflineMaps.remove(context) }.start()
         val home = context.filesDir.absolutePath
         val caFile = File(context.cacheDir, "cacerts.pem")
         coreThread.execute {
@@ -727,7 +725,7 @@ class BenthicCorePlugin : Plugin() {
      * DEVELOPMENT ONLY (debuggable builds; refused otherwise): « Rejouer le premier lancement » as a full reset. The core closes
      * its log; the device logbook, the working copies of the server, every stored credential and the data key, the staged
      * imports and exports go. Kept: the alpha's cache (`.subsurface`, unless `keepAlpha` is false), the development
-     * authority (`cacerts.pem`), the offline maps and the stylesheets. No server is called.
+     * authority (`cacerts.pem`) and the stylesheets. No server is called.
      */
     @PluginMethod
     fun devResetApp(call: PluginCall) = onCoreThread(call) {
@@ -1350,7 +1348,7 @@ class BenthicCorePlugin : Plugin() {
                 try {
                     connection.connectTimeout = 15_000
                     connection.readTimeout = 15_000
-                    connection.setRequestProperty("User-Agent", MapsManager.userAgent)
+                    connection.setRequestProperty("User-Agent", userAgent)
                     connection.setRequestProperty("Accept", "application/json")
                     val status = connection.responseCode
                     val body = if (status in 200..299) connection.inputStream.bufferedReader().use { it.readText() } else ""
@@ -1398,137 +1396,21 @@ class BenthicCorePlugin : Plugin() {
         call.resolve(JSObject().put("level", level.toDouble()))
     }
 
-    // --- Offline maps (MapsManager, MapsDownloadWorker) ---
-
-    private val mapsIo: ExecutorService = Executors.newSingleThreadExecutor()
-
     override fun handleOnDestroy() {
         pushStream.close()
-        MapsManager.listener = null
         super.handleOnDestroy()
     }
 
-    @PluginMethod
-    fun mapsFreeSpace(call: PluginCall) {
-        val (free, total) = MapsManager.freeSpace()
-        call.resolve(JSObject().put("freeBytes", free).put("totalBytes", total))
-    }
-
-    /**
-     * Queues a region ({id, bbox, maxZoom, urlTemplate, version, allowCellular, title}). Rejects
-     * with TOO_MANY_TILES above 3,000 tiles (counted here, whatever the caller says) or BAD_ARGUMENT.
-     * Asks for the notification permission first (Android 13+), once; refused, the download still runs.
-     */
-    @PluginMethod
-    fun mapsTilesStart(call: PluginCall) {
-        if (parseMapsRequest(call) == null) return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && getPermissionState("notifications") == PermissionState.PROMPT) {
-            requestPermissionForAlias("notifications", call, "mapsNotificationResult")
-        } else {
-            startMapsDownload(call)
-        }
-    }
-
-    @PermissionCallback
-    private fun mapsNotificationResult(call: PluginCall) = startMapsDownload(call)
-
-    private class MapsRequest(
-        val id: String, val bbox: DoubleArray, val maxZoom: Int, val urlTemplate: String,
-        val version: String, val allowCellular: Boolean, val title: String,
-    )
-
-    /** The checked request of a call, or null after rejecting it. */
-    private fun parseMapsRequest(call: PluginCall): MapsRequest? {
-        val id = mapsId(call) ?: return null
-        val array = call.data.optJSONArray("bbox")
-        val bbox = if (array != null && array.length() == 4) DoubleArray(4) { array.optDouble(it, Double.NaN) } else null
-        val maxZoom = call.data.optInt("maxZoom", 0)
-        val urlTemplate = call.getString("urlTemplate")
-        val error = MapsManager.check(bbox, maxZoom, urlTemplate)
-        if (error != null) {
-            call.reject(if (error == "TOO_MANY_TILES") "More than ${MapsManager.MAX_TILES} tiles" else "Bad region request", error)
-            return null
-        }
-        return MapsRequest(
-            id, bbox!!, maxZoom, urlTemplate!!, call.getString("version") ?: "",
-            call.getBoolean("allowCellular") ?: false, call.getString("title") ?: id,
-        )
-    }
-
-    private fun startMapsDownload(call: PluginCall) {
-        val r = parseMapsRequest(call) ?: return
-        MapsManager.start(r.id, r.bbox, r.maxZoom, r.urlTemplate, r.version, r.allowCellular, r.title)
-        call.resolve()
-    }
-
-    @PluginMethod
-    fun mapsDownloadPause(call: PluginCall) {
-        MapsManager.pause(mapsId(call) ?: return)
-        call.resolve()
-    }
-
-    @PluginMethod
-    fun mapsDownloadResume(call: PluginCall) {
-        MapsManager.resume(mapsId(call) ?: return, call.getBoolean("allowCellular") ?: false)
-        call.resolve()
-    }
-
-    @PluginMethod
-    fun mapsDownloadCancel(call: PluginCall) {
-        MapsManager.cancel(mapsId(call) ?: return)
-        call.resolve()
-    }
-
-    @PluginMethod
-    fun mapsDownloads(call: PluginCall) {
-        val list = org.json.JSONArray()
-        for (e in MapsManager.downloads()) list.put(e.toEvent())
-        call.resolve(JSObject().put("downloads", list))
-    }
-
-    @PluginMethod
-    fun mapsFiles(call: PluginCall) {
-        val list = org.json.JSONArray()
-        for (r in MapsManager.files()) {
-            list.put(JSObject().put("id", r.id).put("sizeBytes", r.sizeBytes).put("version", r.version).put("maxZoom", r.maxZoom))
-        }
-        call.resolve(JSObject().put("files", list))
-    }
-
-    @PluginMethod
-    fun mapsDelete(call: PluginCall) {
-        MapsManager.delete(mapsId(call) ?: return)
-        call.resolve()
-    }
-
-    /** One tile of a ready region, base64 ('' for an empty tile). Rejects with NOT_FOUND. */
-    @PluginMethod
-    fun mapsReadTile(call: PluginCall) {
-        val id = mapsId(call) ?: return
-        // optInt, not getInt/getLong: those return null for some numbers.
-        val z = call.data.optInt("z", -1)
-        val x = call.data.optInt("x", -1)
-        val y = call.data.optInt("y", -1)
-        if (z < 0 || x < 0 || y < 0) return call.reject("Bad tile", "BAD_ARGUMENT")
-        mapsIo.execute {
-            try {
-                val bytes = MapsManager.readTile(id, z, x, y) ?: return@execute call.reject("No such tile", "NOT_FOUND")
-                call.resolve(JSObject().put("base64", Base64.encodeToString(bytes, Base64.NO_WRAP)))
+    /** `Benthic/<versionName> (dive log app; <repository>)`: no personal data. */
+    private val userAgent: String
+        get() {
+            val version = try {
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName
             } catch (e: Exception) {
-                call.reject(e.message ?: "Cannot read the tile", "FAILED")
+                null
             }
+            return "Benthic/${version ?: "unknown"} (dive log app; https://github.com/remillc/benthic)"
         }
-    }
-
-    /** The region id of a call: letters, digits, dot, dash, underscore (it names a directory). */
-    private fun mapsId(call: PluginCall): String? {
-        val id = call.getString("id")
-        if (id == null || !MapsManager.ID_PATTERN.matches(id) || id.contains("..")) {
-            call.reject("Bad region id", "BAD_ARGUMENT")
-            return null
-        }
-        return id
-    }
 
     /** Takes back the last conflict choice while it is not sent. */
     @PluginMethod

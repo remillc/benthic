@@ -13,6 +13,8 @@
   import ButtonGroup from './ButtonGroup.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
+  import DesktopEquipmentCard from './DesktopEquipmentCard.svelte';
+  import GearIcon from './GearIcon.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
   import DesktopConsumption from './DesktopConsumption.svelte';
@@ -33,7 +35,7 @@
   import { useKey } from '../lib/cylinder-use.js';
   import { formatCylinderSize, formatNumber, formatPressure, formatTemperature } from '../lib/format.js';
   import { t, tIfExists } from '../lib/i18n.js';
-  import { computerRole, consumption, cylinderSpan, gasCards, gasText, parseGas, parsePressurePair } from '../lib/desktop-detail.js';
+  import { computerRole, consumption, cylinderSpan, gasCards, gasText, parseGas, parsePressurePair, weightChips } from '../lib/desktop-detail.js';
   import { formatCoordinates } from '../lib/sites.svelte.js';
   import { focusSite } from '../lib/site-focus.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
@@ -284,6 +286,7 @@
     }
     return result.changes ? write(result.changes) : true;
   }
+  const weightsShown = $derived(weightChips(dive.weights, prefs));
   const feedback = $derived(feedbackOf(dive.tags));
   const feedbackOptions = $derived(FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) })));
   /** @param {string} value */
@@ -429,56 +432,94 @@
       </div>
     </div>
   {:else if tab === 'equipment'}
-    <!-- Équipement (mock-up bureau-carnet-onglet-equipement). -->
-    {#if plus && equipment}
-      <!-- Kit (Benthic+): fills the fields below, each stays editable. -->
-      <DesktopEditField
-        name="kit"
-        kind="choice"
-        label={t('desktopDetail.label.kit')}
-        value={equipment.kitId}
-        display={appliedKit?.name ?? ''}
-        note={appliedKit ? t('desktopDetail.kitPieces', { n: appliedKit.gearIds.length }) : ''}
-        options={kitOptions}
-        invitation={t('desktopDetail.invitation.kit')}
-        showHint={false}
-        onsave={(v) => chooseKit(v)}
-      />
-      <p class="bc-desktop-dive-fields--kit-note">{t('desktopDetail.kitNote')}</p>
-    {/if}
-    <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.computers')}</h3>
-    {#snippet noComputerPhoto()}{/snippet}
-    {#each dive.diveComputers ?? [] as dc, i (i)}
-      <DesktopEditField name="computer" kind="text" readonly label={computerRole(i)} value={dc.nickname || dc.model} display={[dc.nickname || dc.model, dc.serial ? t('desktopDetail.serial', { serial: dc.serial }) : ''].filter(Boolean).join(' · ')}>
-        {#snippet leading()}
-          {#if dc.model}<DcTile model={dc.model} size={32} radius={8} photo={ownComputerPhoto(dc.model, dc.serial)} fallback={dive.diveComputers?.length === 1 ? noComputerPhoto : undefined} />{/if}
+    <!-- Équipement (task 2026-11-23-366): one card per section. -->
+    <div class="bc-desktop-dive-fields--equipment">
+      {#if plus && equipment}
+        <!-- Kit (Benthic+): fills the fields below, each stays editable. A select laid over the text button opens the kit list. -->
+        <DesktopEquipmentCard name="kit" title={t('desktopDetail.label.kit')} indent>
+          {#snippet icon()}<Icon name="briefcase" size={22} />{/snippet}
+          {#snippet action()}
+            <span class="bc-desktop-dive-fields--kit-change" data-field="kit">
+              <span class="bc-desktop-dive-fields--text-button">{t('desktopDetail.changeKit')}<Icon name="chevron" size={20} /></span>
+              <select
+                class="bc-desktop-dive-fields--kit-select"
+                aria-label={t('desktopDetail.changeKit')}
+                value={equipment.kitId}
+                onchange={async (e) => {
+                  const select = /** @type {HTMLSelectElement} */ (e.currentTarget);
+                  if (select.value) await chooseKit(select.value);
+                  select.value = equipment?.kitId ?? '';
+                }}
+              >
+                <option value="">{t('desktopDetail.invitation.kit')}</option>
+                {#each kitOptions as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
+              </select>
+            </span>
+          {/snippet}
+          {#if appliedKit}
+            <p class="bc-desktop-dive-fields--kit-name">{appliedKit.name}<span class="bc-desktop-dive-fields--kit-pieces"> · {t('desktopDetail.kitPieces', { n: appliedKit.gearIds.length })}</span></p>
+            <p class="bc-desktop-dive-fields--kit-note">{t('desktopDetail.kitFilled')}</p>
+          {:else}
+            <p class="bc-desktop-dive-fields--kit-note">{t('desktopDetail.kitNote')}</p>
+          {/if}
+        </DesktopEquipmentCard>
+      {/if}
+
+      <DesktopEquipmentCard name="computers" title={t('desktopDetail.section.computers')}>
+        {#snippet icon()}<Icon name="diveComputer" size={22} />{/snippet}
+        {#snippet noComputerPhoto()}{/snippet}
+        {#each dive.diveComputers ?? [] as dc, i (i)}
+          <div class="bc-desktop-dive-fields--computer" data-field="computer">
+            <span class="bc-desktop-dive-fields--computer-tile" aria-hidden="true">{#if dc.model}<DcTile model={dc.model} size={48} radius={10} photo={ownComputerPhoto(dc.model, dc.serial)} fallback={dive.diveComputers?.length === 1 ? noComputerPhoto : undefined} />{/if}</span>
+            <span class="bc-desktop-dive-fields--computer-text">
+              <span class="bc-desktop-dive-fields--computer-name">{dc.nickname || dc.model}</span>
+              <span class="bc-desktop-dive-fields--computer-role">{[computerRole(i), dc.serial ? t('desktopDetail.serial', { serial: dc.serial }) : ''].filter(Boolean).join(' · ')}</span>
+            </span>
+          </div>
+        {/each}
+        <!-- Computers join a dive when it is downloaded: nothing to type here. -->
+        <button type="button" class="bc-desktop-dive-fields--text-button bc-desktop-dive-fields--add-computer" data-field="computer-add" disabled title={t('desktopDetail.addComputer')}>{t(computers.length ? 'desktopDetail.addSecondComputer' : 'desktopDetail.addFirstComputer')}</button>
+      </DesktopEquipmentCard>
+
+      <DesktopEquipmentCard name="protection" title={t('desktopDetail.section.protection')}>
+        {#snippet icon()}<GearIcon type="suit" size={22} />{/snippet}
+        <div class="bc-desktop-dive-fields--two-columns">
+          <DesktopEditField stacked tall name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
+          {#if plus && equipment && (undersuits.length || equipment.undersuitGearId)}
+            <DesktopEditField stacked tall name="undersuit" kind="choice" label={t('desktopDetail.label.undersuit')} value={equipment.undersuitGearId} options={undersuitOptions} invitation={t('desktopDetail.invitation.undersuit')} showHint={false} onsave={(v) => saveUndersuit(v)} />
+          {/if}
+        </div>
+      </DesktopEquipmentCard>
+
+      <DesktopEquipmentCard name="weights" title={t('desktopDetail.label.weights')}>
+        {#snippet icon()}<GearIcon type="weights" size={22} />{/snippet}
+        {#snippet action()}
+          {#if weightsShown.total}<span class="bc-desktop-dive-fields--total">{t('desktopDetail.weightTotal')}<strong>{weightsShown.total}</strong></span>{/if}
         {/snippet}
-      </DesktopEditField>
-    {/each}
-    <!-- Computers join a dive when it is downloaded: nothing to type here. -->
-    <DesktopEditField name="computer-add" kind="text" disabled label={computerRole(computers.length)} value="" invitation={t('desktopDetail.addComputer')} />
+        <div data-field="weights">
+          <DesktopWeights weights={dive.weights ?? []} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
+        </div>
+        {#if plus && dive.weights?.some((w) => w.grams > 0)}
+          <div class="bc-desktop-dive-fields--feedback">
+            <span class="bc-desktop-dive-fields--feedback-label" id="bc-df-feedback">{t('weightFeedback.title')}</span>
+            <div class="bc-desktop-dive-fields--feedback-group">
+              <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="bc-df-feedback" clearable rail />
+            </div>
+          </div>
+        {/if}
+      </DesktopEquipmentCard>
 
-    <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.protection')}</h3>
-    <DesktopEditField name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
-    {#if plus && equipment && (undersuits.length || equipment.undersuitGearId)}
-      <DesktopEditField name="undersuit" kind="choice" label={t('desktopDetail.label.undersuit')} value={equipment.undersuitGearId} options={undersuitOptions} invitation={t('desktopDetail.invitation.undersuit')} showHint={false} onsave={(v) => saveUndersuit(v)} />
-    {/if}
-    <div class="bc-desktop-dive-fields--row" data-field="weights">
-      <span class="bc-desktop-dive-fields--row-label">{t('desktopDetail.label.weights')}</span>
-      <DesktopWeights weights={dive.weights ?? []} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
+      {#if plus && equipment}
+        <DesktopEquipmentCard name="other-gear" title={t('desktopDetail.section.otherGear')}>
+          {#snippet icon()}<GearIcon type="bcd" size={22} />{/snippet}
+          {#snippet action()}
+            <button type="button" class="bc-desktop-dive-fields--text-button" onclick={() => (addingGear = true)}><Icon name="plus" size={18} />{t('desktopDetail.add')}</button>
+          {/snippet}
+          <DesktopOtherGear items={otherItems} onremove={removeGear} />
+        </DesktopEquipmentCard>
+        <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
+      {/if}
     </div>
-    {#if plus && dive.weights?.some((w) => w.grams > 0)}
-      <div class="bc-desktop-dive-fields--row">
-        <span class="bc-desktop-dive-fields--row-label" id="bc-df-feedback">{t('weightFeedback.title')}</span>
-        <ButtonGroup options={feedbackOptions} value={feedback} onchange={(v) => saveFeedback(v)} ariaLabelledby="bc-df-feedback" clearable rail />
-      </div>
-    {/if}
-
-    {#if plus && equipment}
-      <h3 class="bc-desktop-dive-fields--heading">{t('desktopDetail.section.otherGear')}</h3>
-      <DesktopOtherGear items={otherItems} onadd={() => (addingGear = true)} onremove={removeGear} />
-      <AddEquipmentSheet opened={addingGear} {equipment} onclose={() => (addingGear = false)} onadd={(next) => saveEquipment(next)} />
-    {/if}
   {:else if tab === 'gas'}
     <!-- Gaz (mock-up bureau-carnet-onglet-gaz): one card per cylinder, the selected one's fields, Consommation. -->
     <div class="bc-desktop-dive-fields--card">
@@ -540,12 +581,164 @@
       color: var(--bc-text-2);
     }
 
-    /* The note under the kit row: what applying a kit fills. */
+    /* The Équipement tab (task 2026-11-23-366): the cards, 14 px apart. 64 px at the end, plus the pane's 24 px margin, leave
+       88 px so the + floating button never covers the last row. */
+    .bc-desktop-dive-fields--equipment {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-bottom: 64px;
+    }
+
+    /* A text button of a card: « Changer de kit », « + Ajouter ». */
+    .bc-desktop-dive-fields--text-button {
+      width: auto;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 20px;
+      background: none;
+      color: var(--bc-on-table-selected);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      &:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+
+    .bc-desktop-dive-fields--add-computer {
+      align-self: flex-start;
+      padding-inline-start: 4px;
+    }
+
+    /* « Changer de kit »: the select is laid, invisible, over the button, so a click opens the kit list. */
+    .bc-desktop-dive-fields--kit-change {
+      position: relative;
+      display: inline-flex;
+      &:hover .bc-desktop-dive-fields--text-button {
+        background: color-mix(in srgb, currentColor 8%, transparent);
+      }
+    }
+
+    .bc-desktop-dive-fields--kit-select {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .bc-desktop-dive-fields--kit-name {
+      margin: 0;
+      font-size: 17px;
+      line-height: 24px;
+      font-weight: 500;
+      color: var(--bc-text);
+    }
+
+    .bc-desktop-dive-fields--kit-pieces {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--bc-text-2);
+    }
+
     .bc-desktop-dive-fields--kit-note {
-      margin: -2px 0 0 152px;
+      margin: 0;
       font-size: 13px;
       line-height: 18px;
       color: var(--bc-text-2);
+    }
+
+    /* A dive computer: 64 px grey row, its photo on a 48 px white tile, its name and its role. */
+    .bc-desktop-dive-fields--computer {
+      box-sizing: border-box;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px;
+      border-radius: 12px;
+      background: var(--bc-field-rest);
+    }
+
+    .bc-desktop-dive-fields--computer-tile {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--bc-surface);
+      overflow: hidden;
+    }
+
+    .bc-desktop-dive-fields--computer-text {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bc-desktop-dive-fields--computer-name {
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--bc-text);
+    }
+
+    .bc-desktop-dive-fields--computer-role {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
+    }
+
+    /* The suit and the undersuit: two equal columns. */
+    .bc-desktop-dive-fields--two-columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+
+    /* The weights total, in the card's header. */
+    .bc-desktop-dive-fields--total {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--bc-text-2);
+      & strong {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--bc-text);
+        font-variant-numeric: tabular-nums;
+      }
+    }
+
+    /* « Ce lest était »: the label with the chips, the three-way selector narrower and centred. */
+    .bc-desktop-dive-fields--feedback {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bc-desktop-dive-fields--feedback-label {
+      font-size: 13px;
+      color: var(--bc-text-2);
+    }
+
+    .bc-desktop-dive-fields--feedback-group {
+      width: min(360px, 100%);
+      align-self: center;
     }
 
     .bc-desktop-dive-fields--stack {
@@ -561,31 +754,6 @@
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
       gap: 12px 16px;
       min-width: 0;
-    }
-
-    .bc-desktop-dive-fields--heading {
-      margin: 18px 0 8px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      color: var(--bc-text-2);
-    }
-
-    .bc-desktop-dive-fields--row {
-      display: grid;
-      grid-template-columns: 140px minmax(0, 1fr);
-      align-items: start;
-      column-gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .bc-desktop-dive-fields--row-label {
-      min-height: 40px;
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      color: var(--bc-text-2);
     }
 
     .bc-desktop-dive-fields--card {

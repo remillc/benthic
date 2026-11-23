@@ -11,8 +11,7 @@
   import SyncFailureRow from './SyncFailureRow.svelte';
   import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { navigation, openOver, openSettings, openMapSettings, openAbout } from '../lib/navigation.svelte.js';
-  import { updatesCount } from '../lib/offline-maps.svelte.js';
+  import { navigation, openOver, openSettings, openAbout } from '../lib/navigation.svelte.js';
   import { t } from '../lib/i18n.js';
   import { accountLock } from '../lib/locked-data.svelte.js';
   import { layout, ios, desktopApp } from '../lib/layout.svelte.js';
@@ -34,7 +33,6 @@
   const accountLine = $derived(
     t(logbook.email ? (logbook.mode === 'git' ? (logbook.benthicPlus ? 'menu.serverDives' : 'menu.gitDives') : 'menu.cloudDives') : 'menu.localDives', { n: logbook.dives.length }),
   );
-  const mapUpdates = $derived(updatesCount());
 
   // The three versions of the sheet (task 2026-11-18-281): without a Benthic+ account (the release edition's free
   // version), with one, and the alpha's or a cloud account's, which keeps what it had.
@@ -200,18 +198,6 @@
         <span class="bc-account-sheet--row-label">{t('settings.title')}</span>
         <Icon name="chevron" size={20} />
       </button>
-      {#if mapUpdates > 0}
-        <!-- The message about the update opens the offline maps part of Réglages (todo 89). -->
-        <button type="button" class="bc-account-sheet--ios-row" onclick={() => go(openMapSettings)}>
-          <Icon name="map" />
-          <span class="bc-account-sheet--row-label">
-            {t('settings.groups.maps')}
-            <span class="bc-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
-          </span>
-          <span class="bc-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
-          <Icon name="chevron" size={20} />
-        </button>
-      {/if}
       <button type="button" class="bc-account-sheet--ios-row" onclick={() => go(openAbout)}>
         <Icon name="info" />
         <span class="bc-account-sheet--row-label">{t('about.title')}</span>
@@ -354,19 +340,6 @@
         <Icon name="chevron" size={20} />
       </a>
       <div class="bc-account-sheet--divider bc-account-sheet--inset"></div>
-      {#if mapUpdates > 0}
-        <!-- The message about the update opens the offline maps part of Réglages (todo 89). -->
-        <a href="#settings-maps" class="bc-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openMapSettings))}>
-          <Icon name="map" />
-          <span class="bc-account-sheet--row-label">
-            {t('settings.groups.maps')}
-            <span class="bc-account-sheet--row-line">{t('nav.mapUpdateWaiting')}</span>
-          </span>
-          <span class="bc-account-sheet--badge" aria-label={t('nav.mapUpdates', { n: mapUpdates })}>{mapUpdates}</span>
-          <Icon name="chevron" size={20} />
-        </a>
-        <div class="bc-account-sheet--divider bc-account-sheet--inset"></div>
-      {/if}
       <a href="#about" class="bc-account-sheet--row" onclick={(e) => (e.preventDefault(), go(openAbout))}>
         <Icon name="info" />
         <span class="bc-account-sheet--row-label">{t('about.title')}</span>
@@ -819,16 +792,6 @@
         border-radius: 11px;
         padding: 0 8px 0 6px;
       }
-    }
-
-    .bc-account-sheet--badge {
-      padding: 2px 10px;
-      border-radius: 12px;
-      background: var(--bc-tertiary);
-      color: var(--bc-on-tertiary);
-      font-size: 12px;
-      line-height: 18px;
-      font-weight: 600;
     }
   }
 </style>

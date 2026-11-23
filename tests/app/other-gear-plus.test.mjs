@@ -32,7 +32,8 @@ test('only a subscribed Benthic+ account is a subscriber, wherever the logbook l
 
 test('the desktop and the phone editor gate adding and removing on the subscription', () => {
   const desktop = read('components/DesktopDiveFields.svelte');
-  assert.match(desktop, /\{#if plus && equipment\}\n\s+<h3[^\n]*otherGear[^\n]*\n\s+<DesktopOtherGear items=\{otherItems\} onadd=/);
+  // Task 2026-11-23-366: the section is a card; its « + Ajouter » is in the card's header.
+  assert.match(desktop, /\{#if plus && equipment\}\n\s+<DesktopEquipmentCard name="other-gear"[\s\S]*?onclick=\{\(\) => \(addingGear = true\)\}[\s\S]*?<DesktopOtherGear items=\{otherItems\} onremove=/);
   assert.doesNotMatch(desktop, /locked|BenthicPlusChip/, 'no disabled state and no badge on the desktop');
   const phone = read('components/DiveGearOther.svelte');
   assert.match(phone, /^\{#if plus\}\n<h3/m, 'the whole section is absent without Benthic+');
