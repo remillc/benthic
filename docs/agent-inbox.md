@@ -7045,7 +7045,7 @@ Same on the iPhone and tablet versions of this page.
 
 **Test:** open « Tout ce qui est inclus », scroll to the end: no « Toujours gratuit » note, the price block right after the features, and « Continuer sans abonnement » leaves without subscribing.
 
-## [ ] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
+## [x] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-ups: « Icônes de Icon.svelte · Android » and « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »). Christian handles the licence question himself.
 
@@ -7158,7 +7158,9 @@ M10.9 15.8L18.3 8.4L20.4 5.6L21.1 2.0L17.0 4.3L14.5 6.8L14.5 8.0L13.3 8.0L13.4 9
 
 **Test:** every screen with icons (Carnet, détail, Sites, Profil, Réglages, the account sheet, the download flow, the desktop table) shows the Rounded glyphs at the same sizes and colours, nothing missing or blank; ⋮ is clearly visible; the gear list shows the new knife.
 
-## [ ] 2026-11-23-365 Correction to task 364: `blender` stays a Benthic drawing (a cylinder being filled)
+**Done (23 November 2026).** Built from the task text (the canvas mock-ups are not in the repository). 89 keys of `Icon.svelte` are Material Symbols Rounded glyphs in `symbols` under the same keys (`key` too: Outlined replaced by Rounded); their strokes are gone from `paths`, with the `more` 4 px stroke special case. `tools/build-icon-symbols.mjs` fetches each glyph from the raw GitHub URL and rewrites the `symbols` block (run it again to regenerate). `diveKnife` of `GearIcon.svelte` has the new drawing. `tests/app/icon-sets.test.mjs` checks the 89 symbols, the 18 drawings, shared glyphs and that every `<Icon name>` exists; the tests that read the old paths (`first-launch`, `icons-mockups`) follow. `app/src/pages/Settings.svelte` still has its own inline copy of the old delete icon in the computer menu (not touched here).
+
+## [x] 2026-11-23-365 Correction to task 364: `blender` stays a Benthic drawing (a cylinder being filled)
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de Icon.svelte · Android » (phone canvas, page « Thème et couleurs »).
 
@@ -7171,6 +7173,8 @@ M13.5 10a3.5 3.5 0 0 1 7 0v9.5a1.5 1.5 0 0 1-1.5 1.5h-4a1.5 1.5 0 0 1-1.5-1.5zM1
 It shows wherever `blender` is used: the « Mélangeur de gaz » tile in Outils and the desktop tools menu, « Préparer ce mélange » in Meilleur mélange (phone and desktop), and « Analyse des gaz » in the Benthic+ offer. So 89 keys become Material Symbols, not 90; 18 stay Benthic drawings.
 
 **Test:** Outils shows the cylinder icon on the « Mélangeur de gaz » tile; « Préparer ce mélange » shows it too.
+
+**Done (23 November 2026).** `blender` stays in `paths` with the cylinder-being-filled drawing of the task, so 89 keys are symbols and 18 stay drawings; checked by `tests/app/icon-sets.test.mjs` and on the Outils tiles, phone and desktop.
 
 ## [ ] 2026-11-23-366 Desktop dive detail, « Équipement » tab: one card per section
 

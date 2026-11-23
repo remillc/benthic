@@ -2786,6 +2786,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
       "Download: in the Bluetooth states (allow, permission refused, Bluetooth off), the Bluetooth icon is centred, white on a blue disc, and « Turn Bluetooth on » is a blue button on every device.",
       "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
       "First launch: the light rays of the blue band are always four, scaled to the width of the band, on tablet and computer as on the phone.",
