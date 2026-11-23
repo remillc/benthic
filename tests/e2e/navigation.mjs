@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -29,6 +29,7 @@ import { startFakeDivelogs } from './fake-divelogs.mjs';
 import { regressionFlows } from './navigation-regressions.mjs';
 import { syncLineFlows } from './sync-line.mjs';
 import { syncStateFlows } from './sync-state.mjs';
+import { downloadFlows } from './download-flow.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -2713,7 +2714,7 @@ async function profileSectionFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2760,8 +2761,10 @@ try {
     ['certification agencies', '--cert-agencies-only', 12, true, () => certificationAgencyFlows(expect)],
     ['settings', '--settings-computers-only', 45, true, () => settingsComputersFlows(expect)],
     ['profile layers', '--profile-layers-only', 5, true, () => profileLayersFlows(expect)],
-    ['sync line', '--sync-line-only', '--sync-state-only', 45, !phoneOnly && !tabletOnly && !welcomeOnly, () => syncLineFlows({ ...harness, shot })],
+    ['sync line', '--sync-line-only', 45, !phoneOnly && !tabletOnly && !welcomeOnly, () => syncLineFlows({ ...harness, shot })],
     ['sync state', '--sync-state-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => syncStateFlows({ ...harness, shot })],
+    // The download from a dive computer, step by step (tests/e2e/download-flow.mjs).
+    ['download', '--download-only', 60, !phoneOnly && !tabletOnly && !welcomeOnly, () => downloadFlows({ ...harness, shot })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],

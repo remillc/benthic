@@ -6960,7 +6960,7 @@ Mock-ups: « Permission de notifier, explication avant la demande d’Android / 
 
 **Test:** with two paired devices and the app open on both, a change on one shows on the other within a few seconds without any tap; the account sheets have no « Synchroniser » button; with Benthic closed on the paired phone, a new device's access request shows as a system notification, and touching it opens the request; cutting the connection falls back to pull without errors.
 
-## [ ] 2026-11-23-357 Download from a dive computer: one tap, one download (TODO #40, Android)
+## [x] 2026-11-23-357 Download from a dive computer: one tap, one download (TODO #40, Android)
 
 Christian asked for this on 23 November 2026. Work in `main`. Divers did not understand that they had to tap a computer to start a download: the rows of the choice screen looked like plain information. The Android phone flow is redrawn on the phone canvas, subgroup « Téléchargement » (page Android), in the order of the flow. The page title becomes « Télécharger des plongées » on every step.
 
@@ -6977,7 +6977,9 @@ Filled buttons are #114477 with white text. Keep the logic as it is (remembered 
 
 **Test:** with a remembered computer in transfer mode, one tap on « Télécharger » starts the download; without one, the search screen shows the three steps; « Tout retélécharger » is only in the ⋮ menu.
 
-## [ ] 2026-11-23-358 Addition to 357: the same download flow on iPhone, tablet and desktop
+**Done (23 November 2026).** Built from the task text (the canvas mock-ups are not in the repository). `app/src/pages/Download.svelte` now draws every step (choice or first-time search, connection, progress ring, connection lost, nothing new, done, done with a new computer); `DownloadRing` and `DownloadDives` are new components. Logic unchanged except what the new screens need: a lost connection stays on the page, keeps the dives received in the logbook and « Réessayer » resumes; the end of a download stays on its screen (« Terminer » runs the quick entry and message as before). `lib/download-history.js` keeps the last download date and last dive date per computer on the device. Not given by the core: the number of a dive being received (rows show the date until the logbook numbers them), the model's menu path for the transfer-mode step (generic text), and any auto-start when the computer is seen (none existed). Checked by `tests/e2e/download-flow.mjs` (`navigation.mjs --download-only`) and `tests/app/download-history.test.mjs`.
+
+## [x] 2026-11-23-358 Addition to 357: the same download flow on iPhone, tablet and desktop
 
 Christian asked for this on 23 November 2026. Work in `main`. Task 357 redrew the Android phone download. The same steps, texts and rules now apply to the other devices; only the frame changes. Mock-ups are in each device's « Téléchargement » subgroup.
 
@@ -6986,6 +6988,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Task 357 redrew th
 - **Desktop** (tablet canvas, page Bureau, subgroup « Téléchargement, partage et voyage »): a 640 px dialog (28 px corners, height follows the content, at most 820 px) with « Télécharger des plongées », ⋮ (on the choice step) and ✕ in its header. The choice step has three sections: « Votre ordinateur » (the remembered one, filled « Télécharger », 48 px), « Branché par USB » (each USB computer with a tonal « Télécharger »), « À proximité, en Bluetooth ». Hint: « Branchez l’ordinateur de plongée en USB, ou mettez-le en mode transfert Bluetooth près de cet ordinateur. » No connection step (pairing goes through the system). Actions sit in a footer at the bottom right: in progress « Arrêter le téléchargement »; connection lost « Fermer » + « Réessayer »; nothing new « Tout retélécharger… » + « Terminer »; done « Terminer » + « Voir dans le carnet »; done with a new computer « Voir dans le carnet ». « Téléchargement échoué » is unchanged.
 
 **Test:** on each device, a remembered computer starts with one click or tap on « Télécharger », and « Tout retélécharger » is only in the menu.
+
+**Done (23 November 2026).** Same page, frame by device (`kind`): iPhone navigation bar with « Annuler » and the « … » menu; Android tablet 640 dp column, 420 dp bottom buttons, 72 dp top bar; desktop 640 px dialog with footer actions. Not given by the core: USB computers, so « Branché par USB » is not shown (the desktop has no Bluetooth yet either, so the dialog only shows with a test core). iPhone and desktop still open « Indisponible » from the + button (route unchanged).
 
 ## [ ] 2026-11-23-359 Dive detail, « Photos et vidéos »: Benthic+ only, synced pictures shown as thumbnails
 
