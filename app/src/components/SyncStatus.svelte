@@ -3,7 +3,7 @@
   // <SyncStatus> (spec, section 4, "EtatSynchro"): one line under the Logbook
   // title, never a window. An icon always goes with the color.
   import Icon from './Icon.svelte';
-  import { logbook, syncFlavour } from '../lib/logbook.svelte.js';
+  import { logbook, syncFlavour, autoSyncing } from '../lib/logbook.svelte.js';
   import { t } from '../lib/i18n.js';
   import { formatShortAgo, localNowIso } from '../lib/format.js';
 
@@ -14,6 +14,7 @@
    *   pending?: number,
    *   progress?: import('../lib/sync-progress.js').SyncProgress|null,
    *   steady?: boolean,
+   *   detail?: boolean|'inline',
    * }}
    * `live`: announced when it changes; false for the copy in the side menu.
    * `pending`: changes not sent, for the offline state.
@@ -21,8 +22,11 @@
    * in the bottom padding: the line keeps its height (to-do #2).
    * `steady`: room for two lines of text, whatever the state says, so that
    * what is under it never moves (narrow side menu).
+   * `detail`: the account sheets (task 2026-11-23-356, part 2): there is no « Synchroniser » button, sync is automatic, so a
+   * second line says so (« Automatique, dès qu’une modification est faite », or what happens to the waiting changes);
+   * `'inline'` puts it on one line (« Synchronisé il y a 2 min, automatiquement », the tablet sheet's third line).
    */
-  let { sync, live = true, pending = 0, progress = null, steady = false } = $props();
+  let { sync, live = true, pending = 0, progress = null, steady = false, detail = false } = $props();
 
   // The clock of "il y a N min": moves every 30 s while the line is shown.
   let now = $state(localNowIso());
@@ -50,7 +54,20 @@
     },
     local: { icon: 'device', text: t('sync.local'), pending: false },
   });
-  const state = $derived(states[sync]);
+  // Changes wait: offline, or on a metered connection with « Seulement sur Wi-Fi ou câble ».
+  const waiting = $derived(detail && !!logbook.email && pending > 0 && sync !== 'syncing' && (sync === 'offline' || !autoSyncing()));
+  const base = $derived(states[sync]);
+  const state = $derived.by(() => {
+    if (waiting) return { icon: /** @type {const} */ ('offline'), text: t('nav.pendingChanges', { n: pending }), pending: true };
+    if (detail === 'inline' && sync === 'cloud' && logbook.lastSync) {
+      return { ...base, text: t('sync.syncedAutomatically', { ago: formatShortAgo(logbook.lastSync, now) }) };
+    }
+    return base;
+  });
+  /** The second line of the stacked variant. */
+  const second = $derived(
+    detail !== true || sync === 'syncing' ? '' : waiting ? t('sync.autoWaiting') : sync === 'cloud' ? t('sync.autoLine') : '',
+  );
 </script>
 
 <div class="bc-sync-status" class:bc-sync-status--pending={state.pending} class:bc-sync-status--steady={steady} role={live ? 'status' : undefined}>
@@ -60,6 +77,7 @@
     <span>{showProgress && progress ? t(`sync.stages.${progress.stage}${progress.stage === 'connect' ? syncFlavour() : ''}`) : state.text}</span>
     {#if showProgress}<span class="bc-sync-status--percent bc-value" aria-hidden="true">{percent}&nbsp;%</span>{/if}
   </div>
+  {#if second}<div class="bc-sync-status--second">{second}</div>{/if}
   {#if showProgress}
     <!-- MD3 linear progress indicator, determinate: 4 dp, rounded. -->
     <div class="bc-sync-status--bar" role="progressbar" aria-label={t('sync.syncing')} aria-valuemin="0" aria-valuemax="100" aria-valuenow={percent}>
@@ -96,6 +114,14 @@
     /* Two lines of text in any state: nothing under it moves. */
     .bc-sync-status--steady .bc-sync-status--line {
       min-height: 40px;
+    }
+
+    /* Under the state, indented past its icon (18 dp + 8 dp gap), in the secondary text colour. */
+    .bc-sync-status--second {
+      padding-left: 26px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--f7-list-item-text-text-color, var(--f7-md-on-surface-variant));
     }
 
     .bc-sync-status--percent {

@@ -403,3 +403,29 @@ test('the Benthic+ account: the session says who, the server says subscribed, el
   assert.equal(resolveBenthicPlusAccount({ info, cached: '0', remote: null }).subscribed, false, 'offline: the remembered answer');
   assert.equal(resolveBenthicPlusAccount({ info, cached: null, remote: null }).subscribed, true, 'a kept session is a subscribed one');
 });
+
+// Task 2026-11-23-356, part 2: no « Synchroniser » button anywhere; the state keeps a second line that says sync is automatic.
+test('no sync button in any sheet or page, and the two lines of the state exist in French and English', () => {
+  assert.ok(!existsSync(new URL('components/SyncButton.svelte', root)));
+  for (const file of ['components/AccountSheet.svelte', 'components/DesktopAccountSheet.svelte', 'components/NavMenu.svelte', 'pages/Account.svelte']) {
+    assert.ok(!read(file).includes('SyncButton'), file);
+  }
+  const fr = JSON.parse(readFileSync(new URL('i18n/fr.json', root), 'utf8'));
+  const en = JSON.parse(readFileSync(new URL('i18n/en.json', root), 'utf8'));
+  assert.equal(fr.sync.autoLine, 'Automatique, dès qu’une modification est faite');
+  assert.equal(fr.sync.autoWaiting, 'Envoi automatique au retour du réseau');
+  assert.equal(fr.account.sheet.syncFootnote, 'La synchronisation est automatique : chaque modification part dès que le réseau le permet.');
+  assert.equal(fr.sync.syncedAutomatically, 'Synchronisé {ago}, automatiquement');
+  for (const lang of [fr, en]) {
+    assert.equal(lang.account.syncNow, undefined);
+    assert.equal(lang.desktopSettings.account.syncNow, undefined);
+    assert.ok(lang.sync.autoLine && lang.sync.autoWaiting && lang.account.sheet.syncFootnote);
+  }
+});
+
+test('the sheets show the state with its second line, the tablet as a third line under the account', () => {
+  assert.match(sheet, /<SyncStatus[^>]*detail \/>/);
+  assert.match(sheet, /detail="inline"/);
+  assert.match(sheet, /account\.sheet\.syncFootnote/);
+  assert.equal((desktopSheet.match(/<SyncStatus[^>]*detail \/>/g) ?? []).length, 3);
+});
