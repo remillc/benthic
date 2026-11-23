@@ -2769,6 +2769,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Équipement : l’icône du recycleur montre deux grandes bouteilles de part et d’autre d’un épurateur sur son support, reliés par deux tuyaux, et ne ressemble plus à un bi-bouteille.",
       "Icônes : 89 icônes de l’application passent aux glyphes arrondis de Material Symbols (flèches, nuage, dossier, appareil photo, clé, calendrier, localisation, réglages, etc.) ; le mélangeur de gaz garde un dessin de bouteille que l’on remplit, et le couteau de plongée a un nouveau dessin.",
       "Ordinateur, détail d’une plongée, onglet Équipement : une carte par section (kit, ordinateurs de plongée, protection thermique, lest, autre équipement), avec le total du lest dans son en-tête, un lest par pastille retirable, « Ce lest était » centré et « + Ajouter » dans la carte de l’autre équipement.",
       "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",

@@ -7269,7 +7269,7 @@ Docs updated by the design agent: `docs/ui-specification.md` (photos section, Ab
 
 **Test:** Réglages › Carnet has no photos and videos switch; a subscriber sees the Photos et vidéos section of a dive with pictures, a free user does not; À propos shows « Voir sur GitHub » and « Site Web » centred on one row, and « Site Web » opens benthicdivelog.app.
 
-## [ ] 2026-11-23-371 New `rebreather` drawing in `GearIcon.svelte`
+## [x] 2026-11-23-371 New `rebreather` drawing in `GearIcon.svelte`
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Icônes de GearIcon.svelte · Android » (phone canvas, page « Thème et couleurs »).
 
@@ -7280,3 +7280,5 @@ M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.9
 ```
 
 **Test:** the gear list, the type picker of « Nouvelle pièce » and the kit pages show the new rebreather icon at every size; it no longer looks like a twin set.
+
+**Done (23 November 2026).** The `rebreather` path of `GearIcon.svelte` is the given drawing, stroke 1.8 on the 24 grid like the others. No test read the old path. Checked at 24 px on the gear list and the type picker of « Nouvelle pièce » (desktop).

@@ -225,6 +225,25 @@ async function iconShots(h) {
     await sleep(2500);
   }
   tab.ws.close();
+  // The gear list and the type picker of « Nouvelle pièce » (task 2026-11-23-371: the rebreather icon).
+  const g = await openTab(1400, 900, false, false, true, { theme: 'md' });
+  await g.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
+  await g.run(async () => {
+    const inventory = await import('/src/lib/inventory.svelte.js');
+    await inventory.change((inv) => inv.saveGear({ type: 'rebreather', name: 'Recycleur test' }));
+    (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/');
+    return 1;
+  });
+  await sleep(1800);
+  await g.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'));
+  await sleep(1800);
+  await shot(g, 'gear-type-picker');
+  await g.run(() => (document.querySelector('.bc-piece-edit--close')?.click(), 1));
+  await sleep(1200);
+  await g.run(() => ([...document.querySelectorAll('.bc-profile-nav a, .bc-profile-nav button, .bc-profile-nav [role="link"]')].find((e) => e.textContent?.includes('Équipement'))?.click(), 1));
+  await sleep(1500);
+  await shot(g, 'gear-list');
+  g.ws.close();
   for (const [label, w, hgt, mobile, desktop] of [['phone', 390, 844, true, false], ['desktop', 1400, 900, false, true]]) {
     const t = await openTab(w, hgt, mobile, false, desktop, { theme: 'md' });
     await sleep(1000);
