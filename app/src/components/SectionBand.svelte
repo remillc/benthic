@@ -7,11 +7,13 @@
   // the band: the wave cuts the band, so the map shows under the curve.
   // The page title is not here: it sits on the ☰ row of the top bar (task 2026-11-14-117).
 
-  /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, children?: import('svelte').Snippet }} */
+  /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, syncLine?: boolean, children?: import('svelte').Snippet }} */
   import { ios } from '../lib/layout.svelte.js';
-  let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, children } = $props();
+  import { BAND_PROFILE } from '../lib/band-profile.js';
+  import SyncProfileLine from './SyncProfileLine.svelte';
+  let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, syncLine = false, children } = $props();
 
-  const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+  const PROFILE = BAND_PROFILE;
 </script>
 
 {#if ios && !overMap}
@@ -22,6 +24,8 @@
       {#if summary}<p class="bc-section-band--summary bc-value">{summary}</p>{/if}
     {/key}
     {@render children?.()}
+    <!-- No band here: the faint profile and the sync progress line go under the header (task 2026-11-23-340). -->
+    {#if syncLine}<SyncProfileLine edge />{/if}
   </div>
 {:else}
 <div class="bc-section-band bc-section-band--band" class:bc-section-band--tall={tall} class:bc-section-band--over-map={overMap} class:bc-section-band--pill={pill} class:bc-section-band--with-chip={chip} class:bc-section-band--bare={bare}>
@@ -132,6 +136,7 @@
 
     /* iPhone: the summary and the search field under the large title, no band. */
     .bc-section-band--ios {
+      position: relative;
       padding: 0 16px 8px;
 
       .bc-section-band--summary {

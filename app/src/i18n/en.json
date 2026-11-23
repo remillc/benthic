@@ -453,6 +453,7 @@
     "syncingGit": "Syncing with the git repository…",
     "cloudGit": "Synced with the git repository",
     "syncingServer": "Syncing with the Benthic server…",
+    "progressLine": "Logbook sync",
     "cloudServer": "Synced with the Benthic server"
   },
   "dive": {
@@ -2791,6 +2792,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Logbook: while the app exchanges with the server at start, a white line is drawn on the faint profile of the header, on every device: a segment slides while the progress is unknown, then the line fills up, completes and fades. It replaces the wavy bar.",
       "Logbook: a long press on a dive or a trip starts selection mode as soon as it is recognised, with the finger still down and a short haptic tap on phones and tablets; letting go no longer decides.",
       "Android phone, Logbook and Sites: the search box sits under the summary and, as the list scrolls, shrinks and rises into the top bar as a magnifier. A search in progress stays there as a pill with its text and a clear button; tapping the text or the magnifier opens the box again. On Sites, the map's full-screen button moves above « Center on my position ».",
       "Export: “Send to divelogs.de” sends the dives of the logbook or of the selection to your divelogs.de account, after the user name and the password, which are not kept. The sending shows its progress and resumes after a lost connection.",

@@ -10,16 +10,19 @@
   import { locale } from '../lib/format.js';
   import { monthYearLabel } from '../lib/carnet-months.js';
   import { t } from '../lib/i18n.js';
+  import { BAND_PROFILE } from '../lib/band-profile.js';
+  import SyncProfileLine from './SyncProfileLine.svelte';
 
   /**
-   * @type {{ pill?: boolean, short?: boolean, group?: { year: number, month: number, count: number } }}
+   * @type {{ syncLine?: boolean, pill?: boolean, short?: boolean, group?: { year: number, month: number, count: number } }}
    * `pill`: the taller band (a sync pill), its gradient is longer.
    * `short`: the plain band of Statistics and Tools (no search bar): its gradient is the top bar's.
    * `group`: the month at the top of the list, once the list has passed the band.
+   * `syncLine`: draws the sync progress line on the faint profile (the Carnet).
    */
-  let { pill = false, short = false, group } = $props();
+  let { pill = false, short = false, group, syncLine = false } = $props();
 
-  const PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+  const PROFILE = BAND_PROFILE;
   /** Height of the band once collapsed, wave included: room for the month (Carnet), or the wave alone. */
   const COLLAPSED = $derived(short ? 18 : 64);
   /** Over how many px the texts fade out and the month fades in. */
@@ -75,6 +78,7 @@
       <path d="{PROFILE} V140 H0 Z" class="bc-band-backdrop--area" />
       <path d={PROFILE} class="bc-band-backdrop--line" vector-effect="non-scaling-stroke" />
     </svg>
+    {#if syncLine}<SyncProfileLine />{/if}
     {#if group}
       <div class="bc-band-backdrop--heading" role="heading" aria-level="2">
         <span class="bc-band-backdrop--month">{monthYearLabel(group.year, group.month, locale)}</span>

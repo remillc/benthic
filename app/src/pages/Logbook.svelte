@@ -10,7 +10,6 @@
   import SyncStatus from '../components/SyncStatus.svelte';
   import SyncFailureRow from '../components/SyncFailureRow.svelte';
   import SyncPill from '../components/SyncPill.svelte';
-  import PullProgress from '../components/PullProgress.svelte';
   import DiveRow from '../components/DiveRow.svelte';
   import TripRow from '../components/TripRow.svelte';
   import BandBackdrop from '../components/BandBackdrop.svelte';
@@ -1360,8 +1359,8 @@
     </NavRight>
   </Navbar>
 
-  {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} />{/if}
-  <SectionBand tall pill={showPill} bare={!theme.ios} summary={bandSummary}>
+  {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} syncLine />{/if}
+  <SectionBand tall pill={showPill} bare={!theme.ios} syncLine={theme.ios} summary={bandSummary}>
     {#if showPill}
       {#if conflictWaits}
         <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />
@@ -1391,9 +1390,6 @@
 
   <!-- A wait before flying is running (task 2026-11-13-98): under the search field. -->
   <FlightBanner />
-
-  <!-- Start: the copy of this device is shown while the exchange with the server runs (todo 88). -->
-  {#if logbook.pulling && !logbook.loading && !logbook.error}<PullProgress />{/if}
 
   <!-- While loading, the count and the status are not known yet: nothing is shown. -->
   {#if !logbook.loading && !logbook.error}

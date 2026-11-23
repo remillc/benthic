@@ -7,6 +7,7 @@
   // steps below. The panel is the same on every step and its line draws itself only when this page opens. The page
   // chosen for the edition is pages/WelcomeEntry.svelte.
   import { Page } from 'framework7-svelte';
+  import { BAND_PROFILE as BAND_CURVE } from '../lib/band-profile.js';
   import ReleaseProfile from '../components/ReleaseProfile.svelte';
   import FirstLaunchRays from '../components/FirstLaunchRays.svelte';
   import BrandLockup from '../components/BrandLockup.svelte';
@@ -33,7 +34,7 @@
   const lockup = $derived(lockupSize(layout, flow.stack.length <= 1, currentStep() === 'benthicPlusConnect' || offerPanel));
 
   // The faint profile of the section band (the same path as the app's section band), drawn at the bottom of the phone steps band.
-  const BAND_PROFILE = 'M0 30 L20 38 L45 70 L70 92 L95 96 L120 88 L140 94 L165 80 L185 62 L210 58 L235 50 L255 46 L275 40 L300 36';
+  const BAND_PROFILE = BAND_CURVE;
 </script>
 
 {#snippet panelContent()}
