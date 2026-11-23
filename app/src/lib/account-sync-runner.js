@@ -23,6 +23,7 @@ const MAX_RETRIES = 3;
  * @property {boolean} joinNeeded this device has data and the account has data: the join step must run before anything is sent
  * @property {boolean} differentAccount this device last synced with another account: nothing is sent
  * @property {boolean} keyMissing the account has a data key that this device does not hold (the unlock dialog, the locked look)
+ * @property {string[]} orphaned sealed items under a key nobody holds any more, on a device that holds the account key (the dialog that offers to erase them)
  * @property {boolean} hasRecovery the account has a recovery key (`keys/recovery.json`)
  * @property {string} error the code of the last failure, '' when none
  */
@@ -38,6 +39,7 @@ export const initialState = () => ({
   joinNeeded: false,
   differentAccount: false,
   keyMissing: false,
+  orphaned: [],
   hasRecovery: false,
   error: '',
 });
@@ -122,6 +124,7 @@ export function createAccountSyncRunner({ engine, state, allowed, afterRun, now 
         state.locked = result.locked ?? [];
         state.unsealed = result.unsealed ?? [];
         state.keyMissing = !!result.keyMissing;
+        state.orphaned = result.orphaned ?? [];
         state.hasRecovery = !!result.hasRecovery;
         if (result.conflicts?.length) state.conflicts = [...state.conflicts, ...result.conflicts.filter((c) => !state.conflicts.some((x) => x.path === c.path))];
         break;

@@ -9,25 +9,23 @@
   import { t } from '../lib/i18n.js';
 
   /**
-   * camera: this device can read a QR code (phone, tablet); false on a computer, which shows its own code instead.
    * @type {{
-   *   camera: boolean,
    *   onpair: () => void,
    *   onrecoverykey: () => void,
    *   onlater: () => void,
    *   onlost: () => void,
    * }}
    */
-  let { camera, onpair, onrecoverykey, onlater, onlost } = $props();
+  let { onpair, onrecoverykey, onlater, onlost } = $props();
 </script>
 
 <Md3Dialog title={t('accountSync.unlock.title')} class="bc-unlock-dialog" oncancel={onlater}>
   <div class="bc-unlock-dialog--rows">
     <button type="button" class="bc-unlock-dialog--row" data-row="pair" onclick={onpair}>
-      <Icon name={camera ? 'qr' : 'device'} size={24} />
+      <Icon name="device" size={24} />
       <span class="bc-unlock-dialog--texts">
         <span class="bc-unlock-dialog--label">{t('accountSync.unlock.pair')}</span>
-        <span class="bc-unlock-dialog--line">{t(camera ? 'accountSync.unlock.pairCamera' : 'accountSync.unlock.pairDesktop')}</span>
+        <span class="bc-unlock-dialog--line">{t('accountSync.unlock.pairLine')}</span>
       </span>
     </button>
     <button type="button" class="bc-unlock-dialog--row" data-row="recovery-key" onclick={onrecoverykey}>

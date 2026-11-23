@@ -263,10 +263,10 @@
             </button>
             {#if accountLock.canPair}
               <button type="button" class="bc-account-sheet--ios-row" data-row="pair" onclick={() => go(accountLock.onpairnew)}>
-                <Icon name="qr" />
+                <Icon name="device" />
                 <span class="bc-account-sheet--row-label">
                   {t('accountSync.pair.entry')}
-                  <span class="bc-account-sheet--row-line">{t('accountSync.pair.entryText')}</span>
+                  <span class="bc-account-sheet--row-line">{accountLock.requests ? t('accountSync.pair.entryPending', { n: accountLock.requests }) : t('accountSync.pair.entryNone')}</span>
                 </span>
                 <Icon name="chevron" size={20} />
               </button>
@@ -441,10 +441,10 @@
           {#if accountLock.canPair}
             <div class="bc-account-sheet--divider bc-account-sheet--margin"></div>
             <a href="#pair" class="bc-account-sheet--row bc-account-sheet--profile" data-row="pair" onclick={(e) => (e.preventDefault(), go(accountLock.onpairnew))}>
-              <Icon name="qr" />
+              <Icon name="device" />
               <span class="bc-account-sheet--row-label">
                 {t('accountSync.pair.entry')}
-                <span class="bc-account-sheet--row-line">{t('accountSync.pair.entryText')}</span>
+                <span class="bc-account-sheet--row-line">{accountLock.requests ? t('accountSync.pair.entryPending', { n: accountLock.requests }) : t('accountSync.pair.entryNone')}</span>
               </span>
               <Icon name="chevron" size={20} />
             </a>

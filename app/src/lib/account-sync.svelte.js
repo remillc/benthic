@@ -106,6 +106,25 @@ export function fetchAccountKeys() {
   return build().engine.fetchKeys();
 }
 
+/** « Effacer » (items nobody can open any more): removes them here; the run that follows sends it. */
+export async function eraseAccountOrphans() {
+  const { engine, runner: r } = build();
+  const n = await engine.eraseOrphans();
+  accountSync.orphaned = [];
+  void r.syncNow();
+  return n;
+}
+
+/**
+ * Commits pairing files (requests and answers) and pushes them: nothing of the diver's data is read, sent, received or
+ * joined, so a device that does not hold the key yet never joins before it. The working copy must exist (`fetchAccountKeys`
+ * clones it).
+ * @param {{ writes?: { path: string, json: any }[], deletes?: string[], message?: string }} changes
+ */
+export function commitPairingFiles(changes) {
+  return build().engine.commitKeyFiles({ ...changes, keysOnly: true });
+}
+
 /** Every path of the account's working copy (the start-over lists what to drop). */
 export function listAccountPaths() {
   return build().engine.paths();

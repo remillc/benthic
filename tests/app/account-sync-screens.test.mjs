@@ -75,7 +75,8 @@ test('the join answers follow the segmented choices', () => {
 const app = new URL('../../app/src/', import.meta.url);
 const screens = [
   'AccountUnlockDialog',
-  'PairShowCode',
+  'PairRequestDialog',
+  'OrphanedDataDialog',
   'PairConfirmDialog',
   'PairedDialog',
   'RecoveryKeyOffer',
@@ -86,7 +87,7 @@ const screens = [
   'StartOverDialog',
   'AccountDifferentDialog',
 ].map((n) => [`components/${n}.svelte`, readFileSync(new URL(`components/${n}.svelte`, app), 'utf8')]);
-const libs = ['lib/two-device-notice.js', 'lib/pair-scan.js', 'lib/account-sync-screens.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
+const libs = ['lib/two-device-notice.js', 'lib/device-name.js', 'lib/account-sync-screens.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
 // The wiring: the host picks the screen, the flows hold the texts of the snackbars and the names of the items.
 const wiring = ['components/AccountSyncHost.svelte', 'lib/account-sync-flows.svelte.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
 const everything = [...screens, ...libs, ...wiring];
@@ -99,6 +100,7 @@ test('every accountSync text a screen uses is in fr and en, and every text is us
   for (const [file, source] of everything) {
     // `t('accountSync.x.y')` and the two conditional forms `t(cond ? 'accountSync.a' : 'accountSync.b')`.
     for (const [, key] of source.matchAll(/'(accountSync\.[A-Za-z.]+)'/g)) used.add(key);
+    if (source.includes('`accountSync.device.${kind}`')) for (const id of ['androidPhone', 'androidTablet', 'iphone', 'ipad', 'windows', 'mac', 'linux', 'unknown']) used.add(`accountSync.device.${id}`);
     for (const [, key] of source.matchAll(/`(accountSync\.join)\.\$\{counter\.id\}`/g)) for (const id of ['recognised', 'added', 'toConfirm']) used.add(`${key}.${id}`);
     assert.ok(source.length, file);
   }
@@ -126,11 +128,16 @@ test('the texts keep the task’s words', () => {
   assert.equal(fr.accountSync.join.intro, 'Cet appareil avait déjà de l’équipement. Benthic l’a comparé avec celui de votre compte.');
   assert.equal(fr.accountSync.join.doneSync, 'Elles se synchronisent maintenant avec vos autres appareils.');
   assert.equal(fr.accountSync.startOver.confirm, 'Effacer et repartir');
-  assert.equal(fr.accountSync.unlock.pairCamera, 'Lire le code affiché sur un appareil déjà jumelé');
-  assert.equal(fr.accountSync.unlock.pairDesktop, 'Afficher un code à lire avec votre téléphone');
+  assert.equal(fr.accountSync.unlock.pairLine, 'Demander l’autorisation à un appareil déjà jumelé');
+  assert.equal(fr.accountSync.pair.askTitle, 'Demander l’accès');
+  assert.equal(fr.accountSync.pair.waiting, 'En attente d’autorisation');
+  assert.equal(fr.accountSync.pair.askHint, 'Ouvrez Benthic sur un appareil déjà jumelé et autorisez cet appareil.');
+  assert.equal(fr.accountSync.pair.approveTitle, 'Donner accès à « {name} » ?');
+  assert.equal(fr.accountSync.pair.refuse, 'Refuser');
+  assert.equal(fr.accountSync.pair.allow, 'Autoriser');
+  assert.equal(fr.accountSync.orphans.erase, 'Effacer');
   assert.equal(fr.accountSync.locked.line, 'Verrouillé : jumelez cet appareil');
-  assert.equal(fr.accountSync.pair.expires, 'Le code expire dans {time}');
-  assert.equal(fr.accountSync.pair.scanComputer, 'Lire le code d’un ordinateur');
+  assert.equal(fr.accountSync.pair.expires, 'La demande expire dans {time}');
   assert.equal(fr.accountSync.key.done, 'Je l’ai notée');
 });
 

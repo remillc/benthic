@@ -7,7 +7,8 @@
   import { onMount, untrack } from 'svelte';
   import AccountUnlockDialog from './AccountUnlockDialog.svelte';
   import AccountDifferentDialog from './AccountDifferentDialog.svelte';
-  import PairShowCode from './PairShowCode.svelte';
+  import PairRequestDialog from './PairRequestDialog.svelte';
+  import OrphanedDataDialog from './OrphanedDataDialog.svelte';
   import PairConfirmDialog from './PairConfirmDialog.svelte';
   import PairedDialog from './PairedDialog.svelte';
   import RecoveryKeyOffer from './RecoveryKeyOffer.svelte';
@@ -17,7 +18,6 @@
   import StartOverDialog from './StartOverDialog.svelte';
   import { accountSync } from '../lib/account-sync.svelte.js';
   import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
-  import { desktopApp } from '../lib/layout.svelte.js';
   import { dueScreen } from '../lib/account-sync-screens.js';
   import * as flows from '../lib/account-sync-flows.svelte.js';
 
@@ -41,6 +41,34 @@
     });
   });
 
+  // A device that holds the key looks for the requests of new devices while the app is open and in front: every 15 s (and at
+  // once when it comes back to the front), plus a look in the working copy after each sync run. It stops when the device cannot
+  // approve (signed out, key missing, pull only).
+  const canApprove = $derived(benthicPlusAccount.signedIn && !accountSync.keyMissing && !accountSync.pullOnly && (accountSync.status === 'synced' || accountSync.status === 'syncing'));
+  $effect(() => {
+    if (!canApprove) return;
+    return untrack(() => flows.watchRequests());
+  });
+  $effect(() => {
+    void accountSync.lastSyncedAt;
+    if (canApprove) untrack(() => void flows.refreshRequests({ network: false }));
+  });
+  // A request is put in front of the diver by itself when nothing else is open; the account sheet's row asks again after a « Plus tard ».
+  $effect(() => {
+    void recheck;
+    if (!canApprove || flow.screen || flow.busy || !flow.requests.length) return;
+    untrack(() => {
+      const next = flows.requestDue();
+      if (!next) return;
+      if (flows.modalInTheWay()) {
+        clearTimeout(waiting);
+        waiting = /** @type {any} */ (setTimeout(() => recheck++, 1000));
+        return;
+      }
+      flows.askApproval(next);
+    });
+  });
+
   // Which screen is due, one at a time and in this order: another account, the missing key, the join, the recovery key. A
   // manual sync runs again after a screen was closed, so a question left open comes back then.
   $effect(() => {
@@ -48,9 +76,9 @@
     if (!benthicPlusAccount.signedIn || flow.screen || flow.busy) return;
     void recheck;
     if (accountSync.status === 'syncing') return flows.resetQuestions();
-    const { status, differentAccount, keyMissing, joinNeeded, pullOnly } = accountSync;
+    const { status, differentAccount, keyMissing, joinNeeded, pullOnly, orphaned } = accountSync;
     untrack(() => {
-      const due = dueScreen({ status, differentAccount, keyMissing, joinNeeded, pullOnly }, { different: flows.differentDue(), unlock: flows.unlockDue(), join: flows.joinDue(), recovery: flows.recoveryOfferDue() });
+      const due = dueScreen({ status, differentAccount, keyMissing, joinNeeded, pullOnly, orphaned }, { different: flows.differentDue(), unlock: flows.unlockDue(), join: flows.joinDue(), orphans: flows.orphansDue(), recovery: flows.recoveryOfferDue() });
       if (due && flows.modalInTheWay()) {
         clearTimeout(waiting);
         waiting = /** @type {any} */ (setTimeout(() => recheck++, 1000));
@@ -59,6 +87,7 @@
       if (due === 'different') flows.askDifferentAccount();
       else if (due === 'unlock') flows.askUnlock();
       else if (due === 'join') void flows.openJoin();
+      else if (due === 'orphans') flows.askOrphans();
       else if (due === 'recovery') flows.offerRecoveryKey();
     });
   });
@@ -71,13 +100,13 @@
 
 {#if benthicPlusAccount.signedIn}
   {#if flow.screen === 'unlock'}
-    <AccountUnlockDialog camera={!desktopApp} onpair={() => void flows.pairThisDevice()} onrecoverykey={flows.openRecoveryKeyEntry} onlater={flows.closeScreen} onlost={() => (flow.screen = 'startOver')} />
-  {:else if flow.screen === 'pairOld' && flow.payload}
-    <PairShowCode variant="old" payload={flow.payload} expiresAt={flow.expiresAt} oncancel={() => void flows.cancelPairOld()} onscan={desktopApp ? undefined : () => void flows.scanComputerCode()} onrenew={() => void flows.showPairOld()} />
-  {:else if flow.screen === 'pairNew' && flow.payload}
-    <PairShowCode variant="new" payload={flow.payload} expiresAt={flow.expiresAt} oncancel={flows.closeScreen} onrenew={() => void flows.showPairNew()} />
-  {:else if flow.screen === 'confirm'}
-    <PairConfirmDialog deviceName={flow.deviceName} busy={flow.busy} onconfirm={() => void flows.confirmPair()} onrefuse={flows.closeScreen} />
+    <AccountUnlockDialog onpair={() => void flows.askForAccess()} onrecoverykey={flows.openRecoveryKeyEntry} onlater={flows.closeScreen} onlost={() => (flow.screen = 'startOver')} />
+  {:else if flow.screen === 'requestWait'}
+    <PairRequestDialog kind="waiting" code={flow.code} expiresAt={flow.expiresAt} oncancel={flows.cancelAccessRequest} />
+  {:else if flow.screen === 'requestEnded'}
+    <PairRequestDialog kind={/** @type {'declined'|'expired'|'failed'} */ (flow.endReason || 'failed')} oncancel={flows.closeScreen} onagain={() => void flows.askForAccess()} />
+  {:else if flow.screen === 'approve'}
+    <PairConfirmDialog deviceName={flow.deviceName} code={flow.code} busy={flow.busy} onconfirm={() => void flows.approveNow()} onrefuse={() => void flows.declineNow()} onlater={flows.putAsideRequest} />
   {:else if flow.screen === 'paired'}
     <PairedDialog onclose={flows.closeScreen} />
   {:else if flow.screen === 'joined'}
@@ -92,6 +121,8 @@
     <StartOverDialog busy={flow.busy} onstartover={() => void flows.startOverNow()} oncancel={flows.closeScreen} />
   {:else if flow.screen === 'join'}
     <JoinSummaryDialog recognised={flow.join.recognised} added={flow.join.added} matches={flow.join.matches} busy={flow.busy} onjoin={(answers) => void flows.confirmJoin(answers)} oncancel={flows.closeScreen} />
+  {:else if flow.screen === 'orphans'}
+    <OrphanedDataDialog busy={flow.busy} onerase={() => void flows.eraseOrphansNow()} onlater={flows.closeScreen} />
   {:else if flow.screen === 'different'}
     <AccountDifferentDialog onuse={() => void flows.useThisAccount()} onkeep={flows.closeScreen} />
   {/if}

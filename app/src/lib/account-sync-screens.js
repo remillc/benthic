@@ -108,14 +108,19 @@ export function joinCounters({ recognised, added, matches }) {
  * Which screen of the account sync is due now, one at a time and in this order: another account, the missing key (the
  * pairing), the join, the recovery key. While the account key is missing the join is never offered: it comes after the key is
  * held (the join seals and merges with it). `due` says which questions were not asked yet in this run.
- * @param {{ status: string, differentAccount: boolean, keyMissing: boolean, joinNeeded: boolean, pullOnly: boolean }} state
- * @param {{ different: boolean, unlock: boolean, join: boolean, recovery: boolean }} due
- * @returns {'different'|'unlock'|'join'|'recovery'|''}
+ * `orphaned` (items sealed under a key nobody holds any more) comes before the recovery key offer.
+ * @param {{ status: string, differentAccount: boolean, keyMissing: boolean, joinNeeded: boolean, pullOnly: boolean, orphaned?: string[] }} state
+ * @param {{ different: boolean, unlock: boolean, join: boolean, recovery: boolean, orphans?: boolean }} due
+ * @returns {'different'|'unlock'|'join'|'orphans'|'recovery'|''}
  */
 export function dueScreen(state, due) {
   if (state.differentAccount) return due.different ? 'different' : '';
   if (state.keyMissing) return due.unlock && state.status !== 'error' ? 'unlock' : '';
   if (state.joinNeeded) return due.join ? 'join' : '';
+  if (state.status === 'synced' && !state.pullOnly && state.orphaned?.length && due.orphans) return 'orphans';
   if (state.status === 'synced' && !state.pullOnly && due.recovery) return 'recovery';
   return '';
 }
+
+/** The 6-digit verification code as the diver compares it: `042 913` (a non-breaking space in the middle). @param {string} code */
+export const groupedCode = (code) => (code.length === 6 ? `${code.slice(0, 3)}${NBSP}${code.slice(3)}` : code);

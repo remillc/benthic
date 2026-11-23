@@ -12,7 +12,7 @@
 import { sortedJson } from './file-store.js';
 import { mergeAccountFile, mergeEncryptedAccountFile } from './account-data-merge.js';
 import { repositoryKey } from './server-logbook.js';
-import { ACCOUNT_KEY_PATH, PAIRING_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
+import { ACCOUNT_KEY_PATH, PAIRING_DIR, REQUESTS_DIR, RECOVERY_PATH, accountKeyFile, isPairingExpired, newAccountKey, parseAccountKeyFile, resealFiles } from './account-keys.js';
 
 /** The branch of the account data. */
 export const BRANCH = 'benthic';
@@ -78,6 +78,7 @@ export const codeOf = (e) => String(/** @type {any} */ (e)?.code ?? /** @type {a
  * @property {string[]} [unsealed] files withheld because they still hold clear sensitive data
  * @property {boolean} [keyMissing] the account has a data key (`keys/account.json`) that this device does not hold: sealed items stay locked
  * @property {boolean} [hasRecovery] `keys/recovery.json` exists on the server
+ * @property {string[]} [orphaned] sealed items (`profile/diver.json`, `certifications/*`) under a key that neither the account nor this device holds, on a device that holds the account key: no pairing can open them
  * @property {boolean} [retry] an edit made during the run, or a rejected push, is left for the next run
  * @property {string} [error] the core's error code
  */
@@ -188,7 +189,8 @@ function mergeMaintenance(base, ours, theirs) {
  * @property {string|null} kid the account key's id (`keys/account.json`), null when the account has none yet
  * @property {boolean} keyMissing the account has a key this device does not hold
  * @property {any|null} recovery the content of `keys/recovery.json`
- * @property {{ path: string, json: any }[]} pairing the pairing files on the branch
+ * @property {{ path: string, json: any }[]} pairing the answers on the branch (`keys/pairing/`)
+ * @property {{ path: string, json: any }[]} requests the access requests of new devices (`keys/requests/`)
  */
 
 /**
@@ -381,6 +383,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
       keyMissing,
       recovery: byPath.get(RECOVERY_PATH) ?? null,
       pairing: [...byPath].filter(([path]) => path.startsWith(PAIRING_DIR)).map(([path, json]) => ({ path, json })),
+      requests: [...byPath].filter(([path]) => path.startsWith(REQUESTS_DIR)).map(([path, json]) => ({ path, json })),
     };
   }
 
@@ -414,7 +417,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
    */
   async function cleanPairing(dir) {
     const { files } = await core.bgitFiles({ dir });
-    const paths = files.filter((p) => p.startsWith(PAIRING_DIR) && p.endsWith('.json'));
+    const paths = files.filter((p) => (p.startsWith(PAIRING_DIR) || p.startsWith(REQUESTS_DIR)) && p.endsWith('.json'));
     if (!paths.length) return 0;
     const { texts } = await core.bgitRead({ dir, paths });
     const stale = paths.filter((_, i) => {
@@ -454,6 +457,57 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
     return writes.length + deletes.length;
   }
 
+  /**
+   * Sealed local items whose key is neither the account's nor any key this device holds, on a device that holds the account
+   * key: pairing cannot help (the key was lost for good, e.g. an app install whose Keystore was wiped). The diver is offered to
+   * erase them (`eraseOrphans`).
+   * @returns {Promise<string[]>}
+   */
+  async function findOrphans() {
+    const accountKid = box.getAccountKid();
+    if (!accountKid || !(await box.hasKey(accountKid))) return [];
+    const paths = ['profile/diver.json', ...(await store.list('certifications/'))];
+    /** @type {string[]} */
+    const out = [];
+    for (const path of paths) {
+      const kid = (await store.read(path))?.enc?.kid;
+      if (typeof kid === 'string' && kid !== accountKid && !(await box.hasKey(kid))) out.push(path);
+    }
+    return out;
+  }
+
+  /**
+   * Removes the documents (card photos, scans) that no certification references, on the device and, by the next send, on the
+   * server. Only when every certification opens here (otherwise a reference cannot be told from an absence) and never a
+   * document that is still waiting to be sent.
+   * @returns {Promise<number>}
+   */
+  async function dropUnreferencedDocuments() {
+    const accountKid = box.getAccountKid();
+    if (!accountKid || !(await box.hasKey(accountKid))) return 0;
+    const docs = await store.list('documents/');
+    if (!docs.length) return 0;
+    /** @type {Set<string>} */
+    const referenced = new Set();
+    for (const path of await store.list('certifications/')) {
+      const file = await store.read(path);
+      if (!file) continue;
+      let payload = file;
+      if (file.enc) {
+        try {
+          payload = await box.open(file.enc, sealedItem(path, file));
+        } catch {
+          return 0;
+        }
+      }
+      for (const doc of payload?.documents ?? []) if (typeof doc?.hash === 'string') referenced.add(doc.hash);
+    }
+    const pending = new Set((await store.snapshotPending()).map(([path]) => path));
+    const stale = docs.filter((path) => !pending.has(path) && !referenced.has(path.slice('documents/'.length, -'.json'.length)));
+    if (stale.length) await store.trackedBatch({ removes: stale });
+    return stale.length;
+  }
+
   /** Before a pass: a clear date of birth is sealed, items under an older key are sealed again. Never throws. */
   async function prepareLocal() {
     if (sealClear) {
@@ -468,6 +522,11 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
       await resealHeld();
     } catch (e) {
       if (codeOf(e) !== 'MISSING_DATA_KEY') console.warn('Sealing the local items again before the sync', e);
+    }
+    try {
+      await dropUnreferencedDocuments();
+    } catch (e) {
+      console.warn('Dropping the documents no certification uses', e);
     }
   }
 
@@ -491,7 +550,17 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
    * @returns {Promise<SyncResult>}
    */
   function run() {
-    const next = queue.then(() => runOnce());
+    const next = queue.then(async () => {
+      const result = await runOnce();
+      if (result.status === 'synced') {
+        try {
+          result.orphaned = await findOrphans();
+        } catch (e) {
+          console.warn('Looking for items nobody can open', e);
+        }
+      }
+      return result;
+    });
     queue = next.catch(() => {});
     return next;
   }
@@ -758,6 +827,29 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
     return { received: 0, deferred: [...deferred, ...expected.map(([p]) => p)] };
   }
 
+  /**
+   * Pushes the working copy as it is (key files only: no data pass). A rejected push pulls once and tries again.
+   * @param {string} dir @returns {Promise<SyncResult>}
+   */
+  async function pushKeys(dir) {
+    const { access } = await session();
+    const gitAccess = { dir, username: access.username, token: access.token, branch: BRANCH };
+    try {
+      try {
+        await core.bgitPush(gitAccess);
+      } catch (e) {
+        if (codeOf(e) !== 'REJECTED') throw e;
+        await core.bgitPull({ ...gitAccess, ...author });
+        await core.bgitPush(gitAccess);
+      }
+      return { status: 'synced', sent: 0 };
+    } catch (e) {
+      const code = codeOf(e);
+      if (code === 'UNREACHABLE' || code === 'CANCELLED') return { status: 'offline', error: code, retry: true };
+      return { status: 'error', error: code || 'GIT_ERROR' };
+    }
+  }
+
   /** The working copy's folder and the git access of the signed-in account. */
   async function session() {
     const access = await core.serverSessionAccess();
@@ -779,16 +871,20 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
     /**
      * Commits key files into the working copy (written and deleted paths under `keys/`) and syncs, so that they reach the
      * server and the other devices: a pairing file, `keys/recovery.json`, the start-over's `keys/account.json`.
-     * @param {{ writes?: { path: string, json: any }[], deletes?: string[], message?: string }} changes
+     * With `keysOnly` nothing of the diver's data is read, sent, received or joined: the files are committed and pushed (after a
+     * pull when the server moved), and the result is `synced`, `offline` (the commit waits for the next run) or an error. The
+     * working copy must exist (`fetchKeys` clones it). Pairing uses it, so that a device without the key never joins data first.
+     * @param {{ writes?: { path: string, json: any }[], deletes?: string[], message?: string, keysOnly?: boolean }} changes
      * @returns {Promise<SyncResult>}
      */
-    commitKeyFiles({ writes = [], deletes = [], message = 'Benthic: keys' }) {
+    commitKeyFiles({ writes = [], deletes = [], message = 'Benthic: keys', keysOnly = false }) {
       const files = [...writes.map((w) => ({ path: w.path, text: /** @type {string|null} */ (sortedJson(w.json)) })), ...deletes.map((path) => ({ path, text: /** @type {string|null} */ (null) }))];
       if (!files.length || !files.every((f) => isKeyPath(f.path))) return Promise.reject(new Error('BAD_PATH'));
       const next = queue.then(async () => {
         const { dir } = await session();
         await core.bgitWrite({ dir, files });
         await core.bgitCommit({ dir, paths: files.map((f) => f.path), message, ...author });
+        if (keysOnly) return pushKeys(dir);
         if (!(await store.read('meta/sync.json'))) {
           // No first sync yet (the join is waiting): the next run starts from a fresh clone, so the key files go up now.
           const { access } = await session();
@@ -838,6 +934,29 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
     async paths() {
       const { dir } = await session();
       return (await core.bgitFiles({ dir })).files;
+    },
+    /** Sealed items nobody can open any more (see `findOrphans`). @returns {Promise<string[]>} */
+    findOrphans,
+    /**
+     * « Effacer »: the certifications under a lost key are removed, the profile's unreadable `enc` block is dropped and every
+     * clear field kept (a clear date of birth is sealed with the account key by `sealClear` before the next send). The changes
+     * are pending edits: the next run sends them. The documents of the removed certifications go with the next run's clean-up.
+     * @returns {Promise<number>} the items changed
+     */
+    async eraseOrphans() {
+      const paths = await findOrphans();
+      /** @type {[string, unknown][]} */
+      const writes = [];
+      /** @type {string[]} */
+      const removes = [];
+      for (const path of paths) {
+        if (path === 'profile/diver.json') {
+          const { enc: _unreadable, ...rest } = (await store.read(path)) ?? {};
+          writes.push([path, rest]);
+        } else removes.push(path);
+      }
+      if (writes.length || removes.length) await store.trackedBatch({ writes, removes });
+      return paths.length;
     },
     /** The commits not sent yet (offline queue). @returns {Promise<number>} */
     async unsent() {

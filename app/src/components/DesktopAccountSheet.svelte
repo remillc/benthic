@@ -336,8 +336,8 @@
       </button>
       {#if accountLock.canPair}
         <button type="button" class="bc-desktop-account--row bc-desktop-account--profile" data-row="pair" onclick={() => leaveTo(accountLock.onpairnew)}>
-          <Icon name="qr" size={22} />
-          <span class="bc-desktop-account--row-texts"><span>{t('accountSync.pair.entry')}</span><span class="bc-desktop-account--row-line">{t('accountSync.pair.entryText')}</span></span>
+          <Icon name="device" size={22} />
+          <span class="bc-desktop-account--row-texts"><span>{t('accountSync.pair.entry')}</span><span class="bc-desktop-account--row-line">{accountLock.requests ? t('accountSync.pair.entryPending', { n: accountLock.requests }) : t('accountSync.pair.entryNone')}</span></span>
           <Icon name="chevron" size={20} />
         </button>
       {/if}

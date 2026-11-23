@@ -9,6 +9,7 @@
  * @type {{
  *   locked: boolean,
  *   canPair: boolean,
+ *   requests: number,
  *   onpair: () => void,
  *   onpairnew: () => void,
  *   onrecoverykey: () => void,
@@ -17,6 +18,7 @@
 export const accountLock = $state({
   locked: false,
   canPair: false,
+  requests: 0,
   onpair: () => {},
   onpairnew: () => {},
   onrecoverykey: () => {},

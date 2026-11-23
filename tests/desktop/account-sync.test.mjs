@@ -3,8 +3,9 @@
 // (app/src/lib/account-sync.js), join (account-join.js), key module (account-keys.js) and secret box (secret-box.js), on the
 // core's `bgit*` calls (one benthic-host process per device over stdio), with a real account, a real repository on the dev
 // Forgejo and real pushes. Several devices of one diver: gear and profile created on A are read on B; both edit and the
-// conflict is merged; a device without the data key sees its sealed items locked until it is paired (a QR with a one-time key,
-// then without a camera with ECDH) or given the recovery key; an expired pairing file is cleaned; the start-over.
+// conflict is merged; a device without the data key sees its sealed items locked until it is paired by approval (it asks, a paired
+// device compares the 6-digit code and approves, to-do #183; nothing but key files is committed) or given the recovery key; an
+// expired request is cleaned; the start-over.
 //
 // Skipped unless the stack is up and the host is given:
 //
@@ -24,17 +25,11 @@ import { createSecretBox } from '../../app/src/lib/secret-box.js';
 import { createInventory } from '../../app/src/lib/inventory.js';
 import { createProfile, emptyInfo } from '../../app/src/lib/profile.js';
 import { createAccountSync } from '../../app/src/lib/account-sync.js';
-import {
-  acceptPairing,
-  answerPairingRequest,
-  createPairing,
-  createPairingRequest,
-  createRecoveryKey,
-  pairingFilePath,
-  recoverAccountKey,
+import { createAccessRequest, createRecoveryKey, recoverAccountKey,
   resealFiles,
   startOver,
 } from '../../app/src/lib/account-keys.js';
+import { approveRequest, checkAnswer, declineRequest, finishPairing, pendingRequests, requestAccess } from '../../app/src/lib/account-pairing.js';
 
 const api = process.env.BENTHIC_DEV_API || '';
 const mailpit = process.env.BENTHIC_DEV_MAILPIT || '';
@@ -217,27 +212,42 @@ describe('account data sync between devices against the dev server', { skip }, (
     assert.equal(onServer.enc.kid, await a.box.deviceKid(), 'the profile on the server is still sealed with the account key');
   });
 
-  test('pairing with a camera: A commits the file, B reads it with the code, adopts the key, deletes the file', async () => {
-    const pairing = await createPairing(await heldKey(a));
-    await a.sync.commitKeyFiles({ writes: [pairing.file], message: 'Benthic: pairing' });
-    await synced(b);
-    const found = (await b.sync.readKeys()).pairing.find((f) => f.path === pairingFilePath(pairing.id));
-    assert.ok(found, 'the pairing file reached B');
-    // A wrong code does not open it.
-    const wrong = pairing.payload.replace(/:[^:]+$/, `:${'A'.repeat(43)}`);
-    await assert.rejects(acceptPairing({ payload: wrong }, found.json), /PAIRING_WRONG_KEY/);
-    const account = await acceptPairing({ payload: pairing.payload }, found.json);
-    await adoptAndReseal(b, account);
-    await b.sync.commitKeyFiles({ deletes: [pairingFilePath(pairing.id)], message: 'Benthic: paired' });
+  /** The pairing steps over a device's engine: the server's key files, and key files only committed. */
+  const doors = (d) => ({ store: d.store, box: d.box, fetchKeys: () => d.sync.fetchKeys(), commitKeyFiles: (c) => d.sync.commitKeyFiles({ ...c, keysOnly: true }) });
+  const thisDevice = { deviceName: 'Test tablet', platform: 'android' };
+
+  test('pairing by approval: B asks, A compares the code and approves, B adopts the key and deletes the answer', async () => {
+    await synced(b); // B has the working copy, no key
+    const request = await requestAccess(thisDevice, doors(b));
+    assert.equal((await checkAnswer(request, doors(b))).state, 'waiting');
+    const [seen] = await pendingRequests(await a.sync.fetchKeys());
+    assert.equal(seen.code, request.code, 'both devices show the same 6 digits');
+    assert.equal(seen.deviceName, 'Test tablet');
+    await approveRequest(seen.id, await heldKey(a), doors(a));
+    const answer = await checkAnswer(request, doors(b));
+    assert.equal(answer.state, 'answer');
+    const account = await finishPairing(request, answer.json, doors(b));
     await synced(b);
     const info = await b.profile.readInfo();
     assert.equal(info.fullName, 'Ann Diver');
     assert.equal(info.bloodGroup, 'A+');
     assert.equal(b.box.getAccountKid(), a.box.getAccountKid());
-    // A sees the file gone: that is the confirmation.
+    assert.equal(account.kid, a.box.getAccountKid());
+    // A sees the request and the answer gone: that is the confirmation.
     await synced(a);
-    assert.equal((await a.sync.readKeys()).pairing.length, 0);
+    const keys = await a.sync.readKeys();
+    assert.deepEqual([keys.pairing.length, keys.requests.length], [0, 0]);
     assert.equal((await b.sync.readKeys()).keyMissing, false);
+  });
+
+  test('a declined request is deleted and B is told', async () => {
+    const c = await device('c0');
+    await synced(c);
+    const request = await requestAccess(thisDevice, doors(c));
+    const [seen] = await pendingRequests(await a.sync.fetchKeys());
+    await declineRequest(seen.id, doors(a));
+    assert.equal((await checkAnswer(request, doors(c))).state, 'declined');
+    assert.equal((await synced(c)).keyMissing, true);
   });
 
   test('both edit while apart: different fields merge, the same field keeps the later change and is reported', async () => {
@@ -260,22 +270,6 @@ describe('account data sync between devices against the dev server', { skip }, (
     assert.equal(await b.sync.unsent(), 0);
   });
 
-  test('pairing without a camera: the new computer shows its key, A answers, the computer reads the account', async () => {
-    const c = await device('c');
-    assert.equal((await synced(c)).keyMissing, true);
-    const request = await createPairingRequest();
-    const answer = await answerPairingRequest(request.payload, await heldKey(a));
-    await a.sync.commitKeyFiles({ writes: [answer.file], message: 'Benthic: pairing' });
-    await synced(c);
-    const found = (await c.sync.readKeys()).pairing.find((f) => f.path === request.path);
-    assert.ok(found);
-    const account = await acceptPairing({ id: request.id, privateKey: request.privateKey }, found.json);
-    await adoptAndReseal(c, account);
-    await c.sync.commitKeyFiles({ deletes: [request.path], message: 'Benthic: paired' });
-    await synced(c);
-    assert.equal((await c.profile.readInfo()).bloodGroup, 'B+');
-  });
-
   test('the recovery key unlocks a new device; a wrong key does not', async () => {
     const made = await createRecoveryKey(await heldKey(a));
     assert.match(made.recoveryKey, /^[0-9A-Z]{4}(-[0-9A-Z]{4}){5}-[0-9A-Z]{2}$/);
@@ -293,15 +287,15 @@ describe('account data sync between devices against the dev server', { skip }, (
     assert.equal((await d.profile.readInfo()).fullName, 'Ann A. Diver');
   });
 
-  test('an expired pairing file is deleted by the next sync; one still valid stays', async () => {
-    const old = await createPairing(await heldKey(a), { now: () => Date.now() - 30 * 60 * 1000 });
-    const fresh = await createPairing(await heldKey(a));
-    await a.sync.commitKeyFiles({ writes: [old.file, fresh.file], message: 'Benthic: pairing' });
+  test('an expired request is deleted by the next sync; one still valid stays', async () => {
+    const old = await createAccessRequest(thisDevice, { now: () => Date.now() - 30 * 60 * 1000 });
+    const fresh = await createAccessRequest(thisDevice);
+    await a.sync.commitKeyFiles({ writes: [old.file, fresh.file], message: 'Benthic: request' });
     await synced(a);
     await synced(b);
-    const paths = (await b.sync.readKeys()).pairing.map((f) => f.path);
-    assert.deepEqual(paths, [pairingFilePath(fresh.id)]);
-    await a.sync.commitKeyFiles({ deletes: [pairingFilePath(fresh.id)], message: 'Benthic: pairing cancelled' });
+    const paths = (await b.sync.readKeys()).requests.map((f) => f.path);
+    assert.deepEqual(paths, [fresh.file.path]);
+    await a.sync.commitKeyFiles({ deletes: [fresh.file.path], message: 'Benthic: request cancelled' });
   });
 
   test('start over: a new account key, the sealed files go from the account, the gear stays', async () => {

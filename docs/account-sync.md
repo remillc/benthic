@@ -23,7 +23,7 @@ section 11 (11.3 the `benthic` branch and its merge rules, 11.5 encryption) stay
 | Diver settings (phase 2): units, cylinder library, planner defaults, dive computer list | `deviceStore` | `settings/units.json`, `settings/planner.json`, `settings/computers.json`, newest file wins |
 | Device settings: language, theme, date/time format, notifications, Bluetooth, paper/slate, autoSync, network, maps, snoozes | `deviceStore` | stay on the device |
 | `meta/*` (pending, state, sync head, consent) | IndexedDB | never synced |
-| Data key | secure storage | never in clear; only wrapped: `keys/recovery.json`, `keys/pairing/<id>.json`, plus `keys/account.json` `{kid}` |
+| Data key | secure storage | never in clear; only wrapped: `keys/recovery.json`, `keys/pairing/<id>.json` (the answer to `keys/requests/<id>.json`), plus `keys/account.json` `{kid}` |
 
 ## Store model
 
@@ -84,14 +84,81 @@ desktop only the `main` logbook window syncs account data.
 ## The data key on a second device
 
 There is no account password (sign-in by e-mail code), and a key held by the server would break end-to-end encryption.
-Decided: **QR pairing** carried by the `benthic` branch, plus an optional **recovery key**; platform keychain sync later.
+Decided (23 November 2026, to-do #183): **pairing by approval** carried by the `benthic` branch, plus an optional **recovery
+key**; platform keychain sync later. The first version of this section paired by QR code (a one-time key in a QR read by the
+camera, or an ECDH public key in a QR shown by a computer); it was replaced because it needed a camera, differed between
+phone and desktop, and put a long-lived secret on a screen. Nothing in the code reads a QR any more.
 
-- Pairing, new device with a camera: the old device shows a QR with a one-time 256-bit key K and a pairing id, and commits
-  `keys/pairing/<id>.json` = account key wrapped with K (AES-GCM, expires after 10 minutes). The new device scans, pulls,
-  unwraps, deletes the file. New device without a camera (desktop): it shows a QR with an ephemeral ECDH P-256 public key;
-  the phone scans, wraps the account key to it (ECDH, HKDF, AES-GCM, WebCrypto) and commits. The old device confirms.
-- Recovery key: 128 random bits shown as about 26 base32 characters; `keys/recovery.json` wraps the account key
-  (HKDF from WebCrypto). Offered strongly at the first sync, not forced.
+### Pairing by approval
+
+No camera, the same on a phone, a tablet and a computer. The server relays two small files and never sees the account key in
+clear.
+
+1. **New device** (no key): makes an ephemeral ECDH P-256 key pair (the private key stays in memory), commits the request
+   `keys/requests/<id>.json` and shows « En attente d’autorisation » with a 6-digit **verification code**. Only key files are
+   committed (`commitKeyFiles` with `keysOnly`): no sync, hence no join of data, runs before the key is held.
+2. **Paired device** (holds the account key): finds the request (see below) and asks « Donner accès à « <name> » ? » with the
+   same 6 digits and the buttons « Refuser » / « Autoriser ». Nothing is written before the diver taps.
+   - « Autoriser »: makes its own ephemeral ECDH pair, derives the shared secret with the request's public key, wraps the
+     account key (HKDF-SHA-256, then AES-256-GCM) and commits `keys/pairing/<id>.json`; the request is deleted in the same commit.
+   - « Refuser »: deletes the request and writes nothing else. Back and the scrim leave it for later (not asked again by itself
+     in this run of the app; the account sheet's row « Demandes d’accès » asks again).
+3. **New device** looks at the server every 3 s: when `keys/pairing/<id>.json` exists, it unwraps with its private key, adopts the
+   key, seals its local items with it (`adoptAndReseal`), deletes the answer and shows « Appareil jumelé »; the join summary
+   follows when due. If its request disappears without an answer it was declined; after 10 minutes it expired. Both give a clear
+   message and « Demander de nouveau ».
+
+**How the paired device finds requests.** Without any push channel (instant push between devices is #173), it polls: every 15 s
+while the app is open and in front (`REQUEST_POLL_MS` in `account-sync-flows.svelte.js`; the poll is a pull of the branch with
+`fetchKeys`, nothing of the data), at once when the app comes back to the front, and after each sync run (reads the working copy,
+no network). It polls only when it can approve: signed in, key held, not pull-only. A request opens the approval dialog by
+itself when no other screen is open (the same « one screen at a time » rule as the other questions); the account sheet's row
+shows the count or « Aucune demande » with how to start one from the new device.
+
+**Files** (`app/src/lib/account-keys.js`, `account-pairing.js`)
+
+- `keys/requests/<id>.json`: `{ format: 1, id, pub, deviceName, platform, createdAt, expiresAt }`. `id`: 16 random bytes in
+  base64url (22 characters); `pub`: the new device's ECDH public key, 65 raw bytes in base64url; `expiresAt - createdAt` is
+  10 minutes, and a paired device ignores a request whose span is longer.
+- `keys/pairing/<id>.json`: `{ format: 1, mode: 'e', id, kid, expiresAt, epk, nonce, ct }`; `epk` is the paired device's
+  ephemeral public key. HKDF-SHA-256 (salt = the id, info `benthic-pair-ecdh-v1`), then AES-256-GCM; the authenticated data is
+  `pair|e|<id>|<kid>|<expiresAt>`, so the expiry cannot be extended.
+- The clean-up pass of every run deletes the requests and the answers past their time.
+
+**The verification code.** Six decimal digits: the first 4 bytes of SHA-256 over
+`benthic-pair-sas-v1|<id>|<deviceName>|<pub bytes>`, read as an unsigned number, modulo 1 000 000, zero padded. The new device
+shows it before the paired device has any key, so it can depend only on what both sides read from the request. Both sides
+compute it themselves from the request file's content; it is never sent.
+
+*Why it matters.* The server relays the request. A malicious or compromised server could replace `pub` with its own key,
+let the paired device wrap the account key to that key, and read it. The paired device's code is computed from the `pub` it
+received, the new device's from the `pub` it made: a swapped key (or name, or id) shows two different codes, and the diver,
+who compares them before « Autoriser », refuses. Nothing else authenticates the new device: the server can never get the
+key without the diver approving a code that matches.
+
+*What it does not do (decided limit, to be reviewed).* Six digits are 20 bits. A server that replaced `pub` could try about a
+million key pairs until the code of its key equals the real one (seconds to minutes on a computer) and the comparison would
+then pass: the comparison protects against a passive or opportunistic server and against a mistaken approval, not against a
+server that is actively grinding. Two cheap ways to close it if wanted: a longer code (8 digits is 27 bits, 10 digits 33 bits)
+or a commit step (the new device first publishes only a hash of its key and reveals the key after the paired device shows its
+own random value, as in ZRTP's short authentication string; one more round trip). Not done in this first version, to keep the
+flow to one approval. The approval dialog also says to approve only if the diver just asked for it, and an answer expires after
+10 minutes.
+
+**Device name.** `lib/device-name.js` names a device without a native call: « Téléphone Android » or « Tablette Android »
+(screen's short side of 600 px and more), « iPhone », « iPad », « Ordinateur Windows », « Ordinateur Mac », « Ordinateur Linux »
+(`window.benthicDesktop.platform`), « Autre appareil »; the keys are `accountSync.device.*`. The Android model is not used:
+Chrome's reduced user agent gives « K ». A native model name would need a plugin call and is left out.
+
+### Recovery key
+
+128 random bits shown as about 26 base32 characters; `keys/recovery.json` wraps the account key (HKDF from WebCrypto). Offered
+strongly at the first sync, not forced.
+
+- Crockford's base32 (`0-9 A-Z` without I, L, O, U) in groups of four joined by dashes; on input, spaces, dashes and case are
+  ignored, O reads as 0, I and L as 1. HKDF-SHA-256 (salt `benthic-recovery-v1`, info `account key wrap`), then AES-256-GCM.
+- `keys/recovery.json`: `{ format: 1, kid, nonce, ct }`. `keys/account.json`: `{ format: 1, kid }`, the id of the account key
+  (first 8 bytes of its SHA-256, in hex).
 - `secret-box.js` gets a keyring: `open` picks the key by `block.kid`, `seal` always uses the account key, and no key is
   ever created when `keys/account.json` exists and the key is missing (`MISSING_DATA_KEY`). A joining device that has its
   own key keeps it in the keyring, opens its items and re-seals them with the account key before upload. Until the key
@@ -101,22 +168,25 @@ Decided: **QR pairing** carried by the `benthic` branch, plus an optional **reco
 - Bug fixed on the way: Android must never replace an unreadable data key silently (exclude `data-key.bin` from backups
   or treat an unreadable key as missing).
 
-### QR payloads and key files
+### Items nobody can open any more (« orphaned »)
 
-Implemented in `app/src/lib/account-keys.js`. A QR carries one text, `benthic-pair:1:<mode>:<id>:<data>`: `1` is the
-payload version; `id` is 16 random bytes in base64url (22 characters), the name of `keys/pairing/<id>.json`; `mode` is
-`k` (camera: `data` is the one-time key K, 32 bytes in base64url) or `e` (no camera: `data` is the new device's
-ephemeral ECDH P-256 public key, 65 raw bytes in base64url).
+Found on 23 November 2026 on a tablet that held the account key: its certifications and the profile's `enc` block were sealed
+with the key of an older app install (`org.opendives.app`) that is lost for good (Android Keystore). Pairing cannot help: the
+device already holds the account key, and no other device or recovery key has the old one.
 
-- `keys/account.json`: `{ format: 1, kid }`, the id of the account key (first 8 bytes of its SHA-256, in hex).
-- `keys/pairing/<id>.json`, mode `k`: `{ format: 1, mode, id, kid, expiresAt (ms), nonce, ct }`; AES-GCM under K, the
-  authenticated data is `pair|k|<id>|<kid>|<expiresAt>`, so the expiry cannot be extended. Mode `e` adds `epk` (the
-  paired device's ephemeral public key); the key is ECDH, then HKDF-SHA-256 (salt = the id, info
-  `benthic-pair-ecdh-v1`), then AES-256-GCM.
-- `keys/recovery.json`: `{ format: 1, kid, nonce, ct }`; the recovery key is 128 random bits shown as 26 characters of
-  Crockford's base32 (`0-9 A-Z` without I, L, O, U) in groups of four joined by dashes; on input, spaces, dashes and
-  case are ignored, O reads as 0, I and L as 1. HKDF-SHA-256 (salt `benthic-recovery-v1`, info `account key wrap`),
-  then AES-256-GCM.
+- **Detection** (`findOrphans` in the engine, reported as `orphaned` by every `synced` run): a sealed item of `profile/diver.json`
+  or `certifications/*` whose `enc.kid` is neither the account's nor any key this device holds, on a device that holds the
+  account key. A device that does not hold the account key reports none (pairing can still open them).
+- **Dialog** (`OrphanedDataDialog`, once per run of the app, after the join and before the recovery key offer, not when
+  pull-only): « Données chiffrées illisibles » — « Des données chiffrées avec une ancienne clé ne peuvent plus être ouvertes. … »
+  with « Plus tard » / « Effacer ».
+- **« Effacer »** (`eraseOrphans`): the orphaned certifications are removed; the profile loses its unreadable `enc` block and keeps
+  every clear field (a clear `dateOfBirth` is then sealed with the account key by `sealClear` before the next send); both go up
+  as ordinary pending edits.
+- **Documents.** Each run's clean-up removes `documents/*` that no certification references, on the device and, by the next send,
+  on the server. It does nothing unless the device holds the account key and every certification opens (an unreadable card could
+  reference any document), and it never removes a document still waiting to be sent. It is what deletes the card photos of the
+  erased certifications.
 
 ## Server and native changes
 
@@ -137,7 +207,7 @@ ephemeral ECDH P-256 public key, 65 raw bytes in base64url).
 2. The four native bgit calls, on every platform, with `tests/run-bgit-test.sh` cases on the `benthic` branch.
 3. The engine and the clean-up pass (`account-sync.js`), tested with two fake devices over real git.
 4. The join step and matching (`account-join.js`).
-5. Keyring, pairing and recovery key (`account-keys.js`, `secret-box.js`).
+5. Keyring, pairing by approval and recovery key (`account-keys.js`, `account-pairing.js`, `secret-box.js`).
 6. Triggers, status and screens (pairing, recovery key, join summary, locked items, the conflict notice) — the screens
    from Claude Conception's mock-ups (to-do in `docs/TODOS.md`).
 7. Two-device integration test against the dev server; then a check on the real tablet and phone.
@@ -153,9 +223,10 @@ are in `app/src/lib/account-sync-screens.js`, tested by `tests/app/account-sync-
 
 | Component (`app/src/components/`) | Item | Props | Callbacks |
 |---|---|---|---|
-| `AccountUnlockDialog` | 1 | `camera` (false on a computer: the row reads « Afficher un code à lire avec votre téléphone ») | `onpair`, `onrecoverykey`, `onlater` (also Back and the scrim), `onlost` (opens `StartOverDialog`) |
-| `PairShowCode` | 2, 7 | `variant` (`'old'`: paired device, QR with K; `'new'`: computer without a camera, QR with its ECDH key), `payload` (the QR text), `expiresAt` (ms since 1970), `now` (clock, tests) | `oncancel`, `onscan` (phone and tablet, old variant: the « Lire le code d’un ordinateur » button on the left), `onrenew` (« Nouveau code » once expired) |
-| `PairConfirmDialog` | 8 | `deviceName`, `busy` | `onconfirm` (« Jumeler »: only now is anything committed), `onrefuse` (« Refuser », Back, scrim) |
+| `AccountUnlockDialog` | 1 | none (the pairing row reads « Demander l’autorisation à un appareil déjà jumelé » everywhere) | `onpair`, `onrecoverykey`, `onlater` (also Back and the scrim), `onlost` (opens `StartOverDialog`) |
+| `PairRequestDialog` | 2, 7 (#183) | `kind` (`'waiting'`: « Demander l’accès », « En attente d’autorisation », the 6 digits large and monospace, the countdown, « Ouvrez Benthic sur un appareil déjà jumelé et autorisez cet appareil »; `'declined'`, `'expired'`, `'failed'`: what happened), `code`, `expiresAt` (ms since 1970), `now` (clock, tests) | `oncancel` (« Annuler » / « Fermer », Back, scrim), `onagain` (« Demander de nouveau », the ended kinds) |
+| `PairConfirmDialog` | 8 (#183) | `deviceName`, `code`, `busy` | `onconfirm` (« Autoriser »: only now is anything committed), `onrefuse` (« Refuser »: deletes the request), `onlater` (Back, scrim) |
+| `OrphanedDataDialog` | — | `busy` | `onerase` (« Effacer »), `onlater` (« Plus tard », Back, scrim) |
 | `PairedDialog` | 4 | none | `onclose` |
 | `RecoveryKeyOffer` | 9 | `busy` | `oncreate`, `onlater` |
 | `RecoveryKeyShow` | 10 | `recoveryKey` (the 26 characters, any grouping) | `oncopy(text)` (the key in groups of four), `ondone`; Back and the scrim do nothing: the key is never shown again |
@@ -166,17 +237,17 @@ are in `app/src/lib/account-sync-screens.js`, tested by `tests/app/account-sync-
 
 Not components:
 
-- `lib/pair-scan.js`: the two camera screens (« Jumeler cet appareil », « Lire le code d’un ordinateur ») are the native scanner.
-  `scanPairingCode('new-device' | 'computer')` gives it its texts and resolves to the code's text, or `null` when closed.
+- The two camera screens of the QR pairing (`lib/pair-scan.js`) are gone. The native scanner keeps its `mode: 'text'` (Kotlin `QrScanActivity`, Swift `QrScanController`), unused and harmless.
 - `lib/two-device-notice.js`: `showTwoDeviceNotice(name)` (item 12), the app's snackbar with « OK ». It uses two new options of
   `showSnackbar`: `placement: 'center'` (560 dp, centred at the bottom on a tablet and the desktop) and `long` (three lines).
   Above the FAB on the phone as for every snackbar.
 - `lib/locked-data.svelte.js`: `accountLock` `{ locked, canPair, onpair, onpairnew, onrecoverykey }`, all off by default.
+  `requests` is the count of pending access requests.
   `locked` turns on the item 5 look: the subtitles of « Fiche d’urgence », « Brevets et documents » and « Informations »
   read « Verrouillé : jumelez cet appareil » (phone page and the wide left pane), `LockedDataCard` appears under the phone
   list and replaces the Informations pane and the Brevets pane on a wide screen, and the Brevets « + » and the Informations
-  pencil are hidden. `canPair` shows the account sheet's « Jumeler un nouvel appareil » row (Android, iPhone and desktop
-  sheets), which calls `onpairnew` (show the code, `PairShowCode variant="old"`).
+  pencil are hidden. `canPair` shows the account sheet's « Demandes d’accès » row (Android, iPhone and desktop
+  sheets), whose second line is the count or « Aucune demande … »; it calls `onpairnew` (look for the requests and ask about the first).
 
 ### Wiring (done on 23 November 2026)
 

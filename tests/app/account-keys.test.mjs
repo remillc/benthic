@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createSecretBox, toBase64 } from '../../app/src/lib/secret-box.js';
 import {
-  newAccountKey, createPairing, createPairingRequest, answerPairingRequest, acceptPairing, parsePairingPayload,
+  newAccountKey, createAccessRequest, readAccessRequest, approveAccessRequest, acceptApproval, verificationCode, fromBase64Url,
   createRecoveryKey, recoverAccountKey, parseRecoveryKey, resealFiles, startOver, accountKeyFile, parseAccountKeyFile,
   isPairingExpired, PAIRING_TTL_MS,
 } from '../../app/src/lib/account-keys.js';
@@ -15,47 +15,81 @@ const keeperOf = (b64 = '') => {
 const randKey = () => toBase64(crypto.getRandomValues(new Uint8Array(32)));
 const sha = async (b64) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', Buffer.from(b64, 'base64')))].map((x) => x.toString(16).padStart(2, '0')).join('');
 
-test('pairing with a camera: wrap and unwrap', async () => {
+const device = { deviceName: 'Tablette Android', platform: 'android' };
+
+test('pairing by approval: request, approve, accept with two independent devices; the codes are equal', async () => {
   const acc = await newAccountKey();
   const t = 1_000_000;
-  const p = await createPairing(acc, { now: () => t });
-  assert.match(p.payload, /^benthic-pair:1:k:[A-Za-z0-9_-]{22}:[A-Za-z0-9_-]{43}$/);
-  assert.equal(p.file.path, `keys/pairing/${p.id}.json`);
-  assert.equal(p.file.json.expiresAt, t + PAIRING_TTL_MS);
-  const got = await acceptPairing({ payload: p.payload }, JSON.parse(JSON.stringify(p.file.json)), { now: () => t + 1000 });
+  const req = await createAccessRequest(device, { now: () => t });
+  assert.match(req.code, /^\d{6}$/);
+  assert.equal(req.file.path, `keys/requests/${req.id}.json`);
+  assert.equal(req.answerPath, `keys/pairing/${req.id}.json`);
+  assert.equal(req.file.json.expiresAt, t + PAIRING_TTL_MS);
+  assert.equal(req.file.json.deviceName, 'Tablette Android');
+  // The paired device only has the file as the server hands it over.
+  const seen = await readAccessRequest(JSON.parse(JSON.stringify(req.file.json)), { now: () => t + 1000 });
+  assert.equal(seen.code, req.code, 'same 6 digits on both sides');
+  assert.equal(seen.deviceName, 'Tablette Android');
+  assert.equal(seen.expired, false);
+  const ans = await approveAccessRequest(req.file.json, acc, { now: () => t + 2000 });
+  assert.equal(ans.file.path, req.answerPath);
+  assert.deepEqual(ans.deletes, [req.file.path]);
+  assert.equal(ans.file.json.mode, 'e');
+  const got = await acceptApproval({ id: req.id, privateKey: req.privateKey }, JSON.parse(JSON.stringify(ans.file.json)), { now: () => t + 3000 });
   assert.deepEqual(got, acc);
+  // The file never holds the account key in clear.
+  assert.ok(!JSON.stringify(ans.file.json).includes(acc.key));
 });
 
-test('pairing with a camera: expiry, wrong K, other id, tampered expiry', async () => {
-  const acc = await newAccountKey();
+test('the code authenticates the new device: a swapped public key, name or id gives a different code', async () => {
   const t = 5_000;
-  const p = await createPairing(acc, { now: () => t });
-  await rejects(acceptPairing({ payload: p.payload }, p.file.json, { now: () => t + PAIRING_TTL_MS + 1 }), 'PAIRING_EXPIRED');
-  assert.equal(isPairingExpired(p.file.json, { now: () => t + PAIRING_TTL_MS + 1 }), true);
-  assert.equal(isPairingExpired(p.file.json, { now: () => t }), false);
-  const q = await createPairing(acc, { now: () => t });
-  await rejects(acceptPairing({ payload: q.payload }, p.file.json, { now: () => t }), 'PAIRING_ID_MISMATCH');
-  const wrong = p.payload.replace(/:[A-Za-z0-9_-]{43}$/, ':' + 'A'.repeat(43));
-  await rejects(acceptPairing({ payload: wrong }, p.file.json, { now: () => t }), 'PAIRING_WRONG_KEY');
-  await rejects(acceptPairing({ payload: p.payload }, { ...p.file.json, expiresAt: p.file.json.expiresAt + 1e6 }, { now: () => t }), 'PAIRING_WRONG_KEY');
-  await rejects(acceptPairing({ payload: 'hello' }, p.file.json), 'PAIRING_PAYLOAD_INVALID');
-  await rejects(acceptPairing({ payload: p.payload }, { format: 1 }), 'PAIRING_FILE_INVALID');
+  const a = await createAccessRequest(device, { now: () => t });
+  const b = await createAccessRequest(device, { now: () => t });
+  const swapped = { ...a.file.json, pub: b.file.json.pub };
+  assert.notEqual((await readAccessRequest(swapped, { now: () => t })).code, a.code);
+  const renamed = { ...a.file.json, deviceName: 'Ordinateur Windows' };
+  assert.notEqual((await readAccessRequest(renamed, { now: () => t })).code, a.code);
+  const other = await verificationCode(b.id, device.deviceName, fromBase64Url(a.file.json.pub));
+  assert.notEqual(other, a.code);
+  // Stable and zero padded.
+  assert.equal(await verificationCode(a.id, device.deviceName, fromBase64Url(a.file.json.pub)), a.code);
 });
 
-test('pairing without a camera: ECDH with two independent key pairs', async () => {
+test('a key swapped by the server cannot read the answer meant for the real device', async () => {
+  const acc = await newAccountKey();
+  const real = await createAccessRequest(device);
+  const attacker = await createAccessRequest(device);
+  // The server hands the paired device the attacker's key under the real id.
+  const forged = { ...real.file.json, pub: attacker.file.json.pub };
+  const ans = await approveAccessRequest(forged, acc);
+  await rejects(acceptApproval({ id: real.id, privateKey: real.privateKey }, ans.file.json), 'PAIRING_WRONG_KEY');
+  assert.deepEqual(await acceptApproval({ id: real.id, privateKey: attacker.privateKey }, ans.file.json), acc, 'only the key in the file can read it');
+});
+
+test('requests and answers: expiry, wrong key, other id, tampered expiry, bad files', async () => {
   const acc = await newAccountKey();
   const t = 9_000;
-  const req = await createPairingRequest();
-  assert.match(req.payload, /^benthic-pair:1:e:[A-Za-z0-9_-]{22}:[A-Za-z0-9_-]{87}$/);
-  assert.equal(parsePairingPayload(req.payload).mode, 'e');
-  const ans = await answerPairingRequest(req.payload, acc, { now: () => t });
-  assert.equal(ans.file.path, req.path);
-  const got = await acceptPairing({ id: req.id, privateKey: req.privateKey }, ans.file.json, { now: () => t + 5 });
-  assert.deepEqual(got, acc);
-  const other = await createPairingRequest();
-  await rejects(acceptPairing({ id: req.id, privateKey: other.privateKey }, ans.file.json, { now: () => t }), 'PAIRING_WRONG_KEY');
-  await rejects(acceptPairing({ id: req.id, privateKey: req.privateKey }, ans.file.json, { now: () => t + PAIRING_TTL_MS + 1 }), 'PAIRING_EXPIRED');
-  await rejects(answerPairingRequest((await createPairing(acc)).payload, acc), 'PAIRING_PAYLOAD_INVALID');
+  const req = await createAccessRequest(device, { now: () => t });
+  assert.equal((await readAccessRequest(req.file.json, { now: () => t + PAIRING_TTL_MS + 1 })).expired, true);
+  await rejects(approveAccessRequest(req.file.json, acc, { now: () => t + PAIRING_TTL_MS + 1 }), 'PAIRING_EXPIRED');
+  await rejects(readAccessRequest({ ...req.file.json, expiresAt: t + 10 * PAIRING_TTL_MS }), 'PAIRING_REQUEST_INVALID');
+  await rejects(readAccessRequest({ ...req.file.json, pub: 'AAAA' }), 'PAIRING_REQUEST_INVALID');
+  await rejects(readAccessRequest({ format: 1 }), 'PAIRING_REQUEST_INVALID');
+  await rejects(readAccessRequest(null), 'PAIRING_REQUEST_INVALID');
+  const ans = await approveAccessRequest(req.file.json, acc, { now: () => t });
+  const other = await createAccessRequest(device);
+  await rejects(acceptApproval({ id: req.id, privateKey: other.privateKey }, ans.file.json, { now: () => t }), 'PAIRING_WRONG_KEY');
+  await rejects(acceptApproval({ id: req.id, privateKey: req.privateKey }, ans.file.json, { now: () => t + PAIRING_TTL_MS + 1 }), 'PAIRING_EXPIRED');
+  await rejects(acceptApproval({ id: other.id, privateKey: req.privateKey }, ans.file.json, { now: () => t }), 'PAIRING_ID_MISMATCH');
+  await rejects(acceptApproval({ id: req.id, privateKey: req.privateKey }, { ...ans.file.json, expiresAt: ans.file.json.expiresAt + 1e6 }, { now: () => t }), 'PAIRING_WRONG_KEY');
+  await rejects(acceptApproval({ id: req.id, privateKey: req.privateKey }, { format: 1 }), 'PAIRING_FILE_INVALID');
+  assert.equal(isPairingExpired(ans.file.json, { now: () => t + PAIRING_TTL_MS + 1 }), true);
+  assert.equal(isPairingExpired(req.file.json, { now: () => t }), false);
+});
+
+test('the key module no longer has a QR or camera pairing', async () => {
+  const source = await import('node:fs').then((fs) => fs.readFileSync(new URL('../../app/src/lib/account-keys.js', import.meta.url), 'utf8'));
+  assert.doesNotMatch(source, /benthic-pair:|PAYLOAD_PREFIX|createPairing\b|parsePairingPayload|qrScan/);
 });
 
 test('recovery key: format, round trip, normalisation, wrong key', async () => {

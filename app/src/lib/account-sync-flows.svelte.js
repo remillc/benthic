@@ -10,21 +10,10 @@ import { t } from './i18n.js';
 import { showSnackbar } from './snackbar.js';
 import { deviceStore } from './device-store.js';
 import { accountDataDeps, loadProfile } from './profile.svelte.js';
-import {
-  PAIRING_TTL_MS,
-  acceptPairing,
-  answerPairingRequest,
-  createPairing,
-  createPairingRequest,
-  createRecoveryKey,
-  pairingFilePath,
-  parsePairingPayload,
-  recoverAccountKey,
-  startOver,
-} from './account-keys.js';
+import { createRecoveryKey, recoverAccountKey, startOver } from './account-keys.js';
 import { isKeyPath } from './account-sync.js';
-import { adoptAndReseal as adopt, pairWithCode } from './account-pairing.js';
-import { scanPairingCode } from './pair-scan.js';
+import { adoptAndReseal as adopt, approveRequest, cancelRequest, checkAnswer, declineRequest, finishPairing, pendingRequests, requestAccess } from './account-pairing.js';
+import { currentDeviceKind, platformOf } from './device-name.js';
 import { showTwoDeviceNotice } from './two-device-notice.js';
 import { accountLock } from './locked-data.svelte.js';
 import {
@@ -32,6 +21,8 @@ import {
   analyseJoin,
   applyJoin,
   commitAccountKeyFiles,
+  commitPairingFiles,
+  eraseAccountOrphans,
   dismissAccountConflicts,
   forgetLastAccount,
   listAccountPaths,
@@ -39,24 +30,29 @@ import {
   readAccountKeys,
   syncAccountNow,
 } from './account-sync.svelte.js';
-import { desktopApp } from './layout.svelte.js';
 
-/** @typedef {'unlock'|'pairOld'|'pairNew'|'confirm'|'paired'|'joined'|'offer'|'show'|'enter'|'startOver'|'join'|'different'} AccountScreen */
+/** @typedef {'unlock'|'requestWait'|'requestEnded'|'approve'|'paired'|'joined'|'offer'|'show'|'enter'|'startOver'|'join'|'different'|'orphans'} AccountScreen */
 
 /** The screen open now ('' when none) and what it shows. */
 export const accountFlow = $state({
   /** @type {''|AccountScreen} */
   screen: '',
-  /** The pairing QR's text. */
-  payload: '',
-  /** When the pairing code expires, ms since 1970. */
+  /** The 6-digit code of the request in view (the new device's own, or the one the paired device is asked to approve). */
+  code: '',
+  /** When the new device's request expires, ms since 1970. */
   expiresAt: 0,
+  /** The request the paired device is asked about. */
+  requestId: '',
+  /** The requests of new devices waiting for an answer, as the paired device read them. @type {{ id: string, deviceName: string, code: string, expiresAt: number }[]} */
+  requests: [],
+  /** Why the new device's request ended: 'declined', 'expired' or 'failed'. */
+  endReason: '',
   busy: false,
   /** '' or 'wrong' (the recovery key was refused). */
   error: '',
   /** The recovery key just made, shown once. */
   recoveryKey: '',
-  /** The device asking to be paired (the paired device's confirmation). */
+  /** The device asking for access (the paired device's question). */
   deviceName: '',
   /** @type {{ recognised: number, added: number, matches: import('./account-sync-screens.js').AmbiguousMatch[] }} */
   join: { recognised: 0, added: 0, matches: [] },
@@ -65,7 +61,7 @@ export const accountFlow = $state({
 });
 
 /** Asked once per run of the app; a later manual sync or a button asks again. */
-const asked = { unlock: false, join: false, different: false };
+const asked = { unlock: false, join: false, different: false, orphans: false };
 /** The recovery key's « Plus tard »: asked again after a week. */
 const RECOVERY_LATER_KEY = 'bc.accountRecoveryLater';
 const RECOVERY_PAUSE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -74,10 +70,8 @@ const WATCH_MS = 3000;
 
 /** @type {ReturnType<typeof setInterval>|null} */
 let watcher = null;
-/** The pairing in progress on this device. @type {{ id: string, privateKey?: CryptoKey, payloadText?: string }|null} */
+/** The request this device made and waits on. @type {import('./account-pairing.js').AccessRequest|null} */
 let pairing = null;
-/** The code a paired device scanned from a computer. */
-let scanned = '';
 
 const stopWatching = () => {
   if (watcher !== null) clearInterval(watcher);
@@ -98,12 +92,13 @@ async function heldAccountKey() {
 export function closeScreen() {
   stopWatching();
   pairing = null;
-  scanned = '';
   accountFlow.screen = '';
   accountFlow.busy = false;
   accountFlow.error = '';
   accountFlow.recoveryKey = '';
-  accountFlow.payload = '';
+  accountFlow.code = '';
+  accountFlow.requestId = '';
+  accountFlow.endReason = '';
 }
 
 /** @param {AccountScreen} screen */
@@ -147,160 +142,189 @@ async function afterUnlocked() {
 const codeOf = (e) => String(/** @type {any} */ (e)?.message ?? e);
 
 // ---------------------------------------------------------------------------------------------------------------
-// A paired device shows a code (item 7), or reads a computer's (items 7 and 8)
+// A paired device approves the requests of new devices (to-do #183)
 
-/** « Jumeler un nouvel appareil » (account sheet): the code, valid 10 minutes, and the file it opens. */
-export async function showPairOld() {
-  const account = await heldAccountKey();
-  if (!account) return;
-  open('pairOld');
-  accountFlow.payload = '';
-  accountFlow.busy = true;
+/** What a pairing step needs of the engine: the server's key files, and a commit of key files only (no data is touched). */
+const pairingDeps = () => ({ fetchKeys: fetchAccountKeys, commitKeyFiles: commitPairingFiles });
+
+/** Requests the diver closed with Back or « Plus tard »: not shown again by themselves in this run of the app. @type {Set<string>} */
+const dismissed = new Set();
+
+/** How often a paired device looks for requests while the app is open and in front. */
+export const REQUEST_POLL_MS = 15000;
+
+/** Keeps the requests the paired device knows of, the count on the account sheet's row, and the flag the sheet reads. */
+function setRequests(list) {
+  accountFlow.requests = list;
+  accountLock.requests = list.length;
+}
+
+/**
+ * Looks for requests: on the server (`network`) or in the working copy the last run left (no network). Never throws.
+ * @param {{ network: boolean }} how
+ */
+export async function refreshRequests({ network }) {
   try {
-    const made = await createPairing(account);
-    const result = await commitAccountKeyFiles({ writes: [made.file], message: 'Benthic: pairing' });
-    if (result.status !== 'synced') throw new Error(result.error ?? result.status);
-    pairing = { id: made.id };
-    accountFlow.payload = made.payload;
-    accountFlow.expiresAt = made.expiresAt;
-    accountFlow.busy = false;
-    // The new device deletes the file once it has the key: its disappearance is the confirmation.
-    watcher = setInterval(async () => {
-      if (!pairing || accountFlow.screen !== 'pairOld') return stopWatching();
-      try {
-        await syncAccountNow();
-        const keys = await readAccountKeys();
-        if (!keys.pairing.some((f) => f.path === pairingFilePath(/** @type {{ id: string }} */ (pairing).id)) && Date.now() < accountFlow.expiresAt) {
-          closeScreen();
-          say('accountSync.pair.otherPaired');
-        }
-      } catch (e) {
-        console.error('Waiting for the new device', e);
-      }
-    }, WATCH_MS);
+    const keys = network ? await fetchAccountKeys() : await readAccountKeys();
+    setRequests(await pendingRequests(keys));
   } catch (e) {
-    console.error('Showing the pairing code', e);
-    closeScreen();
-    say('accountSync.pair.failed');
+    if (codeOf(e) !== 'UNREACHABLE' && codeOf(e) !== 'NO_WORKING_COPY') console.warn('Looking for access requests', e);
   }
 }
 
-/** Closes the code; the file it opened is deleted at once (best effort: it expires anyway). */
-export async function cancelPairOld() {
-  const id = pairing?.id;
+/**
+ * Starts looking: now, every `REQUEST_POLL_MS` while the page is visible, when the app comes back to the front, and after each
+ * sync run (`afterRun`, without the network). Returns the function that stops it.
+ * @returns {() => void}
+ */
+export function watchRequests() {
+  const visible = () => typeof document === 'undefined' || document.visibilityState !== 'hidden';
+  const look = () => {
+    if (visible()) void refreshRequests({ network: true });
+  };
+  look();
+  const timer = setInterval(look, REQUEST_POLL_MS);
+  if (typeof document !== 'undefined') document.addEventListener('visibilitychange', look);
+  return () => {
+    clearInterval(timer);
+    if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', look);
+    setRequests([]);
+  };
+}
+
+/** The request to show now: the newest one the diver has not put aside. */
+export const requestDue = () => accountFlow.requests.find((r) => !dismissed.has(r.id)) ?? null;
+
+/** @param {{ id: string, deviceName: string, code: string }} request */
+export function askApproval(request) {
+  accountFlow.requestId = request.id;
+  accountFlow.deviceName = request.deviceName;
+  accountFlow.code = request.code;
+  open('approve');
+}
+
+/** The account sheet's row: the request waiting, or a look at the server and, if there is none, what to do. */
+export async function openRequests() {
+  dismissed.clear();
+  if (!requestDue()) await refreshRequests({ network: true });
+  const next = requestDue();
+  if (next) askApproval(next);
+  else say('accountSync.pair.none');
+}
+
+/** « Plus tard » (Back, the scrim): the request stays on the server until it expires; it is not asked again by itself. */
+export function putAsideRequest() {
+  if (accountFlow.requestId) dismissed.add(accountFlow.requestId);
   closeScreen();
-  if (id) commitAccountKeyFiles({ deletes: [pairingFilePath(id)], message: 'Benthic: pairing cancelled' }).catch((e) => console.error('Deleting the pairing file', e));
 }
 
-/** « Lire le code d’un ordinateur »: the scanner, then the confirmation. */
-export async function scanComputerCode() {
-  await cancelPairOld();
-  let text;
-  try {
-    text = await scanPairingCode('computer');
-  } catch (e) {
-    console.error('Scanning a computer’s code', e);
-    say('accountSync.pair.failed');
-    return;
-  }
-  if (text == null) return;
-  try {
-    if (parsePairingPayload(text).mode !== 'e') throw new Error('PAIRING_PAYLOAD_INVALID');
-  } catch {
-    say('accountSync.pair.failedRead');
-    return;
-  }
-  scanned = text;
-  accountFlow.deviceName = t('accountSync.pair.computerName');
-  open('confirm');
-}
+/** @param {string} id */
+const forget = (id) => setRequests(accountFlow.requests.filter((r) => r.id !== id));
 
-/** « Jumeler »: only now is anything committed. */
-export async function confirmPair() {
+/** « Autoriser »: only now is the key wrapped and anything committed. */
+export async function approveNow() {
   const account = await heldAccountKey();
-  if (!account || !scanned) return closeScreen();
+  const id = accountFlow.requestId;
+  if (!account || !id) return closeScreen();
   accountFlow.busy = true;
   try {
-    const answer = await answerPairingRequest(scanned, account);
-    const result = await commitAccountKeyFiles({ writes: [answer.file], message: 'Benthic: pairing' });
-    if (result.status !== 'synced') throw new Error(result.error ?? result.status);
+    await approveRequest(id, account, pairingDeps());
+    forget(id);
     closeScreen();
-    say('accountSync.pair.keySent');
+    say('accountSync.pair.approved');
   } catch (e) {
-    console.error('Answering the pairing request', e);
+    console.error('Approving the access request', e);
+    forget(id);
     closeScreen();
+    say(codeOf(e) === 'PAIRING_EXPIRED' ? 'accountSync.pair.requestGone' : 'accountSync.pair.failed');
+  }
+}
+
+/** « Refuser »: the request is deleted and nothing else is written. */
+export async function declineNow() {
+  const id = accountFlow.requestId;
+  if (!id) return closeScreen();
+  accountFlow.busy = true;
+  try {
+    await declineRequest(id, pairingDeps());
+  } catch (e) {
+    console.error('Declining the access request', e);
     say('accountSync.pair.failed');
   }
+  forget(id);
+  closeScreen();
 }
 
 // ---------------------------------------------------------------------------------------------------------------
 // This device has no key (items 1 to 4)
 
-/** @param {unknown} e */
-function pairingFailure(e) {
-  const code = codeOf(e);
-  say(code === 'PAIRING_EXPIRED' ? 'accountSync.pair.failedExpired' : code === 'PAIRING_WRONG_KEY' || code.startsWith('PAIRING_') ? 'accountSync.pair.failedRead' : 'accountSync.pair.failed');
-}
-
-/** « Jumeler avec un autre appareil »: the camera on a phone or tablet, the computer's own code on a desktop. */
-export async function pairThisDevice() {
-  if (desktopApp) return showPairNew();
-  closeScreen();
-  let text;
+/**
+ * « Demander l’accès »: the request is sent (no camera, the same on a phone, a tablet and a computer), the 6 digits are shown, and
+ * the answer is awaited. Nothing but key files is committed; the diver's data is not touched before the key is held.
+ */
+export async function askForAccess() {
+  open('requestWait');
+  accountFlow.busy = true;
+  accountFlow.code = '';
   try {
-    text = await scanPairingCode('new-device');
-  } catch (e) {
-    console.error('Scanning the pairing code', e);
-    say('accountSync.pair.failed');
-    return;
-  }
-  // The scanner closed without a code (the diver left, or the app was restarted under it): nothing to say.
-  if (text == null) return;
-  try {
-    accountFlow.busy = true;
-    const { store, box } = accountDataDeps();
-    await pairWithCode(text, { store, box, fetchKeys: fetchAccountKeys, commitKeyFiles: commitAccountKeyFiles });
-    accountSync.keyMissing = false;
-    accountSync.locked = [];
-    await afterUnlocked();
-  } catch (e) {
-    console.error('Pairing this device', e);
+    const kind = currentDeviceKind();
+    const request = await requestAccess({ deviceName: t(`accountSync.device.${kind}`), platform: platformOf(kind) }, pairingDeps());
+    pairing = request;
+    accountFlow.code = request.code;
+    accountFlow.expiresAt = request.expiresAt;
     accountFlow.busy = false;
-    pairingFailure(e);
+    watcher = setInterval(() => void lookForAnswer(), WATCH_MS);
+  } catch (e) {
+    console.error('Asking for access', e);
+    closeScreen();
+    say(codeOf(e) === 'UNREACHABLE' ? 'accountSync.pair.offline' : 'accountSync.pair.failed');
   }
 }
 
-/** A computer: its own code for the phone to read, then the wait for the phone's answer. */
-export async function showPairNew() {
-  open('pairNew');
+/** @type {boolean} */
+let looking = false;
+
+/** One look at the server while the request waits. */
+async function lookForAnswer() {
+  const mine = pairing;
+  if (!mine || accountFlow.screen !== 'requestWait' || looking) return;
+  looking = true;
   try {
-    const request = await createPairingRequest();
-    pairing = { id: request.id, privateKey: request.privateKey };
-    accountFlow.payload = request.payload;
-    accountFlow.expiresAt = Date.now() + PAIRING_TTL_MS;
-    watcher = setInterval(async () => {
-      if (!pairing?.privateKey || accountFlow.screen !== 'pairNew') return stopWatching();
-      const mine = pairing;
-      try {
-        const found = (await fetchAccountKeys()).pairing.find((f) => f.path === pairingFilePath(mine.id));
-        if (!found) return;
-        stopWatching();
-        const account = await acceptPairing({ id: mine.id, privateKey: mine.privateKey }, found.json);
-        await adoptAndReseal(account);
-        await commitAccountKeyFiles({ deletes: [pairingFilePath(mine.id)], message: 'Benthic: paired' }).catch((e) => console.warn('Deleting the pairing file', e));
-        await afterUnlocked();
-      } catch (e) {
-        console.error('Waiting for the phone', e);
-        stopWatching();
-        closeScreen();
-        pairingFailure(e);
-      }
-    }, WATCH_MS);
+    const answer = await checkAnswer(mine, pairingDeps());
+    if (pairing !== mine || accountFlow.screen !== 'requestWait') return;
+    if (answer.state === 'waiting') return;
+    stopWatching();
+    if (answer.state === 'answer') {
+      accountFlow.busy = true;
+      const { store, box } = accountDataDeps();
+      await finishPairing(mine, answer.json, { store, box, ...pairingDeps() });
+      accountSync.keyMissing = false;
+      accountSync.locked = [];
+      await afterUnlocked();
+    } else {
+      pairing = null;
+      accountFlow.endReason = answer.state;
+      open('requestEnded');
+    }
   } catch (e) {
-    console.error('Making the pairing request', e);
-    closeScreen();
-    say('accountSync.pair.failed');
+    // A server that does not answer for a moment is not the end of the request: it is looked at again, until it expires.
+    if (codeOf(e) === 'UNREACHABLE') return;
+    console.error('Waiting for the approval', e);
+    stopWatching();
+    pairing = null;
+    accountFlow.busy = false;
+    accountFlow.endReason = 'failed';
+    open('requestEnded');
+  } finally {
+    looking = false;
   }
+}
+
+/** « Annuler » while waiting: the request is deleted (best effort: it expires anyway). */
+export function cancelAccessRequest() {
+  const mine = pairing;
+  closeScreen();
+  if (mine) cancelRequest(mine, pairingDeps()).catch((e) => console.warn('Deleting the access request', e));
 }
 
 /** « Saisir la clé de secours ». */
@@ -512,8 +536,8 @@ export function setLockFlags({ canPair, locked }) {
 }
 
 export function wireLockActions() {
-  accountLock.onpair = () => void pairThisDevice();
-  accountLock.onpairnew = () => void showPairOld();
+  accountLock.onpair = () => void askForAccess();
+  accountLock.onpairnew = () => void openRequests();
   accountLock.onrecoverykey = () => openRecoveryKeyEntry();
 }
 
@@ -523,6 +547,28 @@ export function unlockDue() {
 }
 
 /** A new sync run began: the questions the diver closed (the join, another account) may be asked again by its result. */
+/** Items sealed under a key nobody holds any more (docs/account-sync.md, « Orphaned items »): asked once per run of the app. */
+export const orphansDue = () => !asked.orphans;
+
+export function askOrphans() {
+  asked.orphans = true;
+  open('orphans');
+}
+
+/** « Effacer »: the unreadable items go from this device and from the account; the clear fields of the profile stay. */
+export async function eraseOrphansNow() {
+  accountFlow.busy = true;
+  try {
+    await eraseAccountOrphans();
+    await loadProfile();
+    closeScreen();
+  } catch (e) {
+    console.error('Erasing the items nobody can open', e);
+    accountFlow.busy = false;
+    say('accountSync.orphans.failed');
+  }
+}
+
 export function resetQuestions() {
   asked.join = false;
   asked.different = false;

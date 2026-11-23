@@ -8,7 +8,7 @@ import { createSecretBox, toBase64 } from '../../app/src/lib/secret-box.js';
 import { createProfile, emptyInfo } from '../../app/src/lib/profile.js';
 import { createInventory } from '../../app/src/lib/inventory.js';
 import { createAccountSync, isKeyPath, isSyncedPath } from '../../app/src/lib/account-sync.js';
-import { createPairing } from '../../app/src/lib/account-keys.js';
+import { createAccessRequest } from '../../app/src/lib/account-keys.js';
 import { FakeBgit, FakeRemote } from './git-history-core.mjs';
 
 let tick = Date.UTC(2026, 10, 23, 8, 0, 0);
@@ -71,10 +71,10 @@ test('an expired pairing file is deleted by the next run; a valid one stays', as
     await a.inventory.saveGear({ name: 'Mask', type: 'mask' });
     await a.sync.run();
     const account = { key: toBase64(new Uint8Array(32).fill(7)), kid: await a.box.deviceKid() };
-    const old = await createPairing(account, { now: () => now().getTime() - 3_600_000 });
-    const fresh = await createPairing(account, { now: () => now().getTime() });
+    const old = await createAccessRequest({ deviceName: "A" }, { now: () => now().getTime() - 3_600_000 });
+    const fresh = await createAccessRequest({ deviceName: "A" }, { now: () => now().getTime() });
     await a.sync.commitKeyFiles({ writes: [old.file, fresh.file], message: 'Benthic: pairing' });
-    assert.deepEqual(Object.keys(remote.files()).filter((p) => p.startsWith('keys/pairing/')), [`keys/pairing/${fresh.id}.json`]);
+    assert.deepEqual(Object.keys(remote.files()).filter((p) => p.startsWith('keys/requests/')), [`keys/requests/${fresh.id}.json`]);
     await assert.rejects(a.sync.commitKeyFiles({ writes: [{ path: 'gear/x.json', json: {} }] }), /BAD_PATH/, 'only keys/ goes through this door');
   } finally {
     a.core.dispose();

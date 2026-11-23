@@ -1,13 +1,12 @@
 // @ts-check
-// The account's data key on a second device (docs/account-sync.md, "The data key on a second device"): pairing with a
-// camera (a one-time key K in a QR), pairing without a camera (ECDH P-256), the recovery key, the re-sealing of the
-// local sealed files when a device joins, and the destructive start-over. Pure functions: WebCrypto, the clock and
-// the reading and writing of the `benthic` branch are parameters; nothing here touches the store or the network.
-// The file formats are in docs/account-sync.md ("QR payloads and key files").
+// The account's data key on a second device (docs/account-sync.md, "The data key on a second device"): pairing by approval
+// (the new device asks, a device that holds the key approves after comparing a 6-digit code), the recovery key, the
+// re-sealing of the local sealed files when a device joins, and the destructive start-over. Pure functions: WebCrypto, the
+// clock and the reading and writing of the `benthic` branch are parameters; nothing here touches the store or the network.
 //
-// Errors are `Error` objects whose message is a code: PAIRING_PAYLOAD_INVALID, PAIRING_FILE_INVALID,
-// PAIRING_ID_MISMATCH, PAIRING_EXPIRED, PAIRING_WRONG_KEY, RECOVERY_KEY_INVALID, RECOVERY_KEY_WRONG,
-// RECOVERY_FILE_INVALID, ACCOUNT_KEY_FILE_INVALID, INVALID_DATA_KEY.
+// Errors are `Error` objects whose message is a code: PAIRING_REQUEST_INVALID, PAIRING_FILE_INVALID, PAIRING_ID_MISMATCH,
+// PAIRING_EXPIRED, PAIRING_WRONG_KEY, RECOVERY_KEY_INVALID, RECOVERY_KEY_WRONG, RECOVERY_FILE_INVALID,
+// ACCOUNT_KEY_FILE_INVALID, INVALID_DATA_KEY.
 
 import { fromBase64, keyId, toBase64 } from './secret-box.js';
 
@@ -18,10 +17,11 @@ import { fromBase64, keyId, toBase64 } from './secret-box.js';
 export const ACCOUNT_KEY_PATH = 'keys/account.json';
 export const RECOVERY_PATH = 'keys/recovery.json';
 export const PAIRING_DIR = 'keys/pairing/';
+export const REQUESTS_DIR = 'keys/requests/';
+const MAX_NAME = 60;
 /** How long a pairing file is valid. */
 export const PAIRING_TTL_MS = 10 * 60 * 1000;
 
-const PAYLOAD_PREFIX = 'benthic-pair:1:';
 const enc = new TextEncoder();
 
 /** @param {Deps} d */
@@ -33,7 +33,7 @@ const clock = (d) => (d.now ?? Date.now)();
 export const toBase64Url = (bytes) => toBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 /** @param {string} text */
 export const fromBase64Url = (text) => {
-  if (!/^[A-Za-z0-9_-]*$/.test(text)) throw new Error('PAIRING_PAYLOAD_INVALID');
+  if (!/^[A-Za-z0-9_-]*$/.test(text)) throw new Error('PAIRING_REQUEST_INVALID');
   const b = text.replace(/-/g, '+').replace(/_/g, '/');
   return fromBase64(b + '='.repeat((4 - (b.length % 4)) % 4));
 };
@@ -49,9 +49,6 @@ function rawKey(key) {
   if (raw.length !== 32) throw new Error('INVALID_DATA_KEY');
   return raw;
 }
-
-/** @param {Deps} d @param {Uint8Array} raw @param {KeyUsage[]} usages */
-const aesKey = (d, raw, usages) => lib(d).subtle.importKey('raw', /** @type {BufferSource} */ (raw), 'AES-GCM', false, usages);
 
 /**
  * AES-GCM seal of the account key under a wrapping key.
@@ -101,65 +98,94 @@ export function parseAccountKeyFile(json) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Pairing: the QR payload and the files
+// Pairing by approval (to-do #183): a request from the new device, an answer from a device that holds the key
 
-/** @typedef {{ mode: 'k', id: string, k: Uint8Array } | { mode: 'e', id: string, pub: Uint8Array }} PairingPayload */
-
+/** @param {string} id */
+const requestPath = (id) => `${REQUESTS_DIR}${id}.json`;
 /** @param {string} id */
 const pairingPath = (id) => `${PAIRING_DIR}${id}.json`;
 
-/** Parses the text of a scanned QR. @param {string} text @returns {PairingPayload} */
-export function parsePairingPayload(text) {
-  if (typeof text !== 'string' || !text.startsWith(PAYLOAD_PREFIX)) throw new Error('PAIRING_PAYLOAD_INVALID');
-  const [mode, id, data, ...extra] = text.slice(PAYLOAD_PREFIX.length).split(':');
-  if (extra.length || !data || !/^[A-Za-z0-9_-]{22}$/.test(id ?? '')) throw new Error('PAIRING_PAYLOAD_INVALID');
-  const bytes = fromBase64Url(data);
-  if (mode === 'k' && bytes.length === 32) return { mode: 'k', id, k: bytes };
-  if (mode === 'e' && bytes.length === 65 && bytes[0] === 4) return { mode: 'e', id, pub: bytes };
-  throw new Error('PAIRING_PAYLOAD_INVALID');
+/** @param {Deps} d */
+const newId = (d) => toBase64Url(lib(d).getRandomValues(new Uint8Array(16)));
+
+/** @param {Deps} d @param {Uint8Array} raw */
+const importPeer = (d, raw) => lib(d).subtle.importKey('raw', /** @type {BufferSource} */ (raw), { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+
+/**
+ * The verification code: 6 decimal digits both devices compute from what the request holds, SHA-256 over
+ * `benthic-pair-sas-v1|id|deviceName|pub` (pub: the new device's public key, 65 raw bytes). It does not depend on the paired
+ * device's key, which does not exist yet when the diver compares the codes. A server that swaps the request's key (or its name)
+ * to read the answer changes the code the paired device shows.
+ * @param {string} id @param {string} deviceName @param {Uint8Array} pub @param {Deps} [d]
+ * @returns {Promise<string>} e.g. `042913`
+ */
+export async function verificationCode(id, deviceName, pub, d = {}) {
+  const head = enc.encode(`benthic-pair-sas-v1|${id}|${deviceName}|`);
+  const data = new Uint8Array(head.length + pub.length);
+  data.set(head);
+  data.set(pub, head.length);
+  const hash = new Uint8Array(await lib(d).subtle.digest('SHA-256', data));
+  const n = ((hash[0] << 24) | (hash[1] << 16) | (hash[2] << 8) | hash[3]) >>> 0;
+  return String(n % 1_000_000).padStart(6, '0');
 }
 
-/** @param {any} f @param {string} id @param {'k'|'e'} mode */
-function checkPairingFile(f, id, mode) {
-  const ok = f && f.format === 1 && f.mode === mode && typeof f.kid === 'string' && Number.isFinite(f.expiresAt) && typeof f.nonce === 'string' && typeof f.ct === 'string' && (mode === 'k' || typeof f.epk === 'string');
+/**
+ * Step 1, on the new device: an ephemeral ECDH P-256 key pair and the request to commit (`keys/requests/<id>.json`). The
+ * private key stays in memory; the 6-digit `code` is shown at once. Then `acceptApproval` with `id` and `privateKey`.
+ * @param {{ deviceName: string, platform?: string }} device what the paired device will read
+ * @param {Deps} [d]
+ * @returns {Promise<{ id: string, code: string, file: JsonFile, privateKey: CryptoKey, createdAt: number, expiresAt: number, answerPath: string }>}
+ */
+export async function createAccessRequest(device, d = {}) {
+  const pair = /** @type {CryptoKeyPair} */ (await lib(d).subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveBits']));
+  const pub = new Uint8Array(await lib(d).subtle.exportKey('raw', pair.publicKey));
+  const id = newId(d);
+  const deviceName = String(device.deviceName ?? '').slice(0, MAX_NAME);
+  const createdAt = clock(d);
+  const expiresAt = createdAt + PAIRING_TTL_MS;
+  const json = { format: 1, id, pub: toBase64Url(pub), deviceName, platform: String(device.platform ?? '').slice(0, 24), createdAt, expiresAt };
+  return { id, code: await verificationCode(id, deviceName, pub, d), file: { path: requestPath(id), json }, privateKey: pair.privateKey, createdAt, expiresAt, answerPath: pairingPath(id) };
+}
+
+/**
+ * A request as the paired device reads it, with its code. Rejects `PAIRING_REQUEST_INVALID` for a file that is not one (the
+ * caller ignores it; the clean-up deletes it once it has expired).
+ * @param {any} json the content of `keys/requests/<id>.json` @param {Deps} [d]
+ * @returns {Promise<{ id: string, deviceName: string, platform: string, code: string, createdAt: number, expiresAt: number, expired: boolean, path: string }>}
+ */
+export async function readAccessRequest(json, d = {}) {
+  const ok = json && json.format === 1 && typeof json.id === 'string' && /^[A-Za-z0-9_-]{22}$/.test(json.id) && typeof json.pub === 'string' && typeof json.deviceName === 'string' && Number.isFinite(json.createdAt) && Number.isFinite(json.expiresAt);
+  if (!ok) throw new Error('PAIRING_REQUEST_INVALID');
+  let pub;
+  try {
+    pub = fromBase64Url(json.pub);
+    if (pub.length !== 65 || pub[0] !== 4) throw new Error('x');
+  } catch {
+    throw new Error('PAIRING_REQUEST_INVALID');
+  }
+  // A server cannot lengthen a request: the paired device never honours more than the normal time from the request's start.
+  if (json.expiresAt - json.createdAt > PAIRING_TTL_MS) throw new Error('PAIRING_REQUEST_INVALID');
+  return {
+    id: json.id,
+    deviceName: json.deviceName.slice(0, MAX_NAME),
+    platform: typeof json.platform === 'string' ? json.platform : '',
+    code: await verificationCode(json.id, json.deviceName, pub, d),
+    createdAt: json.createdAt,
+    expiresAt: json.expiresAt,
+    expired: clock(d) > json.expiresAt,
+    path: requestPath(json.id),
+  };
+}
+
+/** @param {any} f @param {string} id */
+function checkPairingFile(f, id) {
+  const ok = f && f.format === 1 && f.mode === 'e' && typeof f.kid === 'string' && Number.isFinite(f.expiresAt) && typeof f.nonce === 'string' && typeof f.ct === 'string' && typeof f.epk === 'string';
   if (!ok) throw new Error('PAIRING_FILE_INVALID');
   if (f.id !== id) throw new Error('PAIRING_ID_MISMATCH');
 }
 
-/** @param {string} id @param {string} kid @param {number} expiresAt @param {string} mode */
-const pairingAad = (id, kid, expiresAt, mode) => `pair|${mode}|${id}|${kid}|${expiresAt}`;
-
-/**
- * Pairing with a camera, step 1, on the device that holds the account key: makes the one-time key K and the file.
- * The old device shows `payload` as a QR, commits `file`, and the new device reads both.
- * @param {AccountKey} account @param {Deps} [d]
- * @returns {Promise<{ id: string, payload: string, file: JsonFile, expiresAt: number }>}
- */
-export async function createPairing(account, d = {}) {
-  const id = toBase64Url(lib(d).getRandomValues(new Uint8Array(16)));
-  const k = lib(d).getRandomValues(new Uint8Array(32));
-  const expiresAt = clock(d) + PAIRING_TTL_MS;
-  const w = await wrap(d, await aesKey(d, k, ['encrypt']), account.key, pairingAad(id, account.kid, expiresAt, 'k'));
-  return {
-    id,
-    expiresAt,
-    payload: `${PAYLOAD_PREFIX}k:${id}:${toBase64Url(k)}`,
-    file: { path: pairingPath(id), json: { format: 1, mode: 'k', id, kid: account.kid, expiresAt, ...w } },
-  };
-}
-
-/**
- * Pairing without a camera, step 1, on the new device (desktop): an ephemeral ECDH P-256 key pair. It shows `payload`
- * as a QR for the paired device to scan, keeps `privateKey` in memory, and later calls `acceptPairing` with it.
- * @param {Deps} [d]
- * @returns {Promise<{ id: string, payload: string, privateKey: CryptoKey, path: string }>} `path`: the file to wait for
- */
-export async function createPairingRequest(d = {}) {
-  const pair = /** @type {CryptoKeyPair} */ (await lib(d).subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveBits']));
-  const pub = new Uint8Array(await lib(d).subtle.exportKey('raw', pair.publicKey));
-  const id = toBase64Url(lib(d).getRandomValues(new Uint8Array(16)));
-  return { id, payload: `${PAYLOAD_PREFIX}e:${id}:${toBase64Url(pub)}`, privateKey: pair.privateKey, path: pairingPath(id) };
-}
+/** @param {string} id @param {string} kid @param {number} expiresAt */
+const pairingAad = (id, kid, expiresAt) => `pair|e|${id}|${kid}|${expiresAt}`;
 
 /** @param {Deps} d @param {CryptoKey} privateKey @param {CryptoKey} publicKey @param {string} id */
 async function ecdhWrapKey(d, privateKey, publicKey, id) {
@@ -169,72 +195,56 @@ async function ecdhWrapKey(d, privateKey, publicKey, id) {
 }
 
 /**
- * Pairing without a camera, step 2, on the paired device that scanned the new device's QR: wraps the account key to
- * the new device's public key. Commit `file`.
- * @param {string} payloadText the scanned text @param {AccountKey} account @param {Deps} [d]
- * @returns {Promise<{ id: string, file: JsonFile, expiresAt: number }>}
+ * Step 2, on the paired device, when the diver taps « Autoriser »: wraps the account key to the request's public key
+ * (ephemeral ECDH, HKDF-SHA-256, AES-256-GCM). Commit `file` and delete `deletes` (the request). Nothing is made before.
+ * @param {any} requestJson the content of `keys/requests/<id>.json` @param {AccountKey} account @param {Deps} [d]
+ * @returns {Promise<{ id: string, file: JsonFile, deletes: string[], expiresAt: number }>}
+ * @throws PAIRING_REQUEST_INVALID, PAIRING_EXPIRED
  */
-export async function answerPairingRequest(payloadText, account, d = {}) {
-  const p = parsePairingPayload(payloadText);
-  if (p.mode !== 'e') throw new Error('PAIRING_PAYLOAD_INVALID');
+export async function approveAccessRequest(requestJson, account, d = {}) {
+  const request = await readAccessRequest(requestJson, d);
+  if (request.expired) throw new Error('PAIRING_EXPIRED');
   let peer;
   try {
-    peer = await lib(d).subtle.importKey('raw', /** @type {BufferSource} */ (p.pub), { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+    peer = await importPeer(d, fromBase64Url(requestJson.pub));
   } catch {
-    throw new Error('PAIRING_PAYLOAD_INVALID');
+    throw new Error('PAIRING_REQUEST_INVALID');
   }
   const eph = /** @type {CryptoKeyPair} */ (await lib(d).subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, ['deriveBits']));
   const epk = new Uint8Array(await lib(d).subtle.exportKey('raw', eph.publicKey));
   const expiresAt = clock(d) + PAIRING_TTL_MS;
-  const w = await wrap(d, await ecdhWrapKey(d, eph.privateKey, peer, p.id), account.key, pairingAad(p.id, account.kid, expiresAt, 'e'));
-  return { id: p.id, expiresAt, file: { path: pairingPath(p.id), json: { format: 1, mode: 'e', id: p.id, kid: account.kid, expiresAt, epk: toBase64Url(epk), ...w } } };
+  const w = await wrap(d, await ecdhWrapKey(d, eph.privateKey, peer, request.id), account.key, pairingAad(request.id, account.kid, expiresAt));
+  return { id: request.id, expiresAt, deletes: [request.path], file: { path: pairingPath(request.id), json: { format: 1, mode: 'e', id: request.id, kid: account.kid, expiresAt, epk: toBase64Url(epk), ...w } } };
 }
 
 /**
- * Pairing, last step, on the new device: unwraps the account key from the scanned (or, without a camera, shown)
- * payload and the pairing file read from the branch. Afterwards: `box.adoptAccountKey(result.key)`, re-seal, delete the
- * pairing file (`pairingPath`), and tell the old device (it confirms by deleting the file too).
- * @param {{ payload?: string, id?: string, privateKey?: CryptoKey }} how with a camera: `payload` (the scanned text).
- *   Without: `id` and `privateKey` from `createPairingRequest`.
- * @param {any} fileJson the content of `keys/pairing/<id>.json`
- * @param {Deps} [d]
+ * Last step, on the new device: unwraps the account key from the answer. Afterwards: `adoptAndReseal`, delete the answer
+ * (`pairingFilePath`), show « Appareil jumelé ».
+ * @param {{ id: string, privateKey: CryptoKey }} how from `createAccessRequest` @param {any} fileJson the content of `keys/pairing/<id>.json` @param {Deps} [d]
  * @returns {Promise<AccountKey>}
+ * @throws PAIRING_FILE_INVALID, PAIRING_ID_MISMATCH, PAIRING_EXPIRED, PAIRING_WRONG_KEY
  */
-export async function acceptPairing(how, fileJson, d = {}) {
-  if (how.privateKey) {
-    if (!how.id) throw new Error('PAIRING_PAYLOAD_INVALID');
-    checkPairingFile(fileJson, how.id, 'e');
-    if (clock(d) > fileJson.expiresAt) throw new Error('PAIRING_EXPIRED');
-    let epk;
-    try {
-      epk = await lib(d).subtle.importKey('raw', /** @type {BufferSource} */ (fromBase64Url(fileJson.epk)), { name: 'ECDH', namedCurve: 'P-256' }, false, []);
-    } catch {
-      throw new Error('PAIRING_FILE_INVALID');
-    }
-    const raw = await unwrap(d, await ecdhWrapKey(d, how.privateKey, epk, how.id), fileJson, pairingAad(how.id, fileJson.kid, fileJson.expiresAt, 'e'));
-    if (!raw) throw new Error('PAIRING_WRONG_KEY');
-    return finish(raw, fileJson.kid);
-  }
-  const p = parsePairingPayload(how.payload ?? '');
-  if (p.mode !== 'k') throw new Error('PAIRING_PAYLOAD_INVALID');
-  checkPairingFile(fileJson, p.id, 'k');
+export async function acceptApproval(how, fileJson, d = {}) {
+  checkPairingFile(fileJson, how.id);
   if (clock(d) > fileJson.expiresAt) throw new Error('PAIRING_EXPIRED');
-  const raw = await unwrap(d, await aesKey(d, p.k, ['decrypt']), fileJson, pairingAad(p.id, fileJson.kid, fileJson.expiresAt, 'k'));
+  let epk;
+  try {
+    epk = await importPeer(d, fromBase64Url(fileJson.epk));
+  } catch {
+    throw new Error('PAIRING_FILE_INVALID');
+  }
+  const raw = await unwrap(d, await ecdhWrapKey(d, how.privateKey, epk, how.id), fileJson, pairingAad(how.id, fileJson.kid, fileJson.expiresAt));
   if (!raw) throw new Error('PAIRING_WRONG_KEY');
-  return finish(raw, fileJson.kid);
-}
-
-/** @param {Uint8Array} raw @param {string} kid */
-async function finish(raw, kid) {
   const a = await describe(raw);
-  if (a.kid !== kid) throw new Error('PAIRING_WRONG_KEY');
+  if (a.kid !== fileJson.kid) throw new Error('PAIRING_WRONG_KEY');
   return a;
 }
 
-/** The path of a pairing file, to wait for it or to delete it. @param {string} id */
+/** The path of a request or of its answer, to wait for it or to delete it. @param {string} id */
+export const accessRequestPath = requestPath;
 export const pairingFilePath = pairingPath;
 
-/** True when a pairing file is past its time (a clean-up pass deletes such files). @param {any} json @param {Deps} [d] */
+/** True when a request or an answer is past its time (a clean-up pass deletes such files). @param {any} json @param {Deps} [d] */
 export const isPairingExpired = (json, d = {}) => !json || !Number.isFinite(json.expiresAt) || clock(d) > json.expiresAt;
 
 // ---------------------------------------------------------------------------------------------------------------
