@@ -6672,3 +6672,32 @@ The flow, the same on every device, all in basic dialogs over the logbook (no �
 Check before you write the texts of steps 3 and 4: what divelogs.de does with dives already in the account (duplicates, updates). If the upload does not end with a check by divelogs.de, drop that step and tell Christian. A network error during the upload is not drawn: show the progress dialog's step in error with « Réessayer » and « Annuler », and say what you did in the done note.
 
 The phone mock-up « Carnet, menu ouvert · Android » does not show « Exporter le carnet » in the ⋮ menu yet; the app's menu is the reference. iPhone is not drawn: apply the same flow with the iOS dialogs if the export exists there.
+
+## [ ] 2026-11-23-338 Account data sync screens (#179): pairing, recovery key, join summary, locked items, two-device notice, start over
+
+Christian approved this on 23 November 2026. Work in `main`. These are the screens of step 6 of `docs/account-sync.md` (#164). Mock-ups: a new block « Synchronisation du compte (Benthic+) » on each page, right under the Profil block: « Android · … » on the phone canvas, « Tablette Android · … » and « Bureau · … » on the tablet and desktop canvas. Every screen is a basic dialog over the profile (no ✕), except the phone camera screens. Board titles end in « (Benthic+) · Android », « · tablette Android, paysage » or « · bureau ». The whole section exists only for Benthic+ accounts.
+
+**Nouvel appareil**
+1. « Nouvel appareil, déverrouiller les données chiffrées »: shown when this device has no data key and `keys/account.json` exists (`MISSING_DATA_KEY`). Two rows: « Jumeler avec un autre appareil » (phone and tablet: « Lire le code affiché sur un appareil déjà jumelé »; desktop: « Afficher un code à lire avec votre téléphone ») and « Saisir la clé de secours ». Line « En attendant, le reste du compte se synchronise… ». Buttons « Plus tard » and, on the left, « Plus d’appareil ni de clé ? » (opens item 6).
+2. Phone and tablet: « Nouvel appareil, lire le code de jumelage »: the QR scanner screen titled « Jumeler cet appareil » (`keys/pairing/<id>.json`, AES-GCM with K). Desktop: « Nouvel ordinateur sans caméra, montrer le code »: the desktop shows a QR with its ephemeral ECDH P-256 public key, « Le code expire dans … ».
+3. « Nouvel appareil, saisir la clé de secours »: one field, monospace, spaces and dashes optional, button « Déverrouiller ».
+4. « Nouvel appareil, jumelé »: green check, « Appareil jumelé », OK.
+5. « État verrouillé des données chiffrées »: while the key is missing, sealed items show « Verrouillé : jumelez cet appareil » (phone: Fiche d’urgence, Brevets et documents and Informations subtitles, plus a card with « Jumeler cet appareil » (filled) and « Saisir la clé de secours » (outlined); tablet and desktop: the same card replaces the Informations pane, and Brevets reads the same). They are neither uploaded nor overwritten.
+6. « Repartir sans les données chiffrées »: destructive dialog, « Effacer et repartir » in error red. Erases the sealed files from the account on every device, keeps the logbook, gear, kits and maintenance.
+
+**Jumeler depuis un appareil déjà jumelé**
+7. « Appareil déjà jumelé, montrer le code »: QR with K and the pairing id, « Le code expire dans 9 min 42 s » (10 min). Phone and tablet also show « Lire le code d’un ordinateur » on the left, which opens the scanner titled « Lire le code d’un ordinateur » (phone board « Appareil déjà jumelé, lire le code d’un ordinateur »).
+8. « Appareil déjà jumelé, confirmer le jumelage »: « Jumeler « <device name> » ? », « Refuser » / « Jumeler ». Nothing is committed before « Jumeler ».
+   Entry point on the paired device: add « Jumeler un nouvel appareil » to the account sheet (Compte). Christian may move it to the Profil later.
+
+**Clé de secours**
+9. « Clé de secours, offre au premier envoi »: offered strongly at the first sync, « Plus tard » / « Créer la clé ».
+10. « Clé de secours, affichée une seule fois »: 26 base32 characters in groups of four, monospace, dashed box, « Copier » (outlined), « Je l’ai notée ». Never shown again.
+
+**Premier envoi (`account-join.js`)**
+11. « Premier envoi, résumé et pièces à confirmer »: title « Joindre cet appareil », three counters (reconnues, nouvelles, à confirmer), then one card per ambiguous match with « Cet appareil : … » / « Votre compte : … » and a segmented button « Même pièce | Deux pièces » (Material 3 segmented button, not radio buttons). « Annuler » / « Joindre ». The dialog scrolls on the phone.
+
+**Modifié sur deux appareils**
+12. « Avis « modifié sur deux appareils » »: a snackbar « « <name> » a été modifié sur deux appareils. La modification la plus récente est gardée. » with « OK ». Above the FAB on the phone, centered at the bottom (560 dp) on tablet and desktop.
+
+iPhone and tablet portrait are not drawn: use the same dialogs. In the done note, list the screens built and anything in `docs/account-sync.md` the mock-ups do not cover.
