@@ -1159,6 +1159,25 @@ export async function syncNow() {
   return syncEdits();
 }
 
+/** The head of the dives' branch this device has (its copy of the log, no network): the push channel compares it with the server's. */
+export async function divesLocalHead() {
+  if (!logbook.email || logbook.browsing) return '';
+  const copy = await BenthicCore.listCloudDives({ cached: true });
+  return copy.head ?? '';
+}
+
+/**
+ * The server says the dives' branch moved (push channel, lib/push-sync.svelte.js): the exchange of the automatic sync, when
+ * it may run now. `busy` when a load or a sync is running (the channel asks again shortly).
+ * @returns {'started'|'busy'|undefined}
+ */
+export function syncFromPush() {
+  if (!logbook.email || logbook.error || logbook.welcome || !logbook.benthicPlus || !autoSyncing()) return undefined;
+  if (logbook.loading || logbook.sync === 'syncing') return 'busy';
+  void syncNow();
+  return 'started';
+}
+
 /**
  * Edits of each dive in the messages of the pending commits. Subsurface's
  * commit message lists the edit texts ("Edit notes [#12]", "(undo) Edit

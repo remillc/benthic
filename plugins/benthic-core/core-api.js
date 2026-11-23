@@ -628,6 +628,15 @@ export { waterTypeOf };
  *   consent). Rejects with NOT_SIGNED_IN.
  * @property {() => Promise<void>} serverSessionClear
  *   Signs out of the Benthic server: the tokens are erased.
+ * @property {(options: {id: number, url: string, token: string}) => Promise<void>} pushStreamOpen
+ *   The push channel (to-do #185, lib/push-events.js): opens the Server-Sent Events stream `url` with the session token
+ *   (`Authorization: Bearer`) on a background thread and returns at once. What happens comes by the `pushStream` event,
+ *   `{id, kind: 'open'|'line'|'closed', line?, status?, message?}`: `open` when the server answered 200, one `line` per
+ *   line of the stream (blank lines included), `closed` when the connection ended (`status` is the HTTP status, 0 when
+ *   it failed before an answer). A new open with another id closes the previous one. The connection lives as long as the
+ *   app process (foreground or background; no foreground service, no wake lock).
+ * @property {(options: {id: number}) => Promise<void>} pushStreamClose
+ *   Closes that connection; no event follows.
  * @property {(options?: {keepAlpha?: boolean}) => Promise<void>} devResetApp
  *   DEVELOPMENT ONLY (debug builds: rejects NOT_DEBUG otherwise): the app's own data is erased as on a first install. The
  *   core closes its log; the device logbook, the working copies of the server, every credential and the data key, the
@@ -930,7 +939,7 @@ export { waterTypeOf };
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile'|'stageProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile'|'stageProgress'|'pushStream', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
  *   mapsDownload a MapDownload (progress at most twice a second, and every status change),
  *   syncProgress {message}: each message of the core's git work while the cloud log syncs (benthic.h,
@@ -1046,6 +1055,8 @@ export const BenthicCore = {
   serverSessionInfo: () => native.serverSessionInfo(),
   serverSessionAccess: () => native.serverSessionAccess(),
   serverSessionClear: () => native.serverSessionClear(),
+  pushStreamOpen: (options) => native.pushStreamOpen(options),
+  pushStreamClose: (options) => native.pushStreamClose(options),
   devResetApp: (options) => native.devResetApp(options ?? {}),
   dataKeyRead: () => native.dataKeyRead(),
   dataKeyWrite: (options) => native.dataKeyWrite(options),

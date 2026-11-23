@@ -112,6 +112,8 @@ export class BenthicCoreDesktop extends WebPlugin {
       // The messages of the cloud log's git work, as the Android plugin's "syncProgress" ({message}).
       bridge.onCoreEvent('syncProgress', (/** @type {any} */ data) => this.notifyListeners('syncProgress', data));
       bridge.onCoreEvent('gitProgress', (/** @type {any} */ data) => this.notifyListeners('gitProgress', data));
+      // The push channel's stream (bridge.cjs).
+      bridge.onCoreEvent('pushStream', (/** @type {any} */ data) => this.notifyListeners('pushStream', data));
       // The core's process died and started again: what was loaded is gone.
       bridge.onCoreEvent('coreRestarted', () => this.notifyListeners('coreRestarted', {}));
     }
@@ -507,8 +509,18 @@ export class BenthicCoreDesktop extends WebPlugin {
     await this.bridge.credentials.set('datakey', { key: options?.key ?? '' });
   }
 
+  /** The push channel (lib/push-events.js): the stream is read in the main process; see bridge.cjs. */
+  async pushStreamOpen(options) {
+    await this.bridge.push.open({ id: options?.id, url: options?.url, token: options?.token });
+  }
+
+  async pushStreamClose(options) {
+    await this.bridge.push.close({ id: options?.id });
+  }
+
   /** Signs out of the Benthic server. */
   async serverSessionClear() {
+    await this.bridge.push?.close({}).catch(() => {});
     await this.bridge.credentials.clear('server');
   }
 
