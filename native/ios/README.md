@@ -19,8 +19,7 @@ GitHub macOS runner (`.github/workflows/ios.yml`). It uses the same web layer
 - `app/ios/` is the Capacitor iOS project (icon, launch screen, Info.plist).
 - `tests/ios/` runs the round-trip and planner tests in a simulator
   (`run-simulator.sh`; expected round-trip result: 98 passed,
-  0 failed), starts the app (`run-app.sh`), checks the
-  offline maps on iPhone and iPad (`run-maps.sh`) and starts the app many times
+  0 failed), starts the app (`run-app.sh`) and starts the app many times
   (`run-launches.sh`).
 
 ## Building on a Mac

@@ -7015,13 +7015,15 @@ Benthic+ data in the file (profile, certificates, documents, photos) is imported
 
 **Test:** export a logbook, import it on a fresh install (first launch) and over an existing logbook; corrupt one file in the archive and check the incomplete message and that nothing was imported.
 
-## [ ] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
+## [x] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
 
 Christian asked for this on 23 November 2026. Work in `main`. Renumbering the dives is an action on the logbook, not a setting. Remove the row « Renuméroter les plongées » (`id: 'renumber'`) from Réglages › Carnet in `app/src/pages/Settings.svelte`, with its dialog state there, on every device. It stays where the mock-ups already put it: the Carnet ⋮ menu (« Renuméroter les plongées », phone, tablet and the desktop list's ⋮), the selection menu (« Renuméroter à partir d’ici ») and the dive's ⋮ menu (« Renuméroter la plongée »). No mock-up shows it in Réglages. If a search in Réglages finds « renuméroter », point the result to the Carnet menu item or drop it.
 
 **Test:** Réglages › Carnet has no renumber row; the Carnet ⋮ menu still renumbers.
 
-## [ ] 2026-11-23-362 Remove offline maps entirely (TODO #103)
+*Done 23 November 2026: row, dialog state and the unused `renumber.label`/`renumber.text` keys removed; the Carnet, selection and dive menus are unchanged.*
+
+## [x] 2026-11-23-362 Remove offline maps entirely (TODO #103)
 
 Christian decided this on 23 November 2026. Work in `main`. Benthic drops offline maps. The maps (Sites, site cards, dive detail) stay online maps; everything that downloads, stores, updates or mentions map packages for offline use goes away, on phone (Android, iPhone), tablet and desktop.
 
@@ -7033,7 +7035,9 @@ Mock-ups: the « Cartes hors ligne » subgroups are deleted from the phone and t
 
 **Test:** no « Cartes hors ligne » anywhere in the app (search the translations too); the account sheet's Réglages row has no badge; the Sites map works online as before; upgrading a device that had downloaded regions frees their space.
 
-## [ ] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
+*Done 23 November 2026: the settings pages, `offline-maps.svelte.js`, the dialogs, the area screen and their translations are removed; the map tiles are read from OpenFreeMap only (`app/src/lib/map-tiles.js`, the simplified world map still draws when there is no network); native: `MapsManager`, `MapsDownloadWorker` and the plugin methods are removed on Android and iOS (WorkManager, foreground service, BGTask and the `offline-maps` notification channel with them), replaced by `LegacyOfflineMaps`, which deletes the stored packages at every start (a no-op once they are gone). The `bc.offlineMaps*` device keys are no longer read. The « Sites des plongeurs » row of the offer is now listed so that the group « Sites » is not empty.*
+
+## [x] 2026-11-23-363 Benthic+ « Tout ce qui est inclus »: « Continuer sans abonnement », no « Toujours gratuit » note
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthic+, tout ce qui est inclus · Android » (phone canvas, page « Pour commencer », now right of « Benthic+, l’offre · Android »).
 
@@ -7044,6 +7048,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Benthi
 Same on the iPhone and tablet versions of this page.
 
 **Test:** open « Tout ce qui est inclus », scroll to the end: no « Toujours gratuit » note, the price block right after the features, and « Continuer sans abonnement » leaves without subscribing.
+
+*Done 23 November 2026: the button reuses the offer's « Continuer sans abonnement » and its exit (`onwithout`: back to where the offer was opened from, no account); the footer follows the last group 16 dp below it (a grid on tablets, the button on its own line); the key `benthicPlus.all.free` is removed. No mock-up file was in the repository: built from the task text.*
 
 ## [x] 2026-11-23-364 Icons: Material Symbols Rounded in `Icon.svelte`, new `diveKnife` drawing
 
@@ -7192,3 +7198,61 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet
 **Test:** on the desktop, open a dive, tab Équipement: five cards; change the kit, a computer, the suit, a weight and an item as before; the « Ce lest était » selector is centred and narrower; scroll to the end: the + button does not hide the last item. A free user does not see the Kit card, « Sous-vêtement », « Ce lest était » or « Autre équipement ».
 
 **Done (23 November 2026).** Built from the task text (the canvas mock-up is not in the repository; `docs/mockups/bureau-carnet-onglet-equipement.dc.html` is the old layout). `DesktopDiveFields.svelte` draws the tab as five `DesktopEquipmentCard`s (kit, computers, protection thermique, lest, autre équipement) under the hint; `DesktopWeights` has removable 40 px chips, a dashed « + Ajouter » chip and no total (it is in the card header); `DesktopOtherGear` has 56 px grey rows and no add tile (« + Ajouter » is in the card header); `DesktopEditField` has a `tall` 48 px variant with a chevron. « Changer de kit » is a text button with the kit select laid over it. Computers stay read-only and the add button stays disabled, as the old fields were. 64 px + the pane's 24 px margin leave 88 px at the end. `tests/e2e/desktop-equipment.mjs` (`--equipment-only`) checks the free and Benthic+ tabs, the weight chip, total and centred selector, a knife item, and the end of the pane. Also fixed: `DesktopWeights` threw « Cannot read properties of null » when a weight was kept (bindings on `editing`).
+
+## [ ] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (the « Photos et vidéos » section of the dive detail). Mock-ups: phone canvas, page Android, subgroup « Photos et vidéos (Benthic+) », just before « Plusieurs ordinateurs »: « Photos et vidéos de la plongée, « Tout voir » », « … sélection », « … retirer de la plongée », « Photo en plein écran », « … menu », « Vidéo en plein écran ». Android phone only for now; the other devices come later.
+
+**Gallery** (opened by « Tout voir », and by touching a thumbnail of the section, which opens the viewer on that item).
+- Top app bar: back arrow, title « Photos et vidéos », subtitle « N° 5 · Lake Coleridge · 2014-04-02 » (number, site, date), ⋮ on the right.
+- Under it, one line: green cloud-with-check icon, « 7 photos et 2 vidéos, sur tous vos appareils · 186 Mo ».
+- A grid of square thumbnails, 3 columns, 3 dp gaps, edge to edge, in the order of the dive (time taken). Bottom left of each thumbnail: the depth of the profile at the moment the picture was taken (« 18,4 m », white, 12 sp semibold, small shadow), from the picture's offset in the dive (Subsurface's picture offset) and the profile; no depth when the offset falls outside the dive. Videos: a play disc in the centre and the duration bottom right (« 0:42 »).
+- « Ajouter » is a FAB at the bottom right (56 dp, same style as the Carnet's +: 16 dp corners, #EBEAE5, small shadow), « Ajouter des photos ou des vidéos »; 96 dp of empty space under the grid so it never hides the last row. Same picker as the section's « Ajouter » tile.
+
+**Selection** (long press on a thumbnail).
+- The top bar turns #D4E2F2: ✕ (« Annuler la sélection »), « 2 sélectionnées », then Partager and Retirer (trash icon) on the right. No FAB while selecting.
+- Each thumbnail shows an empty circle top left; a selected one shrinks slightly with rounded corners and a filled #114477 check.
+- Retirer opens a basic dialog (no ✕): « Retirer 2 photos de la plongée ? » (« 2 vidéos », « 1 photo et 1 vidéo » as the case may be), « Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la galerie de l’appareil où vous les avez prises. », buttons « Annuler » and « Retirer » (#B3261E).
+
+**Photo full screen.**
+- Black background, the photo fitted to the width; swipe left and right to go through the dive's pictures; small page dots under it (the current one longer).
+- Over the top, on a dark gradient: back arrow, « 2 sur 9 », Partager, ⋮. Touching the photo hides and shows the bars.
+- At the bottom, one line in white at 85 %: « mer. 2014-04-02, 10 h 11 · Olympus TG-6 » (date and time taken, camera model when the file says it). No depth, no time in the dive, no temperature, no profile.
+- ⋮ menu: « Remplacer la photo du site » (uses this photo as the site's photo) and « Retirer de la plongée » (same dialog as above, for one item). Saving to the device's gallery goes through Partager; no separate item.
+
+**Video full screen.** Same screen, plus the player controls above the bottom line: a 48 dp round Lecture/Pause button, elapsed time, a seek bar, total time, and a mute button. No big play disc over the video while it plays.
+
+**Free user:** none of these screens (the section is hidden, task 359).
+
+**Test:** from a dive with photos and videos, « Tout voir » shows the grid in dive order with depths; the FAB adds pictures; a long press selects, Partager shares, Retirer asks then removes on every device; touching a photo opens it full screen, swiping changes picture, ⋮ offers the two items; a video plays with its controls.
+
+## [ ] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Same feature as task 367 (Android phone): same content, same rules (dive order, depth on thumbnails from the picture's offset, Partager, Retirer with confirmation, « Remplacer la photo du site », the bottom line « date, heure · appareil », no depth or profile in the viewer, nothing for a free user). Only the platform patterns change. Mock-ups, subgroup « Photos et vidéos (Benthic+) » on each page: phone canvas, page iPhone (before « Modifier une plongée »); tablet and desktop canvas, pages Tablette (before « Plusieurs ordinateurs »), iPad (after « Modifier une plongée ») and Bureau (before « Téléchargement, partage et voyage »).
+
+**iPhone.**
+- Gallery: navigation bar with the back chevron on the left and, on the right, « Sélectionner » and + (« Ajouter des photos ou des vidéos »); below it, the large title « Photos et vidéos », then « N° 5 · Lake Coleridge · 2014-04-02 », the cloud line (13 pt), and the 3-column grid with 2 pt gaps.
+- Selection (« Sélectionner »): « Annuler » on the left, « 2 sélectionnées » as title; thumbnails show an empty circle top right, a selected one a blue border and a filled check. A bottom toolbar: Partager on the left, « 2 photos sélectionnées » in the middle, the trash on the right.
+- The trash opens an action sheet: the explanation (« Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la photothèque où vous les avez prises. »), the destructive « Retirer 2 photos de la plongée », then « Annuler ».
+- Viewer: black; translucent navigation bar with « ‹ Photos », the title « 2 sur 9 » with the date and time under it, and the « … » button whose pull-down menu has « Remplacer la photo du site ». Translucent bottom toolbar: Partager on the left, the camera model in the middle, the trash (« Retirer de la plongée ») on the right. Swipe to change picture. Video: the player controls sit above the toolbar.
+
+**Android tablet** (landscape mock-ups; portrait follows the same layout). Same as the phone (task 367) with a 6-column grid with 4 dp gaps and 8 dp corners inside 24 dp margins, the FAB at 24 dp from the corner; the viewer centres the picture and adds 56 dp round ‹ › buttons on each side (Précédente, Suivante); the bottom line and the video controls sit under the picture, 120 dp from the sides. Selection and the Retirer dialog are as on the phone.
+
+**iPad.** Like the iPhone, with « ‹ Plongée » as back label, a 6-column grid, and the ‹ › buttons on each side of the viewer.
+
+**Desktop.**
+- « Tout voir » opens a 960 px dialog over the window (28 px corners): « Photos et vidéos » with the dive under it, a filled « + Ajouter » button and ✕ in the header, the cloud line, a 5-column grid (6 px gaps, 8 px corners), and the hint « Double-clic pour ouvrir · Ctrl+clic pour sélectionner plusieurs éléments ». Selected items show the check; with a selection, Partager and Retirer replace « Ajouter » in the header; Suppr also removes (with the confirmation dialog).
+- Viewer: covers the window under the title bar, dark (#0B0B0C). Top bar: ✕ (« Fermer (Échap) »), « 2 sur 9 · mer. 2014-04-02, 10 h 11 · Olympus TG-6 », then Partager, Retirer de la plongée and ⋮ (« Remplacer la photo du site »). The picture is centred, ‹ › buttons on each side (← and → keys too), and a strip of 64 px thumbnails at the bottom with the current one outlined. Video: the controls appear over the bottom of the video.
+
+**Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
+
+## [ ] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
+
+Christian asked for this on 23 November 2026. Work in `main`. Benthic does not use Subsurface's automatic trip grouping (`autogroup`): the value is false, and the setting is not shown anywhere.
+
+- **Settings:** remove the row « Regrouper les plongées en voyages » from Réglages › Carnet on every device (`pages/Settings.svelte`, id `autogroup`), with its strings (`settings.autogroup`, `desktop.undo.autogroup`, the « Regrouper en voyages » menu label if it is still used, the undo name in `lib/undo-name.js`) and `setAutogroup()` in `lib/logbook.svelte.js` once nothing calls it. Mock-ups updated: « Réglages, Carnet » on Android, iPhone, Android tablet (landscape and portrait) and desktop, and the bottle-choice board that shows the same list.
+- **Behaviour:** Benthic never creates trips by itself. Downloads, imports and new logbooks must not group dives into trips automatically, whatever the logbook says. A logbook made in Subsurface may have `autogroup` on: do not rewrite the diver's file just for this if Benthic can ignore the flag on its side (pass « off » to the core's import and download path); if the core can only read it from the logbook, tell Christian before writing it.
+- Unchanged: the trips themselves (make, rename, add to, remove from, « Défaire le voyage »), and the trips already in a logbook.
+- Docs updated by the design agent: `docs/ui-specification.md` (the settings table and the note on what the logbook stores) and `docs/ui-writing.md` (example changed).
+
+**Test:** Réglages › Carnet has no « Regrouper les plongées en voyages » on any device; download or import several dives from different days: no trip is created; a Subsurface logbook with `autogroup` on keeps its existing trips and gets no new automatic ones from Benthic.

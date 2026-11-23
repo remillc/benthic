@@ -454,14 +454,11 @@ test('what a desktop cannot do: the answers the app copes with', async () => {
   assert.deepEqual(await plugin.bluetoothStatus(), { bluetooth: 'none', permission: 'granted' });
   assert.deepEqual(await plugin.installSource(), { store: false, installer: '' });
   assert.deepEqual(await plugin.requestReview(), { requested: false });
-  assert.deepEqual(await plugin.mapsFiles(), { files: [] });
-  assert.deepEqual(await plugin.mapsDownloads(), { downloads: [] });
   await plugin.contentShown();
   await plugin.keepScreenAwake({ on: true });
-  assert.equal((await rejection(plugin.mapsReadTile({ id: 'a', z: 1, x: 0, y: 0 }))).code, 'NOT_FOUND');
   assert.equal((await rejection(plugin.startBluetoothScan())).message, 'NO_BLUETOOTH');
   assert.equal((await rejection(plugin.downloadDives({}))).message, 'NO_BLUETOOTH');
-  for (const method of ['mapsTilesStart', 'mapsDelete', 'openStorePage', 'openAppSettings', 'readSharedFile', 'gaugeCamera', 'qrScan', 'healthDives']) {
+  for (const method of ['openStorePage', 'openAppSettings', 'readSharedFile', 'gaugeCamera', 'qrScan', 'healthDives']) {
     assert.equal((await rejection(plugin[method]({}))).code, 'UNAVAILABLE', method);
   }
 });

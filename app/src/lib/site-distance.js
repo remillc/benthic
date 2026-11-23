@@ -3,7 +3,7 @@
 // site » and of the quick entry's sites, and the distance as it is written there:
 // feet then miles in imperial (« 394 pi », « 1,1 mi », « 61 mi »), metres then
 // kilometres in metric. Without a position, the most recently dived site first.
-import { distanceKm } from './maps-logic.js';
+import { distanceKm } from './geo.js';
 
 /** Under this, a distance is in feet (imperial) or metres (metric). */
 const FEET_LIMIT = 1000;

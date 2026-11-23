@@ -219,20 +219,6 @@ export function openSettings() {
   openOver('/settings/');
 }
 
-/**
- * The offline maps part of Settings, from the message announcing a map update. Settings opens
- * first (without animation), so that the back arrow of the maps leads to Settings, as it does
- * when the diver goes through Settings himself.
- */
-export async function openMapSettings() {
-  openOver('/settings/', { animate: false });
-  const start = Date.now();
-  while (f7.views.current?.router.currentRoute?.path !== '/settings/' && Date.now() - start < 1500) {
-    await new Promise((resolve) => setTimeout(resolve, 30));
-  }
-  openOver('/settings/maps/');
-}
-
 /** About opens over the current section, from the side menu or the tablet navigation. */
 export function openAbout() {
   // Desktop app: a dialog over the section (task 2026-11-15-202), whatever the view.

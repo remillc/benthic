@@ -7,7 +7,7 @@ import { BenthicCore } from 'benthic-core';
 import { cachedSites } from './core-cache.js';
 import { loadMapLibre } from './maplibre.js';
 import { buildMapStyle } from './map-style.js';
-import { onTileOrigin } from './offline-tiles.js';
+import { onTileOrigin } from './map-tiles.js';
 
 const CACHE = 'bc-site-maps-v4';
 const ZOOM = 12;
@@ -18,7 +18,7 @@ export const HALF_HEIGHT = 300;
 const TIMEOUT_MS = 20000;
 /**
  * OpenFreeMap's terms allow offline downloads of 3,000 tiles or 50 MB at most,
- * with 4 requests at a time (offline-tiles.js holds that limit for every tile
+ * with 4 requests at a time (map-tiles.js holds that limit for every tile
  * asked of the network). A site's picture needs about 6 to 12 tiles of zoom 12,
  * at 100 KB at the very most: counted after each site, a run stops at 300 tiles
  * plus the last site (about 312 tiles, 31 MB), a tenth of the 3,000 tiles; the
@@ -33,8 +33,8 @@ const keyOf = (latUdeg, lonUdeg) => `https://localhost/site-map/${latUdeg}/${lon
 let drawers = 0;
 
 /**
- * An off-screen map that draws one site after the other. The tiles come from a
- * downloaded package, else the network (see map-style.js).
+ * An off-screen map that draws one site after the other. The tiles come from the
+ * network (see map-style.js).
  * @param {() => void} [onTile] called for each tile asked of the network
  * @param {{ width: number, height: number }} [size] CSS pixels of the picture
  */

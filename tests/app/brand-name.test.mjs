@@ -66,7 +66,7 @@ test('the app identity is app.benthicdivelog everywhere, with no trace of org.op
   assert.match(site, /IOS_BUNDLE_ID = 'app.benthicdivelog'/);
   assert.equal(JSON.parse(read('desktop/package.json')).name, 'benthic-desktop');
   assert.equal(JSON.parse(read('desktop/package.json')).build.appx.identityName, 'ChristianRmillard.BenthicDiveLog');
-  for (const f of ['app/capacitor.config.json', 'app/android/app/build.gradle', 'app/ios/App/App/Info.plist', 'app/ios/App/App/App.entitlements', 'app/android/app/src/main/AndroidManifest.xml', 'plugins/benthic-core/ios/Plugin/MapsManager.swift', 'site/build.mjs']) {
+  for (const f of ['app/capacitor.config.json', 'app/android/app/build.gradle', 'app/ios/App/App/Info.plist', 'app/ios/App/App/App.entitlements', 'app/android/app/src/main/AndroidManifest.xml', 'site/build.mjs']) {
     assert.doesNotMatch(read(f), /org\.opendives/, f);
   }
 });

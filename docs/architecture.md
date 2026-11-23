@@ -20,7 +20,7 @@ Benthic is built in **three layers**. At the top, a JavaScript web interface in 
 | Coexistence with Subsurface-mobile | Handled explicitly (format fidelity, conflicts, version, Bluetooth, duplicates, signed commits) |
 | Relationship with the Subsurface project | No approach for now; to revisit before publication |
 
-Interface: Svelte 5 + Framework7 v9 (decided). The code coming from Subsurface stays up to date with Subsurface (decided). Maps: OpenStreetMap packages hosted by Benthic (decided). All architecture decisions are made.
+Interface: Svelte 5 + Framework7 v9 (decided). The code coming from Subsurface stays up to date with Subsurface (decided). Maps: online OpenFreeMap vector tiles from OpenStreetMap data (offline maps dropped on 23 November 2026). All architecture decisions are made.
 
 ## 2. Overview
 
