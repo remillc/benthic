@@ -304,7 +304,17 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         paths: { userData: home, temp, resourcesDir: stage, xsltDir: `${stage}/xslt`, caFile: `${temp}/ca.pem` },
         core: (m, a) => call('core', m, a),
         onCoreEvent: () => () => {},
-        credentials: { get: async () => null, set: async () => {}, clear: async () => {} },
+        // The secure storage of the bridge (safeStorage in the real app): kept for the page, so that the data key written
+        // when a sensitive item is first sealed is found again (the app never makes a second key over sealed data).
+        // Kept in the page storage (not in memory): the flows reload the page, and IndexedDB, which holds the sealed items, stays.
+        credentials: (() => {
+          const key = (kind) => `__bcTestCredential.${kind}`;
+          return {
+            get: async (kind) => JSON.parse(localStorage.getItem(key(kind)) ?? "null"),
+            set: async (kind, value) => localStorage.setItem(key(kind), JSON.stringify(value)),
+            clear: async (kind) => localStorage.removeItem(key(kind)),
+          };
+        })(),
         // The recent logbooks (the desktop layout reads them at start): none, as on a first run.
         logbooks: { recent: async () => [], exists: async () => ({}), forget: async () => [], clearRecent: async () => [] },
         fs: new Proxy({}, { get: (_, op) => (o) => call('fs', op, o) }),
@@ -1653,6 +1663,21 @@ async function certsFabFlows(expect) {
   for (const [label, width, height, mobile, desktop, theme] of [['Android phone', 390, 844, true, false, 'md'], ['tablet landscape', 1280, 800, false, false, 'md']]) {
     const tab = await openTab(width, height, mobile, false, desktop, { theme });
     await tab.send('Page.bringToFront');
+    // Each device starts with no certification: the tabs share the browser storage, and the phone adds one further down.
+    await tab.run(() => new Promise((resolve) => {
+      const open = indexedDB.open('benthic-files');
+      open.onerror = () => resolve(null);
+      open.onsuccess = () => {
+        const db = open.result;
+        const names = [...db.objectStoreNames];
+        if (!names.length) return (db.close(), resolve(null));
+        const tx = db.transaction(names, 'readwrite');
+        for (const name of names) tx.objectStore(name).clear();
+        tx.oncomplete = tx.onerror = () => (db.close(), resolve(null));
+      };
+    }));
+    await tab.send('Page.reload');
+    await sleep(2500);
     await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/profile/certs/'));
     await sleep(1600);
     const position = await tab.run(() => {
