@@ -9,9 +9,8 @@
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
-  import SyncButton from './SyncButton.svelte';
   import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
-  import { logbook, autoSyncing } from '../lib/logbook.svelte.js';
+  import { logbook } from '../lib/logbook.svelte.js';
   import { navigation, openOver, openSettings, openMapSettings, openAbout } from '../lib/navigation.svelte.js';
   import { updatesCount } from '../lib/offline-maps.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -63,12 +62,6 @@
     navigation.accountOpen = false;
     openBenthicPlus(screen, 'account');
   }
-
-  /**
-   * Changes not sent while the device is offline or the connection is metered (« Seulement sur Wi-Fi ou câble »): their count
-   * and a filled « Synchroniser » (nav-compte-maj-android.dc.html). Sync itself is always automatic.
-   */
-  const waiting = $derived(!!logbook.email && logbook.pending > 0 && (logbook.sync === 'offline' || !autoSyncing()));
 
   /**
    * Closes the sheet, then opens a page over the current section.
@@ -165,16 +158,14 @@
             <div class="bc-account-sheet--ios-row"><SyncFailureRow conflict /></div>
           {:else}
             <div class="bc-account-sheet--ios-row bc-account-sheet--ios-sync">
-              {#if waiting}
-                <span class="bc-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
-              {:else}
-                <SyncStatus sync={logbook.sync} pending={0} progress={logbook.syncProgress} live={false} steady />
-              {/if}
-              {#if logbook.email}<SyncButton filled={waiting} />{/if}
+              <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} detail />
             </div>
           {/if}
         {/if}
       </div>
+      {#if logbook.email && !logbook.loading && !logbook.error}
+        <p class="bc-account-sheet--ios-footnote">{t('account.sheet.syncFootnote')}</p>
+      {/if}
       {#if devAccounts}{#await import('./DevToolsRow.svelte') then dev}{@const DevToolsRow = dev.default}<DevToolsRow />{/await}{/if}
       {#if isRelease && !desktopApp}
         <!-- « Sauvegarde et restauration » (tasks 290, 291): the diver profile is a main destination now (task 2026-11-23-347). -->
@@ -299,35 +290,25 @@
           <span class="bc-account-sheet--name">{accountName}</span>
           {#if accountEmail}<span class="bc-account-sheet--email">{accountEmail}</span>{/if}
           <span class="bc-account-sheet--line">{accountLine}</span>
+          {#if layout.rail && logbook.email && !logbook.loading && !logbook.error && !logbook.syncFailure && !(logbook.conflict && logbook.conflictLater)}
+            <!-- Tablet: no row of its own, the state is a third line under the account (task 2026-11-23-356). -->
+            <span class="bc-account-sheet--state"><SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} detail="inline" /></span>
+          {/if}
         </span>
       </div>
       <div class="bc-account-sheet--manage">
         <button type="button" class="bc-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>
       </div>
-      {#if !logbook.loading && !logbook.error}
+      {#if !logbook.loading && !logbook.error && (!layout.rail || logbook.syncFailure || (logbook.conflict && logbook.conflictLater))}
         <div class="bc-account-sheet--divider"></div>
         <div class="bc-account-sheet--sync">
           {#if logbook.syncFailure}
             <SyncFailureRow />
           {:else if logbook.conflict && logbook.conflictLater}
             <SyncFailureRow conflict />
-          {:else if waiting}
-            <div class="bc-account-sheet--waiting">
-              {#if logbook.pending > 0}
-                <span class="bc-account-sheet--pending">{t('nav.pendingChanges', { n: logbook.pending })}</span>
-              {:else}
-                <!-- Nothing waiting: the last sync, as in automatic sync, not « 0 modification ». -->
-                <SyncStatus sync={logbook.sync} pending={0} progress={logbook.syncProgress} live={false} />
-              {/if}
-              <SyncButton filled />
-            </div>
           {:else}
-            <!-- One row: the cloud and the status take the width, « Synchroniser » on the right; a long
-                 status wraps beside the button, never above it (task 2026-11-14-156). -->
-            <div class="bc-account-sheet--auto">
-              <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
-              {#if logbook.email}<SyncButton />{/if}
-            </div>
+            <!-- The state and, under it, what sync does by itself: no « Synchroniser » button (task 2026-11-23-356). -->
+            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} detail />
           {/if}
         </div>
       {/if}
@@ -511,8 +492,8 @@
       min-width: 0;
     }
 
-    .bc-account-sheet--ios-sync > :global(:last-child:not(.bc-sync-status)) {
-      flex: none;
+    .bc-account-sheet--ios-sync :global(.bc-sync-status--pending) {
+      color: var(--bc-pending);
     }
 
     .bc-account-sheet--ios-offer .bc-account-sheet--already {
@@ -599,25 +580,6 @@
       color: var(--bc-text);
     }
 
-    .bc-account-sheet--auto {
-      align-self: stretch;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      :global(.bc-sync-status) {
-        flex: 1;
-        min-width: 0;
-        justify-content: flex-start;
-        text-align: start;
-        color: var(--bc-text-2);
-      }
-
-      > :global(*:last-child) {
-        flex: none;
-      }
-    }
-
     /* The white cards: 28 dp corners; the identity card (the first) 12 dp narrower on each side (task 2026-11-14-158). */
     .bc-account-sheet--card {
       margin-top: 8px;
@@ -699,12 +661,21 @@
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       gap: 10px;
 
       :global(.bc-sync-status) {
         padding: 0;
         font-size: 14px;
+        color: var(--bc-text-2);
+      }
+
+      :global(.bc-sync-status--pending) {
+        color: var(--bc-pending);
+      }
+
+      :global(.bc-sync-status--second) {
+        color: var(--bc-text-2);
       }
     }
 
@@ -736,25 +707,28 @@
       color: var(--bc-pending);
     }
 
-    /* The changes waiting and « Synchroniser » on one row. */
-    .bc-account-sheet--waiting {
-      align-self: stretch;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    /* The tablet's third line under the account. */
+    .bc-account-sheet--state {
+      margin-top: 2px;
 
       :global(.bc-sync-status) {
-        flex: 1;
-        justify-content: flex-start;
+        padding: 0;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--bc-text-2);
+      }
+
+      :global(.bc-sync-status--pending) {
+        color: var(--bc-pending);
       }
     }
 
-    .bc-account-sheet--pending {
-      flex: 1;
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: 600;
-      color: var(--bc-pending);
+    /* The footnote of the iPhone sheet's group. */
+    .bc-account-sheet--ios-footnote {
+      margin: 8px 16px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
     }
 
     /* Free version (task 2026-11-18-281): the grey silhouette, « S'abonner », « Déjà abonné ? Se connecter », the Benthic+ rows. */

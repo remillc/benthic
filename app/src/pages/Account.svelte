@@ -8,7 +8,6 @@
   import { Page, Navbar, Link, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import Icon from '../components/Icon.svelte';
-  import SyncButton from '../components/SyncButton.svelte';
   import MenuButton from '../components/MenuButton.svelte';
   import { bottomNav, layout, ios, deviceKind } from '../lib/layout.svelte.js';
   import { deviceSuffix } from '../lib/first-launch.js';
@@ -230,7 +229,10 @@
         <li>
           <div class="item-content">
             <div class="item-inner">
-              <div class="item-title">{t('account.lastSync')}</div>
+              <div class="item-title">
+                {t('account.lastSync')}
+                <div class="item-footer">{t(logbook.pending > 0 ? 'sync.autoWaiting' : 'sync.autoLine')}</div>
+              </div>
               <div class="item-after bc-value">{lastSync}</div>
             </div>
           </div>
@@ -255,9 +257,6 @@
             </a>
           </li>
         {/if}
-        <li class="bc-account--sync-now">
-          <SyncButton />
-        </li>
       </ul>
     </div>
 
@@ -429,13 +428,6 @@
 
     .item-footer {
       white-space: normal;
-    }
-
-    /* "Sync": a real button centred in its row (style: .bc-tonal-button). */
-    .bc-account--sync-now {
-      padding: 12px 16px 14px;
-      display: flex;
-      justify-content: center;
     }
 
     .bc-account--pending {

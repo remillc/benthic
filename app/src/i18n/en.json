@@ -441,6 +441,9 @@
     },
     "cloud": "Synced with Subsurface cloud",
     "syncedAgo": "Synced {ago}",
+    "syncedAutomatically": "Synced {ago}, automatically",
+    "autoLine": "Automatic, as soon as a change is made",
+    "autoWaiting": "Sent automatically when the network is back",
     "offline": "Offline: no changes waiting",
     "local": "Logbook stored on this device only",
     "offlinePending": {
@@ -1495,7 +1498,6 @@
     "lastSyncNever": "Never",
     "todayAt": "today, {time}",
     "cloudDives": "Dives in the cloud",
-    "syncNow": "Sync",
     "subsurfaceGroup": "Subsurface account",
     "changePassword": "Change password",
     "changePasswordText": "A link is sent to your email",
@@ -1562,6 +1564,7 @@
     "sheet": {
       "backup": "Backup and restore",
       "backupText": "Go back to a version of the logbook or of a dive",
+      "syncFootnote": "Sync is automatic: every change is sent as soon as the network allows.",
       "plusDives": {"one": "Benthic+ · {n} dive", "other": "Benthic+ · {n} dives"},
       "gitTitle": "Personal git repository",
       "gitLine": {"one":"{repository} · {n} dive","other":"{repository} · {n} dives"},
@@ -2783,10 +2786,11 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Account: no « Sync » button anywhere (account sheet, Account, side menu, desktop). The state stays, with a second line: « Synced 2 min ago » and « Automatic, as soon as a change is made », or « 3 changes not sent » and « Sent automatically when the network is back »; on tablet the state is the third line under the account.",
       "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
       "Logbook: while the app exchanges with the server at start, a white line is drawn on the faint profile of the header, on every device: a segment slides while the progress is unknown, then the line fills up, completes and fades. It replaces the wavy bar.",
-      "Sync: synchronisation is always automatic. The « Sync automatically » switch and the manual mode are gone; « Wi-Fi or cable only » and « Sync now » stay, and changes not sent still show when the device is offline.",
+      "Sync: synchronisation is always automatic. The « Sync automatically » switch and the manual mode are gone; « Wi-Fi or cable only » stays, and changes not sent still show when the device is offline.",
       "Logbook: a long press on a dive or a trip starts selection mode as soon as it is recognised, with the finger still down and a short haptic tap on phones and tablets; letting go no longer decides.",
       "Android phone, Logbook and Sites: the search box sits under the summary and, as the list scrolls, shrinks and rises into the top bar as a magnifier. A search in progress stays there as a pill with its text and a clear button; tapping the text or the magnifier opens the box again. On Sites, the map's full-screen button moves above « Center on my position ».",
       "Export: “Send to divelogs.de” sends the dives of the logbook or of the selection to your divelogs.de account, after the user name and the password, which are not kept. The sending shows its progress and resumes after a lost connection.",
@@ -5147,7 +5151,6 @@
     },
     "account": {
       "sheet": "Account",
-      "syncNow": "Sync now",
       "unmetered": "Only on Wi-Fi or cable",
       "unmeteredText": "Never on a tethered connection",
       "manage": "Manage account"

@@ -10,7 +10,6 @@
   import Icon from './Icon.svelte';
   import SyncStatus from './SyncStatus.svelte';
   import SyncFailureRow from './SyncFailureRow.svelte';
-  import SyncButton from './SyncButton.svelte';
   import { benthicPlusAccount, benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { logbook, signOut } from '../lib/logbook.svelte.js';
   import { navigation, openOver, openBackup, openManageAccount, openSettings, openAbout, showSection } from '../lib/navigation.svelte.js';
@@ -146,9 +145,8 @@
           {#if logbook.syncFailure}
             <SyncFailureRow />
           {:else}
-            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} detail />
           {/if}
-          <SyncButton />
         </div>
       {/if}
     </div>
@@ -201,9 +199,8 @@
           {#if logbook.syncFailure}
             <SyncFailureRow />
           {:else}
-            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+            <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} detail />
           {/if}
-          <SyncButton />
         </div>
       {/if}
     </div>
@@ -251,7 +248,7 @@
             {#if logbook.syncFailure}
               <SyncFailureRow />
             {:else}
-              <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} steady />
+              <SyncStatus sync={logbook.sync} pending={logbook.pending} progress={logbook.syncProgress} live={false} detail />
             {/if}
           </span>
         {:else if free}
@@ -279,10 +276,11 @@
         <Icon name="chevron" size={20} />
       </button>
     {:else if logbook.email}
-      <div class="bc-desktop-account--sync bc-desktop-account--buttons">
-        {#if subscriber}<button type="button" class="bc-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>{/if}
-        <SyncButton label={t('desktopSettings.account.syncNow')} />
-      </div>
+      {#if subscriber}
+        <div class="bc-desktop-account--sync bc-desktop-account--buttons">
+          <button type="button" class="bc-outlined-button" onclick={manage}>{t('nav.manageAccount')}</button>
+        </div>
+      {/if}
       <label class="bc-desktop-account--switch">
         <span class="bc-desktop-account--switch-texts">
           <span class="bc-desktop-account--switch-label">{t('desktopSettings.account.unmetered')}</span>
@@ -516,11 +514,6 @@
         color: var(--bc-pending);
       }
     }
-    /* « Synchroniser maintenant »: the page's main action, in the ink (the mock-up's black button). */
-    .bc-desktop-account--sync :global(.bc-sync-button) {
-      background: var(--bc-action);
-      color: var(--bc-on-action);
-    }
 
     /* A Benthic+ account (task 2026-11-19-292): the sheet's background, white rounded groups, a 36 px blue tile per entry. */
     .bc-desktop-account--plus {
@@ -602,14 +595,14 @@
       gap: 12px;
       padding: 12px 16px;
 
-      :global(.bc-sync-button) {
-        flex: none;
-        white-space: nowrap;
-      }
-
       :global(.bc-sync-status) {
         flex: 1;
         min-width: 0;
+        padding: 0;
+      }
+
+      :global(.bc-sync-status--pending) {
+        color: var(--bc-pending);
       }
     }
     .bc-desktop-account--entry {
