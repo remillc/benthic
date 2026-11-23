@@ -939,9 +939,13 @@ export { waterTypeOf };
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile'|'stageProgress'|'pushStream', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {() => Promise<void>} openNotificationSettings opens the system's notification settings for Benthic (Android: the app's
+ *   notification page; iOS: the app's page in Settings); the desktop has none. Inbox task 2026-11-23-356, part 4.
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'mapsDownload'|'sharedFile'|'stageProgress'|'pushStream'|'accessRequestOpened', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
  *   mapsDownload a MapDownload (progress at most twice a second, and every status change),
+ *   accessRequestOpened {requestId} (Android): the system notification of an access request was touched, kept until a listener exists
+ *   (cold start); iOS gets the same through the push plugin's pushNotificationActionPerformed.
  *   syncProgress {message}: each message of the core's git work while the cloud log syncs (benthic.h,
  *   set_sync_progress), in English, e.g. "Transfer from storage (30/80)".
  */
@@ -1273,6 +1277,7 @@ export const BenthicCore = {
     return JSON.parse((await native.downloadPartial(options)).json);
   },
   cancelDownload: () => native.cancelDownload(),
+  openNotificationSettings: () => native.openNotificationSettings(),
   addListener(event, listener) {
     if (event === 'bluetoothDevice')
       return native.addListener(event, (/** @type {any} */ d) => listener({ ...d, computer: JSON.parse(d.computer || 'null') }));

@@ -17,6 +17,8 @@
   import RecoveryKeyEnter from './RecoveryKeyEnter.svelte';
   import JoinSummaryDialog from './JoinSummaryDialog.svelte';
   import StartOverDialog from './StartOverDialog.svelte';
+  import NotifyAskDialog from './NotifyAskDialog.svelte';
+  import { answerPushExplanation, pushExplanationDue, pushState, showPushExplanation, startPush } from '../lib/push-notifications.svelte.js';
   import { accountSync } from '../lib/account-sync.svelte.js';
   import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { dueScreen } from '../lib/account-sync-screens.js';
@@ -26,6 +28,7 @@
 
   onMount(() => {
     flows.wireLockActions();
+    void startPush();
     return () => clearTimeout(waiting);
   });
 
@@ -77,6 +80,24 @@
     });
   });
 
+  // The permission to notify (inbox task 2026-11-23-356, part 4): asked once, with Benthic's explanation first, on a device that
+  // holds the key and is settled (nothing else open). « Plus tard » and a refusal never ask again on their own.
+  $effect(() => {
+    void recheck;
+    if (!canApprove || accountSync.status !== 'synced' || flow.screen || flow.busy || pushState.asking) return;
+    untrack(() => {
+      void pushExplanationDue().then((due) => {
+        if (!due || flow.screen || flow.busy || pushState.asking) return;
+        if (flows.modalInTheWay()) {
+          clearTimeout(waiting);
+          waiting = /** @type {any} */ (setTimeout(() => recheck++, 1000));
+          return;
+        }
+        showPushExplanation();
+      });
+    });
+  });
+
   // Which screen is due, one at a time and in this order: another account, the missing key, the join, the recovery key. A
   // manual sync runs again after a screen was closed, so a question left open comes back then.
   $effect(() => {
@@ -107,6 +128,9 @@
 </script>
 
 {#if benthicPlusAccount.signedIn}
+  {#if pushState.asking && !flow.screen}
+    <NotifyAskDialog oncontinue={() => void answerPushExplanation(true)} onlater={() => void answerPushExplanation(false)} />
+  {/if}
   {#if flow.screen === 'unlock'}
     <AccountUnlockDialog names={flow.devices.map((d) => d.name)} onpair={() => void flows.askForAccess()} onrecoverykey={flows.openRecoveryKeyEntry} onlater={flows.closeScreen} onlost={() => (flow.screen = 'startOver')} />
   {:else if flow.screen === 'requestWait'}

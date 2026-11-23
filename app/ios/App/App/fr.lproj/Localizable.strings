@@ -1,0 +1,4 @@
+/* The system notification of an access request (inbox task 2026-11-23-356): the server sends the loc-keys. */
+"ACCESS_REQUEST_TITLE" = "Donner accès à « %@ » ?";
+"ACCESS_REQUEST_BODY" = "Code de vérification %@. Touchez pour répondre.";
+"ACCESS_REQUEST_ACTION" = "Répondre";

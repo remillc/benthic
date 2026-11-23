@@ -794,6 +794,7 @@
     "groups": {
       "notifyDocuments": "Brevets et documents",
       "notifyDive": "Après la plongée",
+      "notifyDevices": "Vos appareils",
       "notifyMaintenance": "Entretien de l’équipement",
       "language": "Langue et formats",
       "units": "Unités",
@@ -2828,6 +2829,7 @@
       "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",
       "Premier lancement : les rayons de lumière de la bande bleue sont toujours quatre, à l’échelle de la largeur de la bande, sur tablette et ordinateur comme sur le téléphone.",
       "Téléchargement depuis l’ordinateur de plongée : un seul geste. L’ordinateur mémorisé a sa carte avec « Télécharger » (état « À portée, prêt »), les autres ont chacun leur bouton ; « Tout retélécharger », « Montrer tous les appareils Bluetooth » et « Aide au téléchargement » sont dans le menu ⋮. Première fois : recherche avec les trois gestes à faire ; puis connexion, progression avec les plongées reçues, « Connexion perdue » (les plongées reçues sont gardées, « Réessayer » reprend), « Aucune nouvelle plongée » et « N nouvelles plongées » avec « Voir dans le carnet ». Même parcours sur téléphone, iPhone, tablette et ordinateur (boîte de dialogue).",
+      "Accès d’un nouvel appareil : Benthic peut vous prévenir par une notification, même fermé, quand un nouvel appareil demande l’accès à vos données chiffrées (Benthic+, téléphone et tablette). La notification affiche le code à comparer ; la toucher ouvre la demande, et elle disparaît quand la demande reçoit une réponse ou expire. L’autorisation est demandée une fois, avec une explication ; Réglages › Notifications montre « Vos appareils » et, si le système refuse les notifications, un bandeau avec un bouton vers les réglages du système.",
       "Compte : plus de bouton « Synchroniser » nulle part (feuille du compte, Compte, menu latéral, ordinateur). L’état reste, avec une seconde ligne : « Synchronisé il y a 2 min » et « Automatique, dès qu’une modification est faite », ou « 3 modifications non envoyées » et « Envoi automatique au retour du réseau » ; sur tablette, l’état est la troisième ligne sous le compte.",
       "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
@@ -4971,6 +4973,7 @@
       "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive ou WebDAV",
       "git": "Dans un dépôt git",
       "gitHelp": "Votre propre dépôt · historique complet des changements",
+      "answer": "Répondre",
       "continue": "Continuer",
       "cancel": "Annuler",
       "back": "Retour",
@@ -7023,6 +7026,21 @@
     }
   },
   "accountSync": {
+    "push": {
+      "askTitle": "Être prévenu des demandes d’accès",
+      "askText": "Quand un nouvel appareil demande l’accès à vos données chiffrées, Benthic vous prévient sur cet appareil, même s’il est fermé. Vous comparez le code et répondez.",
+      "askNote": "Le serveur Benthic n’envoie aucune autre notification.",
+      "later": "Plus tard",
+      "continue": "Continuer",
+      "requests": "Demandes d’accès d’un nouvel appareil",
+      "requestsIos": "Demandes d’accès",
+      "requestsText": "Toujours activées : sans elles, un nouvel appareil ne peut pas être jumelé quand Benthic est fermé ici.",
+      "always": "Toujours",
+      "refusedTitle": "Notifications désactivées pour Benthic",
+      "refusedText": "Les demandes d’accès d’un nouvel appareil et les rappels n’apparaîtront qu’à l’ouverture de l’app.",
+      "openAndroid": "Ouvrir les réglages d’Android",
+      "openIos": "Ouvrir les Réglages de l’iPhone"
+    },
     "unlock": {
       "title": "Déverrouiller vos données chiffrées",
       "pair": "Demander l’accès à un appareil jumelé",

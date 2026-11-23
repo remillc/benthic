@@ -16,6 +16,10 @@
 		<string>applinks:benthicdivelog.app</string>
 		<string>applinks:opendives.app</string>
 	</array>
+	<!-- Push notifications (task 2026-11-23-356). Needs the Push Notifications capability on the App ID. `development` for debug builds
+	     and Xcode's own signing; Xcode and the distribution profile switch it to `production` for TestFlight and the store. -->
+	<key>aps-environment</key>
+	<string>development</string>
 	<!-- iCloud Drive, first launch on iPhone (task 2026-11-16-261): the logbook is created in the app's container.
 	     Needs the iCloud capability (iCloud Documents) and the container on the App ID. -->
 	<key>com.apple.developer.icloud-container-identifiers</key>
