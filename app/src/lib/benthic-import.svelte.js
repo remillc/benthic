@@ -58,9 +58,11 @@ export function openBenthicFile(file) {
 }
 
 /**
- * The media hook of the device. The plugin's media folder (`mediaAdopt`, branch feature/dive-media) is not in `main` yet:
- * until it is, the originals of a file are verified and counted and not kept. When the plugin has it, `put` stages each file
- * in the cache in pieces and `finish` adopts them (`mediaAdopt`), `discard` deletes what was staged.
+ * The media hook of the device: the plugin's media folder (`mediaAdopt`, the dive media sync). `put` stages each original in the
+ * cache in pieces, `finish` adopts them into the media folder under the hash of their content, `discard` deletes what was
+ * staged. A plugin without `mediaAdopt` gives none: the originals are then verified and counted and not kept. The file carries
+ * the originals only, not the dives' reference files (the export does not write them), so an adopted original is not attached
+ * to a dive.
  * @returns {import('./benthic-import.js').MediaDeps|undefined}
  */
 function deviceMedia() {

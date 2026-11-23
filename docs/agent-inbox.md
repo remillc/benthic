@@ -6930,7 +6930,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Correction to task
 
 **Done (23 November 2026).** `FirstLaunchRays.svelte` draws the four rays of the 390 px band (sun at (760, -900), bottom ends -115..0, 80..145, 195..315, 275..390, opacity 3.5, 3, 4, 3.5 %) in a viewBox scaled by the band's width / 390, never repeated; blur stays 2 px on screen, fade gone at 65 % of the height. `docs/system-design.md` already describes it.
 
-## [ ] 2026-11-23-356 Push sync (TODO #185): server notifies devices, no « Synchroniser » button, access requests as push notifications
+## [x] 2026-11-23-356 Push sync (TODO #185): server notifies devices, no « Synchroniser » button, access requests as push notifications
 
 **Progress: part 2 done in 37e214a6** (no « Synchroniser » button anywhere). Parts 3 and 4 are built on branch `feature/access-request-notifications` (Android checked on the emulator with a real FCM push; iPhone written by reading, no Mac; the Apple key and Xcode settings are still to do); part 1 is on `feature/push-sync`.
 Christian asked for this on 23 November 2026. Work in `main`. Read TODO #185 in `docs/TODOS.md` first; it goes with #173. Mock-ups are on the canvases (titles below).
@@ -6959,6 +6959,8 @@ Mock-ups: « Feuille du compte, abonné (Benthic+) · Android » and the other p
 Mock-ups: « Permission de notifier, explication avant la demande d’Android / d’iOS (Benthic+) » and « Permission de notifier, demande d’Android / d’iOS (Benthic+) » (Android, iPhone, tablet paysage), « Réglages, Notifications (essai) » and « Réglages, Notifications, refusées … » (Android, iPhone).
 
 **Test:** with two paired devices and the app open on both, a change on one shows on the other within a few seconds without any tap; the account sheets have no « Synchroniser » button; with Benthic closed on the paired phone, a new device's access request shows as a system notification, and touching it opens the request; cutting the connection falls back to pull without errors.
+
+**Done (23 November 2026, in `integration/device-check`).** Part 1 (push channel; the device syncs through git), part 2 (no « Synchroniser » button), part 3 (system notification of an access request, Android with a real FCM push on the emulator) and part 4 (permission asked once, « Vos appareils », banner and system settings) are all in this branch. iPhone is written by reading and untested (no Mac). **Still needed from Christian for iOS:** the APNs authentication key (`.p8`), its Key ID and the Apple Team ID, to put on the server and in the Xcode project (push capability).
 
 ## [x] 2026-11-23-357 Download from a dive computer: one tap, one download (TODO #40, Android)
 
@@ -7005,7 +7007,7 @@ Mock-ups: « Détail, équipement déplié · Android » and every other Android
 
 **Done (feature/dive-media, not merged: the coordinator checks on devices).** Server (benthic-server `main`, `docs/media-sync.md`): signed upload and download URLs by hash, usage, quota (`MEDIA_QUOTA_BYTES`, 10 GiB by default). App: `lib/dive-media.js` (references `media/<dive start>.json`, merge by hash), `lib/media-sync.js` (uploads wait offline; thumbnails always, originals on Wi-Fi by the choice), plugin `media*` calls (Kotlin, Swift written without a Mac, desktop `media.cjs`), section `DiveMediaSection.svelte` and gallery `DiveGallery.svelte`. No mock-up of the new section is in the repository: built from the text above. The choices live in Réglages › Carnet (« Photos sur cet appareil », « Vidéos sur cet appareil »), next to « Afficher les champs photos et vidéos », for a Benthic+ account only.
 
-## [ ] 2026-11-23-360 Import a .benthic file (full export): new logbook or replace the current one (TODO #113)
+## [x] 2026-11-23-360 Import a .benthic file (full export): new logbook or replace the current one (TODO #113)
 
 Christian asked for this on 23 November 2026. Work in `main`. Benthic already exports everything to a `.benthic` file; this is the import. Decided on 22 November 2026: importing a `.benthic` creates the logbook (first launch) or replaces the current one after confirmation, as « Importer un carnet » does for other formats. Mock-ups: phone canvas, page « Pour commencer », subgroup « Depuis un fichier .benthic (export complet) »; tablet (landscape) and desktop: tablet canvas, page « Pour commencer », subgroups of the same name.
 
@@ -7018,6 +7020,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Benthic already ex
 Benthic+ data in the file (profile, certificates, documents, photos) is imported for everyone; what a free user cannot see stays in the logbook, hidden, as for any Benthic+ data. Same on phone (Android and iPhone), tablet and desktop.
 
 **Test:** export a logbook, import it on a fresh install (first launch) and over an existing logbook; corrupt one file in the archive and check the incomplete message and that nothing was imported.
+
+**Done (23 November 2026, in `integration/device-check`).** The import of a `.benthic` file on every device (entry, new logbook, progress, incomplete file, replace). With the dive media sync in this branch the media hook finds `mediaAdopt` in the plugin: each original of `dive-media/` is staged in pieces and adopted into the media folder under its hash when the import succeeds, and discarded when it fails. The file carries the originals only (the export writes no per-dive reference files), so they are kept on the device but not attached to a dive.
 
 ## [x] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
 

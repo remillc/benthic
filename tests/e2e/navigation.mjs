@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--no-monkey] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--no-monkey] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each

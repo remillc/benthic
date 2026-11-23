@@ -378,9 +378,8 @@ export async function writeData(store, data) {
 }
 
 /**
- * @typedef {Object} MediaDeps the originals of the dives (docs/architecture.md 11.6). The plugin's media folder is on the
- *   branch feature/dive-media; until it is in `main` a device gives none, and the photos and videos of the file are
- *   verified and counted but not kept (`skipped` in the result).
+ * @typedef {Object} MediaDeps the originals of the dives (docs/architecture.md 11.6). A device without the plugin's media
+ *   folder (`mediaAdopt`) gives none, and the photos and videos of the file are verified and counted but not kept (`skipped` in the result).
  * @property {(name: string, chunks: AsyncIterable<Uint8Array>, size: number) => Promise<{ undo: () => Promise<void> }>} put stages one file; the file is kept at `finish`
  * @property {() => Promise<void>} finish keeps every staged file (called with the last step)
  * @property {() => Promise<void>} discard drops every staged file
