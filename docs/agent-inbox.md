@@ -7213,3 +7213,23 @@ Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (
 **Free user:** none of these screens (the section is hidden, task 359).
 
 **Test:** from a dive with photos and videos, « Tout voir » shows the grid in dive order with depths; the FAB adds pictures; a long press selects, Partager shares, Retirer asks then removes on every device; touching a photo opens it full screen, swiping changes picture, ⋮ offers the two items; a video plays with its controls.
+
+## [ ] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
+
+Christian asked for this on 23 November 2026. Work in `main`. Same feature as task 367 (Android phone): same content, same rules (dive order, depth on thumbnails from the picture's offset, Partager, Retirer with confirmation, « Remplacer la photo du site », the bottom line « date, heure · appareil », no depth or profile in the viewer, nothing for a free user). Only the platform patterns change. Mock-ups, subgroup « Photos et vidéos (Benthic+) » on each page: phone canvas, page iPhone (before « Modifier une plongée »); tablet and desktop canvas, pages Tablette (before « Plusieurs ordinateurs »), iPad (after « Modifier une plongée ») and Bureau (before « Téléchargement, partage et voyage »).
+
+**iPhone.**
+- Gallery: navigation bar with the back chevron on the left and, on the right, « Sélectionner » and + (« Ajouter des photos ou des vidéos »); below it, the large title « Photos et vidéos », then « N° 5 · Lake Coleridge · 2014-04-02 », the cloud line (13 pt), and the 3-column grid with 2 pt gaps.
+- Selection (« Sélectionner »): « Annuler » on the left, « 2 sélectionnées » as title; thumbnails show an empty circle top right, a selected one a blue border and a filled check. A bottom toolbar: Partager on the left, « 2 photos sélectionnées » in the middle, the trash on the right.
+- The trash opens an action sheet: the explanation (« Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la photothèque où vous les avez prises. »), the destructive « Retirer 2 photos de la plongée », then « Annuler ».
+- Viewer: black; translucent navigation bar with « ‹ Photos », the title « 2 sur 9 » with the date and time under it, and the « … » button whose pull-down menu has « Remplacer la photo du site ». Translucent bottom toolbar: Partager on the left, the camera model in the middle, the trash (« Retirer de la plongée ») on the right. Swipe to change picture. Video: the player controls sit above the toolbar.
+
+**Android tablet** (landscape mock-ups; portrait follows the same layout). Same as the phone (task 367) with a 6-column grid with 4 dp gaps and 8 dp corners inside 24 dp margins, the FAB at 24 dp from the corner; the viewer centres the picture and adds 56 dp round ‹ › buttons on each side (Précédente, Suivante); the bottom line and the video controls sit under the picture, 120 dp from the sides. Selection and the Retirer dialog are as on the phone.
+
+**iPad.** Like the iPhone, with « ‹ Plongée » as back label, a 6-column grid, and the ‹ › buttons on each side of the viewer.
+
+**Desktop.**
+- « Tout voir » opens a 960 px dialog over the window (28 px corners): « Photos et vidéos » with the dive under it, a filled « + Ajouter » button and ✕ in the header, the cloud line, a 5-column grid (6 px gaps, 8 px corners), and the hint « Double-clic pour ouvrir · Ctrl+clic pour sélectionner plusieurs éléments ». Selected items show the check; with a selection, Partager and Retirer replace « Ajouter » in the header; Suppr also removes (with the confirmation dialog).
+- Viewer: covers the window under the title bar, dark (#0B0B0C). Top bar: ✕ (« Fermer (Échap) »), « 2 sur 9 · mer. 2014-04-02, 10 h 11 · Olympus TG-6 », then Partager, Retirer de la plongée and ⋮ (« Remplacer la photo du site »). The picture is centred, ‹ › buttons on each side (← and → keys too), and a strip of 64 px thumbnails at the bottom with the current one outlined. Video: the controls appear over the bottom of the video.
+
+**Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
