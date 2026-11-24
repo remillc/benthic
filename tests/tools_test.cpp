@@ -216,8 +216,9 @@ int main(int argc, char **argv)
 	}
 	std::string json, error;
 
+	// The library holds no standard types any more (a93d9178): with nothing loaded and nothing added, none is listed.
 	benthic::gas_cylinder_types(json);
-	check_true("cylinder types listed", json.find("\"name\":\"AL80\"") != std::string::npos);
+	check_true("no log: no standard cylinder type listed", json.find("\"name\":\"AL80\"") == std::string::npos);
 
 	// Desaturation with nothing loaded: tissues at rest, (1.013 - 0.0627) * 0.781
 	// = 0.7422 bar of nitrogen, 0.7422 / 1.013 * 50 = 37 % in Subsurface's graph.
@@ -229,6 +230,12 @@ int main(int argc, char **argv)
 	if (benthic::list_dives(argv[1], json, error)) {
 		fprintf(stderr, "%s\n", error.c_str());
 		return 2;
+	}
+	// The types the log's dives use are listed.
+	{
+		std::string types;
+		benthic::gas_cylinder_types(types);
+		check_true("cylinder types of the log listed", types.find("\"name\":\"AL80\"") != std::string::npos);
 	}
 	// End of the last dive of the log (dives are sorted by time).
 	size_t last = json.rfind("\"date\":\"");
