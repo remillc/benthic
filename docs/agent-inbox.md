@@ -7399,7 +7399,7 @@ Christian asked for this on 24 November 2026. Work in `main`. The black outline 
 
 **Test:** open a dive with cylinders on the phone (light and dark) and on the desktop « Gaz » tab: the outline is thin, matching the mock-ups, and the level lines and fill are unchanged.
 
-## [ ] 2026-11-24-380 Health-data consent: the mock-ups follow its removal; leftovers to clean
+## [x] 2026-11-24-380 Health-data consent: the mock-ups follow its removal; leftovers to clean
 
 Christian asked for this on 24 November 2026: the blood group needs no separate consent, it is covered by the agreement the user accepts when installing the app, and there is no way to withdraw a consent either. The app already dropped the consent on 20 November (commit « Remove blood group consent requirement »); the mock-ups were behind and now match. Work in `main`.
 
@@ -7416,7 +7416,7 @@ To do:
 
 **Test:** create a Benthic+ account, fill the blood group: no consent question at any point, no « Retirer l’accord » anywhere; the full export still opens in an older build.
 
-## [ ] 2026-11-24-381 Certifications shown as cards; no back arrow at the top of « Mon profil de plongeur »
+## [x] 2026-11-24-381 Certifications shown as cards; no back arrow at the top of « Mon profil de plongeur »
 
 Christian asked for this on 24 November 2026. Work in `main`. Canvases: « Benthic — Téléphone », « Benthic — Tablette » and, since today, « Benthic — Bureau » for every desktop board. Copies updated in `docs/mockups/`.
 

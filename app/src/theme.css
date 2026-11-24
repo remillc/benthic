@@ -373,6 +373,17 @@
     --bc-plus-green-icon: #1E6B3A;
     --bc-plus-amber: #F4E6D2;
     --bc-plus-amber-icon: #8A4B0F;
+    /* Certification cards (task 2026-11-24-381): the diagonal gradient of each agency tone, light to deep; the same in light and dark. */
+    --bc-cert-blue-from: #1A5A99;
+    --bc-cert-blue-to: #0B2A4A;
+    --bc-cert-green-from: #2A8A5C;
+    --bc-cert-green-to: #123F2A;
+    --bc-cert-amber-from: #B5701D;
+    --bc-cert-amber-to: #4A2A08;
+    --bc-cert-violet-from: #6E52AE;
+    --bc-cert-violet-to: #2B1D55;
+    --bc-cert-neutral-from: #5C626B;
+    --bc-cert-neutral-to: #24272B;
     --bc-plus-violet: #EBE3F3;
     --bc-plus-violet-icon: #5B3A8A;
     --bc-maintenance: #F6E3E0;

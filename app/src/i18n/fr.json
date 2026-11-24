@@ -1,5 +1,12 @@
 {
   "docs": {
+    "card": {
+      "list": "Cartes de brevet",
+      "type": "Carte de brevet",
+      "number": "N° {number}",
+      "numberAria": "n° {number}",
+      "note": "Montrez une carte au centre de plongée, même sans réseau."
+    },
     "title": "Brevets et documents",
     "sections": {
       "certs": "Brevets",
@@ -2840,6 +2847,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Brevets (Benthic+) : chaque brevet est dessiné comme la carte physique (ratio 85,6 × 54, dégradé aux couleurs de l’agence, vagues pâles en bas) avec l’agence, « Carte de brevet », le titre du cours, votre nom, le numéro et la date ; toute la carte ouvre le brevet. Une colonne sur téléphone, plusieurs sur tablette et ordinateur. Le haut de « Mon profil de plongeur » n’a pas de flèche de retour.",
       "Dessin des bouteilles : le contour est plus fin (1,2 dans le dessin de 44 × 76, soit environ 1,2 px à 44 px de large et 1,75 px à 64 px), en clair comme en sombre.",
       "Téléchargement : « Autoriser le Bluetooth », « Autorisation refusée », « Bluetooth désactivé » et « Téléchargement échoué » reprennent la présentation des autres étapes : un disque de 96 px, un titre et un texte centrés, les boutons en bas (dans le pied de la fenêtre sur ordinateur). « Ouvrir les réglages » ouvre les réglages de l’app.",
       "Importer un fichier .benthic : « Un fichier » de « Importer un carnet » et le menu du carnet acceptent l’export complet. Le fichier est d’abord vérifié, fichier par fichier, contre ses empreintes ; s’il est incomplet, rien n’est importé. Sinon le carnet, l’équipement, le profil et les brevets sont importés d’un coup, et les informations personnelles sont chiffrées sur cet appareil. Pour remplacer un carnet, « Remplacer ce carnet ? » propose « Exporter d’abord ce carnet ».",

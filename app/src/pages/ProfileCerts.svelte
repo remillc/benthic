@@ -61,6 +61,10 @@
   /** @param {import('../lib/profile.js').Certification} doc */
   const open = (doc) => f7.views.current.router.navigate(documentPath(doc.kind, doc.id));
 
+  /** The card's accessible name: « PADI, Advanced Open Water Diver, n° 1504AB2231, 2015-06-12 ». @param {import('../lib/profile.js').Certification} doc */
+  const cardLabel = (doc) =>
+    [kindLabel(doc), doc.level, doc.number.trim() ? t('docs.card.numberAria', { number: doc.number }) : '', doc.issuedOn].filter(Boolean).join(', ');
+
   /** @param {string} kind */
   function choose(kind) {
     choosing = false;
@@ -94,12 +98,44 @@
   </button>
 {/snippet}
 
+{#snippet card(/** @type {import('../lib/profile.js').Certification} */ doc)}
+  <button
+    type="button"
+    role="listitem"
+    class="bc-docs--card bc-docs--card-{cardTone(doc)}"
+    aria-label={cardLabel(doc)}
+    onclick={() => open(doc)}
+  >
+    <svg class="bc-docs--card-waves" aria-hidden="true" viewBox="0 0 400 80" preserveAspectRatio="none">
+      <path d="M0 40 C60 20 120 60 200 40 C280 20 340 55 400 35 L400 80 L0 80 Z" />
+      <path d="M0 58 C70 42 140 74 220 58 C300 44 350 66 400 54 L400 80 L0 80 Z" />
+    </svg>
+    <span class="bc-docs--card-top">
+      <span class="bc-docs--card-agency">{kindLabel(doc)}</span>
+      <span class="bc-docs--card-type">{t('docs.card.type')}</span>
+    </span>
+    <span class="bc-docs--card-level">{doc.level}</span>
+    {#if diver.info.fullName}<span class="bc-docs--card-name">{diver.info.fullName}</span>{/if}
+    <span class="bc-docs--card-bottom">
+      <span>{doc.number.trim() ? t('docs.card.number', { number: doc.number }) : ''}</span>
+      <span>{doc.issuedOn ? formatDate(doc.issuedOn) : ''}</span>
+    </span>
+  </button>
+{/snippet}
+
 {#snippet section(/** @type {string} */ key, /** @type {import('../lib/profile.js').Certification[]} */ docs)}
   {#if docs.length}
     <h2 class="bc-docs--heading">{t(`docs.sections.${key}`)}</h2>
-    <div class="bc-docs--list">
-      {#each docs as doc (doc.id)}{@render row(doc)}{/each}
-    </div>
+    {#if key === 'certs'}
+      <div class="bc-docs--cards" role="list" aria-label={t('docs.card.list')}>
+        {#each docs as doc (doc.id)}{@render card(doc)}{/each}
+      </div>
+      <p class="bc-docs--cards-note">{t('docs.card.note')}</p>
+    {:else}
+      <div class="bc-docs--list">
+        {#each docs as doc (doc.id)}{@render row(doc)}{/each}
+      </div>
+    {/if}
   {/if}
 {/snippet}
 
@@ -184,6 +220,99 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+
+    .bc-docs--cards {
+      margin: 0 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+
+      @media (min-width: 600px) {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      }
+    }
+
+    .bc-docs--card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 85.6 / 54;
+      box-sizing: border-box;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, var(--bc-cert-neutral-from), var(--bc-cert-neutral-to));
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+      color: #fff;
+      font: inherit;
+      text-align: start;
+    }
+    .bc-docs--card-blue { background: linear-gradient(135deg, var(--bc-cert-blue-from), var(--bc-cert-blue-to)); }
+    .bc-docs--card-green { background: linear-gradient(135deg, var(--bc-cert-green-from), var(--bc-cert-green-to)); }
+    .bc-docs--card-amber { background: linear-gradient(135deg, var(--bc-cert-amber-from), var(--bc-cert-amber-to)); }
+    .bc-docs--card-violet { background: linear-gradient(135deg, var(--bc-cert-violet-from), var(--bc-cert-violet-to)); }
+
+    .bc-docs--card-waves {
+      position: absolute;
+      inset: auto 0 0 0;
+      width: 100%;
+      height: 34%;
+      opacity: 0.18;
+      fill: #fff;
+      pointer-events: none;
+    }
+
+    .bc-docs--card > :not(svg) {
+      position: relative;
+    }
+
+    .bc-docs--card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .bc-docs--card-agency {
+      min-width: 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .bc-docs--card-type {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+      text-transform: uppercase;
+    }
+    .bc-docs--card-level {
+      margin-top: auto;
+      font-size: 20px;
+      line-height: 24px;
+      font-weight: 600;
+    }
+    .bc-docs--card-name {
+      margin-top: 6px;
+      font-size: 14px;
+      opacity: 0.92;
+    }
+    .bc-docs--card-bottom {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.92;
+    }
+
+    .bc-docs--cards-note {
+      margin: 12px 32px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
     }
 
     .bc-docs--row {
