@@ -14,13 +14,20 @@
   // drawing is 140 tall; the unit is drawn at 68.4 % and the cylinders beside it
   // at 93.5 %, so that both are 134 tall with their bottoms aligned. The DIL and
   // O₂ marks stay outside the scaling, at their 11 px size.
+  //
+  // Dive detail's Gaz tab (task 2026-11-24-382): `compact` crops the drawing to the unit alone (170 or 92 px wide,
+  // 140 tall) for the tile; `variant="pscr"` draws a semi-closed unit: one cylinder, one hose, no oxygen cylinder
+  // and no mark inside.
 
   import { REBREATHER_COLUMN, rebreatherWidth } from '../lib/rebreather-gas.js';
 
   /** @typedef {{ ratio: number, startRatio: number|null, hatched?: boolean }} Fill */
 
-  /** @type {{ diluent?: Fill|null, oxygen?: Fill|null, others?: Fill[], marks: { diluent: string, oxygen: string, bailout: string } }} */
-  let { diluent = null, oxygen = null, others = [], marks } = $props();
+  /** @type {{ diluent?: Fill|null, oxygen?: Fill|null, others?: Fill[], marks: { diluent: string, oxygen: string, bailout: string }, variant?: 'ccr'|'pscr', compact?: boolean }} */
+  let { diluent = null, oxygen = null, others = [], marks, variant = 'ccr', compact = false } = $props();
+  const pscr = $derived(variant === 'pscr');
+  /** The tile's crop: the unit only (x from 30 or 54), at its natural size. */
+  const crop = $derived(pscr ? { x: 54, width: 92 } : { x: 30, width: 170 });
 
   const id = `bc-rebreather-drawing-${Math.random().toString(36).slice(2, 9)}`;
   const HEIGHT = 140;
@@ -81,7 +88,7 @@
     };
   }
 
-  const unitShapes = $derived([shape('dil', 48, UNIT, diluent, false), shape('oxy', 134, UNIT, oxygen, false)]);
+  const unitShapes = $derived(pscr ? [shape('dil', 48, UNIT, diluent, false)] : [shape('dil', 48, UNIT, diluent, false), shape('oxy', 134, UNIT, oxygen, false)]);
   const sideShapes = $derived(others.map((item, i) => shape(`side${i}`, SIDE.x + SIDE.step * i, SIDE, item, true)));
   const shapes = $derived([...unitShapes, ...sideShapes]);
 </script>
@@ -109,7 +116,13 @@
   {@render outline(s, 'bc-rebreather-drawing--outline', null)}
 {/snippet}
 
-<svg class="bc-rebreather-drawing" viewBox="0 0 {width} {HEIGHT}" aria-hidden="true">
+<svg
+  class="bc-rebreather-drawing"
+  class:bc-rebreather-drawing--compact={compact}
+  viewBox={compact ? `${crop.x} 0 ${crop.width} ${HEIGHT}` : `0 0 ${width} ${HEIGHT}`}
+  style:width={compact ? `${crop.width}px` : undefined}
+  aria-hidden="true"
+>
   <defs>
     <linearGradient id="{id}-water" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" class="bc-rebreather-drawing--water-top" />
@@ -134,7 +147,7 @@
   <g transform="translate({UNIT_SCALE.x} {UNIT_SCALE.y}) scale({UNIT_SCALE.k})">
     <!-- Breathing hoses to the shoulders, and the stand. -->
     <path d="M98 30 C 94 16, 80 10, 58 8" class="bc-rebreather-drawing--hose" />
-    <path d="M120 30 C 124 16, 138 10, 160 8" class="bc-rebreather-drawing--hose" />
+    {#if !pscr}<path d="M120 30 C 124 16, 138 10, 160 8" class="bc-rebreather-drawing--hose" />{/if}
     <path d="M100 174 L 92 196 L 126 196 L 118 174" class="bc-rebreather-drawing--stand" />
 
     <!-- Diluent (left) and oxygen (right), valve and first stage at the bottom. -->
@@ -149,8 +162,10 @@
     <rect x="86" y="24" width="46" height="18" rx="6" class="bc-rebreather-drawing--head" />
     <rect x="103" y="66" width="12" height="20" rx="2" class="bc-rebreather-drawing--display" />
   </g>
-  <text x={dilMark.x} y={dilMark.y} text-anchor="middle" dominant-baseline="central" class="bc-rebreather-drawing--mark">{marks.diluent}</text>
-  <text x={oxyMark.x} y={oxyMark.y} text-anchor="middle" dominant-baseline="central" class="bc-rebreather-drawing--mark">{marks.oxygen}</text>
+  {#if !pscr}
+    <text x={dilMark.x} y={dilMark.y} text-anchor="middle" dominant-baseline="central" class="bc-rebreather-drawing--mark">{marks.diluent}</text>
+    <text x={oxyMark.x} y={oxyMark.y} text-anchor="middle" dominant-baseline="central" class="bc-rebreather-drawing--mark">{marks.oxygen}</text>
+  {/if}
 
   <!-- The others beside the unit: the open-circuit cylinder shape, no valve (task 2026-11-13-89). -->
   {#if sideShapes.length}
@@ -177,6 +192,12 @@
       display: block;
       width: 100%;
       height: auto;
+    }
+
+    /* The tile's drawing keeps its own size (a width is set inline). */
+    .bc-rebreather-drawing--compact {
+      flex: none;
+      max-width: 100%;
     }
 
     .bc-rebreather-drawing--hose {

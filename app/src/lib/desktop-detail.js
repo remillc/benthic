@@ -9,6 +9,8 @@ import { gasName, pressureUsed, typeHelper } from './cylinder-card.js';
 import { formatCylinderSize, formatNumber, formatPressure, formatSac, formatWeight } from './format.js';
 import { t, tIfExists } from './i18n.js';
 import { cylinderTypeLabel } from './cylinder-types.js';
+import { rebreatherLayout } from './rebreather-gas.js';
+
 
 /** The five stars of « Visibilité »: the words read out for a value (0: « Non notée »). @param {number} n */
 export const visibilityText = (n) => (n > 0 ? t('desktopDetail.starsLabel', { label: t('desktopDetail.label.visibility'), n }) : t('desktopDetail.notRated'));
@@ -158,4 +160,99 @@ export function parsePressurePair(text) {
   const [start, end = 0] = numbers;
   if (end > start) return null;
   return { start, end };
+}
+
+// --- Gaz tab: the dive type and the cards that follow it (task 2026-11-24-382) ------------------------------------
+
+
+/** The dive modes in the order of the « Type de plongée » selector (the core's `divemode` values). */
+export const DIVE_MODES = /** @type {const} */ (['OC', 'CCR', 'PSCR', 'Freedive']);
+
+/**
+ * The options of the « Type de plongée » segmented button. `short` is for the narrow layouts (portrait tablet, phone):
+ * « Ouvert, CCR, pSCR, Apnée ».
+ * @param {boolean} [short]
+ */
+export const diveTypeOptions = (short = false) => DIVE_MODES.map((value) => ({ value, label: t(`desktopDetail.diveType.${short ? 'short' : 'long'}.${value}`) }));
+
+/** The core's mode of a dive, one of DIVE_MODES (an unknown value reads as open circuit). @param {string} mode */
+export const knownMode = (mode) => (/** @type {readonly string[]} */ (DIVE_MODES).includes(mode) ? /** @type {typeof DIVE_MODES[number]} */ (mode) : 'OC');
+
+/**
+ * The tiles of the Gaz tab for the dive's mode.
+ * - open circuit: one tile per cylinder (`kind: 'cylinder'`), titled with its gas;
+ * - CCR: one wide tile (`kind: 'ccr'`) holding the diluent and the oxygen, then the other cylinders as ordinary tiles
+ *   titled « Secours »;
+ * - pSCR: one tile (`kind: 'pscr'`) with the mix, then the others as bailout tiles;
+ * - freedive: none (the cylinders stay in the dive, they are only not shown).
+ * `key` is `unit` for the rebreather tile and `c<index>` for a cylinder; `indexes` are the cylinders a tile stands for.
+ * @param {import('benthic-core').Cylinder[]} cylinders
+ * @param {string} mode
+ * @param {{ pressure: string, volume: string }} prefs
+ * @returns {{ key: string, kind: 'cylinder'|'ccr'|'pscr', indexes: number[], title: string, lines: string[], label: string, card: ReturnType<typeof gasCards>[number]|null, parts: { role: 'diluent'|'oxygen'|'mix', title: string, lines: string[], card: ReturnType<typeof gasCards>[number] }[] }[]}
+ */
+export function gasTiles(cylinders, mode, prefs) {
+  const cards = gasCards(cylinders, prefs);
+  /** The gas and the cylinder type, « Air · ALU 3L »; the size when the cylinder has no type name. @param {number} i */
+  const gasLine = (i) => [cards[i].gas, cylinderTypeLabel(cylinders[i].description) || formatCylinderSize(cylinders[i].sizeMl, cylinders[i].workingPressureMbar, prefs)].filter(Boolean).join(' · ');
+  /** @param {number} i */
+  const tile = (i) => ({ key: `c${i}`, kind: /** @type {const} */ ('cylinder'), indexes: [i], title: cards[i].gas, lines: [cards[i].type, cards[i].range].filter(Boolean), label: cards[i].label, card: cards[i], parts: [] });
+  /** @param {number} i */
+  const bailout = (i) => ({ ...tile(i), title: t('detail.cylinderUseNames.bailout'), lines: [gasLine(i), cards[i].range].filter(Boolean) });
+  if (mode === 'Freedive') return [];
+  if (mode === 'CCR' || mode === 'PSCR') {
+    const layout = rebreatherLayout(cylinders);
+    const pscr = mode === 'PSCR';
+    // A semi-closed dive has one mix: the diluent, else the first cylinder; the oxygen is only for a closed circuit.
+    const diluent = layout.diluent >= 0 ? layout.diluent : pscr && cylinders.length ? 0 : -1;
+    const oxygen = pscr ? -1 : layout.oxygen;
+    const others = cylinders.map((_, i) => i).filter((i) => i !== diluent && i !== oxygen);
+    /** @type {ReturnType<typeof gasTiles>} */
+    const out = [];
+    if (diluent >= 0 || oxygen >= 0) {
+      const used = [diluent, oxygen].filter((i) => i >= 0);
+      const named = (/** @type {string} */ role, /** @type {number} */ i) => (i >= 0 ? `${role} ${gasLine(i)}${cards[i].range ? `, ${cards[i].range}` : ''}` : '');
+      out.push({
+        key: 'unit',
+        kind: pscr ? 'pscr' : 'ccr',
+        indexes: used,
+        title: t(pscr ? 'desktopDetail.mixTile' : 'desktopDetail.rebreatherTile'),
+        lines: [],
+        label: pscr ? t('desktopDetail.pscrTileLabel', { mix: named('', diluent).trim() }) : t('desktopDetail.ccrTileLabel', { diluent: named(t('desktopDetail.role.diluent').toLocaleLowerCase(), diluent), oxygen: named(t('desktopDetail.role.oxygen').toLocaleLowerCase(), oxygen) }),
+        card: null,
+        parts: [
+          ...(diluent >= 0 ? [{ role: /** @type {const} */ (pscr ? 'mix' : 'diluent'), title: t(pscr ? 'desktopDetail.mixTile' : 'desktopDetail.role.diluent'), lines: [gasLine(diluent), cards[diluent].range].filter(Boolean), card: cards[diluent] }] : []),
+          ...(oxygen >= 0 ? [{ role: /** @type {const} */ ('oxygen'), title: t('desktopDetail.role.oxygen'), lines: [gasLine(oxygen), cards[oxygen].range].filter(Boolean), card: cards[oxygen] }] : []),
+        ],
+      });
+    }
+    for (const i of others) out.push(bailout(i));
+    return out;
+  }
+  return cylinders.map((_, i) => tile(i));
+}
+
+/**
+ * The dive's low and high setpoints (bar) read from the ppO₂ trace of a closed-circuit dive: the controller holds the
+ * ppO₂ at a setpoint, so the values the trace stays at (rounded to 0.1 bar, at least 5 % of the samples once below the
+ * surface, between 0.4 and 1.7 bar) are the setpoints: the lowest is the low one, the highest the high one. Null when
+ * the dive has no trace; one value alone is both.
+ * @param {{ ppo2Mbar?: number[]|null, depthMm?: number[] }|null|undefined} samples
+ * @returns {{ low: number, high: number }|null}
+ */
+export function setpointsOf(samples) {
+  const trace = samples?.ppo2Mbar;
+  if (!trace?.length) return null;
+  /** @type {Map<number, number>} */
+  const counts = new Map();
+  let total = 0;
+  trace.forEach((v, i) => {
+    if (!(v >= 400 && v <= 1700) || (samples?.depthMm?.[i] ?? 1e9) < 3000) return;
+    const bar = Math.round(v / 100) / 10;
+    counts.set(bar, (counts.get(bar) ?? 0) + 1);
+    total++;
+  });
+  const plateaus = [...counts].filter(([, n]) => n >= Math.max(3, total * 0.05)).map(([bar]) => bar);
+  if (!plateaus.length) return null;
+  return { low: Math.min(...plateaus), high: Math.max(...plateaus) };
 }

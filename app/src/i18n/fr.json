@@ -495,6 +495,7 @@
     "collapse": "Replier le voyage"
   },
   "detail": {
+    "tabs": "Rubriques de la plongée",
     "back": "Retour au carnet",
     "loading": "Chargement de la plongée",
     "errorTitle": "Cette plongée n'a pas pu être lue",
@@ -3377,7 +3378,11 @@
       "« Ce lest était » est réservé à Benthic+ sur tous les écrans ; sans Benthic+, la suggestion de lest reprend le poids de la dernière plongée comparable, sans correction. Ce qui est déjà noté sur une plongée est conservé.",
       "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet.",
       "Tablette : sur la page d’accueil du profil, Informations s’ouvre à côté de la liste dès le démarrage, sans erreur de navigation signalée.",
-      "Tablette : choisir le Carnet pendant que Réglages est ouvert ferme Réglages d’abord, sans laisser l’écran du compte vide."
+      "Tablette : choisir le Carnet pendant que Réglages est ouvert ferme Réglages d’abord, sans laisser l’écran du compte vide.",
+      "Détail d’une plongée, onglet Gaz : un sélecteur « Type de plongée » (Circuit ouvert, Recycleur CCR, Recycleur pSCR, Apnée) change le mode de la plongée ; les cartes suivent (le recycleur dessiné avec le diluant et l’oxygène, ses consignes, le mélange du pSCR, « Pas de gaz en apnée »). Changer de type ne supprime aucune bouteille.",
+      "Détail d’une plongée, onglet Équipement : « Changer de kit » disparaît ; le kit est un champ gris qui ouvre un menu (« Plongée précédente », vos kits avec leur nombre de pièces, « Gérer les kits »).",
+      "Détail d’une plongée sur tablette et téléphone : les onglets Informations, Équipement, Gaz, Notes et Carte du bureau, tous les champs modifiables sur place ; plus de barre flottante ni d’écran « Modifier la plongée » ; les actions sont dans le menu ⋮. Sur téléphone, une seule page défile avec le rang d’onglets collé sous la barre ; un champ de liste s’ouvre dans une feuille du bas, la date dans le sélecteur de date. Sur iPhone, un contrôle segmenté « Infos, Équipement, Gaz, Notes, Carte ».",
+      "Informations : « Date et heure » (date et entrée dans l’eau) et « Signatures » (Benthic+) remplacent le groupe « Validations » sur tous les appareils ; « Ordinateurs de plongée » montre la photo de chaque ordinateur sur tablette et téléphone."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -5012,6 +5017,25 @@
     }
   },
   "desktopDetail": {
+    "diveType": {
+      "title": "Type de plongée",
+      "long": { "OC": "Circuit ouvert", "CCR": "Recycleur CCR", "PSCR": "Recycleur pSCR", "Freedive": "Apnée" },
+      "short": { "OC": "Ouvert", "CCR": "CCR", "PSCR": "pSCR", "Freedive": "Apnée" }
+    },
+    "noGas": {
+      "title": "Pas de gaz en apnée",
+      "text": "Une plongée en apnée se fait sans bouteille : il n’y a ni bouteille, ni mélange, ni pression à noter."
+    },
+    "mixTile": "Mélange",
+    "ccrTileLabel": "Recycleur : {diluent} ; {oxygen}",
+    "pscrTileLabel": "Recycleur pSCR : mélange {mix}",
+    "role": { "diluent": "Diluant", "oxygen": "Oxygène" },
+    "rebreatherCard": { "title": "Recycleur", "low": "Consigne basse", "high": "Consigne haute" },
+    "kitMenu": { "previous": "Plongée précédente", "previousLine": "même équipement que la plongée n° {n}" },
+    "dateNote": "Si l’horloge de l’ordinateur était décalée, corrigez ici ; pour plusieurs plongées, utilisez « Décaler la date et l’heure » dans la sélection du Carnet.",
+    "dateNoteDesktop": "Si l’horloge de l’ordinateur était décalée, corrigez ici ; pour plusieurs plongées, utilisez « Décaler la date et l’heure » au clic droit dans le Carnet.",
+    "sheetSearch": "Rechercher",
+    "sheetNone": "Aucun résultat",
     "mean": "moy. {depth}",
     "enlarge": "Agrandir le profil",
     "enlargeTip": "Agrandir le profil ({shortcut})",
@@ -5044,6 +5068,8 @@
     "moveDown": "Descendre la bouteille",
     "cylinder": "Bouteille {n}",
     "label": {
+      "date": "Date",
+      "entryTime": "Entrée dans l’eau",
       "site": "Site",
       "buddies": "Compagnons",
       "guides": "Guides",
@@ -5109,6 +5135,7 @@
     "notRated": "Non notée",
     "starsOf": "{n} sur 5",
     "card": {
+      "datetime": "Date et heure",
       "site": "Site",
       "people": "Personnes",
       "rating": "Appréciation",
@@ -5122,7 +5149,6 @@
     "openSiteLink": "Voir le site dans Sites",
     "serial": "n° {serial}",
     "addComputer": "Ajouter un ordinateur",
-    "changeKit": "Changer de kit",
     "kitFilled": "A rempli les champs ci-dessous ; chacun reste modifiable.",
     "addSecondComputer": "+ Ajouter un deuxième ordinateur",
     "addFirstComputer": "+ Ajouter un ordinateur",
@@ -5514,6 +5540,7 @@
     },
     "tab": {
       "info": "Informations",
+      "infoShort": "Infos",
       "equipment": "Équipement",
       "gas": "Gaz",
       "notes": "Notes",
@@ -6881,7 +6908,7 @@
       "tooMany": "Trop d’essais. Réessayez dans quelques minutes.",
       "failed": "La confirmation n’a pas pu être envoyée."
     },
-    "section": "Validations",
+    "section": "Signatures",
     "add": "Faire signer",
     "pending": "Validation en attente",
     "pendingText": "Elle arrivera quand son téléphone retrouvera le réseau.",

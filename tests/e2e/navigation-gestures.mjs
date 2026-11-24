@@ -15,7 +15,7 @@
  * @param {object} h the harness of navigation.mjs
  */
 export async function gestureFlows(h) {
-  const { sleep, tapDive, tapText, tapBack, hardwareBack, readStack, expect } = h;
+  const { sleep, tapDive, tapText, tapBack, hardwareBack, readStack, expect, openEditPage } = h;
   /** `settled` of navigation.mjs; a failure also prints the end of the app's navigation trace. */
   const settled = async (t, label, o) => {
     const before = h.failureCount();
@@ -47,18 +47,9 @@ export async function gestureFlows(h) {
     await tapDive(tab);
     await settled(tab, `${label}: dive opened`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     const dive = (await tab.run(readStack)).current;
-    // The dive page is still filling in (its profile, its site): the button is tapped once it has stopped moving.
-    const place = () => tab.run(() => {
-      const r = [...document.querySelectorAll('.page-current a, .page-current button')].find((b) => /^\s*(Modifier|Edit)\s*$/.test(b.textContent))?.getBoundingClientRect();
-      return r ? `${Math.round(r.x)},${Math.round(r.y)}` : '';
-    });
-    for (let i = 0, last = ''; i < 20; i++) {
-      const at = await place();
-      if (at && at === last) break;
-      last = at;
-      await sleep(150);
-    }
-    await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
+    // The dive page is still filling in (its profile, its site): the edit page opens once it has settled.
+    await sleep(600);
+    await openEditPage(tab);
     // The first opening of a page loaded on demand can take longer than `settled` waits: its route first.
     for (let i = 0; i < 100 && !(await tab.run(readStack)).current.endsWith('/edit'); i++) await sleep(100);
     // When the page did not open: what the app's navigation trace says of the tap.
@@ -130,7 +121,7 @@ export async function gestureFlows(h) {
   }
   await touch('touchEnd');
   await settled(tab, 'a swipe past half of the width goes back', { route: dive });
-  await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
+  await openEditPage(tab);
   await settled(tab, 'swipe back: edit opened again', { route: /\/edit$/, setup: true });
   await tab.swipe(60, 130, 400, 3);
   await settled(tab, 'a flick goes back', { route: dive });
@@ -210,7 +201,7 @@ export async function gestureFlows(h) {
   await tapDive(wide);
   await settled(wide, 'tablet: dive shown beside the list', { split: true, setup: true });
   const shownDive = (await state()).route;
-  await tapText(wide, '^\\s*(Modifier|Edit)\\s*$', '.page-current, .page-master-detail');
+  await openEditPage(wide);
   for (let i = 0; i < 100 && !(await state()).popup; i++) await sleep(100);
   // Long enough for the app's own check to run (700 ms after the last navigation event).
   await sleep(1600);

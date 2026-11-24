@@ -71,7 +71,7 @@ export async function desktopEquipmentFlows(h) {
         undersuit: text.includes('Sous-vêtement'),
         feedbackTitle: text.includes('Ce lest était'),
         otherGear: text.includes('Autre équipement'),
-        kit: text.includes('Changer de kit'),
+        kit: !!root?.querySelector('[data-card="kit"] [data-field="kit"]'),
         total: root?.querySelector('.bc-desktop-dive-fields--total')?.textContent?.trim() ?? '',
         chips: [...(root?.querySelectorAll('.bc-desktop-weights--chip-edit') ?? [])].map((c) => c.textContent?.replace(/\s+/g, ' ').trim()),
         selector: box(selector ?? null),

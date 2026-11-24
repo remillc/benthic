@@ -19,13 +19,20 @@
   import GearIcon from './GearIcon.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
+  import DesktopSegments from './DesktopSegments.svelte';
+  import DesktopKitField from './DesktopKitField.svelte';
+  import DesktopPickField from './DesktopPickField.svelte';
+  import DiveDateTimeDialogs from './DiveDateTimeDialogs.svelte';
+  import DiveSignatures from './DiveSignatures.svelte';
   import DesktopConsumption from './DesktopConsumption.svelte';
   import SiteMap from './SiteMap.svelte';
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
+  import { layout } from '../lib/layout.svelte.js';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
-  import { applyKit, cloneEquipment, diveKeyOf, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
+  import { applyKit, cloneEquipment, diveKeyOf, equipmentIsEmpty, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
+  import { BenthicCore } from 'benthic-core';
   import { openOver } from '../lib/navigation.svelte.js';
   import { siteChange } from '../lib/sites.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -36,8 +43,12 @@
   import { computerList } from '../lib/gas-summary.js';
   import { useKey } from '../lib/cylinder-use.js';
   import { formatCylinderSize, formatNumber, formatPressure, formatTemperature } from '../lib/format.js';
-  import { t, tIfExists } from '../lib/i18n.js';
-  import { computerRole, consumption, cylinderSpan, gasCards, gasText, parseGas, parsePressurePair, weightChips } from '../lib/desktop-detail.js';
+  import { t } from '../lib/i18n.js';
+  import { computerRole, consumption, cylinderSpan, diveTypeOptions, gasCards, gasText, gasTiles, knownMode, parseGas, parsePressurePair, setpointsOf, weightChips } from '../lib/desktop-detail.js';
+  import { KIT_MANAGE, KIT_PREVIOUS, kitMenuOptions } from '../lib/detail-pick.js';
+  import { copyEquipment } from '../lib/inventory.js';
+  import { formatDiveDay, formatTimeOfDay } from '../lib/format.js';
+  import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { formatCoordinates } from '../lib/sites.svelte.js';
   import { focusSite } from '../lib/site-focus.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
@@ -54,9 +65,12 @@
    *   sac?: string,
    *   gasChanges?: string,
    *   preview?: boolean,
+   *   onsign?: () => void,
+   *   hint?: boolean,
    * }}
+   * `onsign`: « Faire signer » of the Signatures card. `hint`: the line above the fields (the phone's page shows it once).
    */
-  let { dive, tab, prefs, trip = '', sac = '', gasChanges = '', preview = false } = $props();
+  let { dive, tab, prefs, trip = '', sac = '', gasChanges = '', preview = false, onsign = () => {}, hint = true } = $props();
 
   // « Autre équipement »: in the release edition the pieces of the device's inventory used by this dive
   // (the same record as the phone's editor); in the alpha the list stays inert.
@@ -77,11 +91,16 @@
   const plus = $derived(isSubscriber());
   const undersuits = $derived(visibleGear().filter((g) => g.type === 'undersuit'));
   const undersuitOptions = $derived(undersuits.map((g) => ({ value: g.id, label: g.name })));
-  const MANAGE_KITS = '__manage__';
-  const kitOptions = $derived([
-    ...gear.kits.map((kit) => ({ value: kit.id, label: `${kit.name} · ${kit.gearIds.length}` })),
-    { value: MANAGE_KITS, label: t('gear.diveGear.manageKits') },
-  ]);
+  /** The dive that comes just before this one in the logbook: « Plongée précédente » copies its equipment. */
+  const previousDive = $derived(logbook.dives.filter((d) => d.date < dive.date).sort((x, y) => (x.date < y.date ? 1 : -1))[0] ?? null);
+  const kitOptions = $derived(
+    kitMenuOptions(gear.kits, previousDive ? { number: previousDive.number } : null, {
+      previous: t('desktopDetail.kitMenu.previous'),
+      previousLine: (n) => t('desktopDetail.kitMenu.previousLine', { n }),
+      pieces: (n) => t('desktopDetail.kitPieces', { n }),
+      manage: t('gear.diveGear.manageKits'),
+    }),
+  );
   const appliedKit = $derived(equipment ? gear.kits.find((kit) => kit.id === equipment.kitId) : undefined);
 
   /** The undersuit of this dive. @param {string|string[]|number} id */
@@ -91,32 +110,52 @@
   }
 
   /**
-   * A kit chosen: fills the suit, the undersuit and the other gear as the phone's « Remplir avec un kit » does (applyKit); a
-   * message offers « Annuler », which puts the previous equipment and suit back. « Gérer les kits » opens the inventory.
-   * @param {string|string[]|number} id
+   * A choice of the kit menu. A kit fills the suit, the undersuit and the other gear as the phone's « Remplir avec un kit »
+   * does (applyKit); « Plongée précédente » copies the previous dive's equipment and suit (copyEquipment); a message offers
+   * « Annuler », which puts the previous equipment and suit back. « Gérer les kits » opens the inventory.
+   * @param {string} id
    */
   async function chooseKit(id) {
-    if (id === MANAGE_KITS) {
+    if (id === KIT_MANAGE) {
       openOver('/profile/gear/');
-      return false;
+      return;
     }
-    const kit = gear.kits.find((k) => k.id === id);
-    if (!kit || !equipment) return true;
+    if (!equipment) return;
     const before = cloneEquipment(equipment);
     const beforeSuit = dive.suit ?? '';
-    const next = applyKit(equipment, kit, gearMap());
-    await saveEquipment(next);
-    const suit = next.suitGearId && next.suitGearId !== before.suitGearId ? (gearMap().get(next.suitGearId)?.name ?? '') : '';
-    if (suit && suit !== beforeSuit) await save('suit', suit);
-    showSnackbar(t('gear.diveGear.kitApplied', { name: kit.name }), {
+    /** @type {import('../lib/inventory.js').DiveEquipment} */
+    let next;
+    let message = '';
+    if (id === KIT_PREVIOUS) {
+      if (!previousDive) return;
+      const previous = equipmentOf(previousDive);
+      let suit = previous.suitGearId ? (gearMap().get(previous.suitGearId)?.name ?? '') : '';
+      if (!suit) suit = (await BenthicCore.getDive({ id: previousDive.id }).catch(() => null))?.suit ?? '';
+      if (equipmentIsEmpty(previous) && !suit) {
+        showSnackbar(t('gear.diveGear.previousEmpty'));
+        return;
+      }
+      next = copyEquipment(previous);
+      message = t('gear.diveGear.copied');
+      await saveEquipment(next);
+      if (suit !== beforeSuit) await save('suit', suit);
+    } else {
+      const kit = gear.kits.find((k) => k.id === id);
+      if (!kit) return;
+      next = applyKit(equipment, kit, gearMap());
+      message = t('gear.diveGear.kitApplied', { name: kit.name });
+      await saveEquipment(next);
+      const suit = next.suitGearId && next.suitGearId !== before.suitGearId ? (gearMap().get(next.suitGearId)?.name ?? '') : '';
+      if (suit && suit !== beforeSuit) await save('suit', suit);
+    }
+    showSnackbar(message, {
       action: t('edit.undo'),
       timeout: 8000,
       onAction: async () => {
         await saveEquipment(before);
-        if (suit && suit !== beforeSuit) await save('suit', beforeSuit);
+        if ((dive.suit ?? '') !== beforeSuit) await save('suit', beforeSuit);
       },
     });
-    return true;
   }
   let addingGear = $state(false);
   /** @param {import('../lib/inventory.js').DiveEquipment} next */
@@ -354,17 +393,38 @@
   }
   const pressureUnitText = $derived(prefs.pressure === 'psi' ? t('units.psi') : t('units.bar'));
 
-  /** The selected cylinder of the Gaz tab; kept inside the list when the dive changes. */
-  let selectedCylinder = $state(0);
-  const cylinderIndex = $derived(Math.min(Math.max(selectedCylinder, 0), Math.max(dive.cylinders.length - 1, 0)));
+  // The dive type, the tiles it shows and the one chosen (task 2026-11-24-382). The cylinders stay in the dive whatever the
+  // type: a freedive shows none, and back in another type they are there again.
+  const mode = $derived(knownMode(dive.divemode));
+  const rebreather = $derived(mode === 'CCR' || mode === 'PSCR');
+  // The short labels (Ouvert, CCR, pSCR, Apnée) on a portrait tablet and on a phone.
+  // Also when the card is too narrow for the long ones (the second column of a landscape tablet).
+  let paneWidth = $state(1000);
+  const columns = $derived(layout.split && !layout.desktop && !layout.portrait);
+  const shortTypes = $derived(layout.phone || (layout.split && !layout.desktop && layout.portrait) || (!layout.desktop && paneWidth < (columns ? 1000 : 560)));
+  const modeOptions = $derived(diveTypeOptions(shortTypes));
+  /** Writes the dive's mode (the core keeps every cylinder). @param {string} value */
+  const saveMode = (value) => write({ divemode: value });
+  const tiles = $derived(gasTiles(dive.cylinders, mode, prefs));
   const cards = $derived(gasCards(dive.cylinders, prefs));
-  const chosen = $derived(dive.cylinders[cylinderIndex]);
-  const used = $derived(consumption(dive, cylinderIndex, prefs, reserveMbar));
-  const span = $derived(cylinderSpan(dive.samples, cylinderIndex));
-  const cylinderSub = $derived(chosen ? ' · ' + [t(useKey(chosen.use, dive.divemode)), span ? t('desktopDetail.cylinderSpan', { from: span.fromMin, to: span.toMin }) : ''].filter(Boolean).join(', ') : '');
+  let selectedKey = $state('');
+  const activeKey = $derived(tiles.some((x) => x.key === selectedKey) ? selectedKey : (tiles[0]?.key ?? ''));
+  const activeTile = $derived(tiles.find((x) => x.key === activeKey));
+  /** The cylinder of an open-circuit or bailout tile. */
+  const cylinderIndex = $derived(activeTile && activeTile.kind === 'cylinder' ? activeTile.indexes[0] : -1);
+  const chosen = $derived(cylinderIndex >= 0 ? dive.cylinders[cylinderIndex] : undefined);
+  const used = $derived(consumption(dive, Math.max(cylinderIndex, 0), prefs, reserveMbar));
+  const setpoints = $derived(setpointsOf(dive.samples));
+  const setpointText = (/** @type {number|undefined} */ bar) => (bar ? `${formatNumber(bar, 1)} ${t('units.bar')}` : '—');
+  /** « de 0 à 78 min », the span a cylinder was breathed, as the header's second part. @param {number} index */
+  const spanText = (index) => {
+    const span = cylinderSpan(dive.samples, index);
+    return span ? t('desktopDetail.cylinderSpan', { from: span.fromMin, to: span.toMin }) : '';
+  };
   async function addCylinderAndSelect() {
+    const at = dive.cylinders.length;
     const ok = await addCylinder();
-    if (ok) selectedCylinder = dive.cylinders.length;
+    if (ok) selectedKey = `c${at}`;
   }
   /** The mix typed in Mélange. @param {number} index @param {string} text */
   function saveMix(index, text) {
@@ -382,6 +442,26 @@
   const pairText = (c) => (c.startMbar ? `${pressureText(c.startMbar)}${c.endMbar ? ` → ${pressureText(c.endMbar)}` : ''}` : '');
   const pairOk = (/** @type {string} */ text) => !text.trim() || parsePressurePair(text) !== null;
   const mixOk = (/** @type {string} */ text) => parseGas(text) !== null;
+
+  // --- Informations: « Date et heure » (task 2026-11-24-386). The date and the entry time open the pickers; a dive of the
+  // logbook keeps its Benthic id, so the equipment saved under it does not move (a dive with no id yet is re-keyed).
+  /** @type {'date'|'time'|null} */
+  let picking = $state(null);
+  const startIso = $derived(dive.date.slice(0, 19));
+  /** @param {string} next the dive's new start, `YYYY-MM-DDTHH:MM:SS` */
+  async function saveDate(next) {
+    if (next === startIso) return;
+    const from = diveKeyOf({ date: startIso, benthicId: dive.benthicId });
+    const to = diveKeyOf({ date: next, benthicId: dive.benthicId });
+    if (!(await write({ date: next }))) return;
+    if (isRelease && from !== to) {
+      try {
+        await changeInventory((inv) => inv.rekeyDive(from, to));
+      } catch (e) {
+        console.error('Dive date', e);
+      }
+    }
+  }
 
   // --- Informations and Carte: the site card. -------------------------------------------------
   const siteRow = $derived(sites.find((x) => x.name === dive.site));
@@ -410,12 +490,21 @@
   });
 </script>
 
-<div class="bc-desktop-dive-fields" bind:this={root}>
-  <p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>
+<div class="bc-desktop-dive-fields" bind:clientWidth={paneWidth} class:bc-desktop-dive-fields--compact={!layout.desktop} class:bc-desktop-dive-fields--cols={layout.split && !layout.desktop && !layout.portrait} bind:this={root}>
+  {#if hint}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
 
   {#if tab === 'info'}
     <!-- Informations (task 2026-11-23-376): five cards, laid out like the Équipement tab's: site, people, rating, conditions, tags. -->
     <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info">
+      <DesktopEquipmentCard name="datetime" title={t('desktopDetail.card.datetime')}>
+        {#snippet icon()}<Icon name="calendar" size={22} />{/snippet}
+        <div class="bc-desktop-dive-fields--two-columns">
+          <DesktopPickField name="date" label={t('desktopDetail.label.date')} value={formatDiveDay(dive.date)} icon="calendar" disabled={preview} onclick={() => (picking = 'date')} />
+          <DesktopPickField name="time" label={t('desktopDetail.label.entryTime')} value={formatTimeOfDay(dive.date)} icon="clock" disabled={preview} onclick={() => (picking = 'time')} />
+        </div>
+        <p class="bc-desktop-dive-fields--kit-note">{t(layout.desktop ? 'desktopDetail.dateNoteDesktop' : 'desktopDetail.dateNote')}</p>
+      </DesktopEquipmentCard>
+
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
         <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
@@ -426,6 +515,10 @@
         <DesktopChipsField name="guides" label={t('desktopDetail.label.guideOfDive')} value={dive.guides} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
         <DesktopChipsField name="buddies" label={t('desktopDetail.label.buddies')} value={dive.buddies} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
       </DesktopEquipmentCard>
+
+      {#if !preview && benthicPlusSubscriber()}
+        <DiveSignatures {dive} {onsign} />
+      {/if}
 
       <DesktopEquipmentCard name="rating" title={t('desktopDetail.card.rating')}>
         {#snippet icon()}<Icon name="star" size={22} />{/snippet}
@@ -452,7 +545,6 @@
           {:else if dive.waterTempMk}
             <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.waterTemp')} value={formatTemperature(dive.waterTempMk, prefs)} />
           {/if}
-          <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.mode')} value={tIfExists(`detail.modes.${dive.divemode}`) ?? dive.divemode} />
           {#if dive.cns > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.cns')} value={`${formatNumber(dive.cns, 0)} %`} />{/if}
           {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
           {#if trip}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.trip')} value={trip} />{/if}
@@ -468,33 +560,19 @@
     <!-- Équipement (task 2026-11-23-366): one card per section. -->
     <div class="bc-desktop-dive-fields--equipment">
       {#if plus && equipment}
-        <!-- Kit (Benthic+): fills the fields below, each stays editable. A select laid over the text button opens the kit list. -->
-        <DesktopEquipmentCard name="kit" title={t('desktopDetail.label.kit')} indent>
+        <!-- Kit (Benthic+, task 2026-11-24-382): a grey field that opens the kit menu; the fields below stay editable. -->
+        <DesktopEquipmentCard name="kit" title={t('desktopDetail.label.kit')}>
           {#snippet icon()}<Icon name="briefcase" size={22} />{/snippet}
-          {#snippet action()}
-            <span class="bc-desktop-dive-fields--kit-change" data-field="kit">
-              <span class="bc-desktop-dive-fields--text-button">{t('desktopDetail.changeKit')}<Icon name="chevron" size={20} /></span>
-              <select
-                class="bc-desktop-dive-fields--kit-select"
-                aria-label={t('desktopDetail.changeKit')}
-                value={equipment.kitId}
-                onchange={async (e) => {
-                  const select = /** @type {HTMLSelectElement} */ (e.currentTarget);
-                  if (select.value) await chooseKit(select.value);
-                  select.value = equipment?.kitId ?? '';
-                }}
-              >
-                <option value="">{t('desktopDetail.invitation.kit')}</option>
-                {#each kitOptions as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
-              </select>
-            </span>
-          {/snippet}
-          {#if appliedKit}
-            <p class="bc-desktop-dive-fields--kit-name">{appliedKit.name}<span class="bc-desktop-dive-fields--kit-pieces"> · {t('desktopDetail.kitPieces', { n: appliedKit.gearIds.length })}</span></p>
-            <p class="bc-desktop-dive-fields--kit-note">{t('desktopDetail.kitFilled')}</p>
-          {:else}
-            <p class="bc-desktop-dive-fields--kit-note">{t('desktopDetail.kitNote')}</p>
-          {/if}
+          <DesktopKitField
+            label={t('desktopDetail.label.kit')}
+            name={appliedKit?.name ?? ''}
+            pieces={appliedKit ? t('desktopDetail.kitPieces', { n: appliedKit.gearIds.length }) : ''}
+            value={equipment.kitId}
+            options={kitOptions}
+            invitation={t('desktopDetail.invitation.kit')}
+            onselect={chooseKit}
+          />
+          <p class="bc-desktop-dive-fields--kit-note">{appliedKit ? t('desktopDetail.kitFilled') : t('desktopDetail.kitNote')}</p>
         </DesktopEquipmentCard>
       {/if}
 
@@ -554,30 +632,52 @@
       {/if}
     </div>
   {:else if tab === 'gas'}
-    <!-- Gaz (mock-up bureau-carnet-onglet-gaz): one card per cylinder, the selected one's fields, Consommation. -->
-    <div class="bc-desktop-dive-fields--card">
-      <DesktopGasCards {cards} selected={cylinderIndex} onselect={(i) => (selectedCylinder = i)} onadd={addCylinderAndSelect} />
-      {#if chosen}
-        <header class="bc-desktop-dive-fields--cylinder-head">
-          <p class="bc-desktop-dive-fields--cylinder-title">{t('desktopDetail.cylinder', { n: cylinderIndex + 1 })}<span class="bc-desktop-dive-fields--cylinder-sub">{cylinderSub}</span></p>
-          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveUp')} title={t('desktopDetail.moveUp')} disabled={cylinderIndex === 0} onclick={async () => { if (await moveCylinder(cylinderIndex, -1)) selectedCylinder = cylinderIndex - 1; }}><Icon name="arrowUp" size={20} /></button>
-          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveDown')} title={t('desktopDetail.moveDown')} disabled={cylinderIndex === dive.cylinders.length - 1} onclick={async () => { if (await moveCylinder(cylinderIndex, 1)) selectedCylinder = cylinderIndex + 1; }}><Icon name="arrowDown" size={20} /></button>
-          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.removeCylinder')} title={chosen.protected ? t('edit.cylinderInUse') : t('desktopDetail.removeCylinder')} disabled={chosen.protected} onclick={() => removeCylinder(cylinderIndex)}><Icon name="delete" size={20} /></button>
-        </header>
-        {#key cylinderIndex}
-          <DesktopEditField name="cylinder-type" kind="choice" label={t('desktopDetail.label.cylinderType')} value={chosen.description} options={typeOptions(chosen)} note={[chosen.sizeMl ? formatCylinderSize(chosen.sizeMl, chosen.workingPressureMbar, prefs) : '', chosen.workingPressureMbar ? formatPressure(chosen.workingPressureMbar, prefs) : ''].filter(Boolean).join(' · ')} invitation={t('desktopDetail.invitation.cylinderType')} onsave={(v) => chooseType(cylinderIndex, /** @type {string} */ (v))} />
-          <DesktopEditField name="cylinder-mix" kind="text" label={t('desktopDetail.label.mix')} value={gasText(chosen.o2Permille, chosen.hePermille)} display={cards[cylinderIndex]?.gas} note={t('desktopDetail.mixNote', { o2: percentText(chosen.o2Permille || 210), he: percentText(chosen.hePermille) })} invitation={t('desktopDetail.invitation.mix')} valid={mixOk} onsave={(v) => saveMix(cylinderIndex, /** @type {string} */ (v))} />
-          {#if manual}
-            <DesktopEditField name="cylinder-pressure" kind="text" label={t('desktopDetail.label.pressure')} value={pairText(chosen)} display={chosen.startMbar ? cards[cylinderIndex]?.range : ''} note={t('desktopDetail.pressureNote')} invitation={t('desktopDetail.invitation.pressure')} valid={pairOk} onsave={(v) => savePair(cylinderIndex, /** @type {string} */ (v))} />
-          {:else}
-            <DesktopEditField name="cylinder-pressure" kind="text" readonly label={t('desktopDetail.label.pressure')} value={cards[cylinderIndex]?.range ?? ''} />
-          {/if}
-          <DesktopEditField name="cylinder-use" kind="choice" label={t('desktopDetail.label.use')} value={chosen.use} options={useOptions} onsave={(v) => saveCylinder(cylinderIndex, { use: /** @type {string} */ (v) || 'OC-gas' })} />
-        {/key}
+    <!-- Gaz (task 2026-11-24-382; mock-ups bureau-carnet-onglet-gaz and its CCR, pSCR and apnée variants): the dive type, then the cards of that type. -->
+    <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--gas">
+      <section class="bc-desktop-dive-fields--card bc-desktop-dive-fields--type" aria-label={t('desktopDetail.diveType.title')}>
+        <h3 class="bc-desktop-dive-fields--card-title">{t('desktopDetail.diveType.title')}</h3>
+        <div data-field="divemode">
+          <DesktopSegments block options={modeOptions} value={mode} onchange={saveMode} ariaLabel={t('desktopDetail.diveType.title')} />
+        </div>
+      </section>
+
+      {#if mode === 'Freedive'}
+        <section class="bc-desktop-dive-fields--card bc-desktop-dive-fields--no-gas" data-field="no-gas">
+          <h3 class="bc-desktop-dive-fields--card-title">{t('desktopDetail.noGas.title')}</h3>
+          <p class="bc-desktop-dive-fields--no-gas-text">{t('desktopDetail.noGas.text')}</p>
+        </section>
+      {:else}
+        <div class="bc-desktop-dive-fields--card">
+          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} />
+        </div>
+
+        {#if activeTile?.kind === 'cylinder' && chosen}
+          <div class="bc-desktop-dive-fields--card bc-desktop-dive-fields--fields">
+            {@render cylinderFields(cylinderIndex, '', true)}
+          </div>
+        {:else if activeTile}
+          <!-- The rebreather unit: the diluent (or the mix), then the oxygen. -->
+          <div class="bc-desktop-dive-fields--card bc-desktop-dive-fields--fields">
+            {#each activeTile.parts as part, i (part.role)}
+              {@render cylinderFields(activeTile.indexes[i], part.title, false)}
+            {/each}
+          </div>
+        {/if}
+
+        {#if mode === 'OC'}
+          <DesktopConsumption data={used} />
+        {:else if mode === 'CCR'}
+          <DesktopEquipmentCard name="rebreather" title={t('desktopDetail.rebreatherCard.title')}>
+            {#snippet icon()}<Icon name="tune" size={22} />{/snippet}
+            <div class="bc-desktop-dive-fields--two-columns">
+              <DesktopEditField stacked kind="text" readonly name="setpoint-low" label={t('desktopDetail.rebreatherCard.low')} value={setpointText(setpoints?.low)} />
+              <DesktopEditField stacked kind="text" readonly name="setpoint-high" label={t('desktopDetail.rebreatherCard.high')} value={setpointText(setpoints?.high)} />
+            </div>
+          </DesktopEquipmentCard>
+        {/if}
       {/if}
+      {#if gasChanges && mode === 'OC'}<DesktopEditField kind="text" readonly label={t('desktopDetail.label.gasChanges')} value={gasChanges} />{/if}
     </div>
-    <DesktopConsumption data={used} />
-    {#if gasChanges}<DesktopEditField kind="text" readonly label={t('desktopDetail.label.gasChanges')} value={gasChanges} />{/if}
   {:else if tab === 'notes'}
     <!-- Notes (task 2026-11-23-376): the notes; the rating and the tags are in the Informations tab's cards. -->
     <DesktopEditField name="notes" kind="multiline" label={t('desktopDetail.label.notes')} value={dive.notes} invitation={t('desktopDetail.invitation.notes')} onsave={(v) => save('notes', v)} />
@@ -596,12 +696,50 @@
   {/if}
 </div>
 
+{#if picking}
+  <DiveDateTimeDialogs date={startIso} kind={picking} onconfirm={saveDate} onclose={() => (picking = null)} />
+{/if}
+
+{#snippet cylinderFields(/** @type {number} */ index, /** @type {string} */ role, /** @type {boolean} */ own)}
+  {@const c = dive.cylinders[index]}
+  {#if c}
+    {@const span = spanText(index)}
+    <div class="bc-desktop-dive-fields--cylinder" data-cylinder={index}>
+      <header class="bc-desktop-dive-fields--cylinder-head">
+        <p class="bc-desktop-dive-fields--cylinder-title">{role || t('desktopDetail.cylinder', { n: index + 1 })}<span class="bc-desktop-dive-fields--cylinder-sub">{[role ? '' : t(useKey(c.use, dive.divemode)), span].filter(Boolean).map((x, i) => (i ? x : ' · ' + x)).join(', ')}</span></p>
+        {#if own}
+          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveUp')} title={t('desktopDetail.moveUp')} disabled={index === 0} onclick={async () => { if (await moveCylinder(index, -1)) selectedKey = `c${index - 1}`; }}><Icon name="arrowUp" size={20} /></button>
+          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveDown')} title={t('desktopDetail.moveDown')} disabled={index === dive.cylinders.length - 1} onclick={async () => { if (await moveCylinder(index, 1)) selectedKey = `c${index + 1}`; }}><Icon name="arrowDown" size={20} /></button>
+          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.removeCylinder')} title={c.protected ? t('edit.cylinderInUse') : t('desktopDetail.removeCylinder')} disabled={c.protected} onclick={() => removeCylinder(index)}><Icon name="delete" size={20} /></button>
+        {/if}
+      </header>
+      {#key index}
+        <DesktopEditField name="cylinder-type" kind="choice" label={t('desktopDetail.label.cylinderType')} value={c.description} options={typeOptions(c)} note={[c.sizeMl ? formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) : '', c.workingPressureMbar ? formatPressure(c.workingPressureMbar, prefs) : ''].filter(Boolean).join(' · ')} invitation={t('desktopDetail.invitation.cylinderType')} onsave={(v) => chooseType(index, /** @type {string} */ (v))} />
+        <DesktopEditField name="cylinder-mix" kind="text" label={t('desktopDetail.label.mix')} value={gasText(c.o2Permille, c.hePermille)} display={cards[index]?.gas} note={t('desktopDetail.mixNote', { o2: percentText(c.o2Permille || 210), he: percentText(c.hePermille) })} invitation={t('desktopDetail.invitation.mix')} valid={mixOk} onsave={(v) => saveMix(index, /** @type {string} */ (v))} />
+        {#if manual}
+          <DesktopEditField name="cylinder-pressure" kind="text" label={t('desktopDetail.label.pressure')} value={pairText(c)} display={c.startMbar ? cards[index]?.range : ''} note={t('desktopDetail.pressureNote')} invitation={t('desktopDetail.invitation.pressure')} valid={pairOk} onsave={(v) => savePair(index, /** @type {string} */ (v))} />
+        {:else}
+          <DesktopEditField name="cylinder-pressure" kind="text" readonly label={t('desktopDetail.label.pressure')} value={cards[index]?.range ?? ''} />
+        {/if}
+        {#if own}
+          <DesktopEditField name="cylinder-use" kind="choice" label={t('desktopDetail.label.use')} value={c.use} options={useOptions} onsave={(v) => saveCylinder(index, { use: /** @type {string} */ (v) || 'OC-gas' })} />
+        {/if}
+      {/key}
+    </div>
+  {/if}
+{/snippet}
+
 <style>
   @layer bc.components {
     .bc-desktop-dive-fields {
       display: flex;
       flex-direction: column;
       margin: 0 24px 24px;
+    }
+
+    /* On a tablet and a phone the cards run closer to the screen's edges. */
+    .bc-desktop-dive-fields--compact {
+      margin: 0 16px 16px;
     }
 
     /* One line above the fields: the grey ones can be edited with a click. */
@@ -619,6 +757,18 @@
       flex-direction: column;
       gap: 14px;
       padding-bottom: 64px;
+    }
+
+    /* A tablet in landscape lays the cards out in two columns (task 2026-11-24-382); a card never splits across them. */
+    .bc-desktop-dive-fields--cols .bc-desktop-dive-fields--equipment {
+      display: block;
+      column-count: 2;
+      column-gap: 14px;
+      padding-bottom: 64px;
+      & > :global(*) {
+        break-inside: avoid;
+        margin-bottom: 14px;
+      }
     }
 
     /* The Informations tab uses the same cards; the people's rows and the ratings sit in the card's body. */
@@ -658,38 +808,6 @@
     .bc-desktop-dive-fields--add-computer {
       align-self: flex-start;
       padding-inline-start: 4px;
-    }
-
-    /* « Changer de kit »: the select is laid, invisible, over the button, so a click opens the kit list. */
-    .bc-desktop-dive-fields--kit-change {
-      position: relative;
-      display: inline-flex;
-      &:hover .bc-desktop-dive-fields--text-button {
-        background: color-mix(in srgb, currentColor 8%, transparent);
-      }
-    }
-
-    .bc-desktop-dive-fields--kit-select {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    .bc-desktop-dive-fields--kit-name {
-      margin: 0;
-      font-size: 17px;
-      line-height: 24px;
-      font-weight: 500;
-      color: var(--bc-text);
-    }
-
-    .bc-desktop-dive-fields--kit-pieces {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--bc-text-2);
     }
 
     .bc-desktop-dive-fields--kit-note {
@@ -782,11 +900,32 @@
     }
 
     .bc-desktop-dive-fields--card {
-      margin-top: 12px;
+      box-sizing: border-box;
       padding: 16px;
       border-radius: 16px;
       background: var(--bc-surface);
       border: 1px solid var(--bc-surface-container-highest);
+    }
+
+    .bc-desktop-dive-fields--card-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--bc-text);
+    }
+
+    .bc-desktop-dive-fields--no-gas-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--bc-text-2);
+    }
+
+    /* The cylinders' fields: the diluent's, then the oxygen's, as two blocks of the same card. */
+    .bc-desktop-dive-fields--cylinder + .bc-desktop-dive-fields--cylinder {
+      margin-top: 16px;
+      padding-top: 4px;
+      border-top: 1px solid var(--bc-separator);
     }
 
     .bc-desktop-dive-fields--cylinder-head {

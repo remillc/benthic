@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--detail-only|--no-monkey|--cylinder-types-only] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--detail-only|--dive-tabs-only|--no-monkey|--cylinder-types-only] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -39,6 +39,7 @@ import { benthicImportFlows } from './benthic-import-flow.mjs';
 import { desktopListHeaderFlows } from './desktop-list-header.mjs';
 import { cylinderTypeFlows } from './cylinder-types.mjs';
 import { desktopDetailFlows } from './desktop-detail.mjs';
+import { diveDetailTabsFlows } from './dive-detail-tabs.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -305,6 +306,9 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
       // answered with an empty list then; a host that knows the action is used as it is.
       else if (kind === 'core' && method === 'cylinderTypes' && a?.action === 'added') {
         reply = await core(method, a).then((v) => ({ ok: true, v }), (e) => (/unknown action/.test(String(e?.message ?? e)) ? { ok: true, v: JSON.stringify({ types: [] }) } : Promise.reject(e)));
+        // The same for the stable dive ids of a Benthic+ account (« Unknown method benthicIds »): an audit with nothing to assign.
+      } else if (kind === 'core' && method === 'benthicIds') {
+        reply = await core(method, a).then((v) => ({ ok: true, v }), (e) => (/unknown (action|method)/i.test(String(e?.message ?? e)) ? { ok: true, v: '[]' } : Promise.reject(e)));
       } else if (kind === 'core') reply = { ok: true, v: await core(method, a) };
       else if (method === 'writeFile') {
         const p = path.join(temp, a.area, path.basename(a.name));
@@ -504,6 +508,19 @@ const tapDive = async (tab) => {
   if (!box) throw new Error('no dive row');
   await tab.tapAt(box.x, box.y);
 };
+/**
+ * Opens « Modifier la plongée » (route `/dives/:id/edit`) from the dive shown. The detail has no « Modifier » button any more (tasks
+ * 2026-11-24-382, 386 and 387: every field is edited in place); the page stays, as the router's second page that the flows below walk through.
+ */
+const openEditPage = async (tab) => {
+  await tab.run(() => {
+    const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
+    const router = view.f7View.router;
+    router.navigate(`${router.currentRoute.url.split('?')[0]}/edit`);
+    return 1;
+  });
+  await sleep(150);
+};
 /** The Android Back key: the app's listener of the Capacitor App plugin, as the native side calls it. */
 const hardwareBack = async (tab) => {
   await tab.run(() => window.dispatchEvent(new Event('bc:back')));
@@ -582,6 +599,9 @@ async function phoneFlows() {
   const validated = (await tab.run(readStack)).current;
   await tab.run(() => window.__benthicPlusAccount({ signedIn: true, subscribed: true, email: 'diver@benthic.test' }));
   await sleep(800);
+  // The Signatures card is in the Informations group of the dive's page: scrolled into view, as a finger would.
+  await tab.run(() => (document.querySelector('.bc-dive-detail [data-card="signatures"]')?.scrollIntoView({ block: 'center' }), 1));
+  await sleep(500);
   await tapText(tab, '^\\s*(Faire signer|Get it signed)\\s*$');
   await settled(tab, 'validation: choice opened', { route: /^\/validate(\?.*)?$/, setup: true });
   await tapText(tab, 'Signature sur cet écran|Signature on this screen');
@@ -614,11 +634,11 @@ async function phoneFlows() {
   for (let i = 0; i < 60 && (await tab.run(readStack)).current !== validated; i++) await sleep(100);
   await settled(tab, 'validation: back on the dive', { route: validated });
   const shown = await tab.run(() => ({
-    text: document.querySelector('.page-current .bc-dive-validations')?.textContent ?? '',
-    signature: !!document.querySelector('.page-current .bc-dive-validations--signature'),
+    text: document.querySelector('.bc-dive-detail [data-card="signatures"]')?.textContent ?? '',
+    signature: !!document.querySelector('.bc-dive-detail .bc-dive-signatures--signature'),
   }));
   checks++;
-  if (!/Marc Gagnon/.test(shown.text) || !shown.signature) failures.push({ label: 'validation: section', problems: ['the Validations section shows "' + shown.text.slice(0, 80) + '", signature ' + shown.signature] });
+  if (!/Marc Gagnon/.test(shown.text) || !shown.signature) failures.push({ label: 'validation: section', problems: ['the Signatures card shows "' + shown.text.slice(0, 80) + '", signature ' + shown.signature] });
   if (process.env.BC_SHOTS) await shot(tab, 'validation-detail');
   await tapBack(tab);
   await settled(tab, 'validation: back to the logbook', { route: '/' });
@@ -627,11 +647,13 @@ async function phoneFlows() {
   if (!marked) failures.push({ label: 'validation: mark', problems: ['no mark on the validated dive in the logbook list'] });
   await tapDive(tab);
   await settled(tab, 'validation: dive reopened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
+  await tab.run(() => (document.querySelector('.bc-dive-detail [data-card="signatures"]')?.scrollIntoView({ block: 'center' }), 1));
+  await sleep(500);
   await tapText(tab, 'Retirer la validation|Remove the validation');
   await sleep(500);
   await tapText(tab, '^\\s*(Retirer|Remove)\\s*$', '.dialog');
   await sleep(500);
-  const gone = await tab.run(() => !document.querySelector('.page-current .bc-dive-validations--item'));
+  const gone = await tab.run(() => !document.querySelector('.bc-dive-detail .bc-dive-signatures--item'));
   checks++;
   if (!gone) failures.push({ label: 'validation: removed', problems: ['the validation is still listed after « Retirer »'] });
   await tapBack(tab);
@@ -650,7 +672,7 @@ async function phoneFlows() {
     await tapDive(tab);
     await settled(tab, `${how}: dive opened`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     const route = (await tab.run(readStack)).current;
-    await tapText(tab, '^\s*(Modifier|Edit)\s*$');
+    await openEditPage(tab);
     await settled(tab, `${how}: edit opened`, { route: /\/edit$/, setup: true });
     await tab.run(() => {
       const field = document.querySelector('.page-current textarea');
@@ -704,7 +726,7 @@ async function phoneFlows() {
   console.log(' edit > suggestion lists float above the following cards');
   await tapDive(tab);
   await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
-  await tapText(tab, '^\s*(Modifier|Edit)\s*$');
+  await openEditPage(tab);
   await settled(tab, 'edit opened', { route: /\/edit$/, setup: true });
   // Each field is brought to the bottom of the screen (little room below) and to the middle (the list passes over the
   // cards that follow).
@@ -877,11 +899,11 @@ async function phoneFlows() {
   console.log(' edit > Back arrow, then Back at once after Save');
   await tapDive(tab);
   await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
-  await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
+  await openEditPage(tab);
   await settled(tab, 'edit opened', { route: /\/edit$/, setup: true });
   await tapBack(tab);
   await settled(tab, 'edit left with the arrow', { route: validated });
-  await tapText(tab, '^\\s*(Modifier|Edit)\\s*$');
+  await openEditPage(tab);
   await settled(tab, 'edit opened again', { route: /\/edit$/, setup: true });
   await tapText(tab, '^\\s*(Enregistrer|Save)\\s*$');
   await sleep(120);
@@ -2871,7 +2893,7 @@ async function accountBackFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only', '--dive-tabs-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2888,7 +2910,7 @@ try {
     const list = await (await fetch(`${wsBase}/json/list`)).json();
     for (const target of list) if (target.type === 'page' && target.id !== keepId) await fetch(`${wsBase}/json/close/${target.id}`).catch(() => {});
   };
-  const harness = { openTab, closeOtherTabs, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length };
+  const harness = { openEditPage, openTab, closeOtherTabs, sleep, settled, tapDive, tapText, tapBack, hardwareBack, readStack, expect, failureCount: () => failures.length };
   const monkey = (/** @type {string} */ only) => () =>
     monkeyFlows({
       ...harness,
@@ -2947,6 +2969,8 @@ try {
     ['cylinder types', '--cylinder-types-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => cylinderTypeFlows({ ...harness })],
     // The desktop logbook's trip rows and the dive detail's right pane (tests/e2e/desktop-detail.mjs).
     ['desktop detail', '--detail-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopDetailFlows({ ...harness, shot })],
+    // The dive detail's tabs and in-place editing on the desktop, a tablet and a phone (tests/e2e/dive-detail-tabs.mjs).
+    ['dive detail tabs', '--dive-tabs-only', 60, !phoneOnly && !tabletOnly && !welcomeOnly, () => diveDetailTabsFlows({ ...harness, shot })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],

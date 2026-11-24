@@ -192,8 +192,10 @@ test('tablets and the desktop open the validation as a dialog, the phone keeps i
   const logbook = readFileSync(new URL('../../app/src/pages/Logbook.svelte', import.meta.url), 'utf8').split('\r\n').join('\n');
   assert.match(logbook, /function validateChecked\(\) \{\s*if \(layout\.split \|\| layout\.desktop\) validating = \[\.\.\.checkedIds\];\s*else f7router\.navigate\(`\/validate\?ids=\$\{checkedIds\.join\(','\)\}`\)/);
   assert.match(logbook, /<ValidationDialog ids={validating}/);
-  // The menu item (seal icon, before « Renuméroter ») and the desktop header button (between Plan and Share) are Benthic+ only.
-  assert.match(detail, /icon="seal"\s+text=\{t\('validation\.menuOne'\)\}/);
+  // Task 2026-11-24-382: « Faire signer la plongée » is no longer in the ⋮ menu; it is « Faire signer » of the Signatures card (Benthic+),
+  // which calls startValidation. The desktop header button (between Plan and Share) stays, Benthic+ only.
+  assert.doesNotMatch(detail, /text=\{t\('validation\.menuOne'\)\}\s+onclick/);
+  assert.match(detail, /onsign: startValidation/);
   const header = detail.slice(detail.indexOf('bc-dive-detail--desk-head'));
   const at = (key) => header.indexOf(key);
   assert.ok(at('desktopDetail.plan') < at('desktopDetail.validate') && at('desktopDetail.validate') < at('desktopDetail.share'));

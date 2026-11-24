@@ -7425,7 +7425,9 @@ Christian asked for this on 24 November 2026. Work in `main`. Canvases: « Benth
 
 **Test:** open Mon profil › Brevets on each device: cards in the right ratio and colours, one tap opens the certification; the profile's top bar has no back arrow.
 
-## [ ] 2026-11-24-382 Dive detail: dive type selector in « Gaz », rebreather drawing, kit as a menu; tablet tabs with in-place editing
+## [x] 2026-11-24-382 Dive detail: dive type selector in « Gaz », rebreather drawing, kit as a menu; tablet tabs with in-place editing
+
+Done in Dive detail: dive type selector in Gaz, kit menu, tablet and phone tabs edited in place, iPhone segmented control (one commit with 386). Where the app and the task differ: the setpoints of the Recycleur card are read from the ppO2 trace (the façade gives no setpoint events; they are read-only); « Renuméroter à partir de cette plongée » keeps its existing text; the Benthic+ marks drawn in the mock-ups are not shown (the cards exist only for subscribers, tests/app/other-gear-plus.test.mjs).
 
 Christian asked for this on 24 November 2026. Work in `main`. Canvases: « Benthic — Bureau » (all desktop boards, new today), « Benthic — Tablette ». Copies in `docs/mockups/`. `docs/ui-specification.md` has the two new sections (« Dive detail, « Gaz » tab: dive type » and « Dive detail, « Équipement » tab: kit as a menu »).
 
@@ -7472,7 +7474,9 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 2. The note above the buttons (tablet, desktop) loses its first sentence: it reads only « La date, la durée, la profondeur, les bouteilles et le voyage restent propres à chaque plongée. » (no « Les puces en pointillé ne sont que sur certaines plongées. »).
 **Done (24 November 2026):** The Informations tab is five cards on DesktopEquipmentCard (Site, Personnes, Appréciation, Conditions, Étiquettes), 88 px free at the end. New components: DesktopChipsField (36 px chips, 28 px initial in --bc-person-initial, ✕ « Retirer … », dashed « + Ajouter » opening a picker with the logbook's names first; tags use the outlined variant) and DesktopStarsRow (26 px stars in 36 px targets, a radiogroup per row, « N sur 5 », a second click on the current star clears). Several guides: the core keeps them comma-separated (save('guides', list) as before). New icons people, star, tag, waves (Material Symbols, through tools/build-icon-symbols.mjs: 93 keys, tests/app/icon-sets.test.mjs updated from 89 for that reason); new variables --bc-star-on, --bc-star-off, --bc-person-initial, --bc-on-person-initial with dark values. Where the app and the task differ or the task was silent: (1) the rating and the tags moved from the Notes tab to Informations, the Notes tab keeps only the notes; (2) the fields the task does not name (surface pressure, water temperature, depth and duration of a dive logged by hand, mode, CNS, OTU, trip) stay in the Conditions card, after « Type d’eau » and « Air », so nothing is lost; (3) « Air » shows « — » (read-only) when the dive computer recorded none; (4) the site row's second line is « Région, Pays · latitude, longitude » from what the site has (the sample site has coordinates only); the chevron still opens the site, a click on the row changes it, as before; (5) the 56 px height of the site row never applied (a later rule set 40): fixed. Mock-up not available here; built from the task text. Checks: tests/e2e/desktop-detail.mjs (--detail-only), tests/app/desktop-detail.test.mjs and icon-sets.test.mjs updated to the new markup.
 
-## [ ] 2026-11-24-386 Phone dive detail: one page with sticky tabs and in-place editing (to-do #193, phone part); desktop Informations gets Date et heure and Signatures
+## [x] 2026-11-24-386 Phone dive detail: one page with sticky tabs and in-place editing (to-do #193, phone part); desktop Informations gets Date et heure and Signatures
+
+Done in Dive detail: dive type selector in Gaz, kit menu, tablet and phone tabs edited in place, iPhone segmented control (same commit as 382, they rewrite the same screen): one scrolling page on the phone with sticky tabs, bottom sheets, date and time pickers; Date et heure and Signatures on every device.
 
 Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/`. This completes #193 (tablet part: task 382).
 

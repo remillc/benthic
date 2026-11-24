@@ -15,6 +15,8 @@
   import { tick } from 'svelte';
   import Icon from './Icon.svelte';
   import StarsInput from './StarsInput.svelte';
+  import DetailSheet from './DetailSheet.svelte';
+  import { layout } from '../lib/layout.svelte.js';
   import { editKeyAction, listSuggestions, withItem, withoutItem } from '../lib/desktop-edit.js';
   import { t } from '../lib/i18n.js';
 
@@ -85,10 +87,40 @@
       (kind === 'choice' ? (options.find((o) => o.value === value)?.label ?? '') : typeof value === 'string' ? value : ''),
   );
 
+  // On a phone a list field (a choice, the site) opens a bottom sheet instead of an input (task 2026-11-24-386): the list with
+  // the current value checked, a search when it is long, « Nouveau … » when one can be created. A choice saves at once.
+  let sheetOpen = $state(false);
+  const sheetKind = $derived(layout.phone && (kind === 'choice' || kind === 'site'));
+  const sheetOptions = $derived(
+    kind === 'site'
+      ? known.map((k) => ({ value: k.key, label: k.key, example: t('desktopDetail.diveCount', { n: k.dives }) }))
+      : [{ value: '', label: invitation || t('edit.notSet') }, ...options],
+  );
+  /** @param {string} v */
+  async function sheetPick(v) {
+    if (v === (typeof value === 'string' ? value : '')) return;
+    saving = true;
+    try {
+      await onsave?.(v);
+    } finally {
+      saving = false;
+    }
+  }
+  function sheetClosed() {
+    sheetOpen = false;
+    // The focus goes back to the field: that must not open the sheet again.
+    quiet = true;
+    setTimeout(() => (quiet = false), 300);
+  }
+
   /** @param {boolean} [openChoice] */
   function startEdit(openChoice = false) {
-    if (readonly || editing || quiet) {
+    if (readonly || editing || quiet || sheetOpen) {
       quiet = false;
+      return;
+    }
+    if (sheetKind) {
+      sheetOpen = true;
       return;
     }
     draft = Array.isArray(value) ? [...value] : value;
@@ -315,6 +347,10 @@
     </div>
   {/if}
 </div>
+
+{#if sheetOpen}
+  <DetailSheet title={label} options={sheetOptions} value={typeof value === 'string' ? value : ''} search={kind === 'site' && known.length > 6} newLabel={kind === 'site' ? newLabel : ''} onselect={sheetPick} onclose={sheetClosed} />
+{/if}
 
 <style>
   @layer bc.components {
