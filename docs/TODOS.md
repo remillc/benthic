@@ -41,7 +41,6 @@ Next number: 196
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
 - #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes, les détendeurs, les recycleurs et les combinaisons étanches (drysuit)
-- #155 [design] desktop: améliorer la présentation de l'en-tête sur /dives/:id, première colonne (celle de la liste des plongées): boîte de recherche coincée, menu 3-dots qui disparaît lorsque pas assez d'espace.
 - #149 [code] remplacer les uuid par des id plus courts. Décidé le 23 nov. 2026 : 10 caractères en base32 Crockford minuscule (alphabet 0-9 et a-z sans i, l, o, u ; 50 bits de hasard), sans préfixe, par exemple `7k2m9q4x1d`. Les identifiants déjà en circulation (UUID) sont réécrits au nouveau format.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.
 - #173 [code] Devices should synchronize as soon as data is updated.
