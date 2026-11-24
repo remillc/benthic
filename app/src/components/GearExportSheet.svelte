@@ -40,7 +40,7 @@
   <div class="bc-gear-sheet--content">
     <h2 class="bc-gear-sheet--title">{t('gear.inventory.exportTitle')}</h2>
     <p class="bc-gear-sheet--count">{t('gear.inventory.exportChosen', { n: selected.length })}</p>
-    <div class="bc-gear-sheet--scroll"><GearPicker {groups} bind:selected /></div>
+    <div class="bc-gear-sheet--scroll" data-bc-scroll><GearPicker {groups} bind:selected /></div>
     <div class="bc-gear-sheet--actions">
       <button type="button" class="bc-gear-sheet--text" onclick={onclose}>{t('gear.addSheet.cancel')}</button>
       <button type="button" class="bc-gear-sheet--main" disabled={!selected.length} onclick={send}>{t('gear.inventory.exportAction')}</button>

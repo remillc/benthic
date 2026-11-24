@@ -69,7 +69,7 @@
     <h2 class="bc-rule-sheet--title">{t('maintenance.ruleSheet.title')}</h2>
     <p class="bc-rule-sheet--lead">{t('maintenance.ruleSheet.lead', { name })}</p>
 
-    <div class="bc-rule-sheet--scroll">
+    <div class="bc-rule-sheet--scroll" data-bc-scroll>
       <div class="bc-rule-sheet--card" class:bc-rule-sheet--card-on={timeOn}>
         <div class="bc-rule-sheet--row">
           <span class="bc-rule-sheet--icon"><Icon name="calendar" size={22} /></span>

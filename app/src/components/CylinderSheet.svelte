@@ -164,7 +164,7 @@
     >
       <span class="bc-cylinder-sheet--handle" aria-hidden="true"></span>
     </button>
-    <div class="bc-cylinder-sheet--body">
+    <div class="bc-cylinder-sheet--body" data-bc-scroll>
       <div class="bc-cylinder-sheet--head">
         <CylinderIcon />
         <h2 {id} class="bc-cylinder-sheet--title">{t('edit.cylinderTitle', { n })}</h2>

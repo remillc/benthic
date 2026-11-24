@@ -111,3 +111,28 @@ test('desktop logbook: the scroll bar\'s thumb widens while the pointer is over 
   assert.match(src, /&\.bc-desktop-logbook--scroll-bar-hover::-webkit-scrollbar-thumb,\s*&::-webkit-scrollbar-thumb:hover,\s*&::-webkit-scrollbar-thumb:active \{\s*border-width: 1px;/);
   assert.match(src, /class:bc-desktop-logbook--scroll-bar-hover=\{barHover\}[^\n]*onpointermove=\{trackBar\} onpointerleave=/);
 });
+
+test('scrollbar on phones and tablets: a thin visible bar on the scrolling part, in the shared theme and the shared components', () => {
+  const css = read('app/src/theme.css');
+  const rule = css.match(/html:not\(\.bc-desktop-app\) :is\(\.page-content, \[data-bc-scroll\]\) \{[\s\S]*?\n  \}\n\}/);
+  assert.ok(rule, 'the rule is found');
+  assert.match(rule[0], /&::-webkit-scrollbar \{\s*width: 4px;/);
+  assert.match(rule[0], /&::-webkit-scrollbar-track \{\s*background: transparent;/);
+  assert.match(rule[0], /color-mix\(in srgb, var\(--bc-text\) 30%, transparent\)/);
+  assert.doesNotMatch(rule[0], /#[0-9a-fA-F]{3,8}\b|rgb\(/, 'no hard-coded colour');
+  assert.doesNotMatch(rule[0], /scrollbar-(width|color)/, 'the standard properties would switch the pseudo-element off');
+  for (const [file, mark] of [
+    ['app/src/components/Md3Dialog.svelte', 'bc-md3-dialog--content" data-bc-scroll'],
+    ['app/src/components/DetailSheet.svelte', 'bc-detail-sheet--list" data-bc-scroll'],
+    ['app/src/components/CylinderSheet.svelte', 'bc-cylinder-sheet--body" data-bc-scroll'],
+    ['app/src/components/AddEquipmentSheet.svelte', 'bc-add-equipment--scroll" data-bc-scroll'],
+    ['app/src/components/ConflictSheet.svelte', 'bc-conflict-sheet--full-body" data-bc-scroll'],
+    ['app/src/components/ProfileFrame.svelte', 'bc-pf--box" data-bc-scroll'],
+    ['app/src/pages/ProfilePieceEdit.svelte', 'bc-piece-edit--steps-body" data-bc-scroll'],
+  ]) {
+    assert.ok(read(file).includes(mark), `${file}: ${mark}`);
+  }
+  // A dialog's header and action row stay outside the scrolling part.
+  const dialog = read('app/src/components/Md3Dialog.svelte');
+  assert.match(dialog, /<h2 [^>]*>[^\n]*\n[^\n]*\n?[^\n]*data-bc-scroll[\s\S]*bc-md3-dialog--actions/);
+});

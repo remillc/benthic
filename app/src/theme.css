@@ -1049,6 +1049,29 @@ html.ios {
   }
 }
 
+/* Phones and tablets, scrollbars (docs/system-design.md, section 7, « Scrollbar when content overflows »): the
+   scrolling part of a page, a sheet or a dialog draws a thin bar for as long as it can scroll, not only while the finger
+   moves, because the WebViews hide their overlay bars. Only the pseudo-element is styled (no scrollbar-width or
+   scrollbar-color, which would switch it off): the bar exists only where the content overflows, so content that fits
+   shows none. The desktop app has its own thin bar above. */
+@layer bc.base {
+  html:not(.bc-desktop-app) :is(.page-content, [data-bc-scroll]) {
+    &::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 2px;
+      background: color-mix(in srgb, var(--bc-text) 30%, transparent);
+    }
+  }
+}
+
 @layer bc.base {
   body {
     font-family: var(--f7-font-family);

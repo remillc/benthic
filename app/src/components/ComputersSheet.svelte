@@ -48,7 +48,7 @@
   push={false}
   aria-label={t('detail.computersTitle')}
 >
-  <div class="bc-computers-sheet--content">
+  <div class="bc-computers-sheet--content" data-bc-scroll>
     {#if ios}
       <div class="bc-computers-sheet--ios-bar">
         <span class="bc-computers-sheet--ios-title">{t('detail.computersRow')}</span>
