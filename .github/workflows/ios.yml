@@ -69,8 +69,13 @@ jobs:
         run: |
           xcodebuild -workspace app/ios/App/App.xcworkspace -scheme App -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build/app CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= build | tail -40
-          test "${PIPESTATUS[0]}" = 0
+            -derivedDataPath build/app CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= build > build/ios/xcodebuild-simulator.log 2>&1 || {
+            # Every compiler error, not only the last lines (one error can hide the others).
+            grep -E ': (error|fatal error):' build/ios/xcodebuild-simulator.log | sort -u | head -100
+            tail -40 build/ios/xcodebuild-simulator.log
+            exit 1
+          }
+          tail -5 build/ios/xcodebuild-simulator.log
           ditto -c -k --sequesterRsrc --keepParent \
             build/app/Build/Products/Debug-iphonesimulator/App.app build/ios/Benthic-simulator.zip
 

@@ -46,8 +46,12 @@ perl -0pi -e "s/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;\n\t\t\t\t
 ARCHIVE=$WORK/Benthic.xcarchive
 xcodebuild -workspace "$ROOT/app/ios/App/App.xcworkspace" -scheme App -configuration Release \
   -sdk iphoneos -destination 'generic/platform=iOS' -archivePath "$ARCHIVE" \
-  CURRENT_PROJECT_VERSION="$BUILD_NUMBER" OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN" archive | tail -40
-test "${PIPESTATUS[0]}" = 0
+  CURRENT_PROJECT_VERSION="$BUILD_NUMBER" OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN" archive > "$WORK/archive.log" 2>&1 || {
+  grep -E ': (error|fatal error):|error: ' "$WORK/archive.log" | sort -u | head -100
+  tail -40 "$WORK/archive.log"
+  exit 1
+}
+tail -5 "$WORK/archive.log"
 
 # Export signs for the App Store and uploads to App Store Connect (TestFlight) with the API key.
 echo "$ASC_KEY_P8_BASE64" | base64 --decode > "$WORK/AuthKey.p8"
