@@ -935,7 +935,22 @@ let coreErrorHook = null;
  * @param {unknown} message
  */
 export function isExpectedCoreMessage(message) {
-  return typeof message === 'string' && /account not configured|repository not configured|dive not found/i.test(message);
+  return (
+    typeof message === 'string' &&
+    (/account not configured|repository not configured|dive not found/i.test(message) || isUnreachableCoreMessage(message))
+  );
+}
+
+/**
+ * The server could not be reached (libgit2's and the system's words): no network, the server down, a development device
+ * whose USB port forward was lost. The logbook shows « hors ligne » and tries again later: a normal state, not a fault, so
+ * never a report. A refused certificate, a refused sign-in or an unreadable logbook is not in this list and still reports.
+ * @param {string} message
+ */
+export function isUnreachableCoreMessage(message) {
+  return /failed to connect|connection refused|connection reset|connection timed out|operation timed out|timeout was reached|could not resolve|failed to resolve|name or service not known|no such host|network is unreachable|no route to host|host is down|unable to resolve/i.test(
+    message,
+  );
 }
 
 /**
