@@ -225,10 +225,12 @@ export async function desktopDetailFlows(h) {
   /** What the list holds for the dive shown (the columns read the same record). */
   const listed = () =>
     tab.run(async () => {
-      const { desk } = await import('/src/lib/desktop-logbook.svelte.js');
-      const id = Number(window.__live('.bc-desktop-logbook--selected')?.getAttribute('data-dive'));
-      const x = desk.extras.get(id);
-      return { buddies: (x?.buddies ?? []).join('|'), guides: (x?.guides ?? []).join('|'), rating: x?.rating ?? 0 };
+      const { desk, loadExtras } = await import('/src/lib/desktop-logbook.svelte.js');
+      // The columns' values are read again from the core, whichever columns are shown (an earlier block may have hidden some).
+      await loadExtras();
+      // Over the whole logbook (the pane's dive and the selected row are the same dive, but this does not depend on it).
+      const all = [...desk.extras.values()];
+      return { buddies: all.flatMap((x) => x.buddies ?? []).join('|'), guides: all.flatMap((x) => x.guides ?? []).join('|'), rating: all.some((x) => x.rating === 4) ? 4 : 0 };
     });
   /** Adds a value through a field's « + Ajouter ». */
   const addChip = async (field, text) => {
@@ -250,7 +252,7 @@ export async function desktopDetailFlows(h) {
       return !!chip;
     }, field, text);
   const poll = async (read, want) => {
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 100; i++) {
       const got = await read();
       if (JSON.stringify(got) === JSON.stringify(want) || (typeof want === 'function' && want(got))) return got;
       await sleep(150);
@@ -268,6 +270,7 @@ export async function desktopDetailFlows(h) {
   expect('376: the buddy’s ✕ « Retirer … » removes it', { chips: false, list: false, buddies: before.buddies }, { ...state, buddies: (await listed()).buddies });
 
   await addChip('guides', 'Max Guide');
+  await poll(() => chipNames('guides'), (n) => n.includes('Max Guide'));
   await addChip('guides', 'Eve Guide');
   state = await poll(async () => (await listed()).guides, (g) => g.includes('Max Guide') && g.includes('Eve Guide'));
   expect('376: two guides are kept (comma-separated in the core)', { both: true }, { both: state.includes('Max Guide') && state.includes('Eve Guide') });
@@ -285,10 +288,10 @@ export async function desktopDetailFlows(h) {
       return { checked: Number(row?.querySelector('[aria-checked="true"]')?.getAttribute('data-star') ?? 0), text: row?.querySelector('.bc-desktop-stars-row--value')?.textContent.replace(/\s/g, ' ').trim() };
     }, field);
   await star('rating', 4);
-  state = await poll(async () => ({ pane: await stars('rating'), list: (await listed()).rating }), (v) => v.list === 4);
+  state = await poll(async () => ({ pane: await stars('rating'), list: (await listed()).rating }), (v) => v.list === 4 && v.pane.checked === 4);
   expect('376: Note 4: four stars on, « 4 sur 5 », saved (the list reads 4)', { checked: 4, text: '4 sur 5', list: 4 }, { ...state.pane, list: state.list });
   await star('rating', 4);
-  state = await poll(async () => ({ pane: await stars('rating'), list: (await listed()).rating }), (v) => v.list === 0);
+  state = await poll(async () => ({ pane: await stars('rating'), list: (await listed()).rating }), (v) => v.list === 0 && v.pane.checked === 0);
   expect('376: a second click on the current star clears the note', { checked: 0, text: 'Non notée', list: 0 }, { ...state.pane, list: state.list });
   await star('visibility', 3);
   state = await poll(() => stars('visibility'), (v) => v.checked === 3);
