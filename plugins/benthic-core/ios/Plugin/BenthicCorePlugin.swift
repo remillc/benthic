@@ -1094,9 +1094,10 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             setupDone.wait()
             do {
                 let json = try BenthicNative.bgit(operation, args: args, progress: { [weak self] progress in
-                    var data = parseObject(progress)
+                    guard let self else { return }
+                    var data = self.parseObject(progress)
                     data["dir"] = name
-                    self?.notifyListeners("gitProgress", data: data)
+                    self.notifyListeners("gitProgress", data: data)
                 })
                 call.resolve(["json": json])
             } catch {
