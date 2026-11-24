@@ -7407,3 +7407,12 @@ To do:
 3. Keep reading `meta/health-consent.json` only where the full export needs it for compatibility (`full-export.js`), as `docs/architecture.md` says; nothing writes it.
 
 **Test:** create a Benthic+ account, fill the blood group: no consent question at any point, no « Retirer l’accord » anywhere; the full export still opens in an older build.
+
+## [ ] 2026-11-24-381 Certifications shown as cards; no back arrow at the top of « Mon profil de plongeur »
+
+Christian asked for this on 24 November 2026. Work in `main`. Canvases: « Benthic — Téléphone », « Benthic — Tablette » and, since today, « Benthic — Bureau » for every desktop board. Copies updated in `docs/mockups/`.
+
+1. **Brevets as cards** (`ProfileCerts.svelte`). Each certification is drawn like the physical card, in the 85.6 × 54 ratio (`aspect-ratio: 85.6 / 54`), 14 px corners, a light shadow, and a diagonal gradient of the agency's colour (PADI #1A5A99 → #0B2A4A, SSI #2A8A5C → #123F2A; for other agencies, derive the same two shades from their existing colour) with two pale waves along the bottom (white, 18 %). White text, 16 × 20 px padding: on top, the agency (18 px, 800, letter-spacing 1 px) and on the right « CARTE DE BREVET » (11 px, 600, 85 %); at the bottom, the course title (20 px, 600), the diver's name (14 px), then « N° … » on the left and the date on the right (13 px, tabular figures). The whole card is the link to the certification, with an `aria-label` such as « PADI, Advanced Open Water Diver, n° 1504AB2231, 2015-06-12 »; the list is `role="list"`. Layout: one column on the phone (16 px margins, 16 px gap), two columns on the tablet's right pane, `repeat(auto-fill, minmax(300px, 1fr))` on the desktop. « Montrez une carte au centre de plongée, même sans réseau. » stays under the cards. Mock-ups: « Mon profil de plongeur, brevets » (phone `profil-brevets-android`, tablet landscape, desktop).
+2. **No back arrow on « Mon profil de plongeur ».** The profile is reached from the main navigation now, so the arrow left of the « Mon profil de plongeur » title goes, on tablet and desktop (list pane of every profile screen) and on the iPhone (« Mon profil », whose « Compte » back button goes). The title starts where the arrow was (12 px spacer). Arrows inside the profile (a certification, a piece of equipment on the phone) stay: they go back to the profile.
+
+**Test:** open Mon profil › Brevets on each device: cards in the right ratio and colours, one tap opens the certification; the profile's top bar has no back arrow.
