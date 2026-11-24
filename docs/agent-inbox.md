@@ -7369,7 +7369,7 @@ Left for you: two code comments still say « Faire valider la plongée » (`app/
 
 **Test:** search the built app's strings: no « Faire valider »; the desktop header button's tooltip reads « Faire signer la plongée… (signature d’un moniteur ou d’un compagnon) ».
 
-## [ ] 2026-11-24-378 Download: the Bluetooth and failure screens follow the download flow's layout
+## [x] 2026-11-24-378 Download: the Bluetooth and failure screens follow the download flow's layout
 
 Christian asked for this on 24 November 2026 (the screens were redrawn on 23 November with the download flow of tasks 357 and 358, and not sent until now). Work in `main`. The four states that stop a download now look like the other steps of « Télécharger des plongées »: same bar, same centred column, a 96 px disc with the icon, a centred title and text, the action at the bottom. Mock-ups: phone canvas, page Android, subgroup « Téléchargement » (« Téléchargement, autoriser le Bluetooth », « … autorisation refusée », « … Bluetooth désactivé », « Téléchargement échoué »), page iPhone (« Téléchargement échoué »); tablet and desktop canvas, page Tablette (« 08 · … » and « 09 · Téléchargement échoué », landscape and portrait) and page Bureau (« Téléchargement échoué · bureau », the 640 px dialog).
 
@@ -7379,6 +7379,8 @@ Christian asked for this on 24 November 2026 (the screens were redrawn on 23 Nov
 4. **Téléchargement échoué:** red disc (#F9DEDC, icon #B3261E, Bluetooth crossed out); « Perdix 2 introuvable » (the computer's name); « Le téléphone n’a pas trouvé l’ordinateur. Aucune plongée n’a été modifiée. » (« L’iPhone », « La tablette », « Cet ordinateur »); a checklist of three points (« L’ordinateur est allumé et en mode transfert Bluetooth. », « Il est à moins d’un mètre du téléphone. », « Aucune autre app n’est connectée à l’ordinateur. »); filled « Réessayer » with the retry icon, text button « Choisir un autre ordinateur » under it.
 
 Tablet: the same content in a 640 px centred column of the download pane. Desktop: the same content inside the download dialog, with « Choisir un autre ordinateur » (text) and « Réessayer » (filled) in its footer, right-aligned.
+
+**Done (24 November 2026):** `Download.svelte` shows the three Bluetooth states in the flow's centred column (96 px disc, buttons in the bottom bar, the dialog footer on the desktop); `DownloadFailed.svelte` has the same layout (red disc, three points, Réessayer with the retry icon over the text button; the 640 px dialog on the desktop). « Ouvrir les réglages » uses the existing `openAppSettings` (Kotlin, Swift and `desktop.js` already had it). Texts per device in `download.permission/denied` and `downloadFailed`. The « À vérifier » heading is gone. Mock-ups not in the repository: built from the task text. Checked by the `--download-only` block (states on phone Android and iOS, tablet, desktop).
 
 **Test:** on each device, refuse the Bluetooth permission, turn Bluetooth off, and start a download with the computer out of reach: each state shows its disc, title, text and buttons as drawn, and its buttons do what they say.
 

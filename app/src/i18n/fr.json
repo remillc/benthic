@@ -2840,6 +2840,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Téléchargement : « Autoriser le Bluetooth », « Autorisation refusée », « Bluetooth désactivé » et « Téléchargement échoué » reprennent la présentation des autres étapes : un disque de 96 px, un titre et un texte centrés, les boutons en bas (dans le pied de la fenêtre sur ordinateur). « Ouvrir les réglages » ouvre les réglages de l’app.",
       "Importer un fichier .benthic : « Un fichier » de « Importer un carnet » et le menu du carnet acceptent l’export complet. Le fichier est d’abord vérifié, fichier par fichier, contre ses empreintes ; s’il est incomplet, rien n’est importé. Sinon le carnet, l’équipement, le profil et les brevets sont importés d’un coup, et les informations personnelles sont chiffrées sur cet appareil. Pour remplacer un carnet, « Remplacer ce carnet ? » propose « Exporter d’abord ce carnet ».",
       "Hors ligne : un serveur injoignable n’ouvre plus de rapport d’erreur ; le carnet affiche seulement qu’il est hors ligne et réessaie plus tard.",
       "Plongées : quand un changement fait sur un autre appareil arrive pendant qu’une plongée est ouverte, la plongée reste ouverte, ses voisines aussi, et une modification en cours est conservée ; une plongée supprimée sur l’autre appareil se ferme avec un court message. Cela ne produit plus de rapport d’erreur.",
@@ -3831,22 +3832,29 @@
     "cannotAdd": "Les plongées n'ont pas pu être ajoutées au carnet. Aucune plongée n'a été modifiée.",
     "none": {
       "title": "Pas de Bluetooth",
-      "text": "Cet appareil n'a pas de Bluetooth. Le téléchargement depuis l'ordinateur de plongée n'est pas possible ici."
+      "text": "Cet appareil n’a pas de Bluetooth. Le téléchargement depuis l’ordinateur de plongée n’est pas possible ici."
     },
     "permission": {
       "title": "Autoriser le Bluetooth",
-      "text": "Android demande l'autorisation « Appareils à proximité » pour trouver l'ordinateur de plongée. Benthic ne s'en sert pas pour autre chose.",
+      "text": {
+        "android": "Android demande l’autorisation « Appareils à proximité » pour trouver l’ordinateur de plongée. Benthic ne s’en sert pas pour autre chose.",
+        "ios": "iOS demande l’autorisation « Appareils à proximité » pour trouver l’ordinateur de plongée. Benthic ne s’en sert pas pour autre chose."
+      },
       "button": "Autoriser"
     },
     "denied": {
       "title": "Autorisation refusée",
-      "text": "Sans l'autorisation Bluetooth, Benthic ne peut pas trouver l'ordinateur de plongée. Vous pouvez la donner dans les réglages d'Android, rubrique Autorisations.",
+      "text": {
+        "android": "Sans l’autorisation Bluetooth, Benthic ne peut pas trouver l’ordinateur de plongée. Vous pouvez la donner dans les réglages d’Android, rubrique Autorisations.",
+        "iphone": "Sans l’autorisation Bluetooth, Benthic ne peut pas trouver l’ordinateur de plongée. Vous pouvez la donner dans les réglages de l’iPhone, rubrique Autorisations.",
+        "ipad": "Sans l’autorisation Bluetooth, Benthic ne peut pas trouver l’ordinateur de plongée. Vous pouvez la donner dans les réglages de l’iPad, rubrique Autorisations."
+      },
       "button": "Ouvrir les réglages",
       "again": "Demander à nouveau"
     },
     "off": {
       "title": "Bluetooth désactivé",
-      "text": "Activez le Bluetooth pour trouver l'ordinateur de plongée.",
+      "text": "Activez le Bluetooth pour trouver l’ordinateur de plongée.",
       "button": "Activer le Bluetooth"
     },
     "keepReceived": {
@@ -3966,19 +3974,28 @@
     "notFound": {
       "title": "{computer} introuvable",
       "titleNoName": "Ordinateur de plongée introuvable",
-      "text": "Le téléphone n'a pas trouvé l'ordinateur."
+      "text": {
+        "phone": "Le téléphone n’a pas trouvé l’ordinateur.",
+        "iphone": "L’iPhone n’a pas trouvé l’ordinateur.",
+        "tablet": "La tablette n’a pas trouvé l’ordinateur.",
+        "desktop": "Cet ordinateur n’a pas trouvé l’ordinateur de plongée."
+      }
     },
     "lost": {
       "title": "Téléchargement interrompu avec {computer}",
       "titleNoName": "Téléchargement interrompu",
-      "text": "La connexion avec l'ordinateur a été perdue avant la fin."
+      "text": "La connexion avec l’ordinateur a été perdue avant la fin."
     },
-    "nothingChanged": "Aucune plongée n'a été modifiée.",
-    "check": "À vérifier",
+    "nothingChanged": "Aucune plongée n’a été modifiée.",
     "checks": {
-      "on": "L'ordinateur est allumé et en mode transfert Bluetooth.",
-      "near": "Il est à moins d'un mètre du téléphone.",
-      "otherApp": "Aucune autre app n'est connectée à l'ordinateur."
+      "on": "L’ordinateur est allumé et en mode transfert Bluetooth.",
+      "near": {
+        "phone": "Il est à moins d’un mètre du téléphone.",
+        "iphone": "Il est à moins d’un mètre de l’iPhone.",
+        "tablet": "Il est à moins d’un mètre de la tablette.",
+        "desktop": "Il est à moins d’un mètre de cet ordinateur."
+      },
+      "otherApp": "Aucune autre app n’est connectée à l’ordinateur."
     },
     "otherComputer": "Choisir un autre ordinateur",
     "retry": "Réessayer",

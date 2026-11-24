@@ -469,8 +469,8 @@
   );
   /** Which device the texts and the frame are for (« le téléphone », « l’iPhone », « la tablette »; the desktop dialog). */
   const kind = $derived(desktopApp ? 'desktop' : layout.split ? 'tablet' : theme.ios ? 'iphone' : 'phone');
-  /** Tablet (task 2026-11-19-293): the Bluetooth state is a card under the remembered computers, not the whole screen. */
-  const stateBelow = $derived(layout.split && (phase === 'permission' || phase === 'denied' || phase === 'off'));
+  /** Which system's words: the permission texts name Android or iOS, the settings are those of the Android device, the iPhone or the iPad. */
+  const system = $derived(!theme.ios ? 'android' : layout.split ? 'ipad' : 'iphone');
   const percent = $derived(Math.round(fraction * 100));
   const product = $derived(computer?.product ?? '');
 
@@ -482,7 +482,7 @@
   const hasMenu = $derived(phase === 'choose');
   /** Leaving at once is « Annuler » while a choice or a download is open, « Fermer » once it ended. */
   const closeText = $derived(phase === 'finished' || phase === 'nothing' || phase === 'lost' ? t('download.close') : t('download.cancel'));
-  const showActions = $derived(phase === 'downloading' || phase === 'finished' || phase === 'nothing' || phase === 'lost');
+  const showActions = $derived(['downloading', 'finished', 'nothing', 'lost', 'permission', 'denied', 'off'].includes(phase));
 
   /** The dives of the list, newest first; once they are in the logbook, with their number. */
   const diveRows = $derived.by(() => {
@@ -559,21 +559,14 @@
     <span class="bc-download--offer-icon" aria-hidden="true"><Icon name="wristComputer" size={28} weight={1.8} /></span>
   {/snippet}
 
+  <!-- The Bluetooth states (task 2026-11-24-378): the flow's own layout, a blue 96 px disc, a centred title and text; the buttons are the bar's. -->
   {#snippet bluetoothState()}
-    <div class="bc-download--state">
-      <div class="bc-download--state-icon" aria-hidden="true"><Icon name="bluetooth" size={36} weight={2} /></div>
-      <h1>{t(`download.${phase}.title`)}</h1>
-      <p>{t(`download.${phase}.text`)}</p>
-      <div class="bc-download--state-actions">
-        {#if phase === 'permission'}
-          <button type="button" class="bc-download--filled" onclick={askPermission}>{t('download.permission.button')}</button>
-        {:else if phase === 'denied'}
-          <button type="button" class="bc-text-button" onclick={askPermission}>{t('download.denied.again')}</button>
-          <button type="button" class="bc-download--filled" onclick={() => BenthicCore.openAppSettings()}>{t('download.denied.button')}</button>
-        {:else if phase === 'off'}
-          <button type="button" class="bc-download--filled bc-download--filled-blue" onclick={turnOn}>{t('download.off.button')}</button>
-        {/if}
-      </div>
+    <div class="bc-download--center">
+      <span class="bc-download--disc bc-download--disc-bluetooth" aria-hidden="true"><Icon name={phase === 'none' ? 'bluetoothOff' : 'bluetooth'} size={44} weight={2} /></span>
+      <h1 class="bc-download--title">{t(`download.${phase}.title`)}</h1>
+      <p class="bc-download--text">
+        {phase === 'permission' ? t(`download.permission.text.${system === 'android' ? 'android' : 'ios'}`) : phase === 'denied' ? t(`download.denied.text.${system}`) : t(`download.${phase}.text`)}
+      </p>
     </div>
   {/snippet}
 
@@ -615,7 +608,14 @@
 
   {#snippet actions()}
     <div class="bc-download--actions" class:bc-download--actions-bar={!desktopApp}>
-      {#if phase === 'downloading'}
+      {#if phase === 'permission'}
+        <button type="button" class="bc-download--filled" onclick={askPermission}>{t('download.permission.button')}</button>
+      {:else if phase === 'denied'}
+        <button type="button" class="bc-download--filled" onclick={() => BenthicCore.openAppSettings()}>{t('download.denied.button')}</button>
+        <button type="button" class="bc-text-button" onclick={askPermission}>{t('download.denied.again')}</button>
+      {:else if phase === 'off'}
+        <button type="button" class="bc-download--filled bc-download--filled-blue" onclick={turnOn}>{t('download.off.button')}</button>
+      {:else if phase === 'downloading'}
         <button type="button" class="bc-outlined-button" disabled={stopping} onclick={close}>{stopping ? t('download.stopping') : t('download.stop')}</button>
       {:else if phase === 'lost'}
         <button type="button" class="bc-download--primary" onclick={retryLost}>{t('download.lost.retry')}</button>
@@ -646,15 +646,6 @@
     <div class="bc-download--content" class:bc-download--with-bar={showActions && !desktopApp}>
       {#if phase === 'checking'}
         <div class="bc-download--state" aria-busy="true"></div>
-      {:else if stateBelow}
-        <p class="bc-download--hint">{t(`download.hint.${kind}`)}</p>
-        {#if remembered.length}
-          <h2 class="bc-download--subheader">{remembered.length > 1 ? t('download.mineMany') : t('download.mine')}</h2>
-          {#each remembered as c (c.address)}{@render mine(c, false)}{/each}
-        {/if}
-        <div class="bc-download--state-card">
-          {@render bluetoothState()}
-        </div>
       {:else if phase === 'none' || phase === 'permission' || phase === 'denied' || phase === 'off'}
         {@render bluetoothState()}
       {:else if searching}
@@ -1264,10 +1255,18 @@
       }
     }
 
-    .bc-download--bt-disc,
-    .bc-download--disc {
+    .bc-download--bt-disc {
       width: 88px;
       height: 88px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bc-download--disc {
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -1277,6 +1276,12 @@
     .bc-download--bt-disc {
       background: var(--bc-secondary);
       color: var(--bc-on-secondary);
+    }
+
+    /* The Bluetooth states: the white icon in the blue disc (tasks 2026-11-23-351 and 2026-11-24-378). */
+    .bc-download--disc-bluetooth {
+      background: var(--bc-bluetooth-disc);
+      color: var(--bc-on-bluetooth-disc);
     }
 
     .bc-download--disc-alarm {
@@ -1409,70 +1414,23 @@
       color: var(--bc-on-secondary);
     }
 
-    /* Empty and error states (spec, section 6). */
+    /* The first check: nothing to show yet. */
     .bc-download--state {
       margin: 24px 24px 0;
-
-      h1 {
-        margin: 16px 0 8px;
-        font-size: 24px;
-        line-height: 32px;
-        font-weight: 400;
-
-        :global(.ios) & {
-          font-size: 28px;
-          line-height: 34px;
-          font-weight: 700;
-        }
-      }
-
-      p {
-        margin: 0;
-        font-size: 16px;
-        line-height: 24px;
-        color: var(--bc-text-2);
-      }
-    }
-
-    .bc-download--state-card {
-      margin: 16px 16px 0;
-      padding: 8px 0 24px;
-      border-radius: 16px;
-      background: var(--bc-surface-container);
-
-      .bc-download--state {
-        margin: 16px 16px 0;
-      }
-    }
-
-    /* The same on every device: the white icon centred in a 72 dp blue disc, whatever the state. */
-    .bc-download--state-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 72px;
-      height: 72px;
-      margin: 0 auto;
-      border-radius: 50%;
-      background: var(--bc-bluetooth-disc);
-      color: var(--bc-on-bluetooth-disc);
-    }
-
-    .bc-download--state-actions {
-      margin-top: 24px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
     }
 
     /* MD3 filled button; iOS large filled button. */
     .bc-download--filled {
       flex: none;
       width: auto;
-      height: 40px;
+      height: 48px;
       padding: 0 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       border: none;
-      border-radius: 20px;
+      border-radius: 24px;
       background: var(--bc-primary-action);
       color: var(--bc-on-primary-action);
       font: inherit;
