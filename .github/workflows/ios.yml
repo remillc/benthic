@@ -24,6 +24,10 @@ on:
         description: Also install and start the app this many times, to catch an intermittent start-up error (0 for none)
         type: number
         default: 0
+      testflight:
+        description: Sign the app and send it to TestFlight (App Store Connect)
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -76,6 +80,19 @@ jobs:
       - name: Start the app again and again
         if: always() && inputs.launches > 0
         run: bash tests/ios/run-launches.sh "$PWD/build/app/Build/Products/Debug-iphonesimulator/App.app" ${{ inputs.launches }}
+
+      # By hand only: a build for TestFlight, signed with the Apple Distribution certificate (secrets, see the script).
+      - name: Send the app to TestFlight
+        if: inputs.testflight
+        env:
+          IOS_DIST_P12_BASE64: ${{ secrets.IOS_DIST_P12_BASE64 }}
+          IOS_DIST_P12_PASSWORD: ${{ secrets.IOS_DIST_P12_PASSWORD }}
+          IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: bash native/ios/testflight.sh
 
       - name: Keep the test logs
         if: always()
