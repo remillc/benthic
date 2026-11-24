@@ -40,7 +40,7 @@
   import { summariseImport, summariseScan, summaryText } from '../lib/import-summary.js';
   import { scanBlob, scanLogbook, stageFile } from '../lib/staged-file.js';
   import { CLOUD_SERVICES, ICLOUD_SERVICE, cloudServices, cloudComing, createDeviceLogbook, downloadedFile, readImportFile } from '../lib/release-welcome.js';
-  import { logbook, startWithoutAccount, deleteDives, importFile, importData, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
+  import { logbook, startWithoutAccount, removeSample, importFile, importData, importCsvFile, accountReady } from '../lib/logbook.svelte.js';
   import { deviceStore } from '../lib/device-store.js';
   import { importProgress } from '../lib/import-progress.svelte.js';
   import { isCancelled } from '../lib/import-progress.js';
@@ -373,7 +373,7 @@
           deviceLogExists: async () => (await BenthicCore.listDives()).exists,
           start: startWithoutAccount,
           sampleIds: () => logbook.dives.map((d) => d.id),
-          remove: deleteDives,
+          remove: removeSample,
         },
         importer(),
       );
@@ -411,7 +411,7 @@
               deviceLogExists: async () => (await BenthicCore.listDives()).exists,
               start: startWithoutAccount,
               sampleIds: () => logbook.dives.map((d) => d.id),
-              remove: deleteDives,
+              remove: removeSample,
             },
             staged ? () => importData('logbook.ssrf', { path: staged.path }) : null,
           );

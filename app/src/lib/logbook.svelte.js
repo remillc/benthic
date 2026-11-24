@@ -316,6 +316,24 @@ export async function deleteDives(ids) {
 }
 
 /**
+ * A new device logbook starts from the sample logbook: its dives go, and so do the sites they leave without a dive (the
+ * sample's own), so that the new logbook is empty. Saved like an edit; nothing of it can be undone.
+ * @param {number[]} ids the sample's dives
+ */
+export async function removeSample(ids) {
+  await deleteDives(ids);
+  const sites = /** @type {{ uuid: number, dives: number }[]} */ (await BenthicCore.siteQuery({ kind: 'list' }));
+  const unused = sites.filter((s) => !s.dives).map((s) => s.uuid);
+  if (unused.length) {
+    await BenthicCore.siteAction({ action: 'delete', uuids: unused });
+    invalidateCoreCache();
+    logbook.sitesVersion++;
+    await persistChanges();
+  }
+  undoCleared();
+}
+
+/**
  * Merges dives into one with the core's merge (one undoable step), saved and synced like an
  * edit. Whether the dives may be merged is `canMerge` of lib/multi-dive.js: the core merges
  * whatever it is given. The merged dive keeps the first dive's number.

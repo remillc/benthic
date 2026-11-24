@@ -49,3 +49,4 @@ Next number: 198
 - #195 [design] réévaluer la pertinence de synchroniser les photos et vidéos. L'alternative est de les garder sur le serveur et les servir à la demande. Ça pose problème cependant pour exporter un fichier .benthic.
 - #196 [design] stratégie de campagne de communication et publicité pour rejoindre les potentiels acheteurs de l’app.
 - #197 [design] l’extension .benthic n’a pas d’icône.
+- #198 [design] (observé sur iOS) Sites, nettoyer les sites (après l’avertissement « n sites sans plongée ») : le bouton « Supprimer la sélection » en bas est masqué dès que la liste remplit l’écran. Solution : déplacer le bouton Supprimer en haut, à droite. Aucune maquette iOS de cet écran ; maquettes existantes : « Sites, Android, nettoyer les sites », tablette Android et bureau.

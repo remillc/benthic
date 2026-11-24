@@ -446,3 +446,11 @@ test('the tablet empty logbook: the dive computer button and the three ways, ove
   assert.match(sources.logbook, /<ReleaseEmptyLogbook/);
   for (const lang of ['fr', 'en']) assert.ok(langs[lang].logbook.emptyDownload);
 });
+
+test('a new device logbook loses the sample’s sites with its dives: no « site sans plongée » in an empty logbook', () => {
+  assert.equal([...sources.steps.matchAll(/remove: removeSample,/g)].length, 2);
+  const lib = read('lib/logbook.svelte.js');
+  const fn = lib.slice(lib.indexOf('export async function removeSample('), lib.indexOf('\n}\n', lib.indexOf('export async function removeSample(')));
+  assert.match(fn, /await deleteDives\(ids\)[\s\S]*siteQuery\(\{ kind: 'list' \}\)[\s\S]*filter\(\(s\) => !s\.dives\)[\s\S]*siteAction\(\{ action: 'delete', uuids: unused \}\)/);
+  assert.match(fn, /undoCleared\(\)/);
+});

@@ -2907,6 +2907,7 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "iPhone and iPad: « Continue with Apple » signs you in with your Apple Account, a hidden address included; an existing Benthic+ account with the same address is used. Deleting the account also revokes the access Apple gave Benthic.",
+      "New logbook on the device: it no longer keeps the sites of the sample logbook. An empty logbook no longer reports sites without a dive in Sites.",
       "Opening a .benthic file from another app (Files, mail, share sheet): it now goes through the same steps as “A file” — the first import on a new device, or “Replace this logbook?” — instead of being refused.",
       "Site maps: site names show sooner, from a view about 75 km wide, on the shared map and on the personal map.",
       "Certifications (Benthic+): each certification is drawn like the physical card (85.6 × 54 ratio, a gradient in the agency’s colours, pale waves along the bottom) with the agency, “Certification card”, the course title, your name, the number and the date; the whole card opens the certification. One column on the phone, several on tablet and desktop. The top of “My diver profile” has no back arrow.",

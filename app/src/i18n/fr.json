@@ -2907,6 +2907,7 @@
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
       "iPhone et iPad : « Continuer avec Apple » vous connecte avec votre identifiant Apple, y compris avec une adresse masquée ; un compte Benthic+ existant à la même adresse est repris. La suppression du compte révoque aussi l’accès donné à Benthic par Apple.",
+      "Nouveau carnet sur l’appareil : il ne garde plus les sites du carnet d’exemple. Un carnet vide n’annonce plus de sites sans plongée dans Sites.",
       "Ouverture d’un fichier .benthic depuis une autre application (Fichiers, courriel, partage) : il suit maintenant les mêmes étapes que « Un fichier » — la première importation sur un nouvel appareil, ou « Remplacer ce carnet ? » — au lieu d’être refusé.",
       "Cartes des sites : les noms des sites s’affichent plus tôt, dès une vue d’environ 75 km de large, sur la carte commune comme sur la carte personnelle.",
       "Brevets (Benthic+) : chaque brevet est dessiné comme la carte physique (ratio 85,6 × 54, dégradé aux couleurs de l’agence, vagues pâles en bas) avec l’agence, « Carte de brevet », le titre du cours, votre nom, le numéro et la date ; toute la carte ouvre le brevet. Une colonne sur téléphone, plusieurs sur tablette et ordinateur. Le haut de « Mon profil de plongeur » n’a pas de flèche de retour.",
