@@ -7474,3 +7474,15 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 Mock-ups: phone canvas, page Android, subgroup « Une page à onglets (proposition) »: « … haut de page », « … Équipement », « … Gaz », « … feuille du bas, Site »; desktop « Carnet · bureau (Windows, Linux) ».
 
 **Test:** on a phone, scroll a dive from top to bottom: the tabs stick and follow; tap « Gaz »: it scrolls there; change the site from the sheet and the date from the picker without leaving the page; ⋮ actions work. On the desktop, the Informations tab shows Date et heure and Signatures.
+
+## [ ] 2026-11-24-387 Dive detail, last pieces: computers with their photo, pSCR and portrait variants of « Gaz », iPhone versions
+
+Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/`. Completes tasks 382, 383 and 386 (to-dos #141 and #126 closed).
+
+1. **« Ordinateurs de plongée » card** (Équipement tab, tablet and phone, as the desktop already has it): heading icon = `Icon` `diveComputer`; each computer is a grey row with its photo tile (`GearIcon` with `piece`, the diver's photo or the catalog's), the model and « Principal · n° … »; « Ajouter un deuxième ordinateur » under it. Mock-ups: tablet « 05 · Détail, onglet Équipement » landscape and portrait, phone « … Équipement (proposition) ».
+2. **« Gaz » variants:** desktop « Carnet · bureau, détail, onglet Gaz, recycleur pSCR » (one-cylinder rebreather tile at 148 px, « Mélange », its fields, no setpoints, no SAC); tablet portrait boards for circuit ouvert, pSCR and apnée (short labels « Ouvert, CCR, pSCR, Apnée »). Same rules as task 382.
+3. **Signatures replace the old « validations » group** in the dive detail on every device (the Signatures card of tasks 382 and 386); nothing else remains of the old group.
+4. **iPhone dive detail** (same structure as the phone of task 386, iOS controls): navigation bar « ‹ Carnet » and the circled « … » menu; after the secondary facts, a segmented control « Infos, Équipement, Gaz, Notes, Carte » (« Infos » with the accessible name « Informations ») that sticks under the navigation bar, whose title becomes the site once scrolled; same cards. Editing in place uses iOS sheets and pickers. Mock-ups: « Détail, une page à onglets, haut de page (proposition) · iPhone », « Détail, onglets collés en haut, Gaz (proposition) · iPhone ».
+5. **iPhone « Décaler la date et l’heure »** (task 383 said « not drawn »): a page sheet with « Annuler », « Décaler l’heure », « Décaler » (bold) in its header, the explanation, a segmented « Plus tôt / Plus tard », one picker with three columns (« 0 j », « 1 h », « 05 min ») and a single selection band, the « Aperçu » group (first and last dive, old time struck through, new time bold) and the note on intervals. Mock-up: « Carnet, décaler la date et l’heure de plusieurs plongées · iPhone ».
+
+**Test:** a computer with a photo shows it in the card on tablet and phone; switch a dive to pSCR on the desktop and on a portrait tablet; on an iPhone, scroll a dive (the segmented control sticks) and shift two dives 1 h 05 later.
