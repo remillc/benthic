@@ -11,6 +11,8 @@
   // rounded rail, 48 high, with 4 inside padding; a pill slides from one choice to the next in 300 ms (none when
   // reduced motion is on); the chosen label turns white, no check mark; with `clearable`, the pill fades out when
   // the chosen choice is touched again. The same on every platform.
+  // Option `slider` (desktop Réglages, task 2026-11-24-388/392): the rail's behaviour, smaller: 4 padding, 20 corners,
+  // 32 high options at 14 px, the thumb black (--bc-ink) with white 600 text, sliding in 200 ms.
   // Accessibility: a radio group, roving tabindex, arrow keys move the choice.
 
   import Icon from './Icon.svelte';
@@ -26,9 +28,11 @@
    *   clearable?: boolean,
    *   marked?: boolean,
    *   rail?: boolean,
+   *   slider?: boolean,
    * }}
    */
-  let { options, value, onchange, ariaLabel, ariaLabelledby, class: extra = '', clearable = false, marked = false, rail = false } = $props();
+  let { options, value, onchange, ariaLabel, ariaLabelledby, class: extra = '', clearable = false, marked = false, rail: railProp = false, slider = false } = $props();
+  const rail = $derived(railProp || slider);
 
   /** @type {HTMLDivElement|undefined} */
   let group = $state();
@@ -52,7 +56,7 @@
   }
 </script>
 
-<div bind:this={group} class="bc-button-group {extra}" class:bc-button-group--marked={marked && !rail} class:bc-button-group--rail={rail} role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
+<div bind:this={group} class="bc-button-group {extra}" class:bc-button-group--marked={marked && !rail} class:bc-button-group--rail={rail} class:bc-button-group--slider={slider} role="radiogroup" aria-label={ariaLabel} aria-labelledby={ariaLabelledby}>
   {#if rail}
     <span class="bc-button-group--pill" class:bc-button-group--pill-hidden={selectedIndex < 0} style:width="calc((100% - 8px) / {options.length})" style:transform="translateX({lastIndex * 100}%)" aria-hidden="true"></span>
   {/if}
@@ -198,6 +202,33 @@
         transition: none;
       }
     }
+    /* The slider selector: a smaller rail with a black thumb. */
+    .bc-button-group--slider {
+      height: auto;
+      border-radius: 20px;
+      background: var(--bc-desktop-field);
+
+      .bc-button-group--pill {
+        height: 32px;
+        border-radius: 16px;
+        background: var(--bc-primary);
+        transition: transform 200ms cubic-bezier(0.2, 0, 0, 1);
+      }
+      .bc-button-group--button,
+      .bc-button-group--button.bc-button-group--selected {
+        min-height: 32px;
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 16px;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+      .bc-button-group--button.bc-button-group--selected {
+        color: var(--bc-on-primary);
+        font-weight: 600;
+      }
+    }
+
     /* iOS: a segmented control. */
     :global(.ios) .bc-button-group:not(.bc-button-group--rail) {
       gap: 2px;

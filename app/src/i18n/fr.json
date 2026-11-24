@@ -930,6 +930,9 @@
     "feet": "Pieds",
     "pressure": "Pression des bouteilles",
     "ppUnit": "Pressions partielles",
+    "ppUnitNote": "Seule l’étiquette change : 1,4 bar s’affiche 1,4 ATA",
+    "kilograms": "Kilogrammes",
+    "pounds": "Livres",
     "volume": "Volume",
     "volumeNoteCuft": "Aussi la consommation de gaz par minute (SAC, RMV) et la consommation métabolique d’O₂, en pi³/min",
     "volumeNoteLitres": "Aussi la consommation de gaz par minute (SAC, RMV) et la consommation métabolique d’O₂, en l/min",
@@ -994,11 +997,7 @@
     "redCeiling": "Plafond en rouge",
     "calcCeiling": {
       "label": "Plafond calculé",
-      "text": "Selon le modèle choisi dans Réglages › Décompression"
-    },
-    "tankbar": {
-      "label": "Bande des bouteilles",
-      "text": "Sous le profil, montre quelle bouteille est utilisée à chaque moment"
+      "text": "Calculé par le modèle de Réglages › Décompression, affiché en plus de celui de l’ordinateur"
     },
     "deco": {
       "warning": "Ces réglages changent les paliers et les limites calculés par l’app. Une mauvaise valeur expose à un accident de décompression.",
@@ -2840,6 +2839,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Ordinateur, Réglages : les choix courts de « Langue et formats » (format de la date, de l’heure, du papier) et des autres pages deviennent un sélecteur à curseur : un clic ou les flèches changent le choix, enregistré aussitôt. « Unités » reprend la présentation de la tablette : « Système d’unités » en boutons reliés, chaque unité sur une ligne dont la valeur est à droite et qui ouvre son menu ; l’explication passe sous la carte. « Pressions partielles » garde bar ou ATA.",
       "Dessin des bouteilles : le contour est plus fin (1,2 dans le dessin de 44 × 76, soit environ 1,2 px à 44 px de large et 1,75 px à 64 px), en clair comme en sombre.",
       "Téléchargement : « Autoriser le Bluetooth », « Autorisation refusée », « Bluetooth désactivé » et « Téléchargement échoué » reprennent la présentation des autres étapes : un disque de 96 px, un titre et un texte centrés, les boutons en bas (dans le pied de la fenêtre sur ordinateur). « Ouvrir les réglages » ouvre les réglages de l’app.",
       "Importer un fichier .benthic : « Un fichier » de « Importer un carnet » et le menu du carnet acceptent l’export complet. Le fichier est d’abord vérifié, fichier par fichier, contre ses empreintes ; s’il est incomplet, rien n’est importé. Sinon le carnet, l’équipement, le profil et les brevets sont importés d’un coup, et les informations personnelles sont chiffrées sur cet appareil. Pour remplacer un carnet, « Remplacer ce carnet ? » propose « Exporter d’abord ce carnet ».",
