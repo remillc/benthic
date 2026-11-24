@@ -2840,6 +2840,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Site maps: site names show sooner, from a view about 75 km wide, on the shared map and on the personal map.",
       "Cylinder drawing: the outline is thinner (1.2 in the 44 × 76 drawing, about 1.2 px at 44 px wide and 1.75 px at 64 px), in light and dark.",
       "Download: “Allow Bluetooth”, “Permission refused”, “Bluetooth is off” and “Download failed” follow the layout of the other steps: a 96 px disc, a centred title and text, the buttons at the bottom (in the dialog footer on the desktop). “Open settings” opens the app’s settings.",
       "Importing a .benthic file: “A file” in “Import a logbook” and the logbook menu accept the full export. The file is first checked, file by file, against its fingerprints; if it is incomplete, nothing is imported. Otherwise the logbook, equipment, profile and certifications are imported in one go, and personal information is encrypted on this device. To replace a logbook, “Replace this logbook?” offers “Export this logbook first”.",

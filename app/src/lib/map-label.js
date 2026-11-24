@@ -4,6 +4,12 @@
 // 1 plongée. Lake Coleridge au sud, 1 plongée ». The place is read from the
 // visible map: its middle third is « au centre », else one of eight directions.
 
+/**
+ * The zoom from which site names show on the maps (shared and personal, phone, tablet and desktop).
+ * 11 shows about 75 km across a phone screen; it was 13 (one town) until 24 November 2026.
+ */
+export const SITE_NAMES_FROM_ZOOM = 11;
+
 /** @typedef {'centre'|'north'|'northEast'|'east'|'southEast'|'south'|'southWest'|'west'|'northWest'} MapPlace */
 
 const AROUND = /** @type {MapPlace[]} */ (['east', 'northEast', 'north', 'northWest', 'west', 'southWest', 'south', 'southEast']);

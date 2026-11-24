@@ -12,6 +12,7 @@
   import { placeAt } from '../lib/place-lookup.js';
   import { createSiteMap, lngLatOf } from '../lib/desktop-map.js';
   import { stackPins } from '../lib/desktop-sites.js';
+  import { SITE_NAMES_FROM_ZOOM } from '../lib/map-label.js';
 
   /**
    * @type {{
@@ -123,7 +124,7 @@
       node.type = 'button';
       node.className = 'bc-desktop-site-map--shared';
       node.setAttribute('aria-label', site.name);
-      if (m.getZoom() >= Math.min(13, m.getMaxZoom())) {
+      if (m.getZoom() >= Math.min(SITE_NAMES_FROM_ZOOM, m.getMaxZoom())) {
         const label = el(site.name);
         label.className = 'bc-desktop-site-map--name';
         label.setAttribute('aria-hidden', 'true');

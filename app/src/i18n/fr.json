@@ -2840,6 +2840,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Cartes des sites : les noms des sites s’affichent plus tôt, dès une vue d’environ 75 km de large, sur la carte commune comme sur la carte personnelle.",
       "Dessin des bouteilles : le contour est plus fin (1,2 dans le dessin de 44 × 76, soit environ 1,2 px à 44 px de large et 1,75 px à 64 px), en clair comme en sombre.",
       "Téléchargement : « Autoriser le Bluetooth », « Autorisation refusée », « Bluetooth désactivé » et « Téléchargement échoué » reprennent la présentation des autres étapes : un disque de 96 px, un titre et un texte centrés, les boutons en bas (dans le pied de la fenêtre sur ordinateur). « Ouvrir les réglages » ouvre les réglages de l’app.",
       "Importer un fichier .benthic : « Un fichier » de « Importer un carnet » et le menu du carnet acceptent l’export complet. Le fichier est d’abord vérifié, fichier par fichier, contre ses empreintes ; s’il est incomplet, rien n’est importé. Sinon le carnet, l’équipement, le profil et les brevets sont importés d’un coup, et les informations personnelles sont chiffrées sur cet appareil. Pour remplacer un carnet, « Remplacer ce carnet ? » propose « Exporter d’abord ce carnet ».",

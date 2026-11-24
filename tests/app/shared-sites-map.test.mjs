@@ -27,7 +27,9 @@ test('the shared map hides dive counts without changing the personal map or site
 
 test('shared and personal pin names follow the same zoom threshold, with site clusters', () => {
   const map = read('components/SiteMap.svelte');
-  assert.match(map, /namesFromZoom = 13/);
+  assert.match(read('lib/map-label.js'), /export const SITE_NAMES_FROM_ZOOM = 11;/);
+  assert.match(map, /namesFromZoom = SITE_NAMES_FROM_ZOOM/);
+  assert.match(read('components/DesktopSiteMap.svelte'), /m\.getZoom\(\) >= Math\.min\(SITE_NAMES_FROM_ZOOM, m\.getMaxZoom\(\)\)/);
   assert.match(map, /map\.getZoom\(\) >= Math\.min\(namesFromZoom, map\.getMaxZoom\(\)\)/);
   assert.match(map, /names === 'atZoomOrFewInFullScreen'/);
   assert.match(map, /text\.className = 'bc-site-map--base-name'/);

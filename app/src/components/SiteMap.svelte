@@ -11,7 +11,7 @@
   import { loadMapLibre } from '../lib/maplibre.js';
   import { onMount, onDestroy, tick } from 'svelte';
   import { t } from '../lib/i18n.js';
-  import { mapLabel } from '../lib/map-label.js';
+  import { mapLabel, SITE_NAMES_FROM_ZOOM } from '../lib/map-label.js';
   import { createHeatScale, rgb, SPOT_GRADIENTS, SPOT_OPACITY, spotKind, spotRadius } from '../lib/heat-density.js';
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
@@ -102,7 +102,7 @@
     muted = false,
     label: givenLabel,
     names = 'always',
-    namesFromZoom = 13,
+    namesFromZoom = SITE_NAMES_FROM_ZOOM,
     hideDiveCounts = false,
     groupSites = false,
     selected = null,
