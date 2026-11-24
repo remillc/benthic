@@ -2934,7 +2934,13 @@ try {
     // The desktop dive detail's Équipement tab, one card per section (tests/e2e/desktop-equipment.mjs).
     ['desktop equipment', '--equipment-only', 25, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopEquipmentFlows({ ...harness, shot })],
     // The import of a .benthic file, on every device (tests/e2e/benthic-import-flow.mjs).
-    ['benthic import', '--benthic-import-only', 90, !phoneOnly && !tabletOnly && !welcomeOnly, () => benthicImportFlows({ ...harness, shot, work, core, seeded })],
+    ['benthic import', '--benthic-import-only', 90, !phoneOnly && !tabletOnly && !welcomeOnly, async () => {
+      try { await benthicImportFlows({ ...harness, shot, work, core, seeded }); } finally {
+        // The « Remplacer » flows leave the harness core with the file's dives (no cylinders); the blocks that follow in this process
+        // (cylinder types, ...) expect the sample logbook, which is loaded again into the same repository (the app reopens it at start).
+        await core('importFile', { source: seeded, repo: `${path.join(home, 'carnet')}[main]` });
+      }
+    }],
     // The desktop logbook's list header at several column widths (tests/e2e/desktop-list-header.mjs).
     ['desktop list header', '--list-header-only', 25, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopListHeaderFlows({ ...harness, shot })],
     // Settings › Équipement › Types de bouteilles: one list, the chips, a new type, its deletion (tests/e2e/cylinder-types.mjs).
