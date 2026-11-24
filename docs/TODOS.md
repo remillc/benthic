@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 196
+Next number: 197
 
 ## List
 
@@ -47,3 +47,4 @@ Next number: 196
 - #186 [code] Notifications push des demandes d’accès (tâche 356) : clés à fournir par Christian, puis configuration du serveur. Le serveur sait déjà envoyer (FCM et APNs) ; sans clés, il n’envoie rien. (1) Android, Firebase : créer un projet avec l’app Android `app.benthicdivelog` et activer l’API Firebase Cloud Messaging ; télécharger `google-services.json`, à placer dans `app/android/app/` ; créer une clé de compte de service (Project settings › Service accounts › Generate new private key), à placer dans `F:projetsenthic-server.datapushirebase.json`. (2) iPhone, Apple (compte déverrouillé le 24 nov.) : App ID `app.benthicdivelog` avec la capacité Push Notifications ; une clé APNs `.p8` (téléchargeable une seule fois), son Key ID et le Team ID ; la clé va dans `.data/push/`. (3) Serveur : dans `.env`, `FCM_SERVICE_ACCOUNT_FILE=/run/push/firebase.json`, `APNS_KEY_FILE=/run/push/AuthKey_<KeyID>.p8`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_ENV=sandbox` (ou `production`), puis redémarrer le conteneur `api`. Ces fichiers sont secrets : jamais dans git. (4) Production : `FORGEJO_WEBHOOK_SECRET` fixé, `API_INTERNAL_URL` vers l’API par le réseau interne, `ALLOWED_HOST_LIST` de Forgejo limité à ce seul hôte, proxy sans mise en tampon avec des lectures inactives de plus de 25 s, et `/v1/hooks/` bloqué depuis l’extérieur (seul Forgejo l’appelle). Détails : `docs/push-events.md` du dépôt benthic-server.
 - #194 [design] identifier les use cases pour la renumérotation des plongées.
 - #195 [design] réévaluer la pertinence de synchroniser les photos et vidéos. L'alternative est de les garder sur le serveur et les servir à la demande. Ça pose problème cependant pour exporter un fichier .benthic.
+- #196 [design] stratégie de campagne de communication et publicité pour rejoindre les potentiels acheteurs de l’app.
