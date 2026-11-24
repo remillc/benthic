@@ -4,6 +4,7 @@
 // the country and the region, the dives without a site and the clean-up counts. Plain
 // functions, no framework: tested in tests/app/desktop-sites.test.mjs. The reads and writes
 // themselves go through the core (lib/sites.svelte.js).
+import { cleanupPointCount } from './site-cleanup.js';
 import { normalise, highlightParts } from './site-search.js';
 import { defaultKeeper } from './site-merge.js';
 
@@ -114,23 +115,15 @@ export function reduceSelection(state, event, uuid) {
 }
 
 /**
- * The bar above the table: « 5 plongées sans site » (task 175). Null when no dive lacks a site,
- * and while a search is typed.
- * @param {number} withoutSite @param {boolean} searching
- * @returns {{ count: number }|null}
+ * The bar above the table: « 3 points à régler · Nettoyer les sites » (task 2026-11-24-395), one for the four
+ * problems of the clean-up (possible duplicates, sites without a dive, dives without a site, sites without
+ * coordinates). Null when none exists, and while a search is typed.
+ * @param {{ duplicates: number, unused: number, without: number, unplaced: number }} counts @param {boolean} searching
+ * @returns {{ points: number }|null}
  */
-export function withoutSiteBar(withoutSite, searching) {
-  return withoutSite > 0 && !searching ? { count: withoutSite } : null;
-}
-
-/**
- * The second bar: possible duplicates and sites without a dive (task 177, 8). Null when there
- * are none of either, and while a search is typed.
- * @param {number} duplicates @param {number} unused @param {boolean} searching
- * @returns {{ duplicates: number, unused: number }|null}
- */
-export function cleanupBar(duplicates, unused, searching) {
-  return (duplicates > 0 || unused > 0) && !searching ? { duplicates, unused } : null;
+export function cleanupBar(counts, searching) {
+  const points = cleanupPointCount(counts);
+  return points > 0 && !searching ? { points } : null;
 }
 
 /**

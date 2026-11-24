@@ -3,6 +3,7 @@
 // Usage policy: at most one request per second for the whole app.
 
 export const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
+export const NOMINATIM_SEARCH_URL = 'https://nominatim.openstreetmap.org/search';
 /** The policy's absolute maximum is 1 request per second; a margin on top. */
 export const NOMINATIM_GAP_MS = 1100;
 
