@@ -2473,6 +2473,35 @@
       "other": "{n} plongées modifiées"
     },
     "editFailed": "Les plongées n'ont pas pu être modifiées. Aucune plongée n'a été modifiée.",
+    "tabs": "Rubriques",
+    "none": "aucun",
+    "rating": "Note",
+    "visibility": "Visibilité",
+    "kit": "Kit",
+    "kitNote": "Choisir un kit remplit la combinaison, le lest et l’autre équipement de chaque plongée.",
+    "kitNone": "Aucun kit",
+    "suit": "Combinaison",
+    "weight": "Lest",
+    "diveType": "Type de plongée",
+    "modes": {
+      "OC": "Circuit ouvert",
+      "CCR": "Recycleur CCR",
+      "PSCR": "Recycleur pSCR",
+      "Freedive": "Apnée"
+    },
+    "modesShort": {
+      "OC": "Ouvert",
+      "CCR": "CCR",
+      "PSCR": "pSCR",
+      "Freedive": "Apnée"
+    },
+    "modeNote": "Changer le type ne supprime aucune bouteille : les bouteilles et les pressions restent propres à chaque plongée.",
+    "modeMany": "Plusieurs valeurs : {spread}",
+    "appendNotes": "Ajouter aux notes",
+    "appendNotesHint": "Texte ajouté à la fin des notes de chaque plongée",
+    "appendNotesNote": "Le texte s’ajoute sous les notes de chaque plongée, sur une nouvelle ligne. Il ne remplace rien.",
+    "footnote": "La date, la durée, la profondeur, les bouteilles et le voyage restent propres à chaque plongée.",
+    "footnotePhone": "La date, la durée, la profondeur, le profil, les bouteilles et le voyage restent propres à chaque plongée. « Enregistrer » applique tout en une fois, et la notification « {done} · Annuler » permet de revenir en arrière.",
     "loadFailed": "Les plongées n'ont pas pu être lues."
   },
   "shiftTime": {
@@ -3407,7 +3436,8 @@
       "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet.",
       "Tablette : sur la page d’accueil du profil, Informations s’ouvre à côté de la liste dès le démarrage, sans erreur de navigation signalée.",
       "Tablette : choisir le Carnet pendant que Réglages est ouvert ferme Réglages d’abord, sans laisser l’écran du compte vide.",
-      "Carnet : « Décaler la date et l’heure… », dans le menu des plongées cochées (⋮ sur téléphone et tablette, clic droit sur ordinateur), avance ou recule le départ de toutes les plongées choisies de la même durée : trois molettes (jours, heures, minutes), un aperçu de la première et de la dernière plongée, et « Annuler » dans la notification."
+      "Carnet : « Décaler la date et l’heure… », dans le menu des plongées cochées (⋮ sur téléphone et tablette, clic droit sur ordinateur), avance ou recule le départ de toutes les plongées choisies de la même durée : trois molettes (jours, heures, minutes), un aperçu de la première et de la dernière plongée, et « Annuler » dans la notification.",
+      "Carnet : « Modifier ensemble… » range ses champs en quatre onglets (Informations, Équipement, Gaz, Notes) et ajoute la visibilité, le kit (Benthic+), le lest, le type de plongée et « Ajouter aux notes » ; sous un champ dont les valeurs diffèrent, le détail (« Taylor (1), aucun (2) ») ; le sous-titre n’est plus que les numéros des plongées, et « Appliquer aux N plongées » est en bleu. Sur tablette, la fenêtre remplace la feuille plein écran."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

@@ -2473,6 +2473,35 @@
       "other": "{n} dives edited"
     },
     "editFailed": "The dives could not be edited. No dive was changed.",
+    "tabs": "Sections",
+    "none": "none",
+    "rating": "Rating",
+    "visibility": "Visibility",
+    "kit": "Kit",
+    "kitNote": "Choosing a kit fills each dive’s suit, weights and other equipment.",
+    "kitNone": "No kit",
+    "suit": "Suit",
+    "weight": "Weights",
+    "diveType": "Dive type",
+    "modes": {
+      "OC": "Open circuit",
+      "CCR": "CCR rebreather",
+      "PSCR": "pSCR rebreather",
+      "Freedive": "Freediving"
+    },
+    "modesShort": {
+      "OC": "Open",
+      "CCR": "CCR",
+      "PSCR": "pSCR",
+      "Freedive": "Free"
+    },
+    "modeNote": "Changing the type removes no cylinder: the cylinders and pressures stay specific to each dive.",
+    "modeMany": "Several values: {spread}",
+    "appendNotes": "Add to the notes",
+    "appendNotesHint": "Text added at the end of each dive’s notes",
+    "appendNotesNote": "The text is added under each dive’s notes, on a new line. It replaces nothing.",
+    "footnote": "The date, duration, depth, cylinders and trip stay specific to each dive.",
+    "footnotePhone": "The date, duration, depth, profile, cylinders and trip stay specific to each dive. “Save” applies everything at once, and the “{done} · Undo” notification takes it back.",
     "loadFailed": "The dives could not be read."
   },
   "shiftTime": {
@@ -3407,7 +3436,8 @@
       "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen.",
       "Tablet: on the profile home, Information opens beside the list from the start, with no navigation error reported.",
       "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty.",
-      "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification."
+      "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification.",
+      "Logbook: “Edit together…” groups its fields in four tabs (Information, Equipment, Gas, Notes) and adds visibility, the kit (Benthic+), weights, the dive type and “Add to the notes”; under a field whose values differ, the spread (“Taylor (1), none (2)”); the subtitle is only the dive numbers, and “Apply to N dives” is blue. On a tablet, the dialog replaces the full-screen sheet."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

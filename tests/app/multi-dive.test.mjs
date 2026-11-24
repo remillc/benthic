@@ -149,3 +149,61 @@ test('guides go through the diveguide keys', () => {
   assert.deepEqual(multiEditChanges(state, { guides: [] }), { diveguideRemove: ['Zoe'] });
   assert.deepEqual(multiEditChanges(state, { guides: ['Zoe', 'Yan'] }), { diveguideAdd: ['Yan'] });
 });
+
+// --- Tabs and new fields (tasks 2026-11-24-384 and 385) ----------------------------------------------------------------
+
+import { spreadOf, spreadText } from '../../app/src/lib/multi-dive.js';
+
+/** A dive as the core's getDive gives it, with the fields « Modifier ensemble » reads. */
+const diveDetail = (over = {}) => ({
+  site: '', notes: '', suit: '', userSalinity: 0, buddies: [], guides: [], tags: [], rating: 0, visibility: 0, divemode: 'OC', weights: [],
+  ...over,
+});
+
+test('the state holds note, visibility, dive mode and the total weight, mixed or shared', () => {
+  const state = multiEditState([
+    diveDetail({ rating: 3, visibility: 4, divemode: 'CCR', weights: [{ grams: 8000, description: 'belt' }, { grams: 4000, description: 'integrated' }] }),
+    diveDetail({ rating: 3, visibility: 2, divemode: 'OC', weights: [{ grams: 12000, description: 'belt' }] }),
+  ]);
+  assert.deepEqual(state.rating, { mixed: false, value: 3 });
+  assert.equal(state.visibility.mixed, true);
+  assert.equal(state.mode.mixed, true);
+  assert.deepEqual(state.weight, { mixed: false, value: 12000 }, 'two weight entries are one total');
+  assert.deepEqual(multiEditState([diveDetail(), diveDetail({ divemode: '' })]).mode, { mixed: false, value: 'OC' }, 'no mode is open circuit');
+});
+
+test('the spread names each value once with the number of dives, in the order they first appear', () => {
+  assert.deepEqual(spreadOf(['Taylor', '', '']), [{ value: 'Taylor', count: 1 }, { value: '', count: 2 }]);
+  assert.equal(spreadText(['Taylor', '', ''], (v) => v || 'aucun'), 'Taylor (1), aucun (2)');
+  assert.equal(spreadText([12000, 12000, 14000], (g) => `${g / 1000} kg`), '12 kg (2), 14 kg (1)');
+  assert.equal(spreadText(['OC', 'OC', 'CCR'], (m) => m), 'OC (2), CCR (1)');
+});
+
+test('the new fields are sent only when they are touched and differ, or when the dives differ', () => {
+  const state = multiEditState([
+    diveDetail({ rating: 3, visibility: 4, divemode: 'CCR', weights: [{ grams: 12000, description: 'belt' }] }),
+    diveDetail({ rating: 3, visibility: 2, divemode: 'CCR', weights: [{ grams: 12000, description: 'belt' }] }),
+  ]);
+  // Same note, same mode and same weight on both dives: giving them back is no change.
+  assert.deepEqual(multiEditChanges(state, { rating: 3, mode: 'CCR', weightGrams: 12000 }), {});
+  // Visibility differs: even the value of the first dive is a change for the second.
+  assert.deepEqual(multiEditChanges(state, { visibility: 4 }), { visibility: 4 });
+  assert.deepEqual(multiEditChanges(state, { rating: 5, mode: 'PSCR', weightGrams: 9000 }), { rating: 5, divemode: 'PSCR', weightGrams: 9000 });
+  // Clearing the stars sends 0.
+  assert.deepEqual(multiEditChanges(state, { rating: 0 }), { rating: 0 });
+});
+
+test('« Ajouter aux notes » is sent as a text to append, trimmed, and nothing when empty', () => {
+  const state = multiEditState([diveDetail({ notes: 'a' }), diveDetail({ notes: 'b' })]);
+  assert.deepEqual(multiEditChanges(state, { notesAppend: '  Mer calme\n' }), { notesAppend: 'Mer calme' });
+  assert.deepEqual(multiEditChanges(state, { notesAppend: '   ' }), {});
+  assert.deepEqual(multiEditChanges(state, {}), {});
+});
+
+test('the subtitle is only the dive numbers, the most recent first', async () => {
+  const { subtitleOf } = await import('../../app/src/lib/multi-dive.js');
+  const text = (dives) => subtitleOf(dives).replace(/[\u00a0\u202f]/g, ' ');
+  assert.equal(text([{ number: 7, date: '2026-02-07T09:00:00' }, { number: 9, date: '2026-09-14T10:15:00' }, { number: 8, date: '2026-06-30T13:40:00' }]), 'N° 9, 8 et 7');
+  assert.equal(text([{ number: 6, date: '2015-05-23T13:23:00' }, { number: 7, date: '2022-04-24T10:30:00' }]), 'N° 7 et 6');
+  assert.equal(text([{ number: 0, date: '2026-02-07T09:09:00' }]), '2026-02-07T09:09');
+});

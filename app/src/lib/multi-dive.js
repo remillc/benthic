@@ -4,6 +4,8 @@
 // tablet and the desktop. The actions themselves are `mergeDives` and
 // `editDivesTogether` of lib/logbook.svelte.js, which call the core.
 
+import { numbersText } from './backup-text.js';
+
 /** @typedef {import('benthic-core').Dive} Dive */
 /** @typedef {import('benthic-core').DiveDetail} DiveDetail */
 
@@ -82,6 +84,10 @@ export function canMerge(dives, ids) {
  * @property {MultiField<string>} notes
  * @property {MultiField<string>} suit
  * @property {MultiField<number>} salinity the water type chosen by the diver (kg per 10000 L; 0: none)
+ * @property {MultiField<number>} rating the stars of « Note » (0: not filled in)
+ * @property {MultiField<number>} visibility the stars of « Visibilité » (0: not filled in)
+ * @property {MultiField<string>} mode the dive mode: OC, CCR, PSCR or Freedive
+ * @property {MultiField<number>} weight the total weight in grams (0: none)
  * @property {MultiChip[]} buddies
  * @property {MultiChip[]} guides
  * @property {MultiChip[]} tags
@@ -123,6 +129,10 @@ export function multiEditState(details) {
     notes: field(details.map((d) => d.notes)),
     suit: field(details.map((d) => d.suit)),
     salinity: field(details.map((d) => d.userSalinity)),
+    rating: field(details.map((d) => d.rating ?? 0)),
+    visibility: field(details.map((d) => d.visibility ?? 0)),
+    mode: field(details.map((d) => d.divemode || 'OC')),
+    weight: field(details.map((d) => (d.weights ?? []).reduce((sum, w) => sum + (w.grams ?? 0), 0))),
     buddies: chipsOf(details.map((d) => d.buddies)),
     guides: chipsOf(details.map((d) => d.guides)),
     tags: chipsOf(details.map((d) => d.tags)),
@@ -137,6 +147,11 @@ export function multiEditState(details) {
  * @property {string} [notes]
  * @property {string} [suit]
  * @property {number} [salinity] the water type (0: none)
+ * @property {number} [rating] the stars of « Note » (0 clears)
+ * @property {number} [visibility] the stars of « Visibilité » (0 clears)
+ * @property {string} [mode] the dive mode (OC, CCR, PSCR, Freedive); no cylinder is touched
+ * @property {number} [weightGrams] the total weight (0 clears)
+ * @property {string} [notesAppend] a text added on a new line at the end of each dive's notes
  * @property {string[]} [buddies]
  * @property {string[]} [guides]
  * @property {string[]} [tags]
@@ -163,6 +178,13 @@ export function multiEditChanges(state, edits) {
   if (edits.salinity !== undefined && (state.salinity.mixed || edits.salinity !== state.salinity.value)) {
     changes.userSalinity = edits.salinity;
   }
+  for (const key of /** @type {const} */ (['rating', 'visibility'])) {
+    const value = edits[key];
+    if (value !== undefined && (state[key].mixed || value !== state[key].value)) changes[key] = value;
+  }
+  if (edits.mode !== undefined && (state.mode.mixed || edits.mode !== state.mode.value)) changes.divemode = edits.mode;
+  if (edits.weightGrams !== undefined && (state.weight.mixed || edits.weightGrams !== state.weight.value)) changes.weightGrams = edits.weightGrams;
+  if (edits.notesAppend?.trim()) changes.notesAppend = edits.notesAppend.trim();
   for (const [key, prefix] of /** @type {const} */ ([
     ['buddies', 'buddies'],
     ['guides', 'diveguide'],
@@ -177,4 +199,39 @@ export function multiEditChanges(state, edits) {
     if (removed.length) changes[`${prefix}Remove`] = removed;
   }
   return changes;
+}
+
+/**
+ * The values of a field across the dives, each with the number of dives that have it, in the order they first appear (the
+ * caller lists the dives as the logbook shows them, the most recent first): the « Taylor (1), aucun (2) » line under a field whose dives differ.
+ * @template T
+ * @param {T[]} values one per dive
+ * @returns {{ value: T, count: number }[]}
+ */
+export function spreadOf(values) {
+  /** @type {Map<T, number>} */
+  const counts = new Map();
+  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return [...counts].map(([value, count]) => ({ value, count }));
+}
+
+/**
+ * « Taylor (1), aucun (2) »: the spread of a field written out.
+ * @template T
+ * @param {T[]} values one per dive
+ * @param {(value: T) => string} label the text of a value (the caller names the empty one)
+ */
+export function spreadText(values, label) {
+  return spreadOf(values)
+    .map(({ value, count }) => `${label(value)} (${count})`)
+    .join(', ');
+}
+
+/**
+ * « N° 9, 8 et 7 »: the numbers of the dives, the most recent first (a dive without a number is named by its date).
+ * @param {{ date: string, number: number }[]} dives
+ */
+export function subtitleOf(dives) {
+  const listed = [...dives].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.number - a.number));
+  return numbersText(listed.map((d) => ({ number: d.number > 0 ? d.number : null, key: d.date })));
 }
