@@ -64,7 +64,7 @@ test('an account without a subscription keeps nothing on the device', () => {
   assert.match(source.slice(offer, save), /goOffer\(\);\s*return;/);
 });
 
-test('Google, Apple and the purchase are inert: one function each, nothing is bought or created', async () => {
+test('Google and the purchase are inert, Apple without the plugin too: one function each, nothing is bought or created', async () => {
   assert.deepEqual(await signInWithGoogle(), { status: 'unavailable' });
   assert.deepEqual(await signInWithApple(), { status: 'unavailable' });
   assert.deepEqual(await purchaseSubscription(), { status: 'unavailable' });
@@ -133,4 +133,38 @@ test('the server screens no longer draw the « Serveur Benthic » overline, and 
   const source = read('components/FirstLaunchServer.svelte');
   assert.doesNotMatch(source, /overline/);
   assert.match(source, /bc-first-launch-server--tile \{[^}]*align-self: center/s);
+});
+
+test('« Continuer avec Apple »: a fresh nonce, its SHA-256 to Apple, the token and the raw nonce to the server', async () => {
+  const { createHash } = await import('node:crypto');
+  /** @type {any[]} */
+  const asked = [];
+  const done = await signInWithApple(async (o) => {
+    asked.push(o);
+    return { action: 'done', identityToken: 'id.tok.en', authorizationCode: 'code-1', email: '', givenName: 'Ana', familyName: 'Lima' };
+  });
+  assert.equal(done.status, 'signedIn');
+  if (done.status !== 'signedIn') return;
+  assert.match(done.nonce ?? '', /^[0-9a-f]{64}$/);
+  assert.equal(asked[0].nonceHash, createHash('sha256').update(done.nonce ?? '').digest('hex'));
+  assert.deepEqual({ ...done, nonce: '' }, { status: 'signedIn', idToken: 'id.tok.en', nonce: '', authorizationCode: 'code-1', name: 'Ana Lima' });
+  const again = await signInWithApple(async () => ({ action: 'cancelled' }));
+  assert.deepEqual(again, { status: 'cancelled' });
+  assert.deepEqual(await signInWithApple(async () => ({ action: 'failed', message: 'x' })), { status: 'failed' });
+  assert.deepEqual(await signInWithApple(async () => { throw new Error('no window'); }), { status: 'failed' });
+  // Two requests never share a nonce.
+  const nonces = new Set();
+  for (let i = 0; i < 3; i++) {
+    const r = await signInWithApple(async () => ({ action: 'done', identityToken: 't', authorizationCode: '', email: '', givenName: '', familyName: '' }));
+    if (r.status === 'signedIn') nonces.add(r.nonce);
+  }
+  assert.equal(nonces.size, 3);
+  // The screen: Apple only through the plugin on iOS, a subscriber's session kept, the offer otherwise.
+  const screen = read('components/FirstLaunchBenthicPlus.svelte');
+  assert.match(screen, /signInWithApple\(ios \? \(o\) => BenthicCore\.appleSignIn\(o\) : undefined\)/);
+  const call = screen.indexOf('.signInApple(');
+  const offer = screen.indexOf("afterSignIn(session.user) === 'offer'", call);
+  const save = screen.indexOf('serverSessionSave', call);
+  assert.ok(call > 0 && offer > call && save > offer, 'the offer is chosen before the session is saved');
+  for (const lang of ['fr', 'en']) assert.ok(langs[lang].benthicPlus.providerFailed, `${lang}: providerFailed`);
 });

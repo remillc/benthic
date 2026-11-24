@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   # Put in place by native/ios/prepare-app.sh.
   s.vendored_frameworks = 'ios/BenthicCore.xcframework'
-  s.frameworks = 'CoreBluetooth', 'BackgroundTasks', 'Network', 'AVFoundation', 'HealthKit'
+  s.frameworks = 'CoreBluetooth', 'BackgroundTasks', 'Network', 'AVFoundation', 'HealthKit', 'AuthenticationServices'
   s.libraries = 'z', 'iconv', 'c++'
   s.pod_target_xcconfig = {
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',

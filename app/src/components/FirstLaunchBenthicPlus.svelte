@@ -3,8 +3,8 @@
   // The Benthic+ screens of the release edition (task 2026-11-17-265; mock-ups docs/mockups-release/
   // android-odplus-connexion, -offre, -pret and -abonne): « Se connecter ou créer un compte », the offer, « Votre carnet
   // est prêt » and « Bienvenue dans Benthic+ ! ». There is no free account: an account exists only for a diver who
-  // subscribed. The sign-in with Google or Apple and the purchase need native parts that are not wired yet: their
-  // buttons call the one function each of lib/benthic-plus-billing.js, which answers « unavailable » for now.
+  // subscribed. Each provider button and the purchase call one function of lib/benthic-plus-billing.js: Apple works on
+  // iPhone and iPad; Google and the purchase need native parts that are not wired yet and answer « unavailable ».
   import { onMount } from 'svelte';
   import Icon from './Icon.svelte';
   import BenthicPlusChip from './BenthicPlusChip.svelte';
@@ -23,6 +23,10 @@
   import { ACTIVATED, BENEFITS, afterSignIn, includedGroups, providerOrder, summaryRows } from '../lib/benthic-plus.js';
   import { purchaseSubscription, restorePurchases, signInWithApple, signInWithGoogle } from '../lib/benthic-plus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
+  import { BenthicCore } from 'benthic-core';
+  import { createServerApi } from '../lib/server-api.js';
+  import { serverTransport } from '../lib/server-transport.js';
+  import { serverUrl } from '../lib/server-url.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -92,10 +96,40 @@
       devOpen = true;
       return;
     }
-    const answer = await (provider === 'google' ? signInWithGoogle() : signInWithApple());
-    if (answer.status === 'unavailable') showSnackbar(t('benthicPlus.providerUnavailable', { provider: provider === 'google' ? 'Google' : 'Apple' }));
-    // To wire: a signed-in answer goes to the server's sign-in call, then to the download or the offer.
+    if (signingIn) return;
+    signingIn = true;
+    const name = provider === 'google' ? 'Google' : 'Apple';
+    try {
+      const answer = await (provider === 'google' ? signInWithGoogle() : signInWithApple(ios ? (o) => BenthicCore.appleSignIn(o) : undefined));
+      if (answer.status === 'unavailable') showSnackbar(t('benthicPlus.providerUnavailable', { provider: name }));
+      else if (answer.status === 'failed') showSnackbar(t('benthicPlus.providerFailed', { provider: name }));
+      if (answer.status !== 'signedIn' || provider !== 'apple') return;
+      const session = await createServerApi({ baseUrl: serverUrl(), transport: serverTransport }).signInApple({
+        idToken: answer.idToken, nonce: answer.nonce ?? '', authorizationCode: answer.authorizationCode, name: answer.name,
+      });
+      flow.plus.email = session.user.email;
+      // As the e-mail sign-in: an account without a subscription goes to the offer, and nothing of it is kept on this device.
+      if (afterSignIn(session.user) === 'offer') {
+        goOffer();
+        return;
+      }
+      await BenthicCore.serverSessionSave({
+        email: session.user.email,
+        sessionToken: session.sessionToken,
+        repositoryUrl: session.repository.url,
+        branch: session.repository.branch || 'main',
+        gitUsername: session.git.username,
+        gitToken: session.git.token,
+      });
+      goDownload();
+    } catch (e) {
+      console.error('Apple sign-in on the server', e);
+      showSnackbar(t('benthicPlus.providerFailed', { provider: name }));
+    } finally {
+      signingIn = false;
+    }
   }
+  let signingIn = false;
 
   // Development only: the sheet of the simulated Google sign-in, and what it does with the answer.
   let devOpen = $state(false);

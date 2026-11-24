@@ -94,6 +94,12 @@ export { waterTypeOf };
  */
 
 /**
+ * What Apple's sheet answered. `email`, `givenName` and `familyName` are '' except on the account's first sign-in.
+ * @typedef {{action: 'cancelled'|'unavailable'} | {action: 'failed', message: string}
+ *   | {action: 'done', identityToken: string, authorizationCode: string, email: string, givenName: string, familyName: string}} AppleSignInResult
+ */
+
+/**
  * A piece of text found in a picture; the box is in fractions (0 to 1) of the analysed picture.
  * @typedef {{text: string, left: number, top: number, right: number, bottom: number, confidence: number}} GaugeTextBlock
  */
@@ -867,6 +873,10 @@ export { waterTypeOf };
  * @property {(options: QrScanOptions) => Promise<QrScanResult>} qrScan
  *   The full-screen camera that reads the QR codes of a dive or a plan (see QrScanResult).
  *   Android: ML Kit; iOS: AVFoundation. Asks the camera permission itself.
+ * @property {(options: {nonceHash: string}) => Promise<AppleSignInResult>} appleSignIn
+ *   Sign in with Apple: Apple's sheet, with `nonceHash` (SHA-256 of the app's nonce, hexadecimal) in the request. iOS:
+ *   AuthenticationServices; Android and the desktop answer {action: 'unavailable'}. Nothing is kept on the device: the app
+ *   sends the identity token and the raw nonce to the Benthic server. Rejects with BAD_ARGUMENT without `nonceHash`.
  * @property {() => Promise<{action: 'cancelled'|'unavailable'|'done', image?: string, text?: string}>} scanDocument
  *   The system document scanner for a certification card, then text recognition on the device. Android: ML Kit
  *   Document Scanner + ML Kit Text Recognition; iOS: VisionKit + Vision. `image` is a base64 JPEG, `text` the
@@ -1243,6 +1253,7 @@ export const BenthicCore = {
   readSharedFile: (options) => native.readSharedFile(options),
   gaugeCamera: (options) => native.gaugeCamera(options),
   qrScan: (options) => native.qrScan(options),
+  appleSignIn: (options) => native.appleSignIn(options),
   scanDocument: () => native.scanDocument(),
   keepScreenAwake: (options) => native.keepScreenAwake(options),
   healthDives: (options) => native.healthDives(options),

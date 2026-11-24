@@ -2906,6 +2906,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "iPhone and iPad: « Continue with Apple » signs you in with your Apple Account, a hidden address included; an existing Benthic+ account with the same address is used. Deleting the account also revokes the access Apple gave Benthic.",
       "New logbook on the device: it no longer keeps the sites of the sample logbook. An empty logbook no longer reports sites without a dive in Sites.",
       "Opening a .benthic file from another app (Files, mail, share sheet): it now goes through the same steps as “A file” — the first import on a new device, or “Replace this logbook?” — instead of being refused.",
       "Site maps: site names show sooner, from a view about 75 km wide, on the shared map and on the personal map.",
@@ -5813,6 +5814,7 @@
     "chip": "Benthic+",
     "chipName": "Benthic Plus",
     "providerUnavailable": "Signing in with {provider} is not available yet. Use your e-mail address.",
+    "providerFailed": "Signing in with {provider} did not work. Try again or use your e-mail address.",
     "purchaseUnavailable": "Subscribing is not available in this version yet.",
     "connect": {
       "title": "Sign in or create an account",

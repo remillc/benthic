@@ -1151,6 +1151,11 @@ export class BenthicCoreDesktop extends WebPlugin {
     throw unavailable('The QR scanner');
   }
 
+  /** Sign in with Apple exists on iPhone and iPad only. */
+  async appleSignIn() {
+    return { action: 'unavailable' };
+  }
+
   async scanDocument() {
     throw unavailable('The document scanner');
   }

@@ -119,6 +119,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "qrScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "scanDocument", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "appleSignIn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "keepScreenAwake", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "installSource", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "requestReview", returnType: CAPPluginReturnPromise),
@@ -1657,6 +1658,22 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
                 }
             }
             host.present(scanner, animated: true)
+        }
+    }
+
+    /// Sign in with Apple (AppleSignIn): Apple's sheet, with the SHA-256 of the app's nonce in the request.
+    /// Resolves with {action: "cancelled"}, {action: "failed", message} or {action: "done", identityToken, ...}.
+    @objc func appleSignIn(_ call: CAPPluginCall) {
+        guard let nonceHash = call.getString("nonceHash"), !nonceHash.isEmpty else {
+            call.reject("nonceHash is required", "BAD_ARGUMENT")
+            return
+        }
+        DispatchQueue.main.async { [self] in
+            guard let window = bridge?.viewController?.view.window else {
+                call.reject("No screen to show the sign-in", "FAILED")
+                return
+            }
+            AppleSignIn(anchor: window) { result in call.resolve(result) }.start(nonceHash: nonceHash)
         }
     }
 
