@@ -3,9 +3,9 @@
   // The desktop Sites section (tasks 2026-11-15-171, 175 and 177; mock-ups bureau-sites*): from
   // 1200 dp wide, the sites are a table on the left (Site, Pays, Plongées, Dernière), the offline
   // map on the right; a click on a pin selects the row and the reverse. Above the table the bars
-  // that never scroll: « n plongées sans site » and « Nettoyer les sites ». The right pane also
-  // shows the site's sheet (edited in place, saved at once), « Nouveau site », the dives without a
-  // site and the clean-up. App.svelte picks this page for the Sites view when layout.desktop.
+  // that never scroll: « n points à régler · Nettoyer les sites » (task 2026-11-24-395). The right pane also
+  // shows the site's sheet (edited in place, saved at once), « Nouveau site » and the steps of the clean-up
+  // (status, possible duplicates, sites without a dive, dives without a site, sites without coordinates, placing). App.svelte picks this page for the Sites view when layout.desktop.
   import { tick, untrack } from 'svelte';
   import { Page } from 'framework7-svelte';
   import { BenthicCore } from 'benthic-core';
@@ -18,6 +18,11 @@
   import DesktopSiteNew from '../components/DesktopSiteNew.svelte';
   import DesktopSitesWithout from '../components/DesktopSitesWithout.svelte';
   import DesktopSitesCleanup from '../components/DesktopSitesCleanup.svelte';
+  import DesktopSitesStatus from '../components/DesktopSitesStatus.svelte';
+  import DesktopSitesUnused from '../components/DesktopSitesUnused.svelte';
+  import DesktopSitesUnplaced from '../components/DesktopSitesUnplaced.svelte';
+  import DesktopSitesPlace from '../components/DesktopSitesPlace.svelte';
+  import { unplacedSites, unusedSites } from '../lib/site-cleanup.js';
   import { logbook, undoLastChange } from '../lib/logbook.svelte.js';
   import { startup } from '../lib/startup.svelte.js';
   import { possibleDuplicates } from '../lib/sites.svelte.js';
@@ -29,7 +34,6 @@
     sortSites,
     searchSites,
     reduceSelection,
-    withoutSiteBar,
     cleanupBar,
     highlightParts,
   } from '../lib/desktop-sites.js';
@@ -80,7 +84,9 @@
     if (!logbook.loading && startup.ready) untrack(() => load());
   });
 
-  const unused = $derived(sites.filter((s) => s.dives === 0));
+  const unused = $derived(unusedSites(sites));
+  const unplaced = $derived(unplacedSites(sites));
+  const counts = $derived({ duplicates: pairs.length, unused: unused.length, without: without.length, unplaced: unplaced.length });
   const diveCount = $derived(sites.reduce((n, s) => n + s.dives, 0));
 
   // --- Search: names, regions and countries. ------------------------------------------------
@@ -98,7 +104,7 @@
 
   // A search shows the sites again: the map, not the lists of the bars.
   $effect(() => {
-    if (typed && (pane === 'without' || pane === 'cleanup')) pane = 'sites';
+    if (typed && pane !== 'sites' && pane !== 'new') pane = 'sites';
   });
 
   const results = $derived(searchSites(sites, deskSites.regions, query));
@@ -118,7 +124,9 @@
   /** @type {import('../lib/desktop-sites.js').Selection} */
   let sel = $state({ selected: null, mode: 'map' });
   /** What the right pane shows: the map or the sheet, a new site, the dives without a site, the clean-up. */
-  let pane = $state(/** @type {'sites'|'new'|'without'|'cleanup'} */ ('sites'));
+  let pane = $state(/** @type {'sites'|'new'|'cleanup'|'duplicates'|'unused'|'without'|'unplaced'|'place'} */ ('sites'));
+  /** The site being placed (the « place » step of the clean-up). */
+  let placing = $state(0);
   /** « Nouveau site » opened from a dive without a site: that dive, and where the site starts. */
   let newFor = $state(/** @type {{ id: number, at: {latUdeg: number, lonUdeg: number}|null }|null} */ (null));
 
@@ -203,17 +211,16 @@
     if (e.target === e.currentTarget) select({ type: 'escape' });
   }
 
-  const bars = $derived({
-    without: withoutSiteBar(without.length, typed),
-    cleanup: cleanupBar(pairs.length, unused.length, typed),
-  });
+  const bar = $derived(cleanupBar(counts, typed));
 
-  function showWithout() {
-    pane = pane === 'without' ? 'sites' : 'without';
+  /** The steps of « Nettoyer les sites »: a row of the status page opens its step in the right pane. @param {string} kind */
+  function openStep(kind) {
+    pane = /** @type {'duplicates'|'unused'|'without'|'unplaced'} */ (kind);
   }
   function showCleanup() {
-    pane = pane === 'cleanup' ? 'sites' : 'cleanup';
+    pane = pane === 'sites' || pane === 'new' ? 'cleanup' : 'sites';
   }
+  const backToStatus = () => (pane = 'cleanup');
   function newSite(/** @type {typeof newFor} */ from = null) {
     newFor = from;
     pane = 'new';
@@ -426,18 +433,11 @@
     <div class="bc-desktop-sites--body" bind:this={bodyEl}>
       <div class="bc-desktop-sites--list" style:width="{deskSites.width}px">
         <!-- The bars never scroll: the list below is the only part that does (task 175). -->
-        {#if !common && bars.without}
-          <div class="bc-desktop-sites--todo" class:bc-desktop-sites--active={pane === 'without'} role="status">
-            <svg class="bc-desktop-sites--todo-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10zM10 9l4 4M14 9l-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            <span class="bc-desktop-sites--todo-text">{t('desktopSites.withoutBar', { n: bars.without.count })}</span>
-            <button type="button" class="bc-desktop-sites--link" aria-pressed={pane === 'without'} onclick={showWithout}>{t('desktopSites.findThem')}</button>
-          </div>
-        {/if}
-        {#if !common && bars.cleanup}
-          <div class="bc-desktop-sites--todo" class:bc-desktop-sites--active={pane === 'cleanup'} role="status">
+        {#if !common && bar}
+          <div class="bc-desktop-sites--todo" class:bc-desktop-sites--active={pane !== 'sites' && pane !== 'new'} role="status">
             <Icon name="delete" size={18} />
-            <span class="bc-desktop-sites--todo-text">{[bars.cleanup.duplicates ? t('sites.duplicatesCount', { n: bars.cleanup.duplicates }) : '', bars.cleanup.unused ? t('sites.unusedCount', { n: bars.cleanup.unused }) : ''].filter(Boolean).join(' · ')}</span>
-            <button type="button" class="bc-desktop-sites--link" aria-pressed={pane === 'cleanup'} onclick={showCleanup}>{t('desktopSites.cleanUp')}</button>
+            <span class="bc-desktop-sites--todo-text">{t('sites.pointsToFix', { n: bar.points })}</span>
+            <button type="button" class="bc-desktop-sites--link" aria-pressed={pane !== 'sites' && pane !== 'new'} onclick={showCleanup}>{t('desktopSites.cleanUp')}</button>
           </div>
         {/if}
         {#if typed && !common}<p class="bc-desktop-sites--search-note">{t('desktopSites.searchNote')}</p>{/if}
@@ -552,13 +552,31 @@
           <div class="bc-desktop-sites--pane">
             <DesktopSiteNew {sites} at={newFor?.at ?? null} oncreated={created} onuse={useExisting} oncancel={cancelNew} />
           </div>
-        {:else if pane === 'without'}
-          <div class="bc-desktop-sites--pane">
-            <DesktopSitesWithout dives={without} {sites} onnew={(d) => newSite({ id: d.id, at: d.latUdeg !== undefined && d.lonUdeg !== undefined ? { latUdeg: d.latUdeg, lonUdeg: d.lonUdeg } : null })} />
-          </div>
         {:else if pane === 'cleanup'}
           <div class="bc-desktop-sites--pane">
-            <DesktopSitesCleanup {pairs} {unused} />
+            <DesktopSitesStatus {counts} onopen={openStep} />
+          </div>
+        {:else if pane === 'duplicates'}
+          <div class="bc-desktop-sites--pane">
+            <DesktopSitesCleanup {pairs} onback={backToStatus} />
+          </div>
+        {:else if pane === 'unused'}
+          <div class="bc-desktop-sites--pane">
+            <DesktopSitesUnused {unused} onback={backToStatus} />
+          </div>
+        {:else if pane === 'without'}
+          <div class="bc-desktop-sites--pane">
+            <DesktopSitesWithout onback={backToStatus} dives={without} {sites} onnew={(d) => newSite({ id: d.id, at: d.latUdeg !== undefined && d.lonUdeg !== undefined ? { latUdeg: d.latUdeg, lonUdeg: d.lonUdeg } : null })} />
+          </div>
+        {:else if pane === 'unplaced'}
+          <div class="bc-desktop-sites--pane">
+            <DesktopSitesUnplaced sites={unplaced} onback={backToStatus} onplace={(uuid) => { placing = uuid; pane = 'place'; }} />
+          </div>
+        {:else if pane === 'place' && sites.find((s) => s.uuid === placing)}
+          <div class="bc-desktop-sites--pane">
+            {#key placing}
+              <DesktopSitesPlace site={/** @type {any} */ (sites.find((s) => s.uuid === placing))} {sites} onback={() => (pane = 'unplaced')} ondone={() => (pane = unplaced.length > 1 ? 'unplaced' : 'cleanup')} />
+            {/key}
           </div>
         {/if}
       </div>
@@ -718,9 +736,6 @@
     .bc-desktop-sites--active {
       background: var(--bc-table-selected);
       color: var(--bc-on-table-selected);
-    }
-    .bc-desktop-sites--todo-icon {
-      flex: none;
     }
     .bc-desktop-sites--todo-text {
       flex: 1;

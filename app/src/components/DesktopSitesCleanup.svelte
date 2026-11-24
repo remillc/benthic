@@ -1,14 +1,13 @@
 <script>
   // @ts-check
-  // « Nettoyer les sites » on the desktop (task 2026-11-15-177, mock-ups bureau-sites-nettoyer and
-  // -fusion): on the left the possible duplicates (each pair with its reason, both sites,
-  // « Pas des doublons » and « Fusionner »), on the right the sites without a dive with check boxes,
-  // « Tout sélectionner » and « Supprimer la sélection (n) ». « Fusionner » opens a dialog that asks
+  // « Doublons possibles » on the desktop (task 2026-11-15-177, mock-ups bureau-sites-nettoyer and
+  // -fusion; a step of « Nettoyer les sites » since task 2026-11-24-395): the possible duplicates (each pair
+  // with its reason, both sites, « Pas des doublons » and « Fusionner »). « Fusionner » opens a dialog that asks
   // which of the two sites to keep (as the phone does); the pair then collapses into « Fusionnés : un seul site, … », a snackbar offers « Annuler », and Ctrl/⌘+Z
   // undoes it. The rules are the phone's (pages/SitesCleanup.svelte).
   import Icon from './Icon.svelte';
+  import DesktopCleanupHeader from './DesktopCleanupHeader.svelte';
   import { dismissPair, pairKey, restorePair, siteChange } from '../lib/sites.svelte.js';
-  import { checkedUnused, toggleAllUnused } from '../lib/desktop-sites.js';
   import { mergeSides } from '../lib/desktop-sites.js';
   import DesktopSitesMerge from './DesktopSitesMerge.svelte';
   import { confirmAction } from '../lib/dialogs.js';
@@ -22,19 +21,15 @@
   /**
    * @type {{
    *   pairs: {a: Site, b: Site, distanceM: number}[],
-   *   unused: Site[],
+   *   onback: () => void,
    * }}
    */
-  let { pairs, unused } = $props();
+  let { pairs, onback } = $props();
 
-  /** @type {Record<number, boolean>} */
-  let checked = $state({});
   /** The pair whose merge dialog is open. @type {{a: Site, b: Site, distanceM: number}|null} */
   let merging = $state(null);
   /** The pairs merged here: they stay as a line, « Fusionnés », until the diver leaves. @type {{ key: string, name: string, text: string }[]} */
   let merged = $state([]);
-
-  const selection = $derived(checkedUnused(unused, checked));
 
   // A pair that is back (the merge was undone) is no longer a merged line.
   $effect(() => {
@@ -90,36 +85,14 @@
       onAction: () => restorePair(pair.a, pair.b),
     });
   }
-
-  function deleteSelection() {
-    const uuids = selection;
-    const n = uuids.length;
-    if (!n) return;
-    confirmAction({
-      title: t('sites.deleteTitle'),
-      text: t('sites.deleteText', { n }),
-      action: t('sites.delete'),
-      onConfirm: async () => {
-        try {
-          await siteChange({ action: 'delete', uuids });
-          checked = {};
-          offerUndo(t('sites.done'));
-        } catch (e) {
-          console.error('Delete sites', e);
-          showSnackbar(t('edit.failed'));
-        }
-      },
-    });
-  }
 </script>
 
 <section class="bc-cleanup" data-bc-scroll aria-label={t('sites.cleanupTitle')}>
-  <h2 class="bc-cleanup--title">{t('sites.cleanupTitle')}</h2>
+  <DesktopCleanupHeader title={t('sites.duplicatesTitle')} {onback} />
   <p class="bc-cleanup--intro">{t('desktopSites.cleanupIntro', { shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z' })}</p>
 
   <div class="bc-cleanup--columns">
     <div class="bc-cleanup--left">
-      <h3 class="bc-cleanup--heading">{t('desktopSites.possibleDuplicates')}</h3>
       {#each merged as m (m.key)}
         <div class="bc-cleanup--card bc-cleanup--merged" role="status">
           <Icon name="check" size={22} />
@@ -151,31 +124,6 @@
       {/each}
       {#if !pairs.length && !merged.length}<p class="bc-cleanup--none">{t('desktopSites.noDuplicates')}</p>{/if}
     </div>
-
-    <div class="bc-cleanup--right">
-      <h3 class="bc-cleanup--heading">{t('sites.unusedTitle')}</h3>
-      {#if unused.length}
-        <p class="bc-cleanup--sub bc-cleanup--lead">{t('sites.unusedIntro', { n: unused.length })}</p>
-        <div class="bc-cleanup--card">
-          {#each unused as s (s.uuid)}
-            <label class="bc-cleanup--check">
-              <input type="checkbox" bind:checked={checked[s.uuid]} />
-              <span class="bc-cleanup--box" aria-hidden="true"><Icon name="check" size={16} weight={2.6} /></span>
-              <span>
-                <span class="bc-cleanup--site-name">{s.name || t('sites.noName')}</span>
-                <span class="bc-cleanup--sub">{[t('sites.noDive'), s.country || t('sites.noCountry')].join(', ')}</span>
-              </span>
-            </label>
-          {/each}
-          <div class="bc-cleanup--actions bc-cleanup--spread">
-            <button type="button" class="bc-cleanup--text" onclick={() => (checked = toggleAllUnused(unused, checked))}>{t('sites.selectAll')}</button>
-            <button type="button" class="bc-cleanup--danger" disabled={!selection.length} onclick={deleteSelection}>{t('sites.deleteSelection', { n: selection.length })}</button>
-          </div>
-        </div>
-      {:else}
-        <p class="bc-cleanup--none">{t('desktopSites.noUnused')}</p>
-      {/if}
-    </div>
   </div>
 </section>
 
@@ -189,16 +137,9 @@
       box-sizing: border-box;
       height: 100%;
       overflow: auto;
-      /* Fluid layout: the two lists lay out by the pane's width. */
+      /* Fluid layout: the cards lay out by the pane's width. */
       container-type: inline-size;
       padding: 4px 12px 24px 4px;
-    }
-    .bc-cleanup--title {
-      margin: 0;
-      font-family: var(--bc-title-font);
-      font-size: 24px;
-      line-height: 30px;
-      font-weight: 500;
     }
     .bc-cleanup--intro {
       margin: 2px 0 12px;
@@ -207,22 +148,14 @@
     }
     .bc-cleanup--columns {
       display: grid;
-      grid-template-columns: minmax(280px, 342px) minmax(260px, 1fr);
-      gap: 16px;
+      grid-template-columns: minmax(0, 560px);
       align-items: start;
     }
-    @container (max-width: 599px) {
-      .bc-cleanup--columns {
-        grid-template-columns: minmax(0, 1fr);
+    /* A narrow pane: the buttons of a card wrap under each other. */
+    @container (max-width: 399px) {
+      .bc-cleanup--actions {
+        flex-wrap: wrap;
       }
-    }
-    .bc-cleanup--heading {
-      margin: 0 0 8px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-    .bc-cleanup--lead {
-      margin: -4px 0 8px;
     }
     .bc-cleanup--card {
       margin-bottom: 8px;
@@ -275,12 +208,8 @@
       gap: 8px;
       margin-top: 8px;
     }
-    .bc-cleanup--spread {
-      justify-content: space-between;
-    }
     .bc-cleanup--text,
-    .bc-cleanup--tonal,
-    .bc-cleanup--danger {
+    .bc-cleanup--tonal {
       width: auto;
       height: 36px;
       padding: 0 14px;
@@ -297,18 +226,10 @@
     .bc-cleanup--tonal {
       background: var(--bc-table-selected);
     }
-    .bc-cleanup--danger {
-      color: var(--bc-menu-danger);
-      &:disabled {
-        opacity: 0.38;
-        cursor: default;
-      }
-    }
-    .bc-cleanup--text:hover,
-    .bc-cleanup--danger:not(:disabled):hover {
+    .bc-cleanup--text:hover {
       background: color-mix(in srgb, currentColor 8%, transparent);
     }
-    /* Mouse: the tonal button takes the 8 % layer of its text colour; a checkbox row gets a halo round its box. */
+    /* Mouse: the tonal button takes the 8 % layer of its text colour. */
     @media (hover: hover) and (pointer: fine) {
       .bc-cleanup--tonal {
         transition: box-shadow 120ms linear;
@@ -316,40 +237,6 @@
           box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
         }
       }
-      .bc-cleanup--check:hover .bc-cleanup--box {
-        box-shadow: 0 0 0 8px color-mix(in srgb, var(--bc-text) 8%, transparent);
-      }
-    }
-    .bc-cleanup--check {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 6px 0;
-      cursor: pointer;
-      & input {
-        position: absolute;
-        opacity: 0;
-      }
-    }
-    .bc-cleanup--box {
-      display: grid;
-      place-items: center;
-      flex: none;
-      width: 20px;
-      height: 20px;
-      margin: 2px 4px 0 0;
-      border: 2px solid var(--bc-outline);
-      border-radius: 3px;
-      color: transparent;
-    }
-    .bc-cleanup--check input:checked + .bc-cleanup--box {
-      border-color: var(--bc-secondary);
-      background: var(--bc-secondary);
-      color: var(--bc-on-secondary);
-    }
-    .bc-cleanup--check input:focus-visible + .bc-cleanup--box {
-      outline: 2px solid var(--bc-secondary);
-      outline-offset: 2px;
     }
     .bc-cleanup--none {
       margin: 0;

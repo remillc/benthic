@@ -2254,11 +2254,6 @@
       "one": "{n} site",
       "other": "{n} sites"
     },
-    "withoutLink": {
-      "one": "{n} dive without a site: assign it",
-      "other": "{n} dives without a site: assign them"
-    },
-    "cleanupLink": "{what}: clean up the sites",
     "stripLabel": "Map: {a} and {b}, {distance} apart",
     "stripLabelSame": "Map: {a} and {b}, at the same position",
     "duplicatesCount": {
@@ -2410,12 +2405,40 @@
     "mapPlaceNorthWest": "in the north-west",
     "mapCredits": "© OpenFreeMap, OpenMapTiles, OpenStreetMap contributors",
     "listLabel": "List of the sites",
-    "unplacedLink": {
-      "one": "{n} site without coordinates: place it",
-      "other": "{n} sites without coordinates: place them"
-    },
     "unplacedTitle": "Sites without coordinates",
-    "unplacedIntro": "These sites have dives but no position. Open one to place it on the map.",
+    "unplacedIntro": "A site without coordinates is not on the map.",
+    "pointsToFix": {
+      "one": "{n} item to fix",
+      "other": "{n} items to fix"
+    },
+    "noPointsToFix": "Nothing to fix: the sites are in order.",
+    "withoutCount": {
+      "one": "{n} dive without a site",
+      "other": "{n} dives without a site"
+    },
+    "unplacedCount": {
+      "one": "{n} site without coordinates",
+      "other": "{n} sites without coordinates"
+    },
+    "cleanupHintDuplicates": "Compare them, then merge or keep",
+    "cleanupHintUnused": "Choose the ones to delete",
+    "cleanupHintWithout": "Match them to a site",
+    "cleanupHintUnplaced": "Place them on the map",
+    "duplicatesTitle": "Possible duplicates",
+    "unplacedLine": {
+      "one": "{n} dive · last on {date}",
+      "other": "{n} dives · last on {date}"
+    },
+    "useThisPosition": "Use this position",
+    "placeOnMap": "Place on the map",
+    "noDiveGps": "No dive has a GPS position",
+    "diveGpsLabel": "Map: GPS position of a dive at {name}",
+    "placeTitle": "Place {name}",
+    "searchPlace": "Search for a place",
+    "searchPlaceNone": "No place found",
+    "searchPlaceFailed": "Search is not possible offline",
+    "dragPin": "Drag the pin onto the site",
+    "deleteCount": "Delete ({n})",
     "opensElsewhere": "opens in another app",
     "deleteSite": "Delete the site",
     "deleteSiteHint": "The dives that use it stay in the logbook, without a site. You will be asked to confirm.",
@@ -2907,6 +2930,7 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "iPhone and iPad: « Continue with Apple » signs you in with your Apple Account, a hidden address included; an existing Benthic+ account with the same address is used. Deleting the account also revokes the access Apple gave Benthic.",
+      "Clean up the sites: Sites has a single row “Clean up the sites” (“n items to fix”) that opens a status page with one row per problem: possible duplicates, sites without a dive, dives without a site, sites without coordinates. Each row opens its own screen, and Back returns to the status page. “Delete” for sites without a dive stays at the top of the screen, visible however long the list is. New: “Sites without coordinates” offers the GPS position of one of the site’s dives, or “Place on the map” (“Search for a place”, a pin to drag, my position, coordinates, country and region). On the desktop, the two banners above the list become one: “n items to fix”.",
       "New logbook on the device: it no longer keeps the sites of the sample logbook. An empty logbook no longer reports sites without a dive in Sites.",
       "Opening a .benthic file from another app (Files, mail, share sheet): it now goes through the same steps as “A file” — the first import on a new device, or “Replace this logbook?” — instead of being refused.",
       "Site maps: site names show sooner, from a view about 75 km wide, on the shared map and on the personal map.",

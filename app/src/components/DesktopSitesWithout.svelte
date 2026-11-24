@@ -6,6 +6,7 @@
   // the suggestion or its absence. The dives of a trip are grouped under the trip, with « Les associer
   // toutes au même site ». The rules are the phone's (lib/site-suggestion.js, same wording).
   import DesktopSiteChooser from './DesktopSiteChooser.svelte';
+  import DesktopCleanupHeader from './DesktopCleanupHeader.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { setDiveSite } from '../lib/dive-site.js';
   import { siteChange } from '../lib/sites.svelte.js';
@@ -23,9 +24,11 @@
    *   dives: WithoutDive[],
    *   sites: import('benthic-core').SiteSummary[],
    *   onnew: (dive: WithoutDive) => void,
+   *   onback?: () => void,
    * }}
+   * onback: « ‹ Nettoyer les sites » above the title (a step of the clean-up, task 2026-11-24-395).
    */
-  let { dives, sites, onnew } = $props();
+  let { dives, sites, onnew, onback } = $props();
 
   const placed = $derived(sites.filter((s) => s.hasLocation));
   const byId = $derived(new Map(logbook.dives.map((d) => [d.id, d])));
@@ -108,7 +111,7 @@
 </script>
 
 <section class="bc-without" aria-label={t('sites.withoutTitle')}>
-  <h2 class="bc-without--title">{t('sites.withoutTitle')}</h2>
+  <DesktopCleanupHeader title={t('sites.withoutTitle')} {onback} />
   <p class="bc-without--intro">{t('sites.withoutIntro', { n: dives.length })}</p>
 
   {#each groups as group (group.first.id)}
@@ -165,13 +168,6 @@
       height: 100%;
       overflow: auto;
       padding: 4px 12px 24px 4px;
-    }
-    .bc-without--title {
-      margin: 0;
-      font-family: var(--bc-title-font);
-      font-size: 24px;
-      line-height: 30px;
-      font-weight: 500;
     }
     .bc-without--intro {
       margin: 2px 0 12px;

@@ -4,8 +4,7 @@
   // Sites section (docs/mockups/android-sites.dc.html; spec, section 4,
   // "Sites"): the section header (☰, title, search), the map of the sites
   // with a position and "centre on my position", then the list panel: the
-  // count, the list items that apply (dives without a site, sites without
-  // coordinates, possible duplicates), a divider and the sites.
+  // count, the « Nettoyer les sites » row (« n points à régler »), a divider and the sites.
   import { onDestroy, tick, untrack } from 'svelte';
   import { Page, Navbar, NavRight, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -20,7 +19,8 @@
   import ChoiceDialog from '../components/ChoiceDialog.svelte';
   import { logbook } from '../lib/logbook.svelte.js';
   import { startup } from '../lib/startup.svelte.js';
-  import { possibleDuplicates, siteChange } from '../lib/sites.svelte.js';
+  import { cleanupCounts, siteChange } from '../lib/sites.svelte.js';
+  import { cleanupPointCount } from '../lib/site-cleanup.js';
   import { defaultKeeper, sortSitesByName, sortSitesByRecent } from '../lib/site-merge.js';
   import { offerUndo } from '../lib/undo.js';
   import { formatDepth, formatDate, locale } from '../lib/format.js';
@@ -42,16 +42,8 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
 
   /** @type {import('benthic-core').SiteSummary[]} */
   let sites = $state([]);
-  let withoutSite = $state(0);
-  let duplicates = $state(0);
-  /** Sites without a dive, which « Nettoyer les sites » also deletes (task 2026-11-14-148). */
-  const unused = $derived(sites.filter((s) => s.dives === 0).length);
-  /** The clean-up row: « 2 doublons possibles, 3 sites sans plongée : nettoyer les sites ». */
-  const cleanupText = $derived(
-    t('sites.cleanupLink', {
-      what: [duplicates ? t('sites.duplicatesCount', { n: duplicates }) : '', unused ? t('sites.unusedCount', { n: unused }) : ''].filter(Boolean).join(', '),
-    }),
-  );
+  /** How many of the four problems of « Nettoyer les sites » exist (task 2026-11-24-395). */
+  let pointsToFix = $state(0);
   /** @type {SiteMap|undefined} */
   let siteMap = $state();
 
@@ -71,7 +63,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
     return sortBy === 'recent' ? sortSitesByRecent(list) : sortSitesByName(list, locale);
   });
   const located = $derived(used.filter((s) => s.hasLocation));
-  const unplaced = $derived(used.length - located.length);
   const diveCount = $derived(used.reduce((n, s) => n + s.dives, 0));
 
   // The search (spec, "Sites, search open and its animation"): open, it takes
@@ -475,8 +466,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   async function load() {
     try {
       sites = await cachedSites();
-      withoutSite = (await BenthicCore.siteQuery({ kind: 'without' })).length;
-      duplicates = (await possibleDuplicates()).length;
+      pointsToFix = cleanupPointCount(await cleanupCounts());
     } catch (e) {
       console.error('Sites', e);
     }
@@ -616,21 +606,13 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   </section>
   {:else}
   <section class="bc-sites--panel" aria-label={t('sites.listLabel')}>
-    {#if withoutSite || unplaced || duplicates || unused}
+    {#if pointsToFix}
      <div class="bc-sites--todo" class:bc-sites--hidden={finding} bind:this={todoEl}>
       <div class="bc-sites--todo-inner">
-      <!-- « À faire » (bc-sites-todo), on every device: iPhone and iPad too since task 2026-11-14-148. -->
+      <!-- One row, « Nettoyer les sites » (bc-sites-todo), on every device (task 2026-11-24-395). -->
       <nav class="list bc-sites--links bc-sites--surface bc-sites-todo" aria-label={t('sites.todoLabel')}>
         <ul>
-          {#if withoutSite}
-            <li><a href="/sites/without/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.withoutLink', { n: withoutSite })}</div></div></a></li>
-          {/if}
-          {#if unplaced}
-            <li><a href="/sites/unplaced/" class="item-link item-content"><div class="item-inner"><div class="item-title">{t('sites.unplacedLink', { n: unplaced })}</div></div></a></li>
-          {/if}
-          {#if duplicates || unused}
-            <li><a href="/sites/cleanup" class="item-link item-content"><div class="item-inner"><div class="item-title">{cleanupText}</div></div></a></li>
-          {/if}
+          <li><a href="/sites/cleanup/" class="item-link item-content"><div class="item-inner"><div class="bc-sites--text"><div class="item-title">{t('sites.cleanupTitle')}</div><div class="item-text">{t('sites.pointsToFix', { n: pointsToFix })}</div></div></div></a></li>
         </ul>
       </nav>
       </div>

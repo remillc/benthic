@@ -10,6 +10,7 @@ import { settings } from './settings.svelte.js';
 import { formatMinutes } from './format.js';
 import { mapsLinks } from './maps-link.js';
 import { ios } from './layout.svelte.js';
+import { unplacedSites, unusedSites } from './site-cleanup.js';
 import { isDismissed, parseMarks, withMark, withoutMark } from './site-dismissed.js';
 
 export { pairKey } from './site-dismissed.js';
@@ -187,3 +188,16 @@ export function openInMapsApp(latUdeg, lonUdeg, name) {
 }
 
 export { logbook };
+
+/**
+ * How many of each problem « Nettoyer les sites » lists (task 2026-11-24-395).
+ * @returns {Promise<{ duplicates: number, unused: number, without: number, unplaced: number }>}
+ */
+export async function cleanupCounts() {
+  const [sites, without, pairs] = await Promise.all([
+    BenthicCore.siteQuery({ kind: 'list' }),
+    BenthicCore.siteQuery({ kind: 'without' }),
+    possibleDuplicates(),
+  ]);
+  return { duplicates: pairs.length, unused: unusedSites(sites).length, without: without.length, unplaced: unplacedSites(sites).length };
+}
