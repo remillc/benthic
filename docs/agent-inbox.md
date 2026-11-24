@@ -7309,7 +7309,7 @@ Spec updated by the design agent: `docs/ui-specification.md` (settings table, cy
 
 **Test:** a logbook's cylinder types all show in one list with their dive counts; adding a type through a « Tailles courantes » chip fills it; the type appears on a second device signed in to the same logbook before any dive uses it; the default cylinder choice shows the list then the common sizes; Réglages › Équipement has no « Proposer les tailles standard ».
 
-## [ ] 2026-11-23-374 Desktop bug: a trip in the logbook list has no separator after it
+## [x] 2026-11-23-374 Desktop bug: a trip in the logbook list has no separator after it
 
 Christian reported this on 23 November 2026. Work in `main`. On the desktop, in « Mon carnet », the dive table draws a 1 px #E3E1DC line under each dive row, but a trip row has none after it, so the trip runs into the next dive. Mock-up: « Carnet · bureau (Windows, Linux) » (tablet and desktop canvas, page Bureau), which now shows a closed trip « Voyage du 2025-07-12 · 2 plongées, de 19 à 25 m » between dives 12 and 9: a separator above it (the previous dive's line) and one below it.
 
@@ -7318,6 +7318,8 @@ Christian reported this on 23 November 2026. Work in `main`. On the desktop, in 
 - No double line where a trip follows a dive that already has its own line.
 
 **Test:** on the desktop, a logbook with a trip between other dives: closed, it shows a line above and below; open, the dive after the trip is clearly separated; nothing changes on the phone or tablet lists.
+
+**Done (24 November 2026):** A closed trip is a plain 48 px row (no white pill) with the dive rows' 1 px line, drawn as an inset shadow so the row stays 48 px; the row after an open trip's card gets a 1 px line above it (the card has none under it, so no double line); open trip headers are 48 px too (TRIP_HEIGHT 50 for the windowing). The mock-up was not available here; built from the task text. Checks: tests/e2e/desktop-detail.mjs (--detail-only).
 
 ## [ ] 2026-11-23-375 Desktop dive detail: clean up the right pane to match the mock-up
 
