@@ -1304,6 +1304,11 @@
       --f7-page-bg-color: var(--bc-background);
       background: var(--bc-background);
     }
+    /* The master-detail pane paints --bc-surface (App.svelte); the desktop detail keeps the page colour, so the only white
+       surface around the profile is its own card (task 2026-11-23-375). */
+    :global(.view-master-detail .page-master-detail.bc-dive-detail--desk) {
+      background: var(--bc-background);
+    }
     :global(.bc-dive-detail--desk > .navbar) {
       display: none;
     }

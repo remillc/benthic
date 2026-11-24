@@ -7321,7 +7321,7 @@ Christian reported this on 23 November 2026. Work in `main`. On the desktop, in 
 
 **Done (24 November 2026):** A closed trip is a plain 48 px row (no white pill) with the dive rows' 1 px line, drawn as an inset shadow so the row stays 48 px; the row after an open trip's card gets a 1 px line above it (the card has none under it, so no double line); open trip headers are 48 px too (TRIP_HEIGHT 50 for the windowing). The mock-up was not available here; built from the task text. Checks: tests/e2e/desktop-detail.mjs (--detail-only).
 
-## [ ] 2026-11-23-375 Desktop dive detail: clean up the right pane to match the mock-up
+## [x] 2026-11-23-375 Desktop dive detail: clean up the right pane to match the mock-up
 
 Christian reported this on 23 November 2026. Work in `main`. On the desktop, the dive detail (right pane of « Mon carnet ») does not match the mock-up « Carnet · bureau (Windows, Linux) » and the « Carnet · bureau, détail, onglet … » boards (tablet and desktop canvas, page Bureau). Screenshot: `docs/screenshots/2026-11-23-bureau-detail-panneau-blanc.png` (the red circle).
 
@@ -7333,6 +7333,8 @@ Christian reported this on 23 November 2026. Work in `main`. On the desktop, the
    Where the app is right and the mock-up is out of date, say so in the task's done note instead of changing the app.
 
 **Test:** at 1440 × 900, the desktop detail looks like the mock-up: no white block outside the chart's card, same axes, chips and spacing; resizing the splitter keeps it clean.
+
+**Done (24 November 2026):** Cause of the white block: App.svelte paints every Framework7 master-detail pane with --bc-surface and it won over the desktop detail's page colour; DiveDetail.svelte now sets --bc-background on the desktop detail pane, so the only white surface around the profile is the chart card (16 px corners, 24 px margin). Fidelity pass, without the mock-up (not in the repository; built from the task text): the unselected curve chips were drawn filled grey because the outline class never matched Framework7's (chip-outline); on the desktop they are now outlined 1 px chips (--bc-chip-outline), the selected one keeps its check, and the expand button stays at the right. The axes (depth ticks and labels on the left, time labels, dashed average line with its label) and the header, figures and tabs spacing already match the task's description; nothing changed there. Not verified against the canvas: the mock-up's exact spacing values. Checked at 1440x900, also after a splitter move: tests/e2e/desktop-detail.mjs.
 
 ## [ ] 2026-11-23-376 Desktop dive detail, « Informations » tab: one card per group, people as chips, stars for rating and visibility
 

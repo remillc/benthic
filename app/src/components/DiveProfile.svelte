@@ -876,6 +876,13 @@
       }
     }
 
+    /* Desktop pane (task 2026-11-23-375): an unselected curve is an outlined chip, as in the mock-up (the Framework7
+       outline class never matched the component's own name, so it was drawn filled). */
+    .bc-dive-profile--layers-desk .bc-dive-profile--chip-outline {
+      background: transparent;
+      box-shadow: inset 0 0 0 1px var(--bc-chip-outline);
+    }
+
     .bc-dive-profile--chip-temperature {
       --bc-curve: var(--bc-temperature);
     }
