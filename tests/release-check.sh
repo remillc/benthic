@@ -33,7 +33,13 @@ export WSLENV="${WSLENV:+$WSLENV:}BC_JS_MUTATE:BC_TOOLS_MUTATE"
 # A git worktree made by Windows git has a .git file WSL's git cannot follow: use git.exe then.
 GIT=git
 git rev-parse HEAD >/dev/null 2>&1 || GIT=git.exe
-git() { "$GIT" "$@" | tr -d '\r'; }
+# WSL's git has crashed (segmentation fault) on the last calls of a long run, leaving the report without its commit
+# (24 November 2026): when it fails, Windows' git answers instead.
+git() {
+  local out
+  if out=$("$GIT" "$@" 2>/dev/null); then printf '%s\n' "$out" | tr -d '\r'; return 0; fi
+  [ "$GIT" != git.exe ] && command -v git.exe >/dev/null 2>&1 && git.exe "$@" | tr -d '\r'
+}
 mkdir -p "$OUT/logs"
 
 commit() { git rev-parse HEAD; }
@@ -162,6 +168,7 @@ fi
 DIRTY=false
 [ -n "$(git status --porcelain)" ] && DIRTY=true
 C=$(commit)
+[ -n "$C" ] || { echo "RED: the commit could not be read, so no report can name it"; exit 1; }
 REPORT=$OUT/report-$C.json
 {
   printf '{"commit":"%s","dirty":%s,"subsurface":"%s","scope":"%s","date":"%s","host":"%s","seconds":%d,"steps":[' \
