@@ -7455,3 +7455,10 @@ Christian asked for this on 24 November 2026. Work in `main`. Rules: `docs/syste
 Mock-ups: tablet « 03 · Modifier ensemble, trois plongées » and its « onglet Équipement / Gaz / Notes » boards (all four tabs drawn); desktop « Carnet · bureau, modifier ensemble deux plongées, onglet Informations » (new); phone `carnet-modifier-ensemble-android`; iPhone `ios-modifier-ensemble`. Phone, iPhone and desktop show the Informations tab; their other tabs take the tablet's fields.
 
 **Test:** select three dives with different sites, kits and modes: each tab shows the spread; set Visibilité, a kit and CCR, append a note, apply: all three dives change, their cylinders are intact, one undo restores everything.
+
+## [ ] 2026-11-24-385 Correction to task 384: shorter texts in « Modifier ensemble »
+
+Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/` updated.
+
+1. The subtitle under « Modifier N plongées » is only the dive numbers: « N° 9, 8 et 7 » (desktop: « N° 7 et 6 »). Remove « un champ « Plusieurs valeurs » reste tel quel si vous n’y touchez pas. » (tablet, desktop), « ce que vous changez s’applique aux 3 plongées. Un champ « Plusieurs valeurs »… » (Android phone) and « « Plusieurs valeurs » reste tel quel… » (iPhone).
+2. The note above the buttons (tablet, desktop) loses its first sentence: it reads only « La date, la durée, la profondeur, les bouteilles et le voyage restent propres à chaque plongée. » (no « Les puces en pointillé ne sont que sur certaines plongées. »).
