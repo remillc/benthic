@@ -7496,7 +7496,7 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 
 **Test:** a computer with a photo shows it in the card on tablet and phone; switch a dive to pSCR on the desktop and on a portrait tablet; on an iPhone, scroll a dive (the segmented control sticks) and shift two dives 1 h 05 later.
 
-## [ ] 2026-11-24-388 Desktop Réglages: short choices become slider selectors (to-do #143)
+## [x] 2026-11-24-388 Desktop Réglages: short choices become slider selectors (to-do #143)
 
 Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/` (`bureau-reglages`, `bureau-reglages-langue`, `bureau-reglages-macos`).
 
@@ -7509,19 +7509,19 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 
 **Test:** every changed row switches with a click and with the arrow keys, saves at once, and the screen reader names the row and the option.
 
-## [ ] 2026-11-24-389 Réglages › Affichage: remove « Bande des bouteilles » (tank bar)
+## [x] 2026-11-24-389 Réglages › Affichage: remove « Bande des bouteilles » (tank bar)
 
 Christian asked for this on 24 November 2026. Work in `main`. The row « Bande des bouteilles » (Subsurface's `tankbar`) duplicates the « Gaz » chip of the profile, which already draws one band per mix under the curve. Remove the row from Réglages › Affichage on every device (desktop, tablet, Android phone, iPhone) and stop reading the setting; the profile's « Gaz » chip stays the only control, and its last state is remembered like « Température » (phone and tablet: until the app is closed; desktop: on this computer). `docs/ui-specification.md` updated (Settings paragraph, Affichage paragraph, settings table). Mock-ups: « Réglages · bureau, affichage », tablet Réglages landscape and portrait, `reglages-affichage-android`, `ios-reglages-affichage`, `reglages-bouteille-choix-android`.
 
-## [ ] 2026-11-24-390 « Plafond calculé »: clearer line; listed as an advanced setting
+## [x] 2026-11-24-390 « Plafond calculé »: clearer line; listed as an advanced setting
 
 Christian asked for this on 24 November 2026. Work in `main`. In Réglages › Affichage, Profil de plongée, the line under « Plafond calculé » now reads « Calculé par le modèle de Réglages › Décompression, affiché en plus de celui de l’ordinateur » (it read « Selon le modèle de Décompression » / « Selon le modèle choisi dans Réglages › Décompression »). The behaviour does not change: the calculated ceiling (`calcceiling`) is drawn in addition to the computer's ceiling (`dcceiling`), the two switches stay independent. Change the string on every device (desktop, tablet, Android, iPhone; `app/src/i18n/fr.json` and its English counterpart « Computed by the model in Settings › Decompression, shown in addition to the dive computer’s »). The setting is added to `docs/advanced-settings.md`; nothing else changes in the interface. Mock-ups: « Réglages · bureau, affichage », `reglages-affichage-android`, `ios-reglages-affichage`.
 
-## [ ] 2026-11-24-391 Correction to task 388: « Pressions partielles » keeps its bar / ATA choice
+## [x] 2026-11-24-391 Correction to task 388: « Pressions partielles » keeps its bar / ATA choice
 
 Christian asked for this on 24 November 2026. Work in `main`. Task 388 was wrong on one point: it said « Pressions partielles » has no choice and reads « Toujours en bar ». Ignore that part. The row keeps the choice decided on 12 November (`docs/ui-specification.md`, "Partial pressure unit"; `app/src/lib/pp-unit.js`): in desktop Réglages › Unités it becomes a slider selector like the other rows, with two options, « bar » (default) and « ATA ». The line under the row reads « Seule l’étiquette change : 1,4 bar s’affiche 1,4 ATA » (English: « Only the label changes: 1.4 bar shows as 1.4 ATA »). Still no mention of Subsurface. If you already applied 388's « Toujours en bar » text or removed the choice anywhere, put the choice back. Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`.
 
-## [ ] 2026-11-24-392 Correction to tasks 388 and 391: desktop Unités look like the tablet; slider selectors in black
+## [x] 2026-11-24-392 Correction to tasks 388 and 391: desktop Unités look like the tablet; slider selectors in black
 
 Christian asked for this on 24 November 2026. Work in `main`. This replaces part of 388 and 391; where they disagree, follow this task.
 
@@ -7534,7 +7534,7 @@ Christian asked for this on 24 November 2026. Work in `main`. This replaces part
 
 Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`, `docs/mockups/bureau-reglages-langue.dc.html`.
 
-## [ ] 2026-11-24-393 Desktop Réglages › Unités: the « Système d’unités » explanation goes under its card
+## [x] 2026-11-24-393 Desktop Réglages › Unités: the « Système d’unités » explanation goes under its card
 
 Christian asked for this on 24 November 2026. Work in `main`. On desktop (Windows/Linux and macOS), the line « Métrique et Impérial règlent toutes les unités d’un coup. Changer une unité passe en Personnalisé. » leaves the white card: the card holds only « Système d’unités » and its button group (task 392). The line sits right under the card, 13 px #4B4A47, aligned with the section title (4 px inset), as a note on the card, not part of the row. Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`.
 

@@ -937,6 +937,9 @@
     "feet": "Feet",
     "pressure": "Cylinder pressure",
     "ppUnit": "Partial pressures",
+    "ppUnitNote": "Only the label changes: 1.4 bar shows as 1.4 ATA",
+    "kilograms": "Kilograms",
+    "pounds": "Pounds",
     "volume": "Volume",
     "volumeNoteCuft": "Also gas consumption per minute (SAC, RMV) and metabolic O₂ consumption, in cu ft/min",
     "volumeNoteLitres": "Also gas consumption per minute (SAC, RMV) and metabolic O₂ consumption, in L/min",
@@ -1001,11 +1004,7 @@
     "redCeiling": "Ceiling in red",
     "calcCeiling": {
       "label": "Calculated ceiling",
-      "text": "With the model chosen in Settings › Decompression"
-    },
-    "tankbar": {
-      "label": "Tank bar",
-      "text": "Under the profile, shows which cylinder is in use at each moment"
+      "text": "Computed by the model in Settings › Decompression, shown in addition to the dive computer’s"
     },
     "deco": {
       "warning": "These settings change the stops and limits the app calculates. A wrong value exposes you to decompression sickness.",
@@ -2849,6 +2848,7 @@
     "releaseNotes": [
       "Site maps: site names show sooner, from a view about 75 km wide, on the shared map and on the personal map.",
       "Certifications (Benthic+): each certification is drawn like the physical card (85.6 × 54 ratio, a gradient in the agency’s colours, pale waves along the bottom) with the agency, “Certification card”, the course title, your name, the number and the date; the whole card opens the certification. One column on the phone, several on tablet and desktop. The top of “My diver profile” has no back arrow.",
+      "Desktop, Settings: the short choices of « Language and formats » (date, time and paper format) and of the other pages become a slider selector: a click or the arrow keys change the choice, saved at once. « Units » takes the tablet's look: « Unit system » as a connected button group, each unit on a row with its value on the right that opens its menu; the explanation sits under the card. « Partial pressures » keeps bar or ATA.",
       "Cylinder drawing: the outline is thinner (1.2 in the 44 × 76 drawing, about 1.2 px at 44 px wide and 1.75 px at 64 px), in light and dark.",
       "Download: “Allow Bluetooth”, “Permission refused”, “Bluetooth is off” and “Download failed” follow the layout of the other steps: a 96 px disc, a centred title and text, the buttons at the bottom (in the dialog footer on the desktop). “Open settings” opens the app’s settings.",
       "Importing a .benthic file: “A file” in “Import a logbook” and the logbook menu accept the full export. The file is first checked, file by file, against its fingerprints; if it is incomplete, nothing is imported. Otherwise the logbook, equipment, profile and certifications are imported in one go, and personal information is encrypted on this device. To replace a logbook, “Replace this logbook?” offers “Export this logbook first”.",

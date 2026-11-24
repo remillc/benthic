@@ -62,7 +62,7 @@
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
 
   /** @typedef {import('benthic-core').CorePrefValues} CorePrefValues */
-  /** @typedef {{ value: string, label: string, example?: string }} Option */
+  /** @typedef {{ value: string, label: string, example?: string, short?: string }} Option */
   /**
    * @typedef {{ kind: 'switch', id: string, label: string, text?: string, checked: boolean, set: (v: boolean) => unknown, dimmed?: boolean }
    *   | { kind: 'choice', id: string, label: string, text?: string, value: string, title?: string, current: string,
@@ -197,7 +197,7 @@
     pressure: { bar: () => t('units.bar'), psi: () => t('units.psi') },
     volume: { l: () => t('settings.liters'), cuft: () => t('settings.cubicFeet') },
     temperature: { C: () => t('units.celsius'), F: () => t('units.fahrenheit') },
-    weight: { kg: () => t('units.kilograms'), lbs: () => t('units.pounds') },
+    weight: desktopApp ? { kg: () => t('settings.kilograms'), lbs: () => t('settings.pounds') } : { kg: () => t('units.kilograms'), lbs: () => t('units.pounds') },
   };
 
   /** @param {'length'|'pressure'|'volume'|'temperature'|'weight'} key @param {string} label @returns {Row} */
@@ -289,7 +289,7 @@
           options: () => {
             const system = formatDateChoice(today, 'system');
             /** @type {Option[]} */
-            const list = [{ value: 'system', label: system }];
+            const list = [{ value: 'system', label: system, short: t('settings.system') }];
             for (const choice of /** @type {const} */ (['iso', 'medium', 'dmy', 'mdy'])) {
               const label = formatDateChoice(today, choice);
               if (!list.some((o) => o.label === label)) list.push({ value: choice, label });
@@ -350,6 +350,7 @@
           kind: 'choice',
           id: 'ppUnit',
           label: t('settings.ppUnit'),
+          text: desktopApp ? t('settings.ppUnitNote') : undefined,
           value: ppUnitLabel(),
           current: settings.ppUnit,
           options: () => [
@@ -608,7 +609,6 @@
         { kind: 'switch', id: 'dcCeiling', label: t('settings.dcCeiling'), text: t('settings.dcCeilingText'), checked: p.dcCeiling, set: (v) => setCore({ dcCeiling: v }) },
         { kind: 'switch', id: 'redCeiling', label: t('settings.redCeiling'), text: t('settings.redCeilingText'), checked: p.redCeiling, dimmed: !p.dcCeiling, set: (v) => setCore({ redCeiling: v }) },
         { kind: 'switch', id: 'calcCeiling', label: t('settings.calcCeiling.label'), text: t('settings.calcCeiling.text'), checked: p.calcCeiling, set: (v) => setCore({ calcCeiling: v }) },
-        { kind: 'switch', id: 'tankbar', label: t('settings.tankbar.label'), text: t('settings.tankbar.text'), checked: p.tankbar, set: (v) => setCore({ tankbar: v }) },
       ],
     },
     {
@@ -1104,7 +1104,7 @@
     const group = groups.find((g) => g.id === id);
     switch (id) {
       case 'unitSystem':
-        return { title: t('desktopSettings.system'), rows: [{ kind: 'unitSystem', id: 'unitSystem', label: t('settings.unitSystem.label'), text: t('settings.unitSystem.note') }] };
+        return { title: t('desktopSettings.system'), rows: [{ kind: 'unitSystem', id: 'unitSystem', label: t('settings.unitSystem.label') }], note: t('settings.unitSystem.note') };
       case 'units2':
         return { title: t('desktopSettings.unitValues'), rows: group?.rows ?? [] };
       case 'textSize':
@@ -1212,11 +1212,19 @@
     }
   }
 
-  /** The choices of a row that has two or three of them, written out as a button group (else null). @param {any} row */
+  /** Rows of Réglages › Unités that open a menu on the desktop: a name, the value on the right (task 2026-11-24-392). */
+  const UNIT_MENU_ROWS = ['length', 'pressure', 'ppUnit', 'volume', 'temperature', 'weight', 'verticalSpeed'];
+  /** Rows that stay a drop-down although they have a few options. */
+  const DROPDOWN_ROWS = ['appLanguage', ...UNIT_MENU_ROWS];
+
+  /** The choices of a row that has two to four short options, for the desktop's slider selector (else null). @param {any} row */
   function smallChoice(row) {
+    if (DROPDOWN_ROWS.includes(row.id)) return null;
     try {
       const options = row.options();
-      return Array.isArray(options) && options.length >= 2 && options.length <= 3 ? options.map((/** @type {Option} */ o) => ({ value: o.value, label: o.label })) : null;
+      if (!Array.isArray(options) || options.length < 2 || options.length > 4) return null;
+      const list = options.map((/** @type {Option} */ o) => ({ value: o.value, label: o.short ?? o.label }));
+      return list.every((/** @type {{ label: string }} */ o) => o.label.length <= 16) ? list : null;
     } catch {
       return null;
     }
@@ -1359,8 +1367,10 @@
 {/snippet}
 
 {#snippet deskRow(/** @type {any} */ row, /** @type {string} */ lead)}
-  {@const whole = row.kind === 'link' || row.kind === 'reset' || row.kind === 'forgetAll'}
+  {@const whole = row.kind === 'link' || row.kind === 'reset' || row.kind === 'forgetAll' || UNIT_MENU_ROWS.includes(row.id)}
   {@const small = row.kind === 'choice' ? smallChoice(row) : null}
+  {@const menu = row.kind === 'choice' && UNIT_MENU_ROWS.includes(row.id)}
+  {@const sample = small && (row.id === 'dateFormat' || row.id === 'timeFormat')}
   <svelte:element
     this={row.kind === 'switch' ? 'label' : 'div'}
     class="bc-desktop-settings--row"
@@ -1369,8 +1379,8 @@
   >
     <span class="bc-desktop-settings--texts">
       <span class="bc-desktop-settings--label">{@render hl(row.label)}</span>
-      {#if lead || (row.text && row.kind !== 'file')}
-        <span class="bc-desktop-settings--helper">{#if lead}{lead}{#if row.text && row.kind !== 'file'}{' · '}{/if}{/if}{#if row.kind !== 'file'}{@render hl(row.text ?? '')}{/if}</span>
+      {#if lead || (row.text && row.kind !== 'file' && !sample)}
+        <span class="bc-desktop-settings--helper">{#if lead}{lead}{#if row.text && row.kind !== 'file' && !sample}{' · '}{/if}{/if}{#if row.kind !== 'file' && !sample}{@render hl(row.text ?? '')}{/if}</span>
       {/if}
       {#if row.kind === 'file'}<span class="bc-desktop-settings--helper bc-desktop-settings--path">{@render hl(row.value)}</span>{/if}
     </span>
@@ -1383,7 +1393,7 @@
       {:else if row.kind === 'segmented'}
         <ButtonGroup ariaLabel={row.label} value={row.current} marked options={row.options} onchange={(v) => !row.dimmed && row.set(v)} />
       {:else if row.kind === 'unitSystem'}
-        <ButtonGroup ariaLabel={row.label} value={p.unitSystem} marked options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
+        <ButtonGroup class="bc-desktop-settings--unit-system" ariaLabel={row.label} value={p.unitSystem} options={UNIT_SYSTEMS.map((system) => ({ value: system, label: t(`settings.unitSystem.${system}`) }))} onchange={(system) => setUnitSystem(/** @type {any} */ (system))} />
       {:else if row.kind === 'textSize'}
         <ButtonGroup ariaLabel={row.label} value={textSize.id} marked options={TEXT_SIZES.map((s) => ({ value: s.id, label: t(`desktopSettings.textSize.${s.id}`) }))} onchange={(v) => setTextSize(textSizeOf(v))} />
       {:else if row.kind === 'bailout'}
@@ -1395,7 +1405,9 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="18.5" r="2"></circle></svg>
         </button>
       {:else if small}
-        <ButtonGroup ariaLabel={row.label} value={row.current} marked options={small} onchange={(v) => row.set(v)} />
+        <ButtonGroup slider ariaLabel={row.label} value={row.current} options={small} onchange={(v) => row.set(v)} />
+      {:else if menu}
+        <span class="bc-desktop-settings--value">{row.value}</span>
       {:else if row.kind === 'choice' || row.kind === 'number'}
         <button type="button" class="bc-desktop-settings--field" aria-haspopup={row.kind === 'choice' ? 'listbox' : 'dialog'} aria-label="{row.label} : {row.value}" disabled={row.dimmed} onclick={(e) => open(row, e.currentTarget)}>
           <span class="bc-desktop-settings--field-value">{row.value}</span>
@@ -1422,7 +1434,8 @@
       <button
         type="button"
         class="bc-desktop-settings--row-button"
-        aria-label={row.label}
+        aria-label={menu ? `${row.label} : ${row.value}` : row.label}
+        aria-haspopup={menu ? 'listbox' : undefined}
         disabled={row.kind === 'link' && row.disabled}
         onclick={(e) => (row.kind === 'reset' ? confirmReset() : row.kind === 'forgetAll' ? confirmForgetAll() : open(row, e.currentTarget))}
       ></button>
@@ -2349,6 +2362,15 @@
 
       & :global(.bc-button-group--button) {
         white-space: nowrap;
+      }
+    }
+    /* Système d’unités: the tablet's connected button group, 360 px wide in all. */
+    .bc-desktop-settings--control :global(.bc-desktop-settings--unit-system) {
+      width: 360px;
+      max-width: 100%;
+
+      & :global(.bc-button-group--button) {
+        flex: 1;
       }
     }
     .bc-desktop-settings--value {
