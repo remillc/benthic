@@ -465,9 +465,9 @@ export function adjacentTrips(dives, ids) {
 
 // --- Windowing: the table draws only the rows in view. ----------------------------------------
 
-/** A dive row is 48 px plus the 2 px between rows; a trip row 44 px plus 2 (the table's styles set the 48 and the 44). */
+/** A dive row is 48 px plus the 2 px between rows; a trip row 48 px plus 2 (the table's styles set both to 48). */
 export const ROW_HEIGHT = 50;
-export const TRIP_HEIGHT = 46;
+export const TRIP_HEIGHT = 50;
 /** From the top of the table to the first row: spacing, header (36), spacing. */
 export const BODY_TOP = 40;
 /** The same with the sticky year line under the header: its 30 px and the spacing after it (task 2026-11-18-279). */

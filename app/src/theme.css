@@ -403,6 +403,11 @@
     --bc-release-disabled-text: rgb(31 33 36 / 0.38);
     /* Stars to read, not to touch (the average of Conditions in the edit screen). */
     --bc-star-summary: #8A8D91;
+  /* Desktop detail, Informations tab (task 2026-11-23-376): the stars of Note and Visibilité, the initial in a person chip. */
+  --bc-star-on: #114477;
+  --bc-star-off: #8F8D86;
+  --bc-person-initial: #114477;
+  --bc-on-person-initial: #FFFFFF;
     /* Dividers between the rows of a white surface (Sites). */
     --bc-row-divider: #ECECEA;
     --bc-action: #1F2124;
@@ -734,6 +739,10 @@
     --bc-heat-spot-mid: #3FA0E0;
     --bc-heat-spot-edge: #2F86DE;
     --bc-star-summary: #75787C;
+  --bc-star-on: #7FB0E6;
+  --bc-star-off: #8E9196;
+  --bc-person-initial: #7FB0E6;
+  --bc-on-person-initial: #0C2A4A;
     --bc-row-divider: #3A3C40;
     --bc-map-sea: #1E2A36;
     --bc-map-land-low: #232426;

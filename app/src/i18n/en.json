@@ -2855,6 +2855,9 @@
       "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
       "Photos and videos: « Show photo and video fields » is gone from Settings. A Benthic+ subscriber always sees the « Photos and videos » section of a dive; a free user never does. About: « Website » (benthicdivelog.app) replaces « Export my logbook » and sits next to « See on GitHub » on one centred row; exporting stays in the logbook menu.",
       "Trips: « Group dives into trips » is gone from Settings. Benthic never groups dives into trips by itself, whatever a logbook made in Subsurface says: downloads, imports and new dives stay outside any trip until you make or fill one. The trips you made keep working as before.",
+      "Desktop, dive detail, Information tab: five cards (Site, People, Rating, Conditions, Tags). Guides and buddies are chips with their initial, a ✕ to remove them and « + Add » (names from the logbook first); the rating and the visibility are five stars, and another click on the chosen star clears it; the rating and the tags leave the Notes tab.",
+      "Desktop, logbook list: a closed trip is a 48 px row with the same 1 px line as the dives, and the row after an open trip’s card is separated from it by a line.",
+      "Desktop, dive detail: the white panel under the profile card is gone (the pane’s background follows the page colour) and the curves that are off are outlined chips.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
@@ -5054,7 +5057,9 @@
       "weights": "Weights",
       "mix": "Mix",
       "pressure": "Pressure",
-      "coordinates": "Coordinates"
+      "coordinates": "Coordinates",
+      "guideOfDive": "Dive guide",
+      "note": "Rating"
     },
     "kitNote": "Fills the suit, the undersuit, the weights and the other gear. Each field can still be changed.",
     "kitPieces": {
@@ -5084,6 +5089,14 @@
       "mix": "Type the mix, such as 32 or 18/45"
     },
     "notRated": "Not rated",
+    "starsOf": "{n} of 5",
+    "card": {
+      "site": "Site",
+      "people": "People",
+      "rating": "Rating",
+      "conditions": "Conditions",
+      "tags": "Tags"
+    },
     "add": "Add",
     "weightTotal": "total",
     "weightPlace": "Weight place",

@@ -7325,7 +7325,7 @@ Spec updated by the design agent: `docs/ui-specification.md` (settings table, cy
 
 **Test:** a logbook's cylinder types all show in one list with their dive counts; adding a type through a « Tailles courantes » chip fills it; the type appears on a second device signed in to the same logbook before any dive uses it; the default cylinder choice shows the list then the common sizes; Réglages › Équipement has no « Proposer les tailles standard ».
 
-## [ ] 2026-11-23-374 Desktop bug: a trip in the logbook list has no separator after it
+## [x] 2026-11-23-374 Desktop bug: a trip in the logbook list has no separator after it
 
 Christian reported this on 23 November 2026. Work in `main`. On the desktop, in « Mon carnet », the dive table draws a 1 px #E3E1DC line under each dive row, but a trip row has none after it, so the trip runs into the next dive. Mock-up: « Carnet · bureau (Windows, Linux) » (tablet and desktop canvas, page Bureau), which now shows a closed trip « Voyage du 2025-07-12 · 2 plongées, de 19 à 25 m » between dives 12 and 9: a separator above it (the previous dive's line) and one below it.
 
@@ -7335,7 +7335,9 @@ Christian reported this on 23 November 2026. Work in `main`. On the desktop, in 
 
 **Test:** on the desktop, a logbook with a trip between other dives: closed, it shows a line above and below; open, the dive after the trip is clearly separated; nothing changes on the phone or tablet lists.
 
-## [ ] 2026-11-23-375 Desktop dive detail: clean up the right pane to match the mock-up
+**Done (24 November 2026):** A closed trip is a plain 48 px row (no white pill) with the dive rows' 1 px line, drawn as an inset shadow so the row stays 48 px; the row after an open trip's card gets a 1 px line above it (the card has none under it, so no double line); open trip headers are 48 px too (TRIP_HEIGHT 50 for the windowing). The mock-up was not available here; built from the task text. Checks: tests/e2e/desktop-detail.mjs (--detail-only).
+
+## [x] 2026-11-23-375 Desktop dive detail: clean up the right pane to match the mock-up
 
 Christian reported this on 23 November 2026. Work in `main`. On the desktop, the dive detail (right pane of « Mon carnet ») does not match the mock-up « Carnet · bureau (Windows, Linux) » and the « Carnet · bureau, détail, onglet … » boards (tablet and desktop canvas, page Bureau). Screenshot: `docs/screenshots/2026-11-23-bureau-detail-panneau-blanc.png` (the red circle).
 
@@ -7348,7 +7350,9 @@ Christian reported this on 23 November 2026. Work in `main`. On the desktop, the
 
 **Test:** at 1440 × 900, the desktop detail looks like the mock-up: no white block outside the chart's card, same axes, chips and spacing; resizing the splitter keeps it clean.
 
-## [ ] 2026-11-23-376 Desktop dive detail, « Informations » tab: one card per group, people as chips, stars for rating and visibility
+**Done (24 November 2026):** Cause of the white block: App.svelte paints every Framework7 master-detail pane with --bc-surface and it won over the desktop detail's page colour; DiveDetail.svelte now sets --bc-background on the desktop detail pane, so the only white surface around the profile is the chart card (16 px corners, 24 px margin). Fidelity pass, without the mock-up (not in the repository; built from the task text): the unselected curve chips were drawn filled grey because the outline class never matched Framework7's (chip-outline); on the desktop they are now outlined 1 px chips (--bc-chip-outline), the selected one keeps its check, and the expand button stays at the right. The axes (depth ticks and labels on the left, time labels, dashed average line with its label) and the header, figures and tabs spacing already match the task's description; nothing changed there. Not verified against the canvas: the mock-up's exact spacing values. Checked at 1440x900, also after a splitter move: tests/e2e/desktop-detail.mjs.
+
+## [x] 2026-11-23-376 Desktop dive detail, « Informations » tab: one card per group, people as chips, stars for rating and visibility
 
 Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet · bureau (Windows, Linux) » (tablet and desktop canvas, page Bureau), now 1 560 px high to show the whole tab. Same data and editing as today; the layout follows the « Équipement » tab (task 366): the hint « Les champs gris se modifient d’un clic et s’enregistrent tout de suite. », then white cards (16 px corners, 16 px padding, 14 px apart), each with a 40 px round #D4E2F2 icon and a 16 px semibold title.
 
@@ -7462,3 +7466,4 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 
 1. The subtitle under « Modifier N plongées » is only the dive numbers: « N° 9, 8 et 7 » (desktop: « N° 7 et 6 »). Remove « un champ « Plusieurs valeurs » reste tel quel si vous n’y touchez pas. » (tablet, desktop), « ce que vous changez s’applique aux 3 plongées. Un champ « Plusieurs valeurs »… » (Android phone) and « « Plusieurs valeurs » reste tel quel… » (iPhone).
 2. The note above the buttons (tablet, desktop) loses its first sentence: it reads only « La date, la durée, la profondeur, les bouteilles et le voyage restent propres à chaque plongée. » (no « Les puces en pointillé ne sont que sur certaines plongées. »).
+**Done (24 November 2026):** The Informations tab is five cards on DesktopEquipmentCard (Site, Personnes, Appréciation, Conditions, Étiquettes), 88 px free at the end. New components: DesktopChipsField (36 px chips, 28 px initial in --bc-person-initial, ✕ « Retirer … », dashed « + Ajouter » opening a picker with the logbook's names first; tags use the outlined variant) and DesktopStarsRow (26 px stars in 36 px targets, a radiogroup per row, « N sur 5 », a second click on the current star clears). Several guides: the core keeps them comma-separated (save('guides', list) as before). New icons people, star, tag, waves (Material Symbols, through tools/build-icon-symbols.mjs: 93 keys, tests/app/icon-sets.test.mjs updated from 89 for that reason); new variables --bc-star-on, --bc-star-off, --bc-person-initial, --bc-on-person-initial with dark values. Where the app and the task differ or the task was silent: (1) the rating and the tags moved from the Notes tab to Informations, the Notes tab keeps only the notes; (2) the fields the task does not name (surface pressure, water temperature, depth and duration of a dive logged by hand, mode, CNS, OTU, trip) stay in the Conditions card, after « Type d’eau » and « Air », so nothing is lost; (3) « Air » shows « — » (read-only) when the dive computer recorded none; (4) the site row's second line is « Région, Pays · latitude, longitude » from what the site has (the sample site has coordinates only); the chevron still opens the site, a click on the row changes it, as before; (5) the 56 px height of the site row never applied (a later rule set 40): fixed. Mock-up not available here; built from the task text. Checks: tests/e2e/desktop-detail.mjs (--detail-only), tests/app/desktop-detail.test.mjs and icon-sets.test.mjs updated to the new markup.

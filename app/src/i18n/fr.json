@@ -2855,6 +2855,9 @@
       "Ordinateur, détail d’une plongée, onglet Équipement : une carte par section (kit, ordinateurs de plongée, protection thermique, lest, autre équipement), avec le total du lest dans son en-tête, un lest par pastille retirable, « Ce lest était » centré et « + Ajouter » dans la carte de l’autre équipement.",
       "Photos et vidéos : « Afficher les champs photos et vidéos » n’est plus dans Réglages. Un abonné Benthic+ voit toujours la section « Photos et vidéos » d’une plongée, un utilisateur gratuit jamais. À propos : « Site Web » (benthicdivelog.app) remplace « Exporter mon carnet » et se place à côté de « Voir sur GitHub » sur une ligne centrée ; l’export reste dans le menu du carnet.",
       "Voyages : « Regrouper les plongées en voyages » n’est plus dans Réglages. Benthic ne regroupe jamais les plongées en voyages de lui-même, quoi que dise un carnet fait dans Subsurface : téléchargements, imports et nouvelles plongées restent hors voyage tant que vous n’en faites pas un ou n’en remplissez pas un. Les voyages que vous avez faits fonctionnent comme avant.",
+      "Ordinateur, détail d’une plongée, onglet Informations : cinq cartes (Site, Personnes, Appréciation, Conditions, Étiquettes). Les guides et les compagnons sont des pastilles avec leur initiale, un ✕ pour les retirer et « + Ajouter » (les noms du carnet d’abord) ; la note et la visibilité sont cinq étoiles, un nouveau clic sur l’étoile choisie les efface ; la note et les étiquettes quittent l’onglet Notes.",
+      "Ordinateur, liste du carnet : un voyage fermé est une ligne de 48 px avec le même trait de 1 px que les plongées, et la ligne qui suit la carte d’un voyage ouvert en est séparée par un trait.",
+      "Ordinateur, détail d’une plongée : le panneau blanc sous la carte du profil a disparu (le fond du panneau reprend la couleur de la page) et les courbes non choisies sont des pastilles à contour.",
       "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
       "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
       "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
@@ -5054,7 +5057,9 @@
       "weights": "Lest",
       "mix": "Mélange",
       "pressure": "Pression",
-      "coordinates": "Coordonnées"
+      "coordinates": "Coordonnées",
+      "guideOfDive": "Guide de palanquée",
+      "note": "Note"
     },
     "kitNote": "Remplit la combinaison, le sous-vêtement, le lest et l’autre équipement. Chaque champ reste modifiable.",
     "kitPieces": {
@@ -5084,6 +5089,14 @@
       "mix": "Saisir le mélange, par exemple 32 ou 18/45"
     },
     "notRated": "Non notée",
+    "starsOf": "{n} sur 5",
+    "card": {
+      "site": "Site",
+      "people": "Personnes",
+      "rating": "Appréciation",
+      "conditions": "Conditions",
+      "tags": "Étiquettes"
+    },
     "add": "Ajouter",
     "weightTotal": "total",
     "weightPlace": "Emplacement du lest",

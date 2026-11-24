@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--no-monkey|--cylinder-types-only] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--detail-only|--no-monkey|--cylinder-types-only] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -38,6 +38,7 @@ import { desktopEquipmentFlows } from './desktop-equipment.mjs';
 import { benthicImportFlows } from './benthic-import-flow.mjs';
 import { desktopListHeaderFlows } from './desktop-list-header.mjs';
 import { cylinderTypeFlows } from './cylinder-types.mjs';
+import { desktopDetailFlows } from './desktop-detail.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -2870,7 +2871,7 @@ async function accountBackFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2938,6 +2939,8 @@ try {
     ['desktop list header', '--list-header-only', 25, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopListHeaderFlows({ ...harness, shot })],
     // Settings › Équipement › Types de bouteilles: one list, the chips, a new type, its deletion (tests/e2e/cylinder-types.mjs).
     ['cylinder types', '--cylinder-types-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => cylinderTypeFlows({ ...harness })],
+    // The desktop logbook's trip rows and the dive detail's right pane (tests/e2e/desktop-detail.mjs).
+    ['desktop detail', '--detail-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopDetailFlows({ ...harness, shot })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],
