@@ -7443,3 +7443,15 @@ Christian asked for this on 24 November 2026. Work in `main`. Spec: `docs/ui-spe
 3. **Correction to task 382, point 3 and point 4.** « Modifier la plongée » is no longer in the tablet's ⋮ menu either: the menu reads Planifier depuis cette plongée, Partager, Renuméroter la plongée, Renuméroter à partir d’ici, Retirer du voyage, divider, Supprimer la plongée. (« 05 · Détail, menu ⋮ ouvert » was updated.)
 
 **Test:** select two dives of a trip, shift them 1 h 05 later: both start times move, the interval between them is the same, the preview showed exactly that; « Annuler » in the snackbar restores them; shifting one dive past another reorders and renumbers as Subsurface does.
+
+## [ ] 2026-11-24-384 « Modifier ensemble »: fields in tabs, new fields (Visibilité, Kit, Lest, Type de plongée, Notes)
+
+Christian asked for this on 24 November 2026. Work in `main`. Rules: `docs/system-design.md`, section 7, « Actions on several dives » (rewritten). Copies in `docs/mockups/`.
+
+1. **Tabs**, as in a single dive's detail, without « Carte »: Informations, Équipement, Gaz, Notes. MD3 primary tabs (desktop dialog, tablet dialog, Android full-screen sheet), segmented control on iPhone. The dialog keeps one height from tab to tab; switching tabs keeps what was changed.
+2. **New fields:** Visibilité (stars, beside Note), Kit (Benthic+, the same menu as the dive detail, task 382; choosing a kit fills suit, weights and other equipment of every selected dive), Lest, Type de plongée (the segmented button of task 382, nothing checked while the dives differ, the spread under it; never deletes a cylinder), Notes « Ajouter aux notes » (appended on a new line to each dive's notes).
+3. « Plusieurs valeurs » with the spread under each mixed field, as now; « Appliquer aux N plongées » is filled #114477 (it was ink); one undoable change for everything.
+
+Mock-ups: tablet « 03 · Modifier ensemble, trois plongées » and its « onglet Équipement / Gaz / Notes » boards (all four tabs drawn); desktop « Carnet · bureau, modifier ensemble deux plongées, onglet Informations » (new); phone `carnet-modifier-ensemble-android`; iPhone `ios-modifier-ensemble`. Phone, iPhone and desktop show the Informations tab; their other tabs take the tablet's fields.
+
+**Test:** select three dives with different sites, kits and modes: each tab shows the spread; set Visibilité, a kit and CCR, append a note, apply: all three dives change, their cylinders are intact, one undo restores everything.
