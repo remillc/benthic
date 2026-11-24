@@ -49,4 +49,3 @@ Next number: 198
 - #195 [design] réévaluer la pertinence de synchroniser les photos et vidéos. L'alternative est de les garder sur le serveur et les servir à la demande. Ça pose problème cependant pour exporter un fichier .benthic.
 - #196 [design] stratégie de campagne de communication et publicité pour rejoindre les potentiels acheteurs de l’app.
 - #197 [design] l’extension .benthic n’a pas d’icône.
-- #199 [design] Nouvelle pièce d'équipement « Cellules O₂ » : marque, date de fabrication, date d'installation. Rappel à la date la plus proche entre la fabrication plus 18 mois et l'installation plus 12 mois. Retirer les cellules du recycleur, y compris les champs « Cellules O₂ fabriquées le » et « Cellules O₂ installées le ».
