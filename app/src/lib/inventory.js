@@ -18,6 +18,7 @@ import { migrateDiveIdsInStore } from './dive-id-migration.js';
 import { CYLINDER_TYPES_FOLDER, isTypeFile, pathOfType } from './cylinder-type-files.js';
 
 import { ruleProblems } from './maintenance.js';
+import { planO2Cells } from './o2-cells-migration.js';
 import { rekey as rekeyValidations } from './validation.js';
 
 /** @typedef {import('./file-store.js').FileStore} FileStore */
@@ -56,13 +57,13 @@ import { rekey as rekeyValidations } from './validation.js';
 export const RETIRE_REASONS = ['sold', 'lost', 'worn', 'other'];
 
 /**
- * The types of « Nouvelle pièce »: `rebreather` is « Recycleur », `bcd` is « Veste », `dsmb` « Parachute de palier »,
+ * The types of « Nouvelle pièce »: `rebreather` is « Recycleur », `o2Cells` « Cellules O₂ » (a rebreather's cells, task 2026-11-24-397), `bcd` is « Veste », `dsmb` « Parachute de palier »,
  * `floatBuoy` « Bouée de surface ».
- * @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'rebreather'|'bcd'|'light'|'weights'|'mask'|'fins'|'scooter'|'camera'|'dsmb'|'floatBuoy'|'knife'|'diveKnife'|'compass'|'other'} GearType
+ * @typedef {'computer'|'regulator'|'suit'|'undersuit'|'cylinder'|'rebreather'|'o2Cells'|'bcd'|'light'|'weights'|'mask'|'fins'|'scooter'|'camera'|'dsmb'|'floatBuoy'|'knife'|'diveKnife'|'compass'|'other'} GearType
  */
 
 /** The types, in the order of the type grid. @type {GearType[]} */
-export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'rebreather', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other'];
+export const GEAR_TYPES = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'rebreather', 'o2Cells', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other'];
 
 /** The groups of the inventory page and of the kit editor. @type {('computer'|'regulator'|'suit'|'cylinder'|'other')[]} */
 export const GROUPS = ['computer', 'regulator', 'suit', 'cylinder', 'other'];
@@ -713,6 +714,19 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       }
       if (writes.length || removes.length) await store.trackedBatch({ writes, removes });
       return removes.length;
+    },
+
+    /**
+     * The O₂ cells of every rebreather become a piece of their own (task 2026-11-24-397; lib/o2-cells-migration.js has the rules:
+     * idempotent, the same on every device, no date lost). Nothing is written while read only.
+     * @returns {Promise<boolean>} true when files were written
+     */
+    async migrateO2Cells() {
+      if ((await readState()).readOnlyFrom) return false;
+      const plan = planO2Cells({ gear: await store.readAll('gear/'), maintenance: await store.readAll('maintenance/') });
+      if (!plan.writes.length && !plan.removes.length) return false;
+      await store.trackedBatch(plan);
+      return true;
     },
 
     /** @param {string} photoId @returns {Promise<string>} the data URL, '' when the file is gone */

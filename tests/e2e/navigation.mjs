@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--multi-dive-only|--dive-tabs-only|--detail-only|--no-monkey|--cylinder-types-only] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-dates-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--multi-dive-only|--dive-tabs-only|--detail-only|--no-monkey|--cylinder-types-only] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -2156,7 +2156,7 @@ async function gearTypeDialogFlows(expect) {
       expect('tablet: an existing Other piece keeps its type name when saved', { typeName: 'Repair kit' }, { typeName: savedType });
     }
     {
-      // Task 2026-11-22-324: a Recycleur is added with its two dates and gets its two reminders.
+      // Task 2026-11-22-324 and 397: a Recycleur is added with its last service and gets its service reminder; its O₂ cells are a piece of their own.
       await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
       await sleep(1000);
       if (label === 'Android tablet') {
@@ -2176,7 +2176,7 @@ async function gearTypeDialogFlows(expect) {
             expectedFooter: t('dialog.cancel'),
           };
         });
-        expect('tablet: step 1 is a grid of 19 types in 4 columns, with its subtitle, a close button and only Annuler', { tiles: 19, columns: 4, title: 'Nouvelle pièce', subtitle: grid.expectedSubtitle, close: true, footer: grid.expectedFooter }, { tiles: grid.tiles, columns: grid.columns, title: grid.title, subtitle: grid.subtitle, close: grid.close, footer: grid.footer });
+        expect('tablet: step 1 is a grid of 20 types in 4 columns, with its subtitle, a close button and only Annuler', { tiles: 20, columns: 4, title: 'Nouvelle pièce', subtitle: grid.expectedSubtitle, close: true, footer: grid.expectedFooter }, { tiles: grid.tiles, columns: grid.columns, title: grid.title, subtitle: grid.subtitle, close: grid.close, footer: grid.footer });
       }
       await selectType('rebreather');
       if (label === 'Android tablet') {
@@ -2210,8 +2210,8 @@ async function gearTypeDialogFlows(expect) {
           field.dispatchEvent(new Event('input', { bubbles: true }));
         }
       }, label);
-      // The two dates are date fields: each opens the date picker, typed in its keyboard mode.
-      for (const [key, value] of [['gear.field.o2CellsMadeOn', '10/06/2025'], ['gear.field.o2CellsOn', '14/03/2026'], ['gear.field.lastService', '08/11/2025']]) {
+      // The date is a date field: it opens the date picker, typed in its keyboard mode.
+      for (const [key, value] of [['gear.field.lastService', '08/11/2025']]) {
         await tab.run(async (key) => {
           const { t } = await import('/src/lib/i18n.js');
           const button = [...document.querySelectorAll('.page-current.bc-piece-edit button')].find((b) => b.textContent.includes(t(key)));
@@ -2249,14 +2249,109 @@ async function gearTypeDialogFlows(expect) {
         const piece = gear.pieces.find((item) => item.type === 'rebreather' && item.brand === brand);
         return { found: !!piece, o2CellsMadeOn: piece?.details?.o2CellsMadeOn, o2CellsOn: piece?.details?.o2CellsOn, lastService: piece?.details?.lastService, id: piece?.id };
       }, 'rEvo ' + label);
-      expect(label + ': a Recycleur keeps its three dates', { found: true, o2CellsMadeOn: '2025-06-10', o2CellsOn: '2026-03-14', lastService: '2025-11-08' }, { found: reb.found, o2CellsMadeOn: reb.o2CellsMadeOn, o2CellsOn: reb.o2CellsOn, lastService: reb.lastService });
+      expect(label + ': a Recycleur keeps its last service and has no O₂ cells dates', { found: true, o2CellsMadeOn: undefined, o2CellsOn: undefined, lastService: '2025-11-08' }, { found: reb.found, o2CellsMadeOn: reb.o2CellsMadeOn, o2CellsOn: reb.o2CellsOn, lastService: reb.lastService });
       const reminders = await tab.run(async (id) => {
         const { gear, loadInventory } = await import('/src/lib/inventory.svelte.js');
         await loadInventory();
         return gear.maintenance.filter((x) => x.gearId === id).map((x) => [x.task, x.intervalMonths, x.lastDoneOn, x.dueOn ?? null]).sort();
       }, reb.id);
-      // Task 334: the cells are due at the earlier of manufacture (10 June 2025) + 18 months and installation (14 March 2026) + 12 months: 10 December 2026.
-      expect(label + ': a Recycleur gets its two reminders, the cells due at the earlier of the two rules', { reminders: JSON.stringify([['o2Cells', 12, '2026-03-14', '2026-12-10'], ['service', 12, '2025-11-08', null]]) }, { reminders: JSON.stringify(reminders) });
+      expect(label + ': a Recycleur gets its service reminder only', { reminders: JSON.stringify([['service', 12, '2025-11-08', null]]) }, { reminders: JSON.stringify(reminders) });
+    }
+    {
+      // Task 397: « Cellules O₂ »: brand, number, the two dates; the card reads the date of the earlier rule; the reminder is saved with them.
+      await tab.run(async () => { (await import('/src/lib/navigation.svelte.js')).openOver('/profile/gear/new'); });
+      await sleep(1000);
+      await selectType('o2Cells');
+      await tab.run(async (label) => {
+        const { t } = await import('/src/lib/i18n.js');
+        const page = document.querySelector('.page-current.bc-piece-edit');
+        const input = (key) => {
+          const l = [...page.querySelectorAll('label')].find((element) => element.textContent.trim() === t(key));
+          if (!l) throw new Error('Missing label ' + key);
+          return document.getElementById(l.htmlFor);
+        };
+        for (const [key, value] of [['gear.pieceEdit.brand', 'Cells ' + label], ['gear.field.cellsNumber', 'C-' + label]]) {
+          const field = input(key);
+          field.value = value;
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, label);
+      for (const [key, value] of [['gear.field.cellsMadeOn', '15/12/2025'], ['gear.field.cellsInstalledOn', '14/03/2026']]) {
+        await tab.run(async (key) => {
+          const { t } = await import('/src/lib/i18n.js');
+          const button = [...document.querySelectorAll('.page-current.bc-piece-edit button')].find((b) => b.textContent.includes(t(key)));
+          if (!button) throw new Error('Missing date field ' + key);
+          button.click();
+        }, key);
+        await sleep(500);
+        await tab.run(() => {
+          if (!document.querySelector('.bc-date-picker--input')) document.querySelector('.bc-date-picker--mode').click();
+        });
+        await sleep(300);
+        await tab.run((value) => {
+          const input = document.querySelector('.bc-date-picker--input');
+          input.value = value;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }, value);
+        await sleep(200);
+        await tab.run(async () => {
+          const { t } = await import('/src/lib/i18n.js');
+          [...document.querySelectorAll('.bc-date-picker button')].find((b) => b.textContent.trim() === t('dialog.ok')).click();
+        });
+        await sleep(500);
+      }
+      const cellsForm = await tab.run(async () => {
+        const { t } = await import('/src/lib/i18n.js');
+        const page = document.querySelector('.page-current.bc-piece-edit');
+        const labels = [...page.querySelectorAll('label, .bc-button-field--label')].map((e) => e.textContent.trim());
+        const row = page.querySelector('.bc-piece-edit--date-row');
+        const cells = row ? [...row.querySelectorAll('.bc-piece-edit--date-cell')].map((c) => c.getBoundingClientRect()) : [];
+        return {
+          labels: labels.filter((l) => [t('gear.pieceEdit.brand'), t('gear.field.cellsNumber'), t('gear.field.cellsMadeOn'), t('gear.field.cellsInstalledOn'), t('gear.pieceEdit.note'), t('gear.pieceEdit.model'), t('gear.pieceEdit.serial'), t('gear.pieceEdit.purchasedOn')].includes(l)),
+          sameRow: cells.length === 2 && Math.abs(cells[0].top - cells[1].top) < 2 && cells[1].left > cells[0].right - 1,
+          photo: !!page.querySelector('[data-testid="piece-picture"]'),
+          title: page.querySelector('.bc-piece-edit--reminder-title')?.textContent.trim(),
+          line: page.querySelector('.bc-piece-edit--reminder-line')?.textContent.trim(),
+          bell: !!page.querySelector('.bc-piece-edit--reminder-bell svg'),
+          expected: { brand: t('gear.pieceEdit.brand'), number: t('gear.field.cellsNumber'), made: t('gear.field.cellsMadeOn'), installed: t('gear.field.cellsInstalledOn'), note: t('gear.pieceEdit.note'), title: t('maintenance.reminderCard.titleCells'), line: t('maintenance.reminderCard.cellsDueInstalled', { date: '14/03/2027' }) },
+        };
+      });
+      expect(label + ': the O₂ cells form, its two dates on one row, no photo, model, serial or purchase date', { order: [cellsForm.expected.brand, cellsForm.expected.number, cellsForm.expected.made, cellsForm.expected.installed, cellsForm.expected.note].join('|'), sameRow: true, photo: false }, { order: cellsForm.labels.join('|'), sameRow: cellsForm.sameRow, photo: cellsForm.photo });
+      expect(label + ': the card reads the replacement date, with the bell', { title: cellsForm.expected.title, line: cellsForm.expected.line, bell: true }, { title: cellsForm.title, line: cellsForm.line, bell: cellsForm.bell });
+      await tab.run(() => document.querySelector('.page-current .bc-piece-edit--save').click());
+      await sleep(1200);
+      const cells = await tab.run(async (brand) => {
+        const { gear, loadInventory } = await import('/src/lib/inventory.svelte.js');
+        await loadInventory();
+        const piece = gear.pieces.find((item) => item.type === 'o2Cells' && item.brand === brand);
+        return { found: !!piece, details: JSON.parse(JSON.stringify(piece?.details ?? {})), reminders: gear.maintenance.filter((x) => x.gearId === piece?.id).map((x) => [x.task, x.intervalMonths, x.lastDoneOn, x.dueOn ?? null]) };
+      }, 'Cells ' + label);
+      expect(label + ': the O₂ cells keep their dates and their reminder falls on the earlier rule (installation + 12 months)', { found: true, details: JSON.stringify({ cellsMadeOn: '2025-12-15', cellsInstalledOn: '2026-03-14', cellsNumber: 'C-' + label }), reminders: JSON.stringify([['o2Cells', 12, '2026-03-14', '2027-03-14']]) }, { found: cells.found, details: JSON.stringify({ cellsMadeOn: cells.details?.cellsMadeOn, cellsInstalledOn: cells.details?.cellsInstalledOn, cellsNumber: cells.details?.cellsNumber }), reminders: JSON.stringify(cells.reminders) });
+      // Editing the piece: its type is a menu with the type's icon, not the grid of tiles (every device).
+      if (cells.found) {
+        await tab.run(async (brand) => {
+          const { gear } = await import('/src/lib/inventory.svelte.js');
+          const id = gear.pieces.find((item) => item.type === 'o2Cells' && item.brand === brand).id;
+          (await import('/src/lib/navigation.svelte.js')).openOver(`/profile/gear/${id}/edit`);
+        }, 'Cells ' + label);
+        await sleep(1200);
+        const edit = await tab.run(async () => {
+          const { t } = await import('/src/lib/i18n.js');
+          const page = document.querySelector('.page-current.bc-piece-edit');
+          const field = page.querySelector('.bc-piece-edit--type-field');
+          return {
+            tiles: page.querySelectorAll('.bc-piece-edit--tile').length,
+            first: !!field && !page.querySelector('.bc-piece-edit--type-field')?.previousElementSibling?.matches?.('.bc-piece-edit--fields'),
+            menu: !!field?.querySelector('[role="combobox"], select'),
+            value: field?.querySelector('.bc-select-field--value')?.textContent.trim() ?? field?.querySelector('select option:checked')?.textContent.trim() ?? '',
+            icon: !!field?.querySelector('svg.bc-gear-icon'),
+            expected: t('gear.pieceNew.tile.o2Cells'),
+          };
+        });
+        expect(label + ': editing a piece shows its type as a menu with the icon, no tiles', { tiles: 0, menu: true, value: edit.expected, icon: true }, { tiles: edit.tiles, menu: edit.menu, value: edit.value, icon: edit.icon });
+        await tab.run(() => (document.querySelector('.page-current .bc-piece-edit--close') ?? document.querySelector('.page-current .navbar .left a')).click());
+        await sleep(700);
+      }
     }
     {
       // Task 334: the cylinder has a brand and no model; the scooter, the camera and the surface buoy only have the common fields.
@@ -2306,6 +2401,61 @@ async function gearTypeDialogFlows(expect) {
       }
     }
       }
+    tab.ws.close();
+  }
+}
+
+/**
+ * Every date of a piece's form follows Réglages › Format de la date, on the phone, the tablet and the desktop, when a piece is
+ * added and when it is edited (task 2026-11-24-397, point 5).
+ */
+async function gearDatesFlows(expect) {
+  const formats = { system: ['14/03/2026', '01/02/2026', 'jj/mm/aaaa'], iso: ['2026-03-14', '2026-02-01', 'aaaa-mm-jj'], dmy: ['14/03/2026', '01/02/2026', 'jj/mm/aaaa'], mdy: ['03/14/2026', '02/01/2026', 'mm/jj/aaaa'] };
+  for (const [label, width, height, mobile, desktop, theme] of [
+    ['Android phone', 390, 844, true, false, 'md'],
+    ['Android tablet', 1280, 800, false, false, 'md'],
+    ['desktop', 1400, 900, false, true, 'md'],
+  ]) {
+    const tab = await openPlusTab(width, height, mobile, false, desktop, { theme });
+    const id = await tab.run(async () => {
+      const { change, loadInventory } = await import('/src/lib/inventory.svelte.js');
+      await loadInventory();
+      const piece = await change((inv) => inv.saveGear({ type: 'rebreather', name: 'Dates probe', brand: 'Probe', purchasedOn: '2026-02-01', details: { lastService: '2026-03-14' } }));
+      return piece.id;
+    });
+    for (const [choice, [serviceDay, purchaseDay, hint]] of Object.entries(formats)) {
+      await tab.run(async (choice) => { (await import('/src/lib/settings.svelte.js')).setAppSetting('dateFormat', choice); }, choice);
+      for (const mode of ['edit', 'new']) {
+        await tab.run(async ([mode, id]) => { (await import('/src/lib/navigation.svelte.js')).openOver(mode === 'edit' ? `/profile/gear/${id}/edit` : '/profile/gear/new'); }, [mode, id]);
+        await sleep(1200);
+        if (mode === 'new') {
+          await tab.run(async () => {
+            const { t } = await import('/src/lib/i18n.js');
+            const tile = [...document.querySelectorAll('.page-current .bc-piece-edit--tile')].find((e) => e.textContent.trim() === t('gear.pieceNew.tile.rebreather'));
+            tile?.click();
+          });
+          await sleep(900);
+        }
+        const read = await tab.run(async () => {
+          const { t } = await import('/src/lib/i18n.js');
+          const page = document.querySelector('.page-current.bc-piece-edit');
+          const labelled = (key) => {
+            const name = t(key);
+            const l = [...page.querySelectorAll('label')].find((e) => e.textContent.trim() === name);
+            if (l) return document.getElementById(l.htmlFor)?.value ?? '';
+            const b = [...page.querySelectorAll('button.bc-button-field--box')].find((e) => e.querySelector('.bc-button-field--label')?.textContent.trim() === name);
+            return b?.querySelector('.bc-button-field--value')?.textContent.trim() ?? null;
+          };
+          return { purchasedOn: labelled('gear.pieceEdit.purchasedOn'), lastService: labelled('gear.field.lastService') };
+        });
+        if (mode === 'edit') expect(`${label}, ${choice}: editing shows the dates in the chosen format`, { purchasedOn: purchaseDay, lastService: serviceDay }, read);
+        else expect(`${label}, ${choice}: a new piece shows the hint of the chosen format`, { purchasedOn: '', lastService: hint }, read);
+        await tab.run(() => window.dispatchEvent(new Event('bc:back')));
+        await sleep(500);
+      }
+    }
+    // The choice is kept on the device: the blocks and tabs that follow start from the default.
+    await tab.run(async () => { (await import('/src/lib/settings.svelte.js')).setAppSetting('dateFormat', 'system'); });
     tab.ws.close();
   }
 }
@@ -2894,7 +3044,7 @@ async function accountBackFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only', '--multi-dive-only', '--dive-tabs-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-dates-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only', '--multi-dive-only', '--dive-tabs-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2943,6 +3093,7 @@ try {
     ['maintenance entry', '--maintenance-entry-only', 15, true, () => maintenanceEntryFlows(expect)],
     ['gear add', '--gear-add-only', 15, !phoneOnly && !welcomeOnly, () => gearAddFlows(expect)],
     ['gear type', '--gear-type-dialog-only', 35, true, () => gearTypeDialogFlows(expect)],
+    ['gear dates', '--gear-dates-only', 25, true, () => gearDatesFlows(expect)],
     ['gear delete', '--gear-delete-only', 30, true, () => gearDeleteFlows(expect)],
     ['certifications add', '--certs-fab-only', 20, !phoneOnly && !welcomeOnly, () => certsFabFlows(expect)],
     ['certification agencies', '--cert-agencies-only', 12, true, () => certificationAgencyFlows(expect)],

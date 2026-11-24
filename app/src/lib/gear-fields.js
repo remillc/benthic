@@ -28,7 +28,8 @@
  * @property {string} [serialHint] a type's own hint for the serial number: `gear.pieceNew.serialHint.<serialHint>`
  * @property {DetailField[]} [before] fields between the name and the brand (the free type name of « Autre »)
  * @property {DetailField[]} [extras] fields after the serial number
- * @property {DetailField[]} [late] fields after « Date d'achat » (a rebreather's two dates), before « Notes »
+ * @property {DetailField[]} [late] fields after « Date d'achat » (a rebreather's last service), before « Notes »
+ * @property {boolean} [noPurchase] the type has no « Date d'achat » (the O₂ cells: the two dates say it all)
  */
 
 /**
@@ -69,17 +70,26 @@ export const SPECS = {
     ],
   },
   undersuit: { brand: true, extras: [{ key: 'size', kind: 'text' }] },
-  // Task 2026-11-22-324 and 334: the dates the O₂ cells were made and installed and the last service, after « Date d'achat »;
-  // each feeds a reminder (lib/maintenance.js `o2CellsDue`).
+  // The last service, after « Date d'achat », feeds the rebreather's reminder. Its O₂ cells are a piece of their own
+  // (`o2Cells`, task 2026-11-24-397); the two dates they used to have here moved there (lib/o2-cells-migration.js).
   rebreather: {
     photo: true,
     brand: true,
     serial: true,
     serialHint: 'rebreather',
+    late: [{ key: 'lastService', kind: 'date' }],
+  },
+  // A rebreather's O₂ cells (task 2026-11-24-397): brand, the number on the cell's label, the two dates on one row. No photo,
+  // model, serial number or purchase date. The replacement falls due at the earlier of manufacture + 18 months and
+  // installation + 12 months (lib/maintenance.js `o2CellsDue`).
+  o2Cells: {
+    brand: true,
+    brandOnly: true,
+    noPurchase: true,
+    extras: [{ key: 'cellsNumber', kind: 'text', hint: true }],
     late: [
-      { key: 'o2CellsMadeOn', kind: 'date' },
-      { key: 'o2CellsOn', kind: 'date' },
-      { key: 'lastService', kind: 'date' },
+      { key: 'cellsMadeOn', kind: 'date' },
+      { key: 'cellsInstalledOn', kind: 'date' },
     ],
   },
   // The cylinder's brand follows its name; the brand does not make the name, and there is no model (task 334).
@@ -162,6 +172,12 @@ export function detailFields(type) {
 
 /** True when a type names its pieces by hand (cylinder, weight belt, other). @param {GearType} type */
 export const isNamedByHand = (type) => !!SPECS[type]?.named;
+
+/** True when a type has a « Date d'achat » (every type but the O₂ cells). @param {GearType} type */
+export const hasPurchaseDate = (type) => !SPECS[type]?.noPurchase;
+
+/** The keys of the two dates of the O₂ cells, on one row of the form. */
+export const CELLS_DATE_KEYS = ['cellsMadeOn', 'cellsInstalledOn'];
 
 /** Pieces of this type that carry a model (so a name made from brand and model). @param {GearType} type */
 export const hasBrand = (type) => !!SPECS[type]?.brand;

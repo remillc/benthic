@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { SPECS, detailFields, derivedName, detailProblems, detailsToKeep, parseStampText, stampText, detailRows, isNamedByHand } from '../../app/src/lib/gear-fields.js';
+import { SPECS, detailFields, derivedName, detailProblems, detailsToKeep, parseStampText, stampText, detailRows, isNamedByHand, hasPurchaseDate } from '../../app/src/lib/gear-fields.js';
 import { GEAR_TYPES } from '../../app/src/lib/inventory.js';
 
 const langs = Object.fromEntries(['fr', 'en'].map((l) => [l, JSON.parse(fs.readFileSync(new URL(`../../app/src/i18n/${l}.json`, import.meta.url), 'utf8'))]));
@@ -106,15 +106,34 @@ test('the rows of a piece\'s sheet: the type\'s own fields in the order of the f
   assert.deepEqual(detailRows('mask', undefined, text), []);
 });
 
-test('a rebreather (Recycleur, task 324): its two dates come after the purchase date and are kept', () => {
+test('a rebreather (Recycleur): its last service comes after the purchase date and is kept; the O₂ cells are no longer its fields (task 397)', () => {
   assert.equal(GEAR_TYPES[GEAR_TYPES.indexOf('cylinder') + 1], 'rebreather', 'right after the bottle');
   const { before, after, late } = detailFields('rebreather');
   assert.deepEqual([before, after], [[], []]);
-  assert.deepEqual(late.map((f) => [f.key, f.kind]), [['o2CellsMadeOn', 'date'], ['o2CellsOn', 'date'], ['lastService', 'date']]);
+  assert.deepEqual(late.map((f) => [f.key, f.kind]), [['lastService', 'date']]);
   assert.deepEqual([SPECS.rebreather.brand, SPECS.rebreather.serial, SPECS.rebreather.photo, SPECS.rebreather.serialHint], [true, true, true, 'rebreather']);
-  assert.deepEqual(detailsToKeep('rebreather', { o2CellsOn: '2026-03-14', lastService: '2025-11-08', thickness: '5' }), { o2CellsOn: '2026-03-14', lastService: '2025-11-08' });
-  assert.deepEqual(detailProblems('rebreather', { o2CellsOn: '14/03', lastService: '2025-11-08' }), { o2CellsOn: 'date' });
-  assert.deepEqual(detailRows('rebreather', { o2CellsOn: '2026-03-14' }, { label: (k) => k, option: (k, o) => o, yes: 'yes', date: (d) => d }), [{ label: 'o2CellsOn', value: '2026-03-14' }]);
+  assert.deepEqual(detailsToKeep('rebreather', { lastService: '2025-11-08', thickness: '5' }), { lastService: '2025-11-08' });
+  assert.deepEqual(detailProblems('rebreather', { lastService: '08/11' }), { lastService: 'date' });
+  assert.deepEqual(detailRows('rebreather', { lastService: '2025-11-08' }, { label: (k) => k, option: (k, o) => o, yes: 'yes', date: (d) => d }), [{ label: 'lastService', value: '2025-11-08' }]);
+  // The dates of the old fields stay in the file of a rebreather that still holds them (unknown keys are kept, never shown).
+  assert.deepEqual(detailsToKeep('rebreather', { lastService: '2025-11-08' }, { o2CellsOn: '2026-03-14', o2CellsMadeOn: '2025-06-10' }), { o2CellsOn: '2026-03-14', o2CellsMadeOn: '2025-06-10', lastService: '2025-11-08' });
+  assert.deepEqual(detailRows('rebreather', { o2CellsOn: '2026-03-14' }, { label: (k) => k, option: (k, o) => o, yes: 'yes', date: (d) => d }), []);
+});
+
+test('the O₂ cells (task 397): after the rebreather, brand, number, the two dates; no model, serial, photo or purchase date', () => {
+  assert.equal(GEAR_TYPES[GEAR_TYPES.indexOf('rebreather') + 1], 'o2Cells', 'right after the rebreather');
+  const { before, after, late } = detailFields('o2Cells');
+  assert.deepEqual(before, []);
+  assert.deepEqual(after.map((f) => [f.key, f.kind, !!f.hint]), [['cellsNumber', 'text', true]]);
+  assert.deepEqual(late.map((f) => [f.key, f.kind]), [['cellsMadeOn', 'date'], ['cellsInstalledOn', 'date']]);
+  assert.deepEqual([SPECS.o2Cells.brand, SPECS.o2Cells.brandOnly, SPECS.o2Cells.serial, SPECS.o2Cells.photo, SPECS.o2Cells.named], [true, true, undefined, undefined, undefined]);
+  assert.equal(hasPurchaseDate('o2Cells'), false);
+  assert.ok(['rebreather', 'regulator', 'other'].every((t) => hasPurchaseDate(/** @type {any} */ (t))));
+  assert.deepEqual(detailProblems('o2Cells', { cellsInstalledOn: '14/03' }), { cellsInstalledOn: 'date' });
+  assert.deepEqual(detailsToKeep('o2Cells', { cellsNumber: ' 7 ', cellsMadeOn: '2025-12-15', lastService: '2025-01-01' }), { cellsNumber: '7', cellsMadeOn: '2025-12-15' });
+  for (const l of ['fr', 'en']) for (const k of ['cellsNumber', 'cellsMadeOn', 'cellsInstalledOn']) assert.ok(at(langs[l], 'gear.field.' + k), l + ' ' + k);
+  assert.equal(langs.fr.gear.fieldHint.cellsNumber, 'Sur l’étiquette de la cellule');
+  assert.equal(langs.fr.gear.pieceNew.tile.o2Cells, 'Cellules O₂');
 });
 
 test('task 334: the cylinder has a brand after its name, the three types lose their fields, a rebreather has a manufacture date', () => {
@@ -125,8 +144,8 @@ test('task 334: the cylinder has a brand after its name, the three types lose th
   assert.deepEqual(keys('scooter'), []);
   assert.deepEqual(keys('camera'), []);
   assert.deepEqual(keys('floatBuoy'), []);
-  assert.deepEqual(keys('rebreather'), ['o2CellsMadeOn', 'o2CellsOn', 'lastService']);
-  assert.equal(detailProblems('rebreather', { o2CellsMadeOn: '2026-02-30' }).o2CellsMadeOn, 'date');
+  assert.deepEqual(keys('rebreather'), ['lastService']);
+  assert.equal(detailProblems('rebreather', { lastService: '2026-02-30' }).lastService, 'date');
 });
 
 test('task 334: a removed field\'s saved value stays in the file, not shown, while the piece keeps its type', () => {
@@ -141,8 +160,8 @@ test('task 334: a removed field\'s saved value stays in the file, not shown, whi
 
 test('task 334: the new labels exist in French and English', () => {
   for (const l of ['fr', 'en']) {
-    assert.ok(at(langs[l], 'gear.field.o2CellsMadeOn'), l);
+    assert.ok(!at(langs[l], 'gear.field.o2CellsMadeOn') && !at(langs[l], 'gear.field.o2CellsOn'), l);
     assert.ok(!at(langs[l], 'gear.field.speed') && !at(langs[l], 'gear.field.housingDepth') && !at(langs[l], 'gear.field.colour'), l);
   }
-  assert.match(langs.fr.maintenance.reminderCard.suggestRebreather, /18 mois de fabrication ou 12 mois d’installation, révision chaque année/);
+  assert.equal(langs.fr.maintenance.reminderCard.suggestRebreather, 'Suggéré pour un recycleur : révision chaque année');
 });

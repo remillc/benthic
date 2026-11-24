@@ -52,3 +52,29 @@ test('every shown date follows the setting, with or without a time', () => {
   assert.equal(formatDate('2026-11-06T10:30:00'), '06/11/2026');
   settings.dateFormat = 'system';
 });
+
+// Task 2026-11-24-397, point 5: a date inside a form field (the piece, certification, document and profile forms, on the phone, the
+// tablet and the desktop) reads like Réglages › « Format de la date » lists the choice, and like the typed dates of the same form.
+test('a date field shows the date as the setting lists it, for every choice, never the long form of the read-only views', async () => {
+  const { formatFieldDate } = await import('../../app/src/lib/profile-format.js');
+  const march = new Date(Date.UTC(2026, 2, 14));
+  for (const choice of CHOICES) {
+    settings.dateFormat = choice;
+    assert.equal(formatFieldDate('2026-03-14'), formatDateChoice(march, choice), choice);
+  }
+  settings.dateFormat = 'iso';
+  assert.equal(formatFieldDate('2026-03-14'), '2026-03-14');
+  settings.dateFormat = 'dmy';
+  assert.equal(formatFieldDate('2026-03-14'), '14/03/2026');
+  settings.dateFormat = 'mdy';
+  assert.equal(formatFieldDate('2026-03-14'), '03/14/2026');
+  // The device's own format: the numeric date of the device, the one the form's typed dates use, not « 14 mars 2026 ».
+  settings.dateFormat = 'system';
+  assert.equal(formatFieldDate('2026-03-14'), typedDate('2026-03-14'));
+  assert.notEqual(formatFieldDate('2026-03-14'), formatDate('2026-03-14'), 'the read-only views keep the medium date');
+  assert.equal(formatFieldDate(''), '');
+  assert.equal(formatFieldDate('hier'), '');
+  // The field uses it, so every form that has a DateField follows the setting.
+  const field = (await import('node:fs')).readFileSync(new URL('../../app/src/components/DateField.svelte', import.meta.url), 'utf8');
+  assert.match(field, /value \? formatFieldDate\(value\) : placeholder/);
+});

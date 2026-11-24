@@ -21,7 +21,7 @@
  * @property {string} [lastDoneOn] the latest service in the history
  * @property {14|30|60|null} [notifyDays] this reminder's own lead time before the due date (null or absent: the default of
  *   Réglages › Notifications; a stored 7 from before task 2026-11-19-308 reads as 14)
- * @property {string} [dueOn] a due date set from the piece's own dates (the O₂ cells of a rebreather: `o2CellsDue`); it
+ * @property {string} [dueOn] a due date set from the piece's own dates (the O₂ cells piece: `o2CellsDue`); it
  *   replaces the duration's date while `dueFrom` is the latest service
  * @property {string} [dueFrom] the `lastDoneOn` (or '') the `dueOn` was worked out at; a later service ends it
  * @property {boolean} warnInDive warn in the edit of a dive that uses the piece while the service is overdue
@@ -86,35 +86,42 @@ export const SUGGESTIONS = {
     { task: 'hydrostatic', months: 60 },
   ],
   bcd: [{ task: 'service', months: 12 }],
-  // Task 2026-11-22-324 and 334: the O₂ cells at the earlier of 18 months from manufacture and 12 months from installation
-  // (`o2CellsDue`), a service every year.
-  rebreather: [
-    { task: 'o2Cells', months: 12 },
-    { task: 'service', months: 12 },
-  ],
+  // A service every year. The O₂ cells have their own piece since task 2026-11-24-397.
+  rebreather: [{ task: 'service', months: 12 }],
+  // The cells' replacement, at the earlier of 18 months from manufacture and 12 months from installation (`o2CellsDue`).
+  o2Cells: [{ task: 'o2Cells', months: 12 }],
 }
 
 /**
- * Reminders exist only for a cylinder, a BCD, a regulator, a rebreather and a drysuit (docs/equipment-fields.md,
+ * Reminders exist only for a cylinder, a BCD, a regulator, a rebreather, O₂ cells and a drysuit (docs/equipment-fields.md,
  * to-do #148). A suit is a drysuit when its type says so.
  * @param {string} type
  * @param {Record<string, string>} [details]
  */
-export const hasReminders = (type, details) => ['regulator', 'cylinder', 'rebreather', 'bcd'].includes(type) || (type === 'suit' && details?.suitType === 'dry')
+export const hasReminders = (type, details) => ['regulator', 'cylinder', 'rebreather', 'o2Cells', 'bcd'].includes(type) || (type === 'suit' && details?.suitType === 'dry')
 
-/** Months from manufacture and from installation at which a rebreather's O₂ cells fall due. */
+/** Months from manufacture and from installation at which O₂ cells fall due. */
 export const O2_CELLS_MONTHS = { made: 18, installed: 12 }
 
 /**
- * When a rebreather's O₂ cells fall due: the earlier of the manufacture date + 18 months and the installation date +
- * 12 months; with one date only, that date's rule alone; null with none (the month printed on a cell is enough:
- * a date typed as the first of its month works the same).
+ * When O₂ cells fall due: the earlier of the manufacture date + 18 months and the installation date + 12 months; with one
+ * date only, that date's rule alone; null with none (the month printed on a cell is enough: a date typed as the first of
+ * its month works the same). `basis` is the rule that decides (installation wins a tie, the diver's own date).
  * @param {{ madeOn?: string, installedOn?: string }} dates YYYY-MM-DD or empty
- * @returns {string|null}
+ * @returns {{ due: string, basis: 'made'|'installed' }|null}
  */
-export function o2CellsDue({ madeOn, installedOn }) {
-  const dues = [madeOn ? addMonths(madeOn, O2_CELLS_MONTHS.made) : '', installedOn ? addMonths(installedOn, O2_CELLS_MONTHS.installed) : ''].filter(Boolean).sort()
-  return dues[0] ?? null
+export function o2CellsRule({ madeOn, installedOn }) {
+  const made = madeOn ? addMonths(madeOn, O2_CELLS_MONTHS.made) : ''
+  const installed = installedOn ? addMonths(installedOn, O2_CELLS_MONTHS.installed) : ''
+  if (made && installed) return made < installed ? { due: made, basis: 'made' } : { due: installed, basis: 'installed' }
+  if (installed) return { due: installed, basis: 'installed' }
+  if (made) return { due: made, basis: 'made' }
+  return null
+}
+
+/** The day O₂ cells fall due (`o2CellsRule`), or null without a date. @param {{ madeOn?: string, installedOn?: string }} dates @returns {string|null} */
+export function o2CellsDue(dates) {
+  return o2CellsRule(dates)?.due ?? null
 }
 
 /**

@@ -4,7 +4,7 @@
   // (« 1979-03-14 », its hint when empty), and keeps it as YYYY-MM-DD. Empty until chosen.
   import ButtonField from './ButtonField.svelte';
   import DatePickerDialog from './DatePickerDialog.svelte';
-  import { formatDate, partsOf, isoOf } from '../lib/profile-format.js';
+  import { formatFieldDate, partsOf, isoOf } from '../lib/profile-format.js';
   import { dateHint } from '../lib/format.js';
 
   /** @type {{ label: string, value: string, placeholder?: string, supporting?: string, minYear?: number, maxYear?: number }} */
@@ -14,7 +14,7 @@
   const parts = $derived(partsOf(value, maxYear));
 </script>
 
-<ButtonField {label} value={value ? formatDate(value) : placeholder} icon="calendar" {supporting} onclick={() => (open = true)} />
+<ButtonField {label} value={value ? formatFieldDate(value) : placeholder} icon="calendar" {supporting} onclick={() => (open = true)} />
 
 {#if open}
   <DatePickerDialog
