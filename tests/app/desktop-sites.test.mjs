@@ -9,7 +9,6 @@ import {
   matchesSiteText,
   searchSites,
   reduceSelection,
-  withoutSiteBar,
   cleanupBar,
   stackPins,
   countValues,
@@ -92,25 +91,21 @@ test('a site that is no longer listed is no longer selected', () => {
   assert.deepEqual(reduceSelection({ selected: null, mode: 'map' }, { type: 'visible', uuids: [] }), { selected: null, mode: 'map' });
 });
 
-test('the « plongées sans site » bar: its count, absent at 0 and while searching', () => {
-  assert.deepEqual(withoutSiteBar(5, false), { count: 5 });
-  assert.equal(withoutSiteBar(0, false), null, 'no dive without a site: no bar');
-  assert.equal(withoutSiteBar(5, true), null, 'the search hides the bars');
-});
-
 test('the count lowers when dives get a site, and the bar goes at 0', () => {
   const without = [{ id: 1 }, { id: 2 }, { id: 3 }];
   assert.equal(withoutAfter(without, [2]), 2);
-  assert.equal(withoutSiteBar(withoutAfter(without, [2]), false)?.count, 2);
-  assert.equal(withoutSiteBar(withoutAfter(without, [1, 2, 3]), false), null);
+  const counts = (/** @type {number} */ n) => ({ duplicates: 0, unused: 0, without: n, unplaced: 0 });
+  assert.equal(cleanupBar(counts(withoutAfter(without, [2])), false)?.points, 1);
+  assert.equal(cleanupBar(counts(withoutAfter(without, [1, 2, 3])), false), null);
   assert.equal(withoutAfter(without, [99]), 3, 'a dive that was not in the list changes nothing');
 });
 
-test('the clean-up bar shows duplicates and unused sites, under the first bar', () => {
-  assert.deepEqual(cleanupBar(2, 3, false), { duplicates: 2, unused: 3 });
-  assert.deepEqual(cleanupBar(0, 3, false), { duplicates: 0, unused: 3 });
-  assert.equal(cleanupBar(0, 0, false), null);
-  assert.equal(cleanupBar(2, 3, true), null);
+test('the clean-up bar is one: how many of the four problems exist, absent at 0 and while searching', () => {
+  assert.deepEqual(cleanupBar({ duplicates: 2, unused: 3, without: 0, unplaced: 0 }, false), { points: 2 });
+  assert.deepEqual(cleanupBar({ duplicates: 2, unused: 3, without: 5, unplaced: 1 }, false), { points: 4 });
+  assert.deepEqual(cleanupBar({ duplicates: 0, unused: 0, without: 0, unplaced: 7 }, false), { points: 1 }, 'a count of 7 is one problem');
+  assert.equal(cleanupBar({ duplicates: 0, unused: 0, without: 0, unplaced: 0 }, false), null);
+  assert.equal(cleanupBar({ duplicates: 2, unused: 3, without: 5, unplaced: 1 }, true), null, 'the search hides the bar');
 });
 
 test('pins that overlap at the zoom merge into one with their count', () => {
