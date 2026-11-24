@@ -2454,6 +2454,8 @@ async function gearDatesFlows(expect) {
         await sleep(500);
       }
     }
+    // The choice is kept on the device: the blocks and tabs that follow start from the default.
+    await tab.run(async () => { (await import('/src/lib/settings.svelte.js')).setAppSetting('dateFormat', 'system'); });
     tab.ws.close();
   }
 }
