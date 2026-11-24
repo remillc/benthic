@@ -151,7 +151,9 @@ export async function desktopEquipmentFlows(h) {
   });
   await waitFor(() => !!window.__live('.bc-add-equipment [role="checkbox"]'));
   await tab.run(() => {
-    /** @type {HTMLElement|null} */ (window.__live('.bc-add-equipment [role="checkbox"]'))?.click();
+    // The knife made above, not the first piece of the list: the earlier blocks of a shard leave other gear in the inventory.
+    const boxes = window.__liveAll('.bc-add-equipment [role="checkbox"]');
+    /** @type {HTMLElement|undefined} */ (boxes.find((b) => b.textContent?.includes('Couteau test')) ?? boxes[0])?.click();
     return 1;
   });
   await sleep(300);
