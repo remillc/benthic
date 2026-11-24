@@ -49,6 +49,8 @@
 	<string>Benthic uses Bluetooth to download your dives from your dive computer.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Benthic reads the depth and water temperature your Apple Watch Ultra recorded during your dives, to add those dives to your logbook. Nothing is written to Health.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Benthic never writes to Health. It only reads the dives your Apple Watch Ultra recorded.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Benthic uses the camera only to read the QR codes of a dive or a plan shared from another phone. Nothing is recorded.</string>
 	<!-- Push notifications of access requests (task 2026-11-23-356): the background push that removes a notification. -->
