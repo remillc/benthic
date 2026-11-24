@@ -7390,3 +7390,20 @@ Christian asked for this on 24 November 2026. Work in `main`. The black outline 
 2. Check the callers (`GasSummary.svelte`, `GasCard.svelte`, `DesktopGasCards.svelte`) in light and dark themes.
 
 **Test:** open a dive with cylinders on the phone (light and dark) and on the desktop « Gaz » tab: the outline is thin, matching the mock-ups, and the level lines and fill are unchanged.
+
+## [ ] 2026-11-24-380 Health-data consent: the mock-ups follow its removal; leftovers to clean
+
+Christian asked for this on 24 November 2026: the blood group needs no separate consent, it is covered by the agreement the user accepts when installing the app, and there is no way to withdraw a consent either. The app already dropped the consent on 20 November (commit « Remove blood group consent requirement »); the mock-ups were behind and now match. Work in `main`.
+
+Mock-ups (Christian's canvases were split today: « Benthic — Téléphone », « Benthic — Tablette », and a new « Benthic — Bureau » that now holds every desktop board, pages Pour commencer, Bureau and Serveur Benthic):
+- removed: « Mon profil de plongeur, accord pour une donnée de santé », « … informations, données de santé non autorisées » and the Benthic+ step « Benthic+, données de santé, accord facultatif », on phone, tablet and desktop. On the phone, « Benthic+ abonné » now leads to « Prêt ».
+- removed under « Groupe sanguin » on every profile board: « Vous avez donné votre accord le … » and « Retirer l’accord ». What stays: « Le groupe sanguin est chiffré sur votre compte Benthic+ et n’est visible que par vous. »
+- also removed today, obsolete since pairing by approval (#183): the code-pairing boards « Appareil déjà jumelé, montrer le code / confirmer le jumelage » and « Nouvel ordinateur sans caméra, montrer le code ».
+- `docs/mockups/`: the removed boards are deleted and the profile copies updated.
+
+To do:
+1. Check that no screen still asks for or mentions a health-data consent, and that the Benthic+ first launch has no « données de santé » step, on every device.
+2. `app/src/lib/server-api.js`: `healthConsent` and `setHealthConsent` are no longer called; remove them (and `consentOf`) unless something else needs them. Tell Christian if the server's `/v1/account/health-consent` endpoint should go too (benthic-server repository).
+3. Keep reading `meta/health-consent.json` only where the full export needs it for compatibility (`full-export.js`), as `docs/architecture.md` says; nothing writes it.
+
+**Test:** create a Benthic+ account, fill the blood group: no consent question at any point, no « Retirer l’accord » anywhere; the full export still opens in an older build.
