@@ -129,3 +129,12 @@ test('task 226: the link sits right under « Un fichier », before divelogs.de, 
   assert.match(rule, /min-height: 48px;/);
   assert.match(rule, /padding: 0 4px;/);
 });
+
+test('importAccept: only on iOS, with the logbook files, archives, tables and every listed extension', async () => {
+  const { importAccept, IMPORT_FORMATS } = await import('../../app/src/lib/import-formats.js');
+  assert.equal(importAccept('android'), undefined);
+  assert.equal(importAccept('web'), undefined);
+  const list = importAccept('ios').split(',');
+  for (const e of ['.ssrf', '.xml', '.benthic', '.zip', '.csv', ...IMPORT_FORMATS.flatMap((f) => f.extensions)]) assert.ok(list.includes(e), e);
+  assert.equal(new Set(list).size, list.length);
+});

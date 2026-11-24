@@ -12,6 +12,8 @@
   // "Précédent" goes back to step 1, which then only shows the email of the
   // account already created. Also reached when signing in to an account
   // that has no logbook yet.
+  import { Capacitor } from '@capacitor/core';
+  import { importAccept } from '../lib/import-formats.js';
   import { BenthicCore } from 'benthic-core';
   import { stageFile } from '../lib/staged-file.js';
   import TextField from '../components/TextField.svelte';
@@ -121,7 +123,7 @@
   previous
   back={!signedIn}
 >
-  <input type="file" class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" accept={importAccept(Capacitor.getPlatform())} class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   <div class="bc-bring-logbook--sources" role="radiogroup" aria-label={t('bringLogbook.sourceLabel')}>
     {#if deviceCount}
       <!-- The dives already on this device come first when there are some. -->

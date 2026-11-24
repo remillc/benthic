@@ -71,6 +71,7 @@
   import { isCancelled } from '../lib/import-progress.js';
   import { longPressFeedback } from '../lib/haptics.js';
   import { Capacitor } from '@capacitor/core';
+  import { importAccept } from '../lib/import-formats.js';
   import { BenthicCore } from 'benthic-core';
 
   /** @typedef {import('benthic-core').Dive} Dive */
@@ -1767,7 +1768,7 @@
   {/if}
 
   <!-- The file picker of "Import a file" (hidden; any file: the core tells what it can read). -->
-  <input type="file" multiple class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+  <input type="file" multiple accept={importAccept(Capacitor.getPlatform())} class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
   {#if csv}
     <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={csvFailed} />
   {/if}

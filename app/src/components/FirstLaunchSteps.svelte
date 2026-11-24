@@ -50,7 +50,7 @@
   import { importErrorKey, isSubsurfaceXml } from '../lib/deep-link.js';
   import { errorCode } from '../lib/account.js';
   import { reducedMotion } from '../lib/reduced-motion.js';
-  import { IMPORT_FORMAT_COUNT } from '../lib/import-formats.js';
+  import { IMPORT_FORMAT_COUNT, importAccept } from '../lib/import-formats.js';
   import { deviceKind, deviceKey, iosPhone } from '../lib/first-launch-phone.js';
   import { layout, ios, desktopApp, desktopMac } from '../lib/layout.svelte.js';
   import { noLogbook } from '../lib/desktop-logbooks.svelte.js';
@@ -1079,7 +1079,7 @@
             <ReleaseChoiceRow icon="globe" title={t('welcomeSteps.divelogsTitle')} help={t('welcomeSteps.divelogsHelp')} onclick={() => go('divelogs')} />
           </nav>
           {@render dropLine()}
-          <input type="file" multiple class="bc-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
+          <input type="file" multiple accept={importAccept(Capacitor.getPlatform())} class="bc-first-launch--file" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
           {#if csv}
             <CsvImportDialog file={csv.file} companion={csv.companion} onclose={() => (csv = null)} onconfirm={csvConfirmed} onfail={(e) => { const file = csv?.file; csv = null; failed(e, file); }} />
           {/if}

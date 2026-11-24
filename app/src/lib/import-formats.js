@@ -64,3 +64,16 @@ export function formatsOf(column) {
 export const openFormats = (state) => void (state.formatsOpen = true);
 /** @param {{ formatsOpen: boolean }} state */
 export const closeFormats = (state) => void (state.formatsOpen = false);
+
+/**
+ * The `accept` of the import file inputs on iOS: without it WKWebView first offers « Photo Library / Take Photo », and a logbook
+ * never comes from the photo library. Every extension of the list, plus the logbook files, the archives and the CSV tables.
+ * Android and the desktop leave `accept` out (Android greys out a file whose extension has no MIME type).
+ * @param {string} platform `Capacitor.getPlatform()`
+ * @returns {string|undefined}
+ */
+export function importAccept(platform) {
+  if (platform !== 'ios') return undefined;
+  const all = new Set(['.ssrf', '.xml', '.benthic', '.zip', '.csv', '.tsv', ...IMPORT_FORMATS.flatMap((f) => f.extensions)]);
+  return [...all].join(',');
+}
