@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 201
+Next number: 202
 
 ## List
 
@@ -50,3 +50,4 @@ Next number: 201
 - #196 [design] stratégie de campagne de communication et publicité pour rejoindre les potentiels acheteurs de l’app.
 - #197 [design] l’extension .benthic n’a pas d’icône.
 - #200 [design] design et code : constituer une base de données des modèles de recycleurs pour utilisation dans Équipement.
+- #201 [code] mettre en place une étape de validation de la version gratuite avant chaque release : parcourir l’APK de publication sans compte et vérifier qu’aucun serveur n’apparaît.
