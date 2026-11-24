@@ -6,8 +6,10 @@
 // its own arithmetic (ft, cuft, psi...), sent to the core directly, and the core's
 // answer is formatted with the app's display rules, written again here.
 //
-// Rules: only the emulator (emulator-5554); the account must be the test account
-// (the page shows roger.bourdieu) or nothing is run; every plan saved is deleted.
+// Rules: only the emulator (emulator-5554), with the logbook of the device and NO account (nothing
+// leaves the emulator); the run aborts if the app is signed in to any server account (a Benthic
+// server session, a git repository, or a Subsurface cloud account configured in the core);
+// from first launch it opens the sample logbook on the device; every plan saved is deleted.
 //
 // usage: node tests/e2e/planner-e2e.mjs        (the app installed and started on the emulator)
 import { readFileSync } from 'node:fs';
@@ -40,14 +42,30 @@ const yes = (name, ok, detail = '') => record(name, !!ok, detail);
 const p = await connect();
 const q = (s) => JSON.stringify(s);
 
-// --- the account: abort unless it is the test account -----------------------------
-// The account screen fills a few seconds after the start.
-await p.waitFor(`!!document.querySelector('#view-account')?.textContent.trim()`, 'the account screen', 90000).catch(() => {});
-const accountText = await p.eval(`document.querySelector('#view-account')?.textContent ?? ''`);
-if (!accountText.includes('roger.bourdieu')) {
-  console.error('ABORT: the emulator is not on the test account; nothing was run.');
+// --- the account: abort unless the app has no account --------------------------------
+// Only the emulator is ever driven (cdp.mjs), and only a logbook of the device is used: nothing leaves it.
+await p.waitFor(`!!window.Capacitor?.Plugins?.BenthicCore && !!document.querySelector('.view-main, .bc-first-launch, [class*="first-launch"]')`, 'the app', 90000).catch(() => {});
+const accountState = () =>
+  p.eval(`(async () => {
+    const core = Capacitor.Plugins.BenthicCore;
+    const cloud = await core.configureCloud();
+    const session = await core.serverSessionInfo();
+    return { cloud: !!cloud.available, mode: cloud.mode ?? '', session: !!session.signedIn };
+  })()`);
+const acc = await accountState();
+if (acc.cloud || acc.session) {
+  console.error(`ABORT: the app is signed in to an account (${JSON.stringify(acc)}); nothing was run. The scenarios run on the emulator with the device's own logbook and no account.`);
   process.exit(2);
 }
+// First launch: open the sample logbook on the device (no account, nothing sent anywhere).
+if (!(await p.eval(`Capacitor.Plugins.BenthicCore.listDives().then((r) => r.exists)`))) {
+  const link = JSON.stringify(JSON.parse(readFileSync(new URL('../../app/src/i18n/en.json', import.meta.url), 'utf8')).demoLogbook.link);
+  await p.waitFor(`[...document.querySelectorAll('button.bc-first-launch--text-button')].some((b) => b.textContent.trim() === ${link} && !b.disabled)`, 'the sample logbook link on first launch', 90000);
+  await p.eval(`([...document.querySelectorAll('button.bc-first-launch--text-button')].find((b) => b.textContent.trim() === ${link}).click(), 0)`);
+  await p.waitFor(`Capacitor.Plugins.BenthicCore.listDives().then((r) => r.exists)`, 'the sample logbook to open', 120000);
+  await sleep(1500);
+}
+await p.waitFor(`Capacitor.Plugins.BenthicCore.listLoadedDives({}).then((r) => !!r?.json && JSON.parse(r.json).length > 0)`, 'the dives of the logbook', 90000);
 
 // --- hooks in the page ------------------------------------------------------------
 async function inject() {
@@ -489,8 +507,8 @@ async function run() {
     cylinders: [{ o2Permille: 210, hePermille: 350 }, { o2Permille: 500, hePermille: 0 }, { o2Permille: 1000, hePermille: 0 }],
   }, { alarms: true });
   yes('12 the save is allowed', !(await read()).saveDisabled);
-  const account = await p.eval(`document.querySelector('#view-account')?.textContent ?? ''`);
-  if (!account.includes('roger.bourdieu')) throw new Error('not the test account: no save');
+  const accountNow = await accountState();
+  if (accountNow.cloud || accountNow.session) throw new Error('signed in to an account: no save');
   await click('.page-current .navbar .right a, .navbar .right a', T('plan.save'));
   // "Save" asks for a title first (task 2026-11-12-38): keep the proposed one.
   await click('.bc-plan-title-dialog button', T('plan.save'));
@@ -511,7 +529,7 @@ async function run() {
   await sleep(2500);
   await inject();
   await p.waitFor(`!!document.querySelector('.view-main')?.f7View`, 'the app view', 60000);
-  await p.waitFor(`document.querySelector('#view-account')?.textContent.includes('roger.bourdieu')`, 'the account after the reload', 90000);
+  await p.waitFor(`Capacitor.Plugins.BenthicCore.listLoadedDives({}).then((r) => !!r?.json && JSON.parse(r.json).length > 0)`, 'the logbook after the reload', 90000);
   const afterReload = await core('getPrefs');
   if (afterReload.length !== 'm') console.log(`note: after the reload the units are ${afterReload.unitSystem} ${afterReload.length}/${afterReload.pressure}/${afterReload.volume}, not the metric chosen before`);
   await useUnits('metric');

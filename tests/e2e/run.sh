@@ -1,7 +1,7 @@
 #!/bin/bash
 # Builds the app as it ships (debug APK, x86_64 core), installs it on the
 # emulator-5554 and runs the planner scenarios in it (tests/e2e/planner-e2e.mjs).
-# Only ever the emulator. The account of the emulator must be the test account.
+# Only ever the emulator, with the logbook of the device and no account: the scenarios open the sample logbook on first launch and abort if the app is signed in.
 # Needs: the NDK (native/install-ndk.sh), JDK 21 (JAVA_HOME), the Android SDK (ANDROID_HOME),
 # node, and under WSL powershell.exe to run Gradle on Windows (AGENTS.md, "Android app").
 # usage: tests/e2e/run.sh [--no-build]
@@ -40,7 +40,7 @@ APK=$ROOT/app/android/app/build/outputs/apk/debug/app-debug.apk
 adb install -r "$(winpath "$APK")" | tail -1
 adb shell am force-stop app.benthicdivelog
 adb shell monkey -p app.benthicdivelog -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-# The app loads the log: wait for the account screen to be filled.
+# The app starts (the scenarios open the sample logbook themselves on first launch).
 sleep 20
 case "$ADB" in *.exe) NODE=node.exe ;; *) NODE=node ;; esac # the adb forward lives where adb runs
 "$NODE" tests/e2e/planner-e2e.mjs
