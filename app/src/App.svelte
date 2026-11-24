@@ -268,7 +268,10 @@
     { path: '/sites/', component: AdaptivePage, options: { props: { wide: DesktopSites, narrow: Sites } } },
     { path: '/sites/without/', ...lazy(() => import('./pages/DivesWithoutSite.svelte')) },
     { path: '/sites/without-site/:diveId', ...lazy(() => import('./pages/DiveNoSiteProfile.svelte')) },
-    { path: '/sites/cleanup', ...lazy(() => import('./pages/SitesCleanup.svelte')) },
+    // « Nettoyer les sites » (task 2026-11-24-395): the status page, then one screen per problem.
+    { path: '/sites/cleanup/', ...lazy(() => import('./pages/SitesCleanupStatus.svelte')) },
+    { path: '/sites/cleanup/duplicates/', ...lazy(() => import('./pages/SitesCleanup.svelte')) },
+    { path: '/sites/cleanup/unused/', ...lazy(() => import('./pages/SitesUnused.svelte')) },
     // « Choisir un site » (task 2026-11-14-151): lib/site-choice.js.
     { path: '/sites/choose', ...lazy(() => import('./pages/SiteChoose.svelte')) },
     { path: '/sites/unplaced/', ...lazy(() => import('./pages/SitesUnplaced.svelte')) },
@@ -276,6 +279,7 @@
     { path: '/sites/base/:id', ...lazy(() => import('./pages/SharedSiteSheet.svelte')) },
     { path: '/sites/:uuid', ...lazy(() => import('./pages/SiteSheet.svelte')) },
     { path: '/sites/:uuid/edit', ...lazy(() => import('./pages/SiteEdit.svelte')) },
+    { path: '/sites/:uuid/place', ...lazy(() => import('./pages/SitePlace.svelte')) },
     { path: '/statistics/', component: Statistics },
     { path: '/statistics/result', component: StatisticsResult },
     { path: '/statistics/dives/', component: StatisticsDives },

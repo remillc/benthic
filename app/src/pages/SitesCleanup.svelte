@@ -1,9 +1,8 @@
 <script>
   // @ts-check
-  // Clean up the sites (docs/mockups/sites-nettoyer-android.dc.html): possible
-  // duplicates in pairs, "These are not duplicates" or "Merge" (one site keeps
-  // all the dives; undoable); unused sites with check boxes and "Delete the
-  // selection". Each change of the logbook is confirmed first.
+  // « Doublons possibles » (docs/mockups/sites-nettoyer-android.dc.html), a screen of « Nettoyer les sites »
+  // (task 2026-11-24-395): the possible duplicates in pairs, "These are not duplicates" or "Merge" (one site
+  // keeps all the dives; undoable). The sites without a dive have their own screen (SitesUnused.svelte).
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { BenthicCore } from 'benthic-core';
@@ -22,10 +21,7 @@
 
   /** @type {{a: import('benthic-core').SiteSummary, b: import('benthic-core').SiteSummary, distanceM: number}[]} */
   let pairs = $state([]);
-  /** @type {import('benthic-core').SiteSummary[]} */
-  let unused = $state([]);
-  /** @type {Record<number, boolean>} */
-  let selected = $state({});
+  let loaded = $state(false);
 
   /**
    * The pairs listed when a site editor was opened from here, and the site
@@ -36,10 +32,10 @@
 
   async function load() {
     pairs = await possibleDuplicates();
+    loaded = true;
     const done = editing;
     editing = null;
     if (done) await announceGone(done);
-    unused = (await BenthicCore.siteQuery({ kind: 'list' })).filter((/** @type {any} */ s) => s.dives === 0);
   }
 
   /** @param {{uuid: number, pairs: typeof pairs}} done */
@@ -63,8 +59,6 @@
     logbook.sitesVersion;
     load();
   });
-
-  const selection = $derived(unused.filter((s) => selected[s.uuid]).map((s) => s.uuid));
 
   /** @param {import('benthic-core').SiteSummary} s */
   const describe = (s) =>
@@ -125,45 +119,20 @@
     });
   }
 
-  function deleteSelection() {
-    const n = selection.length;
-    if (!n) return;
-    editing = null;
-    confirmAction({
-      title: t('sites.deleteTitle'),
-      text: t('sites.deleteText', { n }),
-      action: t('sites.delete'),
-      onConfirm: async () => {
-        try {
-          await siteChange({ action: 'delete', uuids: selection });
-          selected = {};
-          offerSiteUndo();
-        } catch (e) {
-          console.error('Delete sites', e);
-          showSnackbar(t('edit.failed'));
-        }
-      },
-    });
-  }
-
   function offerSiteUndo() {
     offerUndo(t('sites.done'));
-  }
-
-  function selectAll() {
-    const all = unused.every((s) => selected[s.uuid]);
-    selected = Object.fromEntries(unused.map((s) => [s.uuid, !all]));
   }
 </script>
 
 <Page class="bc-sites-cleanup">
-  <Navbar title={t('sites.cleanupTitle')}>
+  <Navbar title={t('sites.duplicatesTitle')}>
     {#snippet left()}
       <Link back iconOnly><i class="icon icon-back"></i><span class="bc-sr-only">{t('common.back')}</span></Link>
     {/snippet}
   </Navbar>
 
   <p class="bc-intro">{t('sites.cleanupIntro')}</p>
+  {#if loaded && !pairs.length}<p class="bc-intro" role="status">{t('desktopSites.noDuplicates')}</p>{/if}
 
   <!-- One surface per possible duplicate: the site kept is chosen with a tinted, checked row (radio buttons on iOS). -->
   {#each pairs as pair (pairKey(pair.a.uuid, pair.b.uuid))}
@@ -196,34 +165,6 @@
       </div>
     </fieldset>
   {/each}
-
-  {#if unused.length}
-    <h2 class="bc-sites-cleanup--section">{t('sites.unusedTitle')}</h2>
-    <div class="bc-sites-cleanup--surface">
-      <p class="bc-sites-cleanup--explain">{t('sites.unusedIntro', { n: unused.length })}</p>
-      <label class="bc-sites-cleanup--row bc-sites-cleanup--check-row">
-        <span class="checkbox">
-          <input type="checkbox" checked={selection.length === unused.length} indeterminate={selection.length > 0 && selection.length < unused.length} onchange={selectAll} />
-          <i class="icon-checkbox"></i>
-        </span>
-        <span class="bc-sites-cleanup--label bc-sites-cleanup--strong">{t('sites.selectAll')}</span>
-      </label>
-      {#each unused as s (s.uuid)}
-        <label class="bc-sites-cleanup--row bc-sites-cleanup--check-row">
-          <span class="checkbox">
-            <input type="checkbox" bind:checked={selected[s.uuid]} />
-            <i class="icon-checkbox"></i>
-          </span>
-          <span class="bc-sites-cleanup--text"><span class="bc-sites-cleanup--label">{s.name || t('sites.noName')}</span><span class="bc-sites-cleanup--sub">{t('sites.noDive')}</span></span>
-        </label>
-      {/each}
-      <div class="bc-sites-cleanup--actions">
-        <button type="button" class="bc-sites-cleanup--filled" disabled={!selection.length} onclick={deleteSelection}>
-          {t('sites.deleteSelection', { n: selection.length })}
-        </button>
-      </div>
-    </div>
-  {/if}
 </Page>
 
 <style>
@@ -269,16 +210,6 @@
       color: var(--bc-text-2);
     }
 
-    .bc-sites-cleanup--row {
-      min-height: 48px;
-      padding: 8px 16px;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border-top: 1px solid var(--bc-separator);
-      cursor: pointer;
-    }
 
     /* A choice and, apart from it, the button that edits the site. */
     .bc-sites-cleanup--keep-row {
@@ -313,10 +244,6 @@
     .bc-sites-cleanup--label {
       font-size: 16px;
       line-height: 24px;
-
-      &.bc-sites-cleanup--strong {
-        font-weight: 600;
-      }
     }
 
     .bc-sites-cleanup--actions {
@@ -345,23 +272,6 @@
       &:disabled {
         opacity: 0.38;
       }
-    }
-
-    /* Title on the page background, as on the site sheet. */
-    .bc-sites-cleanup--section {
-      margin: 22px 16px 8px;
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: 500;
-      color: var(--bc-text-2);
-    }
-
-    .bc-sites-cleanup--explain {
-      margin: 0;
-      padding: 12px 16px 10px;
-      font-size: 14px;
-      line-height: 20px;
-      color: var(--bc-text-2);
     }
   }
 </style>
