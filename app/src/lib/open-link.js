@@ -14,7 +14,8 @@ import { BenthicCore } from 'benthic-core';
 import { logbook, importData } from './logbook.svelte.js';
 import { diveUrl, diveUrlOfCore } from './dive-id.js';
 import { replaceEligibility } from './replace-logbook.js';
-import { startReplace } from './replace-logbook-ui.js';
+import { benthicProblemDialog, startBenthicReplace, startReplace } from './replace-logbook-ui.js';
+import { openBenthicSource } from './benthic-import.svelte.js';
 import { goToSection, openOver, backToFirstScreen } from './navigation.svelte.js';
 import { anyDirty } from './leave-guard.js';
 import { checkSharedFile, importErrorKey, parseLink } from './deep-link.js';
@@ -154,6 +155,13 @@ const sharedDeps = {
   toFirstLaunch: (/** @type {string} */ name, /** @type {{ path: string, size: number }} */ staged, /** @type {any} */ summary) => {
     sharedFile.staged = { path: staged.path, size: staged.size, name, summary };
   },
+  // A .benthic file (the full export) takes the in-app path of « Un fichier » (lib/benthic-import.svelte.js).
+  openBenthic: openBenthicSource,
+  benthicProblem: benthicProblemDialog,
+  toFirstLaunchBenthic: (/** @type {{ path: string, size: number, name: string }} */ staged, /** @type {any} */ inspection) => {
+    sharedFile.benthic = { path: staged.path, size: staged.size, name: staged.name, inspection };
+  },
+  replaceBenthic: (/** @type {{ name: string }} */ file, /** @type {any} */ inspection) => startBenthicReplace(/** @type {File} */ (file), inspection),
   logbookName: () => deviceStore.getItem('bc.logbookName') || logbook.email || t('welcomeSteps.defaultName'),
   // One logbook at a time on a phone or a tablet (the device's copy, or the account's): no « Nouveau carnet »; its
   // place is « Remplacer ce carnet », a guarded flow for the device's own logbook (lib/replace-logbook-ui.js). The

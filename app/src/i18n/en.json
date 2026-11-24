@@ -2906,6 +2906,7 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Opening a .benthic file from another app (Files, mail, share sheet): it now goes through the same steps as “A file” — the first import on a new device, or “Replace this logbook?” — instead of being refused.",
       "Site maps: site names show sooner, from a view about 75 km wide, on the shared map and on the personal map.",
       "Certifications (Benthic+): each certification is drawn like the physical card (85.6 × 54 ratio, a gradient in the agency’s colours, pale waves along the bottom) with the agency, “Certification card”, the course title, your name, the number and the date; the whole card opens the certification. One column on the phone, several on tablet and desktop. The top of “My diver profile” has no back arrow.",
       "Desktop, Settings: the short choices of « Language and formats » (date, time and paper format) and of the other pages become a slider selector: a click or the arrow keys change the choice, saved at once. « Units » takes the tablet's look: « Unit system » as a connected button group, each unit on a row with its value on the right that opens its menu; the explanation sits under the card. « Partial pressures » keeps bar or ATA.",

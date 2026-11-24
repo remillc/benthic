@@ -16,7 +16,7 @@ import { t } from './i18n.js';
  * divelogs.de logbook downloaded into the app's cache.
  * @typedef {{ kind: 'file', file: File, name: string, summary: ImportSummary, csv?: { params: import('benthic-core').CsvParams, companion: File|null }, alpha?: boolean }
  *   | { kind: 'staged', path: string, fileName: string, name: string, summary: ImportSummary, alpha?: boolean }
- *   | { kind: 'benthic', file: File, inspection: import('./benthic-import.js').Inspection, name: string, summary: ImportSummary }
+ *   | { kind: 'benthic', file: { name: string }, stagedPath?: string, inspection: import('./benthic-import.js').Inspection, name: string, summary: ImportSummary }
  *   | { kind: 'divelogs', path: string, paths?: string[], name: string, summary: ImportSummary }} ImportSource
  * A resumable divelogs.de download is several files (`paths`); `path` is the first one.
  */

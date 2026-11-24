@@ -21,6 +21,8 @@
 import { logbookLabel, logbooksInFile } from './replace-logbook.js';
 import { isZipName, MAX_ZIP_BYTES } from './zip-fit.js';
 import { isCancelled } from './import-progress.js';
+import { isBenthicName } from './benthic-import.js';
+import { stagedSource } from './zip-read.js';
 import { MAX_SITES_FILE, readAllBytes, scanIsSitesOnly, scanLogbook, stageBytes, stagedHead } from './staged-file.js';
 
 /** The largest old-format file (`<dives>` root) whose dangling site references are cleaned in memory. */
@@ -357,6 +359,12 @@ export async function completeStagedSites(core, staged, scan, remembered) {
  *   an account's or the server's, `whyNot` says which) or « Ajouter à ce carnet » (`merge`); `several`: the file is an
  *   archive of several logbooks, only `main` is taken; `discard`: the diver cancelled, the staged file goes;
  *   without `choose`, the single confirmation `confirm` is used
+ * @property {(source: import('./zip-read.js').ByteSource) => Promise<import('./benthic-import.js').Inspection>} [openBenthic] reads a .benthic
+ *   file's end and manifest (openBenthicFile's engine); without it a .benthic file is refused as any unknown file
+ * @property {(fileName: string, error: unknown) => void} [benthicProblem] the dialog of a .benthic file that cannot be imported
+ * @property {(staged: import('./staged-file.js').StagedFile, inspection: import('./benthic-import.js').Inspection) => void} [toFirstLaunchBenthic]
+ *   hands the .benthic file to « Importer un carnet »; the first launch deletes the staged copy
+ * @property {(file: { name: string }, inspection: import('./benthic-import.js').Inspection) => Promise<unknown>} [replaceBenthic] « Remplacer ce carnet ? » (startBenthicReplace)
  * @property {(name: string, data: StagedPayload) => Promise<void>} [newLogbook] creates a logbook from the file, keeps the open one untouched
  * @property {() => boolean} [canCreateLogbook] false when this device holds one logbook at a time (a phone)
  * @property {() => 'ok'|'server'|'account'} [replaceEligibility] whether the open logbook may be replaced (a phone or a
@@ -371,7 +379,7 @@ export async function completeStagedSites(core, staged, scan, remembered) {
  * whole in memory, here or in the plugin: only its path moves, and the core imports from it. Resolves with what was done.
  * @param {SharedDeps} deps
  * @param {string} uri
- * @returns {Promise<'refused'|'cancelled'|'first-launch'|'confirm-dives'|'confirm-sites'>}
+ * @returns {Promise<'refused'|'cancelled'|'first-launch'|'confirm-dives'|'confirm-sites'|'benthic-replace'>}
  */
 export async function openSharedFile(deps, uri) {
   if (deps.ready) await deps.ready();
@@ -429,7 +437,7 @@ export async function openSharedFile(deps, uri) {
  * @param {(next: { name: string, size: number, path: string }) => void} replaced the staged file changed (an archive's logbook, sites added)
  * @param {() => void} keep from now on the file belongs to the next step
  * @param {() => void} wait a question is shown: the progress line stays, hidden, and the answer ends it
- * @returns {Promise<'refused'|'cancelled'|'first-launch'|'confirm-dives'|'confirm-sites'>}
+ * @returns {Promise<'refused'|'cancelled'|'first-launch'|'confirm-dives'|'confirm-sites'|'benthic-replace'>}
  */
 async function handleStaged(deps, staged, replaced, keep, wait) {
   const core = deps.core;
@@ -439,6 +447,29 @@ async function handleStaged(deps, staged, replaced, keep, wait) {
   progress?.phase('check', staged.size);
   const checking = progress?.reporter('check');
   const label = staged.name || '';
+  // A .benthic file (the full export) follows the flow of « Un fichier »: the first launch's import, or « Remplacer ce carnet ? ».
+  if (deps.openBenthic && isBenthicName(staged.name)) {
+    /** @type {import('./benthic-import.js').Inspection} */
+    let inspection;
+    try {
+      inspection = await deps.openBenthic(stagedSource(core, staged.path, staged.size));
+    } catch (e) {
+      if (isCancelled(e)) throw e;
+      over();
+      deps.benthicProblem?.(label, e);
+      return 'refused';
+    }
+    over();
+    if (deps.welcome()) {
+      // The staged copy stays: the import reads the archive from it, and the first launch deletes it at the end.
+      keep();
+      deps.toFirstLaunchBenthic?.(staged, inspection);
+      return 'first-launch';
+    }
+    // The staged copy is read by the import and deleted afterwards (the caller's `finally`).
+    await deps.replaceBenthic?.({ name: label }, inspection);
+    return 'benthic-replace';
+  }
   const head = new TextDecoder().decode(await stagedHead(core, staged.path));
   const check = deps.check(staged.name, head, staged.size);
   if (!check.ok) {

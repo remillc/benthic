@@ -2906,6 +2906,7 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Ouverture d’un fichier .benthic depuis une autre application (Fichiers, courriel, partage) : il suit maintenant les mêmes étapes que « Un fichier » — la première importation sur un nouvel appareil, ou « Remplacer ce carnet ? » — au lieu d’être refusé.",
       "Cartes des sites : les noms des sites s’affichent plus tôt, dès une vue d’environ 75 km de large, sur la carte commune comme sur la carte personnelle.",
       "Brevets (Benthic+) : chaque brevet est dessiné comme la carte physique (ratio 85,6 × 54, dégradé aux couleurs de l’agence, vagues pâles en bas) avec l’agence, « Carte de brevet », le titre du cours, votre nom, le numéro et la date ; toute la carte ouvre le brevet. Une colonne sur téléphone, plusieurs sur tablette et ordinateur. Le haut de « Mon profil de plongeur » n’a pas de flèche de retour.",
       "Ordinateur, Réglages : les choix courts de « Langue et formats » (format de la date, de l’heure, du papier) et des autres pages deviennent un sélecteur à curseur : un clic ou les flèches changent le choix, enregistré aussitôt. « Unités » reprend la présentation de la tablette : « Système d’unités » en boutons reliés, chaque unité sur une ligne dont la valeur est à droite et qui ouvre son menu ; l’explication passe sous la carte. « Pressions partielles » garde bar ou ATA.",

@@ -58,6 +58,16 @@ export function openBenthicFile(file) {
 }
 
 /**
+ * The same for a `.benthic` file already in the app's cache (opened from another app): read through the plugin, in pieces.
+ * @param {import('./zip-read.js').ByteSource} source
+ * @returns {Promise<import('./benthic-import.js').Inspection>}
+ * @throws {BenthicImportError}
+ */
+export function openBenthicSource(source) {
+  return inspectBenthic(source);
+}
+
+/**
  * The media hook of the device: the plugin's media folder (`mediaAdopt`, the dive media sync). `put` stages each original in the
  * cache in pieces, `finish` adopts them into the media folder under the hash of their content, `discard` deletes what was
  * staged. A plugin without `mediaAdopt` gives none: the originals are then verified and counted and not kept. The file carries

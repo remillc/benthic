@@ -391,6 +391,11 @@
    * the same path as any import. All or nothing: a file that is incomplete goes back to « Importer un carnet » with the red
    * banner, « Annuler » goes back to « Nouveau carnet », and nothing was imported in either case.
    */
+  /** The copy of a .benthic file shared with the app is deleted once it cannot be imported any more. @param {{ stagedPath?: string }} source */
+  function dropStaged(source) {
+    if (source.stagedPath) void BenthicCore.discardImport({ path: source.stagedPath }).catch(() => {});
+  }
+
   async function runBenthicNew() {
     const source = flow.source;
     if (source?.kind !== 'benthic' || busy) return;
@@ -413,6 +418,7 @@
         },
       });
       resetFlow();
+      dropStaged(source);
       const name = sanitiseLogbookName(source.name);
       showSnackbar(t(result.dives ? 'benthicImport.done' : 'benthicImport.doneNoDives', { name, n: result.dives }));
       if (result.skipped) showSnackbar(t('benthicImport.mediaSkipped', { n: result.skipped }));
@@ -421,6 +427,7 @@
       console.error('Import a .benthic file', code, /** @type {any} */ (e)?.cause?.message ?? '');
       if (code === 'INCOMPLETE' || code === 'TOO_NEW') {
         goBackTo('import');
+        dropStaged(source);
         incomplete = { file: source.file.name, bad: e instanceof BenthicImportError && e.bad ? e.bad.length : null, newer: code === 'TOO_NEW' };
       } else if (code === 'CANCELLED') {
         goBack();
@@ -625,6 +632,23 @@
       resetFlow();
       go('import');
       void bringStaged(staged);
+    });
+  });
+
+  // A .benthic file shared with the app (lib/open-link.js): the same step as « Un fichier » with a .benthic file, read from the
+  // app's cache (`stagedPath`: deleted once the import ended).
+  $effect(() => {
+    const shared = sharedFile.benthic;
+    if (!shared || busy) return;
+    untrack(() => {
+      sharedFile.benthic = null;
+      resetFlow();
+      go('import');
+      const { inspection } = shared;
+      const name = nameFromFile(shared.name, t('welcomeSteps.defaultName'));
+      flow.source = { kind: 'benthic', file: { name: shared.name }, stagedPath: shared.path, inspection, name, summary: { dives: inspection.counts.dives, sites: inspection.counts.sites, firstYear: null, lastYear: null } };
+      flow.name = name;
+      go('file');
     });
   });
 
