@@ -131,7 +131,7 @@ function dispatch(layersOnly) {
   if (modal) {
     const el = /** @type {HTMLElement} */ (modal);
     // Benthic's own dialogs (components/Md3Dialog.svelte) cancel themselves.
-    if (modal.classList.contains('bc-md3-dialog') || modal.classList.contains('bc-cylinder-sheet') || modal.classList.contains('bc-gauge-sheet')) return cancel(modal, 'bc-dialog');
+    if (modal.classList.contains('bc-md3-dialog') || modal.classList.contains('bc-cylinder-sheet') || modal.classList.contains('bc-detail-sheet') || modal.classList.contains('bc-gauge-sheet')) return cancel(modal, 'bc-dialog');
     if (modal.classList.contains('actions-modal')) f7.actions.close(el);
     else if (modal.classList.contains('dialog')) f7.dialog.close(el);
     else if (modal.classList.contains('sheet-modal')) f7.sheet.close(el);

@@ -502,6 +502,7 @@
     "collapse": "Collapse the trip"
   },
   "detail": {
+    "tabs": "Dive sections",
     "back": "Back to logbook",
     "loading": "Loading the dive",
     "errorTitle": "This dive could not be read",
@@ -3447,7 +3448,11 @@
       "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty.",
       "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification.",
       "Logbook: “Edit together…” groups its fields in four tabs (Information, Equipment, Gas, Notes) and adds visibility, the kit (Benthic+), weights, the dive type and “Add to the notes”; under a field whose values differ, the spread (“Taylor (1), none (2)”); the subtitle is only the dive numbers, and “Apply to N dives” is blue. On a tablet, the dialog replaces the full-screen sheet.",
-      "Desktop: while the logbook loads, the list shows greyed rows that follow its columns, as the phone’s does, instead of a sentence in the middle of the pane."
+      "Desktop: while the logbook loads, the list shows greyed rows that follow its columns, as the phone’s does, instead of a sentence in the middle of the pane.",
+      "Dive detail, Gas tab: a “Dive type” selector (Open circuit, CCR rebreather, pSCR rebreather, Freediving) changes the dive’s mode; the cards follow (the rebreather drawn with its diluent and oxygen, its setpoints, the pSCR mix, “No gas in freediving”). Changing the type never deletes a cylinder.",
+      "Dive detail, Equipment tab: “Change kit” is gone; the kit is a grey field that opens a menu (“Previous dive”, your kits with their piece counts, “Manage kits”).",
+      "Dive detail on tablets and phones: the desktop’s Information, Equipment, Gas, Notes and Map tabs, every field editable in place; no floating bar and no “Edit dive” screen any more; the actions are in the ⋮ menu. On a phone one page scrolls with the tab row stuck under the bar; a list field opens in a bottom sheet, the date in the date picker. On iPhone, a segmented control “Info, Equipment, Gas, Notes, Map”.",
+      "Information: “Date and time” (date and entering the water) and “Signatures” (Benthic+) replace the “Validations” group on every device; “Dive computers” shows each computer’s photo on tablets and phones."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -5082,6 +5087,25 @@
     }
   },
   "desktopDetail": {
+    "diveType": {
+      "title": "Dive type",
+      "long": { "OC": "Open circuit", "CCR": "CCR rebreather", "PSCR": "pSCR rebreather", "Freedive": "Freediving" },
+      "short": { "OC": "Open", "CCR": "CCR", "PSCR": "pSCR", "Freedive": "Freedive" }
+    },
+    "noGas": {
+      "title": "No gas in freediving",
+      "text": "A freedive is made without a cylinder: there is no cylinder, mix or pressure to note."
+    },
+    "mixTile": "Mix",
+    "ccrTileLabel": "Rebreather: {diluent}; {oxygen}",
+    "pscrTileLabel": "pSCR rebreather: mix {mix}",
+    "role": { "diluent": "Diluent", "oxygen": "Oxygen" },
+    "rebreatherCard": { "title": "Rebreather", "low": "Low setpoint", "high": "High setpoint" },
+    "kitMenu": { "previous": "Previous dive", "previousLine": "same equipment as dive no. {n}" },
+    "dateNote": "If the dive computer’s clock was off, fix it here. To fix several dives, use “Shift date and time” in the logbook selection.",
+    "dateNoteDesktop": "If the dive computer’s clock was off, fix it here. To fix several dives, use “Shift date and time” in the logbook’s right-click menu.",
+    "sheetSearch": "Search",
+    "sheetNone": "No result",
     "mean": "avg. {depth}",
     "enlarge": "Enlarge the profile",
     "enlargeTip": "Enlarge the profile ({shortcut})",
@@ -5114,6 +5138,8 @@
     "moveDown": "Move the cylinder down",
     "cylinder": "Cylinder {n}",
     "label": {
+      "date": "Date",
+      "entryTime": "Entering the water",
       "site": "Site",
       "buddies": "Buddies",
       "guides": "Guides",
@@ -5179,6 +5205,7 @@
     "notRated": "Not rated",
     "starsOf": "{n} of 5",
     "card": {
+      "datetime": "Date and time",
       "site": "Site",
       "people": "People",
       "rating": "Rating",
@@ -5192,7 +5219,6 @@
     "openSiteLink": "See the site in Sites",
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
-    "changeKit": "Change kit",
     "kitFilled": "Filled the fields below; each can still be changed.",
     "addSecondComputer": "+ Add a second computer",
     "addFirstComputer": "+ Add a computer",
@@ -5585,6 +5611,7 @@
     },
     "tab": {
       "info": "Information",
+      "infoShort": "Info",
       "equipment": "Equipment",
       "gas": "Gas",
       "notes": "Notes",
@@ -6949,7 +6976,7 @@
       "tooMany": "Too many attempts. Try again in a few minutes.",
       "failed": "The confirmation could not be sent."
     },
-    "section": "Validations",
+    "section": "Signatures",
     "add": "Get it signed",
     "pending": "Validation pending",
     "pendingText": "It arrives when their phone is back on the network.",

@@ -11,9 +11,9 @@ export const ROW_GAP = 4;
 /**
  * Height of the menu: 8 dp padding above and below, 48 dp per option, 56 dp
  * when the option has a help line.
- * @param {{ example?: string, heading?: string }[]} options
+ * @param {{ example?: string, heading?: string, divider?: boolean }[]} options
  */
-export const menuHeight = (options) => 16 + options.reduce((sum, o) => sum + (o.example ? 56 : 48) + (o.heading ? 40 : 0), 0);
+export const menuHeight = (options) => 16 + options.reduce((sum, o) => sum + (o.example ? 56 : 48) + (o.heading ? 40 : 0) + (o.divider ? 9 : 0), 0);
 
 /**
  * Where the menu goes: right-aligned with the row's card, 280 dp wide (never

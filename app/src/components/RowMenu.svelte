@@ -17,7 +17,7 @@
    * @type {{
    *   anchor: HTMLElement,
    *   label: string,
-   *   options: { value: string, label: string, example?: string, heading?: string }[],
+   *   options: { value: string, label: string, example?: string, heading?: string, icon?: string, divider?: boolean }[],
    *   value: string,
    *   onselect: (value: string) => void,
    *   onclose: () => void,
@@ -142,8 +142,10 @@
         class="bc-row-menu--option"
         class:bc-row-menu--help={!!option.example}
         class:bc-row-menu--selected={option.value === value}
+        class:bc-row-menu--divided={option.divider}
         onclick={() => pick(option.value)}
       >
+        {#if option.icon}<span class="bc-row-menu--icon"><Icon name={/** @type {any} */ (option.icon)} size={22} /></span>{/if}
         {#if ios}<span class="bc-row-menu--check">{#if option.value === value}<Icon name="check" size={18} />{/if}</span>{/if}
         <span class="bc-row-menu--texts">
           <span class="bc-row-menu--label">{option.label}</span>
@@ -235,6 +237,26 @@
           background: var(--bc-surface-2);
         }
       }
+    }
+
+    /* A line above the option (the kit menu's « Gérer les kits »), and an icon before its label. */
+    .bc-row-menu--divided {
+      margin-top: 8px;
+      position: relative;
+      &::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: 0;
+        right: 0;
+        border-top: var(--bc-outline-width) solid var(--bc-separator);
+      }
+    }
+
+    .bc-row-menu--icon {
+      flex: none;
+      display: flex;
+      color: var(--bc-text-2);
     }
 
     .bc-row-menu--texts {

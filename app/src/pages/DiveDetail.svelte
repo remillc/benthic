@@ -8,32 +8,25 @@
   // in full. Edit and an overflow menu in the navbar. A row without a value is
   // never shown.
   import { onMount } from 'svelte';
-  import { Page, Navbar, Link, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
+  import { Page, Navbar, Link, List, Button, Popover, f7, theme } from 'framework7-svelte';
   import { dropPreviousPage, heldBack, heldNavigate, lockRouter } from '../lib/router-guard.js';
   import { trace } from '../lib/nav-trace.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { BenthicCore } from 'benthic-core';
   import DiveProfile from '../components/DiveProfile.svelte';
   import DiveFigures from '../components/DiveFigures.svelte';
   import Icon from '../components/Icon.svelte';
-  import { rebreatherLabel, rebreatherLayout } from '../lib/rebreather-gas.js';
-  import GasCard from '../components/GasCard.svelte';
-  import EquipmentCard from '../components/EquipmentCard.svelte';
-  import DiveGearBlock from '../components/DiveGearBlock.svelte';
   import { isRelease } from '../lib/edition.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
-  import { loadValidations, refreshPending, removeValidation, validations, validationsOf } from '../lib/validation.svelte.js';
-  import { loadInventory, equipmentOf, gearMap, gear } from '../lib/inventory.svelte.js';
+  import { loadValidations, refreshPending, validations } from '../lib/validation.svelte.js';
+  import { loadInventory, gear } from '../lib/inventory.svelte.js';
   import { diveKeyOf } from '../lib/inventory.js';
   import { coreIdOfParam, diveParamOf, diveUrl } from '../lib/dive-id.js';
   import { isShortId } from '../lib/short-id.js';
-  import { equipmentIsEmpty } from '../lib/inventory.js';
-  import ComputersSheet from '../components/ComputersSheet.svelte';
-  import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
+  import { cylinderListed, fillLevels, gasChangeLine, gasChanges, unusedShown } from '../lib/gas-summary.js';
+  import { reducedMotion } from '../lib/reduced-motion.js';
   import { gasName, typeHelper } from '../lib/cylinder-card.js';
   import { typeLine } from '../lib/gas-group.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
-  import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import RenumberDiveDialog from '../components/RenumberDiveDialog.svelte';
   import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
@@ -46,8 +39,7 @@
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough, settle } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
-  import { conditionsMean, roundHalfUp1 } from '../lib/conditions.js';
-  import { logbook, deleteDive, deleteDives, saveDiveChanges, tripChange } from '../lib/logbook.svelte.js';
+  import { logbook, deleteDive, deleteDives, tripChange } from '../lib/logbook.svelte.js';
   import { openDiveVersions } from '../lib/backup-nav.js';
   import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
@@ -55,7 +47,6 @@
   import DiveMediaSection from '../components/DiveMediaSection.svelte';
   import { diveMediaEnabled } from '../lib/dive-media.svelte.js';
   import { offerUndo } from '../lib/undo.js';
-  import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
   import { currentDiveId, onDiveIdsRenumbered } from '../lib/dive-ids.js';
@@ -65,12 +56,10 @@
     formatDepth,
     formatDate,
     formatDiveDay,
-        formatGasLong,
     formatNumber,
     formatPressure,
     formatSac,
     formatTemperature,
-    formatWeight,
     formatMinutes,
     formatTimeOfDay,
   } from '../lib/format.js';
@@ -337,25 +326,6 @@
     });
   }
 
-  /** @param {import('../lib/validation.js').ValidationItem} v */
-  function confirmRemoveValidation(v) {
-    confirmAction({
-      title: t('validation.removeTitle'),
-      text: v.pending ? t('validation.removePendingText') : t('validation.removeText', { name: v.name }),
-      action: t('validation.removeAction'),
-      danger: true,
-      onConfirm: async () => {
-        try {
-          await removeValidation(v.id);
-          showSnackbar(t('validation.removed'));
-        } catch (e) {
-          console.error('Remove a validation', e);
-          showSnackbar(t('validation.saveFailed'));
-        }
-      },
-    });
-  }
-
   async function deleteNow() {
     const id = Number(diveId);
     const order = [...logbook.dives].sort((a, b) => b.date.localeCompare(a.date));
@@ -479,7 +449,6 @@
     loadDive();
   }
   // Validations (task 2026-11-19-309, point 2): Benthic+ only. The pending ones are asked about when the page opens.
-  const validationItems = $derived(dive && benthicPlusSubscriber() ? validationsOf(dive) : []);
   onMount(() => {
     if (preview) return;
     const stopFollowing = onDiveIdsRenumbered(followRenumbering);
@@ -488,32 +457,6 @@
     loadDive();
     return stopFollowing;
   });
-
-  /** « Ordinateurs de cette plongée » open (task 2026-11-14-144), and a change of main computer running. */
-  let computersOpen = $state(false);
-  let changingMain = $state(false);
-
-  /** Another computer becomes the main one: one undoable edit through the core. @param {number} index */
-  async function makeMain(index) {
-    if (!dive || changingMain) return;
-    const name = dive.diveComputers?.[index]?.nickname || dive.diveComputers?.[index]?.model || '';
-    changingMain = true;
-    try {
-      await saveDiveChanges(dive.id, { mainComputer: index });
-      offerUndo(t('detail.mainChanged', { name }));
-    } catch (e) {
-      console.error('Main computer', e);
-      showSnackbar(t('edit.failed'));
-    } finally {
-      changingMain = false;
-    }
-  }
-
-  /** The computer's nickname, in « Ordinateurs du carnet ». @param {{ model: string, serial: string }} c */
-  function renameComputer(c) {
-    computersOpen = false;
-    f7router.navigate(`/settings/computers/edit?model=${encodeURIComponent(c.model)}&serial=${encodeURIComponent(c.serial)}`);
-  }
 
   /**
    * « Faire signer la plongée » (task 2026-11-22-330): a dialog on a tablet and on the desktop, the full screen of the
@@ -600,21 +543,6 @@
     !!shownTrip(dive, logbook.dives),
   );
 
-  /** The ⋮ button's name lists what its menu holds, in the menu's order. */
-  const moreOptionsLabel = $derived(
-    t('detail.moreOptionsList', {
-      items: [
-        benthicPlusSubscriber() ? t('detail.moreItemValidate') : '',
-        t('detail.moreItemRenumber'),
-        t('renumberFrom.title'),
-        removableFromTrip ? t('detail.moreItemTrip') : '',
-        t('detail.moreItemDelete'),
-      ]
-        .filter(Boolean)
-        .join(', '),
-    }),
-  );
-
   // "Retirer du voyage": at once, as Subsurface's "Remove dive(s) from trip".
   // A trip left empty is deleted by the core; "Annuler" brings both back.
   async function removeFromTrip() {
@@ -641,29 +569,6 @@
       ? [dive.siteLocation.city, dive.siteLocation.region, dive.siteLocation.country].filter(Boolean).join(', ')
       : '',
   );
-
-  /**
-   * Conditions, in Subsurface's order; each 1 to 5 stars, a condition at 0
-   * (not filled in) is left out (spec, section 4, "Conditions").
-   */
-  const conditions = $derived.by(() => {
-    if (!dive) return [];
-    /** @type {Record<string, number>} */
-    const values = { visibility: dive.visibility, ...(dive.conditions ?? {}) };
-    return ['visibility', 'wavesize', 'current', 'surge', 'chill']
-      .map((key) => ({ key, name: t(`detail.conditionNames.${key}`), value: values[key] ?? 0 }))
-      .filter((c) => c.value > 0);
-  });
-
-  let conditionsOpen = $state(false);
-
-  /**
-   * The closed card shows the average of the ratings that have a value, as five grey stars
-   * filled by fractions (2.25: two stars and a quarter), not rounded (task 2026-11-14-119).
-   */
-  const conditionsAverage = $derived(conditionsMean(conditions.map((c) => c.value)) ?? 0);
-  /** The average as it is read out: one decimal, « 2,3 ». */
-  const conditionsAverageText = $derived(formatNumber(roundHalfUp1(conditionsAverage), 1));
 
   const gasWords = $derived({
     air: t('edit.gasName.air'),
@@ -715,41 +620,6 @@
       });
   });
 
-  const gasLabel = $derived(
-    gasGroupLabel(
-      gasCylinders.map((c, i) => ({ gas: i === 0 ? c.gas : c.gas.toLocaleLowerCase(), start: c.start, end: c.end })),
-      { group: t('detail.gasGroup'), cylinder: t('detail.gasGroupCylinder'), cylinderGas: t('detail.gasGroupCylinderGas'), join: t('detail.gasGroupJoin') },
-    ),
-  );
-
-  /**
-   * The rebreather view of the Gas card (closed circuit only, task
-   * 2026-11-12-78): the cylinders found by their use, the marks and the name.
-   */
-  const ccrView = $derived.by(() => {
-    if (!dive || dive.divemode !== 'CCR' || gasCylinders.length === 0) return null;
-    const layout = rebreatherLayout(gasCylinders);
-    return {
-      ...layout,
-      marks: { diluent: t('detail.rebreatherMarks.diluent'), oxygen: t('detail.rebreatherMarks.oxygen'), bailout: t('detail.rebreatherMarks.bailout') },
-      label: rebreatherLabel(
-        gasCylinders.map((c, i) => ({ gas: i === layout.diluent ? c.gas : c.gas.toLocaleLowerCase(), start: c.start, end: c.end, noPressure: c.noPressure })),
-        layout,
-        {
-          group: t('detail.rebreatherGroup'),
-          diluent: t('detail.rebreatherDiluent'),
-          oxygen: t('detail.rebreatherOxygen'),
-          bailout: t('detail.rebreatherBailout'),
-          cylinder: t('detail.gasGroupCylinder'),
-          cylinderGas: t('detail.gasGroupCylinderGas'),
-          range: t('detail.rebreatherRange'),
-          join: t('detail.gasGroupJoin'),
-          noPressure: t('detail.rebreatherNoPressure'),
-        },
-      ),
-    };
-  });
-
   /**
    * The gas changes, in one plain line: "Switch to air at 222 ft." (nothing when
    * there is none). None on a rebreather dive (Christian, 13 November 2026).
@@ -773,31 +643,6 @@
   /** SAC: only when the core computes one, never on a rebreather dive. */
   const sac = $derived(dive && !rebreather && dive.sacMlMin > 0 ? formatSac(dive.sacMlMin, prefs) : '');
 
-  /**
-   * Weights in the order stored by the core (spec, section 4, "Full dive
-   * detail"): one entry, a row; several, the total then one line per location
-   * (task 2026-11-07-27).
-   */
-  const weightEntries = $derived((dive?.weights ?? []).filter((w) => w.grams > 0));
-  const weights = $derived(
-    weightEntries.map((w) => ({
-      // Locations as stored by Subsurface (integrated, belt...), translated when known.
-      place: w.description ? (tIfExists(`detail.weightPlaces.${w.description}`) ?? w.description) : '',
-      weight: formatWeight(w.grams, prefs),
-    })),
-  );
-  const weightTotal = $derived(formatWeight(weightEntries.reduce((sum, w) => sum + w.grams, 0), prefs));
-
-  /** Dive computers (task 2026-11-12-60): the first is the main one. */
-  const computers = $derived(computerList(dive?.diveComputers));
-
-  // A freediving dive has no Gas section (Christian, 13 November 2026).
-  const hasGas = $derived(dive?.divemode !== 'Freedive' && (gasCylinders.length > 0 || !!sac));
-  // Release edition: what the equipment inventory says this dive used (task 2026-11-17-267).
-  const inventoryEquipment = $derived(isRelease && dive ? equipmentOf(dive) : null);
-  const undersuit = $derived(inventoryEquipment?.undersuitGearId ? (gearMap().get(inventoryEquipment.undersuitGearId)?.name ?? '') : '');
-  const hasEquipment = $derived(!!dive?.suit || weights.length > 0 || computers.length > 0 || !!(inventoryEquipment && !equipmentIsEmpty(inventoryEquipment)));
-
   // --- Desktop (task 2026-11-15-169, mock-up bureau-carnet-profil-droite): a compact header with
   // the actions, the profile in a white card read by hovering, a row of key figures, then tabs.
   const desk = $derived(layout.desktop);
@@ -805,6 +650,8 @@
   /** The last tab chosen is kept for the next dive and the next session (task 2026-11-15-191). */
   let tab = $state(readTab(deviceStore));
   const deskTabs = DETAIL_TABS;
+  /** iPhone (task 2026-11-24-387): a segmented control « Infos, Équipement, Gaz, Notes, Carte » instead of the Material tabs. */
+  const iosPhone = $derived(theme.ios && layout.phone);
   /** @param {import('../lib/detail-tab.js').DetailTab} key */
   function chooseTab(key) {
     tab = key;
@@ -851,44 +698,54 @@
   function tabKey(e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
-    chooseTab(stepTab(tab, e.key));
-    /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.currentTarget).querySelector(`[data-tab="${tab}"]`))?.focus();
+    const next = stepTab(layout.phone ? phoneTab : tab, e.key);
+    if (layout.phone) scrollToGroup(next);
+    else chooseTab(next);
+    /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.currentTarget).querySelector(`[data-tab="${next}"]`))?.focus();
   }
 
-  // Collapsed by default; a tap opens the weights by location and "Ce lest était".
-  let equipmentOpen = $state(false);
-  const feedback = $derived(feedbackOf(dive?.tags ?? []));
 
+  // --- Tablet and phone (tasks 2026-11-24-382, 386 and 387): the desktop's tabs and cards, edited in place. A tablet shows the
+  // tab chosen (kept like the desktop's); a phone is one page of five groups, the tab row sticks under the top bar, a tap on a
+  // tab scrolls to its group and the tab of the group in view is the selected one.
+  /** The dive's trip, as the Informations tab's Conditions card names it. */
+  const tripText = $derived(trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : '');
+  /** The phone's selected tab: the group nearest the top of the page. */
+  let phoneTab = $state(/** @type {import('../lib/detail-tab.js').DetailTab} */ ('info'));
+  /** @param {import('../lib/detail-tab.js').DetailTab} key */
+  function scrollToGroup(key) {
+    phoneTab = key;
+    document.querySelector(`.page-current [data-group="${key}"]`)?.scrollIntoView({ block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth' });
+  }
   /**
-   * "Ce lest était": saved as a tag, one undoable step like an edit made in
-   * "Modifier la plongée" (the choice is cleared when it is tapped again).
-   * @param {string} value 'too-light', 'ok', 'too-heavy' or '' to clear
+   * Keeps the selected tab and the tab row's own scroll in step with the groups on a phone.
+   * @param {HTMLElement} node the sticky tab row's box
    */
-  async function setFeedback(value) {
-    if (!dive) return;
-    try {
-      await saveDiveChanges(dive.id, { tags: withFeedback(dive.tags, /** @type {import('../lib/weight-feedback.js').WeightFeedback|''} */ (value)) });
-      offerUndo(t('edit.saved'), undefined, 6000);
-    } catch (e) {
-      const code = String(/** @type {any} */ (e)?.message ?? '');
-      console.error('Weight feedback', code);
-      showSnackbar(code.startsWith('WRITE_LOCKED') ? t('edit.writeLocked') : t('edit.failed'));
-    }
+  function watchTabs(node) {
+    const scroller = node.closest('.page-content');
+    if (!scroller) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      if (!layout.phone) return;
+      const line = node.getBoundingClientRect().bottom + 8;
+      /** @type {import('../lib/detail-tab.js').DetailTab} */
+      let current = 'info';
+      for (const group of scroller.querySelectorAll('[data-group]')) if (group.getBoundingClientRect().top <= line) current = /** @type {import('../lib/detail-tab.js').DetailTab} */ (group.getAttribute('data-group'));
+      if (current !== phoneTab) {
+        phoneTab = current;
+        const button = /** @type {HTMLElement|null} */ (node.querySelector(`[data-tab="${current}"]`));
+        const row = /** @type {HTMLElement|null} */ (node.firstElementChild);
+        if (button && row) row.scrollTo({ left: button.offsetLeft - (row.clientWidth - button.offsetWidth) / 2, behavior: 'smooth' });
+      }
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    scroller.addEventListener('scroll', schedule, { passive: true });
+    update();
+    return { destroy: () => scroller.removeEventListener('scroll', schedule) };
   }
-  const equipmentName = $derived(
-    equipmentLabel(
-      { suit: dive?.suit ?? '', weight: weights.length ? weightTotal : '', computer: computers[0]?.name ?? '', open: equipmentOpen, opens: equipmentOpens(weightEntries, computers.length) },
-      {
-        both: t('detail.equipmentBoth'),
-        weightOnly: t('detail.equipmentWeight'),
-        suitOnly: t('detail.equipmentSuit'),
-        show: t('detail.equipmentShow'),
-        hide: t('detail.equipmentHide'),
-        computer: t('detail.equipmentComputer'),
-        computerOnly: t('detail.equipmentComputerOnly'),
-      },
-    ),
-  );
 
 </script>
 
@@ -903,73 +760,36 @@
     {/snippet}
     <!-- Named back link: in MD3, Framework7 hides its text and TalkBack would read "#". -->
     {#snippet left()}
-      <Link back iconOnly>
-        <i class="icon icon-back"></i>
-        <span class="bc-sr-only">{t('detail.back')}</span>
-      </Link>
-    {/snippet}
-    {#snippet right()}
-      {#if theme.ios}
-        <Link href="/dives/{diveParam}/edit">{t('detail.edit')}</Link>
-        <Link iconOnly popoverOpen="#{menuId}">
-          <Icon name="moreCircle" /><span class="bc-sr-only">{selectionMenuActive ? t('logbook.selectionActions') : t('detail.moreOptions')}</span>
+      {#if iosPhone}
+        <!-- iPhone: « ‹ Carnet » (the title of the screen it goes back to). -->
+        <Link back>
+          <i class="icon icon-back"></i>
+          <span>{t('tabs.logbook')}</span>
         </Link>
-      {:else if selectionMenuActive}
+      {:else}
+        <Link back iconOnly>
+          <i class="icon icon-back"></i>
+          <span class="bc-sr-only">{t('detail.back')}</span>
+        </Link>
+      {/if}
+    {/snippet}
+    <!-- The actions of a dive are in the ⋮ menu (tasks 2026-11-24-382, 386, 387): no « Modifier » on a phone or a tablet, every field is edited in place. -->
+    {#snippet right()}
+      {#if !desk}
         <Link iconOnly popoverOpen="#{menuId}">
-          <Icon name="more" /><span class="bc-sr-only">{t('logbook.selectionActions')}</span>
+          <Icon name={theme.ios ? 'moreCircle' : 'more'} /><span class="bc-sr-only">{selectionMenuActive ? t('logbook.selectionActions') : t('detail.moreOptions')}</span>
         </Link>
       {/if}
     {/snippet}
   </Navbar>
 
   <!-- Overflow menu (detail2 mock-ups): an MD3 menu on Android, icon before the
-       label; an iOS pull-down menu, label then icon at the end, no arrow. -->
+       label; an iOS pull-down menu, label then icon at the end, no arrow. This page's router, not a link: the menu
+       opens at the app's root, where a link would use the Carnet's view even when the dive is shown in another section. -->
   <Popover id={menuId} class="bc-menu" backdrop={false}>
     <List noChevron>
-      {#if selectionMenuActive && dive && !failed}
-        {#if !theme.ios}
-          <MenuItem
-            icon="edit"
-            text={t('detail.edit')}
-            onclick={() => {
-              f7.popover.close(`#${menuId}`);
-              f7router.navigate(`/dives/${diveParam}/edit`);
-            }}
-          />
-        {/if}
-        <MenuItem
-          icon="plan"
-          text={t('detail.plan')}
-          onclick={() => {
-            f7.popover.close(`#${menuId}`);
-            f7router.navigate(`/plan/${diveParam}`);
-          }}
-        />
-        <MenuItem
-          icon="share"
-          text={t('share.title')}
-          onclick={() => {
-            f7.popover.close(`#${menuId}`);
-            sharing = true;
-          }}
-        />
-        <li class="bc-menu-divider" role="separator"></li>
-      {/if}
-      <!-- This page's router, not a link: the menu opens at the app's root, where a
-           link would use the Carnet's view even when the dive is shown in another section. -->
-      {#if theme.ios && !selectionMenuActive}
-        <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveParam}`)} />
-      {/if}
-      {#if benthicPlusSubscriber()}
-        <MenuItem
-          icon="seal"
-          text={t('validation.menuOne')}
-          onclick={() => {
-            f7.popover.close(`#${menuId}`);
-            startValidation();
-          }}
-        />
-      {/if}
+      <MenuItem icon="plan" text={t('detail.plan')} onclick={() => { f7.popover.close(`#${menuId}`); f7router.navigate(`/plan/${diveParam}`); }} />
+      <MenuItem icon="share" text={t('share.title')} onclick={() => { f7.popover.close(`#${menuId}`); sharing = true; }} />
       <MenuItem
         icon="renumber"
         text={t('renumberDive.title')}
@@ -1000,18 +820,8 @@
           }}
         />
       {/if}
-      {#if theme.ios && !selectionMenuActive}
-        <MenuItem
-          icon="share"
-          text={t('share.title')}
-          onclick={() => {
-            f7.popover.close(`#${menuId}`);
-            sharing = true;
-          }}
-        />
-      {/if}
       <li class="bc-menu-divider" role="separator"></li>
-      <!-- Alarm colour on Android (floating toolbar menu); iOS keeps ink. -->
+      <!-- Alarm colour on Android; iOS keeps ink. -->
       {#if selectionMenuActive}
         <MenuItem icon="delete" text={t('detail.deleteSelected')} destructive={!theme.ios} onclick={confirmDeleteSelected} />
       {:else}
@@ -1118,150 +928,34 @@
       </dl>
     {/if}
 
-    <!-- Validations by a buddy or an instructor (task 2026-11-19-309): Benthic+ only. -->
-    {#if benthicPlusSubscriber()}
-      <section class="bc-dive-detail--section bc-dive-validations">
-        <h2 class="bc-dive-detail--section-title">{t('validation.section')}</h2>
-        <div class="bc-dive-detail--group">
-          {#each validationItems as v (v.id)}
-            <div class="bc-dive-validations--item" class:bc-dive-validations--pending={v.pending}>
-              <div class="bc-dive-validations--text">
-                {#if v.pending}
-                  <span class="bc-dive-validations--name">{t('validation.pending')}</span>
-                  <span class="bc-dive-validations--detail">{t('validation.pendingText')}</span>
-                {:else}
-                  <span class="bc-dive-validations--name">{t('validation.itemName', { name: v.name, role: (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase() })}</span>
-                  <span class="bc-dive-validations--detail">{[t(`validation.method.${v.method}`), formatDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
-                  {#if v.modified}<span class="bc-dive-validations--modified">{t('validation.modified')}</span>{/if}
-                {/if}
-              </div>
-              {#if v.signature}<img class="bc-dive-validations--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />{/if}
-              <button type="button" class="bc-dive-validations--remove" onclick={() => confirmRemoveValidation(v)}>
-                <Icon name="close" /><span class="bc-sr-only">{t('validation.remove')}</span>
-              </button>
-            </div>
+    <!-- Tablet and phone (tasks 2026-11-24-382, 386 and 387): the tabs of the desktop detail, every field edited in place.
+         A tablet shows the chosen tab; a phone is one page with the five groups one after the other, the tab row sticky. -->
+    {#if !desk}
+      {@const fieldProps = { dive, prefs, preview: !!preview, trip: tripText, sac, gasChanges: gasChangesLine, onsign: startValidation }}
+      <div class="bc-dive-detail--tabs-gap"></div>
+      <div class="bc-dive-detail--tabs-wrap" use:watchTabs>
+        <div class="bc-dive-detail--desk-tabs bc-dive-detail--tabs" class:bc-dive-detail--segmented={iosPhone} role="tablist" aria-label={t('detail.tabs')} tabindex="-1" onkeydown={tabKey}>
+          {#each deskTabs as key (key)}
+            <button type="button" role="tab" data-tab={key} aria-selected={(layout.phone ? phoneTab : tab) === key} tabindex={(layout.phone ? phoneTab : tab) === key ? 0 : -1} aria-label={iosPhone && key === 'info' ? t('desktop.tab.info') : undefined} onclick={() => (layout.phone ? scrollToGroup(key) : chooseTab(key))}>{iosPhone && key === 'info' ? t('desktop.tab.infoShort') : t(`desktop.tab.${key}`)}</button>
           {/each}
-          <button type="button" class="bc-dive-validations--add" onclick={startValidation}>
-            <Icon name="plus" /><span>{t('validation.add')}</span>
-          </button>
         </div>
-      </section>
-    {/if}
-
-    {#if !desk && (dive.guides.length || dive.buddies.length)}
-      <section class="bc-dive-detail--section">
-        <h2 class="bc-dive-detail--section-title">{t('detail.people')}</h2>
-        <div class="bc-dive-detail--group">
-          {#if dive.guides.length}
-            <div class="bc-dive-detail--row"><span>{t('detail.guideRow', { n: dive.guides.length })}</span><span class="bc-dive-detail--tags bc-dive-detail--end">{#each dive.guides as name, i (i)}<span class="bc-dive-detail--tag">{name}</span>{/each}</span></div>
-          {/if}
-          {#if dive.buddies.length}
-            <div class="bc-dive-detail--row"><span>{t('detail.buddiesRow', { n: dive.buddies.length })}</span><span class="bc-dive-detail--tags bc-dive-detail--end">{#each dive.buddies as name, i (i)}<span class="bc-dive-detail--tag">{name}</span>{/each}</span></div>
-          {/if}
-        </div>
-      </section>
-    {/if}
-
-    <!-- Notes right under Personnes (task 2026-11-12-64). -->
-    {#if !desk && dive.notes.trim()}
-      <section class="bc-dive-detail--section">
-        <h2 class="bc-dive-detail--section-title">{t('detail.notes')}</h2>
-        <!-- Shown in full, line breaks kept: no "Read more". -->
-        <p class="bc-dive-detail--group bc-dive-detail--notes">{dive.notes}</p>
-      </section>
-    {/if}
-
-    <!-- Tags right under Notes (task 2026-11-12-66). -->
-    {#if !desk && visibleTags(dive.tags).length}
-      <section class="bc-dive-detail--section">
-        <h2 class="bc-dive-detail--section-title">{t('detail.tags', { n: visibleTags(dive.tags).length })}</h2>
-        <ul class="bc-dive-detail--tags">
-          {#each visibleTags(dive.tags) as tag (tag)}<li class="bc-dive-detail--tag">{tag}</li>{/each}
-        </ul>
-      </section>
-    {/if}
-
-    {#if !desk && hasGas}
-      <section class="bc-dive-detail--section">
-        <h2 class="bc-dive-detail--section-title">{t('detail.gasSection')}</h2>
-        <GasCard
-          label={ccrView ? ccrView.label : gasLabel}
-          items={gasCylinders}
-          rebreather={ccrView}
-          changes={gasChangesLine}
-          sac={sac ? { label: t('detail.sacFull'), value: sac } : null}
-        />
-      </section>
-    {/if}
-
-    {#if !desk && hasEquipment}
-      <section class="bc-dive-detail--section">
-        <h2 class="bc-dive-detail--section-title">{t('detail.equipmentSection')}</h2>
-        <EquipmentCard
-          label={equipmentName}
-          suit={dive.suit ?? ''}
-          {undersuit}
-          weightTotal={weights.length ? weightTotal : ''}
-          {weights}
-          computer={computers[0]?.name ?? ''}
-          {computers}
-          opens={equipmentOpens(weightEntries, computers.length)}
-          open={equipmentOpen}
-          ontoggle={() => (equipmentOpen = !equipmentOpen)}
-          {feedback}
-          onfeedback={benthicPlusSubscriber() ? setFeedback : undefined}
-          oncomputers={() => (computersOpen = true)}
-        />
-        {#if inventoryEquipment}<DiveGearBlock equipment={inventoryEquipment} />{/if}
-      </section>
-      {#if computers.length > 1}
-        <ComputersSheet
-          opened={computersOpen}
-          title={dive.site || t('dive.siteNotSet')}
-          date={dive.date}
-          computers={dive.diveComputers ?? []}
-          busy={changingMain}
-          onclose={() => (computersOpen = false)}
-          onmain={makeMain}
-          onrename={renameComputer}
-        />
+      </div>
+      {#if layout.phone}
+        <p class="bc-dive-detail--fields-hint">{t('desktopDetail.fieldsHint')}</p>
+        {#each deskTabs as key (key)}
+          <section class="bc-dive-detail--group-tab" data-group={key} aria-labelledby="bc-group-{uid}-{key}">
+            <h2 class="bc-dive-detail--group-title" id="bc-group-{uid}-{key}">{t(`desktop.tab.${key}`)}</h2>
+            <DesktopDiveFields {...fieldProps} tab={key} hint={false} />
+          </section>
+        {/each}
+      {:else}
+        <DesktopDiveFields {...fieldProps} {tab} />
       {/if}
-    {/if}
-
-
-    {#if !desk && conditions.length}
-      <!-- Collapsed by default, with a summary of the filled-in conditions. -->
-      <section class="bc-dive-detail--section">
-        <div class="bc-dive-detail--group">
-          <button
-            type="button"
-            class="bc-dive-detail--disclosure"
-            aria-expanded={conditionsOpen}
-            aria-label={conditionsOpen ? undefined : t('detail.conditionsClosed', { n: conditionsAverageText })}
-            onclick={() => (conditionsOpen = !conditionsOpen)}
-          >
-            <span class="bc-dive-detail--text">
-              <span class="bc-dive-detail--title">{t('detail.conditions')}</span>
-            </span>
-            <!-- The open card does not repeat the average: each row has its own stars. -->
-            {#if !conditionsOpen}<Stars value={conditionsAverage} size={16} summary label={t('detail.conditionsAverage', { n: conditionsAverageText })} />{/if}
-            <span class="bc-dive-detail--arrow" class:bc-dive-detail--open={conditionsOpen}><Icon name="expand" size={22} weight={2} /></span>
-          </button>
-          {#if conditionsOpen}
-            {#each conditions as condition (condition.key)}
-              <div class="bc-dive-detail--row">
-                <span>{condition.name}</span>
-                <Stars value={condition.value} label={t('detail.starsLabel', { name: condition.name, n: condition.value })} />
-              </div>
-            {/each}
-          {/if}
-        </div>
-      </section>
     {/if}
 
     <!-- The Photos et vidéos section is for Benthic+ subscribers (task 2026-11-23-370); the pictures stay in the logbook. -->
     {#if desk}
-      <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
+      <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={tripText} {sac} gasChanges={gasChangesLine} onsign={startValidation} />
     {/if}
 
     <!-- Benthic+ only (tasks 2026-11-23-359 and 370): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
@@ -1273,22 +967,6 @@
     <div class="bc-dive-detail--end" aria-hidden="true"></div>
   {/if}
 
-  {#snippet fixedContent()}
-    <!-- Android: floating toolbar, except for a checked Logbook selection on a tablet, which uses the top-bar menu. -->
-    {#if !theme.ios && dive && !failed && !desk && !selectionMenuActive}
-      <FloatingToolbar
-        label={t('detail.actions')}
-        clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
-        actions={[
-          { key: 'edit', icon: 'edit', label: t('detail.edit'), text: t('detail.edit'), onclick: () => f7router.navigate(`/dives/${diveParam}/edit`) },
-          // This page's router, not a link: see the overflow menu. Plan before Share (task 2026-11-12-59).
-          { key: 'plan', icon: 'plan', label: t('detail.plan'), onclick: () => f7router.navigate(`/plan/${diveParam}`) },
-          { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
-          { key: 'more', icon: 'more', label: moreOptionsLabel, menu: `#${menuId}` },
-        ]}
-      />
-    {/if}
-  {/snippet}
 </Page>
 
 {#if sharing}
@@ -1561,203 +1239,85 @@
       }
     }
 
-    .bc-dive-detail--section {
-      margin: 22px 16px 0;
+    /* The tab row of the tablet and phone detail (tasks 2026-11-24-382 and 386): it sticks under the top bar. */
+    .bc-dive-detail--tabs-gap {
+      height: 12px;
     }
 
-    .bc-dive-detail--section-title {
-      margin: 0 0 8px;
+    /* Sticky offsets count from the scroll area content edge, which is already under the top bar: `top: 0` is right under it. */
+    .bc-dive-detail--tabs-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bc-background);
+    }
+
+    /* iPhone: a segmented control, 32 pt high, 8 pt corners, the selected segment raised on the grouped background. */
+    .bc-dive-detail--segmented {
+      margin: 0 16px;
+      padding: 2px;
+      overflow: hidden;
+      gap: 0;
+      border-bottom: 0;
+      border-radius: 9px;
+      background: var(--bc-field-rest);
+      & button {
+        flex: 1;
+        height: 32px;
+        padding: 0 4px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--bc-text);
+        &:hover {
+          background: none;
+        }
+        &[aria-selected='true'] {
+          background: var(--bc-surface);
+          color: var(--bc-text);
+          font-weight: 600;
+          box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+          &::after {
+            display: none;
+          }
+        }
+      }
+    }
+
+    /* Scrollable MD3 primary tabs: the row scrolls sideways when the five labels do not fit. */
+    .bc-dive-detail--tabs {
+      margin: 0;
+      padding: 0 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      & button {
+        flex: none;
+        width: auto;
+      }
+    }
+
+    .bc-dive-detail--fields-hint {
+      margin: 12px 16px 0;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
+    }
+
+    /* A group of the phone's page: its 14 sp title, then its cards. A tap on a tab scrolls here, under the sticky row. */
+    .bc-dive-detail--group-tab {
+      scroll-margin-top: calc(var(--f7-navbar-height) + var(--f7-safe-area-top, 0px) + 56px);
+    }
+
+    .bc-dive-detail--group-title {
+      margin: 20px 16px 0;
       font-family: var(--bc-title-font);
       font-size: 14px;
       font-weight: 500;
+      line-height: 20px;
       color: var(--bc-text-2);
-    }
-
-    /* Grouped list in a rounded block, as in the mock-ups (iOS grouped list, MD3 list). */
-    .bc-dive-detail--group {
-      border-radius: 16px;
-      background: var(--bc-surface);
-      color: var(--bc-text);
-      overflow: hidden;
-    }
-
-    .bc-dive-validations--item {
-      box-sizing: border-box;
-      min-height: 56px;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-top: 1px solid var(--bc-separator);
-      &:first-child {
-        border-top: none;
-      }
-    }
-
-    .bc-dive-validations--text {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .bc-dive-validations--name {
-      font-size: 16px;
-      color: var(--bc-text);
-    }
-
-    .bc-dive-validations--detail {
-      font-size: 14px;
-      color: var(--bc-text-2);
-    }
-
-    .bc-dive-validations--modified {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--bc-alarm);
-    }
-
-    /* The signature is drawn black on white, in every mode: it keeps its paper. */
-    .bc-dive-validations--signature {
-      width: 72px;
-      height: 29px;
-      border-radius: 6px;
-      object-fit: contain;
-      background: var(--bc-qr-paper);
-      border: 1px solid var(--bc-separator);
-    }
-
-    .bc-dive-validations--remove {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border: none;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      color: var(--bc-text-2);
-    }
-
-    .bc-dive-validations--add {
-      box-sizing: border-box;
-      width: 100%;
-      min-height: 48px;
-      padding: 0 16px;
-      border: none;
-      border-top: 1px solid var(--bc-separator);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font: inherit;
-      font-size: 16px;
-      font-weight: 500;
-      background: none;
-      color: var(--bc-text);
-    }
-
-    .bc-dive-validations--item:first-child + .bc-dive-validations--add,
-    .bc-dive-validations--add:first-child {
-      border-top: none;
-    }
-
-    .bc-dive-detail--row {
-      box-sizing: border-box;
-      min-height: 44px;
-      padding: 0 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      font-size: 16px;
-      border-top: 1px solid var(--bc-separator);
-
-      /* MD3: one-line list item, 56 dp. */
-      :global(.md) & {
-        min-height: 56px;
-        padding: 10px 16px;
-      }
-
-      &:first-child {
-        border-top: none;
-      }
-    }
-
-    /* Overall rating under the title. */
-    .bc-dive-detail--rating {
-      margin: 8px 0 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      color: var(--bc-text-2);
-    }
-
-    /* Header of the collapsible Conditions block. */
-    .bc-dive-detail--disclosure {
-      width: 100%;
-      min-height: 56px;
-      padding: 8px 16px;
-      border: none;
-      background: none;
-      color: var(--bc-text);
-      font: inherit;
-      text-align: start;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      .bc-dive-detail--text {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-
-      .bc-dive-detail--title {
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-
-      .bc-dive-detail--arrow {
-        display: block;
-        color: var(--bc-text-2);
-
-        &.bc-dive-detail--open {
-          transform: rotate(180deg);
-        }
-      }
-      & + .bc-dive-detail--row {
-        border-top: 1px solid var(--bc-separator);
-      }
-    }
-
-    /* Tags and people: 32 px chips on the tint. */
-    .bc-dive-detail--tags {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-
-      &.bc-dive-detail--end {
-        justify-content: flex-end;
-      }
-    }
-
-    .bc-dive-detail--tag {
-      height: 32px;
-      padding: 0 12px;
-      border-radius: 8px;
-      background: var(--bc-tint);
-      color: var(--bc-on-tint);
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
     }
 
     /* Space after the last block, so that it never touches the bottom bar. */
@@ -1765,13 +1325,6 @@
       height: 32px;
     }
 
-    .bc-dive-detail--notes {
-      margin: 0;
-      padding: 12px 16px;
-      font-size: 16px;
-      line-height: 22px;
-      white-space: pre-line;
-    }
   }
 
   :global(.bc-dive-detail.bc-dive-detail--on-image > .navbar) {
@@ -1796,20 +1349,5 @@
       }
     }
 
-
-    /* Mouse: the Material 3 hover layer, 8 % of the content colour over the background. */
-    @media (hover: hover) and (pointer: fine) {
-      .bc-dive-detail--disclosure {
-        transition: box-shadow 120ms linear;
-        &:not(:disabled):hover {
-          box-shadow: inset 0 0 0 100vmax color-mix(in srgb, currentColor 8%, transparent);
-        }
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .bc-dive-detail--disclosure {
-        transition: none;
-      }
-    }
   }
 </style>

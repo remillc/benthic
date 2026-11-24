@@ -7425,7 +7425,9 @@ Christian asked for this on 24 November 2026. Work in `main`. Canvases: « Benth
 
 **Test:** open Mon profil › Brevets on each device: cards in the right ratio and colours, one tap opens the certification; the profile's top bar has no back arrow.
 
-## [ ] 2026-11-24-382 Dive detail: dive type selector in « Gaz », rebreather drawing, kit as a menu; tablet tabs with in-place editing
+## [x] 2026-11-24-382 Dive detail: dive type selector in « Gaz », rebreather drawing, kit as a menu; tablet tabs with in-place editing
+
+Done in Dive detail: dive type selector in Gaz, kit menu, tablet and phone tabs edited in place, iPhone segmented control (one commit with 386). Where the app and the task differ: the setpoints of the Recycleur card are read from the ppO2 trace (the façade gives no setpoint events; they are read-only); « Renuméroter à partir de cette plongée » keeps its existing text; the Benthic+ marks drawn in the mock-ups are not shown (the cards exist only for subscribers, tests/app/other-gear-plus.test.mjs).
 
 Christian asked for this on 24 November 2026. Work in `main`. Canvases: « Benthic — Bureau » (all desktop boards, new today), « Benthic — Tablette ». Copies in `docs/mockups/`. `docs/ui-specification.md` has the two new sections (« Dive detail, « Gaz » tab: dive type » and « Dive detail, « Équipement » tab: kit as a menu »).
 
@@ -7478,7 +7480,9 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 
 **Done (24 November 2026, with 384):** the subtitle under « Modifier N plongées » is only `N° 9, 8 et 7` (« N° 7 et 6 »); the sentences about « Plusieurs valeurs » are gone from the subtitle on every device; the note above the buttons of the dialog is « La date, la durée, la profondeur, les bouteilles et le voyage restent propres à chaque plongée. » (the phone's sheet keeps the longer note of its mock-up).
 
-## [ ] 2026-11-24-386 Phone dive detail: one page with sticky tabs and in-place editing (to-do #193, phone part); desktop Informations gets Date et heure and Signatures
+## [x] 2026-11-24-386 Phone dive detail: one page with sticky tabs and in-place editing (to-do #193, phone part); desktop Informations gets Date et heure and Signatures
+
+Done in Dive detail: dive type selector in Gaz, kit menu, tablet and phone tabs edited in place, iPhone segmented control (same commit as 382, they rewrite the same screen): one scrolling page on the phone with sticky tabs, bottom sheets, date and time pickers; Date et heure and Signatures on every device.
 
 Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/`. This completes #193 (tablet part: task 382).
 
@@ -7491,6 +7495,8 @@ Mock-ups: phone canvas, page Android, subgroup « Une page à onglets (propositi
 **Test:** on a phone, scroll a dive from top to bottom: the tabs stick and follow; tap « Gaz »: it scrolls there; change the site from the sheet and the date from the picker without leaving the page; ⋮ actions work. On the desktop, the Informations tab shows Date et heure and Signatures.
 
 ## [ ] 2026-11-24-387 Dive detail, last pieces: computers with their photo, pSCR and portrait variants of « Gaz », iPhone versions
+
+Partly done (24 November 2026, in the commit of 382 and 386): points 1 to 4 (computers card with the photo tiles on tablet and phone, pSCR and short-label variants of Gaz on every device, Signatures replacing the old Validations group, iPhone « ‹ Carnet », circled menu and « Infos, Équipement, Gaz, Notes, Carte » segmented control). Point 5 (iPhone sheet « Décaler la date et l’heure ») waits for task 383, whose dialog is not in `main` yet.
 
 Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/`. Completes tasks 382, 383 and 386 (to-dos #141 and #126 closed).
 

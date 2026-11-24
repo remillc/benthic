@@ -8,6 +8,12 @@ import { readHealth, settleHealth } from './navigation-monkey.mjs';
  */
 export async function regressionFlows(h) {
   const { sleep, tapDive, tapText, hardwareBack, readStack, expect } = h;
+  /** « Planifier depuis cette plongée » is in the dive's ⋮ menu (tasks 2026-11-24-382 and 386: no floating bar any more). */
+  const planFromMenu = async (tab, scope) => {
+    await tab.run((root) => (document.querySelector(`${root} .navbar a.popover-open`)?.click(), 1), scope);
+    await sleep(500);
+    await tapText(tab, 'Planifier depuis cette plongée|Plan from this dive', '.popover.modal-in');
+  };
   /** `settled` of navigation.mjs; a failure also prints the end of the app's navigation trace. */
   const settled = async (t, label, o) => {
     const before = h.failureCount();
@@ -68,7 +74,7 @@ export async function regressionFlows(h) {
   await settled(tab, 'plans: dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   const dive = await route(tab);
   await sleep(400);
-  await tapText(tab, 'Planifier depuis cette plongée|Plan from this dive');
+  await planFromMenu(tab, '.page-current');
   await reach(tab, /^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/);
   await settled(tab, 'plans: the planner opened from the dive', { route: /^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapText(tab, '^\\s*(Retour|Back)\\s*$', '.page-current .navbar, .page-current');
@@ -211,7 +217,7 @@ export async function regressionFlows(h) {
   // then another dive tapped in the list. Framework7 hands both pages of the pane to be removed and only the first
   // was: the planner stayed under the new dive, and the next tap in the list left two dives in the pane.
   console.log(' tablet: the planner opened in the pane, then a dive tapped in the list, then another');
-  await tapText(wide, 'Planifier depuis cette plongée|Plan from this dive', '.view.tab-active > .page-master-detail.page-current');
+  await planFromMenu(wide, '.view.tab-active > .page-master-detail.page-current');
   for (let i = 0; i < 50 && !/^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/.test(await route(wide)); i++) await sleep(100);
   await settled(wide, 'tablet pane: the planner is in the pane', { split: true, route: /^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   for (const n of [0, 3]) {
