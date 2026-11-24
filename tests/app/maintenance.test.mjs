@@ -48,7 +48,7 @@ const rule = (extra = {}) => ({
 });
 
 test('a new piece can be created for each equipment type', async () => {
-  assert.deepEqual(GEAR_TYPES, ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'rebreather', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other']);
+  assert.deepEqual(GEAR_TYPES, ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'rebreather', 'o2Cells', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other']);
   const { inventory } = setup();
   for (const type of GEAR_TYPES) await inventory.saveGear({ type, name: `piece ${type}`, brand: 'Apeks' });
   const all = await inventory.listGear();
@@ -56,7 +56,7 @@ test('a new piece can be created for each equipment type', async () => {
   assert.deepEqual(new Set(all.map((g) => g.type)), new Set(GEAR_TYPES));
   // The vest, weight belt and accessories go in « Autres », with the lamps.
   const groups = groupGear(all);
-  assert.deepEqual(groups.find((g) => g.group === 'other').items.map((g) => g.type).sort(), ['bcd', 'camera', 'compass', 'diveKnife', 'dsmb', 'fins', 'floatBuoy', 'knife', 'light', 'mask', 'other', 'rebreather', 'scooter', 'weights']);
+  assert.deepEqual(groups.find((g) => g.group === 'other').items.map((g) => g.type).sort(), ['bcd', 'camera', 'compass', 'diveKnife', 'dsmb', 'fins', 'floatBuoy', 'knife', 'light', 'mask', 'o2Cells', 'other', 'rebreather', 'scooter', 'weights']);
 });
 
 test('a kit can be duplicated under a name no other kit has, then deleted without touching the dives', async () => {
@@ -97,9 +97,9 @@ test('« Remplir avec »: a kit fills the dive, the previous dive copies its equ
   assert.notEqual(copied.adhoc[0].id, 'x');
 });
 
-test('the new-piece reminder field appears only for regulators, cylinders and rebreathers', () => {
+test('the new-piece reminder field appears only for regulators, cylinders, rebreathers and O₂ cells', () => {
   const source = readFileSync(new URL('../../app/src/pages/ProfilePieceEdit.svelte', import.meta.url), 'utf8');
-  assert.match(source, /const showReminderCard = \$derived\(!id && \(type === 'regulator' \|\| type === 'cylinder' \|\| type === 'rebreather'\)\)/);
+  assert.match(source, /const showReminderCard = \$derived\(!id && \(type === 'regulator' \|\| type === 'cylinder' \|\| type === 'rebreather' \|\| type === 'o2Cells'\)\)/);
   assert.match(source, /\(type === 'regulator' \|\| type === 'cylinder'\)/);
 });
 
@@ -406,7 +406,8 @@ test('the release notes mention the new equipment and the maintenance', () => {
   }
 });
 
-test('a rebreather suggests O₂ cells every 12 months, then a yearly service (task 324)', () => {
-  assert.deepEqual(suggestionsFor('rebreather', {}), [{ task: 'o2Cells', months: 12 }, { task: 'service', months: 12 }]);
+test('a rebreather suggests a yearly service; the O₂ cells suggest their replacement (task 397)', () => {
+  assert.deepEqual(suggestionsFor('rebreather', {}), [{ task: 'service', months: 12 }]);
+  assert.deepEqual(suggestionsFor('o2Cells', {}), [{ task: 'o2Cells', months: 12 }]);
   assert.ok(TASKS.includes('o2Cells'));
 });

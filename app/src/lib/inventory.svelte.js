@@ -78,6 +78,12 @@ export async function loadInventory() {
   } catch (e) {
     console.error('Rewriting the ids as short ids', e);
   }
+  // The O₂ cells of a rebreather become a piece of their own, once (task 2026-11-24-397).
+  try {
+    if (await inv.migrateO2Cells()) signalAccountData('edit');
+  } catch (e) {
+    console.error('Moving the O₂ cells of the rebreathers to their own pieces', e);
+  }
   const [pieces, kits, records, state, pending, maintenance, types] = await Promise.all([inv.listGear(), inv.listKits(), inv.listDiveEquipment(), inv.readState(), inv.pendingPaths(), inv.listMaintenance(), inv.listCylinderTypes()]);
   gear.maintenance = maintenance;
   gear.cylinderTypes = types;

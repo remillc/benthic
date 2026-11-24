@@ -16,7 +16,7 @@
    */
   let { type, name = '', size = 24, piece, tile = 0, radius = ios ? 8 : 10 } = $props();
 
-  // The 19 drawings of the type board of « Nouvelle pièce » (docs/mockups/android-tablette-profil-piece-nouvelle-type-paysage.dc.html,
+  // The 20 drawings of the type board of « Nouvelle pièce » (docs/mockups/android-tablette-profil-piece-nouvelle-type-paysage.dc.html,
   // task 2026-11-22-324): 24 grid, round caps and joins, no fill. The mock-up's rectangles and circles are written as paths.
   /** @type {Record<string, string>} */
   const paths = {
@@ -26,6 +26,8 @@
     undersuit: 'M8.5 4l-4.5 2.5 1.5 4.5 2-1V20h9V10l2 1 1.5-4.5L15.5 4c-.6 1.4-1.9 2.2-3.5 2.2S9.1 5.4 8.5 4zM8 13h8M8 16h8',
     cylinder: 'M10 2.5h4M12 2.5V5M9 8a3 3 0 0 1 6 0v12a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 20zM9 11.5h6',
     rebreather: 'M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM16.47 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM9.47 3.89H14.53V19.89H9.47zM10.9 19.89L9.9 22.40H14.1L13.1 19.89M10.74 3.89C10.42 2.63 9.16 2.21 7.89 2.11M13.26 3.89C13.58 2.63 14.84 2.21 16.11 2.11',
+    // Three cells on a line (mock-up profil-piece-nouvelle-type-menu-android).
+    o2Cells: 'M2.8 12a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M8.8 12a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M14.8 12a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M3 18h18',
     bcd: 'M8.5 3L5 5.5V19a2 2 0 0 0 2 2h3.5V10l1.5 1.5 1.5-1.5v11H17a2 2 0 0 0 2-2V5.5L15.5 3M8.5 3c.6 1.6 1.9 2.5 3.5 2.5s2.9-.9 3.5-2.5M5 13h5.5M13.5 13H19M5 16.5h5.5M13.5 16.5H19',
     light: 'M4 8.5h7a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1 -1.5 1.5h-7a1.5 1.5 0 0 1 -1.5 -1.5v-3a1.5 1.5 0 0 1 1.5 -1.5zM13.5 7h1.5a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-1.5a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1zM5.5 14.5V20a1.5 1.5 0 0 0 3 0v-5.5M18.5 7.5l2.5-1.5M19 11.5h2.5M18.5 15.5l2.5 1.5',
     weights: 'M5 10H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2M9 10h6M9 14h6M19 10h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2M6 7.5h2a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1zM16 7.5h2a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1z',

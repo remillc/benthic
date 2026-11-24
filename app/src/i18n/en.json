@@ -3480,7 +3480,8 @@
       "Dive detail, Gas tab: a “Dive type” selector (Open circuit, CCR rebreather, pSCR rebreather, Freediving) changes the dive’s mode; the cards follow (the rebreather drawn with its diluent and oxygen, its setpoints, the pSCR mix, “No gas in freediving”). Changing the type never deletes a cylinder.",
       "Dive detail, Equipment tab: “Change kit” is gone; the kit is a grey field that opens a menu (“Previous dive”, your kits with their piece counts, “Manage kits”).",
       "Dive detail on tablets and phones: the desktop’s Information, Equipment, Gas, Notes and Map tabs, every field editable in place; no floating bar and no “Edit dive” screen any more; the actions are in the ⋮ menu. On a phone one page scrolls with the tab row stuck under the bar; a list field opens in a bottom sheet, the date in the date picker. On iPhone, a segmented control “Info, Equipment, Gas, Notes, Map”.",
-      "Information: “Date and time” (date and entering the water) and “Signatures” (Benthic+) replace the “Validations” group on every device; “Dive computers” shows each computer’s photo on tablets and phones."
+      "Information: “Date and time” (date and entering the water) and “Signatures” (Benthic+) replace the “Validations” group on every device; “Dive computers” shows each computer’s photo on tablets and phones.",
+      "Equipment: “O₂ cells” is a piece of its own (brand, number, manufacture date, installation date); its replacement reminder falls on the earlier of 18 months after manufacture and 12 months after installation. A rebreather no longer has those two dates or their reminder: the ones it had move into an “O₂ cells” piece. When editing, the type of the piece is a menu with its icon on every device; the reminder of a new piece carries a bell with a plus."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -6059,8 +6060,9 @@
       "valve": "Valve",
       "o2Clean": "O₂ clean",
       "lastInspection": "Last visual inspection",
-      "o2CellsMadeOn": "O₂ cells made on",
-      "o2CellsOn": "O₂ cells installed on",
+      "cellsNumber": "Number",
+      "cellsMadeOn": "Manufacture date",
+      "cellsInstalledOn": "Installation date",
       "lastService": "Last service",
       "lastHydro": "Last hydrostatic test"
     },
@@ -6073,6 +6075,7 @@
       "battery": "For example, 12 Ah lithium pack",
       "burnTime": "For example, 3 h at full power",
       "corrective": "The mask has lenses for your sight",
+      "cellsNumber": "On the cell’s label",
       "typeName": "For example, repair kit",
       "o2Clean": "Prepared for pure oxygen or rich nitrox",
       "lastHydro": "The date stamped on the cylinder, like 03/22.",
@@ -6216,6 +6219,7 @@
         "undersuit": "Undersuits",
         "cylinder": "Cylinders",
         "rebreather": "Rebreathers",
+        "o2Cells": "O₂ cells",
         "light": "Lamps",
         "other": "Other",
         "bcd": "BCDs",
@@ -6237,6 +6241,7 @@
         "undersuit": "Undersuit",
         "cylinder": "Cylinder",
         "rebreather": "Rebreather",
+        "o2Cells": "O₂ cells",
         "light": "Lamp",
         "other": "Other",
         "bcd": "BCD",
@@ -6454,6 +6459,7 @@
         "undersuit": "Undersuit",
         "cylinder": "Cylinder",
         "rebreather": "Rebreather",
+        "o2Cells": "O₂ cells",
         "bcd": "BCD",
         "light": "Lamp",
         "weights": "Weight belt",
@@ -6689,7 +6695,12 @@
     "reminderCard": {
       "title": "Maintenance reminders",
       "suggestCylinder": "Suggested: inspection every year, hydrostatic test every 5 years",
-      "suggestRebreather": "Suggested: O₂ cells at 18 months from manufacture or 12 months from installation, service every year",
+      "suggestRebreather": "Suggested for a rebreather: service every year",
+      "titleSingle": "Maintenance reminder",
+      "titleCells": "Replacement reminder",
+      "cellsDueInstalled": "On {date}, 12 months after installation",
+      "cellsDueMade": "On {date}, 18 months after manufacture",
+      "cellsNoDate": "Enter a manufacture or installation date",
       "suggestDrysuit": "Suggested for a drysuit: annual service, including the valves",
       "suggest": {
         "computer": "Suggested for a computer: {rule}",
@@ -6697,7 +6708,8 @@
         "suit": "Suggested for a suit: {rule}",
         "cylinder": "Suggested for a cylinder: {rule}",
         "bcd": "Suggested for a BCD: {rule}",
-        "rebreather": "Suggested for a rebreather: {rule}"
+        "rebreather": "Suggested for a rebreather: {rule}",
+        "o2Cells": "Suggested for O₂ cells: {rule}"
       },
       "noSuggestion": "No reminder suggested for this type of piece",
       "add": "Add",

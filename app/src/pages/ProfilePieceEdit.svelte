@@ -24,10 +24,10 @@
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
   import { gear, loadInventory, change, readPhoto } from '../lib/inventory.svelte.js';
   import { GEAR_TYPES, gearProblems } from '../lib/inventory.js';
-  import { SPECS, detailFields, isNamedByHand, derivedName, detailProblems, detailsToKeep, parseStampText, stampText } from '../lib/gear-fields.js';
+  import { SPECS, detailFields, isNamedByHand, hasPurchaseDate, CELLS_DATE_KEYS, derivedName, detailProblems, detailsToKeep, parseStampText, stampText } from '../lib/gear-fields.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import { logbook } from '../lib/logbook.svelte.js';
-  import { suggestionsFor, ownLeadDays, o2CellsDue } from '../lib/maintenance.js';
+  import { suggestionsFor, ownLeadDays, o2CellsDue, o2CellsRule } from '../lib/maintenance.js';
   import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel } from '../lib/maintenance-text.js';
   import { afterReminderSaved } from '../lib/maintenance-notify.js';
@@ -41,7 +41,7 @@
   import { reducedMotion } from '../lib/reduced-motion.js';
 
   /** The colour of a type's icon square on a wide screen, the inventory's: blue, green, beige, purple, else grey. @type {Record<string, string>} */
-  const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet', rebreather: 'violet', mask: 'green', fins: 'green', scooter: 'blue', camera: 'blue', dsmb: 'beige', floatBuoy: 'beige', knife: 'violet', diveKnife: 'violet', compass: 'blue' };
+  const TONES = { computer: 'blue', bcd: 'blue', regulator: 'green', suit: 'beige', undersuit: 'beige', cylinder: 'violet', rebreather: 'violet', o2Cells: 'violet', mask: 'green', fins: 'green', scooter: 'blue', camera: 'blue', dsmb: 'beige', floatBuoy: 'beige', knife: 'violet', diveKnife: 'violet', compass: 'blue' };
 
   /** @type {{ f7route: { params: Record<string, string> }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -144,8 +144,8 @@
   /** The message of a wrong field, shown once the diver has paused or left it (lib/live-validation.svelte.js). */
   const detailLive = {
     lastInspection: liveError(() => details.lastInspection ?? '', () => (detailWrong.lastInspection ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
-    o2CellsMadeOn: liveError(() => details.o2CellsMadeOn ?? '', () => (detailWrong.o2CellsMadeOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
-    o2CellsOn: liveError(() => details.o2CellsOn ?? '', () => (detailWrong.o2CellsOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
+    cellsMadeOn: liveError(() => details.cellsMadeOn ?? '', () => (detailWrong.cellsMadeOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
+    cellsInstalledOn: liveError(() => details.cellsInstalledOn ?? '', () => (detailWrong.cellsInstalledOn ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
     lastService: liveError(() => details.lastService ?? '', () => (detailWrong.lastService ? t('gear.pieceEdit.dateInvalid', { example: typedDate('2026-11-17') }) : '')),
     lastHydro: liveError(() => stampTyped, () => (detailWrong.lastHydro ? t('gear.fieldError.stamp') : '')),
     secondStages: liveError(() => details.secondStages ?? '', () => (detailWrong.secondStages ? t('gear.fieldError.number') : '')),
@@ -164,8 +164,13 @@
     for (const f of [...fields.before, ...fields.after, ...fields.late]) if (details[f.key] === undefined) details[f.key] = '';
   });
   /** The line of the reminders card: the type's own wording for a cylinder and a drysuit, else the generic one with the rule. */
+  const cellsRule = $derived(o2CellsRule({ madeOn: details.cellsMadeOn ?? '', installedOn: details.cellsInstalledOn ?? '' }));
   const suggestionLine = $derived(
-    type === 'cylinder'
+    type === 'o2Cells'
+      ? cellsRule
+        ? t(cellsRule.basis === 'made' ? 'maintenance.reminderCard.cellsDueMade' : 'maintenance.reminderCard.cellsDueInstalled', { date: typedDate(cellsRule.due) })
+        : t('maintenance.reminderCard.cellsNoDate')
+      : type === 'cylinder'
       ? t('maintenance.reminderCard.suggestCylinder')
       : type === 'rebreather'
         ? t('maintenance.reminderCard.suggestRebreather')
@@ -175,7 +180,9 @@
           ? t(`maintenance.reminderCard.suggest.${type}`, { rule: ruleText(suggestedRule).replace(/^./, (c) => c.toLocaleLowerCase()) })
           : t('maintenance.reminderCard.noSuggestion'),
   );
-  const showReminderCard = $derived(!id && (type === 'regulator' || type === 'cylinder' || type === 'rebreather'));
+  const showReminderCard = $derived(!id && (type === 'regulator' || type === 'cylinder' || type === 'rebreather' || type === 'o2Cells'));
+  /** The card's title: the plural for the types that get several reminders, the replacement for the O₂ cells. */
+  const reminderTitle = $derived(t(type === 'o2Cells' ? 'maintenance.reminderCard.titleCells' : type === 'cylinder' || type === 'suit' ? 'maintenance.reminderCard.title' : 'maintenance.reminderCard.titleSingle'));
   /** @param {string} key @param {string} value */
   const setDetail = (key, value) => {
     if (key === 'suitType' && details[key] !== value) reminder = null;
@@ -266,8 +273,8 @@
           details: kept,
           photoId: nextPhoto || undefined,
         });
-        if (!id && type === 'rebreather') {
-          // A rebreather always gets its two reminders (cells and service); the one the diver set in the card replaces the first rule.
+        if (!id && (type === 'rebreather' || type === 'o2Cells')) {
+          // A rebreather always gets its service reminder, the O₂ cells their replacement; the one the diver set in the card replaces the first rule.
           const own = reminder ?? null;
           for (const [n, s] of suggestions.entries()) {
             const rule = n === 0 && own ? own : null;
@@ -282,9 +289,9 @@
             await inv.saveMaintenance({ gearId: g.id, task: s.task, intervalMonths: s.months ?? null, intervalDives: s.dives ?? null, notifyDays: ownLeadDays(reminder.notifyDays, settings.maintenanceLeadDays), warnInDive: reminder.warnInDive });
           }
         }
-        // A cylinder's last visual inspection and hydrostatic test, a rebreather's O₂ cells and last service enter the maintenance history, from which the next due dates count.
-        if (type === 'cylinder' || type === 'rebreather') {
-          const dated = type === 'cylinder' ? [['inspection', 'inspection', kept.lastInspection], ['hydrostatic', 'other', kept.lastHydro]] : [['o2Cells', 'other', kept.o2CellsOn], ['service', 'service', kept.lastService]];
+        // A cylinder's last visual inspection and hydrostatic test, the O₂ cells' installation and a rebreather's last service enter the maintenance history, from which the next due dates count.
+        if (type === 'cylinder' || type === 'rebreather' || type === 'o2Cells') {
+          const dated = type === 'cylinder' ? [['inspection', 'inspection', kept.lastInspection], ['hydrostatic', 'other', kept.lastHydro]] : type === 'o2Cells' ? [['o2Cells', 'other', kept.cellsInstalledOn]] : [['service', 'service', kept.lastService]];
           for (const [task, kind, date] of /** @type {[any, any, string][]} */ (dated)) {
             if (!date) continue;
             const known = (await inv.listMaintenance()).find((m) => m.gearId === g.id && m.task === task);
@@ -292,12 +299,11 @@
             await inv.noteMaintenance({ gearId: g.id, task }, { kind, doneOn: date });
           }
         }
-        // The O₂ cells fall due at the earlier of manufacture + 18 months and installation + 12 months (task 334).
-        if (type === 'rebreather') {
+        // The O₂ cells fall due at the earlier of manufacture + 18 months and installation + 12 months (task 334, 397).
+        if (type === 'o2Cells') {
           const cells = (await inv.listMaintenance()).find((m) => m.gearId === g.id && m.task === 'o2Cells');
           if (cells && cells.intervalMonths != null) {
-            const due = o2CellsDue({ madeOn: kept.o2CellsMadeOn, installedOn: kept.o2CellsOn });
-            const wanted = kept.o2CellsMadeOn && due ? due : '';
+            const wanted = o2CellsDue({ madeOn: kept.cellsMadeOn, installedOn: kept.cellsInstalledOn }) ?? '';
             if ((cells.dueOn ?? '') !== wanted || (wanted && cells.dueFrom !== (cells.lastDoneOn ?? ''))) {
               await inv.saveMaintenance({ id: cells.id, gearId: g.id, task: 'o2Cells', intervalMonths: cells.intervalMonths, intervalDives: cells.intervalDives, dueOn: wanted || undefined, dueFrom: wanted ? (cells.lastDoneOn ?? '') : undefined });
             }
@@ -307,7 +313,7 @@
       });
       showSnackbar(t('gear.pieceEdit.saved'));
       f7router.back();
-      if (!id && (reminder || type === 'rebreather') && (type === 'regulator' || type === 'cylinder' || type === 'rebreather') && saved) afterReminderSaved();
+      if (!id && (reminder || type === 'rebreather' || type === 'o2Cells') && (type === 'regulator' || type === 'cylinder' || type === 'rebreather' || type === 'o2Cells') && saved) afterReminderSaved();
     } catch (e) {
       showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
     } finally {
@@ -409,14 +415,25 @@
   {#if type}{@render typeFields()}{/if}
 
   <div class="bc-piece-edit--fields">
-    <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
-    {#each fields.late as f (f.key)}{@render detail(f)}{/each}
+    {#if hasPurchaseDate(/** @type {any} */ (type))}
+      <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
+    {/if}
+    {#if type === 'o2Cells'}
+      <div class="bc-piece-edit--date-row">
+        {#each fields.late.filter((f) => CELLS_DATE_KEYS.includes(f.key)) as f (f.key)}<div class="bc-piece-edit--date-cell">{@render detail(f)}</div>{/each}
+      </div>
+    {:else}
+      {#each fields.late as f (f.key)}{@render detail(f)}{/each}
+    {/if}
     <TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={computer ? t('gear.computerEdit.noteHint') : t('gear.pieceEdit.noteHint')} />
     {#if showReminderCard}
       <div class="bc-piece-edit--reminder">
-        <span class="bc-piece-edit--reminder-icon"><Icon name="clock" size={22} /></span>
+        <!-- The bell with a plus (Material Symbols notification_add), not the wrench of the maintenance screens. -->
+        <span class="bc-piece-edit--reminder-icon bc-piece-edit--reminder-bell">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6h6M18 3v6" /><path d="M18 13v4l2 2H4l2-2v-6a6 6 0 0 1 7.5-5.8" /><path d="M10 21h4" /></svg>
+        </span>
         <span class="bc-piece-edit--reminder-texts">
-          <span class="bc-piece-edit--reminder-title">{t('maintenance.reminderCard.title')}</span>
+          <span class="bc-piece-edit--reminder-title">{reminderTitle}</span>
           <span class="bc-piece-edit--reminder-line">
             {#if reminder}
               {taskLabel({ task: reminder.task })} · {ruleText({ intervalMonths: reminder.months, intervalDives: reminder.dives })}
@@ -440,13 +457,24 @@
 {#snippet body()}
   <ReadOnlyNotice />
   {#if id}
-    {#if profileWide()}
-      {@render typeGrid()}
-    {:else}
-      <div class="bc-piece-edit--type-field">
+    <!-- Editing: the type is a menu on every device, never the grid of tiles (task 2026-11-24-397); the grid is step 1 of « Nouvelle pièce » on a wide screen. -->
+    <div class="bc-piece-edit--type-field">
+      {#if ios}
+        <label class="bc-piece-edit--type-row" class:bc-piece-edit--type-row-disabled={!!piece?.computerModel}>
+          <span class="bc-piece-edit--type-row-label">{t('gear.pieceEdit.type')}</span>
+          <span class="bc-piece-edit--type-row-value">
+            <span class="bc-piece-edit--type-row-icon" aria-hidden="true"><GearIcon type={/** @type {any} */ (type)} size={22} /></span>
+            {typeLabel}
+          </span>
+          <svg class="bc-piece-edit--type-row-chevrons" width="12" height="16" viewBox="0 0 12 16" aria-hidden="true"><path d="M2 6l4-4 4 4M2 10l4 4 4-4" /></svg>
+          <select class="bc-piece-edit--type-row-select" value={type} disabled={!!piece?.computerModel} onchange={(e) => chooseType(e.currentTarget.value)}>
+            {#each typeOptions as option (option.value)}<option value={option.value}>{option.label}</option>{/each}
+          </select>
+        </label>
+      {:else}
         <SelectField label={t('gear.pieceNew.typeTitle')} value={type} onchange={chooseType} options={typeOptions} disabled={!!piece?.computerModel} icon={typeIcon} />
-      </div>
-    {/if}
+      {/if}
+    </div>
     {@render form()}
   {:else}
     <div class="bc-piece-edit--stage" bind:this={stage} data-step={choosingType ? 'choose' : 'form'}>
@@ -857,6 +885,78 @@
 
     .bc-piece-edit--type-field {
       --bc-field-margin: 16px;
+    }
+
+    /* iPhone: a « Type » row of a grouped list, the drawing and the name on the right, then the up and down chevrons
+       (mock-up ios-profil-piece-modifier). The system's list opens from the transparent select over the row. */
+    .bc-piece-edit--type-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      margin: 16px 16px 0;
+      padding: 6px 16px;
+      box-sizing: border-box;
+      border-radius: 10px;
+      background: var(--bc-surface);
+      font-size: 17px;
+    }
+    .bc-piece-edit--type-row-label {
+      flex: none;
+      width: 120px;
+      color: var(--bc-text);
+    }
+    .bc-piece-edit--type-row-value {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      color: var(--bc-text-2);
+    }
+    .bc-piece-edit--type-row-icon {
+      display: flex;
+      color: var(--bc-action);
+    }
+    .bc-piece-edit--type-row-chevrons {
+      flex: none;
+      fill: none;
+      stroke: var(--bc-text-2);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .bc-piece-edit--type-row-select {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      font-size: 17px;
+    }
+    .bc-piece-edit--type-row-disabled {
+      opacity: 0.6;
+    }
+
+    /* The O₂ cells' two dates on one row, equal widths (task 2026-11-24-397). */
+    .bc-piece-edit--date-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+      padding: 0 16px;
+    }
+    .bc-piece-edit--date-cell {
+      min-width: 0;
+      --bc-field-margin: 0px;
+    }
+    .bc-piece-edit--reminder-bell svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     /* The model's photo, large, with « Changer d’image » under it (as « Modifier l’ordinateur de plongée »): Android phone a

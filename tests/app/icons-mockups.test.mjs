@@ -24,9 +24,9 @@ function table(source) {
   return Object.fromEntries([...body.matchAll(/^\s*([a-zA-Z0-9]+): '([^']*)',/gm)].map((m) => [m[1], m[2]]));
 }
 
-test('the 19 gear types are drawn as the type board of « Nouvelle pièce » draws them (circles and rectangles are written as paths)', () => {
+test('the 20 gear types are drawn as the type board of « Nouvelle pièce » draws them (circles and rectangles are written as paths)', () => {
   const gear = table(read('app/src/components/GearIcon.svelte'));
-  const types = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'rebreather', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other'];
+  const types = ['computer', 'regulator', 'suit', 'undersuit', 'cylinder', 'rebreather', 'o2Cells', 'bcd', 'light', 'weights', 'mask', 'fins', 'scooter', 'camera', 'dsmb', 'floatBuoy', 'knife', 'diveKnife', 'compass', 'other'];
   assert.deepEqual(Object.keys(gear), types);
   // The subpaths written as paths in the board are found as they are; the shapes the board draws as <rect> and <circle> are
   // checked by the pieces that are paths.

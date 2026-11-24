@@ -3480,7 +3480,8 @@
       "Détail d’une plongée, onglet Gaz : un sélecteur « Type de plongée » (Circuit ouvert, Recycleur CCR, Recycleur pSCR, Apnée) change le mode de la plongée ; les cartes suivent (le recycleur dessiné avec le diluant et l’oxygène, ses consignes, le mélange du pSCR, « Pas de gaz en apnée »). Changer de type ne supprime aucune bouteille.",
       "Détail d’une plongée, onglet Équipement : « Changer de kit » disparaît ; le kit est un champ gris qui ouvre un menu (« Plongée précédente », vos kits avec leur nombre de pièces, « Gérer les kits »).",
       "Détail d’une plongée sur tablette et téléphone : les onglets Informations, Équipement, Gaz, Notes et Carte du bureau, tous les champs modifiables sur place ; plus de barre flottante ni d’écran « Modifier la plongée » ; les actions sont dans le menu ⋮. Sur téléphone, une seule page défile avec le rang d’onglets collé sous la barre ; un champ de liste s’ouvre dans une feuille du bas, la date dans le sélecteur de date. Sur iPhone, un contrôle segmenté « Infos, Équipement, Gaz, Notes, Carte ».",
-      "Informations : « Date et heure » (date et entrée dans l’eau) et « Signatures » (Benthic+) remplacent le groupe « Validations » sur tous les appareils ; « Ordinateurs de plongée » montre la photo de chaque ordinateur sur tablette et téléphone."
+      "Informations : « Date et heure » (date et entrée dans l’eau) et « Signatures » (Benthic+) remplacent le groupe « Validations » sur tous les appareils ; « Ordinateurs de plongée » montre la photo de chaque ordinateur sur tablette et téléphone.",
+      "Équipement : « Cellules O₂ » est une pièce à part (marque, numéro, date de fabrication, date d’installation) ; son rappel de remplacement tombe à la plus proche des dates entre 18 mois après la fabrication et 12 mois après l’installation. Un recycleur n’a plus ces deux dates ni leur rappel : celles qu’il avait passent dans une pièce « Cellules O₂ ». En modification, le type de la pièce est un menu avec son icône, sur tous les appareils ; le rappel d’une nouvelle pièce porte une cloche avec un plus."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -6062,8 +6063,9 @@
       "valve": "Robinet",
       "o2Clean": "Propre O₂",
       "lastInspection": "Dernière inspection visuelle",
-      "o2CellsMadeOn": "Cellules O₂ fabriquées le",
-      "o2CellsOn": "Cellules O₂ installées le",
+      "cellsNumber": "Numéro",
+      "cellsMadeOn": "Date de fabrication",
+      "cellsInstalledOn": "Date d’installation",
       "lastService": "Dernière révision",
       "lastHydro": "Dernier test hydrostatique"
     },
@@ -6076,6 +6078,7 @@
       "battery": "Par exemple, accumulateur lithium 12 Ah",
       "burnTime": "Par exemple, 3 h à pleine puissance",
       "corrective": "Le masque porte des verres à votre vue",
+      "cellsNumber": "Sur l’étiquette de la cellule",
       "typeName": "Par exemple, trousse de réparation",
       "o2Clean": "Préparée pour l’oxygène pur ou le nitrox riche",
       "lastHydro": "La date frappée sur la bouteille, comme 03/22.",
@@ -6219,6 +6222,7 @@
         "undersuit": "Sous-vêtements",
         "cylinder": "Bouteilles",
         "rebreather": "Recycleurs",
+        "o2Cells": "Cellules O₂",
         "light": "Lampes",
         "other": "Autres",
         "bcd": "Vestes",
@@ -6240,6 +6244,7 @@
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
         "rebreather": "Recycleur",
+        "o2Cells": "Cellules O₂",
         "light": "Lampe",
         "other": "Autre",
         "bcd": "Veste",
@@ -6457,6 +6462,7 @@
         "undersuit": "Sous-vêtement",
         "cylinder": "Bouteille",
         "rebreather": "Recycleur",
+        "o2Cells": "Cellules O₂",
         "bcd": "Veste",
         "light": "Lampe",
         "weights": "Ceinture de lest",
@@ -6692,7 +6698,12 @@
     "reminderCard": {
       "title": "Rappels d’entretien",
       "suggestCylinder": "Suggéré : inspection chaque année, test hydrostatique aux 5 ans",
-      "suggestRebreather": "Suggéré : cellules O₂ à 18 mois de fabrication ou 12 mois d’installation, révision chaque année",
+      "suggestRebreather": "Suggéré pour un recycleur : révision chaque année",
+      "titleSingle": "Rappel d’entretien",
+      "titleCells": "Rappel de remplacement",
+      "cellsDueInstalled": "Le {date}, 12 mois après l’installation",
+      "cellsDueMade": "Le {date}, 18 mois après la fabrication",
+      "cellsNoDate": "Indiquez une date de fabrication ou d’installation",
       "suggestDrysuit": "Suggéré pour une combinaison étanche : entretien annuel, y compris des valves",
       "suggest": {
         "computer": "Suggéré pour un ordinateur : {rule}",
@@ -6700,7 +6711,8 @@
         "suit": "Suggéré pour une combinaison : {rule}",
         "cylinder": "Suggéré pour une bouteille : {rule}",
         "bcd": "Suggéré pour une veste : {rule}",
-        "rebreather": "Suggéré pour un recycleur : {rule}"
+        "rebreather": "Suggéré pour un recycleur : {rule}",
+        "o2Cells": "Suggéré pour des cellules O₂ : {rule}"
       },
       "noSuggestion": "Aucun rappel suggéré pour ce type de pièce",
       "add": "Ajouter",
