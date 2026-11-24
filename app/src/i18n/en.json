@@ -2840,6 +2840,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Cylinder drawing: the outline is thinner (1.2 in the 44 × 76 drawing, about 1.2 px at 44 px wide and 1.75 px at 64 px), in light and dark.",
+      "Download: “Allow Bluetooth”, “Permission refused”, “Bluetooth is off” and “Download failed” follow the layout of the other steps: a 96 px disc, a centred title and text, the buttons at the bottom (in the dialog footer on the desktop). “Open settings” opens the app’s settings.",
       "Importing a .benthic file: “A file” in “Import a logbook” and the logbook menu accept the full export. The file is first checked, file by file, against its fingerprints; if it is incomplete, nothing is imported. Otherwise the logbook, equipment, profile and certifications are imported in one go, and personal information is encrypted on this device. To replace a logbook, “Replace this logbook?” offers “Export this logbook first”.",
       "Offline: a server that cannot be reached no longer opens an error report; the logbook only shows that it is offline and tries again later.",
       "Dives: when a change made on another device reaches this one while a dive is open, the dive stays open, its neighbours still open, and an edit in progress is kept; a dive deleted on the other device closes with a short message. This no longer produces an error report.",
@@ -2855,6 +2857,9 @@
       "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
       "Photos and videos: « Show photo and video fields » is gone from Settings. A Benthic+ subscriber always sees the « Photos and videos » section of a dive; a free user never does. About: « Website » (benthicdivelog.app) replaces « Export my logbook » and sits next to « See on GitHub » on one centred row; exporting stays in the logbook menu.",
       "Trips: « Group dives into trips » is gone from Settings. Benthic never groups dives into trips by itself, whatever a logbook made in Subsurface says: downloads, imports and new dives stay outside any trip until you make or fill one. The trips you made keep working as before.",
+      "Desktop, dive detail, Information tab: five cards (Site, People, Rating, Conditions, Tags). Guides and buddies are chips with their initial, a ✕ to remove them and « + Add » (names from the logbook first); the rating and the visibility are five stars, and another click on the chosen star clears it; the rating and the tags leave the Notes tab.",
+      "Desktop, logbook list: a closed trip is a 48 px row with the same 1 px line as the dives, and the row after an open trip’s card is separated from it by a line.",
+      "Desktop, dive detail: the white panel under the profile card is gone (the pane’s background follows the page colour) and the curves that are off are outlined chips.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
@@ -2932,7 +2937,7 @@
       "Equipment: a piece's menu offers permanent deletion after confirmation.",
       "Equipment: the type of piece field no longer appears when creating an Other piece.",
       "Dive profile: selected curves stay visible during the session.",
-      "Dives: “Get it signed” replaces “Get it validated”.",
+      "Dives: asking a buddy or an instructor to sign is called “Get it signed”.",
       "Equipment: the scooter icon has been redesigned.",
       "Equipment: choose the piece type before filling in its form.",
       "Equipment: line cutters and knives are separate types.",
@@ -3370,7 +3375,9 @@
       "Desktop: the site’s map fills the whole width of the dive’s header.",
       "Desktop: with Benthic+, the Equipment tab offers a kit to apply, the undersuit, “This weight was” and “Other gear”; without Benthic+, these fields no longer appear.",
       "“This weight was” is Benthic+ only on every screen; without Benthic+, the weight suggestion uses the last comparable dive’s weight, with no correction. What is already noted on a dive is kept.",
-      "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen."
+      "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen.",
+      "Tablet: on the profile home, Information opens beside the list from the start, with no navigation error reported.",
+      "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -3835,12 +3842,19 @@
     },
     "permission": {
       "title": "Allow Bluetooth",
-      "text": "Android asks for the \"Nearby devices\" permission to find the dive computer. Benthic does not use it for anything else.",
+      "text": {
+        "android": "Android asks for the “Nearby devices” permission to find the dive computer. Benthic does not use it for anything else.",
+        "ios": "iOS asks for the “Nearby devices” permission to find the dive computer. Benthic does not use it for anything else."
+      },
       "button": "Allow"
     },
     "denied": {
       "title": "Permission refused",
-      "text": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the Android settings, under Permissions.",
+      "text": {
+        "android": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the Android settings, under Permissions.",
+        "iphone": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the iPhone settings, under Permissions.",
+        "ipad": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the iPad settings, under Permissions."
+      },
       "button": "Open settings",
       "again": "Ask again"
     },
@@ -3966,7 +3980,12 @@
     "notFound": {
       "title": "{computer} not found",
       "titleNoName": "Dive computer not found",
-      "text": "The phone did not find the dive computer."
+      "text": {
+        "phone": "The phone did not find the dive computer.",
+        "iphone": "The iPhone did not find the dive computer.",
+        "tablet": "The tablet did not find the dive computer.",
+        "desktop": "This computer did not find the dive computer."
+      }
     },
     "lost": {
       "title": "Download from the {computer} interrupted",
@@ -3974,10 +3993,14 @@
       "text": "The connection with the dive computer was lost before the end."
     },
     "nothingChanged": "No dive was changed.",
-    "check": "To check",
     "checks": {
       "on": "The dive computer is on and in Bluetooth transfer mode.",
-      "near": "It is less than a metre from the phone.",
+      "near": {
+        "phone": "It is less than a metre from the phone.",
+        "iphone": "It is less than a metre from the iPhone.",
+        "tablet": "It is less than a metre from the tablet.",
+        "desktop": "It is less than a metre from this computer."
+      },
       "otherApp": "No other app is connected to the dive computer."
     },
     "otherComputer": "Choose another dive computer",
@@ -5052,7 +5075,9 @@
       "weights": "Weights",
       "mix": "Mix",
       "pressure": "Pressure",
-      "coordinates": "Coordinates"
+      "coordinates": "Coordinates",
+      "guideOfDive": "Dive guide",
+      "note": "Rating"
     },
     "kitNote": "Fills the suit, the undersuit, the weights and the other gear. Each field can still be changed.",
     "kitPieces": {
@@ -5082,6 +5107,14 @@
       "mix": "Type the mix, such as 32 or 18/45"
     },
     "notRated": "Not rated",
+    "starsOf": "{n} of 5",
+    "card": {
+      "site": "Site",
+      "people": "People",
+      "rating": "Rating",
+      "conditions": "Conditions",
+      "tags": "Tags"
+    },
     "add": "Add",
     "weightTotal": "total",
     "weightPlace": "Weight place",
@@ -6839,8 +6872,8 @@
     "confirmError": {
       "expired": "This code has expired. Ask for a new one.",
       "used": "This code was already used.",
-      "own": "You cannot validate your own dives.",
-      "plus": "Validating a dive needs Benthic+.",
+      "own": "You cannot confirm your own dives.",
+      "plus": "Confirming a dive needs Benthic+.",
       "unknown": "This code is not recognised.",
       "tooMany": "Too many attempts. Try again in a few minutes.",
       "failed": "The confirmation could not be sent."

@@ -2840,6 +2840,8 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Dessin des bouteilles : le contour est plus fin (1,2 dans le dessin de 44 × 76, soit environ 1,2 px à 44 px de large et 1,75 px à 64 px), en clair comme en sombre.",
+      "Téléchargement : « Autoriser le Bluetooth », « Autorisation refusée », « Bluetooth désactivé » et « Téléchargement échoué » reprennent la présentation des autres étapes : un disque de 96 px, un titre et un texte centrés, les boutons en bas (dans le pied de la fenêtre sur ordinateur). « Ouvrir les réglages » ouvre les réglages de l’app.",
       "Importer un fichier .benthic : « Un fichier » de « Importer un carnet » et le menu du carnet acceptent l’export complet. Le fichier est d’abord vérifié, fichier par fichier, contre ses empreintes ; s’il est incomplet, rien n’est importé. Sinon le carnet, l’équipement, le profil et les brevets sont importés d’un coup, et les informations personnelles sont chiffrées sur cet appareil. Pour remplacer un carnet, « Remplacer ce carnet ? » propose « Exporter d’abord ce carnet ».",
       "Hors ligne : un serveur injoignable n’ouvre plus de rapport d’erreur ; le carnet affiche seulement qu’il est hors ligne et réessaie plus tard.",
       "Plongées : quand un changement fait sur un autre appareil arrive pendant qu’une plongée est ouverte, la plongée reste ouverte, ses voisines aussi, et une modification en cours est conservée ; une plongée supprimée sur l’autre appareil se ferme avec un court message. Cela ne produit plus de rapport d’erreur.",
@@ -2855,6 +2857,9 @@
       "Ordinateur, détail d’une plongée, onglet Équipement : une carte par section (kit, ordinateurs de plongée, protection thermique, lest, autre équipement), avec le total du lest dans son en-tête, un lest par pastille retirable, « Ce lest était » centré et « + Ajouter » dans la carte de l’autre équipement.",
       "Photos et vidéos : « Afficher les champs photos et vidéos » n’est plus dans Réglages. Un abonné Benthic+ voit toujours la section « Photos et vidéos » d’une plongée, un utilisateur gratuit jamais. À propos : « Site Web » (benthicdivelog.app) remplace « Exporter mon carnet » et se place à côté de « Voir sur GitHub » sur une ligne centrée ; l’export reste dans le menu du carnet.",
       "Voyages : « Regrouper les plongées en voyages » n’est plus dans Réglages. Benthic ne regroupe jamais les plongées en voyages de lui-même, quoi que dise un carnet fait dans Subsurface : téléchargements, imports et nouvelles plongées restent hors voyage tant que vous n’en faites pas un ou n’en remplissez pas un. Les voyages que vous avez faits fonctionnent comme avant.",
+      "Ordinateur, détail d’une plongée, onglet Informations : cinq cartes (Site, Personnes, Appréciation, Conditions, Étiquettes). Les guides et les compagnons sont des pastilles avec leur initiale, un ✕ pour les retirer et « + Ajouter » (les noms du carnet d’abord) ; la note et la visibilité sont cinq étoiles, un nouveau clic sur l’étoile choisie les efface ; la note et les étiquettes quittent l’onglet Notes.",
+      "Ordinateur, liste du carnet : un voyage fermé est une ligne de 48 px avec le même trait de 1 px que les plongées, et la ligne qui suit la carte d’un voyage ouvert en est séparée par un trait.",
+      "Ordinateur, détail d’une plongée : le panneau blanc sous la carte du profil a disparu (le fond du panneau reprend la couleur de la page) et les courbes non choisies sont des pastilles à contour.",
       "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
       "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
       "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
@@ -2932,7 +2937,7 @@
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
       "Équipement : le champ « Type de pièce » n’apparaît plus à la création d’une pièce de type Autre.",
       "Profil de plongée : les courbes choisies restent affichées pendant la session.",
-      "Plongées : « Faire signer » remplace « Faire valider ».",
+      "Plongées : demander la signature d’un compagnon ou d’un moniteur s’appelle « Faire signer ».",
       "Équipement : l’icône du scooter a été redessinée.",
       "Équipement : choisissez le type de pièce avant de remplir son formulaire.",
       "Équipement : le coupe-ligne et le couteau sont deux types distincts.",
@@ -3370,7 +3375,9 @@
       "Ordinateur : la carte du site occupe toute la largeur de l’en-tête de la plongée.",
       "Ordinateur : l’onglet Équipement propose, avec Benthic+, un kit à appliquer, le sous-vêtement, « Ce lest était » et « Autre équipement » ; sans Benthic+, ces champs n’apparaissent plus.",
       "« Ce lest était » est réservé à Benthic+ sur tous les écrans ; sans Benthic+, la suggestion de lest reprend le poids de la dernière plongée comparable, sans correction. Ce qui est déjà noté sur une plongée est conservé.",
-      "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet."
+      "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet.",
+      "Tablette : sur la page d’accueil du profil, Informations s’ouvre à côté de la liste dès le démarrage, sans erreur de navigation signalée.",
+      "Tablette : choisir le Carnet pendant que Réglages est ouvert ferme Réglages d’abord, sans laisser l’écran du compte vide."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -3831,22 +3838,29 @@
     "cannotAdd": "Les plongées n'ont pas pu être ajoutées au carnet. Aucune plongée n'a été modifiée.",
     "none": {
       "title": "Pas de Bluetooth",
-      "text": "Cet appareil n'a pas de Bluetooth. Le téléchargement depuis l'ordinateur de plongée n'est pas possible ici."
+      "text": "Cet appareil n’a pas de Bluetooth. Le téléchargement depuis l’ordinateur de plongée n’est pas possible ici."
     },
     "permission": {
       "title": "Autoriser le Bluetooth",
-      "text": "Android demande l'autorisation « Appareils à proximité » pour trouver l'ordinateur de plongée. Benthic ne s'en sert pas pour autre chose.",
+      "text": {
+        "android": "Android demande l’autorisation « Appareils à proximité » pour trouver l’ordinateur de plongée. Benthic ne s’en sert pas pour autre chose.",
+        "ios": "iOS demande l’autorisation « Appareils à proximité » pour trouver l’ordinateur de plongée. Benthic ne s’en sert pas pour autre chose."
+      },
       "button": "Autoriser"
     },
     "denied": {
       "title": "Autorisation refusée",
-      "text": "Sans l'autorisation Bluetooth, Benthic ne peut pas trouver l'ordinateur de plongée. Vous pouvez la donner dans les réglages d'Android, rubrique Autorisations.",
+      "text": {
+        "android": "Sans l’autorisation Bluetooth, Benthic ne peut pas trouver l’ordinateur de plongée. Vous pouvez la donner dans les réglages d’Android, rubrique Autorisations.",
+        "iphone": "Sans l’autorisation Bluetooth, Benthic ne peut pas trouver l’ordinateur de plongée. Vous pouvez la donner dans les réglages de l’iPhone, rubrique Autorisations.",
+        "ipad": "Sans l’autorisation Bluetooth, Benthic ne peut pas trouver l’ordinateur de plongée. Vous pouvez la donner dans les réglages de l’iPad, rubrique Autorisations."
+      },
       "button": "Ouvrir les réglages",
       "again": "Demander à nouveau"
     },
     "off": {
       "title": "Bluetooth désactivé",
-      "text": "Activez le Bluetooth pour trouver l'ordinateur de plongée.",
+      "text": "Activez le Bluetooth pour trouver l’ordinateur de plongée.",
       "button": "Activer le Bluetooth"
     },
     "keepReceived": {
@@ -3966,19 +3980,28 @@
     "notFound": {
       "title": "{computer} introuvable",
       "titleNoName": "Ordinateur de plongée introuvable",
-      "text": "Le téléphone n'a pas trouvé l'ordinateur."
+      "text": {
+        "phone": "Le téléphone n’a pas trouvé l’ordinateur.",
+        "iphone": "L’iPhone n’a pas trouvé l’ordinateur.",
+        "tablet": "La tablette n’a pas trouvé l’ordinateur.",
+        "desktop": "Cet ordinateur n’a pas trouvé l’ordinateur de plongée."
+      }
     },
     "lost": {
       "title": "Téléchargement interrompu avec {computer}",
       "titleNoName": "Téléchargement interrompu",
-      "text": "La connexion avec l'ordinateur a été perdue avant la fin."
+      "text": "La connexion avec l’ordinateur a été perdue avant la fin."
     },
-    "nothingChanged": "Aucune plongée n'a été modifiée.",
-    "check": "À vérifier",
+    "nothingChanged": "Aucune plongée n’a été modifiée.",
     "checks": {
-      "on": "L'ordinateur est allumé et en mode transfert Bluetooth.",
-      "near": "Il est à moins d'un mètre du téléphone.",
-      "otherApp": "Aucune autre app n'est connectée à l'ordinateur."
+      "on": "L’ordinateur est allumé et en mode transfert Bluetooth.",
+      "near": {
+        "phone": "Il est à moins d’un mètre du téléphone.",
+        "iphone": "Il est à moins d’un mètre de l’iPhone.",
+        "tablet": "Il est à moins d’un mètre de la tablette.",
+        "desktop": "Il est à moins d’un mètre de cet ordinateur."
+      },
+      "otherApp": "Aucune autre app n’est connectée à l’ordinateur."
     },
     "otherComputer": "Choisir un autre ordinateur",
     "retry": "Réessayer",
@@ -5052,7 +5075,9 @@
       "weights": "Lest",
       "mix": "Mélange",
       "pressure": "Pression",
-      "coordinates": "Coordonnées"
+      "coordinates": "Coordonnées",
+      "guideOfDive": "Guide de palanquée",
+      "note": "Note"
     },
     "kitNote": "Remplit la combinaison, le sous-vêtement, le lest et l’autre équipement. Chaque champ reste modifiable.",
     "kitPieces": {
@@ -5082,6 +5107,14 @@
       "mix": "Saisir le mélange, par exemple 32 ou 18/45"
     },
     "notRated": "Non notée",
+    "starsOf": "{n} sur 5",
+    "card": {
+      "site": "Site",
+      "people": "Personnes",
+      "rating": "Appréciation",
+      "conditions": "Conditions",
+      "tags": "Étiquettes"
+    },
     "add": "Ajouter",
     "weightTotal": "total",
     "weightPlace": "Emplacement du lest",
@@ -6842,8 +6875,8 @@
     "confirmError": {
       "expired": "Ce code a expiré. Demandez-en un nouveau.",
       "used": "Ce code a déjà servi.",
-      "own": "Vous ne pouvez pas valider vos propres plongées.",
-      "plus": "Valider une plongée demande Benthic+.",
+      "own": "Vous ne pouvez pas confirmer vos propres plongées.",
+      "plus": "Confirmer une plongée demande Benthic+.",
       "unknown": "Ce code n’est pas reconnu.",
       "tooMany": "Trop d’essais. Réessayez dans quelques minutes.",
       "failed": "La confirmation n’a pas pu être envoyée."

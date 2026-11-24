@@ -1683,7 +1683,7 @@
     }
     /* The windowing counts on these heights (ROW_HEIGHT and TRIP_HEIGHT in the script). */
     .bc-desktop-logbook--trip {
-      height: 44px;
+      height: 48px;
       & td {
         padding: 0;
         background: var(--bc-surface);
@@ -1695,9 +1695,27 @@
       background: var(--bc-selected-container);
       box-shadow: 0 2px 0 var(--bc-selected-container);
     }
+    /* A closed trip is a plain 48 px row with the dive rows' 1 px line (task 2026-11-23-374). */
     .bc-desktop-logbook--folded td {
-      border-radius: 20px;
+      background: none;
+      border-radius: 0;
+      /* Inset, so that the line stays inside the 48 px like the dive rows' border. */
+      box-shadow: inset 0 -1px 0 var(--bc-table-divider);
+    }
+    .bc-desktop-logbook--folded.bc-desktop-logbook--trip-selected td {
+      background: var(--bc-selected-container);
       box-shadow: none;
+      border-radius: 12px;
+    }
+    /* The row after an open trip's card is separated from it by a line above it (the card has none under it); an open trip
+       after it needs none, the gap between the cards is enough. */
+    .bc-desktop-logbook--trip-end + .bc-desktop-logbook--row:not(.bc-desktop-logbook--in-trip, .bc-desktop-logbook--selected) td {
+      border-top: 1px solid var(--bc-table-divider);
+    }
+    .bc-desktop-logbook--trip-end + .bc-desktop-logbook--folded:not(.bc-desktop-logbook--trip-selected) td {
+      box-shadow:
+        inset 0 1px 0 var(--bc-table-divider),
+        inset 0 -1px 0 var(--bc-table-divider);
     }
     .bc-desktop-logbook--pad td {
       padding: 0;
@@ -1707,7 +1725,7 @@
       align-items: center;
       gap: 8px;
       width: 100%;
-      height: 44px;
+      height: 48px;
       padding: 0 16px;
       border: 0;
       border-radius: inherit;

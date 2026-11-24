@@ -25,6 +25,8 @@ const KEYS = {
   server: 'dns', settings: 'settings', share: 'share', sites: 'location_on', split: 'call_split', statistics: 'bar_chart',
   sync: 'sync', tablet: 'tablet_android', tools: 'tune', trash: 'delete', tune: 'tune', undo: 'undo', upload: 'upload',
   visibility: 'visibility', visibilityOff: 'visibility_off', warning: 'warning', wrench: 'build',
+  // Desktop dive detail, Informations tab (task 2026-11-23-376).
+  people: 'group', star: 'star', tag: 'sell', waves: 'waves',
 };
 
 const file = new URL('../app/src/components/Icon.svelte', import.meta.url);

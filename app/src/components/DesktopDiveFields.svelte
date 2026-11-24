@@ -14,6 +14,8 @@
   import DesktopWeights from './DesktopWeights.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
   import DesktopEquipmentCard from './DesktopEquipmentCard.svelte';
+  import DesktopChipsField from './DesktopChipsField.svelte';
+  import DesktopStarsRow from './DesktopStarsRow.svelte';
   import GearIcon from './GearIcon.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
@@ -196,8 +198,8 @@
       if (shown === 'info') {
         once('buddy', () => loadValues('buddy'));
         once('guide', () => loadValues('guide'));
+        once('tag', () => loadValues('tag'));
       }
-      if (shown === 'notes') once('tag', () => loadValues('tag'));
       if (shown === 'equipment' || shown === 'gas') once('cylinders', loadCylinderTypes);
       if (shown === 'gas') once('reserve', loadReserve);
     });
@@ -384,7 +386,14 @@
   // --- Informations and Carte: the site card. -------------------------------------------------
   const siteRow = $derived(sites.find((x) => x.name === dive.site));
   const country = $derived(dive.siteLocation?.country || siteRow?.country || '');
-  const siteNote = $derived([country, siteRow ? t('desktopDetail.diveCount', { n: siteRow.dives }) : ''].filter(Boolean).join(' · '));
+  const siteNote = $derived(
+    [
+      [dive.siteLocation?.region, country].filter(Boolean).join(', '),
+      dive.siteCoordinates ? formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg) : '',
+    ]
+      .filter(Boolean)
+      .join(' · '),
+  );
   /** Opens the Sites section on this dive's site. */
   function openSite() {
     if (!siteRow) return;
@@ -405,31 +414,55 @@
   <p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>
 
   {#if tab === 'info'}
-    <!-- Informations (mock-up bureau-carnet-colonnes): the site card, then two columns with the label above. -->
-    <div class="bc-desktop-dive-fields--stack">
-      <DesktopEditField card name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
-      <div class="bc-desktop-dive-fields--columns">
-        <DesktopEditField stacked name="buddies" kind="list" showHint={false} label={t('desktopDetail.label.buddies')} value={dive.buddies} invitation={t('desktopDetail.invitation.buddies')} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
-        <DesktopEditField stacked name="guides" kind="list" showHint={false} label={t('desktopDetail.label.guides')} value={dive.guides} invitation={t('desktopDetail.invitation.guides')} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
-        <DesktopEditField stacked name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
-        <DesktopEditField stacked name="visibility" kind="stars" label={t('desktopDetail.label.visibility')} value={dive.visibility} emptyText={t('desktopDetail.notRated')} invitation={t('desktopDetail.invitation.visibility')} onsave={(v) => save('visibility', v)} />
-        <DesktopEditField stacked name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
-        {#if manual}
-          <!-- A dive logged by hand has no recorded values: they are edited like the others. -->
-          <DesktopEditField stacked name="maxDepth" kind="text" label={t('desktopDetail.label.maxDepth')} value={fieldValue(dive, 'maxDepth', prefs)} unit={depthUnitText} invitation={t('desktopDetail.invitation.maxDepth')} valid={checker('maxDepth')} onsave={(v) => save('maxDepth', v)} />
-          <DesktopEditField stacked name="duration" kind="text" label={t('desktopDetail.label.duration')} value={fieldValue(dive, 'duration', prefs)} unit={t('units.minutes')} invitation={t('desktopDetail.invitation.duration')} valid={checker('duration')} onsave={(v) => save('duration', v)} />
-          <DesktopEditField stacked name="waterTemp" kind="text" label={t('desktopDetail.label.waterTemp')} value={fieldValue(dive, 'waterTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.waterTemp')} valid={checker('waterTemp')} onsave={(v) => save('waterTemp', v)} />
-          <DesktopEditField stacked name="airTemp" kind="text" label={t('desktopDetail.label.airTemp')} value={fieldValue(dive, 'airTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.airTemp')} valid={checker('airTemp')} onsave={(v) => save('airTemp', v)} />
-        {:else}
-          <!-- What the dive computer recorded: plain text, no field. -->
-          {#if dive.airTempMk}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.airTemp')} value={formatTemperature(dive.airTempMk, prefs)} />{/if}
-          {#if dive.waterTempMk}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.waterTemp')} value={formatTemperature(dive.waterTempMk, prefs)} />{/if}
-        {/if}
-        <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.mode')} value={tIfExists(`detail.modes.${dive.divemode}`) ?? dive.divemode} />
-        {#if dive.cns > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.cns')} value={`${formatNumber(dive.cns, 0)} %`} />{/if}
-        {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
-        {#if trip}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.trip')} value={trip} />{/if}
-      </div>
+    <!-- Informations (task 2026-11-23-376): five cards, laid out like the Équipement tab's: site, people, rating, conditions, tags. -->
+    <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info">
+      <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
+        {#snippet icon()}<Icon name="place" size={22} />{/snippet}
+        <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
+      </DesktopEquipmentCard>
+
+      <DesktopEquipmentCard name="people" title={t('desktopDetail.card.people')}>
+        {#snippet icon()}<Icon name="people" size={22} />{/snippet}
+        <DesktopChipsField name="guides" label={t('desktopDetail.label.guideOfDive')} value={dive.guides} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
+        <DesktopChipsField name="buddies" label={t('desktopDetail.label.buddies')} value={dive.buddies} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
+      </DesktopEquipmentCard>
+
+      <DesktopEquipmentCard name="rating" title={t('desktopDetail.card.rating')}>
+        {#snippet icon()}<Icon name="star" size={22} />{/snippet}
+        <DesktopStarsRow name="rating" label={t('desktopDetail.label.note')} value={dive.rating} onsave={(v) => save('rating', v)} />
+        <DesktopStarsRow name="visibility" label={t('desktopDetail.label.visibility')} value={dive.visibility} onsave={(v) => save('visibility', v)} />
+      </DesktopEquipmentCard>
+
+      <DesktopEquipmentCard name="conditions" title={t('desktopDetail.card.conditions')}>
+        {#snippet icon()}<Icon name="waves" size={22} />{/snippet}
+        <div class="bc-desktop-dive-fields--two-columns">
+          <DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
+          {#if manual}
+            <DesktopEditField stacked name="airTemp" kind="text" label={t('desktopDetail.label.airTemp')} value={fieldValue(dive, 'airTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.airTemp')} valid={checker('airTemp')} onsave={(v) => save('airTemp', v)} />
+          {:else}
+            <!-- What the dive computer recorded: plain text, no field (a dash when it recorded none). -->
+            <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.airTemp')} value={dive.airTempMk ? formatTemperature(dive.airTempMk, prefs) : '—'} />
+          {/if}
+          <DesktopEditField stacked name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
+          {#if manual}
+            <!-- A dive logged by hand has no recorded values: they are edited like the others. -->
+            <DesktopEditField stacked name="maxDepth" kind="text" label={t('desktopDetail.label.maxDepth')} value={fieldValue(dive, 'maxDepth', prefs)} unit={depthUnitText} invitation={t('desktopDetail.invitation.maxDepth')} valid={checker('maxDepth')} onsave={(v) => save('maxDepth', v)} />
+            <DesktopEditField stacked name="duration" kind="text" label={t('desktopDetail.label.duration')} value={fieldValue(dive, 'duration', prefs)} unit={t('units.minutes')} invitation={t('desktopDetail.invitation.duration')} valid={checker('duration')} onsave={(v) => save('duration', v)} />
+            <DesktopEditField stacked name="waterTemp" kind="text" label={t('desktopDetail.label.waterTemp')} value={fieldValue(dive, 'waterTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.waterTemp')} valid={checker('waterTemp')} onsave={(v) => save('waterTemp', v)} />
+          {:else if dive.waterTempMk}
+            <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.waterTemp')} value={formatTemperature(dive.waterTempMk, prefs)} />
+          {/if}
+          <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.mode')} value={tIfExists(`detail.modes.${dive.divemode}`) ?? dive.divemode} />
+          {#if dive.cns > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.cns')} value={`${formatNumber(dive.cns, 0)} %`} />{/if}
+          {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
+          {#if trip}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.trip')} value={trip} />{/if}
+        </div>
+      </DesktopEquipmentCard>
+
+      <DesktopEquipmentCard name="tags" title={t('desktopDetail.card.tags')}>
+        {#snippet icon()}<Icon name="tag" size={22} />{/snippet}
+        <DesktopChipsField name="tags" variant="tag" showLabel={false} label={t('desktopDetail.label.tags')} value={/** @type {string[]} */ (fieldValue(dive, 'tags', prefs))} known={known.tag} newLabel={t('desktopDetail.newTag')} onsave={(v) => save('tags', v)} />
+      </DesktopEquipmentCard>
     </div>
   {:else if tab === 'equipment'}
     <!-- Équipement (task 2026-11-23-366): one card per section. -->
@@ -546,10 +579,8 @@
     <DesktopConsumption data={used} />
     {#if gasChanges}<DesktopEditField kind="text" readonly label={t('desktopDetail.label.gasChanges')} value={gasChanges} />{/if}
   {:else if tab === 'notes'}
-    <!-- Notes (mock-up bureau-carnet-onglet-notes): the rating, the notes, the tags. -->
-    <DesktopEditField name="rating" kind="stars" label={t('desktopDetail.label.rating')} value={dive.rating} emptyText={t('desktopDetail.notRated')} invitation={t('desktopDetail.invitation.rating')} onsave={(v) => save('rating', v)} />
+    <!-- Notes (task 2026-11-23-376): the notes; the rating and the tags are in the Informations tab's cards. -->
     <DesktopEditField name="notes" kind="multiline" label={t('desktopDetail.label.notes')} value={dive.notes} invitation={t('desktopDetail.invitation.notes')} onsave={(v) => save('notes', v)} />
-    <DesktopEditField name="tags" kind="list" label={t('desktopDetail.label.tags')} value={/** @type {string[]} */ (fieldValue(dive, 'tags', prefs))} invitation={t('desktopDetail.invitation.tags')} known={known.tag} newLabel={t('desktopDetail.newTag')} onsave={(v) => save('tags', v)} />
   {:else if tab === 'map'}
     <!-- Carte (mock-up bureau-carnet-onglet-carte): the map keeps its height, then the site and its position. -->
     {#if dive.siteCoordinates}
@@ -588,6 +619,15 @@
       flex-direction: column;
       gap: 14px;
       padding-bottom: 64px;
+    }
+
+    /* The Informations tab uses the same cards; the people's rows and the ratings sit in the card's body. */
+    .bc-desktop-dive-fields--info {
+      & :global([data-card='rating'] .bc-desktop-equipment-card--body) {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px 32px;
+      }
     }
 
     /* A text button of a card: « Changer de kit », « + Ajouter ». */
@@ -739,21 +779,6 @@
     .bc-desktop-dive-fields--feedback-group {
       width: min(360px, 100%);
       align-self: center;
-    }
-
-    .bc-desktop-dive-fields--stack {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    /* Two columns that follow the pane's width: one column when it is narrow. */
-    .bc-desktop-dive-fields--columns {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-      gap: 12px 16px;
-      min-width: 0;
     }
 
     .bc-desktop-dive-fields--card {

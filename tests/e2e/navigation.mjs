@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--no-monkey|--cylinder-types-only] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--detail-only|--no-monkey|--cylinder-types-only] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -38,6 +38,7 @@ import { desktopEquipmentFlows } from './desktop-equipment.mjs';
 import { benthicImportFlows } from './benthic-import-flow.mjs';
 import { desktopListHeaderFlows } from './desktop-list-header.mjs';
 import { cylinderTypeFlows } from './cylinder-types.mjs';
+import { desktopDetailFlows } from './desktop-detail.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -232,8 +233,22 @@ class Tab {
   /** Runs `fn(...args)` in the page; resolves with its (JSON) value. */
   async run(fn, ...fnArgs) {
     const expression = `(${fn.toString()})(...${JSON.stringify(fnArgs)})`;
-    const r = await this.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
-    if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description ?? r.exceptionDetails.text);
+    // « Promise was collected » is a protocol error, not an exception of the page: the page was reloaded or navigated while the
+    // evaluation awaited, and its promise went with the old page (the test's own Page.reload, the app's reload after a language
+    // change, or the development server reloading after it optimised a dependency it had not met; the summary at the end lists those).
+    const reloaded = (/** @type {unknown} */ text) => /Promise was collected|Execution context was destroyed|Cannot find context/.test(String(text));
+    /** @type {any} */
+    let r;
+    try {
+      r = await this.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
+    } catch (e) {
+      if (reloaded(/** @type {Error} */ (e).message)) throw new Error(`the page was reloaded during an awaited evaluation (${/** @type {Error} */ (e).message})`);
+      throw e;
+    }
+    if (r.exceptionDetails) {
+      const text = r.exceptionDetails.exception?.description ?? r.exceptionDetails.text;
+      throw new Error(reloaded(text) ? `the page was reloaded during an awaited evaluation (${text})` : text);
+    }
     return r.result.value;
   }
   async touch(type, x, y) {
@@ -255,7 +270,7 @@ class Tab {
   }
 }
 
-/** `opts`: `theme` (md or ios; else BC_THEME), `reducedMotion` (« Remove animations »), `throttle` (a slower processor; else BC_THROTTLE). */
+/** `opts`: `plus` (a Benthic+ account from the first screen), `theme` (md or ios; else BC_THEME), `reducedMotion` (« Remove animations »), `throttle` (a slower processor; else BC_THROTTLE). */
 async function openTab(width, height, mobile, welcome = false, desktop = false, opts = {}) {
   const target = await (await fetch(`${wsBase}/json/new?about:blank`, { method: 'PUT' })).json();
   const ws = new WebSocket(target.webSocketDebuggerUrl);
@@ -285,7 +300,12 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
       // answers « nothing cached » instead, as the app's own start does without an account.
       if (kind === 'core' && method === 'cloudListCachedDives') reply = { ok: true, v: '' };
       else if (kind === 'media') reply = { ok: true, v: await mediaFolder.call(method, a) };
-      else if (kind === 'core') reply = { ok: true, v: await core(method, a) };
+      // A host older than the app (BENTHIC_HOST pointing at an earlier build) answers « unknown action added » to the cylinder
+      // types the app gives it at start, and the error report that follows takes the first Back of every flow. That one call is
+      // answered with an empty list then; a host that knows the action is used as it is.
+      else if (kind === 'core' && method === 'cylinderTypes' && a?.action === 'added') {
+        reply = await core(method, a).then((v) => ({ ok: true, v }), (e) => (/unknown action/.test(String(e?.message ?? e)) ? { ok: true, v: JSON.stringify({ types: [] }) } : Promise.reject(e)));
+      } else if (kind === 'core') reply = { ok: true, v: await core(method, a) };
       else if (method === 'writeFile') {
         const p = path.join(temp, a.area, path.basename(a.name));
         mkdirSync(path.dirname(p), { recursive: true });
@@ -306,7 +326,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
     tab.run((t, r) => window.__bcAnswer(t, r), token, reply).catch(() => {});
   };
   await tab.send('Page.addScriptToEvaluateOnNewDocument', {
-    source: `(${function (home, temp, stage, welcome, mediaPort) {
+    source: `(${function (home, temp, stage, welcome, mediaPort, plus) {
       // The very first start (no value) shows the first launch; otherwise the logbook.
       if (welcome) {
         localStorage.removeItem('CapacitorStorage.bc.welcomeBeta');
@@ -318,6 +338,12 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
       // The hardware Back flow ends on App.minimizeApp, which a browser does not implement: that error is queued as a report
       // (task #102) and would be offered over the next tab. Each tab starts with no report waiting.
       localStorage.removeItem('CapacitorStorage.bc.errorReports');
+      // A cold start of a Benthic+ account (opts.plus): the session of the server and the remembered answer exist before the
+      // page loads, so the Profil section is there from the first screen (what hot-switching with __benthicPlusAccount never does).
+      if (plus) {
+        localStorage.setItem('__bcTestCredential.server', JSON.stringify({ email: 'diver@benthic.test', repositoryUrl: '', branch: '' }));
+        localStorage.setItem('CapacitorStorage.bc.benthicPlusSubscribed', '1');
+      }
       const answers = new Map();
       let n = 0;
       window.__bcAnswer = (token, reply) => answers.get(token)?.(reply);
@@ -349,7 +375,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         media: { call: (op, o) => call('media', op, o) },
         mediaUrl: (hash, mime) => `http://127.0.0.1:${mediaPort}/${hash}?type=${encodeURIComponent(mime || '')}`,
       };
-    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)}, ${PORT + 2000})`,
+    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)}, ${PORT + 2000}, ${JSON.stringify(!!opts.plus)})`,
   });
   await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.BC_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
   for (let i = 0; i < 100; i++) {
@@ -2271,7 +2297,7 @@ async function profileInfoWidthsFlows(expect) {
     const tab = await openPlusTab(width, height, mobile, false, desktop, { theme });
     const state = () => tab.run(() => {
       const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
-      return { route: view?.f7View?.router?.currentRoute?.url, editing: !!document.querySelector('.page-current .bc-profile-info--editing') };
+      return { route: (view?.f7View?.router?.currentRoute?.url ?? '').replace(/\?.*$/, ''), editing: !!document.querySelector('.page-current .bc-profile-info--editing') };
     });
     /** The page opens in its read view; the pencil edits it in place. */
     const edit = async () => {
@@ -2742,11 +2768,110 @@ async function profileSectionFlows(expect) {
   }
 }
 
+
+/**
+ * Task: the broken states of the Android tablet (reports 33 and 35). A cold start with a Benthic+ account, so the Profil
+ * view exists from the first screen: its home opens Informations beside the list while it is still hidden, and no view may
+ * end with two current pages. Read on every view, not on the one on screen only.
+ */
+async function coldProfileFlows(expect) {
+  const views = (tab) =>
+    tab.run(() =>
+      [...document.querySelectorAll('.views > .view')].map((v) => ({
+        id: v.id,
+        current: [...v.querySelectorAll(':scope > .page')].filter((p) => /\bpage-current\b/.test(p.className)).length,
+        route: (v.f7View?.router?.currentRoute?.url ?? '').replace(/\?.*$/, ''),
+      })),
+    );
+  const broken = (tab) => tab.run(async () => (await import('/src/lib/nav-trace.js')).traceEvents().filter((e) => e.type === 'broken').map((e) => e.detail).join(' | '));
+  for (const [label, width, height, theme] of [
+    ['Android tablet 1280x800', 1280, 800, 'md'],
+    ['Samsung SM-P613 1340x800', 1340, 800, 'md'],
+    ['iPad 1280x800', 1280, 800, 'ios'],
+  ]) {
+    console.log(`Cold start with Benthic+, ${label}`);
+    const tab = await openTab(width, height, false, false, false, { theme, plus: true, throttle: Number(process.env.BC_COLD_THROTTLE || 0) });
+    await sleep(2500);
+    const list = await views(tab);
+    const profile = list.find((v) => v.id === 'view-profile');
+    expect(`${label}: the Profil view exists at start`, { exists: true }, { exists: !!profile });
+    expect(`${label}: no view has two current pages after the cold start`, { bad: '' }, { bad: list.filter((v) => v.id !== 'view-logbook' && v.id !== 'view-statistics' && v.current > 1).map((v) => `${v.id}:${v.current}`).join(',') });
+    expect(`${label}: the app found nothing broken at start`, { broken: '' }, { broken: await broken(tab) });
+    // The view starts on its default pane: nothing navigates in a view that is still hidden (a page replaced in place while
+    // the app starts is the race of report 35, which a loaded or slow device loses).
+    expect(`${label}: the Profil view opens on Informations without a navigation`, { navigations: '', route: '/profile/info', history: 1 }, {
+      navigations: await tab.run(async () => (await import('/src/lib/nav-trace.js')).traceEvents().filter((e) => e.type.startsWith('nav') && /^profile /.test(e.detail)).map((e) => e.detail).join(' | ')),
+      route: list.find((v) => v.id === 'view-profile')?.route,
+      history: await tab.run(() => document.querySelector('#view-profile').f7View.router.history.length),
+    });
+    await tab.run(() => document.querySelector('[href="#profile"]')?.click());
+    await settled(tab, `${label}: Profil shown after a cold start`, { split: true });
+    const shown = (await views(tab)).find((v) => v.id === 'view-profile');
+    expect(`${label}: Profil opens on Informations`, { route: '/profile/info' }, { route: shown?.route });
+    expect(`${label}: the app found nothing broken once Profil is shown`, { broken: '' }, { broken: await broken(tab) });
+    tab.ws.close();
+  }
+}
+
+/**
+ * Report 33: Réglages opened on a tablet (the Account view, its list beside its detail), two pages deeper, then the
+ * Android Back key twice in a row while the first Back's page change still runs. The second press found the pane at
+ * its first screen, switched to the Logbook and hid the Account view in the middle of the page change: the view was left
+ * with no current page. The Back dispatcher ignores a press while the router changes page.
+ */
+async function accountBackFlows(expect) {
+  const broken = (tab) => tab.run(async () => (await import('/src/lib/nav-trace.js')).traceEvents().filter((e) => e.type === 'broken').map((e) => e.detail).join(' | '));
+  const stack = (tab) =>
+    tab.run(() => {
+      const view = document.querySelector('#view-account');
+      return { current: [...view.querySelectorAll(':scope > .page')].filter((p) => /\bpage-current\b/.test(p.className)).length, route: (view.f7View.router.currentRoute?.url ?? '').replace(/\?.*$/, '') };
+    });
+  for (const [label, width, height, gap] of [
+    ['Android tablet 1280x800', 1280, 800, 41],
+    ['Samsung SM-P613 1340x800', 1340, 800, 41],
+    ['Android tablet 1280x800, same instant', 1280, 800, 0],
+    ['Android tablet 1280x800, 150 ms apart', 1280, 800, 150],
+    // Report 33 itself: the Logbook chosen in the rail while Réglages is open in the Account view (the trace has a Back
+    // of the page and the switch to the Logbook 41 ms apart: closeOverPages, then showSection).
+    ['Android tablet 1280x800, Logbook chosen in the rail', 1280, 800, 'rail'],
+    ['Samsung SM-P613 1340x800, Logbook chosen in the rail', 1340, 800, 'rail'],
+  ]) {
+    console.log(`Account Back sequence, ${label}`);
+    const tab = await openTab(width, height, false, false, false, { theme: 'md' });
+    await tab.run(() => document.querySelector('[href="#account"]')?.click());
+    await sleep(700);
+    await tab.run(async () => (await import('/src/lib/navigation.svelte.js')).openOver('/settings/'));
+    await sleep(900);
+    // A row of the Settings list replaces the page of the pane (data-reload-detail).
+    await tab.run(() => { document.querySelector('#view-account').f7View.router.navigate('/settings/logbook', { reloadDetail: true }); });
+    await sleep(900);
+    // A report sheet left by the offline start would take the first press.
+    for (let i = 0; i < 3 && (await tab.run(() => !!document.querySelector('.modal-in'))); i++) await hardwareBack(tab), await sleep(500);
+    await settled(tab, `${label}: Réglages two pages deep`, { split: true, setup: true });
+    // Either the Logbook chosen in the rail, or the Back key twice (the page change of the first press still runs when the second arrives).
+    if (gap === 'rail') await tab.run(() => { document.querySelector('.bc-nav-rail--item[href="#logbook"]').click(); });
+    else await tab.run((ms) => {
+      window.dispatchEvent(new Event('bc:back'));
+      setTimeout(() => window.dispatchEvent(new Event('bc:back')), ms);
+    }, gap);
+    await sleep(2500);
+    const view = gap === 'rail' ? 'view-account' : await tab.run(() => document.querySelector('.views > .view.tab-active')?.id);
+    expect(`${label}: the app found nothing broken`, { broken: '' }, { broken: await broken(tab) });
+    const account = await stack(tab);
+    if (gap === 'rail') {
+      expect(`${label}: the Logbook is shown`, { view: 'view-logbook' }, { view: await tab.run(() => document.querySelector('.views > .view.tab-active')?.id) });
+      expect(`${label}: Réglages is closed, the Account view shows its first screen`, { route: '/account', current: 1 }, account);
+    } else if (view === 'view-account') expect(`${label}: the Account view has a current page`, { ok: true }, { ok: account.current >= 1 });
+    await settled(tab, `${label}: the view on screen is sound after the Back presses`, { split: true });
+    tab.ws.close();
+  }
+}
+
 /** What each block of flows made and how long it took, for the summary at the end. @type {{ name: string, checks: number, seconds: number }[]} */
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -2788,6 +2913,8 @@ try {
     ['computer photo', '--computer-photo-only', 10, !phoneOnly && !tabletOnly && !welcomeOnly, () => computerPhotoFlows(expect)],
     ['units', '--units-only', 2, true, () => unitsMenuFlows(expect)],
     ['profile section', '--profile-section-only', 40, true, () => profileSectionFlows(expect)],
+    ['cold profile', '--cold-profile-only', 15, !phoneOnly && !welcomeOnly, () => coldProfileFlows(expect)],
+    ['account back', '--account-back-only', 25, !phoneOnly && !welcomeOnly, () => accountBackFlows(expect)],
     ['profile insets', '--profile-insets-only', 19, !phoneOnly && !welcomeOnly, () => profileInsetsFlows(expect)],
     ['profile info', '--profile-info-widths-only', 20, true, () => profileInfoWidthsFlows(expect)],
     ['maintenance entry', '--maintenance-entry-only', 15, true, () => maintenanceEntryFlows(expect)],
@@ -2807,11 +2934,19 @@ try {
     // The desktop dive detail's Équipement tab, one card per section (tests/e2e/desktop-equipment.mjs).
     ['desktop equipment', '--equipment-only', 25, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopEquipmentFlows({ ...harness, shot })],
     // The import of a .benthic file, on every device (tests/e2e/benthic-import-flow.mjs).
-    ['benthic import', '--benthic-import-only', 90, !phoneOnly && !tabletOnly && !welcomeOnly, () => benthicImportFlows({ ...harness, shot, work, core, seeded })],
+    ['benthic import', '--benthic-import-only', 90, !phoneOnly && !tabletOnly && !welcomeOnly, async () => {
+      try { await benthicImportFlows({ ...harness, shot, work, core, seeded }); } finally {
+        // The « Remplacer » flows leave the harness core with the file's dives (no cylinders); the blocks that follow in this process
+        // (cylinder types, ...) expect the sample logbook, which is loaded again into the same repository (the app reopens it at start).
+        await core('importFile', { source: seeded, repo: `${path.join(home, 'carnet')}[main]` });
+      }
+    }],
     // The desktop logbook's list header at several column widths (tests/e2e/desktop-list-header.mjs).
     ['desktop list header', '--list-header-only', 25, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopListHeaderFlows({ ...harness, shot })],
     // Settings › Équipement › Types de bouteilles: one list, the chips, a new type, its deletion (tests/e2e/cylinder-types.mjs).
     ['cylinder types', '--cylinder-types-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => cylinderTypeFlows({ ...harness })],
+    // The desktop logbook's trip rows and the dive detail's right pane (tests/e2e/desktop-detail.mjs).
+    ['desktop detail', '--detail-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopDetailFlows({ ...harness, shot })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],
@@ -2849,6 +2984,10 @@ try {
   failures.push({ label: 'the run', problems: [String(e.stack ?? e)] });
   console.log(`  ERROR ${e.stack ?? e}`);
 }
+// A dependency that Vite meets for the first time while the run goes (a lazily loaded page) makes it optimise again and reload
+// every open page: a pending Runtime.evaluate then fails with « Promise was collected ». Said at the end, so a failure of that kind is not read as the app's.
+const reloads = viteOut.replace(/\x1b\[[0-9;]*m/g, '').split('\n').filter((line) => /new dependencies optimized|optimized dependencies changed|page reload|reloading/i.test(line));
+if (reloads.length) console.log(`\nthe development server reloaded the pages during the run (${reloads.length}):\n  ${reloads.slice(0, 6).join('\n  ')}`);
 if (blocks.length) console.log(`\n${blocks.map((b) => `  ${b.name.padEnd(24)} ${String(b.checks).padStart(4)} checks  ${String(b.seconds).padStart(4)} s`).join('\n')}`);
 console.log(`\n${checks} checks, ${failures.length} failure(s)`);
 if (failures.length) console.log(JSON.stringify(failures.slice(0, 3), null, 1));

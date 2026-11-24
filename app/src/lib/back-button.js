@@ -16,6 +16,7 @@ import { backTarget, readPane } from './pane-history.js';
 import { backThroughGuard } from './leave-guard.js';
 import { welcomeBack } from './first-launch-back.js';
 import { trace } from './nav-trace.js';
+import { isBusy } from './router-guard.js';
 
 /** @typedef {'system'|'escape'|'test'} BackSource */
 
@@ -169,6 +170,12 @@ function dispatch(layersOnly) {
     return target;
   }
   if (target === 'logbook') {
+    // A press while the view still changes page is dropped, like the guard drops a page Back: hiding a view in the middle
+    // of its page change leaves it with no current page (report 33).
+    if (view && isBusy(view.router)) {
+      trace('back-ignored', `${view.el?.id?.replace(/^view-/, '') ?? 'view'} changing`);
+      return 'busy';
+    }
     f7.tab.show('#view-logbook');
     return 'logbook';
   }

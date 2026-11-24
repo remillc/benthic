@@ -17,6 +17,6 @@ test('the menu and the rail go through goToSection', () => {
 
 test('goToSection closes the screens opened over the current and the chosen section', () => {
   const src = read('lib/navigation.svelte.js');
-  assert.match(src, /export function goToSection[\s\S]*closeOverPages\(f7\.views\.current\)[\s\S]*showSection\(section\)[\s\S]*closeOverPages\(/);
+  assert.match(src, /export (?:async )?function goToSection[\s\S]*closeOverPages\(f7\.views\.current\)[\s\S]*showSection\(section\)[\s\S]*closeOverPages\(/);
   assert.match(src, /path\.startsWith\('\/settings\/'\) \|\| path === '\/about'/);
 });

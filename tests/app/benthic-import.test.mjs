@@ -456,7 +456,7 @@ test('the texts exist in French and English and the screens are wired (the inter
   assert.equal(fr.benthicImport.progress.help, 'Gardez l’app ouverte jusqu’à la fin. Si l’import s’arrête, rien n’est ajouté.');
   assert.equal(fr.benthicImport.progress.helpDesktop, 'Gardez Benthic ouvert jusqu’à la fin. Si l’import s’arrête, rien n’est ajouté.');
   assert.equal(fr.benthicImport.incompleteText.other, 'Dans « {file} », {n} fichiers ne correspondent pas à leur empreinte. Rien n’a été importé. Refaites l’export sur l’appareil d’origine.');
-  assert.ok(fr.about.releaseNotes[0].includes('.benthic') && en.about.releaseNotes[0].includes('.benthic'));
+  assert.ok(fr.about.releaseNotes.some((n) => n.includes('.benthic')) && en.about.releaseNotes.some((n) => n.includes('.benthic')));
   const read = (p) => readFileSync(p, 'utf8');
   assert.match(read('app/src/components/FirstLaunchSteps.svelte'), /isBenthicName\(files\[0\]\.name\)/);
   assert.match(read('app/src/pages/Logbook.svelte'), /startBenthicReplace/);

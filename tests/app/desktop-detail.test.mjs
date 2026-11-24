@@ -95,7 +95,10 @@ test('Informations: the water type menu and the stars write through the edit pat
   assert.deepEqual(fieldChanges(dive({ visibility: 4 }), 'visibility', 0, metric), { ok: true, changes: { visibility: 0 } });
   const fields = read('app/src/components/DesktopDiveFields.svelte');
   assert.match(fields, /WATER_TYPES\.map/);
-  assert.match(fields, /<DesktopEditField stacked name="waterType" kind="choice" openChoiceOnClick[^>]*options=\{waterOptions\}[^>]*onsave=/);
+  assert.match(fields, /<DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick[^>]*options=\{waterOptions\}[^>]*onsave=/);
+  // The stars are the Appréciation card's rows (task 2026-11-23-376): the same save path.
+  assert.match(fields, /<DesktopStarsRow name="visibility"[^>]*onsave=\{\(v\) => save\('visibility', v\)\}/);
+  assert.match(fields, /<DesktopStarsRow name="rating"[^>]*onsave=\{\(v\) => save\('rating', v\)\}/);
   const editor = read('app/src/components/DesktopEditField.svelte');
   assert.match(editor, /onpointerdown=\{pointerDown\}/);
   assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) input\.showPicker\(\)/);
@@ -103,9 +106,11 @@ test('Informations: the water type menu and the stars write through the edit pat
 
 test('Informations: buddy and guide editors hide the editing hint, without hiding errors', () => {
   const fields = read('app/src/components/DesktopDiveFields.svelte');
+  // Since task 2026-11-23-376 the people are chips (DesktopChipsField), which have no hint line at all.
   for (const name of ['buddies', 'guides']) {
-    assert.match(fields, new RegExp(`<DesktopEditField stacked name="${name}" kind="list" showHint=\\{false\\}`));
+    assert.match(fields, new RegExp(`<DesktopChipsField name="${name}"`));
   }
+  assert.ok(!/hint/i.test(read('app/src/components/DesktopChipsField.svelte').replace(/\/\/.*$/gm, '')));
   const editor = read('app/src/components/DesktopEditField.svelte');
   assert.match(editor, /showHint = true/);
   assert.match(editor, /\{#if invalid \|\| \(showHint && kind !== 'choice' && kind !== 'stars'\)\}/);

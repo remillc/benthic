@@ -40,6 +40,7 @@
    *   note?: string,
    *   disabled?: boolean,
    *   card?: boolean,
+   *   noLead?: boolean,
    *   tall?: boolean,
    *   emptyText?: string,
    *   onopen?: () => void,
@@ -50,7 +51,7 @@
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -245,7 +246,7 @@
       onmouseenter={() => (hovered = true)}
       onmouseleave={() => (hovered = false)}
     >
-      {#if card}<span class="bc-desktop-edit-field--lead" aria-hidden="true"><Icon name="place" size={20} /></span>{/if}
+      {#if card && !noLead}<span class="bc-desktop-edit-field--lead" aria-hidden="true"><Icon name="place" size={20} /></span>{/if}
       <span class="bc-desktop-edit-field--content bc-value">
         {#if card}
           <span class="bc-desktop-edit-field--main">{shownText || invitation}</span>
@@ -348,7 +349,8 @@
       white-space: normal;
     }
 
-    .bc-desktop-edit-field--card {
+    /* 56 px (the rest rule below sets 40, so this one is the more specific). */
+    .bc-desktop-edit-field--rest.bc-desktop-edit-field--card {
       min-height: 56px;
       gap: 12px;
       padding: 0 8px 0 10px;

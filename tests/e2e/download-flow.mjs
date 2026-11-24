@@ -20,8 +20,8 @@ export async function downloadFlows(h) {
         const { logbook } = await import('/src/lib/logbook.svelte.js');
         const { computerOffer } = await import('/src/lib/inventory.svelte.js');
         const listeners = {};
-        const calls = { download: 0, keep: 0, scan: 0 };
-        window.__dl = { listeners, calls, computerOffer, logbook };
+        const calls = { download: 0, keep: 0, scan: 0, settings: 0, ask: 0, enable: 0 };
+        window.__dl = { listeners, calls, computerOffer, logbook, core };
         core.bluetoothStatus = async () => ({ bluetooth: 'on', permission: 'granted' });
         core.bluetoothModels = async () => [
           { vendor: 'Shearwater', products: [{ name: 'Perdix 2', ble: true, classic: false }, { name: 'Petrel 3', ble: true, classic: false }] },
@@ -89,7 +89,13 @@ export async function downloadFlows(h) {
       b.click();
       return true;
     }, pattern);
-  const shots = (tab, name) => (process.env.BC_SHOTS ? shot(tab, `download-${name}`) : undefined);
+  // The test host may lack an action of the newer core and open the error report sheet; it is closed first so the picture shows the page.
+  const shots = async (tab, name) => {
+    if (!process.env.BC_SHOTS) return;
+    await tab.run(() => ([...document.querySelectorAll('.sheet-modal.modal-in button')].find((b) => /Ne pas envoyer/.test(b.innerText))?.click(), 1));
+    await sleep(700);
+    await shot(tab, `download-${name}`);
+  };
 
   /** @param {string} name @param {number} w @param {number} h @param {{ theme: 'md'|'ios', desktop?: boolean, mobile?: boolean, kind: string }} o */
   const walk = async (name, w, hgt, o) => {
@@ -245,9 +251,175 @@ export async function downloadFlows(h) {
     tab.ws.close();
   };
 
+  /** The four states that stop a download (task 2026-11-24-378): the flow's layout, each with its disc, title, text and buttons. */
+  const readState = () => {
+    const page = document.querySelector('.page.bc-download, .page.bc-download-failed');
+    const text = (el) => el?.innerText?.replace(/\s+/g, ' ').trim() ?? '';
+    const box = (el) => {
+      const r = el?.getBoundingClientRect();
+      return r ? { width: Math.round(r.width), height: Math.round(r.height), left: Math.round(r.left), top: Math.round(r.top), bottom: Math.round(r.bottom) } : null;
+    };
+    const disc = page?.querySelector('.bc-download--disc, .bc-download-failed--disc');
+    const heading = page?.querySelector('.bc-download--title, .bc-download-failed--content h1');
+    const body = page?.querySelector('.bc-download--text, .bc-download-failed--text');
+    const buttons = [...(page?.querySelectorAll('button, a.link') ?? [])].filter((b) => b.getClientRects().length).map((b) => ({ label: text(b) || b.getAttribute('aria-label') || '', box: box(b) }));
+    const column = page?.querySelector('.bc-download--content, .bc-download-failed--frame, .bc-download-failed--scroll');
+    return {
+      disc: box(disc),
+      discColor: disc ? getComputedStyle(disc).backgroundColor : '',
+      title: text(heading),
+      titleAlign: heading ? getComputedStyle(heading).textAlign : '',
+      text: text(body),
+      points: page ? page.querySelectorAll('.bc-download-failed--number').length : 0,
+      buttons,
+      labels: buttons.map((b) => b.label),
+      column: box(column),
+      pageBox: box(page),
+      window: { width: innerWidth, height: innerHeight },
+    };
+  };
+  const press = (tab, pattern) =>
+    tab.run((p) => {
+      const re = new RegExp(p);
+      const page = document.querySelector('.page.bc-download, .page.bc-download-failed');
+      const b = [...page.querySelectorAll('button, a.link')].find((x) => x.getClientRects().length && re.test((x.innerText || '').trim()));
+      if (!b) return false;
+      b.click();
+      return true;
+    }, pattern);
+  const setStatus = (tab, status) =>
+    tab.run((st) => {
+      const c = window.__dl.core;
+      c.bluetoothStatus = async () => st;
+      c.requestBluetoothPermission = async () => (window.__dl.calls.ask++, { permission: 'denied', bluetooth: 'on' });
+      c.openAppSettings = async () => (window.__dl.calls.settings++, undefined);
+      c.enableBluetooth = async () => (window.__dl.calls.enable++, undefined);
+      return 1;
+    }, status);
+
+  const stateWalk = async (name, w, hgt, o) => {
+    console.log('Download states: ' + name);
+    const slug = 'states-' + name.replace(/\W+/g, '-');
+    const tabOpts = { theme: o.theme };
+    const system = o.theme === 'ios' ? 'iOS' : 'Android';
+    const who = o.theme === 'ios' ? (o.kind === 'tablet' ? 'de l’iPad' : 'de l’iPhone') : 'd’Android';
+    const nearOf = { phone: 'du téléphone', iphone: 'de l’iPhone', tablet: 'de la tablette', desktop: 'de cet ordinateur' }[o.kind];
+    const device = { phone: 'Le téléphone', iphone: 'L’iPhone', tablet: 'La tablette', desktop: 'Cet ordinateur' }[o.kind];
+    const open1 = async (status) => {
+      const tab = await openTab(w, hgt, o.mobile ?? true, false, !!o.desktop, tabOpts);
+      await fake(tab, { remembered: true });
+      await setStatus(tab, status);
+      await open(tab);
+      await sleep(1200);
+      return tab;
+    };
+    /** The disc is 96 px and centred in its column; the title is centred; on a tablet the column is at most 640 px. */
+    const layoutOf = (st) => {
+      const centre = (b) => b.left + b.width / 2;
+      return Object.values({
+        disc96: st.disc?.width === 96 && st.disc?.height === 96,
+        centred: !!st.disc && !!st.column && Math.abs(centre(st.disc) - centre(st.column)) <= 2,
+        titleCentred: st.titleAlign === 'center',
+        column: o.kind === 'tablet' ? st.column.width <= 640 : true,
+      }).every(Boolean);
+    };
+    const layoutExpected = true;
+    // 1. Allow Bluetooth.
+    let tab = await open1({ bluetooth: 'on', permission: 'prompt' });
+    let st = await tab.run(readState);
+    expect(name + ': « Autoriser le Bluetooth », its text and its button', { title: 'Autoriser le Bluetooth', text: true, allow: true, blue: true, layout: layoutExpected }, {
+      title: st.title,
+      text: st.text === system + ' demande l’autorisation « Appareils à proximité » pour trouver l’ordinateur de plongée. Benthic ne s’en sert pas pour autre chose.',
+      allow: st.labels.includes('Autoriser'),
+      blue: st.discColor === 'rgb(31, 92, 153)',
+      layout: layoutOf(st),
+    });
+    const bAllow = st.buttons.find((x) => x.label === 'Autoriser');
+    if (o.desktop) expect(name + ': the button is in the dialog footer, right-aligned', { right: true }, { right: !!bAllow && bAllow.box.left + bAllow.box.width > st.pageBox.left + st.pageBox.width / 2 + 100 });
+    else expect(name + ': « Autoriser » is at the bottom', { bottom: true }, { bottom: !!bAllow && bAllow.box.bottom > st.window.height - 60 });
+    await shots(tab, slug + '-1-permission');
+    await press(tab, '^Autoriser$');
+    await sleep(500);
+    expect(name + ': « Autoriser » asks the permission; a refusal shows « Autorisation refusée »', { ask: 1, denied: true }, { ask: await tab.run(() => window.__dl.calls.ask), denied: (await tab.run(readState)).title === 'Autorisation refusée' });
+    tab.ws.close();
+    // 2. Refused.
+    tab = await open1({ bluetooth: 'on', permission: 'denied' });
+    st = await tab.run(readState);
+    expect(name + ': « Autorisation refusée », its text and two buttons', { title: 'Autorisation refusée', text: true, open: true, again: true, layout: layoutExpected }, {
+      title: st.title,
+      text: st.text === 'Sans l’autorisation Bluetooth, Benthic ne peut pas trouver l’ordinateur de plongée. Vous pouvez la donner dans les réglages ' + who + ', rubrique Autorisations.',
+      open: st.labels.includes('Ouvrir les réglages'),
+      again: st.labels.includes('Demander à nouveau'),
+      layout: layoutOf(st),
+    });
+    const bo = st.buttons.find((x) => x.label === 'Ouvrir les réglages');
+    const ba = st.buttons.find((x) => x.label === 'Demander à nouveau');
+    if (!o.desktop) expect(name + ': « Demander à nouveau » is under « Ouvrir les réglages »', { under: true }, { under: !!bo && !!ba && ba.box.top >= bo.box.bottom - 1 });
+    else expect(name + ': the footer has « Demander à nouveau » left of « Ouvrir les réglages »', { left: true }, { left: !!bo && !!ba && ba.box.left < bo.box.left });
+    await shots(tab, slug + '-2-denied');
+    await press(tab, '^Ouvrir les réglages$');
+    await press(tab, '^Demander à nouveau$');
+    await sleep(400);
+    expect(name + ': the buttons open the settings and ask again', { settings: 1, ask: 1 }, await tab.run(() => ({ settings: window.__dl.calls.settings, ask: window.__dl.calls.ask })));
+    tab.ws.close();
+    // 3. Bluetooth off.
+    tab = await open1({ bluetooth: 'off', permission: 'granted' });
+    st = await tab.run(readState);
+    expect(name + ': « Bluetooth désactivé »', { title: 'Bluetooth désactivé', text: 'Activez le Bluetooth pour trouver l’ordinateur de plongée.', turnOn: true, layout: layoutExpected }, {
+      title: st.title,
+      text: st.text,
+      turnOn: st.labels.includes('Activer le Bluetooth'),
+      layout: layoutOf(st),
+    });
+    await shots(tab, slug + '-3-off');
+    await press(tab, '^Activer le Bluetooth$');
+    await sleep(400);
+    expect(name + ': « Activer le Bluetooth » turns it on', { enable: 1 }, await tab.run(() => ({ enable: window.__dl.calls.enable })));
+    tab.ws.close();
+    // 4. Failed: the computer is out of reach.
+    tab = await open1({ bluetooth: 'on', permission: 'granted' });
+    await emit(tab, 'bluetoothDevice', { mac: 'AA:BB:CC:DD:EE:01', name: 'Perdix 2', le: true, classic: false, computer: { vendor: 'Shearwater', product: 'Perdix 2' } });
+    await sleep(500);
+    await tap(tab, '^Télécharger depuis Perdix 2$');
+    await sleep(500);
+    await tab.run(() => (window.__dl.fail('NOT_FOUND'), 1));
+    await sleep(1200);
+    st = await tab.run(readState);
+    expect(name + ': « Perdix 2 introuvable », its text, three points and a red disc', { title: 'Perdix 2 introuvable', text: true, points: 3, red: true, checks: true, layout: layoutExpected }, {
+      title: st.title,
+      text: st.text === device + ' n’a pas trouvé l’ordinateur' + (o.kind === 'desktop' ? ' de plongée' : '') + '. Aucune plongée n’a été modifiée.',
+      points: st.points,
+      red: st.discColor === 'rgb(249, 222, 220)',
+      checks: await tab.run((near) => {
+        const t = document.querySelector('.page.bc-download-failed ol')?.innerText ?? '';
+        return t.includes('L’ordinateur est allumé et en mode transfert Bluetooth.') && t.includes('Il est à moins d’un mètre ' + near + '.') && t.includes('Aucune autre app n’est connectée à l’ordinateur.');
+      }, nearOf),
+      layout: layoutOf(st),
+    });
+    const br = st.buttons.find((x) => x.label === 'Réessayer');
+    const bc = st.buttons.find((x) => x.label === 'Choisir un autre ordinateur');
+    expect(name + ': both buttons are there', { retry: true, other: true }, { retry: !!br, other: !!bc });
+    if (!o.desktop) expect(name + ': « Choisir un autre ordinateur » is under « Réessayer »', { under: true }, { under: !!br && !!bc && bc.box.top >= br.box.bottom - 1 });
+    else expect(name + ': the footer has « Choisir un autre ordinateur » left of « Réessayer »', { left: true }, { left: !!br && !!bc && bc.box.left < br.box.left && br.box.left + br.box.width > st.pageBox.left + st.pageBox.width / 2 + 100 });
+    await shots(tab, slug + '-4-failed');
+    // « Réessayer » starts the same attempt again.
+    await tab.run(() => ((window.__dl.calls.download = 0), 1));
+    await press(tab, '^Réessayer$');
+    await sleep(1500);
+    expect(name + ': « Réessayer » starts the download again', { download: 1 }, { download: await tab.run(() => window.__dl.calls.download) });
+    tab.ws.close();
+  };
+
+  if (!process.env.BC_STATES_ONLY) {
   await walk('phone md', 390, 844, { theme: 'md', kind: 'phone' });
   await walk('phone ios', 390, 844, { theme: 'ios', kind: 'iphone' });
   await walk('tablet md landscape', 1280, 800, { theme: 'md', kind: 'tablet', mobile: false });
   await walk('tablet md portrait', 800, 1280, { theme: 'md', kind: 'tablet', mobile: false });
   await walk('desktop', 1400, 900, { theme: 'md', kind: 'desktop', mobile: false, desktop: true });
+  }
+  await stateWalk('phone md', 390, 844, { theme: 'md', kind: 'phone' });
+  await stateWalk('phone ios', 390, 844, { theme: 'ios', kind: 'iphone' });
+  await stateWalk('tablet md landscape', 1280, 800, { theme: 'md', kind: 'tablet', mobile: false });
+  await stateWalk('tablet md portrait', 800, 1280, { theme: 'md', kind: 'tablet', mobile: false });
+  await stateWalk('desktop', 1400, 900, { theme: 'md', kind: 'desktop', mobile: false, desktop: true });
 }

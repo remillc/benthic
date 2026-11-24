@@ -19,8 +19,8 @@ const symbols = table('const symbols = {', '\n  };');
 
 const DRAWINGS = ['account', 'bestMix', 'blank', 'blender', 'computer', 'depthGauge', 'desktop', 'diveComputer', 'folderDownload', 'git', 'logbook', 'notebook', 'plan', 'plusMark', 'simplifyProfile', 'trip', 'tripRemove', 'ungroup', 'wristComputer'];
 
-test('89 keys are Material Symbols glyphs, the others Benthic drawings (blender is a drawing since task 365)', () => {
-  assert.equal(Object.keys(symbols).length, 89);
+test('93 keys are Material Symbols glyphs, the others Benthic drawings (blender is a drawing since task 365; people, star, tag and waves added by task 376)', () => {
+  assert.equal(Object.keys(symbols).length, 93);
   // `blank` is the empty placeholder, not an icon: the 18 drawings are the 19 minus it.
   assert.deepEqual(Object.keys(paths).sort(), [...DRAWINGS].sort());
   assert.equal(Object.keys(paths).filter((k) => k !== 'blank').length, 18);
