@@ -1717,6 +1717,10 @@ int site_json(uint32_t uuid, std::string &json, std::string &error)
 	append_taxonomy_entry(json, "city", ds->taxonomy, TC_LOCALNAME);
 	json += ",\"diveList\":[";
 	bool first = true;
+	// A site without coordinates: each dive's own recorded position (GPS1/GPS2 of a dive computer), for
+	// « Utiliser cette position » (task 2026-11-24-395). dive::get_gps_location() falls back to the site's
+	// location, which is empty here, so whatever it finds was recorded with the dive.
+	const bool site_unplaced = !has_location(&ds->location);
 	for (const dive *d: ds->dives) {
 		if (internal::is_plan_only(*d))
 			continue;
@@ -1726,7 +1730,13 @@ int site_json(uint32_t uuid, std::string &json, std::string &error)
 		json += "{\"id\":" + std::to_string(d->id) + ",\"number\":" + std::to_string(d->number) + ",\"date\":";
 		append_json_string(json, iso_time(d->when));
 		json += ",\"durationSeconds\":" + std::to_string(d->duration.seconds) + ",\"maxDepthMm\":" +
-			std::to_string(d->maxdepth.mm) + '}';
+			std::to_string(d->maxdepth.mm);
+		if (site_unplaced) {
+			location_t gps = d->get_gps_location();
+			if (has_location(&gps))
+				json += ",\"recordedLatUdeg\":" + std::to_string(gps.lat.udeg) + ",\"recordedLonUdeg\":" + std::to_string(gps.lon.udeg);
+		}
+		json += '}';
 	}
 	json += "]}";
 	return 0;

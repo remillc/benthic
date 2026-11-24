@@ -474,7 +474,10 @@ export { waterTypeOf };
  * @typedef {SiteSummary & {description: string, notes: string,
  *   countryTaxonomy: {value: string, manual: boolean}, region: {value: string, manual: boolean},
  *   city: {value: string, manual: boolean},
- *   diveList: {id: number, number: number, date: string, durationSeconds: number, maxDepthMm: number}[]}} SiteDetail
+ *   diveList: {id: number, number: number, date: string, durationSeconds: number, maxDepthMm: number,
+ *     recordedLatUdeg?: number, recordedLonUdeg?: number}[]}} SiteDetail
+ *   recordedLatUdeg/recordedLonUdeg: only for a site without coordinates, the position a dive computer recorded with
+ *   that dive (GPS1/GPS2), when it has one.
  */
 
 /**
