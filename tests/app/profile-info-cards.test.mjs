@@ -280,19 +280,10 @@ test('explicitly deleting the blood group keeps the rest', async () => {
   assert.equal(after.emergency.phone.number, '5145550142');
 });
 
-test('the account API: the calls carry the session and read the answer', async () => {
-  const calls = [];
-  const transport = async (request) => {
-    calls.push(request);
-    return { status: 200, text: JSON.stringify({ consent: request.method === 'PUT' ? request.body.consent : false, consentedAt: '2026-11-02T10:00:00.000Z' }) };
-  };
-  const api = createServerApi({ baseUrl: 'https://server.example', transport });
-  assert.deepEqual(await api.healthConsent('abc'), { consent: false, consentedAt: '' });
-  assert.deepEqual(await api.setHealthConsent('abc', true), { consent: true, consentedAt: '2026-11-02T10:00:00.000Z' });
-  assert.equal(calls[0].url, 'https://server.example/v1/account/health-consent');
-  assert.equal(calls[0].headers.Authorization, 'Bearer abc');
-  assert.equal(calls[1].method, 'PUT');
-  assert.deepEqual(calls[1].body, { consent: true });
+test('the account API has no health-consent call any more', () => {
+  const api = createServerApi({ baseUrl: 'https://server.example', transport: async () => ({ status: 200, text: '{}' }) });
+  assert.equal(api.healthConsent, undefined);
+  assert.equal(api.setHealthConsent, undefined);
 });
 
 test('the read-only state of the inventory also refuses the profile', async () => {

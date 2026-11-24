@@ -7,9 +7,6 @@ export function formatDate(iso) {
   return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? formatDay(iso) : '';
 }
 
-/** The date of an ISO timestamp (the consent's), written out. @param {string} timestamp */
-export const formatStampDate = (timestamp) => formatDate(timestamp.slice(0, 10));
-
 /** The year, 0-based month and day the date picker starts on. @param {string} iso @param {number} fallbackYear */
 export function partsOf(iso, fallbackYear) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
