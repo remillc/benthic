@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Menu ⋮ du détail, Android</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc><helmet><style>
+body{margin:0}
+a{color:#1F2124}a:hover{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/badec06cc60bc45d557d30e4499a5a96) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/f03ce3393a653876a4b50633885dea3e) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/29acc6ff37ee9ab6e0e68ecba16ac3bb) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/6c5d422f01f0ea50c45b02b79a03da9f) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/b7a53a41be57d75a8840e8cb1e373751) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/7dc59088bf74bb6b54448bdc7dc6f559) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+
+
+body{margin:0}
+a{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/badec06cc60bc45d557d30e4499a5a96) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/f03ce3393a653876a4b50633885dea3e) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/29acc6ff37ee9ab6e0e68ecba16ac3bb) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/6c5d422f01f0ea50c45b02b79a03da9f) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/b7a53a41be57d75a8840e8cb1e373751) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/7dc59088bf74bb6b54448bdc7dc6f559) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+</style>
+<style>
+body{margin:0}
+a{color:#1F2124}
+/* Source Sans 3 for body text, sized to match the system font (size-adjust 108%) */
+@font-face{font-family:'Source Sans 3 OD';font-weight:400;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/badec06cc60bc45d557d30e4499a5a96) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:500;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/f03ce3393a653876a4b50633885dea3e) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:600;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/29acc6ff37ee9ab6e0e68ecba16ac3bb) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:700;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/6c5d422f01f0ea50c45b02b79a03da9f) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:800;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/b7a53a41be57d75a8840e8cb1e373751) format('woff2')}
+@font-face{font-family:'Source Sans 3 OD';font-weight:900;font-style:normal;font-display:block;size-adjust:108%;ascent-override:85.9%;descent-override:22.6%;line-gap-override:0%;src:url(/_blob/7dc59088bf74bb6b54448bdc7dc6f559) format('woff2')}
+h1,h2,h3,h4,h1 *,h2 *,h3 *,h4 *,[style*='font-size: 2'],[style*='font-size: 3'],[style*='font-size: 4'],[style*='font-size: 2'] *,[style*='font-size: 3'] *,[style*='font-size: 4'] *{font-family:Roboto, 'Google Sans', system-ui, sans-serif !important}
+</style>
+</helmet>
+<div style="width: 330px; height: 412px; box-sizing: border-box; padding: 20px; background: #E6E4DE; font-family: 'Source Sans 3 OD', Roboto, system-ui, sans-serif; color: #1F2124"><div role="menu" aria-label="Plus d’options" style="width: 290px; padding: 8px 0; border-radius: 16px; background: #F5F4F0; box-shadow: 0 3px 10px rgba(0,0,0,0.22)"><span role="menuitem" style="height: 48px; padding: 0 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #1F2124"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4B4A47; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"></path></svg>Modifier la plongée</span><span role="menuitem" style="height: 48px; padding: 0 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #1F2124"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4B4A47; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 6l6 8 4-4 8 8"></path></svg>Planifier depuis cette plongée</span><span role="menuitem" style="height: 48px; padding: 0 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #1F2124"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4B4A47; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4M18 8.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 21.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path></svg>Partager</span><span role="menuitem" style="height: 48px; padding: 0 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #1F2124"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4B4A47; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M5 9h14M5 15h14M10 3L8 21M16 3l-2 18"></path></svg>Renuméroter la plongée</span><span role="menuitem" style="height: 48px; padding: 0 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #1F2124"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4B4A47; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M5 9h9M5 15h9M9 3L7 21M14 3l-1 9M17 14v7M14 18l3 3 3-3"></path></svg>Renuméroter à partir d’ici</span><span role="menuitem" style="height: 48px; padding: 0 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #1F2124"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #4B4A47; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 7h6l2 2h10v10H3zM9 14h6"></path></svg>Retirer du voyage</span><div role="separator" style="height: 1px; margin: 8px 0; background: #DADAD6"></div><span role="menuitem" style="height: 48px; padding: 0 16px; display: flex; align-items: center; gap: 12px; font-size: 15px; color: #B3261E"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="flex: none; fill: none; stroke: #B3261E; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>Supprimer la plongée</span></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":330,"height":412}}'>
+class Component extends DCLogic { renderVals() { return {}; } }
+</script>
+</body>
+</html>
