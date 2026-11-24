@@ -21,9 +21,9 @@ Google Play.
   offer page lists what is included, with "Continue without a subscription" under
   "Subscribe". Without Benthic+, the logbook stays on the device and every other
   function stays free.
-- **Sign in with Apple and Google.** "Continue with Apple" (iPhone, iPad) and
-  "Continue with Google" sign in or create the account, with each provider's official
-  button. An existing Benthic+ account with the same address is reused; deleting the
+- **Sign in with Apple.** "Continue with Apple" (iPhone, iPad) signs in or creates the
+  account, with Apple's official button ("Continue with Google" is shown but not active
+  yet). An existing Benthic+ account with the same address is reused; deleting the
   account also revokes the access Apple gave.
 - **New devices.** A new device is paired by asking for access: a device already paired
   shows the request with a 6-digit code to compare before approving, or a 26-character
@@ -126,7 +126,7 @@ Google Play.
   on the left and oxygen on the right, with the bailout and stage cylinders beside it;
   "Edit dive" draws the same unit. Dive mode (open circuit, rebreather, freediving)
   chooses what the form shows.
-- **Reading a gauge with the camera.** In "Edit dive", a camera button in the Start and
+- **Reading a gauge with the camera (Android).** In "Edit dive", a camera button in the Start and
   End fields of each cylinder reads the pressure on a digital gauge or dive computer
   display (one or two gauges, bar or psi), or on a photo. On-device text recognition;
   the photo is not kept.

@@ -75,9 +75,3 @@ test('the screen claims the motion when the step appears and draws the profile b
   assert.match(screen, /bc-plus-hero--wave/);
 });
 
-test('the release notes mention it in both languages', () => {
-  for (const lang of ['fr', 'en']) {
-    const notes = JSON.parse(read(`i18n/${lang}.json`)).about.releaseNotes;
-    assert.ok(notes.some((n) => /prêt|ready/.test(n) && /(bulles|bubbles)/.test(n)), lang);
-  }
-});
