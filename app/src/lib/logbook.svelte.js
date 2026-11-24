@@ -22,6 +22,7 @@ import { transferCount } from './first-launch.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
 import { applyDeviceSettings, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, MAX_ZIP_BYTES, toBase64 } from './zip-fit.js';
+import { chronologicalRenumber } from './time-shift.js';
 import { stageFile } from './staged-file.js';
 import { importProgress } from './import-progress.svelte.js';
 import { importPayload } from './import-files.js';
@@ -351,9 +352,11 @@ export async function editDivesTogether(ids, changes, openId = null) {
 
 /**
  * « Décaler la date et l'heure »: the start of the dives moves by `seconds` (negative: earlier), one undoable step (the
- * core's ShiftTime), saved and synced like an edit. `shiftSeconds` and the preview are in lib/time-shift.js.
+ * core's ShiftTime), saved and synced like an edit. `shiftSeconds` and the preview are in lib/time-shift.js. When the shift
+ * leaves the numbers out of date order, a second step renumbers them (chronologicalRenumber).
  * @param {number[]} ids
  * @param {number} seconds
+ * @returns {Promise<number>} the undoable steps made (1, or 2 with the renumbering)
  */
 export async function shiftDives(ids, seconds) {
   const result = await BenthicCore.shiftTime({ ids, seconds });
@@ -361,7 +364,11 @@ export async function shiftDives(ids, seconds) {
   logbook.redoText = result.redo ?? '';
   logbook.dives = await BenthicCore.listLoadedDives();
   logbook.sitesVersion++;
-  await persistChanges();
+  // A dive moved past another leaves the numbers out of date order: they follow the dates again (a second undoable step).
+  const plan = chronologicalRenumber(logbook.dives);
+  if (plan.ids.length) await renumberDivesTo(plan.ids, plan.numbers);
+  else await persistChanges();
+  return plan.ids.length ? 2 : 1;
 }
 
 /**

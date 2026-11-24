@@ -2440,7 +2440,7 @@
     "editedNoDuplicate": "{name} edited, no longer a possible duplicate"
   },
   "renumberFrom": {
-    "title": "Renumber from this dive",
+    "title": "Renumber from here",
     "text": "This dive and all later dives receive consecutive numbers in date order, including hidden dives. You can undo this.",
     "conflict": "Number {n} is already used by an earlier dive. Choose another starting number.",
     "tooLarge": "The starting number is too large to number all later dives.",
@@ -2514,6 +2514,7 @@
   "shiftTime": {
     "menu": "Shift date and time…",
     "title": "Shift date and time",
+    "sheetTitle": "Shift time",
     "intro": {
       "one": "{n} dive selected. To correct a dive computer’s clock or a time zone.",
       "other": "{n} dives selected. To correct a dive computer’s clock or a time zone."
@@ -2532,7 +2533,7 @@
     "last": "Last: {dive}",
     "only": "Dive: {dive}",
     "number": "#{n}",
-    "note": "The intervals between the dives do not change. You can undo.",
+    "note": "The intervals between the dives do not change. If the order changes, the numbers follow the dates again. You can undo.",
     "apply": "Shift",
     "done": {
       "one": "{n} dive shifted",
@@ -3446,7 +3447,7 @@
       "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen.",
       "Tablet: on the profile home, Information opens beside the list from the start, with no navigation error reported.",
       "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty.",
-      "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification.",
+      "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification. On iPhone it is a sheet. If a dive moves before another, the numbers follow the date order again; “Undo” takes back the shift and the renumbering.",
       "Logbook: “Edit together…” groups its fields in four tabs (Information, Equipment, Gas, Notes) and adds visibility, the kit (Benthic+), weights, the dive type and “Add to the notes”; under a field whose values differ, the spread (“Taylor (1), none (2)”); the subtitle is only the dive numbers, and “Apply to N dives” is blue. On a tablet, the dialog replaces the full-screen sheet.",
       "Desktop: while the logbook loads, the list shows greyed rows that follow its columns, as the phone’s does, instead of a sentence in the middle of the pane.",
       "Dive detail, Gas tab: a “Dive type” selector (Open circuit, CCR rebreather, pSCR rebreather, Freediving) changes the dive’s mode; the cards follow (the rebreather drawn with its diluent and oxygen, its setpoints, the pSCR mix, “No gas in freediving”). Changing the type never deletes a cylinder.",

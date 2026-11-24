@@ -4,7 +4,9 @@
   // the selected dives moves by the same amount, through the core's undoable ShiftTime. A segmented « Plus tôt / Plus tard »,
   // three wheels (Jours, Heures, Minutes; the mouse wheel, the arrow keys and a typed number work on the desktop), the preview
   // of the first and the last selected dive, then « Annuler » and « Décaler » (disabled at zero). On the iPhone the wheels are
-  // three columns of one picker (« 1 h », « 05 min »).
+  // three columns of one picker (« 1 h », « 05 min »); the iPhone shows it as a page sheet (« Annuler », title, « Décaler »
+  // in its header), the iPad and the other devices as the dialog.
+  import { Sheet } from 'framework7-svelte';
   import Md3Dialog from './Md3Dialog.svelte';
   import WheelPicker from './WheelPicker.svelte';
   import DesktopSegments from './DesktopSegments.svelte';
@@ -22,6 +24,8 @@
   let { ids, oncancel, ondone } = $props();
 
   const n = ids.length;
+  /** The iPhone's page sheet; the iPad keeps the dialog. */
+  const sheet = ios && !layout.split;
   /** The ids now: the core numbers its dives again when it reads the logbook again. */
   const live = $derived(ids.map(liveDiveId));
   let later = $state(true);
@@ -49,9 +53,9 @@
     if (busy || seconds === 0) return;
     busy = true;
     try {
-      await shiftDives(live, seconds);
+      const steps = await shiftDives(live, seconds);
       ondone();
-      offerUndo(t('shiftTime.done', { n }));
+      offerUndo(t('shiftTime.done', { n }), undefined, 6000, steps);
     } catch (e) {
       console.error('Shift dive times', e);
       busy = false;
@@ -66,8 +70,8 @@
   ]);
 </script>
 
-<Md3Dialog class="bc-shift-time" title={t('shiftTime.title')} text={t('shiftTime.intro', { n })} {oncancel}>
-  <div class="bc-shift-time--body">
+{#snippet content()}
+  <div class="bc-shift-time--body" class:bc-shift-time--body-sheet={sheet}>
     {#if ios}
       <div class="bc-shift-time--direction">
         <div class="bc-shift-time--ios-segments" role="radiogroup" aria-label={t('shiftTime.direction')}>
@@ -101,12 +105,28 @@
     </section>
     <p class="bc-shift-time--note">{t('shiftTime.note')}</p>
   </div>
+{/snippet}
+
+{#if sheet}
+  <Sheet class="bc-shift-time bc-shift-time--sheet" opened backdrop swipeToClose push={false} onSheetClosed={oncancel} aria-label={t('shiftTime.title')}>
+    <div class="bc-shift-time--ios-bar">
+      <button type="button" class="bc-shift-time--ios-cancel" onclick={oncancel}>{t('dialog.cancel')}</button>
+      <span class="bc-shift-time--ios-title">{t('shiftTime.sheetTitle')}</span>
+      <button type="button" class="bc-shift-time--apply bc-shift-time--ios-apply" disabled={busy || seconds === 0} onclick={apply}>{t('shiftTime.apply')}</button>
+    </div>
+    <p class="bc-shift-time--ios-intro">{t('shiftTime.intro', { n })}</p>
+    {@render content()}
+  </Sheet>
+{:else}
+<Md3Dialog class="bc-shift-time" title={t('shiftTime.title')} text={t('shiftTime.intro', { n })} {oncancel}>
+  {@render content()}
 
   {#snippet actions()}
     <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
     <button type="button" class:button={layout.desktop} class:button-fill={layout.desktop} class="bc-shift-time--apply" disabled={busy || seconds === 0} onclick={apply}>{t('shiftTime.apply')}</button>
   {/snippet}
 </Md3Dialog>
+{/if}
 
 <style>
   @layer bc.components {
@@ -177,6 +197,63 @@
       background: var(--bc-secondary);
       color: var(--bc-on-secondary);
       font-weight: 600;
+    }
+
+    /* iPhone: the page sheet. */
+    :global(.sheet-modal.bc-shift-time--sheet) {
+      --f7-sheet-bg-color: var(--bc-background);
+      height: auto;
+      max-height: 92%;
+      border-radius: 10px 10px 0 0;
+      overflow-y: auto;
+    }
+
+    .bc-shift-time--ios-bar {
+      height: 52px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 8px;
+
+      & button {
+        min-height: 44px;
+        padding: 0 8px;
+        border: 0;
+        background: none;
+        color: var(--bc-text);
+        font: inherit;
+        font-size: 17px;
+      }
+    }
+
+    .bc-shift-time--ios-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .bc-shift-time--ios-cancel {
+      justify-self: start;
+    }
+
+    .bc-shift-time--ios-bar .bc-shift-time--ios-apply {
+      justify-self: end;
+      font-weight: 600;
+    }
+
+    .bc-shift-time--ios-bar .bc-shift-time--ios-apply:disabled {
+      opacity: 0.38;
+    }
+
+    .bc-shift-time--ios-intro {
+      margin: 0;
+      padding: 4px 24px 12px;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--bc-text-2);
+    }
+
+    .bc-shift-time--body-sheet {
+      padding-bottom: calc(16px + var(--bc-safe-bottom));
     }
 
     /* iPhone: a two-part segmented control. */

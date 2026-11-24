@@ -207,7 +207,7 @@ export async function diveDetailTabsFlows(h) {
     await tablet.run(() => (window.__live('.bc-dive-detail .navbar a.popover-open')?.click(), 1));
     await sleep(600);
     state = await tablet.run(() => ({ items: [...document.querySelectorAll('.popover.modal-in .item-title')].map((e) => e.textContent.trim()).join('|') }));
-    expect(`tablet ${label}: the ⋮ menu holds the actions without « Modifier la plongée »`, { items: 'Planifier depuis cette plongée|Partager|Renuméroter la plongée|Renuméroter à partir de cette plongée|Supprimer la plongée' }, state);
+    expect(`tablet ${label}: the ⋮ menu holds the actions without « Modifier la plongée »`, { items: 'Planifier depuis cette plongée|Partager|Renuméroter la plongée|Renuméroter à partir d’ici|Supprimer la plongée' }, state);
     if (process.env.BC_SHOTS) await shot(tablet, `dive-tabs-tablet-${label}-menu`);
     tablet.ws.close();
   }
@@ -273,7 +273,7 @@ export async function diveDetailTabsFlows(h) {
   await phone.run(() => (document.querySelector('.bc-dive-detail .navbar a.popover-open').click(), 1));
   await sleep(600);
   state = await phone.run(() => ({ items: [...document.querySelectorAll('.popover.modal-in .item-title')].map((e) => e.textContent.trim()).join('|') }));
-  expect('phone: the ⋮ menu holds the actions, no « Modifier »', { items: 'Planifier depuis cette plongée|Partager|Renuméroter la plongée|Renuméroter à partir de cette plongée|Supprimer la plongée' }, state);
+  expect('phone: the ⋮ menu holds the actions, no « Modifier »', { items: 'Planifier depuis cette plongée|Partager|Renuméroter la plongée|Renuméroter à partir d’ici|Supprimer la plongée' }, state);
   phone.ws.close();
 
   // ================================================================================================================

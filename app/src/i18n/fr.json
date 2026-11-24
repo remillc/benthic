@@ -2440,7 +2440,7 @@
     "editedNoDuplicate": "{name} modifié, ce n’est plus un doublon possible"
   },
   "renumberFrom": {
-    "title": "Renuméroter à partir de cette plongée",
+    "title": "Renuméroter à partir d’ici",
     "text": "Cette plongée et toutes les suivantes reçoivent des numéros consécutifs, dans l’ordre des dates, même si elles sont masquées. Vous pourrez annuler.",
     "conflict": "Le numéro {n} est déjà utilisé par une plongée précédente. Choisissez un autre premier numéro.",
     "tooLarge": "Le premier numéro est trop grand pour numéroter toutes les plongées suivantes.",
@@ -2514,6 +2514,7 @@
   "shiftTime": {
     "menu": "Décaler la date et l’heure…",
     "title": "Décaler la date et l’heure",
+    "sheetTitle": "Décaler l’heure",
     "intro": {
       "one": "{n} plongée sélectionnée. Pour corriger l’horloge d’un ordinateur de plongée ou un fuseau horaire.",
       "other": "{n} plongées sélectionnées. Pour corriger l’horloge d’un ordinateur de plongée ou un fuseau horaire."
@@ -2532,7 +2533,7 @@
     "last": "Dernière : {dive}",
     "only": "Plongée : {dive}",
     "number": "n° {n}",
-    "note": "Les intervalles entre les plongées ne changent pas. Vous pourrez annuler.",
+    "note": "Les intervalles entre les plongées ne changent pas. Si l’ordre change, les numéros suivent de nouveau les dates. Vous pourrez annuler.",
     "apply": "Décaler",
     "done": {
       "one": "{n} plongée décalée",
@@ -3446,7 +3447,7 @@
       "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet.",
       "Tablette : sur la page d’accueil du profil, Informations s’ouvre à côté de la liste dès le démarrage, sans erreur de navigation signalée.",
       "Tablette : choisir le Carnet pendant que Réglages est ouvert ferme Réglages d’abord, sans laisser l’écran du compte vide.",
-      "Carnet : « Décaler la date et l’heure… », dans le menu des plongées cochées (⋮ sur téléphone et tablette, clic droit sur ordinateur), avance ou recule le départ de toutes les plongées choisies de la même durée : trois molettes (jours, heures, minutes), un aperçu de la première et de la dernière plongée, et « Annuler » dans la notification.",
+      "Carnet : « Décaler la date et l’heure… », dans le menu des plongées cochées (⋮ sur téléphone et tablette, clic droit sur ordinateur), avance ou recule le départ de toutes les plongées choisies de la même durée : trois molettes (jours, heures, minutes), un aperçu de la première et de la dernière plongée, et « Annuler » dans la notification. Sur iPhone, c’est une feuille. Si une plongée passe avant une autre, les numéros suivent de nouveau l’ordre des dates ; « Annuler » reprend le décalage et la renumérotation.",
       "Carnet : « Modifier ensemble… » range ses champs en quatre onglets (Informations, Équipement, Gaz, Notes) et ajoute la visibilité, le kit (Benthic+), le lest, le type de plongée et « Ajouter aux notes » ; sous un champ dont les valeurs diffèrent, le détail (« Taylor (1), aucun (2) ») ; le sous-titre n’est plus que les numéros des plongées, et « Appliquer aux N plongées » est en bleu. Sur tablette, la fenêtre remplace la feuille plein écran.",
       "Ordinateur : pendant le chargement du carnet, la liste affiche des lignes grisées qui suivent ses colonnes, comme celle du téléphone, au lieu d’une phrase au milieu du volet.",
       "Détail d’une plongée, onglet Gaz : un sélecteur « Type de plongée » (Circuit ouvert, Recycleur CCR, Recycleur pSCR, Apnée) change le mode de la plongée ; les cartes suivent (le recycleur dessiné avec le diluant et l’oxygène, ses consignes, le mélange du pSCR, « Pas de gaz en apnée »). Changer de type ne supprime aucune bouteille.",

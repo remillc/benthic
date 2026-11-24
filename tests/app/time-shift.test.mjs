@@ -2,7 +2,7 @@
 // first and the last selected dive; the menu entry of the desktop's right-click menu.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { MAX_SHIFT_DAYS, WHEEL_TEXTS, shiftIso, shiftPreview, shiftSeconds } from '../../app/src/lib/time-shift.js';
+import { MAX_SHIFT_DAYS, WHEEL_TEXTS, chronologicalRenumber, shiftIso, shiftPreview, shiftSeconds } from '../../app/src/lib/time-shift.js';
 import { contextMenuEntries } from '../../app/src/lib/desktop-table.js';
 
 test('the shift is signed: later is positive, earlier negative', () => {
@@ -71,4 +71,20 @@ test('« Décaler la date et l’heure… » follows « Modifier » in the right
   const entry = contextMenuEntries(2, { mac: false, available }).find((e) => e.key === 'shiftTime');
   assert.equal(entry.icon, 'history');
   assert.equal(entry.shortcut, undefined, 'no shortcut');
+});
+
+test('numbers follow the dates again only when a shift changed the order', () => {
+  const kept = [
+    { id: 1, number: 1, date: '2020-01-01T09:00:00' },
+    { id: 2, number: 2, date: '2020-01-02T09:00:00' },
+    { id: 3, number: 0, date: '2020-01-01T12:00:00' },
+  ];
+  assert.deepEqual(chronologicalRenumber(kept), { ids: [], numbers: [] });
+  // Dive 1 was shifted past dive 2 and a gap in the numbers stays where it is.
+  const moved = [
+    { id: 1, number: 1, date: '2020-01-03T09:00:00' },
+    { id: 2, number: 2, date: '2020-01-02T09:00:00' },
+    { id: 4, number: 5, date: '2020-01-04T09:00:00' },
+  ];
+  assert.deepEqual(chronologicalRenumber(moved), { ids: [2, 1], numbers: [1, 2] });
 });

@@ -7494,9 +7494,9 @@ Mock-ups: phone canvas, page Android, subgroup « Une page à onglets (propositi
 
 **Test:** on a phone, scroll a dive from top to bottom: the tabs stick and follow; tap « Gaz »: it scrolls there; change the site from the sheet and the date from the picker without leaving the page; ⋮ actions work. On the desktop, the Informations tab shows Date et heure and Signatures.
 
-## [ ] 2026-11-24-387 Dive detail, last pieces: computers with their photo, pSCR and portrait variants of « Gaz », iPhone versions
+## [x] 2026-11-24-387 Dive detail, last pieces: computers with their photo, pSCR and portrait variants of « Gaz », iPhone versions
 
-Partly done (24 November 2026, in the commit of 382 and 386): points 1 to 4 (computers card with the photo tiles on tablet and phone, pSCR and short-label variants of Gaz on every device, Signatures replacing the old Validations group, iPhone « ‹ Carnet », circled menu and « Infos, Équipement, Gaz, Notes, Carte » segmented control). Point 5 (iPhone sheet « Décaler la date et l’heure ») waits for task 383, whose dialog is not in `main` yet.
+Partly done (24 November 2026, in the commit of 382 and 386): points 1 to 4 (computers card with the photo tiles on tablet and phone, pSCR and short-label variants of Gaz on every device, Signatures replacing the old Validations group, iPhone « ‹ Carnet », circled menu and « Infos, Équipement, Gaz, Notes, Carte » segmented control). Point 5 done (24 November 2026, branch `feature/ios-picker-shift`): on the iPhone `ShiftTimeDialog` is a page sheet (« Annuler », « Décaler l’heure », « Décaler » bold; the same logic and preview; the iPad keeps the dialog). It cannot be seen in the e2e (Android look) and was not run on an iPhone.
 
 Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/`. Completes tasks 382, 383 and 386 (to-dos #141 and #126 closed).
 

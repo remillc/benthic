@@ -64,3 +64,27 @@ export function shiftPreview(dives, seconds) {
   };
   return listed.length === 1 ? [row('only', listed[0])] : [row('first', listed[0]), row('last', listed[listed.length - 1])];
 }
+
+/**
+ * The renumbering that puts the numbers in date order again after a shift (task 2026-11-24-383): the numbers the numbered
+ * dives hold, in ascending order, go to those dives from the oldest to the most recent one (equal dates keep their
+ * current relative order). Only the dives whose number changes are returned; none when the order was not disturbed.
+ * @param {{ id: number, date: string, number: number }[]} dives
+ * @returns {{ ids: number[], numbers: number[] }}
+ */
+export function chronologicalRenumber(dives) {
+  const numbered = dives.filter((d) => d.number > 0);
+  const byDate = [...numbered].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.number - b.number));
+  const numbers = numbered.map((d) => d.number).sort((a, b) => a - b);
+  /** @type {number[]} */
+  const ids = [];
+  /** @type {number[]} */
+  const wanted = [];
+  byDate.forEach((d, i) => {
+    if (d.number !== numbers[i]) {
+      ids.push(d.id);
+      wanted.push(numbers[i]);
+    }
+  });
+  return { ids, numbers: wanted };
+}
