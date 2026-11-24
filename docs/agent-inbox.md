@@ -7511,3 +7511,16 @@ Christian asked for this on 24 November 2026. Work in `main`. In Réglages › A
 ## [ ] 2026-11-24-391 Correction to task 388: « Pressions partielles » keeps its bar / ATA choice
 
 Christian asked for this on 24 November 2026. Work in `main`. Task 388 was wrong on one point: it said « Pressions partielles » has no choice and reads « Toujours en bar ». Ignore that part. The row keeps the choice decided on 12 November (`docs/ui-specification.md`, "Partial pressure unit"; `app/src/lib/pp-unit.js`): in desktop Réglages › Unités it becomes a slider selector like the other rows, with two options, « bar » (default) and « ATA ». The line under the row reads « Seule l’étiquette change : 1,4 bar s’affiche 1,4 ATA » (English: « Only the label changes: 1.4 bar shows as 1.4 ATA »). Still no mention of Subsurface. If you already applied 388's « Toujours en bar » text or removed the choice anywhere, put the choice back. Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`.
+
+## [ ] 2026-11-24-392 Correction to tasks 388 and 391: desktop Unités look like the tablet; slider selectors in black
+
+Christian asked for this on 24 November 2026. Work in `main`. This replaces part of 388 and 391; where they disagree, follow this task.
+
+1. **Slider selector colour.** The chosen option's thumb is black #1F2124 with white 600 text, not #114477. This applies wherever task 388's slider selector is used, which now means desktop Réglages › Langue et formats (« Format de la date », « Format de l’heure », « Format du papier (impression) »). Filled buttons stay #114477.
+2. **Réglages › Unités on desktop (Windows/Linux and macOS) use the tablet's look, not slider selectors** (undo that part of 388 and 391):
+   - « Système d’unités »: the tablet's connected button group (`android-tablette-reglages-*`): three buttons 40 px high, 2 px apart, about 360 px wide in all; the chosen one #1F2124 with #F5F4F0 text and fully round corners (20 px), the others #EBEAE5 with #1F2124 text, 20 px corners outside and 8 px inside. It replaces the outlined MD3 segmented button.
+   - Each unit is a plain row: its name on the left, the current value on the right in 14 px #4B4A47 (tabular figures), no box, no chevron. Clicking anywhere on the row opens the menu of choices under it. Rows: Profondeur (Mètres · Pieds), Pression des bouteilles (bar · psi), Pressions partielles (bar · ATA), Volume (Litres · pi³), Température (°C · °F), Poids (Kilogrammes · Livres), and « Vitesses de remontée et de descente » in « Affichage des valeurs » (par minute · par seconde).
+   - « Pressions partielles » keeps the bar / ATA choice and its line « Seule l’étiquette change : 1,4 bar s’affiche 1,4 ATA » (task 391), now as a row with a menu.
+3. The row opens its menu with Enter or Space too; the screen reader names the row, its value and that it opens a menu.
+
+Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`, `docs/mockups/bureau-reglages-langue.dc.html`.
