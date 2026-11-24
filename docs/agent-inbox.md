@@ -7499,3 +7499,7 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 2. Check the other desktop Réglages pages for drop-downs of two to four short options and use the same selector there; tell Christian which ones changed.
 
 **Test:** every changed row switches with a click and with the arrow keys, saves at once, and the screen reader names the row and the option.
+
+## [ ] 2026-11-24-389 Réglages › Affichage: remove « Bande des bouteilles » (tank bar)
+
+Christian asked for this on 24 November 2026. Work in `main`. The row « Bande des bouteilles » (Subsurface's `tankbar`) duplicates the « Gaz » chip of the profile, which already draws one band per mix under the curve. Remove the row from Réglages › Affichage on every device (desktop, tablet, Android phone, iPhone) and stop reading the setting; the profile's « Gaz » chip stays the only control, and its last state is remembered like « Température » (phone and tablet: until the app is closed; desktop: on this computer). `docs/ui-specification.md` updated (Settings paragraph, Affichage paragraph, settings table). Mock-ups: « Réglages · bureau, affichage », tablet Réglages landscape and portrait, `reglages-affichage-android`, `ios-reglages-affichage`, `reglages-bouteille-choix-android`.
