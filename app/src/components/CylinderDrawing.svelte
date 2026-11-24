@@ -7,10 +7,12 @@
   // was breathed between the end and the start level, and a dashed line marks
   // each level (task 46). `hatched`: the start and end pressures are not both
   // known, so the body is hatched in grey with no level (13 November 2026).
+  // The outline is `stroke` wide in the drawing's own units (1.2 of the 44 x 76 viewBox, task 2026-11-24-379): it scales with `width`,
+  // 1.2 px at 44 px and about 1.75 px at 64 px.
   // Decorative: the text next to it says the same.
 
   /** @type {{ ratio?: number, startRatio?: number|null, hatched?: boolean, width?: number, stroke?: number }} */
-  let { ratio = 0, startRatio = null, hatched = false, width = 44, stroke = 2 } = $props();
+  let { ratio = 0, startRatio = null, hatched = false, width = 44, stroke = 1.2 } = $props();
 
   const id = `bc-cylinder-drawing-${Math.random().toString(36).slice(2, 9)}`;
   // The cylinder (task 2026-11-13-85): a slim body with shoulders narrowing into a
@@ -52,7 +54,7 @@
       <line x1="7" y1={lineY(fillTop)} x2="37" y2={lineY(fillTop)} class="bc-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
     {/if}
   {/if}
-  <path d={SHAPE} class="bc-cylinder-drawing--outline" stroke-width={stroke} vector-effect="non-scaling-stroke" />
+  <path d={SHAPE} class="bc-cylinder-drawing--outline" stroke-width={stroke} />
 </svg>
 
 <style>

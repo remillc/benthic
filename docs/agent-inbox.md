@@ -7373,7 +7373,7 @@ Left for you: two code comments still say « Faire valider la plongée » (`app/
 
 **Test:** search the built app's strings: no « Faire valider »; the desktop header button's tooltip reads « Faire signer la plongée… (signature d’un moniteur ou d’un compagnon) ».
 
-## [ ] 2026-11-24-378 Download: the Bluetooth and failure screens follow the download flow's layout
+## [x] 2026-11-24-378 Download: the Bluetooth and failure screens follow the download flow's layout
 
 Christian asked for this on 24 November 2026 (the screens were redrawn on 23 November with the download flow of tasks 357 and 358, and not sent until now). Work in `main`. The four states that stop a download now look like the other steps of « Télécharger des plongées »: same bar, same centred column, a 96 px disc with the icon, a centred title and text, the action at the bottom. Mock-ups: phone canvas, page Android, subgroup « Téléchargement » (« Téléchargement, autoriser le Bluetooth », « … autorisation refusée », « … Bluetooth désactivé », « Téléchargement échoué »), page iPhone (« Téléchargement échoué »); tablet and desktop canvas, page Tablette (« 08 · … » and « 09 · Téléchargement échoué », landscape and portrait) and page Bureau (« Téléchargement échoué · bureau », the 640 px dialog).
 
@@ -7384,14 +7384,18 @@ Christian asked for this on 24 November 2026 (the screens were redrawn on 23 Nov
 
 Tablet: the same content in a 640 px centred column of the download pane. Desktop: the same content inside the download dialog, with « Choisir un autre ordinateur » (text) and « Réessayer » (filled) in its footer, right-aligned.
 
+**Done (24 November 2026):** `Download.svelte` shows the three Bluetooth states in the flow's centred column (96 px disc, buttons in the bottom bar, the dialog footer on the desktop); `DownloadFailed.svelte` has the same layout (red disc, three points, Réessayer with the retry icon over the text button; the 640 px dialog on the desktop). « Ouvrir les réglages » uses the existing `openAppSettings` (Kotlin, Swift and `desktop.js` already had it). Texts per device in `download.permission/denied` and `downloadFailed`. The « À vérifier » heading is gone. Mock-ups not in the repository: built from the task text. Checked by the `--download-only` block (states on phone Android and iOS, tablet, desktop).
+
 **Test:** on each device, refuse the Bluetooth permission, turn Bluetooth off, and start a download with the computer out of reach: each state shows its disc, title, text and buttons as drawn, and its buttons do what they say.
 
-## [ ] 2026-11-24-379 Cylinder drawing: thinner outline
+## [x] 2026-11-24-379 Cylinder drawing: thinner outline
 
 Christian asked for this on 24 November 2026. Work in `main`. The black outline of the cylinder drawing was too thick. In every mock-up that draws it (dive detail, gas cards, editing, tablet and desktop « Gaz » tab), the outline now has `stroke-width="1.2"` in the drawing's 44 × 76 viewBox instead of `2`. On screen that is 1.2 px at the 44 px width and about 1.75 px at 64 px (desktop gas cards and tablet tiles). The dark theme outline (#F4F4F2) is thinned the same way. The fill, the gradient and the red dashed level lines do not change. Mock-ups: phone canvas, page Android (« Détail », « Modifier une plongée », « Faire signer » boards); tablet and desktop canvas, pages Tablette and Bureau (every board with a cylinder, e.g. « Carnet · bureau, détail, onglet Gaz »). The copies in `docs/mockups/` are updated (57 files).
 
 1. `app/src/components/CylinderDrawing.svelte`: the outline is drawn with `vector-effect="non-scaling-stroke"` and `stroke = 2` by default, so it is 2 px at every size. Make it scale with the drawing: 1.2 in viewBox units (`stroke-width = 1.2 × width / 44` if you keep the non-scaling stroke, or drop `vector-effect` and use 1.2). Keep the `stroke` prop working for any caller that sets it.
 2. Check the callers (`GasSummary.svelte`, `GasCard.svelte`, `DesktopGasCards.svelte`) in light and dark themes.
+
+**Done (24 November 2026):** the outline drops `vector-effect` and uses `stroke-width = 1.2` (the `stroke` prop stays, now in viewBox units, default 1.2). Callers (`GasSummary`, `GasCard`, `DesktopGasCards`) pass no `stroke`. Checked in light and dark on the phone detail and the desktop « Gaz » tab.
 
 **Test:** open a dive with cylinders on the phone (light and dark) and on the desktop « Gaz » tab: the outline is thin, matching the mock-ups, and the level lines and fill are unchanged.
 

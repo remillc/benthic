@@ -295,6 +295,9 @@
     --bc-on-bluetooth-disc: #FFFFFF;
     --bc-bluetooth-action: #114477;
     --bc-on-bluetooth-action: #FFFFFF;
+    /* The failed download (task 2026-11-24-378): the pale red disc and its crossed-out Bluetooth icon. Fixed, light and dark. */
+    --bc-download-failed-disc: #F9DEDC;
+    --bc-on-download-failed-disc: #B3261E;
     --bc-start-fill: #1F5C99;
     --bc-on-start-fill: #FFFFFF;
     --bc-start-hover: rgb(31 33 36 / 0.06);

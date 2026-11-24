@@ -2840,6 +2840,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Cylinder drawing: the outline is thinner (1.2 in the 44 × 76 drawing, about 1.2 px at 44 px wide and 1.75 px at 64 px), in light and dark.",
+      "Download: “Allow Bluetooth”, “Permission refused”, “Bluetooth is off” and “Download failed” follow the layout of the other steps: a 96 px disc, a centred title and text, the buttons at the bottom (in the dialog footer on the desktop). “Open settings” opens the app’s settings.",
       "Importing a .benthic file: “A file” in “Import a logbook” and the logbook menu accept the full export. The file is first checked, file by file, against its fingerprints; if it is incomplete, nothing is imported. Otherwise the logbook, equipment, profile and certifications are imported in one go, and personal information is encrypted on this device. To replace a logbook, “Replace this logbook?” offers “Export this logbook first”.",
       "Offline: a server that cannot be reached no longer opens an error report; the logbook only shows that it is offline and tries again later.",
       "Dives: when a change made on another device reaches this one while a dive is open, the dive stays open, its neighbours still open, and an edit in progress is kept; a dive deleted on the other device closes with a short message. This no longer produces an error report.",
@@ -3840,12 +3842,19 @@
     },
     "permission": {
       "title": "Allow Bluetooth",
-      "text": "Android asks for the \"Nearby devices\" permission to find the dive computer. Benthic does not use it for anything else.",
+      "text": {
+        "android": "Android asks for the “Nearby devices” permission to find the dive computer. Benthic does not use it for anything else.",
+        "ios": "iOS asks for the “Nearby devices” permission to find the dive computer. Benthic does not use it for anything else."
+      },
       "button": "Allow"
     },
     "denied": {
       "title": "Permission refused",
-      "text": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the Android settings, under Permissions.",
+      "text": {
+        "android": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the Android settings, under Permissions.",
+        "iphone": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the iPhone settings, under Permissions.",
+        "ipad": "Without the Bluetooth permission, Benthic cannot find the dive computer. You can give it in the iPad settings, under Permissions."
+      },
       "button": "Open settings",
       "again": "Ask again"
     },
@@ -3971,7 +3980,12 @@
     "notFound": {
       "title": "{computer} not found",
       "titleNoName": "Dive computer not found",
-      "text": "The phone did not find the dive computer."
+      "text": {
+        "phone": "The phone did not find the dive computer.",
+        "iphone": "The iPhone did not find the dive computer.",
+        "tablet": "The tablet did not find the dive computer.",
+        "desktop": "This computer did not find the dive computer."
+      }
     },
     "lost": {
       "title": "Download from the {computer} interrupted",
@@ -3979,10 +3993,14 @@
       "text": "The connection with the dive computer was lost before the end."
     },
     "nothingChanged": "No dive was changed.",
-    "check": "To check",
     "checks": {
       "on": "The dive computer is on and in Bluetooth transfer mode.",
-      "near": "It is less than a metre from the phone.",
+      "near": {
+        "phone": "It is less than a metre from the phone.",
+        "iphone": "It is less than a metre from the iPhone.",
+        "tablet": "It is less than a metre from the tablet.",
+        "desktop": "It is less than a metre from this computer."
+      },
       "otherApp": "No other app is connected to the dive computer."
     },
     "otherComputer": "Choose another dive computer",
