@@ -2851,8 +2851,8 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
-      "Offline: a server that cannot be reached no longer opens an error report; the logbook only shows that it is offline and tries again later.",
       "Importing a .benthic file: “A file” in “Import a logbook” and the logbook menu accept the full export. The file is first checked, file by file, against its fingerprints; if it is incomplete, nothing is imported. Otherwise the logbook, equipment, profile and certifications are imported in one go, and personal information is encrypted on this device. To replace a logbook, “Replace this logbook?” offers “Export this logbook first”.",
+      "Offline: a server that cannot be reached no longer opens an error report; the logbook only shows that it is offline and tries again later.",
       "Dives: when a change made on another device reaches this one while a dive is open, the dive stays open, its neighbours still open, and an edit in progress is kept; a dive deleted on the other device closes with a short message. This no longer produces an error report.",
       "Photos and videos (Benthic+): “See all” opens the dive’s gallery, in the order the pictures were taken, with the profile depth at the moment of each photo. A long press (“Select” on iPhone and iPad, Ctrl+click on desktop) selects; “Share” sends the files and “Remove” takes them off the dive, after a confirmation, on all your devices (the files stay in the device’s gallery). A photo opens full screen: a swipe changes picture, with the date, time and camera model read from the file; ⋮ offers “Replace the site photo”. A video has its controls (play, position, sound). The same on phone, tablet, iPhone, iPad and desktop.",
       "Logbook: a dive dragged and dropped back on its own place, or on a year header, changes nothing and no longer shows an error.",
