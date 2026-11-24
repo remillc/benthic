@@ -39,7 +39,6 @@ Next number: 196
 - #134 [code] On /profile/info, in edit mode, place Save at the bottom right.
 - #136 [code] Encrypt all the information in the profile > Information. Evaluate the impacts on the rest of the application. On /profile/info, update the sentence to say that all information in this section is encrypted. Décidé le 22 nov. 2026 : la date de naissance, le contact d’urgence et les informations de santé sont chiffrés de bout en bout.
 - #138 [code] Some files are named OpenDives or od. Rename them to Benthic and bc.
-- #143 [design] /settings/ en desktop : redessiner les boutons Format date et Format heure pour qu’ils soient des sliders. Vérifier aussi les autres boutons semblables dans les réglages.
 - #148 [code] retirer les rappels d'entretien pour toutes les pièces d'équipement sauf pour les bouteilles, les vestes, les détendeurs, les recycleurs et les combinaisons étanches (drysuit)
 - #149 [code] remplacer les uuid par des id plus courts. Décidé le 23 nov. 2026 : 10 caractères en base32 Crockford minuscule (alphabet 0-9 et a-z sans i, l, o, u ; 50 bits de hasard), sans préfixe, par exemple `7k2m9q4x1d`. Les identifiants déjà en circulation (UUID) sont réécrits au nouveau format.
 - #161 [code] trouver pouquoi une app, lorsqu'elle se charge, reste autant de temps sur le premier écran, celui du logo.

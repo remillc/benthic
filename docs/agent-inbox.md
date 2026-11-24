@@ -7486,3 +7486,16 @@ Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mo
 5. **iPhone « Décaler la date et l’heure »** (task 383 said « not drawn »): a page sheet with « Annuler », « Décaler l’heure », « Décaler » (bold) in its header, the explanation, a segmented « Plus tôt / Plus tard », one picker with three columns (« 0 j », « 1 h », « 05 min ») and a single selection band, the « Aperçu » group (first and last dive, old time struck through, new time bold) and the note on intervals. Mock-up: « Carnet, décaler la date et l’heure de plusieurs plongées · iPhone ».
 
 **Test:** a computer with a photo shows it in the card on tablet and phone; switch a dive to pSCR on the desktop and on a portrait tablet; on an iPhone, scroll a dive (the segmented control sticks) and shift two dives 1 h 05 later.
+
+## [ ] 2026-11-24-388 Desktop Réglages: short choices become slider selectors (to-do #143)
+
+Christian asked for this on 24 November 2026. Work in `main`. Copies in `docs/mockups/` (`bureau-reglages`, `bureau-reglages-langue`, `bureau-reglages-macos`).
+
+1. **Slider selector** (the same control as « Ce lest était » in the dive detail): a pill track #EBEAE5, 4 px padding, 20 px corners; the options side by side (14 px, 32 px high, 14 px side padding); the chosen one on a #114477 thumb with white 600 text, which slides to the option clicked (200 ms, none with reduced motion). `role="radiogroup"` named after the row, each option `role="radio"`; arrow keys move the choice. Use it in the desktop Réglages for every choice of two to four short options:
+   - Langue et formats: « Format de la date » Système · 2026-11-06 · 06/11/2026 · 11/06/2026; « Format de l’heure » Système · 24 h · 12 h; « Format du papier (impression) » Automatique · Lettre · A4. The sample under the date and time labels goes (the options show it). « Langue de l’app » stays a drop-down.
+   - Unités (Windows/Linux and macOS): Profondeur Mètres · Pieds; Pression des bouteilles bar · psi; Volume Litres · pi³; Température °C · °F; Poids kg · lb; Vitesses de remontée et de descente par minute · par seconde.
+   - « Pressions partielles » has no choice: plain text « bar » on the right, and its line reads « Toujours en bar » (no mention of Subsurface).
+   « Système d’unités » (Métrique · Impérial · Personnalisé) keeps its MD3 segmented button for now.
+2. Check the other desktop Réglages pages for drop-downs of two to four short options and use the same selector there; tell Christian which ones changed.
+
+**Test:** every changed row switches with a click and with the arrow keys, saves at once, and the screen reader names the row and the option.
