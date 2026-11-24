@@ -7,6 +7,8 @@ import { untrack } from 'svelte';
 import { deviceStore } from './device-store.js';
 import { syncNetwork, syncAllowedOnThisNetwork, networkKnown, onSyncAllowedAgain } from './sync-network.svelte.js';
 import { invalidateCoreCache, setCacheVersions } from './core-cache.js';
+import { currentDiveIds, noteDiveList } from './dive-ids.js';
+import { forgetAllDives } from './dive-preload.js';
 import { BenthicCore } from 'benthic-core';
 import { runCsvImport } from './csv-import.js';
 import { storedDemo } from './demo.js';
@@ -29,6 +31,9 @@ import { loadBenthicPlusAccount, benthicPlusAccount, benthicPlusSubscriber, setB
 import { isIgnoredCloudAccount } from './subsurface-cloud.js';
 import { isServerRepository } from './server-logbook.js';
 import { signalAccountData } from './account-sync-signal.js';
+import { signOutPush } from './push-notifications.svelte.js';
+import { assignMissingIds, idsLookIncomplete, noteIdsList, useDives } from './dive-id.js';
+import { newId } from './short-id.js';
 
 /** @typedef {import('benthic-core').Dive} Dive */
 /** @typedef {import('benthic-core').Prefs} Prefs */
@@ -54,13 +59,26 @@ import { signalAccountData } from './account-sync-signal.js';
  */
 let diveList = $state.raw([]);
 
+/** The ids held by the logbook store itself move to the dives' new ids, after the core read the log again. */
+function followRenumbering() {
+  logbook.checkedDiveIds = currentDiveIds(untrack(() => logbook.checkedDiveIds));
+  // The last edit's result is for the old id: dropped (the detail screen reads the dive again).
+  logbook.edited = null;
+  forgetAllDives();
+}
+
 export const logbook = $state({
   /** @type {Dive[]} */
   get dives() {
     return diveList;
   },
   set dives(value) {
+    const before = untrack(() => diveList);
     diveList = value;
+    // A list read again from the log has new ids: whatever holds ids follows (lib/dive-ids.js).
+    if (noteDiveList(before, value)) followRenumbering();
+    if (idsLookIncomplete(value)) void ensureBenthicIds();
+    else noteIdsList(value);
   },
   /** Checked dives in the Logbook list, shared with the tablet detail pane. */
   checkedDiveIds: /** @type {number[]} */ ([]),
@@ -147,6 +165,37 @@ export const logbook = $state({
   browsing: false,
 });
 
+useDives(() => diveList);
+
+let ensuring = false;
+/** The dive list the last pass found nothing to assign for, or could not write: it does not run again for the same list. */
+let ensuredFor = /** @type {Dive[]|null} */ (null);
+
+/**
+ * Gives every dive of the log its Benthic id (lib/dive-id.js): the ones with none, and the later one of two that share an id.
+ * Fire and forget, never blocking, once per list of dives: the setter of `logbook.dives` starts it when a loaded list has a dive
+ * without an id (or two with the same), and a pass that assigned reads the list again, saves it (the commit « Benthic ids ») and
+ * sends it like an edit. A log that cannot be written (browsing an old version, a locked cloud log) is left as it is.
+ */
+export async function ensureBenthicIds() {
+  if (ensuring || logbook.browsing || diveList === ensuredFor) return;
+  ensuring = true;
+  const asked = diveList;
+  try {
+    const assigned = await assignMissingIds(BenthicCore);
+    ensuredFor = asked;
+    if (assigned) {
+      logbook.dives = await BenthicCore.listLoadedDives();
+      await persistChanges();
+    }
+  } catch (e) {
+    ensuredFor = asked;
+    console.error('Giving the dives their ids', e);
+  } finally {
+    ensuring = false;
+  }
+}
+
 // What the kept answers of the core (lib/core-cache.js, lib/dive-preload.js) are tied to: they are read
 // again once the list was read again or the sites changed.
 setCacheVersions(() => untrack(() => [logbook.dives, logbook.sitesVersion]));
@@ -164,20 +213,6 @@ export async function tripChange(options) {
   logbook.dives = await BenthicCore.listLoadedDives();
   await persistChanges();
   return result;
-}
-
-/**
- * "Group dives into trips" (Settings), the logbook's autogroup: one undoable
- * step, saved and synced like a trip change.
- * @param {boolean} on
- */
-export async function setAutogroup(on) {
-  const result = await BenthicCore.tripAction({ action: 'autogroup', value: on ? 'on' : 'off' });
-  logbook.undoText = result.undo;
-  logbook.redoText = result.redo ?? '';
-  logbook.dives = await BenthicCore.listLoadedDives();
-  logbook.prefs = await prefsAfterLoad();
-  await persistChanges();
 }
 
 /**
@@ -403,7 +438,7 @@ export function renumberPlanFrom(id) {
  * @returns {Promise<number>} the new dive's identifier
  */
 export async function addDive(fields) {
-  const result = await BenthicCore.createDive({ fields });
+  const result = await BenthicCore.createDive({ fields: { benthicId: newId(), ...fields } });
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await BenthicCore.listLoadedDives();
@@ -423,6 +458,9 @@ export async function savePlan(request, replaceId = 0, title = '') {
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   await persistChanges();
+  // The plan is not in the dive list: the pass looks at the whole log.
+  ensuredFor = null;
+  void ensureBenthicIds();
   return result.list?.id ?? 0;
 }
 
@@ -807,6 +845,8 @@ async function syncEdits() {
   let outcome = 'failed';
   try {
     const status = await BenthicCore.syncChanges();
+    // The sync does not say which commit the log is now at: the push channel will find out by syncing.
+    knownHead = '';
     if (status.reloaded) {
       // The cloud brought changes: the merged log was read again, its dives
       // are new objects and the undo history is gone (lib/undo.js).
@@ -964,7 +1004,11 @@ export async function startApp() {
 export async function signOut({ deleteCopy = false } = {}) {
   await BenthicCore.signOut({ deleteCopy });
   // The Benthic server's session goes with the logbook that was connected through it (the tokens are erased).
-  if (logbook.benthicPlus || benthicPlusAccount.signedIn) await BenthicCore.serverSessionClear();
+  if (logbook.benthicPlus || benthicPlusAccount.signedIn) {
+    // The server ends the session and drops this device's push tokens (never waited for long, never fatal).
+    await signOutPush();
+    await BenthicCore.serverSessionClear();
+  }
   setBenthicPlusAccount({ signedIn: false });
   forgetAccount(true);
 }
@@ -1157,6 +1201,34 @@ export async function syncNow() {
   }
   clearTimeout(syncTimer);
   return syncEdits();
+}
+
+/**
+ * The commit of the dives' branch the shown logbook was read from, when it is known ('' after a sync, which does not
+ * say). Kept here so that nothing has to ask the core: `listCloudDives({ cached: true })` reads the whole log again
+ * and gives every dive a new id, which left the list on screen pointing at dives the core no longer had.
+ */
+let knownHead = '';
+
+/**
+ * The head of the dives' branch this device has, as last known (no core call, no network): the push channel compares
+ * it with the server's. Unknown ('') means « sync to find out »: a fetch, and nothing read again when nothing changed.
+ */
+export async function divesLocalHead() {
+  if (!logbook.email || logbook.browsing) return '';
+  return knownHead;
+}
+
+/**
+ * The server says the dives' branch moved (push channel, lib/push-sync.svelte.js): the exchange of the automatic sync, when
+ * it may run now. `busy` when a load or a sync is running (the channel asks again shortly).
+ * @returns {'started'|'busy'|undefined}
+ */
+export function syncFromPush() {
+  if (!logbook.email || logbook.error || logbook.welcome || !logbook.benthicPlus || !autoSyncing()) return undefined;
+  if (logbook.loading || logbook.sync === 'syncing') return 'busy';
+  void syncNow();
+  return 'started';
 }
 
 /**
@@ -1367,6 +1439,7 @@ async function loadCloud(force, pre = null) {
       if (cached.dives) {
         if (cached.server) logbook.server = cached.server;
         logbook.dives = cached.dives;
+        knownHead = cached.head ?? '';
         logbook.prefs = await prefsAfterLoad();
         logbook.sync = 'cloud';
         await countPending();
@@ -1397,6 +1470,7 @@ async function loadCloud(force, pre = null) {
       logbook.pulling = true;
       logbook.loading = false;
       shownHead = cached.head ?? '';
+      knownHead = shownHead;
     }
   } catch (e) {
     // An unreadable copy is not fatal: the sync below reads the log again.
@@ -1425,6 +1499,8 @@ async function loadCloud(force, pre = null) {
       logbook.dives = fresh.dives;
       logbook.prefs = await prefsAfterLoad();
     }
+    // The server's head when the log is in step with it; otherwise unknown.
+    knownHead = fresh.synced && fresh.head ? fresh.head : '';
     if (fresh.server) logbook.server = fresh.server;
     logbook.sync = fresh.synced ? 'cloud' : 'offline';
     if (fresh.synced) markSynced();

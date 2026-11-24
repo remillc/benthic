@@ -32,7 +32,9 @@
   import { CATEGORIES, categoryOf, searchBlocks, highlightParts, categoriesOf, TEXT_SIZES, textSizeOf } from '../lib/desktop-settings.js';
   import { textSize, setTextSize } from '../lib/text-size.svelte.js';
   import { STARTUP_MODES } from '../lib/desktop-logbooks.js';
-  import { logbook, setAutogroup } from '../lib/logbook.svelte.js';
+  import { logbook } from '../lib/logbook.svelte.js';
+  import { diveMediaEnabled } from '../lib/dive-media.svelte.js';
+  import { policyOf, DEFAULT_POLICY } from '../lib/dive-media.js';
   import {
     settings,
     setCorePrefs,
@@ -55,6 +57,9 @@
   import { afterDocumentNotifyChange } from '../lib/document-notify.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
   import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
+  import NotifyRefusedBanner from '../components/NotifyRefusedBanner.svelte';
+  import { pushState, refreshPushPermission } from '../lib/push-notifications.svelte.js';
+  import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
 
   /** @typedef {import('benthic-core').CorePrefValues} CorePrefValues */
   /** @typedef {{ value: string, label: string, example?: string }} Option */
@@ -71,6 +76,7 @@
    */
 
   onMount(async () => {
+    void refreshPushPermission();
     if (desktopApp) {
       try {
         startupMode = (await /** @type {any} */ (window).benthicDesktop.logbooks.startup()).mode;
@@ -524,19 +530,6 @@
       id: 'logbook',
       title: t('settings.groups.logbook'),
       rows: [
-        {
-          kind: 'switch',
-          id: 'autogroup',
-          label: t('settings.autogroup.label'),
-          checked: logbook.prefs.autogroup === true,
-          set: async (v) => {
-            try {
-              await setAutogroup(v);
-            } catch (e) {
-              failed(e);
-            }
-          },
-        },
         { kind: 'switch', id: 'displayInvalidDives', label: t('settings.invalidDives.label'), text: t('settings.invalidDives.text'), checked: p.displayInvalidDives, set: async (v) => {
           await setCore({ displayInvalidDives: v });
           // The core's list leaves invalid dives out unless this is on.
@@ -547,7 +540,17 @@
           }
         } },
         { kind: 'switch', id: 'extraEnvironmental', label: t('settings.extraConditions.label'), text: t('settings.extraConditions.text'), checked: p.extraEnvironmental, set: (v) => setCore({ extraEnvironmental: v }) },
-        { kind: 'switch', id: 'showPhotos', label: t('settings.showPhotos.label'), text: t('settings.showPhotos.text'), checked: settings.showPhotos, set: (v) => setAppSetting('showPhotos', v) },
+        // Benthic+ only (task 2026-11-23-359): which originals of the synced photos and videos this device downloads on Wi-Fi.
+        ...(diveMediaEnabled() ? /** @type {const} */ (['mediaPhotos', 'mediaVideos']).map((key) => ({
+          kind: /** @type {const} */ ('choice'),
+          id: key,
+          label: t(`settings.${key}.label`),
+          text: t(`settings.${key}.text`),
+          value: t(`settings.mediaChoice.${policyOf(settings[key], DEFAULT_POLICY[key === 'mediaPhotos' ? 'photos' : 'videos'])}`),
+          current: policyOf(settings[key], DEFAULT_POLICY[key === 'mediaPhotos' ? 'photos' : 'videos']),
+          options: () => /** @type {const} */ (['all', 'recent', 'onDemand']).map((id) => ({ value: id, label: t(`settings.mediaChoice.${id}`) })),
+          set: (/** @type {string} */ v) => setAppSetting(key, /** @type {'all'|'recent'|'onDemand'} */ (v)),
+        })) : []),
         { kind: 'switch', id: 'salinityEdit', label: t('settings.salinity.label'), text: t('settings.salinity.text'), checked: p.salinityEdit, set: (v) => setCore({ salinityEdit: v }) },
         {
           kind: 'choice',
@@ -1302,6 +1305,25 @@
   {/if}
 {/snippet}
 
+<!-- « Vos appareils » (inbox task 2026-11-23-356, part 4; Benthic+, phone and tablet): no switch, the access request is always on. -->
+{#snippet devicesView()}
+  {#if pushState.view !== 'unsupported' && benthicPlusSubscriber()}
+    <h2 class="bc-settings--title">{t('settings.groups.notifyDevices')}</h2>
+    <div class="bc-settings--surface" role="list">
+      <div role="listitem">
+        <div class="bc-settings--row bc-settings--access-requests">
+          <span class="bc-settings--texts">
+            <span class="bc-settings--label">{t(ios ? 'accountSync.push.requestsIos' : 'accountSync.push.requests')}</span>
+            {#if !ios}<span class="bc-settings--supporting">{t('accountSync.push.requestsText')}</span>{/if}
+          </span>
+          {#if ios}<span class="bc-settings--value">{t('accountSync.push.always')}</span>{/if}
+        </div>
+      </div>
+    </div>
+    {#if ios}<p class="bc-settings--note">{t('accountSync.push.requestsText')}</p>{/if}
+  {/if}
+{/snippet}
+
 {#snippet groupView(/** @type {string} */ id, /** @type {boolean} */ titled = true)}
   {@const g = group(id)}
   {#if g.rows.length}
@@ -1564,9 +1586,11 @@
 
   <!-- Notifications (task 2026-11-19-308): the maintenance reminders, then « Après la plongée ». -->
   {#if inPage('notifications')}
+    {#if pushState.view === 'refused' && !query}<NotifyRefusedBanner />{/if}
     {@render groupView('notifyMaintenance')}
     {@render groupView('notifyDocuments')}
     {@render groupView('notifyDive')}
+    {@render devicesView()}
     {#if !query}<p class="bc-settings--note">{t('settings.notifications.note')}</p>{/if}
   {/if}
 

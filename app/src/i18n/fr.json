@@ -655,11 +655,85 @@
       "one": "{n} photo",
       "other": "{n} photos"
     },
-    "photoNote": "Sur un autre appareil : seule leur référence est synchronisée",
+    "mediaPhotos": {
+      "one": "{n} photo",
+      "other": "{n} photos"
+    },
+    "mediaVideos": {
+      "one": "{n} vidéo",
+      "other": "{n} vidéos"
+    },
+    "mediaBoth": "{photos} et {videos}",
+    "mediaSynced": "{counts}, sur tous vos appareils",
+    "mediaEmpty": "Aucune photo ni vidéo, sur tous vos appareils",
+    "mediaAdd": "Ajouter",
+    "mediaAddLabel": "Ajouter des photos ou des vidéos",
+    "mediaSeeAll": "Tout voir",
+    "mediaPhotoLabel": "Photo {n}",
+    "mediaVideoLabel": "Vidéo {n}, {duration}",
+    "mediaPending": "{n} en attente d’envoi",
+    "mediaFull": "L’espace de 10 Go est plein. Ces fichiers restent sur cet appareil.",
+    "mediaAddFailed": "Les fichiers n’ont pas pu être ajoutés.",
+    "mediaOffline": "Cet original n’est pas sur cet appareil. Reconnectez-vous pour l’ouvrir.",
+    "mediaNotOnServer": "Cet original n’est pas encore sur le serveur. Il arrive quand l’autre appareil l’a envoyé.",
+    "mediaGallery": "Photos et vidéos",
+    "mediaClose": "Fermer",
+    "mediaOnDevice": "Sur cet appareil",
+    "mediaInCloud": "Dans le compte",
+    "mediaSyncedSize": "{counts}, sur tous vos appareils · {size}",
+    "mediaDiveLine": "N° {number} · {site} · {date}",
+    "mediaDiveLineNoNumber": "{site} · {date}",
+    "mediaSelect": "Sélectionner",
+    "mediaSelectedCount": {
+      "one": "{n} sélectionnée",
+      "other": "{n} sélectionnées"
+    },
+    "mediaSelectedItems": "sélectionnées",
+    "mediaCancelSelection": "Annuler la sélection",
+    "mediaShare": "Partager",
+    "mediaRemove": "Retirer",
+    "mediaRemoveFromDive": "Retirer de la plongée",
+    "mediaRemoveTitle": "Retirer {counts} de la plongée ?",
+    "mediaRemoveAction": "Retirer {counts} de la plongée",
+    "mediaRemoveText": {
+      "one": "Elle ne sera plus liée à la plongée, sur aucun de vos appareils. Le fichier reste dans la galerie de l’appareil où vous l’avez prise.",
+      "other": "Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la galerie de l’appareil où vous les avez prises."
+    },
+    "mediaRemoveTextIos": {
+      "one": "Elle ne sera plus liée à la plongée, sur aucun de vos appareils. Le fichier reste dans la photothèque où vous l’avez prise.",
+      "other": "Elles ne seront plus liées à la plongée, sur aucun de vos appareils. Les fichiers restent dans la photothèque où vous les avez prises."
+    },
+    "mediaRemoveFailed": "Les fichiers n’ont pas pu être retirés.",
+    "mediaShareFailed": "Le partage n’a pas abouti.",
+    "mediaReplaceSite": "Remplacer la photo du site",
+    "mediaSitePhotoSet": "Photo du site remplacée",
+    "mediaMore": "Plus d’options",
+    "mediaViewerOf": "{n} sur {total}",
+    "mediaTaken": "{date}, {time}",
+    "mediaTakenCamera": "{taken} · {camera}",
+    "mediaBackPhotos": "Photos",
+    "mediaBackDive": "Plongée",
+    "mediaPrevious": "Précédente",
+    "mediaNext": "Suivante",
+    "mediaPlay": "Lecture",
+    "mediaPause": "Pause",
+    "mediaMute": "Couper le son",
+    "mediaUnmute": "Rétablir le son",
+    "mediaSeek": "Position dans la vidéo",
+    "mediaElapsed": "Temps écoulé",
+    "mediaTotal": "Durée totale",
+    "mediaCloseEsc": "Fermer (Échap)",
+    "mediaHint": "Double-clic pour ouvrir · Ctrl+clic pour sélectionner plusieurs éléments",
+    "mediaHintMac": "Double-clic pour ouvrir · ⌘+clic pour sélectionner plusieurs éléments",
+    "mediaSelectItem": "Sélectionner {label}",
+    "mediaDepthAt": "Profondeur {depth}",
+    "mediaStripItem": "Aller à {label}",
+    "mediaPlayBig": "Lire la vidéo",
     "delete": "Supprimer la plongée",
     "deleteSelected": "Supprimer ces plongées",
     "deleteTitle": "Supprimer la plongée",
     "deleted": "Plongée supprimée",
+    "deletedElsewhere": "Cette plongée a été supprimée sur un autre appareil.",
     "deleteFailed": "La plongée n'a pas pu être supprimée. Aucune plongée n'a été modifiée.",
     "computersRow": "Ordinateurs",
     "computersLabel": "Ordinateurs : {list}. Afficher les ordinateurs de cette plongée",
@@ -770,6 +844,7 @@
     "groups": {
       "notifyDocuments": "Brevets et documents",
       "notifyDive": "Après la plongée",
+      "notifyDevices": "Vos appareils",
       "notifyMaintenance": "Entretien de l’équipement",
       "language": "Langue et formats",
       "units": "Unités",
@@ -881,9 +956,6 @@
       "decimal": "Décimales",
       "minutes": "Degrés, minutes",
       "seconds": "Degrés, minutes, secondes"
-    },
-    "autogroup": {
-      "label": "Regrouper les plongées en voyages"
     },
     "invalidDives": {
       "label": "Afficher les plongées invalides",
@@ -1161,9 +1233,18 @@
         "en13319": "Norme des ordinateurs, 1 020 g/L"
       }
     },
-    "showPhotos": {
-      "label": "Afficher les champs photos et vidéos",
-      "text": "Dans le détail et la modification d’une plongée"
+    "mediaPhotos": {
+      "label": "Photos sur cet appareil",
+      "text": "Originaux téléchargés en Wi-Fi ; les miniatures sont toujours gardées"
+    },
+    "mediaVideos": {
+      "label": "Vidéos sur cet appareil",
+      "text": "Originaux téléchargés en Wi-Fi ; les miniatures sont toujours gardées"
+    },
+    "mediaChoice": {
+      "all": "Toutes",
+      "recent": "Celles des 12 derniers mois",
+      "onDemand": "À la demande"
     }
   },
   "gas": {
@@ -2770,12 +2851,20 @@
     "feedback": "Donner votre avis",
     "feedbackText": "Sur la page du projet, dans GitHub",
     "releaseNotes": [
+      "Importer un fichier .benthic : « Un fichier » de « Importer un carnet » et le menu du carnet acceptent l’export complet. Le fichier est d’abord vérifié, fichier par fichier, contre ses empreintes ; s’il est incomplet, rien n’est importé. Sinon le carnet, l’équipement, le profil et les brevets sont importés d’un coup, et les informations personnelles sont chiffrées sur cet appareil. Pour remplacer un carnet, « Remplacer ce carnet ? » propose « Exporter d’abord ce carnet ».",
+      "Hors ligne : un serveur injoignable n’ouvre plus de rapport d’erreur ; le carnet affiche seulement qu’il est hors ligne et réessaie plus tard.",
+      "Plongées : quand un changement fait sur un autre appareil arrive pendant qu’une plongée est ouverte, la plongée reste ouverte, ses voisines aussi, et une modification en cours est conservée ; une plongée supprimée sur l’autre appareil se ferme avec un court message. Cela ne produit plus de rapport d’erreur.",
+      "Photos et vidéos (Benthic+) : « Tout voir » ouvre la galerie de la plongée, dans l’ordre des prises de vue, avec la profondeur du profil à l’instant de chaque photo. Une pression longue (« Sélectionner » sur iPhone et iPad, Ctrl+clic sur ordinateur) sélectionne ; « Partager » envoie les fichiers et « Retirer » les retire de la plongée, après confirmation, sur tous vos appareils (les fichiers restent dans la galerie de l’appareil). Une photo s’ouvre en plein écran : un balayage change d’image, avec la date, l’heure et le modèle d’appareil lus dans le fichier ; ⋮ propose « Remplacer la photo du site ». Une vidéo a ses commandes (lecture, position, son). Même parcours sur téléphone, tablette, iPhone, iPad et ordinateur.",
+      "Carnet : une plongée glissée puis relâchée à sa place, ou sur un titre d’année, ne change rien et n’affiche plus d’erreur.",
+      "Photos et vidéos (Benthic+) : la fiche d’une plongée montre les photos et les vidéos en miniatures, avec « Ajouter », la ligne « sur tous vos appareils » et « Tout voir » qui ouvre la galerie de la plongée. Elles sont envoyées au compte (10 Go) et suivent le plongeur sur ses autres appareils : les miniatures sont toujours gardées, les originaux arrivent en Wi-Fi selon Réglages › Carnet (« Toutes », « Celles des 12 derniers mois », « À la demande ») et s’ouvrent à la demande. Hors ligne, les envois attendent le retour du réseau. La version gratuite ne montre pas la section.",
       "Ordinateur, Carnet : la barre de défilement de la liste se saisit de nouveau à la souris (elle était sous la poignée du séparateur des deux panneaux) et s’élargit quand le pointeur passe dessus.",
       "Ordinateur, liste du carnet : dans une colonne étroite, la recherche devient une loupe à gauche du bouton des colonnes et de ⋮, qui restent visibles à toute largeur ; la loupe ou Ctrl+F ouvre le champ sur toute la largeur de l’en-tête, ✕ ou Échap le ferme, et la ligne de résumé est coupée par une ellipse.",
       "Types de bouteille : un type sans pression de service (venu d’une plongée) n’affiche plus « 0 » en pieds cubes et se renomme sans erreur ; un volume saisi sans pression demande la pression de service.",
       "Équipement : l’icône du recycleur montre deux grandes bouteilles de part et d’autre d’un épurateur sur son support, reliés par deux tuyaux, et ne ressemble plus à un bi-bouteille.",
       "Icônes : 89 icônes de l’application passent aux glyphes arrondis de Material Symbols (flèches, nuage, dossier, appareil photo, clé, calendrier, localisation, réglages, etc.) ; le mélangeur de gaz garde un dessin de bouteille que l’on remplit, et le couteau de plongée a un nouveau dessin.",
       "Ordinateur, détail d’une plongée, onglet Équipement : une carte par section (kit, ordinateurs de plongée, protection thermique, lest, autre équipement), avec le total du lest dans son en-tête, un lest par pastille retirable, « Ce lest était » centré et « + Ajouter » dans la carte de l’autre équipement.",
+      "Photos et vidéos : « Afficher les champs photos et vidéos » n’est plus dans Réglages. Un abonné Benthic+ voit toujours la section « Photos et vidéos » d’une plongée, un utilisateur gratuit jamais. À propos : « Site Web » (benthicdivelog.app) remplace « Exporter mon carnet » et se place à côté de « Voir sur GitHub » sur une ligne centrée ; l’export reste dans le menu du carnet.",
+      "Voyages : « Regrouper les plongées en voyages » n’est plus dans Réglages. Benthic ne regroupe jamais les plongées en voyages de lui-même, quoi que dise un carnet fait dans Subsurface : téléchargements, imports et nouvelles plongées restent hors voyage tant que vous n’en faites pas un ou n’en remplissez pas un. Les voyages que vous avez faits fonctionnent comme avant.",
       "Offre Benthic+ : « Tout ce qui est inclus » finit par « Continuer sans abonnement » sous « S’abonner », la note « Toujours gratuit » disparaît et le prix suit directement le dernier groupe.",
       "Cartes : les cartes hors ligne n’existent plus. « Cartes hors ligne » quitte Réglages, la feuille du compte et l’offre Benthic+ (le groupe « Sites et cartes » devient « Sites »), le badge de mise à jour disparaît, et la carte des sites n’affiche plus de pastille « Hors ligne ». Les régions déjà téléchargées sont supprimées de l’appareil au premier démarrage : leur espace est libéré.",
       "Réglages : « Renuméroter les plongées » n’y figure plus. L’action reste dans le menu ⋮ du carnet, dans le menu de sélection et dans le menu ⋮ d’une plongée.",
@@ -2783,6 +2872,7 @@
       "Clé de secours : l’icône de clé de Material Symbols marque l’offre de la clé de secours, la fenêtre qui l’affiche, sa saisie et le déverrouillage des données chiffrées.",
       "Premier lancement : les rayons de lumière de la bande bleue sont toujours quatre, à l’échelle de la largeur de la bande, sur tablette et ordinateur comme sur le téléphone.",
       "Téléchargement depuis l’ordinateur de plongée : un seul geste. L’ordinateur mémorisé a sa carte avec « Télécharger » (état « À portée, prêt »), les autres ont chacun leur bouton ; « Tout retélécharger », « Montrer tous les appareils Bluetooth » et « Aide au téléchargement » sont dans le menu ⋮. Première fois : recherche avec les trois gestes à faire ; puis connexion, progression avec les plongées reçues, « Connexion perdue » (les plongées reçues sont gardées, « Réessayer » reprend), « Aucune nouvelle plongée » et « N nouvelles plongées » avec « Voir dans le carnet ». Même parcours sur téléphone, iPhone, tablette et ordinateur (boîte de dialogue).",
+      "Accès d’un nouvel appareil : Benthic peut vous prévenir par une notification, même fermé, quand un nouvel appareil demande l’accès à vos données chiffrées (Benthic+, téléphone et tablette). La notification affiche le code à comparer ; la toucher ouvre la demande, et elle disparaît quand la demande reçoit une réponse ou expire. L’autorisation est demandée une fois, avec une explication ; Réglages › Notifications montre « Vos appareils » et, si le système refuse les notifications, un bandeau avec un bouton vers les réglages du système.",
       "Compte : plus de bouton « Synchroniser » nulle part (feuille du compte, Compte, menu latéral, ordinateur). L’état reste, avec une seconde ligne : « Synchronisé il y a 2 min » et « Automatique, dès qu’une modification est faite », ou « 3 modifications non envoyées » et « Envoi automatique au retour du réseau » ; sur tablette, l’état est la troisième ligne sous le compte.",
       "Profil : « Profil » devient une entrée de la navigation, après Sites, pour un compte Benthic+, sur tous les appareils, avec sa page d’accueil et une pastille rouge qui compte les entretiens en retard ; « Mon profil de plongeur » quitte la feuille du compte.",
       "Benthic+ : le profil, l’équipement, les brevets et les documents sont enregistrés avec le compte et suivent le plongeur sur chaque appareil. Un nouvel appareil se jumelle en demandant l’accès : un appareil déjà jumelé affiche la demande avec un code à 6 chiffres, à comparer avant d’autoriser (ou avec une clé de secours de 26 caractères) ; les données chiffrées restent verrouillées tant qu’il n’est pas jumelé. Un appareil qui a déjà de l’équipement montre d’abord ce qu’il va réunir (« Jumeler cet appareil »), puis confirme.",
@@ -3339,7 +3429,8 @@
       "code": "L’offre de base reste toujours gratuite. Les apps et leur code sont sur GitHub : chacun peut toujours y télécharger les apps gratuitement, lire le code, le modifier et le partager.",
       "logbook": "Exportable en tout temps, votre carnet vous appartient.",
       "github": "Voir sur GitHub",
-      "export": "Exporter mon carnet"
+      "website": "Site Web",
+      "websiteLabel": "Site Web de Benthic (s’ouvre dans le navigateur)"
     }
   },
   "bringLogbook": {
@@ -4794,6 +4885,7 @@
       "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive ou WebDAV",
       "git": "Dans un dépôt git",
       "gitHelp": "Votre propre dépôt · historique complet des changements",
+      "answer": "Répondre",
       "continue": "Continuer",
       "cancel": "Annuler",
       "back": "Retour",
@@ -5423,8 +5515,6 @@
       "removeFromTrip": "Retirer du voyage",
       "createTrip": "Créer le voyage",
       "mergeTrips": "Fusionner les voyages",
-      "autogroup": "Regrouper en voyages",
-      "ungroup": "Défaire les voyages automatiques",
       "mergeSites": "Fusionner les sites",
       "deleteSites": "Supprimer les sites",
       "deleteDives": "Supprimer les plongées",
@@ -6611,6 +6701,87 @@
     "failed": "Le carnet n’a pas pu être remplacé. Le carnet actuel est conservé.",
     "failedNoDives": "Le fichier ne contient aucune plongée. Le carnet actuel est conservé."
   },
+  "benthicImport": {
+    "fileCardDetail": "Export complet de Benthic, {date}",
+    "contentsTitle": "Ce que le fichier contient",
+    "rowDives": "Plongées et sites",
+    "rowEquipment": "Équipement, kits et entretien",
+    "rowProfile": "Profil, brevets et documents",
+    "rowMedia": "Photos et vidéos des plongées",
+    "pieces": {
+      "one": "{n} pièce",
+      "other": "{n} pièces"
+    },
+    "kits": {
+      "one": "{n} kit",
+      "other": "{n} kits"
+    },
+    "certs": {
+      "one": "{n} brevet",
+      "other": "{n} brevets"
+    },
+    "documents": {
+      "one": "{n} document",
+      "other": "{n} documents"
+    },
+    "profileOnly": "Profil",
+    "note": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur cette tablette. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "notePhone": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur ce téléphone. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "noteIphone": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur cet iPhone. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "noteDesktop": "Ce fichier contient des informations personnelles en clair. Benthic les chiffre sur cet ordinateur. Gardez le fichier en lieu sûr ou supprimez-le.",
+    "progress": {
+      "group": "Progression de l’import du fichier .benthic",
+      "verify": "Vérification du fichier",
+      "verifyCount": "{done} sur {total} fichiers",
+      "verifyDone": {
+        "one": "{n} fichier, intact",
+        "other": "{n} fichiers, tous intacts"
+      },
+      "dives": "Plongées et sites",
+      "data": "Équipement, profil et brevets",
+      "media": "Photos et vidéos, {size}",
+      "count": "{done} sur {total}",
+      "write": "Enregistrement…",
+      "help": "Gardez l’app ouverte jusqu’à la fin. Si l’import s’arrête, rien n’est ajouté.",
+      "helpDesktop": "Gardez Benthic ouvert jusqu’à la fin. Si l’import s’arrête, rien n’est ajouté.",
+      "cancel": "Annuler",
+      "cancelling": "Annulation…"
+    },
+    "size": {
+      "kb": "{n} Ko",
+      "mb": "{n} Mo",
+      "gb": "{n} Go"
+    },
+    "incompleteTitle": "Ce fichier .benthic est incomplet",
+    "incompleteText": {
+      "one": "Dans « {file} », {n} fichier ne correspond pas à son empreinte. Rien n’a été importé. Refaites l’export sur l’appareil d’origine.",
+      "other": "Dans « {file} », {n} fichiers ne correspondent pas à leur empreinte. Rien n’a été importé. Refaites l’export sur l’appareil d’origine."
+    },
+    "incompleteCut": "« {file} » s’arrête avant la fin. Rien n’a été importé. Refaites l’export sur l’appareil d’origine.",
+    "tooNew": "« {file} » vient d’une version plus récente de Benthic. Mettez Benthic à jour, puis réessayez.",
+    "failedTitle": "Import impossible",
+    "failed": "Le fichier n’a pas pu être importé. Rien n’a été modifié.",
+    "badLogbook": "Le carnet de ce fichier n’a pas pu être lu. Rien n’a été modifié.",
+    "cancelled": "Import annulé. Rien n’a été modifié.",
+    "done": "Carnet « {name} » importé : {n} plongées.",
+    "doneNoDives": "Carnet « {name} » importé.",
+    "mediaSkipped": {
+      "one": "{n} photo ou vidéo du fichier n’a pas été importée : cet appareil ne les garde pas encore.",
+      "other": "{n} photos et vidéos du fichier n’ont pas été importées : cet appareil ne les garde pas encore."
+    },
+    "replace": {
+      "title": "Remplacer ce carnet ?",
+      "text": "Cet appareil ne garde qu’un carnet. « {logbook} » ({dives}) quitte cet appareil et est remplacé par « {file} » : {contents}.",
+      "personal": "Les informations personnelles du fichier seront chiffrées sur cet appareil.",
+      "personalDesktop": "Les informations personnelles du fichier seront chiffrées sur cet ordinateur.",
+      "equipment": "l’équipement",
+      "profile": "le profil",
+      "certs": "les brevets",
+      "documents": "les documents",
+      "media": "{size} de photos et vidéos",
+      "and": " et "
+    }
+  },
   "validation": {
     "back": "Retour",
     "itemName": "{name}, {role}",
@@ -6849,6 +7020,21 @@
     }
   },
   "accountSync": {
+    "push": {
+      "askTitle": "Être prévenu des demandes d’accès",
+      "askText": "Quand un nouvel appareil demande l’accès à vos données chiffrées, Benthic vous prévient sur cet appareil, même s’il est fermé. Vous comparez le code et répondez.",
+      "askNote": "Le serveur Benthic n’envoie aucune autre notification.",
+      "later": "Plus tard",
+      "continue": "Continuer",
+      "requests": "Demandes d’accès d’un nouvel appareil",
+      "requestsIos": "Demandes d’accès",
+      "requestsText": "Toujours activées : sans elles, un nouvel appareil ne peut pas être jumelé quand Benthic est fermé ici.",
+      "always": "Toujours",
+      "refusedTitle": "Notifications désactivées pour Benthic",
+      "refusedText": "Les demandes d’accès d’un nouvel appareil et les rappels n’apparaîtront qu’à l’ouverture de l’app.",
+      "openAndroid": "Ouvrir les réglages d’Android",
+      "openIos": "Ouvrir les Réglages de l’iPhone"
+    },
     "unlock": {
       "title": "Déverrouiller vos données chiffrées",
       "pair": "Demander l’accès à un appareil jumelé",

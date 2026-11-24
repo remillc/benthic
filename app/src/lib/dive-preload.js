@@ -5,6 +5,7 @@
 // instead of filling in during the slide.
 import { BenthicCore } from 'benthic-core';
 import { currentStamp, sameStamp } from './core-cache.js';
+import { currentDiveId } from './dive-ids.js';
 
 /** @typedef {import('benthic-core').DiveDetail} DiveDetail */
 
@@ -51,12 +52,31 @@ export function forgetDive(id) {
   details.delete(id);
 }
 
-/** @param {number} id */
+/** Forgets every kept detail: the log was read again, the ids are new (lib/dive-ids.js). */
+export function forgetAllDives() {
+  details.clear();
+  reading.clear();
+}
+
+/** The core's answer for an id it does not hold: a stale id after the log was read again, never a fault. @param {unknown} e */
+const isStale = (e) => /dive not found/i.test(String(/** @type {any} */ (e)?.message ?? e));
+
+/**
+ * One read. An id that the core no longer knows (the log was read again since the id was taken) is asked once more
+ * under the id the dive has now (lib/dive-ids.js); a dive that is gone fails as a stale id, which is not reported.
+ * @param {number} id
+ */
 function read(id) {
   let promise = reading.get(id);
   if (!promise) {
     const stamp = currentStamp();
-    promise = BenthicCore.getDive({ id })
+    const ask = (/** @type {number} */ at) => BenthicCore.getDive({ id: at });
+    promise = ask(id)
+      .catch(async (/** @type {unknown} */ e) => {
+        const now = currentDiveId(id);
+        if (!isStale(e) || now === null || now === id) throw e;
+        return ask(now);
+      })
       .then((dive) => {
         keepDive(id, dive, stamp);
         return dive;
@@ -85,7 +105,8 @@ export async function preloadDives(ids) {
           await sharedSiteMap(c.latUdeg, c.lonUdeg).catch(() => {});
         }
       } catch (e) {
-        console.warn('Preparing a dive', id, e);
+        // A stale id is a cache that was not renewed yet, not a fault: the swipe loads the dive as before.
+        if (!isStale(e)) console.warn('Preparing a dive', id, e);
       }
     }),
   );

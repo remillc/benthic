@@ -169,7 +169,7 @@
     <div class="list" bind:this={listEl}>
       {#each plans as plan (plan.id)}
         <div class="bc-plans--row" class:bc-plans--row-highlighted={plan.id === highlighted}>
-          <a class="bc-plans--open" href="/plans/{plan.id}">
+          <a class="bc-plans--open" href="/plans/{plan.benthicId || plan.id}">
             <ProfileThumbnail profile={plan.profile} maxDepthMm={plan.maxDepthMm} {prefs} />
             <span class="bc-plans--texts">
               <span class="bc-plans--name" class:bc-plans--name-fallback={untitled(plan)}>{title(plan)}</span>

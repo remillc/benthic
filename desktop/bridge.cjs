@@ -80,6 +80,7 @@ const readline = require('node:readline');
 const { StringDecoder } = require('node:string_decoder');
 const { isBrokenPipe, safeWrite } = require('./process-errors.cjs');
 const logbooks = require('./logbooks.cjs');
+const { createMedia } = require('./media.cjs');
 
 /** The NativeCore functions the renderer may call (host.cpp), without the ones the bridge runs itself. */
 const CORE_METHODS = new Set([
@@ -87,7 +88,7 @@ const CORE_METHODS = new Set([
   'alphaCacheList', 'alphaCacheOpen', 'cloudSignOut', 'cloudDeleteAccount', 'cloudCreateAccount', 'cloudVerifyPin', 'cloudCreateLog', 'importCount',
   'divelogsCheck', 'divelogsDownload', 'setCloudTestEmail', 'pendingChanges', 'history', 'cloudProbe', 'gitCheck',
   'gitConfigure', 'gitCreateLog', 'editDive', 'getTrip', 'tripAction', 'diveComputers', 'diveComputerAction',
-  'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'mergeDives', 'editDives', 'renumberDives', 'importDives', 'filterPresets',
+  'siteQuery', 'filterQuery', 'createDive', 'deleteDive', 'mergeDives', 'editDives', 'benthicIds', 'renumberDives', 'importDives', 'filterPresets',
   'syncConflicts', 'resolveConflicts', 'cancelConflictResolution', 'siteAction', 'toolQuery', 'exportDives',
   'saveLogbookFile', 'undo', 'sync', 'listLoadedDives', 'diveColumns', 'saveLocal', 'getDive', 'getPrefs', 'setPrefs', 'cylinderTypes',
   'plannerSetup', 'planDive', 'listPlans', 'savePlan', 'listDives', 'statsQuery', 'dcFromBluetoothName',
@@ -342,6 +343,9 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   fs.mkdirSync(userData, { recursive: true });
   // Where imports are staged and shares are written: the core writes there too (divelogs.de, exports).
   for (const area of ['import', 'share']) fs.mkdirSync(path.join(tempDir, area), { recursive: true, mode: 0o700 });
+
+  // Dive photos and videos by hash (media.cjs).
+  const media = createMedia({ userData, tempDir });
 
   const electron_ = () => (electron ? electron() : require('electron'));
   const sendAll = broadcast || ((channel, ...args) => {
@@ -824,20 +828,26 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
 
   // --- The Benthic server (release edition) ---
 
+  /** An address the page may reach: https, or http for this machine's development server only. @param {unknown} text */
+  function serverAddress(text) {
+    let url;
+    try {
+      url = new URL(String(text ?? ''));
+    } catch {
+      throw new Error('BAD_ARGUMENT: not an address');
+    }
+    const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
+    if (url.protocol !== 'https:' && !local) throw new Error('BAD_ARGUMENT: not an allowed address');
+    return url;
+  }
+
   /**
    * One HTTP call for the page: https, or http for this machine's development server only. Answers `{ status, text }`;
    * a network failure rejects (the page shows « Le serveur ne répond pas »).
    * @param {{ method?: string, url?: string, headers?: Record<string, string>, body?: unknown, raw?: string, timeoutMs?: number }} request
    */
   async function serverRequest(request) {
-    let url;
-    try {
-      url = new URL(String(request?.url ?? ''));
-    } catch {
-      throw new Error('BAD_ARGUMENT: not an address');
-    }
-    const local = url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
-    if (url.protocol !== 'https:' && !local) throw new Error('BAD_ARGUMENT: not an allowed address');
+    const url = serverAddress(request?.url);
     const method = request?.method === 'POST' || request?.method === 'PUT' ? request.method : 'GET';
     const headers = { Accept: request?.binary ? 'image/webp,*/*' : 'application/json', 'User-Agent': 'Benthic', ...(request?.headers ?? {}) };
     // `raw`: a body already written as text, sent as it is with the caller's own Content-Type (the divelogs.de upload, whose
@@ -853,6 +863,66 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
       return { status: response.status, base64: bytes.toString('base64') };
     }
     return { status: response.status, text: await response.text() };
+  }
+
+  // --- The push channel (to-do #185, app/src/lib/push-events.js) ---
+  // One Server-Sent Events stream per window, read here (the page cannot stream from the server: no CORS). Every line goes
+  // to the page as a `pushStream` core event, `{ id, kind: 'open'|'line'|'closed', line, status, message }`, as on the phones;
+  // the page owns the protocol, the reconnection and the backoff.
+
+  /** @type {Map<WindowContext, { id: number, abort: AbortController }>} */
+  const pushStreams = new Map();
+
+  /** @param {WindowContext} ctx */
+  function pushStreamClose(ctx, id) {
+    const open = pushStreams.get(ctx);
+    if (!open || (id !== undefined && open.id !== id)) return;
+    pushStreams.delete(ctx);
+    open.abort.abort();
+  }
+
+  /** @param {{ id?: number, url?: string, token?: string }} options @param {WindowContext} ctx */
+  function pushStreamOpen(options, ctx) {
+    const url = serverAddress(options?.url);
+    if (!Number.isInteger(options?.id) || typeof options?.token !== 'string' || !options.token) throw new Error('BAD_ARGUMENT: an id and a token are needed');
+    const id = /** @type {number} */ (options.id);
+    pushStreamClose(ctx);
+    const abort = new AbortController();
+    pushStreams.set(ctx, { id, abort });
+    const send = (/** @type {Record<string, unknown>} */ data) => {
+      // Closed by the page (no longer the current one): nothing is said; a timeout or a failure is.
+      if (pushStreams.get(ctx)?.abort === abort) emit(ctx, 'bc:core-event', 'pushStream', { id, ...data });
+    };
+    void (async () => {
+      // No answer within 15 s: the attempt ends (the page tries again later); once the stream is open the page's watchdog watches it.
+      const connectTimer = setTimeout(() => abort.abort(), 15000);
+      try {
+        const response = await fetch(url, { headers: { Accept: 'text/event-stream', 'Cache-Control': 'no-cache', 'User-Agent': 'Benthic', Authorization: `Bearer ${options.token}` }, signal: abort.signal });
+        clearTimeout(connectTimer);
+        if (response.status !== 200 || !response.body) {
+          send({ kind: 'closed', status: response.status });
+          response.body?.cancel().catch(() => {});
+          return;
+        }
+        send({ kind: 'open', status: 200 });
+        const decoder = new TextDecoder();
+        let pending = '';
+        for await (const chunk of response.body) {
+          pending += decoder.decode(chunk, { stream: true });
+          let newline;
+          while ((newline = pending.indexOf(String.fromCharCode(10))) >= 0) {
+            send({ kind: 'line', line: pending.slice(0, newline), status: 200 });
+            pending = pending.slice(newline + 1);
+          }
+        }
+        send({ kind: 'closed', status: 0, message: 'closed by the server' });
+      } catch (e) {
+        send({ kind: 'closed', status: 0, message: String(e && e.message ? e.message : e) });
+      } finally {
+        clearTimeout(connectTimer);
+        if (pushStreams.get(ctx)?.abort === abort) pushStreams.delete(ctx);
+      }
+    })();
   }
 
   // --- Files ---
@@ -1058,6 +1128,13 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
   }));
   // Release edition: the Benthic server's JSON calls and the repository downloads (no CORS in the main process).
   ipcMain.handle('bc:server', answer((_event, request) => serverRequest(request)));
+  ipcMain.handle('bc:media', answer((_event, op, options) => media.call(op, options)));
+  ipcMain.handle('bc:push', answer((event, op, options) => {
+    const ctx = contextFor(event);
+    if (op === 'open') return pushStreamOpen(options, ctx) ?? null;
+    if (op === 'close') return pushStreamClose(ctx, options?.id) ?? null;
+    throw new Error(`Unknown push operation ${op}`);
+  }));
   ipcMain.handle('bc:fs', answer((event, op, options) => fsCall(op, options, contextFor(event))));
   ipcMain.handle('bc:htmlToPdf', answer((_event, options) => htmlToPdf(options)));
   ipcMain.handle('bc:placesSearch', answer((_event, options) => placesSearch(options)));
@@ -1136,6 +1213,7 @@ function setupBridge({ ipcMain, app, safeStorage, hostPath, hostArgs = [], resou
     call: (method, args) => coreCall(method, args),
     stop: stopAll,
     paths,
+    media,
     // Windows and logbooks (windows.cjs)
     attach,
     detach,

@@ -5,6 +5,7 @@
 // with the router of the page's view. None navigates away from the section; they move what the
 // other layout shows into the shape this one shows it in.
 import { desk } from './desktop-logbook.svelte.js';
+import { diveUrlOfCore } from './dive-id.js';
 import { openTool, desktopTools } from './desktop-tools.svelte.js';
 import { pathOfTool, toolOfPath } from './desktop-tools.js';
 import { encodeCriteria, myStatistics, rowHref } from './statistics.svelte.js';
@@ -107,5 +108,5 @@ export function logbookToNarrow(router) {
   if (!layout.split || route(router)?.path !== '/pane/selection') return;
   const { ids, focus } = desk.selection;
   const id = ids.includes(focus) ? focus : ids[0];
-  if (id) router.navigate(`/dives/${id}`, { reloadDetail: true, animate: false });
+  if (id) router.navigate(diveUrlOfCore(id), { reloadDetail: true, animate: false });
 }

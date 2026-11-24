@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The system notification of an access request (inbox task 2026-11-23-356): the same texts as accountSync.notify in the app. -->
+    <string name="bc_access_channel">Demandes d’accès</string>
+    <string name="bc_access_channel_description">Un nouvel appareil demande l’accès à vos données chiffrées.</string>
+    <string name="bc_access_title">Donner accès à « %1$s » ?</string>
+    <string name="bc_access_body">Code de vérification %1$s. Touchez pour répondre.</string>
+    <string name="bc_access_action">Répondre</string>
+</resources>

@@ -12,6 +12,7 @@
 // A trip left without dive is dropped by Subsurface's core itself (a trip lives through its dives).
 // Prints "PASS: ..." lines; exit status 0 when all pass, 1 otherwise.
 #include "core/libbenthic/benthic.h"
+#include "core/libbenthic/internal.h"
 
 #include "core/dive.h"
 #include "core/divelog.h"
@@ -80,8 +81,9 @@ int main(int argc, char **argv)
 	check(site_create(site_name, 12345678, 23456789, json, error) == 0 && has_site(site_name), "an unused site is added");
 	check(create_device_node(divelog.devices, "Test model", "SER-4242", "My test computer") >= 0 && has_nickname("My test computer"),
 	      "a dive computer nickname is added");
-	trips_autogroup(true, json, error);
-	check(divelog.autogroup, "autogroup is on");
+	// A log whose file says autogroup is on: the core sees it off, the save writes it back.
+	internal::file_autogroup = true;
+	check(!divelog.autogroup, "the core's autogroup is off in memory");
 
 	// A trip that loses its last dive, and the trips that stay.
 	dive *first = divelog.dives[0].get();
@@ -124,12 +126,46 @@ int main(int argc, char **argv)
 	check(divelog.dives.size() == dives_in_memory, "the reloaded log has the same dives");
 	check(has_site(site_name), "the reloaded log has the unused site");
 	check(has_nickname("My test computer"), "the reloaded log has the nickname");
-	check(divelog.autogroup, "the reloaded log has autogroup on");
+	check(internal::file_autogroup && !divelog.autogroup,
+	      "the reloaded log keeps the file's autogroup, the core sees it off");
 	size_t reloaded_with_trip = 0;
 	for (auto &d: divelog.dives)
 		if (d->divetrip)
 			reloaded_with_trip++;
 	check(reloaded_with_trip == with_trip && divelog.trips.size() == trips_in_memory, "the reloaded log has the same trips");
+	// Task 2026-11-23-369: with autogroup on in the file, Benthic never makes a trip by itself.
+	// The reloaded log (autogroup on in its file) is listed: process_loaded_dives() must not group.
+	std::string json2;
+	check(list_dives(folder + "-reloaded[main]", json2, error) == 0, "the autogroup log is listed");
+	check(divelog.trips.size() == trips_in_memory, "load: no new trip");
+	size_t dives_before = divelog.dives.size();
+	// An import of dives from different days, from a file with autogroup on.
+	std::string xml = folder + "-days.ssrf";
+	{
+		std::ofstream f(xml);
+		f << "<divelog program='subsurface' version='3'>\n<settings>\n  <autogroup state='1' />\n</settings>\n<divesites>\n</divesites>\n<dives>\n";
+		const char *days[] = { "2012-03-01", "2012-03-02", "2012-03-03" };
+		for (int i = 0; i < 3; i++)
+			f << "<dive number='" << (i + 1) << "' date='" << days[i] << "' time='10:00:00' duration='30:00 min' />\n";
+		f << "</dives>\n</divelog>\n";
+	}
+	int import_ret = import_dives(xml, "test", json2, error);
+	check(import_ret == 0, "the three dives are imported: " + error);
+	check(divelog.dives.size() == dives_before + 3, "three dives came in");
+	size_t new_trips = 0;
+	for (auto &d: divelog.dives)
+		if (d->when >= 1330560000 && d->when < 1330905600 && d->divetrip)
+			new_trips++;
+	check(new_trips == 0 && divelog.trips.size() == trips_in_memory, "import: no new trip");
+	// A manual dive next to the imported ones.
+	check(create_dive("{\"date\":\"2012-03-03T11:00\",\"durationSeconds\":1800,\"maxDepthMm\":10000}", json2, error) == 0,
+	      "a manual dive is added");
+	check(divelog.trips.size() == trips_in_memory, "createDive: no new trip");
+	// A save writes the file's autogroup line unchanged.
+	std::string file2 = folder + "-saved2.ssrf";
+	check(save_logbook_file(file2, error) == 0, "the log is written again");
+	check(read_file(file2).find("<autogroup") != std::string::npos && !divelog.autogroup,
+	      "the file keeps its autogroup line, the core stays off");
 	printf("%s\n", failures ? "FAILED" : "ALL PASSED");
 	return failures ? 1 : 0;
 }

@@ -7,6 +7,7 @@
   // change is one undoable step, as Subsurface's trip commands. The trip id is
   // that of the current load: never stored.
   import { onMount, tick } from 'svelte';
+  import { diveParamOf } from '../lib/dive-id.js';
   import { Page, Navbar, Link, List, Popover, f7, theme } from 'framework7-svelte';
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import { layout } from '../lib/layout.svelte.js';
@@ -272,7 +273,7 @@
     <List noChevron>
       {#if menuDive}
         {@const d = menuDive}
-        <MenuItem icon="arrowRight" text={t('tripScreen.openDive')} onclick={() => f7router.navigate(`/trips/${tripId}/dives/${d.id}`)} />
+        <MenuItem icon="arrowRight" text={t('tripScreen.openDive')} onclick={() => f7router.navigate(`/trips/${tripId}/dives/${diveParamOf(d.id)}`)} />
         <MenuItem icon="remove" text={t('tripScreen.removeDive')} onclick={() => change({ action: 'remove', diveId: d.id })} />
         {#if d.index > 0}
           <MenuItem icon="split" text={t('tripScreen.splitHere')} onclick={() => change({ action: 'split', diveId: d.id })} />

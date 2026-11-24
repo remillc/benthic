@@ -792,6 +792,39 @@ std::string plan_extra_value(const struct divecomputer &dc, const char *key, con
 	return current.empty() ? legacy : current;
 }
 
+std::string benthic_id_of(const struct dive &d)
+{
+	for (const struct divecomputer &dc: d.dcs)
+		for (const extra_data &e: dc.extra_data)
+			if (e.key == ID_KEY)
+				return e.value;
+	return std::string();
+}
+
+bool valid_benthic_id(const std::string &id)
+{
+	if (id.size() != 10)
+		return false;
+	for (char c: id)
+		if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z' && c != 'i' && c != 'l' && c != 'o' && c != 'u')))
+			return false;
+	return true;
+}
+
+bool set_benthic_id(struct dive &d, const std::string &id)
+{
+	for (struct divecomputer &dc: d.dcs)
+		for (extra_data &e: dc.extra_data)
+			if (e.key == ID_KEY) {
+				if (e.value == id)
+					return false;
+				e.value = id;
+				return true;
+			}
+	add_extra_data(&d.dcs[0], ID_KEY, id);
+	return true;
+}
+
 int rewrite_legacy_extra_data()
 {
 	int renamed = 0;

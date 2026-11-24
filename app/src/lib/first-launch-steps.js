@@ -8,6 +8,7 @@
 //     cloudService → cloudConnect → cloudConnected | webdav | git (reached from the open and git-link paths)
 //   (iCloud Drive, iPhone and macOS only: cloudService → cloudConnected, no sign-in; tasks 2026-11-16-228 and 261)
 //   start → import → (file | importDivelogs → importProgress) → importNew (the name; « Importer le carnet » creates it on the device)
+//   (a .benthic file, task 2026-11-23-360: importNew → importBenthic, the progress; it ends the first launch, or goes back to `import` with the red banner)
 //   (The beta's « open » step now offers the Benthic server only, decided on 18 November 2026: no screen sends to the
 //   cloud-drive and git steps below any more; their transitions stay for the desktop paths and the tests.)
 //   start → open → (openCloudService → openCloudConnect → openCloudConnected → openChoose | openWebdav | openGit)
@@ -27,7 +28,7 @@
 
 /**
  * @typedef {'start'|'new'|'cloudService'|'cloudConnect'|'cloudConnected'|'webdav'|'git'
- *   |'import'|'importDivelogs'|'importProgress'|'importNew'
+ *   |'import'|'importDivelogs'|'importProgress'|'importNew'|'importBenthic'
  *   |'open'|'openCloudService'|'openCloudConnect'|'openCloudConnected'|'openChoose'|'openWebdav'|'openGit'
  *   |'server'|'serverCode'|'serverOffline'|'serverDownload'
  *   |'benthicPlusConnect'|'benthicPlusOffer'|'benthicPlusAll'|'benthicPlusReady'|'benthicPlusWelcome'|'benthicPlusPair'
@@ -56,6 +57,8 @@ const FORWARD = {
   'import:divelogs': 'importDivelogs',
   'importDivelogs:submit': 'importProgress',
   'import:file': 'importNew',
+  // A .benthic file (the full export): « Importer le carnet » of « Nouveau carnet » opens its progress, which has no « Retour ».
+  'importNew:benthic': 'importBenthic',
   'open:cloud': 'openCloudService',
   'open:git': 'openGit',
   'open:server': 'server',
@@ -174,7 +177,7 @@ export function hasBack(step, leavable = false) {
  * (« Annuler l'envoi », « Reprendre l'envoi », « Revenir à l'accueil »), and the end of the Benthic+ screens, which
  * leave through their own buttons.
  */
-const NO_BACK = /** @type {Step[]} */ (['importProgress', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'benthicPlusOffer', 'benthicPlusReady', 'benthicPlusWelcome', 'benthicPlusPair']);
+const NO_BACK = /** @type {Step[]} */ (['importProgress', 'importBenthic', 'serverDownload', 'createSend', 'createInterrupted', 'createOffline', 'benthicPlusOffer', 'benthicPlusReady', 'benthicPlusWelcome', 'benthicPlusPair']);
 
 /**
  * What the system Back (Android back key and gesture, predictive back; the iOS left-edge swipe) does on a step. It does
@@ -204,6 +207,7 @@ export function systemBack(stack, fromMenu) {
 /** The « Annuler » button of the steps that have no « Retour » (it stops what is running). */
 const CANCEL_BUTTON = /** @type {Record<string, string>} */ ({
   importProgress: '.bc-first-launch-divelogs--cancel',
+  importBenthic: '.bc-first-launch-benthic--cancel',
   serverDownload: '.bc-first-launch-server--cancel',
   createSend: '.bc-server-create--text',
 });

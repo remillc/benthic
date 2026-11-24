@@ -9,6 +9,7 @@
   // whose text changed are sent; Save applies one undoable step, saves
   // locally and closes; Undo is offered.
   import { onMount, tick } from 'svelte';
+  import { currentDiveId, liveDiveId, onDiveIdsRenumbered } from '../lib/dive-ids.js';
   import { Page, Navbar, Link, Popup, View, f7 } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import { BenthicCore } from 'benthic-core';
@@ -54,6 +55,7 @@
   import RenameComputerDialog from '../components/RenameComputerDialog.svelte';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf } from '../lib/inventory.svelte.js';
+  import { coreIdOfParam } from '../lib/dive-id.js';
   import { cloneEquipment, diveKeyOf, emptyEquipment, sameEquipment } from '../lib/inventory.js';
   import ButtonGroup from '../components/ButtonGroup.svelte';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
@@ -210,9 +212,25 @@
     };
   }
 
+  // The core read the log again while this form is open (a change from another device): the form keeps what was typed and
+  // saves against the dive's new id; a dive deleted on the other device closes the form.
+  onMount(() =>
+    onDiveIdsRenumbered(() => {
+      if (!dive) return;
+      const now = currentDiveId(dive.id);
+      if (now === dive.id) return;
+      if (now === null) {
+        toast(t('detail.deletedElsewhere'));
+        leave();
+        return;
+      }
+      dive = { ...dive, id: now };
+    }),
+  );
+
   onMount(async () => {
     try {
-      const d = await BenthicCore.getDive({ id: Number(f7route.params.id) });
+      const d = await BenthicCore.getDive({ id: liveDiveId(coreIdOfParam(f7route.params.id)) });
       // Release edition: the inventory is read before the form shows (it awaits).
       if (isRelease) {
         await loadInventory();
@@ -957,18 +975,18 @@
           }
         }
       }
-      // The inventory's side: this dive's pieces, under its start time (re-keyed when the start time changed).
+      // The inventory's side: this dive's pieces, under its Benthic id (the key never changes with the start time; a dive with no id yet is keyed by its start and re-keyed).
       let equipmentSaved = false;
       if (equipmentChanged()) {
-        const from = diveKeyOf({ date: initialDate });
-        const to = diveKeyOf({ date: isoDate });
+        const from = diveKeyOf({ date: initialDate, benthicId: dive?.benthicId });
+        const to = diveKeyOf({ date: isoDate, benthicId: dive?.benthicId });
         await changeInventory(async (inv) => {
           await inv.rekeyDive(from, to);
           await inv.saveDiveEquipment(to, equipment);
         });
         equipmentSaved = true;
       } else if (isRelease && isoDate !== initialDate) {
-        await changeInventory((inv) => inv.rekeyDive(diveKeyOf({ date: initialDate }), diveKeyOf({ date: isoDate })));
+        await changeInventory((inv) => inv.rekeyDive(diveKeyOf({ date: initialDate, benthicId: dive?.benthicId }), diveKeyOf({ date: isoDate, benthicId: dive?.benthicId })));
       }
       leave();
       if (steps) offerUndo(t('edit.saved'), undefined, 6000, steps);

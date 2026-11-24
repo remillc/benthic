@@ -5,6 +5,8 @@
   // error, empty logbook, offline with pending changes, sync conflict. A log can hold thousands of dives:
   // the list is virtual, only the rows near the screen are in the document.
   import { onDestroy, tick, untrack } from 'svelte';
+  import { diveUrl } from '../lib/dive-id.js';
+  import { currentDiveId, currentDiveIds, onDiveIdsRenumbered } from '../lib/dive-ids.js';
   import { Page, Navbar, NavRight, Link, Searchbar, List, ListItem, Block, Button, Popover, f7, theme } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
   import SyncStatus from '../components/SyncStatus.svelte';
@@ -35,7 +37,8 @@
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
   import { replaceEligibility, replacementFromFile } from '../lib/replace-logbook.js';
-  import { startReplace } from '../lib/replace-logbook-ui.js';
+  import { benthicProblemDialog, startBenthicReplace, startReplace } from '../lib/replace-logbook-ui.js';
+  import { isBenthicName, openBenthicFile } from '../lib/benthic-import.svelte.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import CsvImportDialog from '../components/CsvImportDialog.svelte';
   import { pickCsvFiles } from '../lib/csv-import.js';
@@ -159,7 +162,7 @@
     if (!dive) return;
     tick().then(() => {
       // At start, only the logbook holds links to dives and trips.
-      const href = dive.trip ? `/trips/${dive.trip.id}` : `/dives/${dive.id}`;
+      const href = dive.trip ? `/trips/${dive.trip.id}` : diveUrl(dive);
       const link = /** @type {HTMLElement|null} */ (document.querySelector(`a[href="${href}"]`));
       /** @type {HTMLElement|null} */ (tap.expand ? link?.querySelector('.bc-trip-row--expand') : link)?.click();
     });
@@ -191,6 +194,19 @@
   let selecting = $state(false);
   /** Checked dives, by identifier of the current load. */
   let checked = $state(/** @type {Record<number, boolean>} */ ({}));
+  // The core read the log again (a change from another device): the checked dives keep their new ids, the ones deleted leave.
+  $effect(() =>
+    onDiveIdsRenumbered(() => {
+      /** @type {Record<number, boolean>} */
+      const moved = {};
+      for (const [id, on] of Object.entries(untrack(() => checked))) {
+        const now = on ? currentDiveId(Number(id)) : null;
+        if (now !== null) moved[now] = true;
+      }
+      checked = moved;
+      if (selecting && !Object.keys(moved).length) endSelection();
+    }),
+  );
   const checkedCount = $derived(Object.values(checked).filter(Boolean).length);
   const LONG_PRESS_MS = 500;
 
@@ -667,13 +683,19 @@
       target = null;
       const under = document.elementFromPoint(touchX, touchY);
       const li = /** @type {HTMLElement|null} */ (under?.closest('li'));
-      const dragged = (dragIds ?? []).map(diveById).filter((d) => d !== undefined);
-      if (li && el?.contains(li) && dragged.length) {
-        const tripId = Number(li.dataset.trip) || 0;
+      const dragged = currentDiveIds(dragIds ?? []).map(diveById).filter((d) => d !== undefined);
+      // The dive of the row under the finger, if that row is a dive (not a trip or a year header).
+      const underDive = li ? diveById(Number(/** @type {HTMLElement|null} */ (li.querySelector('[data-dive]'))?.dataset.dive)) : undefined;
+      // Back on one of the dragged rows: the dives stay where they are, nothing to do.
+      const onItself = !!underDive && dragged.some((d) => d.id === underDive.id);
+      if (li && el?.contains(li) && dragged.length && !onItself) {
+        // A trip row, or a dive of a trip (its trip read from the dive, as a row does not always carry it).
+        const tripId = Number(li.dataset.trip) || underDive?.trip?.id || 0;
         if (tripId && dragged.some((d) => d.trip?.id !== tripId)) {
           target = { action: 'add', tripId };
           el.querySelectorAll(`li[data-trip="${tripId}"]`).forEach((n) => n.classList.add('bc-logbook--drop-target'));
-        } else if (!tripId && dragged.some((d) => d.trip)) {
+        } else if (!tripId && underDive && dragged.some((d) => d.trip)) {
+          // Only on a dive that is in no trip: a year header or an empty spot does nothing.
           target = { action: 'remove' };
         }
       }
@@ -724,7 +746,8 @@
     }
 
     async function drop() {
-      const ids = dragIds ?? [];
+      // The log may have been read again during the drag: the ids follow (lib/dive-ids.js).
+      const ids = currentDiveIds(dragIds ?? []);
       const what = target;
       endDrag();
       if (!what || !ids.length) return;
@@ -871,7 +894,7 @@
     autoOpening = true;
     // The detail kept at the last start, if it is of this dive: the page draws it from its first frame, then reads the dive.
     seedStartDetail(dive, keepDive);
-    f7router.navigate(`/dives/${dive.id}`, { reloadDetail: true });
+    f7router.navigate(diveUrl(dive), { reloadDetail: true });
   });
 
   // Tablet: a logbook emptied (signed out, data of this device deleted) keeps
@@ -1269,6 +1292,18 @@
     fileInput.value = '';
     if (picked) {
       csv = { file: picked.csv, companion: picked.companion };
+      return;
+    }
+    // A .benthic file (the full export): « Remplacer ce carnet ? », then the progress (task 2026-11-23-360).
+    if (files.length === 1 && isBenthicName(files[0].name)) {
+      let inspection;
+      try {
+        inspection = await openBenthicFile(files[0]);
+      } catch (e) {
+        benthicProblemDialog(files[0].name, e);
+        return;
+      }
+      await startBenthicReplace(files[0], inspection);
       return;
     }
     // A phone or a tablet keeps one logbook: a Subsurface logbook file can also replace the open one.

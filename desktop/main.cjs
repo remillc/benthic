@@ -85,6 +85,8 @@ app.on('child-process-gone', (_event, details) => {
 });
 
 /** @type {ReturnType<typeof createWindowManager>|null} */
+/** The media folder of the bridge (dive photos and videos), set once the bridge exists. @type {{ fileFor: (hash: string) => string }|null} */
+let bridgeMedia = null;
 let windows = null;
 
 /** @type {import('electron').BrowserWindow|null} */
@@ -221,6 +223,17 @@ app.whenReady().then(async () => {
     if (pathname === legacy.HANDOVER_PAGE && (host === legacy.NEW_HOST || host === legacy.OLD_HOST)) {
       return new Response(legacy.HANDOVER_HTML, { headers: { 'content-type': 'text/html; charset=utf-8' } });
     }
+    // A dive photo or video, from the media folder by its hash: app://media/<sha-256>?type=<mime> (range requests for the video).
+    if (host === 'media') {
+      const file = bridgeMedia ? bridgeMedia.fileFor(pathname.slice(1)) : '';
+      if (!file) return new Response('', { status: 404 });
+      const type = new URL(request.url).searchParams.get('type') || '';
+      return net.fetch(pathToFileURL(file).toString(), { headers: request.headers.has('range') ? { range: request.headers.get('range') } : {} }).then((r) => {
+        const headers = new Headers(r.headers);
+        if (/^(image|video)\/[a-z0-9.+-]+$/i.test(type)) headers.set('content-type', type);
+        return new Response(r.body, { status: r.status, headers });
+      });
+    }
     if (host !== legacy.NEW_HOST) return new Response('', { status: 404 });
     const file = path.normalize(path.join(webRoot, decodeURIComponent(pathname)));
     if (!file.startsWith(webRoot)) return new Response('', { status: 404 });
@@ -253,6 +266,7 @@ app.whenReady().then(async () => {
     log: (text) => console.error('[desktop]', text),
   });
   const bridge = setupBridge({ ipcMain, app, safeStorage, hostPath: hostPath(), resourcesDir: resources, cloud, onHostCrash: (reason) => crashes.write('Core helper', reason) });
+  bridgeMedia = bridge.media;
   // « Seulement sur Wi-Fi ou câble » (task 2026-11-15-202): the connection type, asked of the system here (network.cjs).
   const network = createNetworkMonitor({
     onChange: (cost) => {

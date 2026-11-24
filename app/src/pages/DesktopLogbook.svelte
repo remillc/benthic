@@ -8,6 +8,7 @@
   // keyboard shortcuts; a file dropped on the window is imported. Below 1200 dp the
   // tablet's Logbook.svelte shows instead (App.svelte).
   import { tick, untrack } from 'svelte';
+  import { diveUrlOfCore } from '../lib/dive-id.js';
   import { Page, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import SearchClear from '../components/SearchClear.svelte';
@@ -29,6 +30,8 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { importErrorKey } from '../lib/deep-link.js';
   import { logbook, loadLogbook, importFile, importData, undoLastChange, deleteDives, tripChange, mergeDives } from '../lib/logbook.svelte.js';
+  import { benthicProblemDialog, startBenthicReplace } from '../lib/replace-logbook-ui.js';
+  import { isBenthicName, openBenthicFile } from '../lib/benthic-import.svelte.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import ValidationDialog from '../components/ValidationDialog.svelte';
   import { canMerge, mergeErrorKey } from '../lib/multi-dive.js';
@@ -237,7 +240,7 @@
       else showDetail('/pane/empty');
       return;
     }
-    showDetail(ids.length === 1 ? `/dives/${ids[0]}` : '/pane/selection');
+    showDetail(ids.length === 1 ? diveUrlOfCore(ids[0]) : '/pane/selection');
   });
 
   // The first dive of the table, once shown in the pane, is kept for the next start (lib/detail-snapshot.js).
@@ -737,6 +740,15 @@
 
   /** @param {File} file */
   async function importOne(file) {
+    // A .benthic file (the full export): « Remplacer ce carnet ? », then the progress (task 2026-11-23-360).
+    if (isBenthicName(file.name)) {
+      try {
+        await startBenthicReplace(file, await openBenthicFile(file));
+      } catch (e) {
+        benthicProblemDialog(file.name, e);
+      }
+      return;
+    }
     try {
       const n = await importFile(file);
       offerUndo(t('logbook.importedFrom', { n, name: file.name }));

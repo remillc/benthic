@@ -16,7 +16,7 @@ export const PENDING_IMPORT_KEY = 'bc.pendingImport';
 /**
  * What the new logbook still has to import: the staged files (the import folder of the app's temp folder), read
  * back and imported once the logbook is open.
- * @typedef {{ files: { path: string, name: string }[], csv?: { params: any, companion: boolean } }} PendingImport
+ * @typedef {{ files: { path: string, name: string }[], csv?: { params: any, companion: boolean }, benthic?: boolean }} PendingImport
  * `files[0]` is the file imported; for a CSV, `files[1]` is its companion (a Poseidon MkVI .txt) when `companion`.
  */
 
@@ -32,6 +32,8 @@ export async function pendingFromSource(source, stage) {
   // A staged source is already in the import folder: only its path is parked.
   if (source.kind === 'staged') return { files: [{ path: source.path, name: source.fileName }] };
   const files = [{ path: await stage(source.file), name: source.file.name }];
+  // A .benthic file (the full export) is imported by its own engine, from the staged archive (task 2026-11-23-360).
+  if (source.kind === 'benthic') return { files, benthic: true };
   if (source.csv?.companion) files.push({ path: await stage(source.csv.companion), name: source.csv.companion.name });
   return source.csv ? { files, csv: { params: source.csv.params, companion: !!source.csv.companion } } : { files };
 }
@@ -57,7 +59,7 @@ export function takePending(storage) {
     const value = JSON.parse(raw);
     const files = Array.isArray(value?.files) ? value.files : [];
     if (!files.length || !files.every((f) => f && typeof f.path === 'string' && typeof f.name === 'string')) return null;
-    return { files: files.map((f) => ({ path: f.path, name: f.name })), ...(value.csv ? { csv: { params: value.csv.params, companion: !!value.csv.companion } } : {}) };
+    return { files: files.map((f) => ({ path: f.path, name: f.name })), ...(value.benthic === true ? { benthic: true } : {}), ...(value.csv ? { csv: { params: value.csv.params, companion: !!value.csv.companion } } : {}) };
   } catch {
     return null;
   }

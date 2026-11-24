@@ -85,6 +85,10 @@ static std::string loaded_cloud_url;
 // Address of the log in memory; see internal::current_log().
 static std::string current_log_path;
 
+bool internal::file_autogroup = false;
+internal::KeepFileAutogroup::KeepFileAutogroup() { divelog.autogroup = file_autogroup; }
+internal::KeepFileAutogroup::~KeepFileAutogroup() { divelog.autogroup = false; }
+
 static int load(const std::string &path, std::string &error)
 {
 	// Set by the core's git loader; cleared here for files and failed loads.
@@ -96,6 +100,10 @@ static int load(const std::string &path, std::string &error)
 	// The loader fills the table again from the log.
 	fingerprints.clear();
 	int ret = parse_file(path.c_str(), &divelog);
+	// Benthic never groups dives into trips by itself: the log's flag is kept
+	// aside for the next save and the core sees it off (see internal.h).
+	internal::file_autogroup = divelog.autogroup;
+	divelog.autogroup = false;
 	if (ret) {
 		error = "Cannot read " + path + " (" + std::to_string(ret) + ")";
 		internal::on_log_loaded();
@@ -187,6 +195,7 @@ int import_file(const std::string &source, const std::string &repo, std::string 
 		return -1;
 	}
 	uncache_shared_start_times();
+	internal::KeepFileAutogroup keep_autogroup;
 	int ret = save_dives(repo.c_str(), true);
 	if (ret) {
 		error = "Cannot save to " + repo + " (" + std::to_string(ret) + ")";
@@ -313,7 +322,9 @@ int list_plans(std::string &json)
 		if (!first)
 			json += ',';
 		first = false;
-		json += "{\"id\":" + std::to_string(d.id) + ",\"date\":";
+		json += "{\"id\":" + std::to_string(d.id) + ",\"benthicId\":";
+		append_json_string(json, internal::benthic_id_of(d));
+		json += ",\"date\":";
 		append_json_string(json, iso_date(d.when));
 		json += ",\"when\":" + std::to_string(d.when) + ",\"site\":";
 		append_json_string(json, site_name(d));
@@ -360,6 +371,8 @@ static std::string dives_json(bool include_invalid = false)
 		first = false;
 		json += "{\"id\":" + std::to_string(d->id);
 		json += ",\"number\":" + std::to_string(d->number);
+		json += ",\"benthicId\":";
+		append_json_string(json, internal::benthic_id_of(*d));
 		json += ",\"date\":";
 		append_json_string(json, iso_date(d->when));
 		json += ",\"site\":";
@@ -410,6 +423,8 @@ int get_dive(int id, std::string &json, std::string &error)
 
 	json = "{\"id\":" + std::to_string(d->id);
 	json += ",\"number\":" + std::to_string(d->number);
+	json += ",\"benthicId\":";
+	append_json_string(json, internal::benthic_id_of(*d));
 	json += ",\"date\":";
 	append_json_string(json, iso_date(d->when));
 	json += ",\"site\":";
@@ -1019,6 +1034,7 @@ int cloud_sign_out(bool delete_copy, std::string &error)
 	}
 	// Close the log and forget the account.
 	divelog.clear();
+	internal::file_autogroup = false;
 	fingerprints.clear();
 	loaded_git_commit.clear();
 	current_log_path.clear();
@@ -1603,6 +1619,7 @@ int save_logbook_file(const std::string &path, std::string &error)
 	// File > Save As in Subsurface's main window: save_dives() writes the whole
 	// log (every dive, site, trip reached by a dive, the settings, the filter
 	// presets), not the selected dives only.
+	internal::KeepFileAutogroup keep_autogroup;
 	if (save_dives(path.c_str())) {
 		error = "SAVE_FAILED";
 		return -1;

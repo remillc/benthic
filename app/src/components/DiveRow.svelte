@@ -2,6 +2,7 @@
   // @ts-check
   // <DiveRow> (spec, section 4, "LignePlongee"): thumbnail, site (or "site not
   // set"), date and time; on the right the maximum depth, then the duration.
+  import { diveUrl } from '../lib/dive-id.js';
   import { theme } from 'framework7-svelte';
   import Icon from './Icon.svelte';
   import ProfileThumbnail from './ProfileThumbnail.svelte';
@@ -84,7 +85,7 @@
     style:top={top === undefined ? undefined : `${top}px`}
   >
     <a
-      href="/dives/{dive.id}"
+      href={diveUrl(dive)}
       data-reload-detail="true"
       data-dive={dive.id}
       draggable="false"
@@ -126,7 +127,7 @@
 <li class="bc-dive-row" data-trip={inTrip ? dive.trip?.id : undefined} class:bc-dive-row--in-trip={inTrip} class:bc-dive-row--trip-first={tripFirst} class:bc-dive-row--trip-last={tripLast} class:bc-dive-row--appear={appear} class:bc-dive-row--selected={layout.split && navigation.dive === String(dive.id)} data-virtual-list-index={index} style:top={top === undefined ? undefined : `${top}px`}>
   <!-- data-reload-detail: beside the list (tablet), the dive replaces the one shown. -->
   <a
-    href="/dives/{dive.id}"
+    href={diveUrl(dive)}
     data-reload-detail="true"
     data-dive={dive.id}
     draggable="false"

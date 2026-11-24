@@ -23,6 +23,7 @@ let temp;
 let resources;
 const handlers = new Map();
 let encryption = true;
+const broadcasts = [];
 
 const rejection = (promise) => promise.then(() => assert.fail('it must reject'), (e) => e);
 /** What the preload does with an ipc answer. */
@@ -62,7 +63,7 @@ before(() => {
     hostPath: process.execPath,
     hostArgs: [fakeHost],
     resourcesDir: resources,
-    broadcast: () => {},
+    broadcast: (...args) => broadcasts.push(args),
   });
   temp = path.join(root, 'tmp', 'benthic');
 });
@@ -332,4 +333,45 @@ test('files: the development env files, read and deleted by name only', async ()
 test('places search only goes to Nominatim; htmlToPdf needs html and a name', async () => {
   assert.match((await rejection(invoke('bc:placesSearch', { url: 'https://example.com/' }))).message, /bad address/);
   assert.match((await rejection(invoke('bc:htmlToPdf', { html: 'x' }))).message, /missing html or name/);
+});
+
+test('the push stream: the lines of the server reach the page as pushStream events; an error status and a dead port end it quietly', async () => {
+  const http = await import('node:http');
+  let status = 200;
+  const server = http.createServer((req, res) => {
+    if (status !== 200) {
+      res.writeHead(status).end();
+      return;
+    }
+    assert.equal(req.headers.authorization, 'Bearer tok');
+    res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+    res.write('retry: 5000\n\nevent: hello\ndata: {"heads":{"main":"a","benthic":""}}\n\n: ping\n');
+    setTimeout(() => res.end(), 50);
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const port = server.address().port;
+  const events = (id) => broadcasts.filter((b) => b[1] === 'bc:core-event' || b[0] === 'bc:core-event').map((b) => b.at(-1)).filter((d) => d?.id === id);
+  const waitFor = async (id, kind) => {
+    for (let i = 0; i < 100 && !events(id).some((e) => e.kind === kind); i++) await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.ok(events(id).some((e) => e.kind === kind), `${kind} for ${id}`);
+  };
+  try {
+    await invoke('bc:push', 'open', { id: 11, url: `http://127.0.0.1:${port}/v1/events`, token: 'tok' });
+    await waitFor(11, 'closed');
+    const lines = events(11).filter((e) => e.kind === 'line').map((e) => e.line);
+    assert.deepEqual(lines, ['retry: 5000', '', 'event: hello', 'data: {"heads":{"main":"a","benthic":""}}', '', ': ping']);
+    assert.equal(events(11)[0].kind, 'open');
+    status = 503;
+    await invoke('bc:push', 'open', { id: 12, url: `http://127.0.0.1:${port}/v1/events`, token: 'tok' });
+    await waitFor(12, 'closed');
+    assert.equal(events(12).at(-1).status, 503);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+  // The port is dead now: the attempt ends with a closed event, nothing throws.
+  await invoke('bc:push', 'open', { id: 13, url: `http://127.0.0.1:${port}/v1/events`, token: 'tok' });
+  await waitFor(13, 'closed');
+  assert.equal(events(13).at(-1).status, 0);
+  await rejection(invoke('bc:push', 'open', { id: 14, url: 'http://example.com/v1/events', token: 'tok' }));
+  await invoke('bc:push', 'close', { id: 99 });
 });

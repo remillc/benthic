@@ -4,7 +4,7 @@
 //
 // Where it is kept. A validation belongs to the dive, but the Subsurface core has no generic door for a dive's extra data
 // (the façade writes only the keys of plans and titles), and the dive's equipment already lives in the Benthic data store
-// keyed by the start time (lib/inventory.js, diveKeyOf). A validation follows the same rule: one file
+// keyed by the dive's Benthic id (lib/inventory.js, diveKeyOf; the start time until migrated). A validation follows the same rule: one file
 // `dive-validations/<id>.json` in the store, so nothing is written into the Subsurface logbook, desktop Subsurface reads
 // and writes the log as before, and the signature image (a small PNG) stays next to it. When dives get their own UUID
 // (docs/architecture.md, section 11.3) the record's `dives` move to that key.
@@ -12,10 +12,10 @@
 // A record:
 //   { format: 1, id, method: 'signature'|'qr', status: 'confirmed'|'pending',
 //     signer: { name, role, instructorNumber }, signature: 'data:image/png;base64,...'|'', at: local time of the signing,
-//     dives: [{ start: 'YYYY-MM-DDTHH:MM:SS', hash }], token?, expiresAt? (pending), createdAt, updatedAt }
+//     dives: [{ benthicId, hash }] ({ start: 'YYYY-MM-DDTHH:MM:SS', hash } until migrated), token?, expiresAt? (pending), createdAt, updatedAt }
 // A validation of several dives is one record with several `dives`.
 
-import { diveKeyOf } from './inventory.js';
+import { diveKeyOf, keyField, recordKey } from './inventory.js';
 
 /** The roles of the signer, in the order of the menu. */
 export const ROLES = /** @type {const} */ (['buddy', 'instructor', 'diveguide']);
@@ -107,7 +107,7 @@ export const cleanSigner = (f) => ({ name: f.name.trim().replace(/\s+/g, ' ').sl
  * @property {{ name: string, role: string, instructorNumber: string }} signer name '' while pending
  * @property {string} signature a PNG data URL; '' for a QR validation
  * @property {string} at the signing, as local wall-clock text `YYYY-MM-DDTHH:MM:SS` (what the date formats of the app take); '' while pending
- * @property {{ start: string, hash: string }[]} dives
+ * @property {{ benthicId?: string, start?: string, hash: string }[]} dives
  * @property {string} [token] the server's code, while pending
  * @property {string} [expiresAt] ISO time the code expires, while pending
  * @property {string} createdAt
@@ -135,7 +135,7 @@ export function pendingRecord({ id, token, expiresAt, dives, now }) {
 }
 
 /** @param {Record<string, any>} dive */
-const entryOf = (dive) => ({ start: diveKeyOf(dive), hash: diveHash(dive) });
+const entryOf = (dive) => ({ ...keyField(diveKeyOf(dive)), hash: diveHash(dive) });
 
 /**
  * The server's answer for a pending record, applied: confirmed with the signer's data, dropped when the server says the
@@ -176,7 +176,7 @@ export function itemsFor(records, dive) {
   const key = diveKeyOf(dive);
   const hash = diveHash(dive);
   return records
-    .map((r) => ({ r, entry: r.dives.find((d) => d.start === key) }))
+    .map((r) => ({ r, entry: r.dives.find((d) => recordKey(d) === key) }))
     .filter((x) => x.entry)
     .sort((a, b) => (a.r.createdAt < b.r.createdAt ? -1 : a.r.createdAt > b.r.createdAt ? 1 : 0))
     .map(({ r, entry }) => ({
@@ -199,7 +199,7 @@ export function itemsFor(records, dive) {
  */
 export function validatedKeys(records) {
   const out = new Set();
-  for (const r of records) if (r.status === 'confirmed') for (const d of r.dives) out.add(d.start);
+  for (const r of records) if (r.status === 'confirmed') for (const d of r.dives) out.add(recordKey(d));
   return out;
 }
 
@@ -210,7 +210,7 @@ export function validatedKeys(records) {
  */
 export function rekey(records, from, to) {
   if (from === to) return [];
-  return records.filter((r) => r.dives.some((d) => d.start === from)).map((r) => ({ ...r, dives: r.dives.map((d) => (d.start === from ? { ...d, start: to } : d)) }));
+  return records.filter((r) => r.dives.some((d) => recordKey(d) === from)).map((r) => ({ ...r, dives: r.dives.map((d) => (recordKey(d) === from ? { hash: d.hash, ...keyField(to) } : d)) }));
 }
 
 /**

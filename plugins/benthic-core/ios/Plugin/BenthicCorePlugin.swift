@@ -62,6 +62,8 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "serverSessionInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionAccess", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "serverSessionClear", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pushStreamOpen", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pushStreamClose", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "devResetApp", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "dataKeyRead", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "dataKeyWrite", returnType: CAPPluginReturnPromise),
@@ -100,6 +102,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "renumberDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "benthicIds", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importCsv", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDivesFiles", returnType: CAPPluginReturnPromise),
@@ -124,6 +127,12 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "stageSharedFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "cancelStage", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readFileChunk", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaAdopt", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaPutBytes", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaStat", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaUpload", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaDownload", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "mediaDelete", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "assembleFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "startBluetoothScan", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopBluetoothScan", returnType: CAPPluginReturnPromise),
@@ -135,6 +144,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "grantShareFile", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "exportDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "htmlToPdf", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "openNotificationSettings", returnType: CAPPluginReturnPromise),
     ]
 
     /// The core is not reentrant: only this queue calls it.
@@ -560,6 +570,17 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
         onCoreThread(call) { [self] in
             call.resolve(["json": try BenthicNative.editDives(numbers(ids), changes: text)])
+        }
+    }
+
+    @objc func benthicIds(_ call: CAPPluginCall) {
+        guard let action = call.getString("action"), action == "audit" || action == "assign" else {
+            call.reject("Missing action", "BAD_ARGUMENT")
+            return
+        }
+        let assignments = call.getString("assignments") ?? "{}"
+        onCoreThread(call) { [self] in
+            call.resolve(["json": try BenthicNative.benthicIds(action, assignments: assignments)])
         }
     }
 
@@ -1187,7 +1208,32 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// Signs out of the Benthic server: the tokens are erased from this device.
     @objc func serverSessionClear(_ call: CAPPluginCall) {
+        pushStream.close()
         serverStore.delete()
+        call.resolve()
+    }
+
+    /// The push channel (lib/push-events.js): its lines and endings reach the page as `pushStream` events.
+    private lazy var pushStream = PushStream { [weak self] id, kind, line, status, message in
+        var data: [String: Any] = ["id": id, "kind": kind, "status": status]
+        if let line = line { data["line"] = line }
+        if let message = message { data["message"] = message }
+        self?.notifyListeners("pushStream", data: data)
+    }
+
+    /// Opens the Server-Sent Events stream and returns at once (`id`, `url`, `token`).
+    @objc func pushStreamOpen(_ call: CAPPluginCall) {
+        guard let id = call.getInt("id"), let address = call.getString("url"), let url = URL(string: address),
+              url.scheme == "https" || url.scheme == "http", let token = call.getString("token"), !token.isEmpty else {
+            call.reject("An id, an address and a token are needed", "BAD_ARGUMENT")
+            return
+        }
+        pushStream.open(id: id, url: url, token: token)
+        call.resolve()
+    }
+
+    @objc func pushStreamClose(_ call: CAPPluginCall) {
+        pushStream.close(id: call.getInt("id"))
         call.resolve()
     }
 
@@ -1323,6 +1369,61 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             }
             try bytes.write(to: file)
             call.resolve(["path": file.path])
+        }
+    }
+
+    // MARK: - Dive photos and videos (DiveMedia.swift; docs/architecture.md, 11.6)
+
+    private let diveMedia = DiveMedia()
+
+    @objc func mediaAdopt(_ call: CAPPluginCall) {
+        let path = call.getString("path") ?? ""
+        onNetworkThread(call) { [self] in
+            guard let staged = stagedImport(path) else { throw Failure("BAD_REQUEST") }
+            let (hash, size) = try diveMedia.adopt(staged)
+            call.resolve(["hash": hash, "size": size])
+        }
+    }
+
+    @objc func mediaPutBytes(_ call: CAPPluginCall) {
+        let data = call.getString("data") ?? ""
+        onNetworkThread(call) { [self] in
+            let (hash, size) = try diveMedia.putBytes(data)
+            call.resolve(["hash": hash, "size": size])
+        }
+    }
+
+    @objc func mediaStat(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        onNetworkThread(call) { [self] in
+            let file = try diveMedia.stat(hash)
+            let size = (try? file.flatMap { try FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int64 }) ?? nil
+            call.resolve(["exists": file != nil, "size": size ?? 0, "path": file?.path ?? ""])
+        }
+    }
+
+    @objc func mediaUpload(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        let url = call.getString("url") ?? ""
+        let headers = (call.getObject("headers") as? [String: String]) ?? [:]
+        onNetworkThread(call) { [self] in
+            call.resolve(["status": try diveMedia.upload(hash, url: url, headers: headers)])
+        }
+    }
+
+    @objc func mediaDownload(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        let url = call.getString("url") ?? ""
+        onNetworkThread(call) { [self] in
+            call.resolve(["size": try diveMedia.download(hash, url: url)])
+        }
+    }
+
+    @objc func mediaDelete(_ call: CAPPluginCall) {
+        let hash = call.getString("hash")
+        onNetworkThread(call) { [self] in
+            try diveMedia.delete(hash)
+            call.resolve()
         }
     }
 
@@ -1474,10 +1575,27 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// Opens the system's notification settings for Benthic (iOS 16 and later: the app's notification page; before: the app's page in
+    /// Settings), where the diver turns notifications back on after refusing them (inbox task 2026-11-23-356, part 4).
+    @objc func openNotificationSettings(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            let address: String
+            if #available(iOS 16.0, *) {
+                address = UIApplication.openNotificationSettingsURLString
+            } else {
+                address = UIApplication.openSettingsURLString
+            }
+            if let url = URL(string: address) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+            call.resolve()
+        }
+    }
+
     /// `Benthic/<version> (dive log app; <repository>)`: no personal data.
     private static var userAgent: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
-        return "Benthic/(version) (dive log app; https://github.com/remillc/benthic)"
+        return "Benthic/\(version) (dive log app; https://github.com/remillc/benthic)"
     }
 
     // MARK: - Bluetooth and download from a dive computer

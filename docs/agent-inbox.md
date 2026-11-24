@@ -6930,9 +6930,9 @@ Christian asked for this on 23 November 2026. Work in `main`. Correction to task
 
 **Done (23 November 2026).** `FirstLaunchRays.svelte` draws the four rays of the 390 px band (sun at (760, -900), bottom ends -115..0, 80..145, 195..315, 275..390, opacity 3.5, 3, 4, 3.5 %) in a viewBox scaled by the band's width / 390, never repeated; blur stays 2 px on screen, fade gone at 65 % of the height. `docs/system-design.md` already describes it.
 
-## [ ] 2026-11-23-356 Push sync (TODO #185): server notifies devices, no « Synchroniser » button, access requests as push notifications
+## [x] 2026-11-23-356 Push sync (TODO #185): server notifies devices, no « Synchroniser » button, access requests as push notifications
 
-**Progress: part 2 done in 37e214a6** (no « Synchroniser » button anywhere; parts 1, 3 and 4 are still open).
+**Progress: part 2 done in 37e214a6** (no « Synchroniser » button anywhere). Parts 3 and 4 are built on branch `feature/access-request-notifications` (Android checked on the emulator with a real FCM push; iPhone written by reading, no Mac; the Apple key and Xcode settings are still to do); part 1 is on `feature/push-sync`.
 Christian asked for this on 23 November 2026. Work in `main`. Read TODO #185 in `docs/TODOS.md` first; it goes with #173. Mock-ups are on the canvases (titles below).
 
 **1. Server pushes, devices stop polling.**
@@ -6959,6 +6959,8 @@ Mock-ups: « Feuille du compte, abonné (Benthic+) · Android » and the other p
 Mock-ups: « Permission de notifier, explication avant la demande d’Android / d’iOS (Benthic+) » and « Permission de notifier, demande d’Android / d’iOS (Benthic+) » (Android, iPhone, tablet paysage), « Réglages, Notifications (essai) » and « Réglages, Notifications, refusées … » (Android, iPhone).
 
 **Test:** with two paired devices and the app open on both, a change on one shows on the other within a few seconds without any tap; the account sheets have no « Synchroniser » button; with Benthic closed on the paired phone, a new device's access request shows as a system notification, and touching it opens the request; cutting the connection falls back to pull without errors.
+
+**Done (23 November 2026, in `integration/device-check`).** Part 1 (push channel; the device syncs through git), part 2 (no « Synchroniser » button), part 3 (system notification of an access request, Android with a real FCM push on the emulator) and part 4 (permission asked once, « Vos appareils », banner and system settings) are all in this branch. iPhone is written by reading and untested (no Mac). **Still needed from Christian for iOS:** the APNs authentication key (`.p8`), its Key ID and the Apple Team ID, to put on the server and in the Xcode project (push capability).
 
 ## [x] 2026-11-23-357 Download from a dive computer: one tap, one download (TODO #40, Android)
 
@@ -6991,7 +6993,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Task 357 redrew th
 
 **Done (23 November 2026).** Same page, frame by device (`kind`): iPhone navigation bar with « Annuler » and the « … » menu; Android tablet 640 dp column, 420 dp bottom buttons, 72 dp top bar; desktop 640 px dialog with footer actions. Not given by the core: USB computers, so « Branché par USB » is not shown (the desktop has no Bluetooth yet either, so the dialog only shows with a test core). iPhone and desktop still open « Indisponible » from the + button (route unchanged).
 
-## [ ] 2026-11-23-359 Dive detail, « Photos et vidéos »: Benthic+ only, synced pictures shown as thumbnails
+## [x] 2026-11-23-359 Dive detail, « Photos et vidéos »: Benthic+ only, synced pictures shown as thumbnails
 
 Christian asked for this on 23 November 2026. Work in `main`. Photos and videos are a Benthic+ feature (synced, within the 10 Go of the account).
 
@@ -7001,7 +7003,11 @@ Christian asked for this on 23 November 2026. Work in `main`. Photos and videos 
 
 Mock-ups: « Détail, équipement déplié · Android » and every other Android phone and tablet dive detail (light and dark); tablet « Carnet d’exemple (mode démo) » and « Feuille du compte, version gratuite » show the detail without the section. iPhone and desktop details had no such section; add it there the same way for subscribers.
 
-## [ ] 2026-11-23-360 Import a .benthic file (full export): new logbook or replace the current one (TODO #113)
+**Done (feature/dive-media, not merged: the coordinator checks on devices).** Server (benthic-server `main`, `docs/media-sync.md`): signed upload and download URLs by hash, usage, quota (`MEDIA_QUOTA_BYTES`, 10 GiB by default). App: `lib/dive-media.js` (references `media/<dive start>.json`, merge by hash), `lib/media-sync.js` (uploads wait offline; thumbnails always, originals on Wi-Fi by the choice), plugin `media*` calls (Kotlin, Swift written without a Mac, desktop `media.cjs`), section `DiveMediaSection.svelte` and gallery `DiveGallery.svelte`. No mock-up of the new section is in the repository: built from the text above. The choices live in Réglages › Carnet (« Photos sur cet appareil », « Vidéos sur cet appareil »), next to « Afficher les champs photos et vidéos », for a Benthic+ account only.
+
+**Done (feature/dive-media, not merged: the coordinator checks on devices).** Server (benthic-server `main`, `docs/media-sync.md`): signed upload and download URLs by hash, usage, quota (`MEDIA_QUOTA_BYTES`, 10 GiB by default). App: `lib/dive-media.js` (references `media/<dive start>.json`, merge by hash), `lib/media-sync.js` (uploads wait offline; thumbnails always, originals on Wi-Fi by the choice), plugin `media*` calls (Kotlin, Swift written without a Mac, desktop `media.cjs`), section `DiveMediaSection.svelte` and gallery `DiveGallery.svelte`. No mock-up of the new section is in the repository: built from the text above. The choices live in Réglages › Carnet (« Photos sur cet appareil », « Vidéos sur cet appareil »), next to « Afficher les champs photos et vidéos », for a Benthic+ account only.
+
+## [x] 2026-11-23-360 Import a .benthic file (full export): new logbook or replace the current one (TODO #113)
 
 Christian asked for this on 23 November 2026. Work in `main`. Benthic already exports everything to a `.benthic` file; this is the import. Decided on 22 November 2026: importing a `.benthic` creates the logbook (first launch) or replaces the current one after confirmation, as « Importer un carnet » does for other formats. Mock-ups: phone canvas, page « Pour commencer », subgroup « Depuis un fichier .benthic (export complet) »; tablet (landscape) and desktop: tablet canvas, page « Pour commencer », subgroups of the same name.
 
@@ -7014,6 +7020,8 @@ Christian asked for this on 23 November 2026. Work in `main`. Benthic already ex
 Benthic+ data in the file (profile, certificates, documents, photos) is imported for everyone; what a free user cannot see stays in the logbook, hidden, as for any Benthic+ data. Same on phone (Android and iPhone), tablet and desktop.
 
 **Test:** export a logbook, import it on a fresh install (first launch) and over an existing logbook; corrupt one file in the archive and check the incomplete message and that nothing was imported.
+
+**Done (23 November 2026, in `integration/device-check`).** The import of a `.benthic` file on every device (entry, new logbook, progress, incomplete file, replace). With the dive media sync in this branch the media hook finds `mediaAdopt` in the plugin: each original of `dive-media/` is staged in pieces and adopted into the media folder under its hash when the import succeeds, and discarded when it fails. The file carries the originals only (the export writes no per-dive reference files), so they are kept on the device but not attached to a dive.
 
 ## [x] 2026-11-23-361 « Renuméroter les plongées » leaves Réglages (TODO #72)
 
@@ -7199,7 +7207,7 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet
 
 **Done (23 November 2026).** Built from the task text (the canvas mock-up is not in the repository; `docs/mockups/bureau-carnet-onglet-equipement.dc.html` is the old layout). `DesktopDiveFields.svelte` draws the tab as five `DesktopEquipmentCard`s (kit, computers, protection thermique, lest, autre équipement) under the hint; `DesktopWeights` has removable 40 px chips, a dashed « + Ajouter » chip and no total (it is in the card header); `DesktopOtherGear` has 56 px grey rows and no add tile (« + Ajouter » is in the card header); `DesktopEditField` has a `tall` 48 px variant with a chevron. « Changer de kit » is a text button with the kit select laid over it. Computers stay read-only and the add button stays disabled, as the old fields were. 64 px + the pane's 24 px margin leave 88 px at the end. `tests/e2e/desktop-equipment.mjs` (`--equipment-only`) checks the free and Benthic+ tabs, the weight chip, total and centred selector, a knife item, and the end of the pane. Also fixed: `DesktopWeights` threw « Cannot read properties of null » when a weight was kept (bindings on `editing`).
 
-## [ ] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
+## [x] 2026-11-23-367 Android phone: dive gallery, photo and video viewers (Benthic+, TODO #187)
 
 Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (the « Photos et vidéos » section of the dive detail). Mock-ups: phone canvas, page Android, subgroup « Photos et vidéos (Benthic+) », just before « Plusieurs ordinateurs »: « Photos et vidéos de la plongée, « Tout voir » », « … sélection », « … retirer de la plongée », « Photo en plein écran », « … menu », « Vidéo en plein écran ». Android phone only for now; the other devices come later.
 
@@ -7226,7 +7234,9 @@ Christian asked for this on 23 November 2026. Work in `main`. Follows task 359 (
 
 **Test:** from a dive with photos and videos, « Tout voir » shows the grid in dive order with depths; the FAB adds pictures; a long press selects, Partager shares, Retirer asks then removes on every device; touching a photo opens it full screen, swiping changes picture, ⋮ offers the two items; a video plays with its controls.
 
-## [ ] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
+**Done (branch `feature/dive-gallery`, task 367).** Gallery, selection, Partager (system share sheet; « Enregistrer sous… » on desktop), Retirer with confirmation (tombstones in `media/<dive>.json`, synced; server objects and quota unchanged), photo and video viewers, depth under thumbnails (profile at the picture's offset, worked out from the time taken), time and camera from EXIF (JPEG, HEIC). The mock-ups were not in the repository: built from the text. « Remplacer la photo du site »: the site had no photo mechanism, so the choice is stored and synced as `media/site-<position>.json`; nothing displays it yet (where it shows is for Christian or the design agent to decide).
+
+## [x] 2026-11-23-368 Dive gallery, photo and video viewers on iPhone, Android tablet, iPad and desktop (Benthic+, TODO #187)
 
 Christian asked for this on 23 November 2026. Work in `main`. Same feature as task 367 (Android phone): same content, same rules (dive order, depth on thumbnails from the picture's offset, Partager, Retirer with confirmation, « Remplacer la photo du site », the bottom line « date, heure · appareil », no depth or profile in the viewer, nothing for a free user). Only the platform patterns change. Mock-ups, subgroup « Photos et vidéos (Benthic+) » on each page: phone canvas, page iPhone (before « Modifier une plongée »); tablet and desktop canvas, pages Tablette (before « Plusieurs ordinateurs »), iPad (after « Modifier une plongée ») and Bureau (before « Téléchargement, partage et voyage »).
 
@@ -7246,7 +7256,9 @@ Christian asked for this on 23 November 2026. Work in `main`. Same feature as ta
 
 **Test:** on each device, open « Tout voir » from a dive with photos and videos, add, select, share, remove (with the confirmation), open a photo, change picture, play a video; a free user sees none of it.
 
-## [ ] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
+**Done (branch `feature/dive-gallery`, task 368).** Gallery, selection, Partager (system share sheet; « Enregistrer sous… » on desktop), Retirer with confirmation (tombstones in `media/<dive>.json`, synced; server objects and quota unchanged), photo and video viewers, depth under thumbnails (profile at the picture's offset, worked out from the time taken), time and camera from EXIF (JPEG, HEIC). The mock-ups were not in the repository: built from the text. « Remplacer la photo du site »: the site had no photo mechanism, so the choice is stored and synced as `media/site-<position>.json`; nothing displays it yet (where it shows is for Christian or the design agent to decide).
+
+## [x] 2026-11-23-369 Remove the « Regrouper les plongées en voyages » setting: automatic trip grouping stays off (TODO #190)
 
 Christian asked for this on 23 November 2026. Work in `main`. Benthic does not use Subsurface's automatic trip grouping (`autogroup`): the value is false, and the setting is not shown anywhere.
 
@@ -7257,7 +7269,9 @@ Christian asked for this on 23 November 2026. Work in `main`. Benthic does not u
 
 **Test:** Réglages › Carnet has no « Regrouper les plongées en voyages » on any device; download or import several dives from different days: no trip is created; a Subsurface logbook with `autogroup` on keeps its existing trips and gets no new automatic ones from Benthic.
 
-## [ ] 2026-11-23-370 Remove the « Afficher les champs photos et vidéos » setting; About: « Site Web » replaces « Exporter mon carnet » (TODO #191, #192)
+**Done (23 November 2026).** The row, `settings.autogroup`, `desktop.undo.autogroup`, `desktop.undo.ungroup`, the two undo names and `setAutogroup()` are gone; the `autogroup` action of `tripAction` and `benthic::trips_autogroup` are removed on every platform. The core never groups on its own: `load()` reads the logbook's flag into `internal::file_autogroup` and puts `divelog.autogroup` off (so `process_loaded_dives` does not group), `import_log` forces the import log's flag off (a file with autogroup on would group in `process_imported_dives`, downloads included), and `create_dive` no longer passes a trip to AddDive. Every save of the log in memory writes the file's own value back (`KeepFileAutogroup`), so the diver's file is not rewritten for this. Checked by `tests/save_logbook_test.cpp` (load, import of three days, `createDive`, save keeps the `autogroup` line).
+
+## [x] 2026-11-23-370 Remove the « Afficher les champs photos et vidéos » setting; About: « Site Web » replaces « Exporter mon carnet » (TODO #191, #192)
 
 Christian asked for this on 23 November 2026. Work in `main`.
 
@@ -7268,6 +7282,8 @@ Christian asked for this on 23 November 2026. Work in `main`.
 Docs updated by the design agent: `docs/ui-specification.md` (photos section, About card) and `docs/advanced-settings.md` (row removed).
 
 **Test:** Réglages › Carnet has no photos and videos switch; a subscriber sees the Photos et vidéos section of a dive with pictures, a free user does not; À propos shows « Voir sur GitHub » and « Site Web » centred on one row, and « Site Web » opens benthicdivelog.app.
+
+**Done (23 November 2026).** `showPhotos` is removed (row, setting, stored value dropped at start, strings); the dive detail's « Photos et vidéos » section follows `benthicPlusSubscriber()` alone (EditDive has no photo field in main). À propos: « Site Web » (globe icon, outlined, `aria-label` as the task) replaces the export button; both buttons sit on one centred row, as wide as their label, wrapping when narrow. `tests/app/about-free.test.mjs` follows.
 
 ## [x] 2026-11-23-371 New `rebreather` drawing in `GearIcon.svelte`
 

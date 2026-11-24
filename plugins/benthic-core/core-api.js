@@ -109,6 +109,7 @@ export { waterTypeOf };
  * A dive in the logbook list.
  * @typedef {Object} Dive
  * @property {number} id identifier valid until the next load (for getDive)
+ * @property {string} benthicId the dive's stable id (extra data `Benthic id`, 10 characters); empty until one is assigned
  * @property {number} number
  * @property {string} date local time of the dive, e.g. 2012-11-05T10:15:00
  * @property {string} site empty string when there is no site
@@ -156,6 +157,7 @@ export { waterTypeOf };
 /**
  * @typedef {Object} DiveDetail
  * @property {number} id
+ * @property {string} benthicId the stable id; empty until one is assigned
  * @property {number} number
  * @property {string} date
  * @property {string} site
@@ -331,6 +333,7 @@ export { waterTypeOf };
  * A planned dive of the logbook (list_plans).
  * @typedef {Object} PlannedDive
  * @property {number} id
+ * @property {string} benthicId the plan's stable id; empty until one is assigned
  * @property {string} date
  * @property {number} when
  * @property {string} site
@@ -616,6 +619,15 @@ export { waterTypeOf };
  *   consent). Rejects with NOT_SIGNED_IN.
  * @property {() => Promise<void>} serverSessionClear
  *   Signs out of the Benthic server: the tokens are erased.
+ * @property {(options: {id: number, url: string, token: string}) => Promise<void>} pushStreamOpen
+ *   The push channel (to-do #185, lib/push-events.js): opens the Server-Sent Events stream `url` with the session token
+ *   (`Authorization: Bearer`) on a background thread and returns at once. What happens comes by the `pushStream` event,
+ *   `{id, kind: 'open'|'line'|'closed', line?, status?, message?}`: `open` when the server answered 200, one `line` per
+ *   line of the stream (blank lines included), `closed` when the connection ended (`status` is the HTTP status, 0 when
+ *   it failed before an answer). A new open with another id closes the previous one. The connection lives as long as the
+ *   app process (foreground or background; no foreground service, no wake lock).
+ * @property {(options: {id: number}) => Promise<void>} pushStreamClose
+ *   Closes that connection; no event follows.
  * @property {(options?: {keepAlpha?: boolean}) => Promise<void>} devResetApp
  *   DEVELOPMENT ONLY (debug builds: rejects NOT_DEBUG otherwise): the app's own data is erased as on a first install. The
  *   core closes its log; the device logbook, the working copies of the server, every credential and the data key, the
@@ -687,6 +699,22 @@ export { waterTypeOf };
  *   Up to 4 MB of a staged file, base64, with the file's size: to look at the start of a logbook or scan it.
  * @property {(options: {name: string, parts: ({path: string, start: number, end: number}|{text: string})[]}) => Promise<{path: string}>} assembleFile
  *   A new staged file made of byte ranges of staged files and literal text, copied in order.
+ * @property {(options: {path: string}) => Promise<{hash: string, size: number}>} mediaAdopt
+ *   Dive photos and videos (docs/architecture.md, 11.6). A staged file (stageImport, in pieces) becomes the object of its
+ *   content: hashed (SHA-256, streamed) and moved into the device's media folder under that hash; if the object is already
+ *   there the staged file is deleted. Never altered or recompressed. Rejects BAD_REQUEST, NOT_FOUND.
+ * @property {(options: {data: string}) => Promise<{hash: string, size: number}>} mediaPutBytes
+ *   The same for small bytes (base64): a thumbnail, a 256 px JPEG, is an object of its own.
+ * @property {(options: {hash: string}) => Promise<{exists: boolean, size: number, path: string}>} mediaStat
+ *   Whether the device holds the object; `path` is its file (for fileUrl / convertFileSrc), '' when absent.
+ * @property {(options: {hash: string, url: string, headers?: Record<string, string>}) => Promise<{status: number}>} mediaUpload
+ *   PUT of the object's file to a signed URL, streamed from the file (never through the bridge). `status` is the
+ *   storage's answer (2xx: stored). Rejects NOT_FOUND (no such object here), NETWORK.
+ * @property {(options: {hash: string, url: string}) => Promise<{size: number}>} mediaDownload
+ *   GET of a signed URL, streamed into the media folder; the SHA-256 of what came is checked against `hash` before the
+ *   object is kept. Rejects HASH_MISMATCH, NETWORK, HTTP_<status>.
+ * @property {(options: {hash: string}) => Promise<void>} mediaDelete
+ *   Forgets the object on this device (the server's copy is untouched).
  * @property {(options: {path: string}) => Promise<{dives: number}>} importCount
  *   Import step 2, read-only: the dives of the downloaded file (IMPORT_FAILED).
  * @property {(options: {path: string, companionPath?: string, name: string, params: CsvParams, dryRun: boolean}) => Promise<any>} importCsv
@@ -739,6 +767,10 @@ export { waterTypeOf };
  *   The same changes on several dives, one undoable step (edit_dives in benthic.h): site (uuid), notes, suit,
  *   userSalinity, diveguide, and the chip lists buddiesAdd/buddiesRemove, diveguideAdd/diveguideRemove,
  *   tagsAdd/tagsRemove (only those names are added or removed, per dive).
+ * @property {(options: {action: 'audit'|'assign', assignments?: string}) => Promise<any>} benthicIds
+ *   The stable dive ids (benthic_ids_json and assign_benthic_ids in benthic.h; not an undo step). `audit` lists every dive
+ *   of the log, hidden ones too, as `{id, benthicId, when, plan}[]`; `assign` writes `assignments`, a JSON object core id
+ *   to Benthic id (it replaces an id already there), and answers `{assigned}`. Saved with the next save (commit "Benthic ids").
  * @property {(options: {ids: number[], start: number, numbers?: number[]}) => Promise<EditResult>} renumberDives
  *   Renumbers the dives (all if ids is empty) in date order from start, one undoable step (renumber_dives);
  *   with numbers (one per id), each dive gets its own number instead.
@@ -769,9 +801,9 @@ export { waterTypeOf };
  *   corrected; it rejects with NO_RESULT when all four are empty.
  * @property {(options: {tripId: number}) => Promise<TripDetail>} getTrip
  *   "remove" takes diveId, or diveIds for several dives in one step.
- * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create'|'autogroup', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
- *   One undoable trip change, as Subsurface's trip commands; "autogroup" (value "on" or
- *   "off") sets the log's trip grouping, as Subsurface's View > Autogroup.
+ * @property {(options: {action: 'location'|'notes'|'remove'|'split'|'merge'|'add'|'ungroup'|'create', tripId?: number, diveId?: number, otherId?: number, diveIds?: number[], value?: string}) => Promise<EditResult>} tripAction
+ *   One undoable trip change, as Subsurface's trip commands. Benthic never groups dives
+ *   into trips by itself, so there is no "autogroup" action.
  * @property {(options?: {includeInvalid?: boolean}) => Promise<Dive[]>} listLoadedDives
  *   The dives of the log in memory, without loading anything. includeInvalid also returns hidden invalid dives.
  * @property {(options: {name: string, base64: string}) => Promise<{uri: string}>} writeShareFile
@@ -875,9 +907,13 @@ export { waterTypeOf };
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
- * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'sharedFile'|'stageProgress', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
+ * @property {() => Promise<void>} openNotificationSettings opens the system's notification settings for Benthic (Android: the app's
+ *   notification page; iOS: the app's page in Settings); the desktop has none. Inbox task 2026-11-23-356, part 4.
+ * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'sharedFile'|'stageProgress'|'pushStream'|'accessRequestOpened', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
  *   bluetoothDevice gives a BluetoothDevice, downloadProgress a DownloadProgress, syncProgress
- *   {message}: each message of the core's git work while the cloud log syncs (benthic.h,
+ *   accessRequestOpened {requestId} (Android): the system notification of an access request was touched, kept until a listener exists
+ *   (cold start); iOS gets the same through the push plugin's pushNotificationActionPerformed.
+ *   syncProgress {message}: each message of the core's git work while the cloud log syncs (benthic.h,
  *   set_sync_progress), in English, e.g. "Transfer from storage (30/80)".
  */
 
@@ -894,11 +930,27 @@ let coreErrorHook = null;
 
 /**
  * The core answers some expected states with a generic CORE_ERROR and only the message tells them apart: no account is set
- * (the beta's local logbook has none). They are never a fault, so never a report.
+ * (the beta's local logbook has none); a dive id the core no longer holds (the log was read again since the id was taken, the
+ * app asks again under the dive's new id). They are never a fault, so never a report.
  * @param {unknown} message
  */
 export function isExpectedCoreMessage(message) {
-  return typeof message === 'string' && /account not configured|repository not configured/i.test(message);
+  return (
+    typeof message === 'string' &&
+    (/account not configured|repository not configured|dive not found/i.test(message) || isUnreachableCoreMessage(message))
+  );
+}
+
+/**
+ * The server could not be reached (libgit2's and the system's words): no network, the server down, a development device
+ * whose USB port forward was lost. The logbook shows « hors ligne » and tries again later: a normal state, not a fault, so
+ * never a report. A refused certificate, a refused sign-in or an unreadable logbook is not in this list and still reports.
+ * @param {string} message
+ */
+export function isUnreachableCoreMessage(message) {
+  return /failed to connect|connection refused|connection reset|connection timed out|operation timed out|timeout was reached|could not resolve|failed to resolve|name or service not known|no such host|network is unreachable|no route to host|host is down|unable to resolve/i.test(
+    message,
+  );
 }
 
 /**
@@ -990,6 +1042,8 @@ export const BenthicCore = {
   serverSessionInfo: () => native.serverSessionInfo(),
   serverSessionAccess: () => native.serverSessionAccess(),
   serverSessionClear: () => native.serverSessionClear(),
+  pushStreamOpen: (options) => native.pushStreamOpen(options),
+  pushStreamClose: (options) => native.pushStreamClose(options),
   devResetApp: (options) => native.devResetApp(options ?? {}),
   dataKeyRead: () => native.dataKeyRead(),
   dataKeyWrite: (options) => native.dataKeyWrite(options),
@@ -1034,6 +1088,12 @@ export const BenthicCore = {
   stageSharedFile: (options) => native.stageSharedFile(options),
   cancelStage: (options) => native.cancelStage(options),
   readFileChunk: (options) => native.readFileChunk(options),
+  mediaAdopt: (options) => native.mediaAdopt(options),
+  mediaPutBytes: (options) => native.mediaPutBytes(options),
+  mediaStat: (options) => native.mediaStat(options),
+  mediaUpload: (options) => native.mediaUpload(options),
+  mediaDownload: (options) => native.mediaDownload(options),
+  mediaDelete: (options) => native.mediaDelete(options),
   assembleFile: (options) => native.assembleFile(options),
   divelogsDownload: (options) => native.divelogsDownload(options),
   importCount: (options) => native.importCount(options),
@@ -1078,6 +1138,9 @@ export const BenthicCore = {
   },
   async editDives(options) {
     return JSON.parse((await native.editDives(options)).json);
+  },
+  async benthicIds(options) {
+    return JSON.parse((await native.benthicIds(options)).json);
   },
   async renumberDives(options) {
     return JSON.parse((await native.renumberDives(options)).json);
@@ -1191,6 +1254,7 @@ export const BenthicCore = {
     return JSON.parse((await native.downloadPartial(options)).json);
   },
   cancelDownload: () => native.cancelDownload(),
+  openNotificationSettings: () => native.openNotificationSettings(),
   addListener(event, listener) {
     if (event === 'bluetoothDevice')
       return native.addListener(event, (/** @type {any} */ d) => listener({ ...d, computer: JSON.parse(d.computer || 'null') }));

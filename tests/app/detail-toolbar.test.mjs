@@ -10,7 +10,7 @@ test('the dive detail toolbar: edit, plan, share, more, in that order, and no ma
   const block = src.slice(src.indexOf('<FloatingToolbar'), src.indexOf('/>', src.indexOf('<FloatingToolbar')));
   const keys = [...block.matchAll(/key: '(\w+)'/g)].map((m) => m[1]);
   assert.deepEqual(keys, ['edit', 'plan', 'share', 'more']);
-  assert.match(block, /\/plan\/\$\{diveId\}/);
+  assert.match(block, /\/plan\/\$\{diveParam\}/);
 });
 
 test('the overflow menu names its items in the menu order, validation only with Benthic+', () => {

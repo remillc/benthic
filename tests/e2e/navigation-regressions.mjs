@@ -65,12 +65,12 @@ export async function regressionFlows(h) {
   // the planner by the list of plans), « Nouveau plan », then Back twice: the view was left with no current page.
   console.log(' dive > plan from the dive > Retour (the plans) > new plan > Back > Back');
   await tapDive(tab);
-  await settled(tab, 'plans: dive opened', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'plans: dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   const dive = await route(tab);
   await sleep(400);
   await tapText(tab, 'Planifier depuis cette plongée|Plan from this dive');
-  await reach(tab, /^\/plan\/\d+$/);
-  await settled(tab, 'plans: the planner opened from the dive', { route: /^\/plan\/\d+$/, setup: true });
+  await reach(tab, /^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/);
+  await settled(tab, 'plans: the planner opened from the dive', { route: /^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await tapText(tab, '^\\s*(Retour|Back)\\s*$', '.page-current .navbar, .page-current');
   await reach(tab, '/plans/');
   await settled(tab, 'plans: Retour shows the plans', { route: '/plans/' });
@@ -141,7 +141,7 @@ export async function regressionFlows(h) {
     await sleep(400);
     await settled(tab, `section ${gap} ms after a dive: the Logbook view is at rest`, {});
     const where = await route(tab);
-    expect(`section ${gap} ms after a dive: on the dive or the list`, { ok: true }, { ok: where === '/' || /^\/dives\/\d+$/.test(where) });
+    expect(`section ${gap} ms after a dive: on the dive or the list`, { ok: true }, { ok: where === '/' || /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/.test(where) });
     if (where !== '/') {
       await hardwareBack(tab);
       await settled(tab, `section ${gap} ms after a dive: Back to the list`, { route: '/' });
@@ -212,13 +212,13 @@ export async function regressionFlows(h) {
   // was: the planner stayed under the new dive, and the next tap in the list left two dives in the pane.
   console.log(' tablet: the planner opened in the pane, then a dive tapped in the list, then another');
   await tapText(wide, 'Planifier depuis cette plongée|Plan from this dive', '.view.tab-active > .page-master-detail.page-current');
-  for (let i = 0; i < 50 && !/^\/plan\/\d+$/.test(await route(wide)); i++) await sleep(100);
-  await settled(wide, 'tablet pane: the planner is in the pane', { split: true, route: /^\/plan\/\d+$/, setup: true });
+  for (let i = 0; i < 50 && !/^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/.test(await route(wide)); i++) await sleep(100);
+  await settled(wide, 'tablet pane: the planner is in the pane', { split: true, route: /^\/plan\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   for (const n of [0, 3]) {
     await tapRow(n);
-    for (let i = 0; i < 30 && !/^\/dives\/\d+$/.test(await route(wide)); i++) await sleep(100);
+    for (let i = 0; i < 30 && !/^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/.test(await route(wide)); i++) await sleep(100);
     await sleep(600);
-    await settled(wide, `tablet pane: dive ${n} of the list replaces the pane`, { split: true, route: /^\/dives\/\d+$/ });
+    await settled(wide, `tablet pane: dive ${n} of the list replaces the pane`, { split: true, route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/ });
     const stack = await wide.run(readStack);
     expect(`tablet pane: the list and one dive, a history of two (dive ${n})`, { pages: 2, history: 2 }, { pages: stack.pages.length, history: stack.history.length });
   }

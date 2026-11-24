@@ -25,6 +25,19 @@
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:excludeFromRecents="true" />
+        <!-- Firebase Cloud Messaging data messages (inbox task 2026-11-23-356): this service builds the notification of an access
+             request; the push plugin's own service, which shows nothing for a data message, is removed in the app's manifest. -->
+        <service
+            android:name="app.benthicdivelog.core.BenthicMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
     </application>
 
     <!-- Sharing a dive: the apps that can receive a file, to grant them read

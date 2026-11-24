@@ -23,7 +23,10 @@
   import { isRelease } from '../lib/edition.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { loadValidations, refreshPending, removeValidation, validations, validationsOf } from '../lib/validation.svelte.js';
-  import { loadInventory, equipmentOf, gearMap } from '../lib/inventory.svelte.js';
+  import { loadInventory, equipmentOf, gearMap, gear } from '../lib/inventory.svelte.js';
+  import { diveKeyOf } from '../lib/inventory.js';
+  import { coreIdOfParam, diveParamOf, diveUrl } from '../lib/dive-id.js';
+  import { isShortId } from '../lib/short-id.js';
   import { equipmentIsEmpty } from '../lib/inventory.js';
   import ComputersSheet from '../components/ComputersSheet.svelte';
   import { cylinderListed, equipmentLabel, equipmentOpens, computerList, fillLevels, gasChangeLine, gasChanges, gasGroupLabel, unusedShown } from '../lib/gas-summary.js';
@@ -39,7 +42,7 @@
   import { qrSummary } from '../lib/qr-send.js';
   import SiteHeaderImage from '../components/SiteHeaderImage.svelte';
   import { sharePdf, shareSummary, shareLink, shareTitle } from '../lib/share.js';
-  import { diveLink } from '../lib/deep-link.js';
+  import { diveIdLink, diveLink } from '../lib/deep-link.js';
   import { filter } from '../lib/filter.svelte.js';
   import { horizontalSwipe, swipeGoesThrough, settle } from '../lib/swipe.js';
   import Stars from '../components/Stars.svelte';
@@ -49,10 +52,13 @@
   import { layout, desktopMac } from '../lib/layout.svelte.js';
   import { shownTrip } from '../lib/trip-shown.js';
   import { settings } from '../lib/settings.svelte.js';
+  import DiveMediaSection from '../components/DiveMediaSection.svelte';
+  import { diveMediaEnabled } from '../lib/dive-media.svelte.js';
   import { offerUndo } from '../lib/undo.js';
   import { feedbackOf, visibleTags, withFeedback } from '../lib/weight-feedback.js';
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
+  import { currentDiveId, onDiveIdsRenumbered } from '../lib/dive-ids.js';
   import { forgetDive, keepDive, loadDive as readDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
@@ -106,7 +112,7 @@
     // The same kind of route as this one: /dives/<id> (beside the list in the
     // Logbook) or /trips/<trip>/dives/<id>; only the dive changes.
     const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
-    f7router.navigate(`${base}${id}`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
+    f7router.navigate(`${base}${diveParamOf(id)}`, { reloadCurrent: true, props: { slide: step > 0 ? 'next' : 'previous' } });
   }
 
   /** The neighbour dive's id on the side of a swipe of `dx`, or undefined. @param {number} dx */
@@ -276,7 +282,45 @@
 
   const uid = $props.id();
   const menuId = `dive-menu-${uid}`;
-  const diveId = $derived(f7route.params.id);
+  // The address holds the dive's Benthic id (lib/dive-id.js); `diveId` is the core's id of the dive in this session, for the
+  // core's calls. Every address built here uses `diveParam`. The core numbers its dives again whenever it reads the log again
+  // (a change from another device arrives): a Benthic id in the address still names the dive, so the page only reads it again;
+  // an old numeric address (a dive with no id yet, a link in flight) follows the renumbering: `renumbered` holds the new
+  // address from that moment, until the route says the same.
+  let renumbered = $state(/** @type {string|null} */ (null));
+  const diveParam = $derived(renumbered ?? f7route.params.id);
+  const diveId = $derived(String(coreIdOfParam(diveParam)));
+
+  /** The dive shown has a new id (the log was read again), or is gone: the route follows in place, with no page change. */
+  function followRenumbering() {
+    if (preview) return;
+    // This page is the one the router shows (another page may lie over it).
+    const shown = f7router.currentRoute?.url === f7route.url;
+    const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
+    const gone = () => {
+      showSnackbar(t('detail.deletedElsewhere'));
+      if (!shown) return;
+      if (layout.split) f7router.navigate('/pane/empty', { reloadDetail: true, animate: false });
+      else f7router.back();
+    };
+    if (isShortId(diveParam)) {
+      if (!coreIdOfParam(diveParam)) return gone();
+      forgetDive(Number(diveId));
+      loadDive();
+      return;
+    }
+    const was = Number(diveParam);
+    const now = currentDiveId(was);
+    if (now === was) return;
+    forgetDive(was);
+    if (now === null) return gone();
+    renumbered = diveParamOf(now);
+    if (!shown) {
+      loadDive();
+      return;
+    }
+    f7router.navigate(`${base}${renumbered}`, layout.split ? { reloadDetail: true, animate: false } : { reloadCurrent: true, animate: false });
+  }
 
   // "Delete the dive" (⋮ menu, task 2026-11-07-28, to-do #15): the same
   // confirmation as a Logbook selection of one dive, then the core's undoable
@@ -320,7 +364,7 @@
     try {
       await deleteDive(id);
       forgetDive(id);
-      if (layout.split && next) f7router.navigate(`/dives/${next.id}`, { reloadDetail: true });
+      if (layout.split && next) f7router.navigate(diveUrl(next), { reloadDetail: true });
       else f7router.back();
       offerUndo(t('detail.deleted'), undefined, 10000);
     } catch (e) {
@@ -396,7 +440,7 @@
   // Prepared before the swipe that led here (dive-preload.js): shown from the
   // first frame, then read again from the core in case it changed.
   // svelte-ignore state_referenced_locally
-  let dive = $state(/** @type {import('benthic-core').DiveDetail|null} */ (preview ?? readyDive(Number(f7route.params.id))));
+  let dive = $state(/** @type {import('benthic-core').DiveDetail|null} */ (preview ?? readyDive(coreIdOfParam(f7route.params.id))));
   let failed = $state(false);
   const prefs = $derived(logbook.prefs);
   const diveNumber = $derived(logbook.dives.find((d) => d.id === dive?.id)?.number ?? dive?.number ?? 0);
@@ -417,7 +461,8 @@
       // The first screen is up: what waited for it starts (lib/startup.svelte.js).
       if (!preview && !f7route.params.trip) startup.detail = true;
     } catch (e) {
-      console.error('Dive detail', e);
+      // A dive that is gone (deleted on another device) is handled by `followRenumbering`, not reported.
+      if (!/dive not found/i.test(String(/** @type {any} */ (e)?.message ?? e))) console.error('Dive detail', e);
       failed = true;
       return;
     }
@@ -437,9 +482,11 @@
   const validationItems = $derived(dive && benthicPlusSubscriber() ? validationsOf(dive) : []);
   onMount(() => {
     if (preview) return;
+    const stopFollowing = onDiveIdsRenumbered(followRenumbering);
     if (benthicPlusSubscriber()) (validations.ready ? Promise.resolve() : loadValidations()).then(refreshPending).catch((e) => console.error('Validations', e));
     if (isRelease) loadInventory();
-    return loadDive();
+    loadDive();
+    return stopFollowing;
   });
 
   /** « Ordinateurs de cette plongée » open (task 2026-11-14-144), and a change of main computer running. */
@@ -518,7 +565,7 @@
     // The profile chart of this page (the current one in its view).
     const svg = /** @type {SVGSVGElement|null} */ (document.querySelector('.page-current .bc-dive-profile--profile .bc-dive-profile--frame svg'));
     try {
-      if (kind === 'link') await shareLink(diveLink(dive.date) ?? '', shareTitle(dive));
+      if (kind === 'link') await shareLink(diveIdLink(dive.benthicId) ?? diveLink(dive.date) ?? '', shareTitle(dive));
       else if (kind === 'pdf') await sharePdf(dive, prefs, svg);
       else await shareSummary(dive, prefs, svg);
     } catch (e) {
@@ -863,7 +910,7 @@
     {/snippet}
     {#snippet right()}
       {#if theme.ios}
-        <Link href="/dives/{diveId}/edit">{t('detail.edit')}</Link>
+        <Link href="/dives/{diveParam}/edit">{t('detail.edit')}</Link>
         <Link iconOnly popoverOpen="#{menuId}">
           <Icon name="moreCircle" /><span class="bc-sr-only">{selectionMenuActive ? t('logbook.selectionActions') : t('detail.moreOptions')}</span>
         </Link>
@@ -886,7 +933,7 @@
             text={t('detail.edit')}
             onclick={() => {
               f7.popover.close(`#${menuId}`);
-              f7router.navigate(`/dives/${diveId}/edit`);
+              f7router.navigate(`/dives/${diveParam}/edit`);
             }}
           />
         {/if}
@@ -895,7 +942,7 @@
           text={t('detail.plan')}
           onclick={() => {
             f7.popover.close(`#${menuId}`);
-            f7router.navigate(`/plan/${diveId}`);
+            f7router.navigate(`/plan/${diveParam}`);
           }}
         />
         <MenuItem
@@ -911,7 +958,7 @@
       <!-- This page's router, not a link: the menu opens at the app's root, where a
            link would use the Carnet's view even when the dive is shown in another section. -->
       {#if theme.ios && !selectionMenuActive}
-        <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)} />
+        <MenuItem icon="plan" text={t('detail.plan')} onclick={() => f7router.navigate(`/plan/${diveParam}`)} />
       {/if}
       {#if benthicPlusSubscriber()}
         <MenuItem
@@ -994,7 +1041,7 @@
           <h1 class="bc-dive-detail--desk-title">{diveNumber ? t('desktop.diveTitle', { number: diveNumber, site: dive.site || t('desktop.noSite') }) : dive.site || t('desktop.noSite')}</h1>
           <p class="bc-dive-detail--desk-sub bc-value">{[formatDate(dive.date) + ', ' + formatTimeOfDay(dive.date), location, dive.computer].filter(Boolean).join(' · ')}</p>
         </div>
-        <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveId}`)}><Icon name="plan" size={22} /></button>
+        <button type="button" class="bc-dive-detail--desk-action" aria-label={t('desktopDetail.plan')} title={t('desktopDetail.plan')} onclick={() => f7router.navigate(`/plan/${diveParam}`)}><Icon name="plan" size={22} /></button>
         {#if benthicPlusSubscriber()}
           <button type="button" class="bc-dive-detail--desk-action" aria-label={t('validation.menuOne')} title={t('desktopDetail.validate')} onclick={startValidation}><Icon name="seal" size={22} /></button>
         {/if}
@@ -1212,20 +1259,15 @@
       </section>
     {/if}
 
-    <!-- Only with "Afficher les champs photos et vidéos" (off by default, task 2026-11-12-65); the pictures stay in the logbook. -->
+    <!-- The Photos et vidéos section is for Benthic+ subscribers (task 2026-11-23-370); the pictures stay in the logbook. -->
     {#if desk}
       <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={trip ? trip.location || t('trip.startingOn', { date: formatDate(logbook.dives.filter((d) => d.trip?.id === trip.id).map((d) => d.date).sort()[0]) }) : ''} {sac} gasChanges={gasChangesLine} />
     {/if}
 
-    {#if !desk && dive.pictures > 0 && settings.showPhotos}
-      <section class="bc-dive-detail--section">
-        <h2 class="bc-dive-detail--section-title">{t('detail.photos')}</h2>
-        <div class="bc-dive-detail--group">
-          <div class="bc-dive-detail--row">
-            <span class="bc-dive-detail--stacked"><span>{t('detail.photoCount', { n: dive.pictures })}</span><span class="bc-dive-detail--sub">{t('detail.photoNote')}</span></span>
-          </div>
-        </div>
-      </section>
+    <!-- Benthic+ only (tasks 2026-11-23-359 and 370): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
+         the line about references on another device is gone. The pictures referenced in the logbook stay untouched. -->
+    {#if diveMediaEnabled() && !preview}
+      <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} dive={{ number: diveNumber, site: dive.site, date: dive.date, samples: dive.samples, siteCoordinates: dive.siteCoordinates }} {prefs} />
     {/if}
 
     <div class="bc-dive-detail--end" aria-hidden="true"></div>
@@ -1238,9 +1280,9 @@
         label={t('detail.actions')}
         clearFab={layout.split && !layout.rail && navigation.section === 'logbook'}
         actions={[
-          { key: 'edit', icon: 'edit', label: t('detail.edit'), text: t('detail.edit'), onclick: () => f7router.navigate(`/dives/${diveId}/edit`) },
+          { key: 'edit', icon: 'edit', label: t('detail.edit'), text: t('detail.edit'), onclick: () => f7router.navigate(`/dives/${diveParam}/edit`) },
           // This page's router, not a link: see the overflow menu. Plan before Share (task 2026-11-12-59).
-          { key: 'plan', icon: 'plan', label: t('detail.plan'), onclick: () => f7router.navigate(`/plan/${diveId}`) },
+          { key: 'plan', icon: 'plan', label: t('detail.plan'), onclick: () => f7router.navigate(`/plan/${diveParam}`) },
           { key: 'share', icon: 'share', label: t('share.title'), onclick: () => (sharing = true) },
           { key: 'more', icon: 'more', label: moreOptionsLabel, menu: `#${menuId}` },
         ]}
@@ -1635,29 +1677,6 @@
 
       &:first-child {
         border-top: none;
-      }
-    }
-
-    /* A label with a second line under it (computer role, photos). */
-    .bc-dive-detail--stacked {
-      padding: 10px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      :global(.md) & {
-        padding: 0;
-      }
-
-      .bc-dive-detail--sub {
-        font-size: 13px;
-        line-height: 18px;
-        color: var(--bc-text-2);
-
-        :global(.md) & {
-          font-size: 14px;
-          line-height: 20px;
-        }
       }
     }
 

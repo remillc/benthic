@@ -112,6 +112,8 @@ export class BenthicCoreDesktop extends WebPlugin {
       // The messages of the cloud log's git work, as the Android plugin's "syncProgress" ({message}).
       bridge.onCoreEvent('syncProgress', (/** @type {any} */ data) => this.notifyListeners('syncProgress', data));
       bridge.onCoreEvent('gitProgress', (/** @type {any} */ data) => this.notifyListeners('gitProgress', data));
+      // The push channel's stream (bridge.cjs).
+      bridge.onCoreEvent('pushStream', (/** @type {any} */ data) => this.notifyListeners('pushStream', data));
       // The core's process died and started again: what was loaded is gone.
       bridge.onCoreEvent('coreRestarted', () => this.notifyListeners('coreRestarted', {}));
     }
@@ -507,8 +509,18 @@ export class BenthicCoreDesktop extends WebPlugin {
     await this.bridge.credentials.set('datakey', { key: options?.key ?? '' });
   }
 
+  /** The push channel (lib/push-events.js): the stream is read in the main process; see bridge.cjs. */
+  async pushStreamOpen(options) {
+    await this.bridge.push.open({ id: options?.id, url: options?.url, token: options?.token });
+  }
+
+  async pushStreamClose(options) {
+    await this.bridge.push.close({ id: options?.id });
+  }
+
   /** Signs out of the Benthic server. */
   async serverSessionClear() {
+    await this.bridge.push?.close({}).catch(() => {});
     await this.bridge.credentials.clear('server');
   }
 
@@ -620,6 +632,40 @@ export class BenthicCoreDesktop extends WebPlugin {
   async readFileChunk(options) {
     if (!this.isImportFile(options?.path ?? '')) throw reject('BAD_REQUEST');
     return this.bridge.fs.readChunk({ path: options.path, offset: options.offset ?? 0, length: options.length ?? 65536 });
+  }
+
+  // --- Dive photos and videos (the objects of docs/architecture.md, 11.6): files in <userData>/media, by hash ---
+
+  /** @param {{path?: string}} options */
+  async mediaAdopt(options) {
+    if (!this.isImportFile(options?.path ?? '')) throw reject('BAD_REQUEST');
+    return this.bridge.media.call('adopt', { path: options.path });
+  }
+
+  /** @param {{data?: string}} options */
+  async mediaPutBytes(options) {
+    if (typeof options?.data !== 'string') throw reject('BAD_REQUEST');
+    return this.bridge.media.call('putBytes', { base64: options.data });
+  }
+
+  /** @param {{hash?: string}} options */
+  async mediaStat(options) {
+    return this.bridge.media.call('stat', { hash: options?.hash });
+  }
+
+  /** @param {{hash?: string, url?: string, headers?: Record<string, string>}} options */
+  async mediaUpload(options) {
+    return this.bridge.media.call('upload', { hash: options?.hash, url: options?.url, headers: options?.headers ?? {} });
+  }
+
+  /** @param {{hash?: string, url?: string}} options */
+  async mediaDownload(options) {
+    return this.bridge.media.call('download', { hash: options?.hash, url: options?.url });
+  }
+
+  /** @param {{hash?: string}} options */
+  async mediaDelete(options) {
+    await this.bridge.media.call('delete', { hash: options?.hash });
   }
 
   /**
@@ -829,6 +875,12 @@ export class BenthicCoreDesktop extends WebPlugin {
   async editDives(options) {
     if (!options?.ids?.length || options.changes == null) throw reject('Missing ids or changes', 'BAD_ARGUMENT');
     return { json: await this.core('editDives', { ids: options.ids, changes: JSON.stringify(options.changes) }) };
+  }
+
+  /** The stable dive ids. @param {{action?: 'audit'|'assign', assignments?: string}} options */
+  async benthicIds(options) {
+    if (options?.action !== 'audit' && options?.action !== 'assign') throw reject('Missing action', 'BAD_ARGUMENT');
+    return { json: await this.core('benthicIds', { action: options.action, assignments: options.assignments ?? '{}' }) };
   }
 
   /** @param {{start?: number, ids?: number[], numbers?: number[]}} options */
@@ -1051,6 +1103,9 @@ export class BenthicCoreDesktop extends WebPlugin {
   async cancelDownload() {
     await this.core('downloadCancel');
   }
+
+  /** The desktop has no push notification: nothing to open. */
+  async openNotificationSettings() {}
 
   // --- What belongs to a phone ---
 

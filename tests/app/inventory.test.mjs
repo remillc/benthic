@@ -23,6 +23,7 @@ import {
   readOnlyInfo,
   ReadOnlyError,
 } from '../../app/src/lib/inventory.js';
+import { isShortId } from '../../app/src/lib/short-id.js';
 
 function setup() {
   const backend = memoryBackend();
@@ -129,10 +130,10 @@ test('IndexedDB applies a confirmed server state with the same concurrent-edit p
   await exerciseSyncedApply(store);
 });
 
-test('a piece gets a UUID v4, is written under gear/<id>.json and keeps unknown fields', async () => {
+test('a piece gets a short id, is written under gear/<id>.json and keeps unknown fields', async () => {
   const { inventory, store } = setup();
   const g = await inventory.saveGear(piece('regulator', '  Apeks XTX50 ', { brand: 'Apeks', note: '' }));
-  assert.ok(isUuid(g.id));
+  assert.ok(isShortId(g.id));
   assert.equal(g.name, 'Apeks XTX50');
   assert.equal('note' in g, false, 'an empty text is not stored');
   const file = await store.read(`gear/${g.id}.json`);
@@ -224,7 +225,7 @@ test('a piece outside the inventory lives on its dive only', async () => {
   const { inventory } = setup();
   const e = addToEquipment(emptyEquipment(), { adhocName: ' Saucisse ' });
   assert.deepEqual(e.adhoc.map((p) => p.name), ['Saucisse']);
-  assert.ok(isUuid(e.adhoc[0].id));
+  assert.ok(isShortId(e.adhoc[0].id));
   assert.equal(addToEquipment(e, { adhocName: 'saucisse' }).adhoc.length, 1, 'the same name twice is one piece');
   assert.equal(addToEquipment(e, { adhocName: '   ' }).adhoc.length, 1);
   await inventory.saveDiveEquipment('2014-04-02T10:00:00', e);
@@ -376,8 +377,9 @@ test('a kit summary names its first pieces and leaves the computers out', () => 
   assert.equal(kitSummary({ gearIds: ['2', '3'] }, m, 1), 'Apeks');
 });
 
-test('ids are UUID v4', () => {
-  assert.ok(isUuid(newId()));
+test('ids are short ids, not UUIDs', () => {
+  assert.ok(isShortId(newId()));
+  assert.equal(isUuid(newId()), false);
   assert.notEqual(newId(), newId());
   assert.equal(isUuid('123'), false);
 });

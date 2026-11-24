@@ -7,6 +7,7 @@ import { BenthicCore } from 'benthic-core';
 import { deviceStore } from './device-store.js';
 import { DEFAULT_COLUMNS, DEFAULT_SORT, EMPTY_SELECTION, cleanColumnWidths } from './desktop-table.js';
 import { logbookKey } from './window-logbook.js';
+import { currentDiveId, currentDiveIds, onDiveIdsRenumbered } from './dive-ids.js';
 
 const SORT_KEY = 'bc.desktopSort';
 // The columns and their widths belong to the logbook the window holds (task 2026-11-15-181): the main logbook keeps
@@ -24,6 +25,9 @@ function remembered(key, fallback) {
     return fallback;
   }
 }
+
+/** @param {number|null} id */
+const followed = (id) => (id === null ? null : currentDiveId(id));
 
 export const desk = $state({
   /** @type {import('./desktop-table.js').Selection} */
@@ -92,3 +96,10 @@ export async function loadExtras() {
     console.error('Desktop columns', e);
   }
 }
+
+// The core read the log again (a change from another device): the selected dives keep their new ids, the deleted ones leave.
+onDiveIdsRenumbered(() => {
+  const { ids, anchor, focus } = desk.selection;
+  if (!ids.length) return;
+  desk.selection = { ids: currentDiveIds(ids), anchor: followed(anchor), focus: followed(focus) };
+});

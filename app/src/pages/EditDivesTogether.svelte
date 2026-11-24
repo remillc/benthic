@@ -28,6 +28,7 @@
   import { offerUndo } from '../lib/undo.js';
   import { WATER_TYPES, waterTypeName, waterTypeOfSalinity } from '../lib/tools.js';
   import { t } from '../lib/i18n.js';
+  import { liveDiveId } from '../lib/dive-ids.js';
 
   /** @type {{ f7route: { query: { ids?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
@@ -66,7 +67,7 @@
 
   onMount(async () => {
     try {
-      const details = await Promise.all(ids.map((id) => BenthicCore.getDive({ id })));
+      const details = await Promise.all(ids.map((id) => BenthicCore.getDive({ id: liveDiveId(id) })));
       const s = multiEditState(details);
       siteName = s.site.value;
       notes = s.notes.mixed ? '' : s.notes.value;

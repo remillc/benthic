@@ -524,7 +524,7 @@ static void send_sync_progress(const char *message)
 	return ns(json);
 }
 
-// action: location, notes, remove, split, merge, add, ungroup, create, autogroup.
+// action: location, notes, remove, split, merge, add, ungroup, create.
 + (NSString *)tripAction:(NSString *)actionIn
 		  tripId:(NSInteger)tripId
 		  diveId:(NSInteger)diveId
@@ -551,8 +551,6 @@ static void send_sync_progress(const char *message)
 		ret = benthic::trip_ungroup((int)tripId, json, message);
 	else if (action == "create")
 		ret = benthic::trip_create(ids, json, message);
-	else if (action == "autogroup")
-		ret = benthic::trips_autogroup(value == "on", json, message);
 	else {
 		ret = -1;
 		message = "BAD_REQUEST: unknown action " + action;
@@ -657,6 +655,21 @@ static void send_sync_progress(const char *message)
 	std::string json, message;
 	int ret = benthic::edit_dives(ints(ids), str(changes), json, message);
 	return edit_or_fail(ret, json, message, error);
+}
+
++ (NSString *)benthicIds:(NSString *)action assignments:(NSString *)assignments error:(NSError **)error
+{
+	std::string json, message;
+	int ret = 0;
+	if (str(action) == "audit")
+		ret = benthic::benthic_ids_json(json);
+	else
+		ret = benthic::assign_benthic_ids(str(assignments), json, message);
+	if (ret) {
+		fail(error, message);
+		return nil;
+	}
+	return ns(json);
 }
 
 + (NSString *)renumberDives:(NSArray<NSNumber *> *)ids

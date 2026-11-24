@@ -545,8 +545,6 @@ Java_app_benthicdivelog_core_NativeCore_tripAction(JNIEnv *env, jobject, jstring
 		ret = benthic::trip_ungroup(tripId, json, error);
 	else if (action == "create")
 		ret = benthic::trip_create(ids, json, error);
-	else if (action == "autogroup")
-		ret = benthic::trips_autogroup(value == "on", json, error);
 	else {
 		ret = -1;
 		error = "BAD_REQUEST: unknown action " + action;
@@ -702,6 +700,20 @@ Java_app_benthicdivelog_core_NativeCore_editDives(JNIEnv *env, jobject, jintArra
 		return nullptr;
 	}
 	return edit_result(env, json);
+}
+
+// The stable dive ids: "audit" lists them, "assign" writes the ones the app made (benthic_ids_json, assign_benthic_ids).
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_benthicIds(JNIEnv *env, jobject, jstring action, jstring assignments)
+{
+	std::string json, error;
+	if (to_string(env, action) == "audit") {
+		benthic::benthic_ids_json(json);
+	} else if (benthic::assign_benthic_ids(to_string(env, assignments), json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return env->NewStringUTF(json.c_str());
 }
 
 // Renumbers dives (all of them if ids is empty): one undoable step (renumber_dives).

@@ -45,7 +45,7 @@ export async function gestureFlows(h) {
   };
   const openEdit = async (label) => {
     await tapDive(tab);
-    await settled(tab, `${label}: dive opened`, { route: /^\/dives\/\d+$/, setup: true });
+    await settled(tab, `${label}: dive opened`, { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     const dive = (await tab.run(readStack)).current;
     // The dive page is still filling in (its profile, its site): the button is tapped once it has stopped moving.
     const place = () => tab.run(() => {
@@ -94,7 +94,7 @@ export async function gestureFlows(h) {
   console.log(' the system takes the touch from the right edge of a dive page (the neighbour dive had started to come in)');
   for (const gap of [0, 120]) {
     await tapDive(tab);
-    await settled(tab, 'dive opened', { route: /^\/dives\/\d+$/, setup: true });
+    await settled(tab, 'dive opened', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
     await taken(386, -70, 600, 4);
     if (gap) await sleep(gap);
     await hardwareBack(tab);
@@ -108,7 +108,7 @@ export async function gestureFlows(h) {
   await sound('section swipe taken: the sections are in place at once');
   await settled(tab, 'section swipe taken: logbook', { route: '/', setup: true });
   await tapDive(tab);
-  await settled(tab, 'section swipe taken: a dive opens', { route: /^\/dives\/\d+$/, setup: true });
+  await settled(tab, 'section swipe taken: a dive opens', { route: /^\/dives\/(\d+|[0-9a-hjkmnp-tv-z]{10})$/, setup: true });
   await hardwareBack(tab);
   await settled(tab, 'section swipe taken: Back', { route: '/' });
 

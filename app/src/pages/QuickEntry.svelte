@@ -8,6 +8,7 @@
   // check on the chosen row). « Chercher un autre site » opens « Choisir un site ». Save is one
   // undoable edit of the dive (lib/logbook.svelte.js saveDiveChanges); the next new dive follows.
   import { onMount } from 'svelte';
+  import { coreIdOfParam } from '../lib/dive-id.js';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import ChipsField from '../components/ChipsField.svelte';
@@ -33,9 +34,9 @@
   /** @type {{ f7route: { params: { id: string }, query: { next?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
 
-  const id = Number(f7route.params.id);
+  const id = coreIdOfParam(f7route.params.id);
   /** The dives still to complete after this one. */
-  const next = (f7route.query?.next ?? '').split(',').map(Number).filter(Boolean);
+  const next = (f7route.query?.next ?? '').split(',').map((p) => coreIdOfParam(p)).filter(Boolean);
 
   const dive = $derived(logbook.dives.find((d) => d.id === id));
   const unit = $derived(/** @type {'m'|'ft'} */ (logbook.prefs.length === 'ft' ? 'ft' : 'm'));

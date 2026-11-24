@@ -19,6 +19,19 @@ using fingerprint_table = std::vector<fingerprint_record>; // core/device.h
 
 namespace benthic::internal {
 
+// Benthic never groups dives into trips by itself (task 2026-11-23-369). The
+// core groups tripless dives after a load and in an import when divelog's
+// `autogroup` is on, and AddDive does when it is asked to. The façade keeps
+// the flag off in memory (load() clears it after reading the log) and
+// remembers here what the log's file said, so that a save writes the
+// diver's own value back unchanged: the file is never rewritten for this.
+extern bool file_autogroup;
+// While alive, divelog.autogroup holds the file's value, for a save; off again after.
+struct KeepFileAutogroup {
+	KeepFileAutogroup();
+	~KeepFileAutogroup();
+};
+
 // Reads a file to import into `log`, as Subsurface's desktop import does
 // (MainWindow::importFiles(): it keeps whatever dives parse_file() found):
 // true when the file could not be read. parse_file()'s return value is not a
@@ -84,6 +97,21 @@ inline constexpr const char *PLAN_KEY = "Benthic plan";
 inline constexpr const char *TITLE_KEY = "Benthic title";
 inline constexpr const char *LEGACY_PLAN_KEY = "OpenDives plan";
 inline constexpr const char *LEGACY_TITLE_KEY = "OpenDives title";
+
+// The stable identifier of a dive (23 November 2026): extra data "Benthic id" of the dive's first dive computer that has
+// one (written on the first dive computer, like "Benthic plan"), 10 characters of lowercase Crockford base32 made by the
+// app (app/src/lib/short-id.js). The core never makes one: the app passes them (assign_benthic_ids).
+inline constexpr const char *ID_KEY = "Benthic id";
+
+// The dive's Benthic id, or "" when it has none.
+std::string benthic_id_of(const ::dive &d);
+
+// Whether `id` has the shape of a Benthic id (10 characters of [0-9a-hjkmnp-tv-z]).
+bool valid_benthic_id(const std::string &id);
+
+// Puts `id` in the dive's extra data (replaces the value that benthic_id_of() reads, else adds the key to the first dive
+// computer). Returns false when the dive already has it.
+bool set_benthic_id(::dive &d, const std::string &id);
 
 // The value of the plan (or title) extra data of a dive computer: the new key wins over the old one; "" when none.
 std::string plan_extra_value(const ::divecomputer &dc, const char *key, const char *legacy_key);

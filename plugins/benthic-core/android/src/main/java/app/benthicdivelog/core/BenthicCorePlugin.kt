@@ -79,6 +79,7 @@ class BenthicCorePlugin : Plugin() {
         CrashReporter.install(context)
         // A file shared with the app before the web layer was up (cold start from « Share to »).
         offerSharedFiles(activity?.intent)
+        offerAccessRequest(activity?.intent)
         // Staged files a killed app left behind (a logbook can be 100 MB): those older than half a day go.
         Thread {
             val limit = System.currentTimeMillis() - 12L * 3600 * 1000
@@ -757,7 +758,36 @@ class BenthicCorePlugin : Plugin() {
     /** Signs out of the Benthic server: the tokens are erased from this device. */
     @PluginMethod
     fun serverSessionClear(call: PluginCall) {
+        pushStream.close()
         serverStore.delete()
+        call.resolve()
+    }
+
+    /** The push channel (lib/push-events.js): its lines and endings reach the page as `pushStream` events. */
+    private val pushStream = PushStream { id, kind, line, status, message ->
+        val data = JSObject().put("id", id).put("kind", kind).put("status", status)
+        if (line != null) data.put("line", line)
+        if (message != null) data.put("message", message)
+        notifyListeners("pushStream", data)
+    }
+
+    /** Opens the Server-Sent Events stream on a background thread and returns at once (`id`, `url`, `token`). */
+    @PluginMethod
+    fun pushStreamOpen(call: PluginCall) {
+        val id = call.getInt("id")
+        val url = call.getString("url")
+        val token = call.getString("token")
+        if (id == null || url.isNullOrEmpty() || token.isNullOrEmpty() || !(url.startsWith("https://") || url.startsWith("http://"))) {
+            call.reject("An id, an address and a token are needed", "BAD_ARGUMENT")
+            return
+        }
+        pushStream.open(id, url, token)
+        call.resolve()
+    }
+
+    @PluginMethod
+    fun pushStreamClose(call: PluginCall) {
+        pushStream.close(call.getInt("id"))
         call.resolve()
     }
 
@@ -931,6 +961,66 @@ class BenthicCorePlugin : Plugin() {
     private fun newStagedFile(name: String): File {
         val clean = File(name).name.replace(Regex("[^A-Za-z0-9._-]"), "_").ifEmpty { "import.xml" }
         return File(context.cacheDir, "$IMPORT_PREFIX${System.nanoTime()}-$clean")
+    }
+
+    // --- Dive photos and videos (DiveMedia.kt; docs/architecture.md, 11.6) ---
+
+    private val diveMedia by lazy { DiveMedia(context) }
+
+    /** Runs a media call off the main thread; a failure rejects with its code. */
+    private fun mediaCall(call: PluginCall, block: () -> JSObject) {
+        Thread {
+            try {
+                call.resolve(block())
+            } catch (e: DiveMedia.Failure) {
+                call.reject(e.code, e.code)
+            } catch (e: Exception) {
+                Log.e(TAG, "media", e)
+                call.reject("FAILED", "FAILED", e)
+            }
+        }.start()
+    }
+
+    /** A staged file becomes the object of its content: {hash, size}. */
+    @PluginMethod
+    fun mediaAdopt(call: PluginCall) = mediaCall(call) {
+        val staged = importFile(call.getString("path").orEmpty()) ?: throw DiveMedia.Failure("BAD_REQUEST")
+        val (hash, size) = diveMedia.adopt(staged)
+        JSObject().put("hash", hash).put("size", size)
+    }
+
+    /** Small bytes (a thumbnail), base64: {hash, size}. */
+    @PluginMethod
+    fun mediaPutBytes(call: PluginCall) = mediaCall(call) {
+        val (hash, size) = diveMedia.putBytes(call.getString("data").orEmpty())
+        JSObject().put("hash", hash).put("size", size)
+    }
+
+    /** {exists, size, path}. */
+    @PluginMethod
+    fun mediaStat(call: PluginCall) = mediaCall(call) {
+        val file = diveMedia.stat(call.getString("hash"))
+        JSObject().put("exists", file != null).put("size", file?.length() ?: 0L).put("path", file?.absolutePath ?: "")
+    }
+
+    /** PUT of the object to a signed URL, streamed from the file: {status}. */
+    @PluginMethod
+    fun mediaUpload(call: PluginCall) = mediaCall(call) {
+        val headers = HashMap<String, String>()
+        call.getObject("headers")?.let { h -> h.keys().forEach { k -> headers[k] = h.getString(k).orEmpty() } }
+        JSObject().put("status", diveMedia.upload(call.getString("hash"), call.getString("url").orEmpty(), headers))
+    }
+
+    /** GET of a signed URL into the media folder, checked against the hash: {size}. */
+    @PluginMethod
+    fun mediaDownload(call: PluginCall) = mediaCall(call) {
+        JSObject().put("size", diveMedia.download(call.getString("hash"), call.getString("url").orEmpty()))
+    }
+
+    @PluginMethod
+    fun mediaDelete(call: PluginCall) = mediaCall(call) {
+        diveMedia.delete(call.getString("hash"))
+        JSObject()
     }
 
     /**
@@ -1306,6 +1396,11 @@ class BenthicCorePlugin : Plugin() {
         call.resolve(JSObject().put("level", level.toDouble()))
     }
 
+    override fun handleOnDestroy() {
+        pushStream.close()
+        super.handleOnDestroy()
+    }
+
     /** `Benthic/<versionName> (dive log app; <repository>)`: no personal data. */
     private val userAgent: String
         get() {
@@ -1394,6 +1489,17 @@ class BenthicCorePlugin : Plugin() {
             return@onCoreThread
         }
         call.resolve(JSObject().put("json", NativeCore.editDives(ids, changes.toString())))
+    }
+
+    /** The stable dive ids (benthic_ids_json, assign_benthic_ids): not an undo step. */
+    @PluginMethod
+    fun benthicIds(call: PluginCall) = onCoreThread(call) {
+        val action = call.getString("action")
+        if (action != "audit" && action != "assign") {
+            call.reject("Missing action", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.benthicIds(action, call.getString("assignments") ?: "{}")))
     }
 
     /** Renumbers dives in date order (renumber_dives): all of them if no ids, one undoable step. */
@@ -2022,6 +2128,39 @@ class BenthicCorePlugin : Plugin() {
     override fun handleOnNewIntent(intent: Intent) {
         super.handleOnNewIntent(intent)
         offerSharedFiles(intent)
+        offerAccessRequest(intent)
+    }
+
+    /**
+     * The notification of an access request was touched (AccessRequestNotifier): its intent carries the request id. It goes to the web
+     * layer as the "accessRequestOpened" event ({requestId}), kept until a listener exists (cold start), and is removed from the
+     * intent so that a restart of the activity does not open the request again.
+     */
+    private fun offerAccessRequest(intent: Intent?) {
+        val id = intent?.getStringExtra(AccessRequestNotifier.EXTRA_REQUEST_ID) ?: return
+        intent.removeExtra(AccessRequestNotifier.EXTRA_REQUEST_ID)
+        notifyListeners("accessRequestOpened", JSObject().put("requestId", id), true)
+    }
+
+    /**
+     * Opens the system's notification settings for Benthic (the app's notification page), where the diver turns notifications back
+     * on after refusing them. Falls back to the app's details page.
+     */
+    @PluginMethod
+    fun openNotificationSettings(call: PluginCall) {
+        try {
+            val intent = Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.packageName)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (e2: Exception) {
+                Log.w(TAG, "Opening the notification settings", e2)
+            }
+        }
+        call.resolve()
     }
 
     /**

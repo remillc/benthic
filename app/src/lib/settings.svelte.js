@@ -3,8 +3,7 @@
 // modelled on Subsurface"). As in Subsurface, they belong to the device, not
 // to the logbook: the values of the core's preferences changed by the diver
 // are kept here and set again in the core at each start (applyDeviceSettings),
-// before the logbook is loaded. Only trip grouping is the logbook's
-// (autogroup), changed through the logbook (logbook.svelte.js).
+// before the logbook is loaded.
 //
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
@@ -36,8 +35,6 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   Benthic itself (the core only knows seconds and decimal): -35.4485, 35° 26.9′ S, 35° 26′ 54.6″ S
  * @property {'bar'|'ata'} ppUnit label of every partial pressure; the number never changes (1 bar = 1 ATA).
  *   Per device, never in the logbook. Métrique implies bar, Impérial ATA (pp-unit.js).
- * @property {boolean} showPhotos "Afficher les champs photos et vidéos" (advanced, off by default,
- *   task 2026-11-12-65): the Photos et vidéos section of the dive detail. Per device, never in the logbook.
  * @property {boolean} showAllBluetooth the Bluetooth scan shows every device, not only dive computers
  * @property {'system'|'letter'|'a4'} paperSize the PDF sheet of a dive: "system" follows the
  *   device's region (US Letter where it is used, A4 elsewhere). Used by every printable PDF:
@@ -51,6 +48,8 @@ const UNIT_KEYS = /** @type {const} */ (['length', 'temperature', 'pressure', 'v
  *   plan and the gas calculator start from
  * @property {'none'|'fresh'|'salt'|'en13319'} downloadWater water type written on dives downloaded from a
  *   dive computer that gave none; 'none' (Non précisé) leaves it empty. Per device.
+ * @property {"all"|"recent"|"onDemand"} mediaPhotos "Photos sur cet appareil" (task 2026-11-23-359, Benthic+): which originals of the dives' photos are downloaded on Wi-Fi: all, those of the last 12 months, on demand. Per device.
+ * @property {"all"|"recent"|"onDemand"} mediaVideos "Vidéos sur cet appareil": the same for videos; on demand by default
  * @property {number} defaultAltitudeMm "Conditions par défaut": the altitude a new plan starts from, mm
  * @property {string} defaultDiluent cylinder type added as diluent when a dive becomes CCR or pSCR
  * @property {string} defaultOxygen the same for the oxygen cylinder
@@ -81,7 +80,6 @@ const APP_DEFAULTS = {
   coordinatesFormat: 'decimal',
   ppUnit: 'bar',
   showAllBluetooth: false,
-  showPhotos: false,
   paperSize: 'system',
   slateSize: 'standard',
   slateFile: 'pdf',
@@ -89,6 +87,8 @@ const APP_DEFAULTS = {
   slatePlusDepth: true,
   defaultWater: 'salt',
   downloadWater: 'none',
+  mediaPhotos: 'recent',
+  mediaVideos: 'onDemand',
   defaultAltitudeMm: 0,
   defaultDiluent: '',
   defaultOxygen: '',
@@ -143,6 +143,11 @@ try {
 }
 
 const storedApp = /** @type {Partial<AppSettings>} */ (readJson(APP_KEY) ?? {});
+// Task 2026-11-23-370: "Afficher les champs photos et vidéos" is gone; the subscription decides. Its stored value is dropped.
+if ('showPhotos' in storedApp) {
+  delete (/** @type {any} */ (storedApp)).showPhotos;
+  writeJson(APP_KEY, storedApp);
+}
 // Task 2026-11-12-74: the app's own stress factor and divers. Devices from before keep the
 // core factor they had if the diver changed it (200, the old default, counts as unchanged).
 const reserve = reserveSettings(storedApp, storedCore.sacFactor);

@@ -59,6 +59,9 @@ dependencies {
     implementation "com.google.android.gms:play-services-mlkit-document-scanner:16.0.0"
     // The QR scanner (a dive or a plan received from another phone): the bundled model, QR codes only.
     implementation "com.google.mlkit:barcode-scanning:17.3.0"
+    // Push notifications (access requests): the service extends the push plugin's, and receives FCM data messages.
+    implementation project(':capacitor-push-notifications')
+    implementation "com.google.firebase:firebase-messaging:24.1.0"
     // The system's in-app review dialog (shown only after a successful download, see review-prompt.js).
     implementation "com.google.android.play:review:2.0.2"
 }

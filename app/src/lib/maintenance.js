@@ -3,13 +3,13 @@
 // of dives, or both: the first reached wins), when it falls due, and the notifications that go with it.
 //
 // Everything here is pure: dates are 'YYYY-MM-DD' strings and `today` is given by the caller, so the tests set the
-// clock. The records live in the inventory (maintenance/<uuid>.json, lib/inventory.js).
+// clock. The records live in the inventory (maintenance/<id>.json, lib/inventory.js).
 
 /**
  * One reminder of a piece, with its history.
  * @typedef {Object} MaintenanceItem
  * @property {number} format
- * @property {string} id UUID version 4
+ * @property {string} id short id
  * @property {string} createdAt
  * @property {string} updatedAt
  * @property {string} gearId
@@ -209,8 +209,8 @@ export const hasRule = (item) => item.intervalMonths != null || item.intervalDiv
  */
 
 /**
- * When a reminder falls due. The dives counted are those where the piece is in the equipment (`diveKeys`: the start
- * times that the inventory keeps, lib/inventory.js `diveKeyOf`), after the last service (the service day itself is
+ * When a reminder falls due. The dives counted are those where the piece is in the equipment (`diveKeys`: their start
+ * times, lib/inventory.svelte.js `diveStartsOf`), after the last service (the service day itself is
  * not counted), or, before any service, from the day the rule was set. The first criterion reached wins: the reminder
  * is overdue as soon as the duration is past or the dives are reached.
  * @param {MaintenanceItem} item

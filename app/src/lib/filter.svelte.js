@@ -10,6 +10,7 @@ import { t } from './i18n.js';
 import { formatNumber, readTypedDate } from './format.js';
 import { withoutFeedbackTags } from './weight-feedback.js';
 import { logbook } from './logbook.svelte.js';
+import { currentDiveIds, onDiveIdsRenumbered } from './dive-ids.js';
 
 /** @typedef {import('benthic-core').FilterRule} FilterRule */
 /** @typedef {import('benthic-core').FilterOptions} FilterOptions */
@@ -750,3 +751,8 @@ export function activeKeys(c) {
   for (const g of groups) for (const k of g.keys) if (isSet(k.key, c)) keys.push(k.key);
   return keys;
 }
+
+// The core read the log again: the matching dives keep their new ids at once (the filter is also applied again after each load).
+onDiveIdsRenumbered(() => {
+  if (filter.ids) filter.ids = new Set(currentDiveIds([...filter.ids]));
+});

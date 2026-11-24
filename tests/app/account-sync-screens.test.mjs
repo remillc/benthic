@@ -87,6 +87,7 @@ const screens = [
   'LockedDataCard',
   'StartOverDialog',
   'AccountDifferentDialog',
+  'NotifyAskDialog',
 ].map((n) => [`components/${n}.svelte`, readFileSync(new URL(`components/${n}.svelte`, app), 'utf8')]);
 const libs = ['lib/two-device-notice.js', 'lib/device-name.js', 'lib/access-request-notify.js', 'lib/account-sync-screens.js'].map((f) => [f, readFileSync(new URL(f, app), 'utf8')]);
 // The wiring: the host picks the screen, the flows hold the texts of the snackbars and the names of the items.
@@ -105,7 +106,7 @@ test('every accountSync text a screen uses is in fr and en, and every text is us
     for (const [, key] of source.matchAll(/`(accountSync\.join)\.\$\{counter\.id\}`/g)) for (const id of ['recognised', 'added', 'toConfirm']) used.add(`${key}.${id}`);
     assert.ok(source.length, file);
   }
-  for (const file of ['components/AccountSheet.svelte', 'components/DesktopAccountSheet.svelte', 'components/FirstLaunchBenthicPlus.svelte']) {
+  for (const file of ['components/AccountSheet.svelte', 'components/DesktopAccountSheet.svelte', 'components/FirstLaunchBenthicPlus.svelte', 'pages/Settings.svelte', 'components/NotifyRefusedBanner.svelte']) {
     const extra = readFileSync(new URL(file, app), 'utf8');
     for (const [, key] of extra.matchAll(/'(accountSync\.[A-Za-z.]+)'/g)) used.add(key);
     if (extra.includes('`accountSync.devices.${seen.key}`')) for (const id of ['seenToday', 'seenYesterday', 'seenDays']) used.add(`accountSync.devices.${id}`);

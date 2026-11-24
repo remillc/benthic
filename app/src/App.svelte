@@ -5,6 +5,7 @@
   // iPad sidebar or the Android rail and, in the Logbook, the list and the
   // dive side by side from `splitBreakpoint` (Framework7's master-detail).
   import { onMount, untrack } from 'svelte';
+  import { diveUrlOfCore } from './lib/dive-id.js';
   import { App, Views, View, f7, f7ready } from 'framework7-svelte';
   import Logbook from './pages/Logbook.svelte';
   import DiveDetail from './pages/DiveDetail.svelte';
@@ -60,6 +61,7 @@
   import { flushQueue, loadValidations, refreshPending } from './lib/validation.svelte.js';
   import { benthicPlusAccount } from './lib/benthic-plus-state.svelte.js';
   import FileImportProgress from './components/FileImportProgress.svelte';
+  import BenthicImportOverlay from './components/BenthicImportOverlay.svelte';
   import Welcome from './components/Welcome.svelte';
   import DemoHost from './components/DemoHost.svelte';
   import { accountGuard } from './lib/demo.svelte.js';
@@ -411,6 +413,12 @@
     void import('./lib/account-sync.svelte.js').then((m) => m.startAccountSync()).catch((e) => console.error('Account data sync', e));
   });
 
+  // The push channel (to-do #185): the server says when there is something new, so the syncs above run at once; they stay as the fallback.
+  $effect(() => {
+    if (!isRelease || sideWindow || !benthicPlusAccount.signedIn || logbook.loading || logbook.welcome || logbook.error) return;
+    void import('./lib/push-sync.svelte.js').then((m) => m.startPushSync()).catch((e) => console.error('Push channel', e));
+  });
+
   // The bottom bar on screen: the content, the « + » and the snackbar make room for it (theme.css).
   $effect(() => {
     document.documentElement.classList.toggle('bc-bottom-nav-on', bottomNav() && navigation.atRoot);
@@ -521,6 +529,7 @@
   <QrReceived />
   <ValidationConfirm />
   <FileImportProgress />
+  <BenthicImportOverlay />
   {#if showRoute}<RouteBadge />{/if}
   {#if devAccounts}{#await import('./components/DevToolsHost.svelte') then { default: DevToolsHost }}<DevToolsHost />{/await}{/if}
   <Welcome />
@@ -536,7 +545,7 @@
         {#if paneSnapshot}
           <!-- The detail kept at the last start, in the real page's look; inert until the real dive opens over it (lib/detail-snapshot.js). -->
           <div class="bc-pane-opening bc-pane-opening--snapshot" class:bc-pane-opening--desk={layout.desktop} inert aria-hidden="true">
-            <DiveDetail f7route={{ params: { id: String(paneSnapshot.detail.id) }, url: `/dives/${paneSnapshot.detail.id}` }} f7router={null} preview={paneSnapshot.detail} />
+            <DiveDetail f7route={{ params: { id: String(paneSnapshot.detail.id) }, url: diveUrlOfCore(paneSnapshot.detail.id) }} f7router={null} preview={paneSnapshot.detail} />
           </div>
         {:else}
           <div class="bc-pane-opening" class:bc-pane-opening--desk={layout.desktop}><DiveDetailSkeleton desk={layout.desktop} /></div>

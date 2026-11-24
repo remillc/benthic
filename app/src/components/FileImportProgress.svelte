@@ -10,6 +10,7 @@
   import LinearWavyProgress from './LinearWavyProgress.svelte';
   import ProgressLine from './ProgressLine.svelte';
   import { importProgress, importState } from '../lib/import-progress.svelte.js';
+  import { benthicRun } from '../lib/benthic-import.svelte.js';
   import { sizeParts } from '../lib/import-progress.js';
   import { t } from '../lib/i18n.js';
 
@@ -32,7 +33,8 @@
   const spoken = $derived(t('importFlow.spoken', { phase: phaseLabel, n: percent }));
 </script>
 
-{#if importState.active && importState.visible}
+<!-- A .benthic import draws its own steps (components/BenthicProgressSteps.svelte): the one line stays out of its way. -->
+{#if importState.active && importState.visible && !benthicRun.active}
   <div class="bc-import-progress" role="group" aria-label={t('importFlow.group')}>
     <!-- Announced once per phase, not at each count (the line itself is read on demand). -->
     <span class="bc-sr-only" role="status">{phaseLabel}</span>

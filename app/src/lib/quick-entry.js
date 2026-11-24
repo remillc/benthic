@@ -1,4 +1,5 @@
 // @ts-check
+import { diveParamOf } from './dive-id.js';
 // « Compléter la plongée » (task 2026-11-14-151): which dives of a download the quick entry opens for.
 
 /**
@@ -18,4 +19,4 @@ export function newDivesWithoutSite(dives, before, mergedIds = []) {
 }
 
 /** The address of the quick entry for these dives, in the order they are completed. @param {number[]} ids */
-export const quickEntryUrl = (ids) => `/dives/${ids[0]}/complete${ids.length > 1 ? `?next=${ids.slice(1).join(',')}` : ''}`;
+export const quickEntryUrl = (ids) => `/dives/${diveParamOf(ids[0])}/complete${ids.length > 1 ? `?next=${ids.slice(1).map(diveParamOf).join(',')}` : ''}`;

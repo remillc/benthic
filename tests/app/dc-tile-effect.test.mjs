@@ -40,3 +40,19 @@ test('the report of a core failure carries the JS caller', () => {
   assert.match(read('plugins/benthic-core/core-api.js'), /new Error\(\)\.stack/);
   assert.match(read('app/src/lib/error-reports.svelte.js'), /called from/);
 });
+
+test('an unreachable server is the offline state, not a report; a refused certificate still reports', async () => {
+  const { isExpectedCoreMessage, isUnreachableCoreMessage } = await import('../../plugins/benthic-core/core-api.js');
+  for (const message of [
+    'probeCloud: Error: failed to connect to 127.0.0.1: Connection refused',
+    'failed to resolve address for ssrf-cloud.example: Name or service not known',
+    'Connection timed out',
+    'Network is unreachable',
+  ]) {
+    assert.ok(isUnreachableCoreMessage(message), message);
+    assert.ok(isExpectedCoreMessage(message), message);
+  }
+  for (const message of ['the SSL certificate is invalid: 0x08 - The certificate is not correctly signed by the trusted CA', 'Authentication failed', 'Out of memory']) {
+    assert.ok(!isExpectedCoreMessage(message), message);
+  }
+});

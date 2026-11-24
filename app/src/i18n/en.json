@@ -655,11 +655,85 @@
       "one": "{n} photo",
       "other": "{n} photos"
     },
-    "photoNote": "On another device: only their reference is synced",
+    "mediaPhotos": {
+      "one": "{n} photo",
+      "other": "{n} photos"
+    },
+    "mediaVideos": {
+      "one": "{n} video",
+      "other": "{n} videos"
+    },
+    "mediaBoth": "{photos} and {videos}",
+    "mediaSynced": "{counts}, on all your devices",
+    "mediaEmpty": "No photos or videos, on all your devices",
+    "mediaAdd": "Add",
+    "mediaAddLabel": "Add photos or videos",
+    "mediaSeeAll": "See all",
+    "mediaPhotoLabel": "Photo {n}",
+    "mediaVideoLabel": "Video {n}, {duration}",
+    "mediaPending": "{n} waiting to upload",
+    "mediaFull": "The 10 GB of storage is full. These files stay on this device.",
+    "mediaAddFailed": "The files could not be added.",
+    "mediaOffline": "This original is not on this device. Reconnect to open it.",
+    "mediaNotOnServer": "This original is not on the server yet. It arrives when the other device has sent it.",
+    "mediaGallery": "Photos and videos",
+    "mediaClose": "Close",
+    "mediaOnDevice": "On this device",
+    "mediaInCloud": "In the account",
+    "mediaSyncedSize": "{counts}, on all your devices · {size}",
+    "mediaDiveLine": "No. {number} · {site} · {date}",
+    "mediaDiveLineNoNumber": "{site} · {date}",
+    "mediaSelect": "Select",
+    "mediaSelectedCount": {
+      "one": "{n} selected",
+      "other": "{n} selected"
+    },
+    "mediaSelectedItems": "selected",
+    "mediaCancelSelection": "Cancel selection",
+    "mediaShare": "Share",
+    "mediaRemove": "Remove",
+    "mediaRemoveFromDive": "Remove from dive",
+    "mediaRemoveTitle": "Remove {counts} from the dive?",
+    "mediaRemoveAction": "Remove {counts} from the dive",
+    "mediaRemoveText": {
+      "one": "It will no longer be linked to the dive, on any of your devices. The file stays in the gallery of the device where you took it.",
+      "other": "They will no longer be linked to the dive, on any of your devices. The files stay in the gallery of the device where you took them."
+    },
+    "mediaRemoveTextIos": {
+      "one": "It will no longer be linked to the dive, on any of your devices. The file stays in the photo library where you took it.",
+      "other": "They will no longer be linked to the dive, on any of your devices. The files stay in the photo library where you took them."
+    },
+    "mediaRemoveFailed": "The files could not be removed.",
+    "mediaShareFailed": "The files could not be shared.",
+    "mediaReplaceSite": "Replace the site photo",
+    "mediaSitePhotoSet": "Site photo replaced",
+    "mediaMore": "More options",
+    "mediaViewerOf": "{n} of {total}",
+    "mediaTaken": "{date}, {time}",
+    "mediaTakenCamera": "{taken} · {camera}",
+    "mediaBackPhotos": "Photos",
+    "mediaBackDive": "Dive",
+    "mediaPrevious": "Previous",
+    "mediaNext": "Next",
+    "mediaPlay": "Play",
+    "mediaPause": "Pause",
+    "mediaMute": "Mute",
+    "mediaUnmute": "Unmute",
+    "mediaSeek": "Position in the video",
+    "mediaElapsed": "Elapsed time",
+    "mediaTotal": "Total length",
+    "mediaCloseEsc": "Close (Esc)",
+    "mediaHint": "Double-click to open · Ctrl+click to select several items",
+    "mediaHintMac": "Double-click to open · ⌘+click to select several items",
+    "mediaSelectItem": "Select {label}",
+    "mediaDepthAt": "Depth {depth}",
+    "mediaStripItem": "Go to {label}",
+    "mediaPlayBig": "Play the video",
     "delete": "Delete the dive",
     "deleteSelected": "Delete these dives",
     "deleteTitle": "Delete the dive",
     "deleted": "Dive deleted",
+    "deletedElsewhere": "This dive was deleted on another device.",
     "deleteFailed": "The dive could not be deleted. No dive was changed.",
     "computersRow": "Computers",
     "computersLabel": "Computers: {list}. Show the computers of this dive",
@@ -770,6 +844,7 @@
     "groups": {
       "notifyDocuments": "Certifications and documents",
       "notifyDive": "After the dive",
+      "notifyDevices": "Your devices",
       "notifyMaintenance": "Equipment maintenance",
       "language": "Language and formats",
       "units": "Units",
@@ -881,9 +956,6 @@
       "decimal": "Decimal",
       "minutes": "Degrees, minutes",
       "seconds": "Degrees, minutes, seconds"
-    },
-    "autogroup": {
-      "label": "Group dives into trips"
     },
     "invalidDives": {
       "label": "Show invalid dives",
@@ -1161,9 +1233,18 @@
         "en13319": "Standard used by dive computers, 1,020 g/L"
       }
     },
-    "showPhotos": {
-      "label": "Show photo and video fields",
-      "text": "In the detail and the editing of a dive"
+    "mediaPhotos": {
+      "label": "Photos on this device",
+      "text": "Originals downloaded on Wi-Fi; thumbnails are always kept"
+    },
+    "mediaVideos": {
+      "label": "Videos on this device",
+      "text": "Originals downloaded on Wi-Fi; thumbnails are always kept"
+    },
+    "mediaChoice": {
+      "all": "All",
+      "recent": "Those of the last 12 months",
+      "onDemand": "On demand"
     }
   },
   "gas": {
@@ -2770,12 +2851,20 @@
     "feedback": "Give feedback",
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
+      "Importing a .benthic file: “A file” in “Import a logbook” and the logbook menu accept the full export. The file is first checked, file by file, against its fingerprints; if it is incomplete, nothing is imported. Otherwise the logbook, equipment, profile and certifications are imported in one go, and personal information is encrypted on this device. To replace a logbook, “Replace this logbook?” offers “Export this logbook first”.",
+      "Offline: a server that cannot be reached no longer opens an error report; the logbook only shows that it is offline and tries again later.",
+      "Dives: when a change made on another device reaches this one while a dive is open, the dive stays open, its neighbours still open, and an edit in progress is kept; a dive deleted on the other device closes with a short message. This no longer produces an error report.",
+      "Photos and videos (Benthic+): “See all” opens the dive’s gallery, in the order the pictures were taken, with the profile depth at the moment of each photo. A long press (“Select” on iPhone and iPad, Ctrl+click on desktop) selects; “Share” sends the files and “Remove” takes them off the dive, after a confirmation, on all your devices (the files stay in the device’s gallery). A photo opens full screen: a swipe changes picture, with the date, time and camera model read from the file; ⋮ offers “Replace the site photo”. A video has its controls (play, position, sound). The same on phone, tablet, iPhone, iPad and desktop.",
+      "Logbook: a dive dragged and dropped back on its own place, or on a year header, changes nothing and no longer shows an error.",
+      "Photos and videos (Benthic+): a dive shows its photos and videos as thumbnails, with « Add », the line « on all your devices » and « See all », which opens the dive’s gallery. They are sent to the account (10 GB) and follow the diver to the other devices: thumbnails are always kept, originals arrive on Wi-Fi following Settings › Logbook (All, Those of the last 12 months, On demand) and open on demand. Offline, uploads wait for the network. The free version does not show the section.",
       "Computer, Logbook: the list’s scroll bar can be grabbed with the mouse again (it was under the handle of the divider between the two panes) and widens when the pointer is over it.",
       "Desktop, logbook list: in a narrow column the search box becomes a magnifier button left of the columns button and ⋮, which stay visible at every width; the magnifier or Ctrl+F opens the field across the header, ✕ or Esc closes it, and the summary line is cut with an ellipsis.",
       "Cylinder types: a type without a working pressure (read from a dive) no longer shows « 0 » in cubic feet and can be renamed without an error; a volume typed without a pressure asks for the working pressure.",
       "Gear: the rebreather icon shows two tall cylinders on each side of a scrubber on its stand, joined by two hoses, and no longer looks like a twin set.",
       "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
       "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
+      "Photos and videos: « Show photo and video fields » is gone from Settings. A Benthic+ subscriber always sees the « Photos and videos » section of a dive; a free user never does. About: « Website » (benthicdivelog.app) replaces « Export my logbook » and sits next to « See on GitHub » on one centred row; exporting stays in the logbook menu.",
+      "Trips: « Group dives into trips » is gone from Settings. Benthic never groups dives into trips by itself, whatever a logbook made in Subsurface says: downloads, imports and new dives stay outside any trip until you make or fill one. The trips you made keep working as before.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
       "Maps: offline maps are gone. « Offline maps » leaves Settings, the account sheet and the Benthic+ offer (the group « Sites and maps » becomes « Sites »), the update badge disappears, and the Sites map no longer shows an « Offline » pill. Regions already downloaded are deleted from the device at the first start: their space is freed.",
       "Settings: « Renumber dives » is no longer there. The action stays in the logbook ⋮ menu, the selection menu and a dive’s ⋮ menu.",
@@ -2783,6 +2872,7 @@
       "Recovery key: the key icon of Material Symbols marks the recovery-key offer, the dialog that shows it, its entry and the unlocking of encrypted data.",
       "First launch: the light rays of the blue band are always four, scaled to the width of the band, on tablet and computer as on the phone.",
       "Downloading from the dive computer takes one gesture. The remembered computer has its card with « Download » (state « In range, ready »), the others each have their own button; « Download everything again », « Show all Bluetooth devices » and « Download help » are in the ⋮ menu. First time: a search with the three things to do; then the connection, the progress with the dives received, « Connection lost » (the dives received are kept, « Try again » reads on), « No new dives » and « N new dives » with « See in the logbook ». The same steps on phone, iPhone, tablet and desktop (a dialog).",
+      "New device access: Benthic can notify you, even when closed, when a new device asks for access to your encrypted data (Benthic+, phone and tablet). The notification shows the code to compare; touching it opens the request, and it disappears once the request is answered or expires. The permission is asked once, with an explanation; Settings › Notifications shows \"Your devices\" and, when the system refuses notifications, a banner with a button to the system settings.",
       "Account: no « Sync » button anywhere (account sheet, Account, side menu, desktop). The state stays, with a second line: « Synced 2 min ago » and « Automatic, as soon as a change is made », or « 3 changes not sent » and « Sent automatically when the network is back »; on tablet the state is the third line under the account.",
       "Profile: « Profile » is a main entry after Sites for a Benthic+ account, on every device, with its own home page and a red badge counting the overdue maintenance reminders; « My diver profile » leaves the account sheet.",
       "Benthic+: the profile, equipment, certifications and documents are saved with the account and follow the diver on every device. A new device is paired by asking for access: a device that is already paired shows the request with a 6-digit code to compare before approving (or with a 26-character recovery key); encrypted data stays locked until the device is paired. A device that already has equipment first shows what it will join (« Pair this device »), then confirms.",
@@ -3339,7 +3429,8 @@
       "code": "The base plan always stays free. The apps and their code are on GitHub: anyone can always download the apps there for free, read the code, change it and share it.",
       "logbook": "Exportable at any time, your logbook belongs to you.",
       "github": "See on GitHub",
-      "export": "Export my logbook"
+      "website": "Website",
+      "websiteLabel": "Benthic website (opens in the browser)"
     }
   },
   "bringLogbook": {
@@ -4794,6 +4885,7 @@
       "cloudServicesMac": "Google Drive, OneDrive, Dropbox, iCloud Drive or WebDAV",
       "git": "In a git repository",
       "gitHelp": "Your own repository · full history of changes",
+      "answer": "Answer",
       "continue": "Continue",
       "cancel": "Cancel",
       "back": "Back",
@@ -5423,8 +5515,6 @@
       "removeFromTrip": "Remove from the trip",
       "createTrip": "Create the trip",
       "mergeTrips": "Merge the trips",
-      "autogroup": "Group into trips",
-      "ungroup": "Undo automatic trips",
       "mergeSites": "Merge the sites",
       "deleteSites": "Delete the sites",
       "deleteDives": "Delete the dives",
@@ -6608,6 +6698,87 @@
     "failed": "The logbook could not be replaced. The current logbook is kept.",
     "failedNoDives": "The file holds no dive. The current logbook is kept."
   },
+  "benthicImport": {
+    "fileCardDetail": "Full Benthic export, {date}",
+    "contentsTitle": "What the file contains",
+    "rowDives": "Dives and sites",
+    "rowEquipment": "Equipment, kits and maintenance",
+    "rowProfile": "Profile, certifications and documents",
+    "rowMedia": "Dive photos and videos",
+    "pieces": {
+      "one": "{n} item",
+      "other": "{n} items"
+    },
+    "kits": {
+      "one": "{n} kit",
+      "other": "{n} kits"
+    },
+    "certs": {
+      "one": "{n} certification",
+      "other": "{n} certifications"
+    },
+    "documents": {
+      "one": "{n} document",
+      "other": "{n} documents"
+    },
+    "profileOnly": "Profile",
+    "note": "This file holds personal information in clear text. Benthic encrypts it on this tablet. Keep the file somewhere safe or delete it.",
+    "notePhone": "This file holds personal information in clear text. Benthic encrypts it on this phone. Keep the file somewhere safe or delete it.",
+    "noteIphone": "This file holds personal information in clear text. Benthic encrypts it on this iPhone. Keep the file somewhere safe or delete it.",
+    "noteDesktop": "This file holds personal information in clear text. Benthic encrypts it on this computer. Keep the file somewhere safe or delete it.",
+    "progress": {
+      "group": ".benthic file import progress",
+      "verify": "Checking the file",
+      "verifyCount": "{done} of {total} files",
+      "verifyDone": {
+        "one": "{n} file, intact",
+        "other": "{n} files, all intact"
+      },
+      "dives": "Dives and sites",
+      "data": "Equipment, profile and certifications",
+      "media": "Photos and videos, {size}",
+      "count": "{done} of {total}",
+      "write": "Saving…",
+      "help": "Keep the app open until the end. If the import stops, nothing is added.",
+      "helpDesktop": "Keep Benthic open until the end. If the import stops, nothing is added.",
+      "cancel": "Cancel",
+      "cancelling": "Cancelling…"
+    },
+    "size": {
+      "kb": "{n} KB",
+      "mb": "{n} MB",
+      "gb": "{n} GB"
+    },
+    "incompleteTitle": "This .benthic file is incomplete",
+    "incompleteText": {
+      "one": "In “{file}”, {n} file does not match its fingerprint. Nothing was imported. Export again on the original device.",
+      "other": "In “{file}”, {n} files do not match their fingerprint. Nothing was imported. Export again on the original device."
+    },
+    "incompleteCut": "“{file}” stops before its end. Nothing was imported. Export again on the original device.",
+    "tooNew": "“{file}” comes from a newer version of Benthic. Update Benthic, then try again.",
+    "failedTitle": "Import failed",
+    "failed": "The file could not be imported. Nothing was changed.",
+    "badLogbook": "The logbook in this file could not be read. Nothing was changed.",
+    "cancelled": "Import cancelled. Nothing was changed.",
+    "done": "Logbook “{name}” imported: {n} dives.",
+    "doneNoDives": "Logbook “{name}” imported.",
+    "mediaSkipped": {
+      "one": "{n} photo or video of the file was not imported: this device does not keep them yet.",
+      "other": "{n} photos and videos of the file were not imported: this device does not keep them yet."
+    },
+    "replace": {
+      "title": "Replace this logbook?",
+      "text": "This device keeps one logbook only. “{logbook}” ({dives}) leaves this device and is replaced by “{file}”: {contents}.",
+      "personal": "The personal information in the file will be encrypted on this device.",
+      "personalDesktop": "The personal information in the file will be encrypted on this computer.",
+      "equipment": "the equipment",
+      "profile": "the profile",
+      "certs": "the certifications",
+      "documents": "the documents",
+      "media": "{size} of photos and videos",
+      "and": " and "
+    }
+  },
   "validation": {
     "back": "Back",
     "itemName": "{name}, {role}",
@@ -6846,6 +7017,21 @@
     }
   },
   "accountSync": {
+    "push": {
+      "askTitle": "Get notified of access requests",
+      "askText": "When a new device asks for access to your encrypted data, Benthic notifies you on this device, even when it is closed. You compare the code and answer.",
+      "askNote": "The Benthic server sends no other notification.",
+      "later": "Later",
+      "continue": "Continue",
+      "requests": "Access requests from a new device",
+      "requestsIos": "Access requests",
+      "requestsText": "Always on: without them, a new device cannot be paired while Benthic is closed here.",
+      "always": "Always",
+      "refusedTitle": "Notifications are off for Benthic",
+      "refusedText": "Access requests from a new device and reminders will only appear when the app is open.",
+      "openAndroid": "Open Android settings",
+      "openIos": "Open iPhone Settings"
+    },
     "unlock": {
       "title": "Unlock your encrypted data",
       "pair": "Ask a paired device for access",
