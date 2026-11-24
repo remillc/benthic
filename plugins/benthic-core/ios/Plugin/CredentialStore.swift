@@ -108,12 +108,7 @@ struct GitRemoteStore {
     }
 }
 
-/// The Benthic server's session (release edition): "email
-sessionToken
-repositoryUrl
-branch
-gitUsername
-gitToken".
+/// The Benthic server's session (release edition): "email\nsessionToken\nrepositoryUrl\nbranch\ngitUsername\ngitToken".
 struct ServerSession {
     let email: String
     let sessionToken: String
@@ -128,18 +123,15 @@ struct ServerSessionStore {
 
     func read() -> ServerSession? {
         guard let text = item.read() else { return nil }
-        let parts = text.components(separatedBy: "
-")
+        let parts = text.components(separatedBy: "\n")
         if parts.count != 6 || parts.contains(where: { $0.isEmpty }) { return nil }
         return ServerSession(email: parts[0], sessionToken: parts[1], repositoryUrl: parts[2], branch: parts[3], gitUsername: parts[4], gitToken: parts[5])
     }
 
     func write(_ session: ServerSession) throws {
         let fields = [session.email, session.sessionToken, session.repositoryUrl, session.branch, session.gitUsername, session.gitToken]
-        if fields.contains(where: { $0.isEmpty || $0.contains("
-") }) { throw Failure("BAD_ARGUMENT", "BAD_ARGUMENT") }
-        try item.write(fields.joined(separator: "
-"))
+        if fields.contains(where: { $0.isEmpty || $0.contains("\n") }) { throw Failure("BAD_ARGUMENT", "BAD_ARGUMENT") }
+        try item.write(fields.joined(separator: "\n"))
     }
 
     func delete() {
