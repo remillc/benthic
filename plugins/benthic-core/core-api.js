@@ -766,8 +766,11 @@ export { waterTypeOf };
  *   the merged dive keeps the first numbered dive's number. The result's `id` is the merged dive.
  * @property {(options: {ids: number[], changes: Record<string, string|number|string[]>}) => Promise<EditResult>} editDives
  *   The same changes on several dives, one undoable step (edit_dives in benthic.h): site (uuid), notes, suit,
- *   userSalinity, diveguide, and the chip lists buddiesAdd/buddiesRemove, diveguideAdd/diveguideRemove,
+ *   userSalinity, rating, visibility, divemode, weightGrams, notesAppend, diveguide, and the chip lists buddiesAdd/buddiesRemove, diveguideAdd/diveguideRemove,
  *   tagsAdd/tagsRemove (only those names are added or removed, per dive).
+ * @property {(options: {ids: number[], seconds: number}) => Promise<EditResult>} shiftTime
+ *   « Décaler la date et l'heure »: the start time of several dives moves by `seconds` (negative: earlier), one undoable
+ *   step (shift_time in benthic.h, Subsurface's ShiftTime). The tables are sorted again; numbers and profiles do not change.
  * @property {(options: {action: 'audit'|'assign', assignments?: string}) => Promise<any>} benthicIds
  *   The stable dive ids (benthic_ids_json and assign_benthic_ids in benthic.h; not an undo step). `audit` lists every dive
  *   of the log, hidden ones too, as `{id, benthicId, when, plan}[]`; `assign` writes `assignments`, a JSON object core id
@@ -1139,6 +1142,9 @@ export const BenthicCore = {
   },
   async editDives(options) {
     return JSON.parse((await native.editDives(options)).json);
+  },
+  async shiftTime(options) {
+    return JSON.parse((await native.shiftTime(options)).json);
   },
   async benthicIds(options) {
     return JSON.parse((await native.benthicIds(options)).json);

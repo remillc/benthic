@@ -582,10 +582,19 @@ int merge_dives(const std::vector<int> &ids, std::string &result_json, std::stri
 // "diveguideAdd", "diveguideRemove", "tagsAdd", "tagsRemove" (lists of names:
 // added at the end of each dive's list, removed from each dive that has them,
 // nothing else touched) and "diveguide" (a list that replaces the guides of
-// every dive, as EditDiveGuide). Dives that already have the values are left
+// every dive, as EditDiveGuide). Since 24 November 2026 also: "rating" and "visibility" (0 to 5), "divemode" (OC, CCR,
+// PSCR, Freedive: the first dive computer of each dive, no cylinder touched), "weightGrams" (the total weight: one weight
+// system of that weight, keeping the description of the first one) and "notesAppend" (a text added on a new line at the
+// end of each dive's notes). Dives that already have the values are left
 // alone; no step is added when nothing changes. Result:
 // {"listChange":true,"dives":<count>,"id":0}.
 int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std::string &result_json, std::string &error);
+
+// Shifts the start time of the listed dives by `seconds` (negative: earlier) as one undoable step (Command::shiftTime,
+// ShiftTime in commands/command_divelist.cpp: "shift time of 3 dives [#1, #2, #3]"). The dive and trip tables are sorted
+// again; numbers, durations, profiles and gases are untouched. Result: {"listChange":true,"dives":<count>,"id":0}.
+// Errors: WRITE_LOCKED, NOT_FOUND (no such dive), NOTHING_TO_DO (no dive or a zero shift), BAD_REQUEST (more than 10 years).
+int shift_time(const std::vector<int> &ids, long long seconds, std::string &result_json, std::string &error);
 
 // Stable dive ids (23 November 2026). Every dive carries a "Benthic id" in the extra data of its first dive computer (the
 // key and the shape are in internal.h; "benthicId" in list_dives(), get_dive() and list_plans()). The core never makes

@@ -17,6 +17,7 @@
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
   import DesktopEditTogetherDialog from '../components/DesktopEditTogetherDialog.svelte';
+  import ShiftTimeDialog from '../components/ShiftTimeDialog.svelte';
   import DesktopLogbookSelector from '../components/DesktopLogbookSelector.svelte';
   import DesktopLogbookReady from '../components/DesktopLogbookReady.svelte';
   import FlightBanner from '../components/FlightBanner.svelte';
@@ -87,7 +88,7 @@
   loadDesktopChoices();
 
   /** The actions the right-click menu can offer today (the others wait: see the task's notes). */
-  const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'renumberFrom', 'copy', 'export', 'share', 'delete']);
+  const AVAILABLE = new Set(['merge', 'addToTrip', 'edit', 'editTogether', 'shiftTime', 'renumberFrom', 'copy', 'export', 'share', 'delete']);
   /** « Faire signer… » is a Benthic+ action, like every signing entry point. */
   const available = $derived(benthicPlusSubscriber() ? new Set([...AVAILABLE, 'sign']) : AVAILABLE);
   const mod = desktopMac ? '⌘' : 'Ctrl+';
@@ -502,6 +503,9 @@
     }
   }
 
+  /** The dives « Décaler la date et l’heure… » is open for, or null (task 2026-11-24-383). */
+  let shifting = $state(/** @type {number[]|null} */ (null));
+
   /** The dives the signing dialog is open for (« Faire signer… »), or null. */
   let validating = $state(/** @type {number[]|null} */ (null));
 
@@ -510,6 +514,7 @@
     if (key === 'edit') editSelected();
     else if (key === 'delete') deleteSelected();
     else if (key === 'editTogether') editingTogether = true;
+    else if (key === 'shiftTime') shifting = [...desk.selection.ids];
     else if (key === 'merge') mergeSelected();
     else if (key === 'sign' && benthicPlusSubscriber() && desk.selection.ids.length > 1 && desk.selection.ids.length <= MAX_SIGNED) validating = [...desk.selection.ids];
     else if (key === 'renumberFrom' && desk.selection.ids.length === 1) renumberFrom = desk.selection.ids[0];
@@ -1242,6 +1247,9 @@
   {/if}
   {#if renumbering}
     <RenumberDialog oncancel={() => (renumbering = false)} ondone={() => (renumbering = false)} />
+  {/if}
+  {#if shifting}
+    <ShiftTimeDialog ids={shifting} oncancel={() => (shifting = null)} ondone={() => (shifting = null)} />
   {/if}
   {#if renumberFrom !== null}
     <RenumberFromDialog id={renumberFrom} oncancel={() => (renumberFrom = null)} ondone={() => (renumberFrom = null)} />

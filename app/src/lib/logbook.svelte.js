@@ -350,6 +350,21 @@ export async function editDivesTogether(ids, changes, openId = null) {
 }
 
 /**
+ * « Décaler la date et l'heure »: the start of the dives moves by `seconds` (negative: earlier), one undoable step (the
+ * core's ShiftTime), saved and synced like an edit. `shiftSeconds` and the preview are in lib/time-shift.js.
+ * @param {number[]} ids
+ * @param {number} seconds
+ */
+export async function shiftDives(ids, seconds) {
+  const result = await BenthicCore.shiftTime({ ids, seconds });
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  logbook.dives = await BenthicCore.listLoadedDives();
+  logbook.sitesVersion++;
+  await persistChanges();
+}
+
+/**
  * Renumbers dives in date order from `start` (one undoable step), saved and
  * synced like an edit. No ids: all the dives, as Subsurface's Renumber dialog.
  * @param {number[]} ids

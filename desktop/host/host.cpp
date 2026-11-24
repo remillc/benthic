@@ -578,6 +578,12 @@ void register_methods()
 			fail(error);
 		return edit_result(json);
 	});
+	add("shiftTime", core, [](const Args &a) {
+		std::string json, error;
+		if (benthic::shift_time(a.ints("ids"), a.num("seconds"), json, error))
+			fail(error);
+		return edit_result(json);
+	});
 	// The stable dive ids: action "audit" lists every dive's id, "assign" writes the ones the app made.
 	add("benthicIds", core, [](const Args &a) {
 		std::string action = a.str("action"), json, error;

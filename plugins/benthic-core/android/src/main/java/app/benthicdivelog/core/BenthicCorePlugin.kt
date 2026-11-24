@@ -1491,6 +1491,18 @@ class BenthicCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", NativeCore.editDives(ids, changes.toString())))
     }
 
+    /** Shifts the start time of several dives (shift_time): one undoable step. */
+    @PluginMethod
+    fun shiftTime(call: PluginCall) = onCoreThread(call) {
+        val ids = call.getArray("ids")?.toList<Int>()?.toIntArray()
+        val seconds = call.getInt("seconds")
+        if (ids == null || ids.isEmpty() || seconds == null) {
+            call.reject("Missing ids or seconds", "BAD_ARGUMENT")
+            return@onCoreThread
+        }
+        call.resolve(JSObject().put("json", NativeCore.shiftTime(ids, seconds)))
+    }
+
     /** The stable dive ids (benthic_ids_json, assign_benthic_ids): not an undo step. */
     @PluginMethod
     fun benthicIds(call: PluginCall) = onCoreThread(call) {

@@ -2475,6 +2475,35 @@
     "editFailed": "The dives could not be edited. No dive was changed.",
     "loadFailed": "The dives could not be read."
   },
+  "shiftTime": {
+    "menu": "Shift date and time…",
+    "title": "Shift date and time",
+    "intro": {
+      "one": "{n} dive selected. To correct a dive computer’s clock or a time zone.",
+      "other": "{n} dives selected. To correct a dive computer’s clock or a time zone."
+    },
+    "direction": "Direction of the shift",
+    "earlier": "Earlier",
+    "later": "Later",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "daysShort": "{n} d",
+    "hoursShort": "{n} h",
+    "minutesShort": "{n} min",
+    "preview": "Preview",
+    "first": "First: {dive}",
+    "last": "Last: {dive}",
+    "only": "Dive: {dive}",
+    "number": "#{n}",
+    "note": "The intervals between the dives do not change. You can undo.",
+    "apply": "Shift",
+    "done": {
+      "one": "{n} dive shifted",
+      "other": "{n} dives shifted"
+    },
+    "failed": "The dives could not be shifted. No dive was changed."
+  },
   "dialog": {
     "close": "Close",
     "ok": "OK",
@@ -3377,7 +3406,8 @@
       "“This weight was” is Benthic+ only on every screen; without Benthic+, the weight suggestion uses the last comparable dive’s weight, with no correction. What is already noted on a dive is kept.",
       "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen.",
       "Tablet: on the profile home, Information opens beside the list from the start, with no navigation error reported.",
-      "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty."
+      "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty.",
+      "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -5451,6 +5481,7 @@
       "merge": "Merge into one dive",
       "addToTrip": "Add to a trip…",
       "editTogether": "Edit together…",
+      "shiftTime": "Shift date and time…",
       "sign": "Get signed…",
       "edit": "Edit",
       "copy": "Copy",

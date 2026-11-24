@@ -3424,9 +3424,12 @@ int merge_dives(const std::vector<int> &ids, std::string &result_json, std::stri
 namespace {
 struct MultiEdit {
 	bool has_site = false, has_notes = false, has_suit = false, has_salinity = false;
+	bool has_rating = false, has_visibility = false, has_mode = false, has_weight = false;
 	uint32_t site = 0;
 	std::string notes, suit;
-	int salinity = 0;
+	// Text appended on a new line to each dive's notes (after "notes" when both are given).
+	std::string notes_append;
+	int salinity = 0, rating = 0, visibility = 0, mode = 0, weight_grams = 0;
 	// Names to add and to remove (the Add and Remove suffixes) from the lists.
 	std::vector<std::string> buddies_add, buddies_remove, guide_add, guide_remove, tags_add, tags_remove;
 	// "diveguide" given as a list: the whole new list.
@@ -3511,6 +3514,41 @@ int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std
 			}
 			e.has_salinity = true;
 			e.salinity = static_cast<int>(value.number);
+		} else if (key == "notesAppend") {
+			if (value.kind != JsonValue::STRING) {
+				error = "BAD_REQUEST: notesAppend must be a string";
+				return -1;
+			}
+			e.notes_append = value.text;
+		} else if (key == "rating" || key == "visibility") {
+			// EditRating and EditVisibility: 0 to 5 stars.
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 5) {
+				error = "BAD_REQUEST: " + key + " must be an integer from 0 to 5";
+				return -1;
+			}
+			(key == "rating" ? e.has_rating : e.has_visibility) = true;
+			(key == "rating" ? e.rating : e.visibility) = static_cast<int>(value.number);
+		} else if (key == "divemode") {
+			// EditMode on the first dive computer of each dive: OC, CCR, PSCR, Freedive. No cylinder is touched.
+			int mode = -1;
+			if (value.kind == JsonValue::STRING)
+				for (int m = 0; m < NUM_DIVEMODE; m++)
+					if (value.text == divemode_text[m])
+						mode = m;
+			if (mode < 0) {
+				error = "BAD_REQUEST: divemode";
+				return -1;
+			}
+			e.has_mode = true;
+			e.mode = mode;
+		} else if (key == "weightGrams") {
+			// The total weight: each dive keeps one weight system of that weight (the description of its first one).
+			if (value.kind != JsonValue::NUMBER || value.number < 0 || value.number > 200000) {
+				error = "BAD_REQUEST: weightGrams";
+				return -1;
+			}
+			e.has_weight = true;
+			e.weight_grams = static_cast<int>(value.number);
 		} else if (key == "buddiesAdd" || key == "buddiesRemove" || key == "diveguideAdd" || key == "diveguideRemove" ||
 			   key == "tagsAdd" || key == "tagsRemove" || key == "diveguide") {
 			std::vector<std::string> &target =
@@ -3550,10 +3588,52 @@ int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std
 			note_field("suit");
 			any = true;
 		}
+		if (!e.notes_append.empty()) {
+			copy->notes = copy->notes.empty() ? e.notes_append : copy->notes + '\n' + e.notes_append;
+			note_field("notes");
+			any = true;
+		}
 		if (e.has_salinity && copy->user_salinity != e.salinity) {
 			copy->user_salinity = e.salinity;
 			note_field("salinity");
 			any = true;
+		}
+		if (e.has_rating && copy->rating != e.rating) {
+			copy->rating = e.rating;
+			note_field("rating");
+			any = true;
+		}
+		if (e.has_visibility && copy->visibility != e.visibility) {
+			copy->visibility = e.visibility;
+			note_field("visibility");
+			any = true;
+		}
+		if (e.has_mode && copy->dcs[0].divemode != e.mode) {
+			copy->dcs[0].divemode = static_cast<divemode_t>(e.mode);
+			update_setpoint_events(copy.get(), &copy->dcs[0]);
+			note_field("dive mode");
+			any = true;
+		}
+		if (e.has_weight) {
+			int total = 0;
+			for (const weightsystem_t &ws: copy->weightsystems)
+				total += ws.weight.grams;
+			if (total != e.weight_grams || copy->weightsystems.size() > 1) {
+				weightsystem_t ws;
+				ws.description = copy->weightsystems.empty() ? "belt" : copy->weightsystems[0].description;
+				ws.weight.grams = e.weight_grams;
+				weightsystem_table list;
+				if (e.weight_grams > 0)
+					list.push_back(std::move(ws));
+				if (list.size() != copy->weightsystems.size() ||
+				    (!list.empty() && !std::equal(list.begin(), list.end(), copy->weightsystems.begin()))) {
+					copy->weightsystems = std::move(list);
+					for (const weightsystem_t &w: copy->weightsystems)
+						add_weightsystem_description(w); // EditWeight::redo()
+					note_field("weights");
+					any = true;
+				}
+			}
 		}
 		if (e.has_site) {
 			dive_site *ds = e.site ? divelog.sites.get_by_uuid(e.site) : nullptr;
@@ -3602,6 +3682,44 @@ int edit_dives(const std::vector<int> &ids, const std::string &changes_json, std
 		step.text = what + " [" + dive_number_or_date(*changed[0]) + "]";
 	else
 		step.text = what + " (" + std::to_string(changed.size()) + " dive(s)) [" + list_of_dives(changed) + "]";
+	std::string unused;
+	swap_step(step, result_json, unused);
+	push_step(std::move(step));
+	return 0;
+}
+
+// Command::shiftTime(changedDives, amount) (ShiftTime, commands/command_divelist.cpp) as one undoable step: every
+// listed dive starts `seconds` later (earlier when negative). Subsurface changes dive::when and then sorts the dive and
+// trip tables; like the "date" edit of one dive, the dive computers keep their offset to the dive (dive_computer::when),
+// so that the file written has no stray computer date. Durations, profiles and gases are untouched; the dive numbers
+// are not changed (ShiftTime does not renumber): a dive moved past another one keeps its number and changes place.
+int shift_time(const std::vector<int> &ids, long long seconds, std::string &result_json, std::string &error)
+{
+	if (check_writable_log(error))
+		return -1;
+	if (seconds < -3650LL * 86400 || seconds > 3650LL * 86400) {
+		error = "BAD_REQUEST: seconds";
+		return -1;
+	}
+	std::vector<dive *> dives;
+	if (dives_in_table_order(ids, dives, error))
+		return -1;
+	if (dives.empty() || seconds == 0) {
+		error = "NOTHING_TO_DO";
+		return -1;
+	}
+	Step step;
+	step.kind = Step::DIVES_EDIT;
+	// ShiftTime::ShiftTime(): "shift time of 3 dives [#1, #2, #3]".
+	step.text = "shift time of " + std::to_string(dives.size()) + (dives.size() == 1 ? " dive [" : " dives [") + list_of_dives(dives) + "]";
+	for (dive *d: dives) {
+		auto copy = std::make_unique<dive>(*d);
+		copy->when += seconds;
+		for (divecomputer &dc: copy->dcs)
+			if (dc.when)
+				dc.when += seconds;
+		step.dive_swaps.emplace_back(d->id, std::move(copy));
+	}
 	std::string unused;
 	swap_step(step, result_json, unused);
 	push_step(std::move(step));
