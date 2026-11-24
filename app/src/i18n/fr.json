@@ -2932,7 +2932,7 @@
       "Équipement : le menu d’une pièce propose de la supprimer définitivement après confirmation.",
       "Équipement : le champ « Type de pièce » n’apparaît plus à la création d’une pièce de type Autre.",
       "Profil de plongée : les courbes choisies restent affichées pendant la session.",
-      "Plongées : « Faire signer » remplace « Faire valider ».",
+      "Plongées : demander la signature d’un compagnon ou d’un moniteur s’appelle « Faire signer ».",
       "Équipement : l’icône du scooter a été redessinée.",
       "Équipement : choisissez le type de pièce avant de remplir son formulaire.",
       "Équipement : le coupe-ligne et le couteau sont deux types distincts.",
@@ -3370,7 +3370,9 @@
       "Ordinateur : la carte du site occupe toute la largeur de l’en-tête de la plongée.",
       "Ordinateur : l’onglet Équipement propose, avec Benthic+, un kit à appliquer, le sous-vêtement, « Ce lest était » et « Autre équipement » ; sans Benthic+, ces champs n’apparaissent plus.",
       "« Ce lest était » est réservé à Benthic+ sur tous les écrans ; sans Benthic+, la suggestion de lest reprend le poids de la dernière plongée comparable, sans correction. Ce qui est déjà noté sur une plongée est conservé.",
-      "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet."
+      "Tablette et ordinateur : « Faire signer les plongées », sur des plongées cochées, ouvre la même fenêtre que depuis une plongée ; le téléphone garde l’écran complet.",
+      "Tablette : sur la page d’accueil du profil, Informations s’ouvre à côté de la liste dès le démarrage, sans erreur de navigation signalée.",
+      "Tablette : choisir le Carnet pendant que Réglages est ouvert ferme Réglages d’abord, sans laisser l’écran du compte vide."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",
@@ -6842,8 +6844,8 @@
     "confirmError": {
       "expired": "Ce code a expiré. Demandez-en un nouveau.",
       "used": "Ce code a déjà servi.",
-      "own": "Vous ne pouvez pas valider vos propres plongées.",
-      "plus": "Valider une plongée demande Benthic+.",
+      "own": "Vous ne pouvez pas confirmer vos propres plongées.",
+      "plus": "Confirmer une plongée demande Benthic+.",
       "unknown": "Ce code n’est pas reconnu.",
       "tooMany": "Trop d’essais. Réessayez dans quelques minutes.",
       "failed": "La confirmation n’a pas pu être envoyée."

@@ -10,7 +10,8 @@ test('the sections are Carnet, Sites, Profil, Statistiques, Outils; Profil only 
   assert.match(nav, /sectionOrder = \['logbook', 'sites', 'profile', 'statistics', 'tools'\]/);
   assert.match(nav, /export const sections = \(\) => sectionOrder\.filter\(\(s\) => s !== 'profile' \|\| navigation\.profile\)/);
   const app = read('App.svelte');
-  assert.match(app, /\{#if navigation\.profile\}<View id="view-profile" tab url="\/profile" \/>\{\/if\}/);
+  // The view starts on its default pane on a wide screen: nothing navigates at start (report 35 of 24 November 2026).
+  assert.match(app, /\{#if navigation\.profile\}<View id="view-profile" tab url=\{profileWide\(\) \? '\/profile\/info' : '\/profile'\} \/>\{\/if\}/);
   assert.match(app, /navigation\.profile = on/);
   for (const file of ['components/NavigationBar.svelte', 'components/NavRail.svelte', 'components/NavMenu.svelte']) assert.match(read(file), /sections\(\)/, file);
 });
@@ -30,4 +31,12 @@ test('the profile home has no back arrow and no footnote; the badge is the overd
   assert.doesNotMatch(home, /BackLink|gear\.profile\.kept/);
   assert.match(home, /gear\.profile\.encrypted/);
   assert.match(read('components/NavBadge.svelte'), /overdueBadge\(\)/);
+});
+
+test('a screen opened over a section closes before the section changes; the Back key does not hide a view that is changing page', () => {
+  // Report 33 of 24 November 2026: the Logbook chosen in the rail while Réglages was open in the Account view.
+  assert.match(nav, /export async function goToSection/);
+  assert.match(nav, /await closeOverPages\(f7\.views\.current\);\s*showSection\(section\);/);
+  assert.match(nav, /classList\.contains\('view-master-detail'\)\) \{\s*router\.navigate\(router\.history\[0\], \{ reloadAll: true, animate: false \}\);\s*await untilFree\(router\);/);
+  assert.match(read('lib/back-button.js'), /if \(view && isBusy\(view\.router\)\) \{[\s\S]*?return 'busy';/);
 });
