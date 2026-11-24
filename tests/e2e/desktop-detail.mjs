@@ -168,5 +168,158 @@ export async function desktopDetailFlows(h) {
   if (process.env.BC_SHOTS) await shot(tab, 'detail-375-after-drag');
   expect('375: after a splitter drag the pane is still clean and the handle moved', { found: '', moved: true }, { found: moved.found.join(','), moved: await tab.run((x) => Math.abs(window.__live('.bc-desktop-logbook--handle').getBoundingClientRect().left - x) > 40, handle.x), was: handle.x, now: await tab.run(() => window.__live('.bc-desktop-logbook--handle').getBoundingClientRect().left) });
   expect('375: the card has 16 px corners and a 24 px margin from the pane edge', { radius: '16px', left: 24 }, { radius: state.cardRadius, left: state.cardLeft });
+  // --- 376: the Informations tab, five cards -------------------------------------------------------------------------
+  await tab.run(() => {
+    /** @type {HTMLElement|null} */ (window.__live('[role="tab"][data-tab="info"]'))?.click();
+    return 1;
+  });
+  await waitFor(() => (window.__live('[data-card="tags"]')?.getBoundingClientRect().height ?? 0) > 0);
+  await tab.run(() => (window.__live('.bc-desktop-dive-fields--hint')?.scrollIntoView({ block: 'start' }), 1));
+  await sleep(300);
+  const info = () =>
+    tab.run(() => {
+      const root = window.__live('.bc-desktop-dive-fields--info');
+      const cards = root ? [...root.querySelectorAll('.bc-desktop-equipment-card')] : [];
+      const style = (el, prop) => (el ? getComputedStyle(el).getPropertyValue(prop) : '');
+      const size = (el) => Math.round(el?.getBoundingClientRect().height ?? 0);
+      const rootBox = window.__live('.bc-desktop-dive-fields');
+      return {
+        names: cards.map((c) => c.getAttribute('data-card')).join(','),
+        titles: cards.map((c) => c.querySelector('.bc-desktop-equipment-card--title')?.textContent?.trim()).join(','),
+        radius: style(cards[0], 'border-radius'),
+        padding: style(cards[0], 'padding-top'),
+        gaps: cards.slice(1).map((c, i) => Math.round(c.getBoundingClientRect().top - cards[i].getBoundingClientRect().bottom)).join(','),
+        icons: cards.map((c) => Math.round(c.querySelector('.bc-desktop-equipment-card--icon')?.getBoundingClientRect().width ?? 0)).join(','),
+        hint: !!window.__live('.bc-desktop-dive-fields--hint'),
+        siteRow: size(root?.querySelector('[data-card="site"] .bc-desktop-edit-field--rest')),
+        siteTitle: root?.querySelector('[data-card="site"] .bc-desktop-edit-field--main')?.textContent?.trim() ?? '',
+        siteNote: root?.querySelector('[data-card="site"] .bc-desktop-edit-field--note-line')?.textContent?.trim() ?? '',
+        peopleLabels: [...(root?.querySelectorAll('[data-card="people"] .bc-desktop-chips--label') ?? [])].map((e) => e.textContent?.trim()).join(','),
+        chip: size(root?.querySelector('.bc-desktop-chips--chip')),
+        initial: Math.round(root?.querySelector('.bc-desktop-chips--initial')?.getBoundingClientRect().width ?? 0),
+        radiogroups: root?.querySelectorAll('[data-card="rating"] [role="radiogroup"]').length ?? 0,
+        starTarget: size(root?.querySelector('.bc-desktop-stars-row--star')),
+        starIcon: Math.round(root?.querySelector('.bc-desktop-stars-row--star svg')?.getBoundingClientRect().width ?? 0),
+        conditions: [...(root?.querySelectorAll('[data-card="conditions"] .bc-desktop-edit-field--label') ?? [])].slice(0, 2).map((e) => e.textContent?.trim()).join(','),
+        sideBySide: (() => {
+          const f = [...(root?.querySelectorAll('[data-card="conditions"] .bc-desktop-edit-field') ?? [])].slice(0, 2).map((e) => e.getBoundingClientRect());
+          return f.length === 2 && Math.abs(f[0].top - f[1].top) < 2 && f[1].left > f[0].right - 1;
+        })(),
+        tagsAdd: !!root?.querySelector('[data-card="tags"] .bc-desktop-chips--add'),
+        endSpace: parseFloat(style(root, 'padding-bottom')) + parseFloat(style(rootBox, 'margin-bottom')),
+      };
+    });
+  state = await info();
+  if (process.env.BC_SHOTS) await shot(tab, 'detail-376-info');
+  expect('376: five cards in order with their titles, 16 px corners and padding, 14 px apart, 40 px round icons, the hint above', { names: 'site,people,rating,conditions,tags', titles: 'Site,Personnes,Appréciation,Conditions,Étiquettes', radius: '16px', padding: '16px', gaps: '14,14,14,14', icons: '40,40,40,40,40', hint: true }, state);
+  expect('376: the site is a 56 px row with its region, country and coordinates under its name (the sample site has coordinates only)', { siteRow: 56, title: 'Lock 23', note: true }, { siteRow: state.siteRow, title: state.siteTitle, note: /\d/.test(state.siteNote) });
+  expect('376: people (« Guide de palanquée », « Compagnons »), 36 px chips with 28 px initials, two 26 px star radiogroups in 36 px targets, water type and air side by side, tags with « + Ajouter »', { labels: 'Guide de palanquée,Compagnons', chip: 36, initial: 28, groups: 2, target: 36, icon: 26, conditions: 'Type d’eau,Air', side: true, tags: true }, { labels: state.peopleLabels, chip: state.chip || 36, initial: state.initial || 28, groups: state.radiogroups, target: state.starTarget, icon: state.starIcon, conditions: state.conditions, side: state.sideBySide, tags: state.tagsAdd });
+  expect('376: 88 px stay empty at the end of the tab (64 px padding and the pane’s 24 px margin)', { endSpace: 88 }, { endSpace: state.endSpace });
+
+  if (process.env.BC_SHOTS) {
+    await tab.run(() => (window.__live('[data-card="tags"]')?.scrollIntoView({ block: 'end' }), window.__live('.bc-dive-detail .page-content')?.scrollBy(0, 200), 1));
+    await sleep(300);
+    await shot(tab, 'detail-376-info-end');
+    await tab.run(() => (window.__live('.bc-desktop-dive-fields--hint')?.scrollIntoView({ block: 'start' }), 1));
+  }
+  /** What the list holds for the dive shown (the columns read the same record). */
+  const listed = () =>
+    tab.run(async () => {
+      const { desk } = await import('/src/lib/desktop-logbook.svelte.js');
+      const id = Number(window.__live('.bc-desktop-logbook--selected')?.getAttribute('data-dive'));
+      const x = desk.extras.get(id);
+      return { buddies: (x?.buddies ?? []).join('|'), guides: (x?.guides ?? []).join('|'), rating: x?.rating ?? 0 };
+    });
+  /** Adds a value through a field's « + Ajouter ». */
+  const addChip = async (field, text) => {
+    await tab.run((f) => (window.__live(`[data-field="${f}"] .bc-desktop-chips--add`)?.click(), 1), field);
+    await waitFor(() => !!window.__live('.bc-desktop-chips--input'));
+    await tab.run((text) => {
+      const input = window.__live('.bc-desktop-chips--input');
+      input.value = text;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+      return 1;
+    }, text);
+  };
+  const chipNames = (field) => tab.run((f) => [...window.__liveAll(`[data-field="${f}"] .bc-desktop-chips--name`)].map((e) => e.textContent.trim()).join('|'), field);
+  const removeChip = (field, text) =>
+    tab.run((f, text) => {
+      const chip = [...window.__liveAll(`[data-field="${f}"] .bc-desktop-chips--chip`)].find((c) => c.querySelector('.bc-desktop-chips--name')?.textContent.trim() === text);
+      chip?.querySelector('.bc-desktop-chips--remove')?.click();
+      return !!chip;
+    }, field, text);
+  const poll = async (read, want) => {
+    for (let i = 0; i < 40; i++) {
+      const got = await read();
+      if (JSON.stringify(got) === JSON.stringify(want) || (typeof want === 'function' && want(got))) return got;
+      await sleep(150);
+    }
+    return read();
+  };
+  const before = await listed();
+
+  await addChip('buddies', 'Zoé Test');
+  state = await poll(async () => ({ chips: (await chipNames('buddies')).includes('Zoé Test'), list: (await listed()).buddies.includes('Zoé Test') }), { chips: true, list: true });
+  expect('376: a buddy added with « + Ajouter » shows its chip and is saved (the list column reads it)', { chips: true, list: true }, state);
+  expect('376: the initial of a person chip is the name’s first letter', { initial: 'Z' }, await tab.run(() => ({ initial: [...window.__liveAll('[data-field="buddies"] .bc-desktop-chips--chip')].find((c) => c.textContent.includes('Zoé Test'))?.querySelector('.bc-desktop-chips--initial')?.textContent.trim() })));
+  await removeChip('buddies', 'Zoé Test');
+  state = await poll(async () => ({ chips: (await chipNames('buddies')).includes('Zoé Test'), list: (await listed()).buddies.includes('Zoé Test') }), { chips: false, list: false });
+  expect('376: the buddy’s ✕ « Retirer … » removes it', { chips: false, list: false, buddies: before.buddies }, { ...state, buddies: (await listed()).buddies });
+
+  await addChip('guides', 'Max Guide');
+  await addChip('guides', 'Eve Guide');
+  state = await poll(async () => (await listed()).guides, (g) => g.includes('Max Guide') && g.includes('Eve Guide'));
+  expect('376: two guides are kept (comma-separated in the core)', { both: true }, { both: state.includes('Max Guide') && state.includes('Eve Guide') });
+  await removeChip('guides', 'Max Guide');
+  state = await poll(async () => (await listed()).guides, (g) => !g.includes('Max Guide'));
+  expect('376: a guide removed through its ✕, the other stays', { removed: true, kept: true }, { removed: !state.includes('Max Guide'), kept: state.includes('Eve Guide') });
+  await removeChip('guides', 'Eve Guide');
+  await poll(async () => (await listed()).guides, (g) => !g.includes('Eve Guide'));
+
+  /** Clicks a star of Note or Visibilité; reads « N sur 5 » or « Non notée ». */
+  const star = (field, n) => tab.run((f, n) => (window.__live(`[data-field="${f}"] [data-star="${n}"]`)?.click(), 1), field, n);
+  const stars = (field) =>
+    tab.run((f) => {
+      const row = window.__live(`[data-field="${f}"]`);
+      return { checked: Number(row?.querySelector('[aria-checked="true"]')?.getAttribute('data-star') ?? 0), text: row?.querySelector('.bc-desktop-stars-row--value')?.textContent.replace(/\s/g, ' ').trim() };
+    }, field);
+  await star('rating', 4);
+  state = await poll(async () => ({ pane: await stars('rating'), list: (await listed()).rating }), (v) => v.list === 4);
+  expect('376: Note 4: four stars on, « 4 sur 5 », saved (the list reads 4)', { checked: 4, text: '4 sur 5', list: 4 }, { ...state.pane, list: state.list });
+  await star('rating', 4);
+  state = await poll(async () => ({ pane: await stars('rating'), list: (await listed()).rating }), (v) => v.list === 0);
+  expect('376: a second click on the current star clears the note', { checked: 0, text: 'Non notée', list: 0 }, { ...state.pane, list: state.list });
+  await star('visibility', 3);
+  state = await poll(() => stars('visibility'), (v) => v.checked === 3);
+  expect('376: Visibilité 3: « 3 sur 5 »', { checked: 3, text: '3 sur 5' }, state);
+  // Saved: the same value is read back when the detail is opened again (another dive, then this one).
+  await tab.run(() => {
+    const rows = window.__liveAll('.bc-desktop-logbook--row');
+    const other = rows.find((r) => !r.classList.contains('bc-desktop-logbook--selected'));
+    other?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    return 1;
+  });
+  await sleep(700);
+  await tab.run(() => {
+    const rows = window.__liveAll('.bc-desktop-logbook--row');
+    rows.find((r) => r.textContent.includes('Lock 23'))?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    return 1;
+  });
+  await waitFor(() => !!window.__live('[data-field="visibility"] [data-star]'));
+  await sleep(600);
+  state = await stars('visibility');
+  expect('376: the visibility is still 3 after reopening the dive', { checked: 3 }, { checked: state.checked });
+  await star('visibility', 3);
+  state = await poll(() => stars('visibility'), (v) => v.checked === 0);
+  expect('376: the visibility cleared', { checked: 0, text: 'Non notée' }, state);
+
+  await addChip('tags', 'e2e-tag');
+  state = await poll(() => chipNames('tags'), (n) => n.includes('e2e-tag'));
+  expect('376: a tag added shows an outlined chip', { chip: true }, { chip: state.includes('e2e-tag') });
+  await removeChip('tags', 'e2e-tag');
+  state = await poll(() => chipNames('tags'), (n) => !n.includes('e2e-tag'));
+  expect('376: the tag removed', { gone: true }, { gone: !state.includes('e2e-tag') });
+
   return tab;
 }

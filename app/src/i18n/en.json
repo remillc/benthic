@@ -2776,6 +2776,7 @@
       "Gear: the rebreather icon shows two tall cylinders on each side of a scrubber on its stand, joined by two hoses, and no longer looks like a twin set.",
       "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",
       "Desktop, dive detail, Equipment tab: one card per section (kit, dive computers, thermal protection, weights, other gear), with the weight total in its header, one removable chip per weight, a centred « This weight was » and « + Add » in the other gear card.",
+      "Desktop, dive detail, Information tab: five cards (Site, People, Rating, Conditions, Tags). Guides and buddies are chips with their initial, a ✕ to remove them and « + Add » (names from the logbook first); the rating and the visibility are five stars, and another click on the chosen star clears it; the rating and the tags leave the Notes tab.",
       "Desktop, logbook list: a closed trip is a 48 px row with the same 1 px line as the dives, and the row after an open trip’s card is separated from it by a line.",
       "Desktop, dive detail: the white panel under the profile card is gone (the pane’s background follows the page colour) and the curves that are off are outlined chips.",
       "Benthic+ offer: « Everything included » ends with « Continue without a subscription » under « Subscribe », the « Always free » note is gone and the price follows the last group directly.",
@@ -4972,7 +4973,9 @@
       "weights": "Weights",
       "mix": "Mix",
       "pressure": "Pressure",
-      "coordinates": "Coordinates"
+      "coordinates": "Coordinates",
+      "guideOfDive": "Dive guide",
+      "note": "Rating"
     },
     "kitNote": "Fills the suit, the undersuit, the weights and the other gear. Each field can still be changed.",
     "kitPieces": {
@@ -5002,6 +5005,14 @@
       "mix": "Type the mix, such as 32 or 18/45"
     },
     "notRated": "Not rated",
+    "starsOf": "{n} of 5",
+    "card": {
+      "site": "Site",
+      "people": "People",
+      "rating": "Rating",
+      "conditions": "Conditions",
+      "tags": "Tags"
+    },
     "add": "Add",
     "weightTotal": "total",
     "weightPlace": "Weight place",
