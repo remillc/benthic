@@ -15,6 +15,7 @@ import { sameComputer } from './dc-model.js';
 import { recordKey } from './inventory.js';
 import { fromBase64 } from './secret-box.js';
 import { BRANCH, SYNCED_PREFIXES, codeOf, isSyncedPath, workingCopyName } from './account-sync.js';
+import { typeKey } from './cylinder-type-files.js';
 
 /** The commit message of the join. */
 export const JOIN_MESSAGE = 'Joindre cet appareil';
@@ -312,6 +313,25 @@ export function createAccountJoin({ core, store, box, now = () => new Date(), au
       if (!equal(next, kit)) next.updatedAt = stamp();
       finalFiles.set(pathOf('kits', kit), next);
       handled.add(pathOf('kits', kit));
+    }
+
+    // --- Cylinder types the diver added: the name; the size with the later `updatedAt` wins (task 2026-11-23-373).
+    const remoteTypes = values('cylinder-types/', remote);
+    const remoteByName = new Map(remoteTypes.map((r) => [typeKey(r.name), r]));
+    for (const l of values('cylinder-types/', local)) {
+      const r = remoteByName.get(typeKey(l.name));
+      handled.add(pathOf('cylinder-types', l));
+      if (!r) {
+        count('cylinderType').added++;
+        finalFiles.set(pathOf('cylinder-types', l), l);
+        continue;
+      }
+      count('cylinderType').recognised++;
+      const localNewer = String(l.updatedAt ?? '') > String(r.updatedAt ?? '');
+      const merged = localNewer ? { ...r, ml: l.ml, mbar: l.mbar ?? 0, name: l.name, updatedAt: l.updatedAt } : r;
+      if (l.createdAt && String(l.createdAt) < String(r.createdAt ?? 'z')) merged.createdAt = l.createdAt;
+      finalFiles.set(pathOf('cylinder-types', r), merged);
+      dropLocal.add(pathOf('cylinder-types', l));
     }
 
     // --- Maintenance: the piece and the task.

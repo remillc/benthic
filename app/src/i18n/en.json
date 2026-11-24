@@ -985,10 +985,6 @@
       "label": "Show unused cylinders",
       "text": "And include them in export, copy and merge"
     },
-    "standardSizes": {
-      "label": "Offer standard sizes",
-      "text": "When choosing the type of a cylinder"
-    },
     "cylinderTypes": {
       "label": "Cylinder types",
       "text": "Add, rename, remove"
@@ -1155,21 +1151,13 @@
     },
     "cylinders": {
       "title": "Cylinder types",
-      "intro": "Offered when choosing the type of a cylinder. Renaming a type also renames the cylinders of that type in the logbook. Changing its size does not change existing dives. Deleting one of your types removes its cylinders from the dives that use them.",
-      "yours": "Your types",
-      "standard": "Standard",
-      "standardNote": "Standard types can be changed like yours.",
-      "hidden": "Standard sizes are hidden: the “Offer standard sizes” setting is off.",
+      "intro": "The cylinder types of your logbook, and the ones you add. Offered when you choose a cylinder’s type. Renaming a type also renames the cylinders of that type in the logbook; changing its size does not change existing dives.",
       "add": "Add a type",
       "newTitle": "New type",
       "editTitle": "Edit type",
       "name": "Name",
       "volume": "Volume",
       "pressure": "Working pressure",
-      "delete": "Remove this type",
-      "deleteTitle": "Remove {name}?",
-      "deleteText": "The type is no longer offered. Existing dives do not change.",
-      "deleteAction": "Remove",
       "deleteType": "Delete this type",
       "deleteTypeTitle": "Delete “{name}”?",
       "deleteTypeAction": "Delete",
@@ -1179,7 +1167,6 @@
       "deleteKept": { "one": "In {n} dive where it is used for the profile or is the only cylinder, it stays, without a type.", "other": "In {n} dives where it is used for the profile or is the only cylinder, it stays, without a type." },
       "deleteIrreversible": "This action cannot be undone.",
       "deleteRemovedDialog": { "one": "Deleting it removes this cylinder from this dive.", "other": "Deleting it removes this cylinder from these {n} dives." },
-      "standardMore": { "one": "And {n} other standard type…", "other": "And {n} other standard types…" },
       "unknown": "Unknown type",
       "fromLogbook": "This type comes from the dives of the logbook. It stays offered while a dive uses it.",
       "nameInUse": "This name is already a type",
@@ -1196,10 +1183,12 @@
       "usedInNoDive": "used in no dive",
       "usedInOneDive": "used in 1 dive",
       "usedInDives": "used in {n} dives",
-      "noteStandard": "Standard type, {use}. Renaming it also renames those cylinders in the logbook. Changing its size does not change existing dives.",
-      "noteYours": "Your own type, {use}. Renaming it also renames those cylinders in the logbook. Changing its size does not change existing dives.",
       "volumeNoteCuft": "The volume of gas at working pressure, in cubic feet. In metric units, you enter the water volume of the cylinder in litres.",
-      "volumeNoteLitres": "The water volume of the cylinder, in litres. In imperial units, you enter the volume of gas at working pressure, in cubic feet. The working pressure is optional for a volume in litres."
+      "volumeNoteLitres": "The water volume of the cylinder, in litres. In imperial units, you enter the volume of gas at working pressure, in cubic feet. The working pressure is optional for a volume in litres.",
+      "addedUnused": "Added by you · in no dive",
+      "commonSizes": "Common sizes",
+      "commonSizesNote": "Tap a size to fill in the name, the volume and the pressure.",
+      "note": "{use}. Renaming it also renames those cylinders in the logbook. Changing its size does not change existing dives."
     },
     "paperSize": {
       "label": "Paper size (printing)",
@@ -2859,6 +2848,7 @@
       "Photos and videos (Benthic+): a dive shows its photos and videos as thumbnails, with « Add », the line « on all your devices » and « See all », which opens the dive’s gallery. They are sent to the account (10 GB) and follow the diver to the other devices: thumbnails are always kept, originals arrive on Wi-Fi following Settings › Logbook (All, Those of the last 12 months, On demand) and open on demand. Offline, uploads wait for the network. The free version does not show the section.",
       "Computer, Logbook: the list’s scroll bar can be grabbed with the mouse again (it was under the handle of the divider between the two panes) and widens when the pointer is over it.",
       "Desktop, logbook list: in a narrow column the search box becomes a magnifier button left of the columns button and ⋮, which stay visible at every width; the magnifier or Ctrl+F opens the field across the header, ✕ or Esc closes it, and the summary line is cut with an ellipsis.",
+      "Cylinder types: one list, the types of the logbook’s dives and the ones you add, with each one’s dive count (“Added by you · in no dive” and the “Unused” label for one of yours that no dive uses). “Standard” and “And N other standard types” are gone. Every type opens the same “Edit type” screen (a dialog on the desktop), with “Delete this type”. “New type” offers “Common sizes” (AL80, HP100… in imperial units; 10 L, 12 L, 15 L 232 bar… in metric) that fill the name, the volume and the pressure; the default cylinder choice lists them too, under “Common sizes”. The types you add are kept with your account (nothing is written to the logbook): they show on your other devices before any dive uses them, and renaming or deleting one follows. The types you had added to this device’s old list, or whose size you had changed, are taken over. “Offer standard sizes” leaves Settings › Equipment.",
       "Cylinder types: a type without a working pressure (read from a dive) no longer shows « 0 » in cubic feet and can be renamed without an error; a volume typed without a pressure asks for the working pressure.",
       "Gear: the rebreather icon shows two tall cylinders on each side of a scrubber on its stand, joined by two hoses, and no longer looks like a twin set.",
       "Icons: 89 icons of the app move to the rounded glyphs of Material Symbols (arrows, cloud, folder, camera, key, calendar, location, settings and more); the gas blender keeps a drawing of a cylinder being filled, and the dive knife has a new drawing.",

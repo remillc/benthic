@@ -233,6 +233,10 @@ static void send_sync_progress(const char *message)
 		ret = benthic::cylinder_types(json);
 	} else if (action == "library") {
 		ret = benthic::set_cylinder_library(value, message) ? -1 : benthic::cylinder_types(json);
+	} else if (action == "added") {
+		ret = benthic::set_added_cylinder_types(value, message) ? -1 : benthic::cylinder_types(json);
+	} else if (action == "defaults") {
+		ret = benthic::default_cylinder_types(json);
 	} else if (action == "standard") {
 		benthic::reset_cylinder_library();
 		ret = benthic::cylinder_types(json);

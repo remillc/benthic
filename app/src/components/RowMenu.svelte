@@ -17,7 +17,7 @@
    * @type {{
    *   anchor: HTMLElement,
    *   label: string,
-   *   options: { value: string, label: string, example?: string }[],
+   *   options: { value: string, label: string, example?: string, heading?: string }[],
    *   value: string,
    *   onselect: (value: string) => void,
    *   onclose: () => void,
@@ -132,6 +132,7 @@
 >
   <ul class="bc-row-menu--options" role="listbox" aria-label={label}>
     {#each options as option, i (option.value)}
+      {#if option.heading}<li class="bc-row-menu--heading" role="presentation">{option.heading}</li>{/if}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <li
         id="{id}-o{i}"
@@ -193,6 +194,17 @@
       list-style: none;
       overflow-y: auto;
       overscroll-behavior: contain;
+    }
+
+    /* A divider with a title between two groups of options (the default cylinder's « Tailles courantes »). */
+    .bc-row-menu--heading {
+      margin-top: 8px;
+      padding: 12px 16px 4px;
+      border-top: var(--bc-outline-width) solid var(--bc-separator);
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 500;
+      color: var(--bc-text-2);
     }
 
     .bc-row-menu--option {

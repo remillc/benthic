@@ -10,6 +10,7 @@
 // lib/account-sync.svelte.js; the first sync of a device that already has data is lib/account-join.js.
 
 import { sortedJson } from './file-store.js';
+import { CYLINDER_TYPES_FOLDER, mergeSameName } from './cylinder-type-files.js';
 import { mergeAccountFile, mergeEncryptedAccountFile } from './account-data-merge.js';
 import { mergeMediaFile } from './dive-media.js';
 import { repositoryKey } from './server-logbook.js';
@@ -28,7 +29,7 @@ export const BRANCH = 'benthic';
  * key's file, the pairing files) is not in this list on purpose: those files never enter the local store; the engine
  * reads and writes them in the working copy only (`KEYS_PREFIX`, `readKeys`, `commitKeyFiles`).
  */
-export const SYNCED_PREFIXES = ['profile/', 'certifications/', 'documents/', 'gear/', 'gear-photos/', 'kits/', 'maintenance/', 'dive-equipment/', 'dive-validations/', 'media/'];
+export const SYNCED_PREFIXES = ['profile/', 'certifications/', 'documents/', 'gear/', 'gear-photos/', 'kits/', 'maintenance/', 'dive-equipment/', 'dive-validations/', 'media/', 'cylinder-types/'];
 
 /** The folder of the key files in the working copy (docs/account-sync.md, « QR payloads and key files »). */
 export const KEYS_PREFIX = 'keys/';
@@ -296,7 +297,7 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
    */
   async function cleanUp({ dir }) {
     const { files } = await core.bgitFiles({ dir });
-    const wanted = files.filter((p) => ['gear/', 'kits/', 'maintenance/', 'dive-equipment/'].some((prefix) => p.startsWith(prefix)) && p.endsWith('.json'));
+    const wanted = files.filter((p) => ['gear/', 'kits/', 'maintenance/', 'dive-equipment/', CYLINDER_TYPES_FOLDER].some((prefix) => p.startsWith(prefix)) && p.endsWith('.json'));
     const { texts } = await core.bgitRead({ dir, paths: wanted });
     /** @type {Map<string, Record<string, any>>} */
     const byPath = new Map();
@@ -357,6 +358,8 @@ export function createAccountSync({ core, store, box, now = () => new Date(), se
       if (next.kitId && !kitIds.has(next.kitId)) next.kitId = '';
       if (sortedJson(next) !== sortedJson(current)) changes.set(path, changes.has(path) ? next : touched(next));
     }
+    // Two files for the same name (two devices added it): the earliest id stays, the later size wins.
+    for (const [path, value] of mergeSameName(byPath, stamp)) changes.set(path, value);
     if (!changes.size) return 0;
     const writes = [...changes].map(([path, value]) => ({ path, text: value === null ? null : sortedJson(value) }));
     await core.bgitWrite({ dir, files: writes });

@@ -20,7 +20,7 @@ import { ownLogbookWindow, noLogbookWindow } from './window-logbook.js';
 import { nextProgress } from './sync-progress.js';
 import { transferCount } from './first-launch.js';
 import { failureCause, isRefused, retryDelay } from './sync-failure.js';
-import { applyDeviceSettings, keepCylinderLibrary, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
+import { applyDeviceSettings, keepDiveComputers, prefsAfterLoad } from './settings.svelte.js';
 import { fitFilesInZip, isZipName, MAX_ZIP_BYTES, toBase64 } from './zip-fit.js';
 import { stageFile } from './staged-file.js';
 import { importProgress } from './import-progress.svelte.js';
@@ -224,7 +224,6 @@ export async function tripChange(options) {
 export async function renameCylinderType(name, newName) {
   const result = await BenthicCore.cylinderTypes({ action: 'rename', name, value: newName });
   invalidateCoreCache();
-  keepCylinderLibrary(result.library);
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   await persistChanges();
@@ -251,7 +250,6 @@ export async function previewCylinderTypeDeletion(name) {
 export async function deleteCylinderType(name) {
   const result = await BenthicCore.cylinderTypes({ action: 'delete', name });
   invalidateCoreCache();
-  keepCylinderLibrary(result.library);
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   logbook.dives = await BenthicCore.listLoadedDives();
@@ -744,7 +742,8 @@ export async function undoLastChange(redo = false) {
     logbook.dives = await BenthicCore.listLoadedDives();
     logbook.sitesVersion++;
   }
-  if (result.cylinderTypes) keepCylinderLibrary(result.cylinderTypes.library);
+  // An undone or redone rename of a cylinder type: the added type's file follows.
+  if (result.cylinderTypes) import('./cylinder-type-library.svelte.js').then((m) => m.followCoreTypes(result.cylinderTypes.types)).catch((e) => console.error('Cylinder types', e));
   logbook.undoText = result.undo;
   logbook.redoText = result.redo ?? '';
   await persistChanges();

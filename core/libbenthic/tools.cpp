@@ -81,7 +81,7 @@ int gas_cylinder_types(std::string &json)
 	for (const auto &ti: tank_info_table)
 		add(ti.name);
 	if (tank_info_table.empty() && prefs.display_default_tank_infos)
-		for (const auto &ti: get_tank_info_baseline())
+		for (const auto &ti: internal::cylinder_library())
 			add(ti.name);
 
 	json = "{\"default\":";
@@ -92,7 +92,7 @@ int gas_cylinder_types(std::string &json)
 			json += ',';
 		auto [size, pressure] = get_tank_info_data(tank_info_table, names[i]);
 		if (!size.mliter && !pressure.mbar)
-			std::tie(size, pressure) = get_tank_info_data(get_tank_info_baseline(), names[i]);
+			std::tie(size, pressure) = get_tank_info_data(internal::cylinder_library(), names[i]);
 		json += "{\"name\":";
 		tools_json_string(json, names[i]);
 		json += ",\"ml\":" + std::to_string(size.mliter) + ",\"workingPressureMbar\":" + std::to_string(pressure.mbar) + '}';

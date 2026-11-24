@@ -189,28 +189,22 @@ export function applyDeviceSettings() {
   // "Choisir le type d’eau dans l’éditeur" is on by default in Benthic; the
   // depth grid is no longer a setting: the core's default.
   storedCore.salinityEdit ??= true;
-  // "Proposer les tailles standard" is off by default in Benthic (task
-  // 2026-11-12-48), on in Subsurface: the cylinder type choice shows the
-  // diver's own types and those of the logbook. A value chosen stays.
-  storedCore.displayDefaultTankInfos ??= false;
+  // The core's default table is never the list of cylinder types (task 2026-11-23-373): it is offered as suggestions
+  // only. The value an older version stored is dropped; the core is told "off" at each start.
+  delete storedCore.displayDefaultTankInfos;
   // "Afficher les bouteilles inutilisées" is on by default in Benthic (task
   // 2026-11-12-56), off in Subsurface: every cylinder entered or imported shows.
   storedCore.includeUnusedTanks ??= true;
   delete storedCore.threeMGrid;
   // A value refused by this core (an older version kept something else): the others are kept.
-  if (Object.keys(storedCore).length) {
-    send('Restoring the settings of this device', () => BenthicCore.setPrefs({ changes: storedCore }));
-  }
+  send('Restoring the settings of this device', () => BenthicCore.setPrefs({ changes: { ...storedCore, displayDefaultTankInfos: false } }));
   const computers = readJson(COMPUTERS_KEY);
   if (Array.isArray(computers)) {
     send('Restoring the dive computers of this device', () => BenthicCore.setPrefs({ changes: { diveComputerList: computers } }));
   }
-  const library = readJson(LIBRARY_KEY);
-  if (Array.isArray(library)) {
-    send('Restoring the cylinder types of this device', () =>
-      BenthicCore.cylinderTypes({ action: 'library', value: JSON.stringify({ library }) }),
-    );
-  }
+  // The cylinder types the diver added are files of the account data: migrated from the old device library once, then
+  // given to the core (lib/cylinder-type-library.svelte.js).
+  send('Restoring the cylinder types of this device', () => import('./cylinder-type-library.svelte.js').then((m) => m.startCylinderTypes()));
   return Promise.all(calls).then(() => {});
 }
 
@@ -220,9 +214,7 @@ export function applyDeviceSettings() {
  * chosen on this device stays; what was not follows the log.
  */
 export async function prefsAfterLoad() {
-  if (Object.keys(storedCore).length) {
-    await BenthicCore.setPrefs({ changes: storedCore }).catch((/** @type {unknown} */ e) => console.error('Restoring the settings of this device', e));
-  }
+  await BenthicCore.setPrefs({ changes: { ...storedCore, displayDefaultTankInfos: false } }).catch((/** @type {unknown} */ e) => console.error('Restoring the settings of this device', e));
   return BenthicCore.getPrefs();
 }
 
@@ -306,12 +298,18 @@ export function keepDiveComputers(list) {
 }
 
 /**
- * Keeps the device's cylinder types library after a change.
- * @param {string[]} library
+ * The cylinder types library an older version kept on this device (strings, « name TAB ml TAB bar TAB cuft TAB psi »),
+ * or null when there is none: read once to migrate it (lib/cylinder-type-library.svelte.js), then dropped.
+ * @returns {string[]|null}
  */
-export function keepCylinderLibrary(library) {
-  invalidateCoreCache(); // the cylinder types the tools list
-  writeJson(LIBRARY_KEY, library);
+export function oldCylinderLibrary() {
+  const library = readJson(LIBRARY_KEY);
+  return Array.isArray(library) ? library : null;
+}
+
+/** Drops the old cylinder types library once its added types are files. */
+export function dropOldCylinderLibrary() {
+  writeJson(LIBRARY_KEY, null);
 }
 
 /**

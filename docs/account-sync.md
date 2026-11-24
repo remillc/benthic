@@ -13,6 +13,7 @@ section 11 (11.3 the `benthic` branch and its merge rules, 11.5 encryption) stay
 | Diver profile (name, date of birth, emergency contact, blood group…) | `profile/diver.json` | `benthic` branch, same path; every sensitive field in the sealed `enc` block (#136) |
 | Equipment pieces | `gear/<id>.json` | branch, same path |
 | Kits | `kits/<id>.json` | branch |
+| Cylinder types the diver added (task 2026-11-23-373) | `cylinder-types/<id>.json` = `{ format: 1, id, name, ml, mbar, createdAt, updatedAt }` | branch, same path; one file per type, so that two devices adding different types merge cleanly. The clean-up pass merges two files with the same normalised name (earliest id stays, the size with the later `updatedAt` wins, the other file is removed). Never written to the Subsurface log (`main` branch): a dive still copies the name, volume and pressure into its own cylinder. In memory, the app gives the list to the core at start and after each sync (`cylinderTypes` action `added`) so that the dive editor, the planner and the tools offer the types. Free and local mode keep the same files in the device store, unsynced; joining an account matches them by normalised name, like kits |
 | Maintenance (reminders and history) | `maintenance/<id>.json` | branch; `history` entries are combined by `id` |
 | What a dive used | `dive-equipment/<id>.json` (keyed by `diveKey.benthicId`, the dive's Benthic id; `diveKey.start` until moved, « Dive ids ») | branch, plus a clean-up pass: at most one file per `diveKey` |
 | Dive validations | `dive-validations/<id>.json` | branch |
@@ -46,7 +47,8 @@ No screen code; receives `core`, `store` and `box` (tested with fakes, as `serve
 8. Write `meta/sync.json` `{ accountKey, head }`, then reload inventory and profile and reschedule notifications.
 
 **Clean-up pass** after a merge: drop kit `gearIds` and `dive-equipment` links to missing pieces; merge `dive-equipment`
-files that share a `diveKey` (newest `updatedAt` wins, `gearIds` combined); remove maintenance whose piece is gone. The move of the dive references to the dives' ids (« Dive ids ») runs just before it, at every run.
+files that share a `diveKey` (newest `updatedAt` wins, `gearIds` combined); remove maintenance whose piece is gone. The move of the dive references to the dives' ids (« Dive ids ») runs just before it, at every run. Cylinder types: merge `cylinder-types` files
+that share a normalised name (earliest id stays, the size with the later `updatedAt` wins, the other file is removed).
 
 **When it runs:** at start once the logbook is open; about 3 s after a change (`inventory.svelte.js` `change()`,
 `profile.svelte.js` `changeProfile()`, same debounce as `persistChanges`); right after each dives sync (`syncEdits`);

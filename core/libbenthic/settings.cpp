@@ -437,7 +437,7 @@ int set_prefs(const std::string &changes_json, std::string &error)
 	bool tank_infos_changed = p.display_default_tank_infos != prefs.display_default_tank_infos;
 	prefs = p;
 	if (tank_infos_changed)
-		reset_tank_info_table(tank_info_table); // as preferences_equipment.cpp
+		internal::refresh_cylinder_table(); // as preferences_equipment.cpp
 	return 0;
 }
 
@@ -445,11 +445,35 @@ int set_prefs(const std::string &changes_json, std::string &error)
 
 namespace internal {
 
+static bool library_owned = false;
+
+std::vector<tank_info> &cylinder_library()
+{
+	if (!library_owned) {
+		set_tank_info_baseline({});
+		library_owned = true;
+	}
+	return get_tank_info_baseline();
+}
+
+void refresh_cylinder_table()
+{
+	std::vector<tank_info> &library = internal::cylinder_library();
+	reset_tank_info_table(tank_info_table);
+	// The diver's size wins over the one a dive's cylinder carries (the dive keeps its own copy).
+	for (const tank_info &info: library) {
+		if (tank_info *row = get_tank_info(tank_info_table, info.name))
+			*row = info;
+		else
+			tank_info_table.push_back(info);
+	}
+}
+
 bool cylinder_type_name_in_use(const std::string &name)
 {
 	auto same = [&name](const tank_info &ti) { return ti.name == name; };
 	return std::any_of(tank_info_table.begin(), tank_info_table.end(), same) ||
-	       std::any_of(get_tank_info_baseline().begin(), get_tank_info_baseline().end(), same);
+	       std::any_of(internal::cylinder_library().begin(), internal::cylinder_library().end(), same);
 }
 
 } // namespace internal
@@ -457,7 +481,7 @@ bool cylinder_type_name_in_use(const std::string &name)
 int cylinder_types(std::string &json)
 {
 	std::vector<tank_info> standard = default_tank_info_table();
-	std::vector<tank_info> &library = get_tank_info_baseline();
+	std::vector<tank_info> &library = internal::cylinder_library();
 	std::vector<const tank_info *> sorted;
 	for (const tank_info &info: tank_info_table)
 		sorted.push_back(&info);
@@ -506,9 +530,57 @@ int cylinder_types(std::string &json)
 
 void reset_cylinder_library()
 {
-	// "Reset all settings": the device's library back to Subsurface's list.
-	set_tank_info_baseline(default_tank_info_table());
-	reset_tank_info_table(tank_info_table);
+	// "Reset all settings": the diver's own types are logbook data, not settings, and stay; the table is rebuilt.
+	internal::refresh_cylinder_table();
+}
+
+int set_added_cylinder_types(const std::string &added_json, std::string &error)
+{
+	// {"added":["name\tml\tmbar", ...]}: the diver's own types, from the `cylinder-types/` files, instead of the library.
+	std::vector<std::pair<std::string, JsonValue>> fields;
+	if (!JsonReader(added_json).object(fields) || fields.size() != 1 || fields[0].first != "added" ||
+	    fields[0].second.kind != JsonValue::LIST) {
+		error = "BAD_REQUEST: added";
+		return -1;
+	}
+	std::vector<tank_info> library;
+	for (const std::string &line: fields[0].second.list) {
+		size_t a = line.find('\t');
+		size_t b = a == std::string::npos ? a : line.find('\t', a + 1);
+		if (a == std::string::npos || b == std::string::npos || a == 0) {
+			error = "BAD_REQUEST: added entry";
+			return -1;
+		}
+		tank_info info { line.substr(0, a), 0, 0, 0, 0 };
+		int ml = atoi(line.substr(a + 1, b - a - 1).c_str()), mbar = atoi(line.substr(b + 1).c_str());
+		if (ml > 0)
+			update_tank_info_data(info, volume_t { .mliter = ml }, pressure_t { .mbar = mbar });
+		library.push_back(info);
+	}
+	internal::cylinder_library(); // takes the library over from Subsurface's default list
+	set_tank_info_baseline(std::move(library));
+	internal::refresh_cylinder_table();
+	return 0;
+}
+
+int default_cylinder_types(std::string &json)
+{
+	// Subsurface's default table, as suggestions only (never copied into the library).
+	json = "{\"types\":[],\"library\":[],\"defaults\":[";
+	bool first = true;
+	for (const tank_info &info: default_tank_info_table()) {
+		auto [size, pressure] = extract_tank_info(info);
+		if (!first)
+			json += ',';
+		first = false;
+		json += "{\"name\":";
+		append_string(json, info.name);
+		json += ",\"ml\":" + std::to_string(size.mliter) + ",\"mbar\":" + std::to_string(pressure.mbar);
+		// Imperial entries carry cubic feet and psi: they are offered when the volume unit is cubic feet.
+		json += std::string(",\"imperial\":") + (info.cuft || info.psi ? "true" : "false") + "}";
+	}
+	json += "]}";
+	return 0;
 }
 
 int set_cylinder_library(const std::string &library_json, std::string &error)
@@ -537,15 +609,16 @@ int set_cylinder_library(const std::string &library_json, std::string &error)
 		library.push_back(tank_info { parts[0], atoi(parts[3].c_str()), atoi(parts[1].c_str()),
 					      atoi(parts[4].c_str()), atoi(parts[2].c_str()) });
 	}
+	internal::cylinder_library(); // takes the library over from Subsurface's default list
 	set_tank_info_baseline(std::move(library));
-	reset_tank_info_table(tank_info_table);
+	internal::refresh_cylinder_table();
 	return 0;
 }
 
 int cylinder_type_action(const std::string &action, const std::string &name, int ml, int mbar, std::string &json,
 			 std::string &error)
 {
-	std::vector<tank_info> &library = get_tank_info_baseline();
+	std::vector<tank_info> &library = internal::cylinder_library();
 	if (action == "add") {
 		// TankInfoModel::add(), then the size and pressure typed in the sheet.
 		if (name.empty()) {

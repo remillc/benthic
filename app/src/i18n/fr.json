@@ -985,10 +985,6 @@
       "label": "Afficher les bouteilles inutilisées",
       "text": "Et les inclure à l’export, la copie et la fusion"
     },
-    "standardSizes": {
-      "label": "Proposer les tailles standard",
-      "text": "Dans le choix du type de bouteille"
-    },
     "cylinderTypes": {
       "label": "Types de bouteilles",
       "text": "Ajouter, renommer, retirer"
@@ -1155,21 +1151,13 @@
     },
     "cylinders": {
       "title": "Types de bouteilles",
-      "intro": "Proposés quand on choisit le type d’une bouteille. Renommer un type renomme aussi les bouteilles de ce type dans le carnet. Changer sa taille ne modifie pas les plongées existantes. Supprimer un de vos types retire ses bouteilles des plongées qui l’utilisent.",
-      "yours": "Vos types",
-      "standard": "Standard",
-      "standardNote": "Les types standard sont modifiables comme les vôtres.",
-      "hidden": "Les tailles standard sont masquées : le réglage « Proposer les tailles standard » est désactivé.",
+      "intro": "Les types de bouteilles de votre carnet, et ceux que vous ajoutez. Proposés quand on choisit le type d’une bouteille. Renommer un type renomme aussi les bouteilles de ce type dans le carnet ; changer sa taille ne modifie pas les plongées existantes.",
       "add": "Ajouter un type",
       "newTitle": "Nouveau type",
       "editTitle": "Modifier le type",
       "name": "Nom",
       "volume": "Volume",
       "pressure": "Pression de service",
-      "delete": "Retirer ce type",
-      "deleteTitle": "Retirer {name} ?",
-      "deleteText": "Le type n’est plus proposé. Les plongées existantes ne changent pas.",
-      "deleteAction": "Retirer",
       "deleteType": "Supprimer ce type",
       "deleteTypeTitle": "Supprimer « {name} » ?",
       "deleteTypeAction": "Supprimer",
@@ -1179,7 +1167,6 @@
       "deleteKept": { "one": "Dans {n} plongée où elle sert au profil ou est la seule bouteille, elle reste, sans type.", "other": "Dans {n} plongées où elle sert au profil ou est la seule bouteille, elle reste, sans type." },
       "deleteIrreversible": "Cette action ne peut pas être annulée.",
       "deleteRemovedDialog": { "one": "Le supprimer retire cette bouteille de cette plongée.", "other": "Le supprimer retire cette bouteille de ces {n} plongées." },
-      "standardMore": { "one": "Et {n} autre type standard…", "other": "Et {n} autres types standard…" },
       "unknown": "Type inconnu",
       "fromLogbook": "Ce type vient des plongées du carnet. Il reste proposé tant qu’une plongée l’utilise.",
       "nameInUse": "Ce nom est déjà celui d’un type",
@@ -1196,10 +1183,12 @@
       "usedInNoDive": "utilisé dans aucune plongée",
       "usedInOneDive": "utilisé dans 1 plongée",
       "usedInDives": "utilisé dans {n} plongées",
-      "noteStandard": "Type standard, {use}. Le renommer renomme aussi ces bouteilles dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
-      "noteYours": "Type personnel, {use}. Le renommer renomme aussi ces bouteilles dans le carnet. Changer sa taille ne modifie pas les plongées existantes.",
       "volumeNoteCuft": "Le volume de gaz à la pression de service, en pieds cubes. En unités métriques, on saisit le volume d’eau de la bouteille en litres.",
-      "volumeNoteLitres": "Le volume d’eau de la bouteille, en litres. En unités impériales, on saisit le volume de gaz à la pression de service, en pieds cubes. La pression de service est facultative pour un volume en litres."
+      "volumeNoteLitres": "Le volume d’eau de la bouteille, en litres. En unités impériales, on saisit le volume de gaz à la pression de service, en pieds cubes. La pression de service est facultative pour un volume en litres.",
+      "addedUnused": "Ajouté par vous · dans aucune plongée",
+      "commonSizes": "Tailles courantes",
+      "commonSizesNote": "Touchez une taille pour remplir le nom, le volume et la pression.",
+      "note": "{use}. Le renommer renomme aussi ces bouteilles dans le carnet. Changer sa taille ne modifie pas les plongées existantes."
     },
     "paperSize": {
       "label": "Format du papier (impression)",
@@ -2859,6 +2848,7 @@
       "Photos et vidéos (Benthic+) : la fiche d’une plongée montre les photos et les vidéos en miniatures, avec « Ajouter », la ligne « sur tous vos appareils » et « Tout voir » qui ouvre la galerie de la plongée. Elles sont envoyées au compte (10 Go) et suivent le plongeur sur ses autres appareils : les miniatures sont toujours gardées, les originaux arrivent en Wi-Fi selon Réglages › Carnet (« Toutes », « Celles des 12 derniers mois », « À la demande ») et s’ouvrent à la demande. Hors ligne, les envois attendent le retour du réseau. La version gratuite ne montre pas la section.",
       "Ordinateur, Carnet : la barre de défilement de la liste se saisit de nouveau à la souris (elle était sous la poignée du séparateur des deux panneaux) et s’élargit quand le pointeur passe dessus.",
       "Ordinateur, liste du carnet : dans une colonne étroite, la recherche devient une loupe à gauche du bouton des colonnes et de ⋮, qui restent visibles à toute largeur ; la loupe ou Ctrl+F ouvre le champ sur toute la largeur de l’en-tête, ✕ ou Échap le ferme, et la ligne de résumé est coupée par une ellipse.",
+      "Types de bouteilles : une seule liste, ceux des plongées du carnet et ceux que vous ajoutez, avec le nombre de plongées de chacun (« Ajouté par vous · dans aucune plongée » et l’étiquette « Inutilisé » pour un type de vous que nulle plongée n’utilise). « Standard » et « Et N autres types standard » disparaissent. Chaque type s’ouvre dans le même écran « Modifier le type » (une fenêtre sur ordinateur), avec « Supprimer ce type ». « Nouveau type » propose des « Tailles courantes » (AL80, HP100… en unités impériales ; 10 L, 12 L, 15 L 232 bar… en métrique) qui remplissent le nom, le volume et la pression ; le choix de la bouteille par défaut les liste aussi, sous « Tailles courantes ». Les types que vous ajoutez sont gardés avec le compte (sans rien écrire dans le carnet) : ils apparaissent sur vos autres appareils avant qu’une plongée les utilise, et leur renommage ou leur suppression les suit. Les types de l’ancienne liste de l’appareil que vous aviez ajoutés ou dont vous aviez changé la taille sont repris. « Proposer les tailles standard » quitte Réglages › Équipement.",
       "Types de bouteille : un type sans pression de service (venu d’une plongée) n’affiche plus « 0 » en pieds cubes et se renomme sans erreur ; un volume saisi sans pression demande la pression de service.",
       "Équipement : l’icône du recycleur montre deux grandes bouteilles de part et d’autre d’un épurateur sur son support, reliés par deux tuyaux, et ne ressemble plus à un bi-bouteille.",
       "Icônes : 89 icônes de l’application passent aux glyphes arrondis de Material Symbols (flèches, nuage, dossier, appareil photo, clé, calendrier, localisation, réglages, etc.) ; le mélangeur de gaz garde un dessin de bouteille que l’on remplit, et le couteau de plongée a un nouveau dessin.",

@@ -15,6 +15,7 @@
 import { sameComputer } from './dc-model.js';
 import { isShortId, newId } from './short-id.js';
 import { migrateDiveIdsInStore } from './dive-id-migration.js';
+import { CYLINDER_TYPES_FOLDER, isTypeFile, pathOfType } from './cylinder-type-files.js';
 
 import { ruleProblems } from './maintenance.js';
 import { rekey as rekeyValidations } from './validation.js';
@@ -565,6 +566,21 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       }
       await commit([[`gear/${piece.id}.json`, piece]]);
       return { added: true, gear: piece };
+    },
+
+    /** The cylinder types the diver added (lib/cylinder-type-files.js). @returns {Promise<import('./cylinder-type-files.js').CylinderTypeFile[]>} */
+    async listCylinderTypes() {
+      return (await store.readAll(CYLINDER_TYPES_FOLDER)).filter(isTypeFile);
+    },
+
+    /**
+     * Writes and removes added types in one step, tracked for the sync. Not refused when the subscription ended: these
+     * types are a setting of the diver's list, not Benthic+ data.
+     * @param {import('./cylinder-type-files.js').CylinderTypeFile[]} files
+     * @param {string[]} [removeIds]
+     */
+    async changeCylinderTypes(files, removeIds = []) {
+      await store.trackedBatch({ writes: files.map((f) => [pathOfType(f.id), f]), removes: removeIds.map(pathOfType) });
     },
 
     /** @returns {Promise<{ id: string, name: string, gearIds: string[], createdAt: string, updatedAt: string }[]>} */

@@ -1255,7 +1255,7 @@ Java_app_benthicdivelog_core_NativeCore_setPrefs(JNIEnv *env, jobject, jstring c
 		throw_core_error(env, error);
 }
 
-// Cylinder types: list, library (set the device's library from `value`), add,
+// Cylinder types: list, library (set the device's library from `value`), added (the diver's own types from `value`), defaults (the common sizes), add,
 // size, remove, rename (to `value`, one undoable step). Each returns
 // {"cylinderTypes":…, "undo":…, "redo":…}.
 JNIEXPORT jstring JNICALL
@@ -1269,6 +1269,10 @@ Java_app_benthicdivelog_core_NativeCore_cylinderTypes(JNIEnv *env, jobject, jstr
 		ret = benthic::cylinder_types(json);
 	else if (action == "library")
 		ret = benthic::set_cylinder_library(value, error) ? -1 : benthic::cylinder_types(json);
+	else if (action == "added")
+		ret = benthic::set_added_cylinder_types(value, error) ? -1 : benthic::cylinder_types(json);
+	else if (action == "defaults")
+		ret = benthic::default_cylinder_types(json);
 	else if (action == "standard") {
 		benthic::reset_cylinder_library();
 		ret = benthic::cylinder_types(json);

@@ -28,10 +28,12 @@ test('one dive reads in the singular', () => {
   assert.doesNotMatch(deletionSentences({ removed: 0, kept: 1 })[0], /dives|plongées/);
 });
 
-test('your types can be deleted; standard types and the unknown type cannot', () => {
-  assert.equal(deletable({ name: 'ALU 3L', standard: false }), true);
-  assert.equal(deletable({ name: 'AL80', standard: true }), false);
-  assert.equal(deletable({ name: UNKNOWN_CYLINDER_TYPE, standard: false }), false);
+// Task 2026-11-23-373: the list has no « Standard » section any more, so every type can be deleted but the type a cylinder
+// keeps when its own was deleted. (Before: a type named like a standard one, « AL80 », could not be deleted.)
+test('every type can be deleted but the unknown type', () => {
+  assert.equal(deletable({ name: 'ALU 3L' }), true);
+  assert.equal(deletable({ name: 'AL80' }), true);
+  assert.equal(deletable({ name: UNKNOWN_CYLINDER_TYPE }), false);
 });
 
 test('a cylinder that kept the unknown type reads « Type inconnu »; other names are shown as they are', () => {
@@ -45,8 +47,8 @@ test('the screen: an unused type is deleted without a dialog, a used one asks fi
   // No dive: deleteNow() before any confirmAction().
   assert.ok(src.indexOf('if (!type.dives)') < src.indexOf('confirmAction({\n        title: t(\'settings.cylinders.deleteTypeTitle\''));
   assert.match(src, /danger: true/);
-  // Standard types keep « Retirer ce type » (only the device's list changes).
-  assert.match(src, /action: 'remove'/);
+  // One screen for every type: no « Retirer ce type » any more.
+  assert.ok(!/action: 'remove'/.test(src));
   assert.match(src, /\{#if deletable\(type\)\}/);
 });
 

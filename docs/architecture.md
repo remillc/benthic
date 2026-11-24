@@ -354,6 +354,7 @@ Renamed on 22 November 2026 (it was `opendives`, with `opendives.json` and the k
 benthic.json                   { "format": 1, "kind": "benthic-data", "minReader": 1, "createdAt": "..." }
 gear/<id>.json                     inventory item: cylinder, regulator, suit, ... (#42)
 kits/<id>.json                     kit: a name and the `gearId`s of its pieces (#42, added on 17 November 2026)
+cylinder-types/<id>.json           a cylinder type the diver added (task 2026-11-23-373): { format: 1, id, name, ml, mbar, createdAt, updatedAt }; one file per type, never in the Subsurface log. Two files with the same normalised name (letters and digits, case and accents ignored) merge in the clean-up pass: earliest id, the later `updatedAt`'s size, the other file removed. The core's default table (`default_tank_info_table()`) is code, not data: it is never copied or synced, only offered as « Tailles courantes »
 maintenance/<id>.json              reminder or service record (#47)
 gas-analyses/<id>.json             analysis of a cylinder's gas (#49)
 certifications/<id>.json           certification or document (#48), sensitive: encrypted
