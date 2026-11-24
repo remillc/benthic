@@ -145,6 +145,17 @@ export function createServerApi({ baseUrl, transport }) {
     },
 
     /**
+     * Signs in with an Apple account (the answer of signInWithApple); the account is created when it is new.
+     * @param {{ idToken: string, nonce: string, authorizationCode?: string, name?: string }} apple
+     * @returns {Promise<ServerSession>}
+     */
+    async signInApple({ idToken, nonce, authorizationCode, name }) {
+      const r = await call('POST', '/v1/auth/apple', { identityToken: idToken, nonce, ...(authorizationCode ? { authorizationCode } : {}), ...(name ? { name } : {}) });
+      if (typeof r.sessionToken !== 'string' || !r.repository?.url || !r.git?.token) throw new ServerError('UNREACHABLE');
+      return r;
+    },
+
+    /**
      * What the account screen shows (task 2026-11-18-281): how the diver signs in, the subscription and the photo space.
      * Every field is optional and the screen shows a placeholder for what is missing. Expected shape:
      * `{ email, signInMethod: 'google'|'apple'|'email', subscription: { subscribed: boolean, store:

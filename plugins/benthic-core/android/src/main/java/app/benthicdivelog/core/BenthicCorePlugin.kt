@@ -1787,6 +1787,12 @@ class BenthicCorePlugin : Plugin() {
         if (json == null) call.resolve(JSObject().put("action", "cancelled")) else call.resolve(JSObject(json))
     }
 
+    /** Sign in with Apple exists on iPhone and iPad only: Android answers {action: "unavailable"}. */
+    @PluginMethod
+    fun appleSignIn(call: PluginCall) {
+        call.resolve(JSObject().put("action", "unavailable"))
+    }
+
     /**
      * The document scanner (DocumentScanActivity: ML Kit Document Scanner, then text recognition).
      * Resolves with {action: "cancelled"}, {action: "unavailable"} or {action: "done", image (base64 JPEG), text}.

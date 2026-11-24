@@ -43,7 +43,7 @@ test('the action sheet: the explanation, the action in red, « Annuler » apart'
   assert.match(page, /bc-cylinder-type--delete-ios/);
 });
 
-test('StoreKit and Sign in with Apple stay inert: the same « not available » answers', async () => {
+test('StoreKit stays inert, and Sign in with Apple without the plugin: the same « not available » answers', async () => {
   assert.deepEqual(await purchaseSubscription(), { status: 'unavailable' });
   assert.deepEqual(await restorePurchases(), { status: 'unavailable' });
   assert.deepEqual(await signInWithApple(), { status: 'unavailable' });
