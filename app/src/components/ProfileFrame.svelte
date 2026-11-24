@@ -32,9 +32,9 @@
   {:else if bar === 'dialog'}
     <div class="bc-pf--main"></div>
     <div class="bc-pf--scrim"></div>
-    <div class="bc-pf--box" role="dialog" aria-modal="true">{@render children?.()}</div>
+    <div class="bc-pf--box" data-bc-scroll role="dialog" aria-modal="true">{@render children?.()}</div>
   {:else}
-    <div class="bc-pf--main" class:bc-pf--padded={bar === 'main'}>
+    <div class="bc-pf--main" data-bc-scroll class:bc-pf--padded={bar === 'main'}>
       {#if children}{@render children()}{:else}<p class="bc-pf--empty">{t('gear.profile.paneEmpty')}</p>{/if}
     </div>
   {/if}

@@ -165,7 +165,7 @@
         <input type="search" class="bc-detail-sheet--search-input" placeholder={t('desktopDetail.sheetSearch')} aria-label={t('desktopDetail.sheetSearch')} bind:value={query} />
       </div>
     {/if}
-    <ul class="bc-detail-sheet--list" role="listbox" aria-label={title}>
+    <ul class="bc-detail-sheet--list" data-bc-scroll role="listbox" aria-label={title}>
       {#each shown as option (option.value)}
         {#if option.divider}<li class="bc-detail-sheet--divider" role="separator"></li>{/if}
         <li role="option" aria-selected={option.value === value}>

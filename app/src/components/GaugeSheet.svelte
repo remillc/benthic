@@ -75,7 +75,7 @@
   <div class="bc-gauge-sheet--scrim" onclick={oncancel}></div>
   <div class="bc-gauge-sheet--surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1">
     <span class="bc-gauge-sheet--handle" aria-hidden="true"></span>
-    <div class="bc-gauge-sheet--body">
+    <div class="bc-gauge-sheet--body" data-bc-scroll>
       <h2 {id} class="bc-gauge-sheet--title">{t(two ? 'gauge.readTwo' : 'gauge.readOne')}</h2>
       <p class="bc-gauge-sheet--note">
         {#if two}

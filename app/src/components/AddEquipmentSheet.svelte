@@ -77,7 +77,7 @@
       {#if query}<SearchClear onclear={() => (query = '')} />{/if}
     </div>
 
-    <div class="bc-add-equipment--scroll">
+    <div class="bc-add-equipment--scroll" data-bc-scroll>
       {#if kits.length}
         <h3 class="bc-add-equipment--group">{t('gear.addSheet.kits')}</h3>
         <div class="bc-add-equipment--chips">

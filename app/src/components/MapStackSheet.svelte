@@ -44,7 +44,7 @@
 </script>
 
 <Sheet class="bc-map-stack-sheet bc-sheet-dialog" opened onSheetClosed={closed} backdrop swipeToClose push={false} aria-label={title}>
-  <div class="bc-map-stack-sheet--content" bind:this={content}>
+  <div class="bc-map-stack-sheet--content" data-bc-scroll bind:this={content}>
     <div class="bc-map-stack-sheet--handle" aria-hidden="true"></div>
     <div class="bc-map-stack-sheet--head">
       <h2 class="bc-map-stack-sheet--title">{title}</h2>

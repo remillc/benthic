@@ -2930,6 +2930,7 @@
     "feedbackText": "On the project page, in GitHub",
     "releaseNotes": [
       "iPhone and iPad: « Continue with Apple » signs you in with your Apple Account, a hidden address included; an existing Benthic+ account with the same address is used. Deleting the account also revokes the access Apple gave Benthic.",
+      "Scrollbar: on phones and tablets, a page, a sheet or a dialog taller than the screen shows a thin bar at the right edge for as long as it can scroll; a dialog's title and buttons stay outside it.",
       "Clean up the sites: Sites has a single row “Clean up the sites” (“n items to fix”) that opens a status page with one row per problem: possible duplicates, sites without a dive, dives without a site, sites without coordinates. Each row opens its own screen, and Back returns to the status page. “Delete” for sites without a dive stays at the top of the screen, visible however long the list is. New: “Sites without coordinates” offers the GPS position of one of the site’s dives, or “Place on the map” (“Search for a place”, a pin to drag, my position, coordinates, country and region). On the desktop, the two banners above the list become one: “n items to fix”.",
       "New logbook on the device: it no longer keeps the sites of the sample logbook. An empty logbook no longer reports sites without a dive in Sites.",
       "Opening a .benthic file from another app (Files, mail, share sheet): it now goes through the same steps as “A file” — the first import on a new device, or “Replace this logbook?” — instead of being refused.",

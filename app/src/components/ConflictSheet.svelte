@@ -348,7 +348,7 @@
             <button type="button" class="bc-conflict-sheet--tonal bc-conflict-sheet--continue bc-conflict-sheet--bar-action" disabled={busy} onclick={choose}>{t('conflict.continue')}</button>
           {/if}
         </div>
-        <div class="bc-conflict-sheet--full-body">
+        <div class="bc-conflict-sheet--full-body" data-bc-scroll>
           {#if detailItem}{@render body()}{:else}{@render many()}{/if}
         </div>
       </div>
