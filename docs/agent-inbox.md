@@ -7524,3 +7524,7 @@ Christian asked for this on 24 November 2026. Work in `main`. This replaces part
 3. The row opens its menu with Enter or Space too; the screen reader names the row, its value and that it opens a menu.
 
 Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`, `docs/mockups/bureau-reglages-langue.dc.html`.
+
+## [ ] 2026-11-24-393 Desktop Réglages › Unités: the « Système d’unités » explanation goes under its card
+
+Christian asked for this on 24 November 2026. Work in `main`. On desktop (Windows/Linux and macOS), the line « Métrique et Impérial règlent toutes les unités d’un coup. Changer une unité passe en Personnalisé. » leaves the white card: the card holds only « Système d’unités » and its button group (task 392). The line sits right under the card, 13 px #4B4A47, aligned with the section title (4 px inset), as a note on the card, not part of the row. Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`.
