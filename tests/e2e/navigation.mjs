@@ -1925,7 +1925,7 @@ async function certsFabFlows(expect) {
     await sleep(300);
     const populated = await tab.run(() => {
       const page = document.querySelector('.page-current.bc-docs');
-      return { empty: !!page.querySelector('.bc-docs--empty'), card: !!page.querySelector('.bc-docs--row') };
+      return { empty: !!page.querySelector('.bc-docs--empty'), card: !!page.querySelector('.bc-docs--card') };
     });
     expect(`${label}: a saved document replaces the empty state`, { empty: false, card: true }, populated);
     tab.ws.close();
