@@ -102,6 +102,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "renumberDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "mergeDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "editDives", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "shiftTime", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "benthicIds", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "importCsv", returnType: CAPPluginReturnPromise),
@@ -570,6 +571,16 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         }
         onCoreThread(call) { [self] in
             call.resolve(["json": try BenthicNative.editDives(numbers(ids), changes: text)])
+        }
+    }
+
+    @objc func shiftTime(_ call: CAPPluginCall) {
+        guard let ids = intList(call, "ids"), !ids.isEmpty, let seconds = call.getInt("seconds") else {
+            call.reject("Missing ids or seconds", "BAD_ARGUMENT")
+            return
+        }
+        onCoreThread(call) { [self] in
+            call.resolve(["json": try BenthicNative.shiftTime(numbers(ids), seconds: seconds)])
         }
     }
 

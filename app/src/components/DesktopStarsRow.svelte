@@ -10,10 +10,11 @@
    *   label: string,
    *   value: number,
    *   name?: string,
+   *   text?: string,
    *   onsave: (value: number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, value, name = '', onsave } = $props();
+  let { label, value, name = '', text = '', onsave } = $props();
 
   const uid = $props.id();
   const current = $derived(Math.min(Math.max(Number(value) || 0, 0), 5));
@@ -56,7 +57,7 @@
         </button>
       {/each}
     </span>
-    <span class="bc-desktop-stars-row--value">{current ? t('desktopDetail.starsOf', { n: current }) : t('desktopDetail.notRated')}</span>
+    <span class="bc-desktop-stars-row--value">{text || (current ? t('desktopDetail.starsOf', { n: current }) : t('desktopDetail.notRated'))}</span>
   </div>
 </div>
 

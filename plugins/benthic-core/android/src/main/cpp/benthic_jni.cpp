@@ -702,6 +702,25 @@ Java_app_benthicdivelog_core_NativeCore_editDives(JNIEnv *env, jobject, jintArra
 	return edit_result(env, json);
 }
 
+// The start time of several dives moves by `seconds`: one undoable step (shift_time).
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_shiftTime(JNIEnv *env, jobject, jintArray diveIds, jint seconds)
+{
+	std::vector<int> ids;
+	if (diveIds) {
+		jsize n = env->GetArrayLength(diveIds);
+		ids.resize(n);
+		if (n)
+			env->GetIntArrayRegion(diveIds, 0, n, ids.data());
+	}
+	std::string json, error;
+	if (benthic::shift_time(ids, seconds, json, error)) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
 // The stable dive ids: "audit" lists them, "assign" writes the ones the app made (benthic_ids_json, assign_benthic_ids).
 JNIEXPORT jstring JNICALL
 Java_app_benthicdivelog_core_NativeCore_benthicIds(JNIEnv *env, jobject, jstring action, jstring assignments)

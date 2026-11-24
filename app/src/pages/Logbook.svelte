@@ -33,6 +33,8 @@
   import ActiveFilter from '../components/ActiveFilter.svelte';
   import RenumberDialog from '../components/RenumberDialog.svelte';
   import RenumberFromDialog from '../components/RenumberFromDialog.svelte';
+  import ShiftTimeDialog from '../components/ShiftTimeDialog.svelte';
+  import DesktopEditTogetherDialog from '../components/DesktopEditTogetherDialog.svelte';
   import RenameLogbook from '../components/RenameLogbook.svelte';
   import ExportSheet from '../components/ExportSheet.svelte';
   import { exportDives } from '../lib/share.js';
@@ -390,9 +392,14 @@
     }
   }
 
-  /** "Modifier ensemble…": a full-screen sheet for the checked dives (pages/EditDivesTogether.svelte). */
+  /**
+   * "Modifier ensemble…": a dialog on a tablet (components/DesktopEditTogetherDialog.svelte, as on the desktop), a full-screen
+   * sheet on a phone (pages/EditDivesTogether.svelte).
+   */
+  let editingTogether = $state(/** @type {number[]|null} */ (null));
   function editChecked() {
-    f7router.navigate(`/dives/edit-together?ids=${checkedIds.join(',')}`);
+    if (layout.split || layout.desktop) editingTogether = [...checkedIds];
+    else f7router.navigate(`/dives/edit-together?ids=${checkedIds.join(',')}`);
   }
 
   /**
@@ -408,6 +415,8 @@
   /** "Renumber the dives" of the menu: Subsurface's Renumber dialog, all the dives. */
   let renumbering = $state(false);
   let renumberFrom = $state(/** @type {number|null} */ (null));
+  /** « Décaler la date et l’heure… »: the checked dives the dialog is open for, or null (task 2026-11-24-383). */
+  let shifting = $state(/** @type {number[]|null} */ (null));
 
   /**
    * Undo or Redo from the menu, one step each time: the history of this
@@ -1618,6 +1627,11 @@
       <MenuItem icon="filter" text={t(filtered ? 'logbook.menuFilterOn' : 'logbook.menuFilter')} link="/filter" />
       {#if selecting && checkedCount >= 2}
         <MenuItem icon="edit" text={t('multiDive.menuEdit')} onclick={editChecked} />
+      {/if}
+      {#if selecting && checkedCount >= 1}
+        <MenuItem icon="history" text={t('shiftTime.menu')} onclick={() => (shifting = [...checkedIds])} />
+      {/if}
+      {#if selecting && checkedCount >= 2}
         <MenuItem
           icon="merge"
           text={t('multiDive.menuMerge')}
@@ -1741,6 +1755,12 @@
         endSelection();
       }}
     />
+  {/if}
+  {#if editingTogether}
+    <DesktopEditTogetherDialog ids={editingTogether} openId={navigation.dive === null ? null : Number(navigation.dive)} onclose={() => (editingTogether = null)} />
+  {/if}
+  {#if shifting}
+    <ShiftTimeDialog ids={shifting} oncancel={() => (shifting = null)} ondone={() => (shifting = null)} />
   {/if}
   {#if renumberFrom !== null}
     <RenumberFromDialog id={renumberFrom} oncancel={() => (renumberFrom = null)} ondone={() => { renumberFrom = null; endSelection(); }} />

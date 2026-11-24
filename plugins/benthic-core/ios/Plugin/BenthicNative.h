@@ -140,6 +140,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)editDives:(NSArray<NSNumber *> *)ids
 			 changes:(NSString *)changes
 			   error:(NSError **)error NS_SWIFT_NAME(editDives(_:changes:));
++ (nullable NSString *)shiftTime:(NSArray<NSNumber *> *)ids
+			 seconds:(NSInteger)seconds
+			   error:(NSError **)error NS_SWIFT_NAME(shiftTime(_:seconds:));
 + (nullable NSString *)benthicIds:(NSString *)action
 		      assignments:(NSString *)assignments
 			    error:(NSError **)error NS_SWIFT_NAME(benthicIds(_:assignments:));

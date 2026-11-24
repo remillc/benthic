@@ -10,7 +10,8 @@
 //     (same git tree as before the merge); redo merges again;
 //   - editing three dives together changes only the edited fields, as one
 //     undoable step; a buddy chip removed goes from every dive that had it
-//     and the other buddies stay; a second identical edit adds no step.
+//     and the other buddies stay; a second identical edit adds no step;
+//   - shifting the start of three dives (shift_time) is one undoable step, byte for byte; the new fields of edit_dives.
 // Prints "PASS: ..." lines; exit status 0 when all pass, 1 otherwise.
 #include "core/libbenthic/benthic.h"
 
@@ -260,6 +261,112 @@ static void check_benthic_ids(const std::string &log, const std::string &folder)
 	check(undo(result, error) == 0, "the creation is undone");
 }
 
+// « Décaler la date et l'heure » (shift_time) and the fields « Modifier ensemble » added on 24 November 2026
+// (rating, visibility, divemode, weightGrams, notesAppend): one undoable step, the saved log is back byte for byte.
+static void check_shift_and_new_edits(const std::string &log, const std::string &folder)
+{
+	std::string json, error, result;
+	if (list_dives(log, json, error) || divelog.dives.size() < 3) {
+		check(false, "shift time: cannot load enough dives");
+		return;
+	}
+	std::vector<int> ids;
+	std::vector<timestamp_t> whens, dc_whens;
+	std::vector<int> numbers, durations;
+	for (size_t i = 0; i < 3; i++) {
+		const dive &d = *divelog.dives[i];
+		ids.push_back(d.id);
+		whens.push_back(d.when);
+		dc_whens.push_back(d.dcs[0].when);
+		numbers.push_back(d.number);
+		durations.push_back(d.duration.seconds);
+	}
+	const std::string tree0 = tree_of(folder);
+	check(shift_time(ids, 0, json, error) != 0 && error == "NOTHING_TO_DO", "a zero shift is refused");
+	check(shift_time({}, 60, json, error) != 0 && error == "NOTHING_TO_DO", "a shift of no dive is refused");
+	check(shift_time(ids, 3650LL * 86400 + 1, json, error) != 0 && error.rfind("BAD_REQUEST", 0) == 0, "a shift of over ten years is refused");
+	check(!can_undo(), "refused shifts add no step");
+
+	// 1 h 05 later: every dive moves by the same amount, the intervals stay, durations and numbers do not change.
+	const long long later = 65 * 60;
+	check(shift_time(ids, later, json, error) == 0, "shift three dives 1 h 05 later");
+	check(undo_text().rfind("shift time of 3 dives [", 0) == 0, "one undo step for the three dives");
+	bool moved = true;
+	for (size_t i = 0; i < 3; i++) {
+		const dive *d = divelog.dives.get_by_uniq_id(ids[i]);
+		moved = moved && d->when == whens[i] + later && d->number == numbers[i] && d->duration.seconds == durations[i] &&
+			d->dcs[0].when == (dc_whens[i] ? dc_whens[i] + later : 0);
+	}
+	check(moved, "start times move by the same amount; numbers, durations are untouched");
+	check(save_local(error) == 0 && tree_of(folder) != tree0, "the shift is saved");
+	const std::string tree_shifted = tree_of(folder);
+	check(undo(result, error) == 0 && !can_undo(), "one undo");
+	bool restored = true;
+	for (size_t i = 0; i < 3; i++)
+		restored = restored && divelog.dives.get_by_uniq_id(ids[i])->when == whens[i];
+	check(restored && save_local(error) == 0 && tree_of(folder) == tree0, "undo restores the saved log byte for byte");
+	check(redo(result, error) == 0 && save_local(error) == 0 && tree_of(folder) == tree_shifted, "redo shifts again, byte for byte");
+	// Reloaded, as Subsurface would read it.
+	check(list_dives(log, json, error) == 0 && by_when(whens[0] + later) && by_when(whens[1] + later) && by_when(whens[2] + later) &&
+		      by_when(whens[0] + later)->number == numbers[0],
+	      "the saved log reloads with the dives at their new times");
+
+	// A dive shifted past another one changes place in the table and keeps its number.
+	if (list_dives(log, json, error) || divelog.dives.size() < 3) {
+		check(false, "shift time: cannot reload");
+		return;
+	}
+	dive *first = divelog.dives[0].get(), *second = divelog.dives[1].get();
+	int first_id = first->id, first_number = first->number, second_id = second->id;
+	timestamp_t first_when = first->when;
+	long long past = second->when - first->when + 120;
+	check(shift_time({ first_id }, past, json, error) == 0, "shift one dive past the next");
+	size_t pos_first = 0, pos_second = 0;
+	for (size_t i = 0; i < divelog.dives.size(); i++) {
+		if (divelog.dives[i]->id == first_id)
+			pos_first = i;
+		if (divelog.dives[i]->id == second_id)
+			pos_second = i;
+	}
+	check(pos_first > pos_second && divelog.dives.get_by_uniq_id(first_id)->number == first_number, "the dive is reordered and keeps its number");
+	check(undo(result, error) == 0 && divelog.dives.get_by_uniq_id(first_id)->when == first_when && divelog.dives[0]->id == first_id,
+	      "undo puts it back in place");
+
+	// The new fields of edit_dives.
+	if (list_dives(log, json, error) || divelog.dives.size() < 3) {
+		check(false, "edit together: cannot reload");
+		return;
+	}
+	ids.clear();
+	std::vector<std::string> old_notes;
+	std::vector<size_t> cyl;
+	for (size_t i = 0; i < 3; i++) {
+		ids.push_back(divelog.dives[i]->id);
+		old_notes.push_back(divelog.dives[i]->notes);
+		cyl.push_back(divelog.dives[i]->cylinders.size());
+	}
+	const std::string tree1 = tree_of(folder);
+	check(edit_dives(ids, "{\"rating\":6}", json, error) != 0 && error.rfind("BAD_REQUEST", 0) == 0, "a rating over 5 is refused");
+	check(edit_dives(ids, "{\"divemode\":\"SCUBA\"}", json, error) != 0 && error.rfind("BAD_REQUEST", 0) == 0, "an unknown dive mode is refused");
+	check(!can_undo(), "refused edits add no step");
+	check(edit_dives(ids, "{\"rating\":3,\"visibility\":4,\"divemode\":\"CCR\",\"weightGrams\":12000,\"notesAppend\":\"added line\"}", json, error) == 0,
+	      "rating, visibility, mode, weight and appended notes on three dives");
+	bool fields = true;
+	for (size_t i = 0; i < 3; i++) {
+		const dive *d = divelog.dives.get_by_uniq_id(ids[i]);
+		int total = 0;
+		for (const weightsystem_t &ws: d->weightsystems)
+			total += ws.weight.grams;
+		fields = fields && d->rating == 3 && d->visibility == 4 && d->dcs[0].divemode == CCR && total == 12000 &&
+			 d->cylinders.size() == cyl[i] &&
+			 d->notes == (old_notes[i].empty() ? std::string("added line") : old_notes[i] + "\nadded line");
+	}
+	check(fields, "every dive has the new values, the notes are appended on a new line, no cylinder is removed");
+	check(undo_text().rfind("Edit dive (3 dive(s)) [", 0) == 0, "one undo step");
+	check(save_local(error) == 0 && undo(result, error) == 0 && !can_undo() && save_local(error) == 0 && tree_of(folder) == tree1,
+	      "one undo restores everything, byte for byte");
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 3) {
@@ -500,6 +607,7 @@ int main(int argc, char **argv)
 		if (d->notes == "edited together")
 			reread = reread && d->suit == "7 mm";
 	check(reread, "the reloaded dives carry the edit");
+	check_shift_and_new_edits(log, folder);
 	check_merge_number_persistence(log, folder);
 	check_benthic_ids(log, folder);
 	printf("%s: %d failure(s)\n", failures ? "FAIL" : "PASS", failures);

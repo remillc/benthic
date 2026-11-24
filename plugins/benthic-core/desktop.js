@@ -877,6 +877,12 @@ export class BenthicCoreDesktop extends WebPlugin {
     return { json: await this.core('editDives', { ids: options.ids, changes: JSON.stringify(options.changes) }) };
   }
 
+  /** « Décaler la date et l'heure »: the start of several dives, in seconds (negative: earlier). @param {{ids?: number[], seconds?: number}} options */
+  async shiftTime(options) {
+    if (!options?.ids?.length || !Number.isInteger(options.seconds)) throw reject('Missing ids or seconds', 'BAD_ARGUMENT');
+    return { json: await this.core('shiftTime', { ids: options.ids, seconds: options.seconds }) };
+  }
+
   /** The stable dive ids. @param {{action?: 'audit'|'assign', assignments?: string}} options */
   async benthicIds(options) {
     if (options?.action !== 'audit' && options?.action !== 'assign') throw reject('Missing action', 'BAD_ARGUMENT');

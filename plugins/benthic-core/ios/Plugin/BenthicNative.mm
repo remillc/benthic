@@ -661,6 +661,13 @@ static void send_sync_progress(const char *message)
 	return edit_or_fail(ret, json, message, error);
 }
 
++ (NSString *)shiftTime:(NSArray<NSNumber *> *)ids seconds:(NSInteger)seconds error:(NSError **)error
+{
+	std::string json, message;
+	int ret = benthic::shift_time(ints(ids), (long long)seconds, json, message);
+	return edit_or_fail(ret, json, message, error);
+}
+
 + (NSString *)benthicIds:(NSString *)action assignments:(NSString *)assignments error:(NSError **)error
 {
 	std::string json, message;

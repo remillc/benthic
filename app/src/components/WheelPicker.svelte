@@ -5,7 +5,7 @@
   // docs/mockups/reglages-nombre-android.dc.html): the current value centred
   // between two lines, larger and bold, the neighbours fading above and below;
   // scrolling changes it, no typing. For screen readers and the keyboard it is
-  // a spin button: arrows up and down, Page up and down, Home and End.
+  // a spin button: arrows up and down, Page up and down, Home and End, and the digits of a number typed.
 
   /**
    * @type {{
@@ -57,8 +57,37 @@
     scroller?.scrollTo({ top: index * ITEM, behavior: 'smooth' });
   }
 
+  // A number typed on the keyboard (desktop): the digits typed within a second make the number, and the wheel goes to the
+  // value of that number when it has one; a new digit that makes no value starts again from itself.
+  let typed = '';
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let typedTimer;
+  /** @param {string} digit */
+  function type(digit) {
+    clearTimeout(typedTimer);
+    typedTimer = setTimeout(() => (typed = ''), 1000);
+    const find = (/** @type {string} */ text) => values.findIndex((v) => /^\d+$/.test(v) && Number(v) === Number(text));
+    typed += digit;
+    let found = find(typed);
+    if (found < 0 && typed.length > 1) {
+      typed = digit;
+      found = find(typed);
+    }
+    // At once, not smoothly: the settling of a smooth scroll would read the wheel's old position back.
+    if (found >= 0) {
+      index = found;
+      if (scroller) scroller.scrollTop = found * ITEM;
+      position = found;
+    }
+  }
+
   /** @param {KeyboardEvent} e */
   function keydown(e) {
+    if (/^\d$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      type(e.key);
+      e.preventDefault();
+      return;
+    }
     const step = { ArrowUp: -1, ArrowDown: 1, PageUp: -5, PageDown: 5 }[e.key];
     if (step) go(index + step);
     else if (e.key === 'Home') go(0);

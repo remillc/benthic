@@ -2479,7 +2479,65 @@
       "other": "{n} dives edited"
     },
     "editFailed": "The dives could not be edited. No dive was changed.",
+    "tabs": "Sections",
+    "none": "none",
+    "rating": "Rating",
+    "visibility": "Visibility",
+    "kit": "Kit",
+    "kitNote": "Choosing a kit fills each dive’s suit, weights and other equipment.",
+    "kitNone": "No kit",
+    "suit": "Suit",
+    "weight": "Weights",
+    "diveType": "Dive type",
+    "modes": {
+      "OC": "Open circuit",
+      "CCR": "CCR rebreather",
+      "PSCR": "pSCR rebreather",
+      "Freedive": "Freediving"
+    },
+    "modesShort": {
+      "OC": "Open",
+      "CCR": "CCR",
+      "PSCR": "pSCR",
+      "Freedive": "Free"
+    },
+    "modeNote": "Changing the type removes no cylinder: the cylinders and pressures stay specific to each dive.",
+    "modeMany": "Several values: {spread}",
+    "appendNotes": "Add to the notes",
+    "appendNotesHint": "Text added at the end of each dive’s notes",
+    "appendNotesNote": "The text is added under each dive’s notes, on a new line. It replaces nothing.",
+    "footnote": "The date, duration, depth, cylinders and trip stay specific to each dive.",
+    "footnotePhone": "The date, duration, depth, profile, cylinders and trip stay specific to each dive. “Save” applies everything at once, and the “{done} · Undo” notification takes it back.",
     "loadFailed": "The dives could not be read."
+  },
+  "shiftTime": {
+    "menu": "Shift date and time…",
+    "title": "Shift date and time",
+    "intro": {
+      "one": "{n} dive selected. To correct a dive computer’s clock or a time zone.",
+      "other": "{n} dives selected. To correct a dive computer’s clock or a time zone."
+    },
+    "direction": "Direction of the shift",
+    "earlier": "Earlier",
+    "later": "Later",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "daysShort": "{n} d",
+    "hoursShort": "{n} h",
+    "minutesShort": "{n} min",
+    "preview": "Preview",
+    "first": "First: {dive}",
+    "last": "Last: {dive}",
+    "only": "Dive: {dive}",
+    "number": "#{n}",
+    "note": "The intervals between the dives do not change. You can undo.",
+    "apply": "Shift",
+    "done": {
+      "one": "{n} dive shifted",
+      "other": "{n} dives shifted"
+    },
+    "failed": "The dives could not be shifted. No dive was changed."
   },
   "dialog": {
     "close": "Close",
@@ -3386,7 +3444,10 @@
       "“This weight was” is Benthic+ only on every screen; without Benthic+, the weight suggestion uses the last comparable dive’s weight, with no correction. What is already noted on a dive is kept.",
       "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen.",
       "Tablet: on the profile home, Information opens beside the list from the start, with no navigation error reported.",
-      "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty."
+      "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty.",
+      "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification.",
+      "Logbook: “Edit together…” groups its fields in four tabs (Information, Equipment, Gas, Notes) and adds visibility, the kit (Benthic+), weights, the dive type and “Add to the notes”; under a field whose values differ, the spread (“Taylor (1), none (2)”); the subtitle is only the dive numbers, and “Apply to N dives” is blue. On a tablet, the dialog replaces the full-screen sheet.",
+      "Desktop: while the logbook loads, the list shows greyed rows that follow its columns, as the phone’s does, instead of a sentence in the middle of the pane."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -5460,6 +5521,7 @@
       "merge": "Merge into one dive",
       "addToTrip": "Add to a trip…",
       "editTogether": "Edit together…",
+      "shiftTime": "Shift date and time…",
       "sign": "Get signed…",
       "edit": "Edit",
       "copy": "Copy",

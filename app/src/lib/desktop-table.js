@@ -367,6 +367,7 @@ export function contextMenuEntries(count, { mac, available, mergeable = true }) 
       count > 1
         ? { key: 'editTogether', label: 'desktop.menu.editTogether', icon: 'edit', shortcut: key('E') }
         : { key: 'edit', label: 'desktop.menu.edit', icon: 'edit', shortcut: key('E') },
+      { key: 'shiftTime', label: 'desktop.menu.shiftTime', icon: 'history' },
       count > 1
         ? { key: 'sign', label: 'desktop.menu.sign', icon: 'seal', ...(count > MAX_SIGNED ? { disabled: true, hint: 'validation.tooMany' } : {}) }
         : null,
