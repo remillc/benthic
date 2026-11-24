@@ -95,7 +95,7 @@
   import { schedulePreparingSiteMaps } from './lib/site-image.js';
   import { logbook, isSubscriber } from './lib/logbook.svelte.js';
   import { loadBenthicPlusAccount } from './lib/benthic-plus-state.svelte.js';
-  import { rememberHero, heroOf } from './lib/profile-frame.js';
+  import { rememberHero, heroOf, profileWide } from './lib/profile-frame.js';
   import { resumePendingImport } from './lib/desktop-pending-import.js';
   import { t } from './lib/i18n.js';
   import { lazyRoute, safeAsync, stylesheetsReady } from './lib/lazy-route.js';
@@ -230,7 +230,7 @@
           // Phone: the repository's logbook comes down on the download screen (task 2026-11-16-247).
           { path: '/welcome/git/downloading', ...lazy(() => import('./pages/FirstDownload.svelte')) },
         ]),
-    // « Faire valider la plongée » (task 2026-11-19-309): the choice, the signature and the QR code, one full screen.
+    // « Faire signer la plongée » (task 2026-11-19-309): the choice, the signature and the QR code, one full screen.
     { path: '/validate', ...lazy(() => import('./pages/Validate.svelte')) },
     // Phone: a full screen. Tablet: a sheet (iPad) or a pane (Android) over the
     // list and the dive, chosen when the screen opens (EditDive.svelte).
@@ -554,7 +554,9 @@
     </View>
     <View id="view-sites" tab url="/sites/" />
     <!-- Profil (Benthic+, task 2026-11-23-347): the diver profile, after Sites; it exists only for a subscriber. -->
-    {#if navigation.profile}<View id="view-profile" tab url="/profile" />{/if}
+    <!-- A wide screen opens on its default pane (Informations) at once: replacing the home page in place at start raced with the
+         view's own start and left two current pages on a loaded tablet (report 35). -->
+    {#if navigation.profile}<View id="view-profile" tab url={profileWide() ? '/profile/info' : '/profile'} />{/if}
     <View
       id="view-statistics"
       tab

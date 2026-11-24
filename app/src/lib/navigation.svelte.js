@@ -88,19 +88,42 @@ function backFromPush(router, route) {
 }
 
 /**
- * Settings or About opened over a section (openOver): back to the section's
- * own first screen.
- * @param {any} view a Framework7 view
+ * Waits until a router is free again (a page change ended), at most two seconds.
+ * @param {any} router a Framework7 router
+ * @returns {Promise<void>}
  */
-function closeOverPages(view) {
+async function untilFree(router) {
+  const start = Date.now();
+  do await new Promise((resolve) => setTimeout(resolve, 30));
+  while (isBusy(router) && Date.now() - start < 2000);
+}
+
+/**
+ * Settings or About opened over a section (openOver): back to the section's
+ * own first screen. Resolves once the page change is over: the caller must not hide the view before (a view that is
+ * hidden in the middle of a page change is left with no current page, report 33 of 24 November 2026).
+ * @param {any} view a Framework7 view
+ * @returns {Promise<void>}
+ */
+async function closeOverPages(view) {
   const router = view?.router;
   if (!router || router.history.length < 2) return;
   if (!isOverPath(router.currentRoute?.path ?? '')) return;
+  // A tablet's Account view (list beside detail): Framework7's Back from the pane, once Settings has replaced its detail
+  // page, can leave the Settings list in place of the Account page and the view with no current page (report 33). The
+  // first screen is loaded again instead, through the guard.
+  if (view.el?.classList.contains('view-master-detail')) {
+    router.navigate(router.history[0], { reloadAll: true, animate: false });
+    await untilFree(router);
+    return;
+  }
   // One step back when Settings or About sit right on the first screen;
   // deeper (a page of Settings), straight back to the first screen. Without
   // animation Framework7 left the first screen shifted as a previous page.
-  if (router.history.length === 2) router.back();
-  else backToFirstScreen(router);
+  if (router.history.length === 2) {
+    router.back();
+    await untilFree(router);
+  } else await backToFirstScreen(router);
 }
 
 /**
@@ -134,11 +157,14 @@ export const isOverPath = (path) => path.startsWith('/settings/') || path === '/
  * its own screen even when it is the one under Settings (bug of 12 November
  * 2026: Carnet chosen from Settings opened over the Carnet did nothing).
  * @param {Section} section
+ * @returns {Promise<void>} settled once the section is shown
  */
-export function goToSection(section) {
-  closeOverPages(f7.views.current);
+export async function goToSection(section) {
+  // The screen opened over the current section closes first and the switch waits for it: hiding the view in the middle
+  // of its page change left it with no current page (report 33).
+  await closeOverPages(f7.views.current);
   showSection(section);
-  closeOverPages(f7.views.get(`#view-${section}`));
+  await closeOverPages(f7.views.get(`#view-${section}`));
 }
 
 /**
@@ -182,7 +208,7 @@ export async function openProfilePath(path = '/profile', options) {
   const view = f7.views.get('#view-profile');
   const router = view?.router;
   if (!router || !navigation.profile) return;
-  closeOverPages(f7.views.current);
+  await closeOverPages(f7.views.current);
   showSection('profile');
   if (path === '/profile') {
     if (router.history.length > 1) await backToFirstScreen(router);

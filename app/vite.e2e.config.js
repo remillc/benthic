@@ -6,6 +6,8 @@ import { defineConfig, mergeConfig } from 'vite';
 import base from './vite.config.js';
 const resolved = typeof base === 'function' ? base : () => base;
 export default defineConfig((env) => mergeConfig(resolved(env), {
+  // BC_E2E_CACHE: a cold dependency cache of its own (shows what Vite optimises while a run goes).
+  ...(process.env.BC_E2E_CACHE ? { cacheDir: process.env.BC_E2E_CACHE } : {}),
   server: { port: Number(process.env.BC_E2E_PORT || 5541), strictPort: true, host: '127.0.0.1' },
   plugins: [{
     name: 'repro-not-desktop',

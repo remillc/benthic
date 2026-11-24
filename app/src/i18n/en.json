@@ -2932,7 +2932,7 @@
       "Equipment: a piece's menu offers permanent deletion after confirmation.",
       "Equipment: the type of piece field no longer appears when creating an Other piece.",
       "Dive profile: selected curves stay visible during the session.",
-      "Dives: “Get it signed” replaces “Get it validated”.",
+      "Dives: asking a buddy or an instructor to sign is called “Get it signed”.",
       "Equipment: the scooter icon has been redesigned.",
       "Equipment: choose the piece type before filling in its form.",
       "Equipment: line cutters and knives are separate types.",
@@ -3370,7 +3370,9 @@
       "Desktop: the site’s map fills the whole width of the dive’s header.",
       "Desktop: with Benthic+, the Equipment tab offers a kit to apply, the undersuit, “This weight was” and “Other gear”; without Benthic+, these fields no longer appear.",
       "“This weight was” is Benthic+ only on every screen; without Benthic+, the weight suggestion uses the last comparable dive’s weight, with no correction. What is already noted on a dive is kept.",
-      "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen."
+      "Tablet and desktop: “Get the dives signed” on checked dives opens the same dialog as from one dive; the phone keeps the full screen.",
+      "Tablet: on the profile home, Information opens beside the list from the start, with no navigation error reported.",
+      "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",
@@ -6839,8 +6841,8 @@
     "confirmError": {
       "expired": "This code has expired. Ask for a new one.",
       "used": "This code was already used.",
-      "own": "You cannot validate your own dives.",
-      "plus": "Validating a dive needs Benthic+.",
+      "own": "You cannot confirm your own dives.",
+      "plus": "Confirming a dive needs Benthic+.",
       "unknown": "This code is not recognised.",
       "tooMany": "Too many attempts. Try again in a few minutes.",
       "failed": "The confirmation could not be sent."

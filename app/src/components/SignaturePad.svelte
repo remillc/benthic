@@ -1,6 +1,6 @@
 <script>
   // @ts-check
-  // The signature frame of « Faire valider la plongée » (docs/mockups/validation-signature-android.dc.html): a white
+  // The signature frame of « Faire signer la plongée » (docs/mockups/validation-signature-android.dc.html): a white
   // canvas the signer draws on with a finger or a mouse (pointer events, so the same code serves both). Black ink on white
   // whatever the app's mode, so the saved image reads in the PDF and in the dark theme. `clear()` empties it; `toDataUrl()`
   // gives the PNG (the class no-swipeback keeps a stroke from being taken for the page swipe back); `onchange(hasInk)` tells the screen when it goes from empty to signed and back.
