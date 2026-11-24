@@ -7540,6 +7540,8 @@ Christian asked for this on 24 November 2026. Work in `main`. On desktop (Window
 
 ## [ ] 2026-11-24-394 Sites › « Carte commune »: your sites look like the others; fewer tablet portrait mock-ups
 
+**Wait** (Christian, 24 November 2026): point 1 waits until the merge algorithm of the shared map has been discussed. The aim stays: personal sites are not added to « Carte commune » as such; a site that reached it through the merge is drawn with the same pin and colour as the other shared sites. Point 2 needs no code.
+
 Christian asked for this on 24 November 2026. Work in `main`.
 
 1. **No distinction between your sites and the shared ones on « Carte commune ».** In Sites with « Carte commune » chosen, a site that is also in « Mes sites » is drawn like any shared site: the same teal dot on the map (no black numbered pin) and the same teal dot in the list. Its list line reads like the others (« 31 plongées · à 1,3 mi »), without « Dans vos sites ». The selected site is a larger teal dot with the light halo. The map's accessible name counts the shared sites (« Carte commune : 46 sites. Poor Knights est sélectionné. »). Remove the `inYourSites` marker from this view (`lib/shared-sites-format.js`, `lib/shared-sites.js`) and drop its strings if nothing else uses them. « Mes sites » is unchanged. Mock-up: `docs/mockups/sites-commun-android.dc.html`.
