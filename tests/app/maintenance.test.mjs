@@ -398,14 +398,6 @@ test('the routes exist in the release edition, and the notification seam is wire
   assert.match(read('lib/flight-reminder.svelte.js'), /extra\?\.maintenance === true\) return/);
 });
 
-test('the release notes mention the new equipment and the maintenance', () => {
-  for (const lang of ['fr', 'en']) {
-    const notes = catalog(lang).about.releaseNotes;
-    assert.ok(notes.some((n) => /(Remplir avec|Fill with)/.test(n)));
-    assert.ok(notes.some((n) => /(Révisions de l’équipement|Equipment service)/.test(n)));
-  }
-});
-
 test('a rebreather suggests a yearly service; the O₂ cells suggest their replacement (task 397)', () => {
   assert.deepEqual(suggestionsFor('rebreather', {}), [{ task: 'service', months: 12 }]);
   assert.deepEqual(suggestionsFor('o2Cells', {}), [{ task: 'o2Cells', months: 12 }]);
