@@ -3437,7 +3437,8 @@
       "Tablet: on the profile home, Information opens beside the list from the start, with no navigation error reported.",
       "Tablet: choosing the Logbook while Settings is open closes Settings first, without leaving the account screen empty.",
       "Logbook: “Shift date and time…”, in the menu of the checked dives (⋮ on phone and tablet, right-click on the desktop), moves the start of every chosen dive earlier or later by the same amount: three wheels (days, hours, minutes), a preview of the first and the last dive, and “Undo” in the notification.",
-      "Logbook: “Edit together…” groups its fields in four tabs (Information, Equipment, Gas, Notes) and adds visibility, the kit (Benthic+), weights, the dive type and “Add to the notes”; under a field whose values differ, the spread (“Taylor (1), none (2)”); the subtitle is only the dive numbers, and “Apply to N dives” is blue. On a tablet, the dialog replaces the full-screen sheet."
+      "Logbook: “Edit together…” groups its fields in four tabs (Information, Equipment, Gas, Notes) and adds visibility, the kit (Benthic+), weights, the dive type and “Add to the notes”; under a field whose values differ, the spread (“Taylor (1), none (2)”); the subtitle is only the dive numbers, and “Apply to N dives” is blue. On a tablet, the dialog replaces the full-screen sheet.",
+      "Desktop: while the logbook loads, the list shows greyed rows that follow its columns, as the phone’s does, instead of a sentence in the middle of the pane."
     ],
     "source": "Source code",
     "issues": "Question / report a problem",

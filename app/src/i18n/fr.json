@@ -3437,7 +3437,8 @@
       "Tablette : sur la page d’accueil du profil, Informations s’ouvre à côté de la liste dès le démarrage, sans erreur de navigation signalée.",
       "Tablette : choisir le Carnet pendant que Réglages est ouvert ferme Réglages d’abord, sans laisser l’écran du compte vide.",
       "Carnet : « Décaler la date et l’heure… », dans le menu des plongées cochées (⋮ sur téléphone et tablette, clic droit sur ordinateur), avance ou recule le départ de toutes les plongées choisies de la même durée : trois molettes (jours, heures, minutes), un aperçu de la première et de la dernière plongée, et « Annuler » dans la notification.",
-      "Carnet : « Modifier ensemble… » range ses champs en quatre onglets (Informations, Équipement, Gaz, Notes) et ajoute la visibilité, le kit (Benthic+), le lest, le type de plongée et « Ajouter aux notes » ; sous un champ dont les valeurs diffèrent, le détail (« Taylor (1), aucun (2) ») ; le sous-titre n’est plus que les numéros des plongées, et « Appliquer aux N plongées » est en bleu. Sur tablette, la fenêtre remplace la feuille plein écran."
+      "Carnet : « Modifier ensemble… » range ses champs en quatre onglets (Informations, Équipement, Gaz, Notes) et ajoute la visibilité, le kit (Benthic+), le lest, le type de plongée et « Ajouter aux notes » ; sous un champ dont les valeurs diffèrent, le détail (« Taylor (1), aucun (2) ») ; le sous-titre n’est plus que les numéros des plongées, et « Appliquer aux N plongées » est en bleu. Sur tablette, la fenêtre remplace la feuille plein écran.",
+      "Ordinateur : pendant le chargement du carnet, la liste affiche des lignes grisées qui suivent ses colonnes, comme celle du téléphone, au lieu d’une phrase au milieu du volet."
     ],
     "source": "Code source",
     "issues": "Question / signaler un problème",

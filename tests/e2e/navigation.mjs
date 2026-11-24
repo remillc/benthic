@@ -39,7 +39,7 @@ import { benthicImportFlows } from './benthic-import-flow.mjs';
 import { desktopListHeaderFlows } from './desktop-list-header.mjs';
 import { cylinderTypeFlows } from './cylinder-types.mjs';
 import { desktopDetailFlows } from './desktop-detail.mjs';
-import { multiDiveFlows } from './multi-dive.mjs';
+import { multiDiveFlows, desktopSkeletonFlows } from './multi-dive.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.BC_E2E_PORT || 5541);
@@ -2949,7 +2949,10 @@ try {
     // The desktop logbook's trip rows and the dive detail's right pane (tests/e2e/desktop-detail.mjs).
     ['desktop detail', '--detail-only', 30, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopDetailFlows({ ...harness, shot })],
     // « Décaler la date et l’heure » and « Modifier ensemble » on the selected dives (tests/e2e/multi-dive.mjs).
-    ['multi-dive actions', '--multi-dive-only', 40, !phoneOnly && !tabletOnly && !welcomeOnly, () => multiDiveFlows({ ...harness, shot })],
+    ['multi-dive actions', '--multi-dive-only', 40, !phoneOnly && !tabletOnly && !welcomeOnly, async () => {
+      await multiDiveFlows({ ...harness, shot });
+      await desktopSkeletonFlows({ ...harness, shot });
+    }],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],

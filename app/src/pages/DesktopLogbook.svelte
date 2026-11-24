@@ -145,6 +145,21 @@
     observer.observe(element);
     return () => observer.disconnect();
   });
+  /** The greyed rows of the loading state: enough to fill the pane. */
+  const SKELETON_ROWS = 16;
+  /**
+   * The width of a greyed bar in a column: the width of the text it stands for (a number, a date), a varying share of the
+   * column for a name.
+   * @param {string} key the column
+   * @param {number} row
+   */
+  function skeletonWidth(key, row) {
+    if (key === 'number') return '2em';
+    if (key === 'date') return '10em';
+    if (key === 'site' || key === 'guides' || key === 'gases' || key === 'computer' || key === 'suit') return `${40 + ((row * 17) % 35)}%`;
+    if (key === 'buddies') return '5em';
+    return '3em';
+  }
   const sorted = $derived(sortDives(listed, desk.extras, desk.sort));
   const rows = $derived(tableRows(sorted, desk.sort, desk.collapsed));
   const order = $derived(rowDiveIds(rows));
@@ -1085,7 +1100,36 @@
     <FlightBanner />
 
     {#if logbook.loading}
-      <p class="bc-desktop-logbook--state" role="status" aria-busy="true">{t('logbook.loading')}</p>
+      <!-- Loading: greyed bars in the table's own columns and row height, as the phone's list does (pages/Logbook.svelte), so
+           that the rows keep their place when the dives arrive. No spinner; a screen reader hears « Chargement du carnet ». -->
+      <div class="bc-desktop-logbook--scroll bc-desktop-logbook--skeleton skeleton-effect-wave" data-bc-scroll bind:this={tableEl} role="status" aria-busy="true" aria-label={t('logbook.loading')}>
+        <table class="bc-desktop-logbook--table" style={tableStyle} aria-hidden="true">
+          <thead>
+            <tr>
+              {#each columnsNow as column (column.key)}
+                <th scope="col" class="bc-desktop-logbook--head bc-desktop-logbook--plain" class:bc-desktop-logbook--numeric={column.numeric} data-col={column.key}>
+                  <span class="bc-desktop-logbook--skeleton-head">{t(column.label)}</span>
+                </th>
+              {/each}
+            </tr>
+          </thead>
+          <tbody>
+            {#each Array(SKELETON_ROWS) as _, i (i)}
+              <tr class="bc-desktop-logbook--row bc-desktop-logbook--skeleton-row">
+                {#each columnsNow as column (column.key)}
+                  <td data-col={column.key} class:bc-desktop-logbook--numeric={column.numeric}>
+                    {#if column.key === 'profile'}
+                      <span class="skeleton-block bc-desktop-logbook--skeleton-profile"></span>
+                    {:else if column.key !== 'buddies' || i % 3 !== 2}
+                      <span class="skeleton-block bc-desktop-logbook--skeleton-bar" style:width={skeletonWidth(column.key, i)}></span>
+                    {/if}
+                  </td>
+                {/each}
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
     {:else if logbook.error}
       <div class="bc-desktop-logbook--state" role="alert">
         <h2 class="bc-state-title">{t('logbook.errorTitle')}</h2>
@@ -1608,6 +1652,30 @@
           font-weight: 500;
         }
       }
+    }
+    /* The loading state: the header's texts without buttons, bars as high as one line, the rows' 48 dp. */
+    .bc-desktop-logbook--skeleton-head {
+      display: block;
+      padding: 0 10px;
+      line-height: 36px;
+      white-space: nowrap;
+    }
+    .bc-desktop-logbook--skeleton-row {
+      cursor: default;
+    }
+    .bc-desktop-logbook--skeleton-bar {
+      display: inline-block;
+      height: 0.8em;
+      max-width: 100%;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .bc-desktop-logbook--skeleton-profile {
+      display: inline-block;
+      width: 80px;
+      height: 24px;
+      border-radius: 6px;
+      vertical-align: middle;
     }
     .bc-desktop-logbook--time {
       font-size: 12px;

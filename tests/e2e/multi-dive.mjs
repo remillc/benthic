@@ -271,3 +271,58 @@ export async function multiDiveFlows(h) {
   expect('phone: the dive type has the short labels', { modes: 'Ouvert,CCR,pSCR,Apnée' }, { modes: modes.join(',') });
   phone.ws.close();
 }
+
+/**
+ * The desktop logbook while it loads: greyed rows in the table's own columns (one commit with the multi-dive flows because
+ * both read the desktop list). Run by tests/e2e/navigation.mjs (`--multi-dive-only`).
+ * @param {object} h the harness of navigation.mjs
+ */
+export async function desktopSkeletonFlows(h) {
+  const { openTab, closeOtherTabs, sleep, expect, shot } = h;
+  console.log('Desktop logbook, loading state: skeleton rows');
+  const tab = await openTab(1440, 900, false, false, true, { theme: 'md' });
+  await closeOtherTabs?.(tab.targetId);
+  await tab.send('Page.bringToFront');
+  for (let i = 0; i < 80 && !(await tab.run(() => document.querySelectorAll('.bc-desktop-logbook--row[data-dive]').length >= 3).catch(() => false)); i++) await sleep(150);
+  const columns = () =>
+    tab.run(() => [...document.querySelectorAll('.bc-desktop-logbook--table thead th')].map((th) => th.getAttribute('data-col')));
+  const real = await columns();
+  await tab.run(async () => {
+    const { logbook } = await import('/src/lib/logbook.svelte.js');
+    window.__loadingWas = logbook.loading;
+    logbook.loading = true;
+  });
+  await sleep(500);
+  if (process.env.BC_SHOTS) await shot(tab, 'desktop-skeleton');
+  const skeleton = await tab.run(() => {
+    const box = document.querySelector('.bc-desktop-logbook--skeleton');
+    const rows = [...document.querySelectorAll('.bc-desktop-logbook--skeleton-row')];
+    return {
+      busy: box?.getAttribute('aria-busy'),
+      label: box?.getAttribute('aria-label'),
+      columns: [...document.querySelectorAll('.bc-desktop-logbook--table thead th')].map((th) => th.getAttribute('data-col')),
+      rows: rows.length,
+      height: Math.round(rows[0]?.getBoundingClientRect().height ?? 0),
+      bars: document.querySelectorAll('.bc-desktop-logbook--skeleton-row .skeleton-block').length,
+      cellsPerRow: rows[0]?.children.length ?? 0,
+      oldText: !!document.querySelector('p.bc-desktop-logbook--state'),
+    };
+  });
+  expect('desktop skeleton: the greyed rows have the real table’s columns', { same: JSON.stringify(real.filter(Boolean)) }, { same: JSON.stringify(skeleton.columns) });
+  expect('desktop skeleton: 16 rows of 48 px with their bars, announced as loading', { rows: 16, height: 48, bars: true, busy: 'true', cells: real.filter(Boolean).length }, {
+    rows: skeleton.rows,
+    height: skeleton.height,
+    bars: skeleton.bars > 16,
+    busy: skeleton.busy,
+    cells: skeleton.cellsPerRow,
+  });
+  expect('desktop skeleton: no loading sentence in the middle of the pane', { text: false }, { text: skeleton.oldText });
+  await tab.run(async () => {
+    const { logbook } = await import('/src/lib/logbook.svelte.js');
+    logbook.loading = window.__loadingWas;
+  });
+  await sleep(500);
+  const back = await tab.run(() => ({ rows: document.querySelectorAll('.bc-desktop-logbook--row[data-dive]').length, skeleton: !!document.querySelector('.bc-desktop-logbook--skeleton') }));
+  expect('desktop skeleton: the dives replace it', { rows: true, skeleton: false }, { rows: back.rows >= 3, skeleton: back.skeleton });
+  tab.ws.close();
+}
