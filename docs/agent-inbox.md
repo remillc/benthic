@@ -7360,3 +7360,11 @@ Christian asked for this on 23 November 2026. Work in `main`. Mock-up: « Carnet
 - Leave 88 px empty at the end so the + floating button never covers the last card.
 
 **Test:** on the desktop, a dive's Informations tab shows the five cards; add and remove a buddy and a guide through the chips; set and clear the rating and the visibility with the stars; the values are saved as before and show in the other views (list columns, phone detail).
+
+## [ ] 2026-11-24-377 « Faire signer »: leftovers of « Faire valider »
+
+Christian asked for this on 24 November 2026. Work in `main`. « Faire valider » became « Faire signer » in the app (the strings already say « Faire signer la plongée », « Faire signer les plongées », « Faire signer par code QR », « Signer »). The mock-ups were behind: the design agent fixed every board on both canvases (the Android validation screens, the tablet ⋮ menus, the desktop header button's tooltip and dialog on about fifty desktop boards) and the copies in `docs/mockups/`; the signature screen's confirm button now reads « Signer » as in the app.
+
+Left for you: two code comments still say « Faire valider la plongée » (`app/src/App.svelte` near line 231, `app/src/components/SignaturePad.svelte` line 3); update them. Check that no user-visible string, `aria-label`, `title` or tooltip anywhere (every device, French and English) still says « valider » / « validate » for this action; the section « Validations » of the dive detail and the « Validation en attente » state keep their names.
+
+**Test:** search the built app's strings: no « Faire valider »; the desktop header button's tooltip reads « Faire signer la plongée… (signature d’un moniteur ou d’un compagnon) ».
