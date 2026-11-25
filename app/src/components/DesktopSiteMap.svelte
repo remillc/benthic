@@ -346,10 +346,12 @@
       height: auto;
       aspect-ratio: 1;
       padding: 0 5px;
+      /* Teal, with a translucent teal halo like the groups of your pins. */
       border: 2px solid var(--bc-on-shared-site);
       border-radius: 50%;
       background: var(--bc-shared-site);
       color: var(--bc-on-shared-site);
+      box-shadow: 0 0 0 7px color-mix(in srgb, var(--bc-shared-site) 22%, transparent);
       font: inherit;
       font-size: 13px;
       font-weight: 700;
