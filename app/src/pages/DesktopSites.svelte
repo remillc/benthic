@@ -126,6 +126,9 @@
   let pane = $state(/** @type {'sites'|'new'|'cleanup'|'duplicates'|'unused'|'without'|'unplaced'|'place'} */ ('sites'));
   /** The site being placed (the « place » step of the clean-up). */
   let placing = $state(0);
+  /** The open site card's height, for the FAB above it, px. */
+  let cardHeight = $state(0);
+
   /** « Nouveau site » opened from a dive without a site: that dive, and where the site starts. */
   let newFor = $state(/** @type {{ id: number, at: {latUdeg: number, lonUdeg: number}|null }|null} */ (null));
 
@@ -420,9 +423,6 @@
         <input type="search" bind:this={searchField} bind:value={query} placeholder={t('sites.search')} spellcheck="false" aria-keyshortcuts={desktopMac ? 'Meta+F' : 'Control+F'} autocomplete="off" />
         {#if query}<SearchClear onclear={() => (query = '')} />{:else}<kbd class="bc-desktop-sites--hint">{mod}F</kbd>{/if}
       </label>
-      <button type="button" class="bc-desktop-sites--outlined" aria-keyshortcuts={desktopMac ? 'Meta+N' : 'Control+N'} onclick={() => newSite()}>
-        <Icon name="plus" size={20} />{t('sites.newSite')}
-      </button>
       <button type="button" class="bc-desktop-sites--icon-button" aria-label={t('desktopSites.moreSites')} title={t('desktopSites.moreSites')} aria-haspopup="menu" onclick={openMore}>
         <Icon name="more" size={22} />
       </button>
@@ -520,7 +520,7 @@
                 </div>
               {/if}
               {#if selectedSite}
-                <div class="bc-desktop-sites--card">
+                <div class="bc-desktop-sites--card" bind:clientHeight={cardHeight}>
                   <div class="bc-desktop-sites--card-text">
                     <h2 class="bc-desktop-sites--card-title">{selectedSite.name || t('sites.noName')}</h2>
                     <p class="bc-desktop-sites--card-line bc-value">{cardLine(selectedSite)}</p>
@@ -529,7 +529,7 @@
                   <button type="button" class="bc-desktop-sites--filled" onclick={() => showSiteDives(selectedSite?.name ?? '')}>{t('desktopSites.seeDives')}</button>
                 </div>
               {:else if baseSelected}
-                <div class="bc-desktop-sites--card">
+                <div class="bc-desktop-sites--card" bind:clientHeight={cardHeight}>
                   <div class="bc-desktop-sites--card-text">
                     <h2 class="bc-desktop-sites--card-title">{baseSelected.name}</h2>
                     <p class="bc-desktop-sites--card-line">{baseCardLine(baseSelected, false)}</p>
@@ -537,6 +537,10 @@
                   <a class="bc-desktop-sites--filled" href="/sites/base/{encodeURIComponent(baseSelected.id)}">{t('sites.openSiteSheet')}</a>
                 </div>
               {/if}
+              <!-- « Nouveau site »: the FAB at the bottom right of the map, above the site card while it is open. -->
+              <button type="button" class="bc-desktop-sites--fab" style:bottom="{selectedSite || baseSelected ? 24 + cardHeight + 16 : 40}px" aria-label={t('sites.newSite')} title="{t('sites.newSite')} ({mod}N)" aria-keyshortcuts={desktopMac ? 'Meta+N' : 'Control+N'} onclick={() => newSite()}>
+                <Icon name="plus" size={24} />
+              </button>
             {/snippet}
           </DesktopSiteMap>
         </div>
@@ -940,6 +944,35 @@
       }
     }
     /* The selected site's card at the bottom of the map: white, 16 dp corners. */
+    /* MD3 FAB, 56 px, at the bottom right of the map. */
+    .bc-desktop-sites--fab {
+      position: absolute;
+      z-index: 4;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      border: 0;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bc-primary-container);
+      color: var(--bc-on-primary-container);
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
+      cursor: pointer;
+      transition: bottom 150ms ease-out;
+
+      &:hover {
+        box-shadow: 0 2px 3px rgb(0 0 0 / 0.3), 0 6px 10px 4px rgb(0 0 0 / 0.15);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--bc-text);
+        outline-offset: 2px;
+      }
+    }
+
     .bc-desktop-sites--card {
       position: absolute;
       z-index: 4;

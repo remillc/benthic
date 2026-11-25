@@ -2941,7 +2941,7 @@
       "Logbook: dives grouped by year, trips you can select, merge, edit together and shift the date and time of several dives, the wait before flying above the list.",
       "Planner: rebuilt, with planned dives saved in the logbook, several levels and gases, the volume per gas with the reserve, and sharing (water slate to print, PDF, image, .ssrf file, QR codes).",
       "Dive: cylinders drawn with their gas, the rebreather seen from the back, several dive computers, reading a digital gauge with the camera (Android), a map of the site behind the header.",
-      "Sites: a shared map of dive sites next to your own, and “Clean up the sites” to merge duplicates and give a site to the dives that have none.",
+      "Sites: a shared map of dive sites next to your own, and “Clean up the sites” to merge duplicates and give a site to the dives that have none; on tablets and computers, “New site” is a floating button on the map.",
       "Statistics: each row opens its dives, and the “Where I dive most” heat map shows where your dives concentrate.",
       "Import and export: the .benthic file holds the whole logbook and your data; import of several files, Garmin watches (.fit) and the Suunto app; sending to divelogs.de.",
       "First launch: sign in, start a logbook on the device, import a logbook or try the sample logbook; a copy of the alpha’s logbook is offered.",
