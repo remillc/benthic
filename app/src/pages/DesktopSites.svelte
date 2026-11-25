@@ -7,6 +7,7 @@
   // shows the site's sheet (edited in place, saved at once), « Nouveau site » and the steps of the clean-up
   // (status, possible duplicates, sites without a dive, dives without a site, sites without coordinates, placing). App.svelte picks this page for the Sites view when layout.desktop.
   import { tick, untrack } from 'svelte';
+  import SharedSiteCard from '../components/SharedSiteCard.svelte';
   import { Page } from 'framework7-svelte';
   import { BenthicCore } from 'benthic-core';
   import { cachedSites } from '../lib/core-cache.js';
@@ -48,7 +49,7 @@
   import { t } from '../lib/i18n.js';
   import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { loadLinks, readWholeMap, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
-  import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
+  import { baseRowText } from '../lib/shared-sites-format.js';
   import { distanceKm } from '../lib/geo.js';
   import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 
@@ -126,6 +127,19 @@
   let pane = $state(/** @type {'sites'|'new'|'cleanup'|'duplicates'|'unused'|'without'|'unplaced'|'place'} */ ('sites'));
   /** The site being placed (the « place » step of the clean-up). */
   let placing = $state(0);
+  /** @type {any} */
+  let desktopMap = $state();
+
+  /**
+   * A row of the shared list: the site is selected on the map, which centres on it, and its card shows (task 398).
+   * @param {import('../lib/shared-sites.js').BaseSite} site
+   */
+  function pickBase(site) {
+    select({ type: 'clear' });
+    baseSelectedId = site.id;
+    desktopMap?.centreOn(site.lat, site.lon);
+  }
+
   /** The open site card's height, for the FAB above it, px. */
   let cardHeight = $state(0);
 
@@ -452,10 +466,10 @@
           {:else}
             <div class="bc-desktop-sites--scroll" aria-label={t('sharedSites.listLabel')}>
               {#each baseList as site (site.id)}
-                <a class="bc-desktop-sites--shared-row" href="/sites/base/{encodeURIComponent(site.id)}">
+                <button type="button" class="bc-desktop-sites--shared-row" aria-pressed={site.id === baseSelectedId} onclick={() => pickBase(site)}>
                   <span>{site.name}</span>
                   <span class="bc-desktop-sites--muted">{baseRowText(site, logbook.prefs)}</span>
-                </a>
+                </button>
               {:else}
                 <p class="bc-desktop-sites--state">{t('sites.noMatch')}</p>
               {/each}
@@ -511,7 +525,7 @@
       <div class="bc-desktop-sites--right">
         <!-- The map stays mounted under the other panes, so that its view is kept. -->
         <div class="bc-desktop-sites--pane" hidden={pane !== 'sites' || sel.mode === 'sheet'}>
-          <DesktopSiteMap sites={common ? [] : sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} base={baseLayer} {common} onview={(view) => mapView = view} onbaseselect={(id) => { select({ type: 'clear' }); baseSelectedId = id; }} onselect={(uuid) => { baseSelectedId = null; select({ type: 'pin' }, uuid); }} onclear={() => { baseSelectedId = null; select({ type: 'clear' }); }}>
+          <DesktopSiteMap bind:this={desktopMap} sites={common ? [] : sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} base={baseLayer} {common} onview={(view) => mapView = view} onbaseselect={(id) => { select({ type: 'clear' }); baseSelectedId = id; }} onselect={(uuid) => { baseSelectedId = null; select({ type: 'pin' }, uuid); }} onclear={() => { baseSelectedId = null; select({ type: 'clear' }); }}>
             {#snippet overlay()}
               {#if canCommon}
                 <div class="bc-desktop-sites--mode" role="group" aria-label={t('sharedSites.show')}>
@@ -529,18 +543,12 @@
                   <button type="button" class="bc-desktop-sites--filled" onclick={() => showSiteDives(selectedSite?.name ?? '')}>{t('desktopSites.seeDives')}</button>
                 </div>
               {:else if baseSelected}
-                <div class="bc-desktop-sites--card" bind:clientHeight={cardHeight}>
-                  <div class="bc-desktop-sites--card-text">
-                    <h2 class="bc-desktop-sites--card-title">{baseSelected.name}</h2>
-                    <p class="bc-desktop-sites--card-line">{baseCardLine(baseSelected, false)}</p>
-                  </div>
-                  <a class="bc-desktop-sites--filled" href="/sites/base/{encodeURIComponent(baseSelected.id)}">{t('sites.openSiteSheet')}</a>
-                </div>
+                {#key baseSelected.id}<SharedSiteCard site={baseSelected} desktop onclose={() => (baseSelectedId = null)} />{/key}
               {/if}
-              <!-- « Nouveau site »: the FAB at the bottom right of the map, above the site card while it is open. -->
-              <button type="button" class="bc-desktop-sites--fab" style:bottom="{selectedSite || baseSelected ? 24 + cardHeight + 16 : 40}px" aria-label={t('sites.newSite')} title="{t('sites.newSite')} ({mod}N)" aria-keyshortcuts={desktopMac ? 'Meta+N' : 'Control+N'} onclick={() => newSite()}>
+              <!-- « Nouveau site »: the FAB at the bottom right of the map, above the site card while it is open; not on « Carte commune ». -->
+              {#if !common}<button type="button" class="bc-desktop-sites--fab" style:bottom="{selectedSite ? 24 + cardHeight + 16 : 40}px" aria-label={t('sites.newSite')} title="{t('sites.newSite')} ({mod}N)" aria-keyshortcuts={desktopMac ? 'Meta+N' : 'Control+N'} onclick={() => newSite()}>
                 <Icon name="plus" size={24} />
-              </button>
+              </button>{/if}
             {/snippet}
           </DesktopSiteMap>
         </div>
@@ -781,11 +789,24 @@
       gap: 4px;
       padding: 12px 16px;
       border-bottom: 1px solid var(--bc-separator);
+      width: 100%;
+      border-top: none;
+      border-right: none;
+      border-left: none;
+      background: none;
+      font: inherit;
+      text-align: start;
+      align-items: flex-start;
+      cursor: pointer;
       color: var(--bc-text);
       text-decoration: none;
 
       &:hover {
         background: color-mix(in srgb, var(--bc-text) 4%, transparent);
+      }
+
+      &[aria-pressed='true'] {
+        background: var(--bc-secondary-container);
       }
     }
     .bc-desktop-sites--table {

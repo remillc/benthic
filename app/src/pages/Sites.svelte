@@ -30,6 +30,7 @@ import { connection } from '../lib/online.svelte.js';
 import { distanceKm, inBbox, normalizeBbox } from '../lib/geo.js';
 import { matchesSite, highlightParts } from '../lib/site-search.js';
 import MapStackSheet from '../components/MapStackSheet.svelte';
+import SharedSiteCard from '../components/SharedSiteCard.svelte';
 import MapSiteCard from '../components/MapSiteCard.svelte';
 import { placeAt } from '../lib/place-lookup.js';
 import { language } from '../lib/i18n.js';
@@ -435,6 +436,20 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
     untrack(() => loadWholeMap());
   });
 
+  /**
+   * A row of the shared list: the site is selected on the map, which centres on it, and its card shows (task 398).
+   * On the phone the page scrolls back up to the map.
+   * @param {import('../lib/shared-sites.js').BaseSite} b
+   */
+  function pickBase(b) {
+    stack = null;
+    selectedUuid = null;
+    baseSelectedId = b.id;
+    // On the phone the card covers the bottom of the map: the site shows in the strip above it.
+    siteMap?.centreOn({ latUdeg: Math.round(b.lat * 1e6), lonUdeg: Math.round(b.lon * 1e6) }, layout.phone ? 96 : 0);
+    if (layout.phone) baseListEl?.closest('.page-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   /** What the map draws of the base. */
   const baseLayer = $derived(
     common && wholeMap
@@ -452,8 +467,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
     return baseSelected ? `${count} ${t('sites.mapSelected', { name: baseSelected.name })}` : count;
   });
 
-  /** @param {string} id */
-  const openBase = (id) => f7.views.current?.router.navigate(`/sites/base/${encodeURIComponent(id)}`);
 
   async function load() {
     try {
@@ -487,7 +500,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
 
 {#snippet mapBlock(/** @type {string} */ height)}
   {#if located.length || canCommon}
-    <div class="bc-sites--map" class:bc-sites--card-open={!!selectedSite || !!baseSelected}>
+    <div class="bc-sites--map" class:bc-sites--card-open={!!selectedSite} class:bc-sites--shared-card-open={!selectedSite && !!baseSelected} class:bc-sites--no-fab={common}>
       <!-- Full screen keeps the pins and its own locate button. A tapped pin shows its card;
            several under the finger open a sheet. The shared map shows names from zoom 13. -->
       <SiteMap
@@ -514,12 +527,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
           {#if selectedSite}
             <MapSiteCard site={selectedSite} hideDiveCounts={common} onopen={() => openFromMap(selectedSite.uuid)} onclose={() => (selectedUuid = null)} />
           {:else if baseSelected}
-            <MapSiteCard
-              site={{ name: baseSelected.name, country: baseSelected.country, dives: baseSelected.dives ?? 0, lastDate: '', maxDepthMm: 0 }}
-              line={baseCardLine(baseSelected, false)}
-              onopen={() => baseSelected && openBase(baseSelected.id)}
-              onclose={() => (baseSelectedId = null)}
-            />
+            {#key baseSelected.id}<SharedSiteCard site={baseSelected} onclose={() => (baseSelectedId = null)} />{/key}
           {/if}
         {/snippet}
       </SiteMap>
@@ -576,7 +584,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
           <ul>
             {#each baseVisible.items as b, i (b.id)}
               <li data-virtual-list-index={baseVisible.from + i} aria-posinset={baseVisible.from + i + 1} aria-setsize={baseList.length} style:top="{baseVisible.top}px">
-                <a href="/sites/base/{encodeURIComponent(b.id)}" class="item-link item-content">
+                <button type="button" class="item-link item-content bc-sites--common-row" aria-pressed={b.id === baseSelectedId} onclick={() => pickBase(b)}>
                   <span class="bc-sites--common-dot" aria-hidden="true"></span>
                   <div class="item-inner">
                     <div class="bc-sites--text">
@@ -584,7 +592,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
                       <div class="item-text">{baseRowText(b, logbook.prefs)}</div>
                     </div>
                   </div>
-                </a>
+                </button>
               </li>
             {/each}
           </ul>
@@ -701,7 +709,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
         {/if}
       </div>
     {/if}
-    {#if layout.phone && !selection.length}
+    {#if layout.phone && !selection.length && !common}
       {@render fab()}
     {:else if layout.phone}
       <!-- Selecting: no FAB. -->
@@ -712,7 +720,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
           <!-- Like the Carnet: the band tops the list pane, the map stays beside it. -->
           <div class="bc-sites--scroll" data-bc-scroll>{@render band(false)}{@render panel()}</div>
         </div>
-        <div class="bc-sites--map-pane">{@render mapBlock('100%')}{#if !selection.length}{@render fab()}{/if}</div>
+        <div class="bc-sites--map-pane">{@render mapBlock('100%')}{#if !selection.length && !common}{@render fab()}{/if}</div>
       </div>
     {/if}
   {/snippet}
@@ -1043,6 +1051,16 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
       bottom: 116px;
     }
 
+    /* The shared site's card is taller (task 398); on the tablet it sits at the bottom left and leaves the button be. */
+    .bc-sites--shared-card-open .bc-sites--locate {
+      bottom: 208px;
+    }
+
+    /* Tablet, « Carte commune »: no FAB, so « Centrer sur ma position » comes down above the map credits. */
+    .bc-sites--split:not(.ios) .bc-sites--no-fab .bc-sites--locate {
+      bottom: 64px;
+    }
+
     /* « Mes sites | Carte commune »: MD3 segmented button, 40 dp, over the bottom left of the map. */
     .bc-sites--mode {
       position: absolute;
@@ -1104,6 +1122,17 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
     .bc-sites--card-open .bc-sites--mode {
       bottom: 116px;
     }
+    /* A row of the shared list is a button: it selects the site on the map. */
+    .bc-sites--common-row {
+      width: 100%;
+      border: none;
+      background: none;
+      font: inherit;
+      color: inherit;
+      text-align: start;
+      cursor: pointer;
+    }
+
     .bc-sites--common-dot {
       flex: none;
       width: 12px;

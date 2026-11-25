@@ -193,6 +193,11 @@
   }
 
   /** Frames every site, once. */
+  /** Centres the map on a position, closer in if needed (a row of the shared list). @param {number} lat @param {number} lon */
+  export function centreOn(lat, lon) {
+    map?.easeTo({ center: [lon, lat], zoom: Math.max(map.getZoom(), 11) });
+  }
+
   function frame() {
     if (!map || !maplibregl || !sites.length) return;
     framed = true;
