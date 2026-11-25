@@ -34,8 +34,8 @@ import MapSiteCard from '../components/MapSiteCard.svelte';
 import { placeAt } from '../lib/place-lookup.js';
 import { language } from '../lib/i18n.js';
 import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
-import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
-import { readAreaSites } from '../lib/shared-sites.js';
+import { loadLinks, readWholeMap, setSitesMode, sharedSites } from '../lib/shared-sites.svelte.js';
+import { sitesInView } from '../lib/shared-clusters.js';
 import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
 import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 import FoldingSearch from '../components/FoldingSearch.svelte';
@@ -316,9 +316,16 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   // account sees the shared map over its own sites. Who may read it is the server's switch: a refusal shows the offer.
   const canCommon = $derived(benthicPlusAccount.signedIn);
   const common = $derived(canCommon && sharedSites.mode === 'common');
-  let baseBox = $state.raw(/** @type {{ mode: string, total: number, sites: import('../lib/shared-sites.js').BaseSite[], clusters: { lat: number, lon: number, count: number }[] }|null} */ (null));
-  /** The base sites in the visible area, including those grouped into clusters. */
-  let baseList = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  /** The whole shared map, grouped on the device by the map (lib/shared-clusters.js). */
+  let wholeMap = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]|null} */ (null));
+  /** The base sites in the visible area, nearest the centre first (each time the map stops). */
+  const baseList = $derived(
+    common && wholeMap && view
+      ? sitesInView(wholeMap, normalizeBbox(view.bounds))
+          .map((s) => ({ ...s, distanceM: distanceKm(view.center[0], view.center[1], s.lon, s.lat) * 1000 }))
+          .sort((a, b) => a.distanceM - b.distanceM)
+      : [],
+  );
   /** @type {HTMLElement|undefined} */
   let baseListEl = $state();
   /** @type {any} */
@@ -393,70 +400,45 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   });
   /** @type {'idle'|'loading'|'ready'|'offer'|'failed'} */
   let baseState = $state('idle');
-  let baseLoadingMore = $state(false);
   let baseSelectedId = $state(/** @type {string|null} */ (null));
-  const baseSelected = $derived(baseSelectedId === null ? null : (baseBox?.sites.find((x) => x.id === baseSelectedId) ?? baseList.find((x) => x.id === baseSelectedId) ?? null));
-  /** @type {ReturnType<typeof setTimeout>|undefined} */
-  let baseTimer;
+  const baseSelected = $derived(baseSelectedId === null ? null : (wholeMap?.find((x) => x.id === baseSelectedId) ?? null));
   let baseAsk = 0;
 
-  /** Reads the base in the view once the map has stopped. @param {{ center: [number, number], bounds: [number, number, number, number], zoom: number }} v */
-  function loadBase(v) {
-    clearTimeout(baseTimer);
+  /** Reads the whole shared map (kept for the session, asked again with its version when old). */
+  async function loadWholeMap() {
     const ask = ++baseAsk;
-    baseState = 'loading';
-    baseLoadingMore = true;
-    baseBox = null;
-    baseList = [];
-    baseTimer = setTimeout(async () => {
-      if (!connection.online) return;
-      try {
-        await withSession(async (api, token) => {
-          const bbox = normalizeBbox(v.bounds);
-          const box = await api.inBox(token, { bbox, zoom: v.zoom });
-          if (ask !== baseAsk) return;
-          baseBox = box;
-          await readAreaSites(
-            (after) => api.inBoxPage(token, { bbox, after, limit: 500 }),
-            () => ask === baseAsk && common,
-            (sites) => {
-              baseList = sites.map((s) => ({ ...s, distanceM: distanceKm(v.center[0], v.center[1], s.lon, s.lat) * 1000 }))
-                .sort((a, b) => a.distanceM - b.distanceM);
-              baseState = 'ready';
-            },
-          );
-          if (ask === baseAsk) baseLoadingMore = false;
-        });
-      } catch (err) {
-        if (ask !== baseAsk) return;
-        console.error('Shared site area', err);
-        const code = /** @type {any} */ (err)?.code;
-        baseState = code === 'SUBSCRIPTION_REQUIRED' ? 'offer' : 'failed';
-      }
-    }, 350);
+    if (!wholeMap) baseState = 'loading';
+    try {
+      const sites = await readWholeMap();
+      if (ask !== baseAsk) return;
+      wholeMap = sites;
+      baseState = 'ready';
+    } catch (err) {
+      if (ask !== baseAsk) return;
+      console.error('Shared map', err);
+      const code = /** @type {any} */ (err)?.code;
+      baseState = code === 'SUBSCRIPTION_REQUIRED' ? 'offer' : 'failed';
+    }
   }
 
   $effect(() => {
     if (!common || !connection.online) {
-      clearTimeout(baseTimer);
       untrack(() => baseAsk++);
       baseSelectedId = null;
-      baseBox = null;
-      baseList = [];
+      wholeMap = null;
+      baseState = 'idle';
       return;
     }
     if (!sharedSites.linksLoaded) loadLinks();
-    const currentView = view;
-    if (currentView) untrack(() => loadBase(currentView));
+    // Each stop of the map checks the copy is fresh (no request while it is).
+    view;
+    untrack(() => loadWholeMap());
   });
 
   /** What the map draws of the base. */
   const baseLayer = $derived(
-    common && baseBox
-      ? {
-          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, label: `${x.name}, ${baseCardLine(x, false)}` })),
-          clusters: baseBox.clusters,
-        }
+    common && wholeMap
+      ? { sites: wholeMap.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, label: `${x.name}, ${baseCardLine(x, false)}` })) }
       : null,
   );
 
@@ -465,8 +447,8 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
    * (task 2026-11-24-394), and its accessible name counts them.
    */
   const commonMapLabel = $derived.by(() => {
-    if (!common || !baseBox) return undefined;
-    const count = t('sharedSites.mapLabel', { n: baseBox.total });
+    if (!common || !wholeMap) return undefined;
+    const count = t('sharedSites.mapLabel', { n: baseList.length });
     return baseSelected ? `${count} ${t('sites.mapSelected', { name: baseSelected.name })}` : count;
   });
 
@@ -588,7 +570,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
       <p class="bc-sites--area-count" role="status">{t('sharedSites.failed')}</p>
     {:else if baseState === 'loading'}
       <p class="bc-sites--area-count" role="status">{t('sharedSites.loadingArea')}</p>
-    {:else if baseState === 'ready' && baseBox}
+    {:else if baseState === 'ready' && wholeMap}
       {#if baseList.length}
         <nav class="list no-chevron bc-sites--surface bc-sites--list bc-sites--common-list" aria-label={t('sharedSites.listLabel')} bind:this={baseListEl}>
           <ul>
@@ -608,9 +590,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
           </ul>
         </nav>
       {/if}
-      {#if baseLoadingMore}
-        <p class="bc-sites--area-count" role="status">{t('sharedSites.loadingArea')}</p>
-      {:else if !baseList.length}
+      {#if !baseList.length}
         <p class="bc-sites--area-count" role="status">{t('sharedSites.emptyArea')}</p>
       {/if}
     {/if}

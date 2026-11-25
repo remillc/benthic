@@ -50,6 +50,7 @@ let fakeToken = null;
 export function useSharedSitesApi(f) {
   fake = f?.api ?? null;
   fakeToken = f?.sessionToken ?? null;
+  whole = { version: '', sites: [], at: 0 };
 }
 if (import.meta.env?.DEV && typeof window !== 'undefined') /** @type {any} */ (window).__sharedSitesApi = useSharedSitesApi;
 
@@ -73,6 +74,28 @@ export async function withSession(f) {
   const t = await token();
   if (!t) throw new SharedSitesError('UNAUTHENTICATED', 401);
   return f(api(), t);
+}
+
+/** The whole shared map is asked again after this, ms (the server then answers « unchanged » unless it moved). */
+const WHOLE_MAP_FRESH_MS = 10 * 60 * 1000;
+/** The whole shared map held for the session. @type {{ version: string, sites: import('./shared-sites.js').BaseSite[], at: number }} */
+let whole = { version: '', sites: [], at: 0 };
+/** @type {Promise<import('./shared-sites.js').BaseSite[]>|null} */
+let wholeAsk = null;
+
+/**
+ * The whole shared map, for grouping on the device (lib/shared-clusters.js): read once, then asked again with its version
+ * when older than WHOLE_MAP_FRESH_MS. Throws the server's refusal (SUBSCRIPTION_REQUIRED shows the offer).
+ * @returns {Promise<import('./shared-sites.js').BaseSite[]>}
+ */
+export function readWholeMap() {
+  if (whole.version && Date.now() - whole.at < WHOLE_MAP_FRESH_MS) return Promise.resolve(whole.sites);
+  wholeAsk ??= withSession(async (a, t) => {
+    const r = await a.wholeMap(t, whole.version || undefined);
+    whole = { version: r.version, sites: r.sites ?? whole.sites, at: Date.now() };
+    return whole.sites;
+  }).finally(() => { wholeAsk = null; });
+  return wholeAsk;
 }
 
 /** Whether this device may show the shared map and contribute: a subscribed Benthic+ account. */

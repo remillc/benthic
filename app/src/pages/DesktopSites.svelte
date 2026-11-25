@@ -47,7 +47,7 @@
   import { setDiveSite } from '../lib/dive-site.js';
   import { t } from '../lib/i18n.js';
   import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
-  import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
+  import { loadLinks, readWholeMap, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
   import { distanceKm } from '../lib/geo.js';
   import { openBenthicPlus } from '../lib/open-offer.svelte.js';
@@ -156,8 +156,8 @@
   const canCommon = $derived(benthicPlusAccount.signedIn);
   const common = $derived(canCommon && sharedSites.mode === 'common');
   let mapView = $state.raw(/** @type {{ center: [number, number], bounds: [number, number, number, number], zoom: number }|null} */ (null));
+  /** The whole shared map, grouped on the device by the map (lib/shared-clusters.js). */
   let baseBox = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
-  let baseClusters = $state.raw(/** @type {{ lat: number, lon: number, count: number }[]} */ ([]));
   let baseList = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
   let baseSelectedId = $state(/** @type {string|null} */ (null));
   let baseState = $state(/** @type {'idle'|'loading'|'ready'|'offer'|'failed'} */ ('idle'));
@@ -175,16 +175,15 @@
     if (!sharedSites.linksLoaded) void loadLinks();
     const timer = setTimeout(async () => {
       baseState = 'loading';
-      const [w, s, e, n] = view.bounds;
+      const [, , e, n] = view.bounds;
       const radiusM = Math.min(50000, Math.max(1, Math.round(distanceKm(view.center[0], view.center[1], e, n) * 1000)));
       try {
-        const [box, nearby] = await withSession((api, token) => Promise.all([
-          api.inBox(token, { bbox: [w, s, e, n], zoom: view.zoom }),
-          api.nearby(token, { lat: view.center[1], lon: view.center[0], radiusM, limit: 30, q }),
-        ]));
+        const [whole, nearby] = await Promise.all([
+          readWholeMap(),
+          withSession((api, token) => api.nearby(token, { lat: view.center[1], lon: view.center[0], radiusM, limit: 30, q })),
+        ]);
         if (ask !== baseAsk) return;
-        baseBox = box.sites;
-        baseClusters = box.clusters;
+        baseBox = whole;
         baseList = nearby;
         baseState = 'ready';
       } catch (error) {
@@ -512,7 +511,7 @@
       <div class="bc-desktop-sites--right">
         <!-- The map stays mounted under the other panes, so that its view is kept. -->
         <div class="bc-desktop-sites--pane" hidden={pane !== 'sites' || sel.mode === 'sheet'}>
-          <DesktopSiteMap sites={common ? [] : sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} base={baseLayer} clusters={common ? baseClusters : []} {common} onview={(view) => mapView = view} onbaseselect={(id) => { select({ type: 'clear' }); baseSelectedId = id; }} onselect={(uuid) => { baseSelectedId = null; select({ type: 'pin' }, uuid); }} onclear={() => { baseSelectedId = null; select({ type: 'clear' }); }}>
+          <DesktopSiteMap sites={common ? [] : sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} base={baseLayer} {common} onview={(view) => mapView = view} onbaseselect={(id) => { select({ type: 'clear' }); baseSelectedId = id; }} onselect={(uuid) => { baseSelectedId = null; select({ type: 'pin' }, uuid); }} onclear={() => { baseSelectedId = null; select({ type: 'clear' }); }}>
             {#snippet overlay()}
               {#if canCommon}
                 <div class="bc-desktop-sites--mode" role="group" aria-label={t('sharedSites.show')}>

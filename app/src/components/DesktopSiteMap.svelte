@@ -12,6 +12,7 @@
   import { placeAt } from '../lib/place-lookup.js';
   import { createSiteMap, lngLatOf } from '../lib/desktop-map.js';
   import { stackPins } from '../lib/desktop-sites.js';
+  import { groupsIn, indexSites, openingZoom } from '../lib/shared-clusters.js';
   import { SITE_NAMES_FROM_ZOOM } from '../lib/map-label.js';
 
   /**
@@ -22,14 +23,17 @@
    *   onselect: (uuid: number) => void,
    *   onclear: () => void,
    *   base?: { id: string, name: string, lat: number, lon: number }[],
-   *   clusters?: { lat: number, lon: number, count: number }[],
    *   common?: boolean,
    *   onbaseselect?: (id: string) => void,
    *   onview?: (view: { center: [number, number], bounds: [number, number, number, number], zoom: number }) => void,
    *   overlay?: import('svelte').Snippet,
    * }}
    */
-  let { sites, selected, matching, onselect, onclear, base = [], clusters = [], common = false, onbaseselect, onview, overlay } = $props();
+  let { sites, selected, matching, onselect, onclear, base = [], common = false, onbaseselect, onview, overlay } = $props();
+
+  /** The whole shared map, grouped on the device at each whole zoom level (lib/shared-clusters.js). */
+  const baseIndex = $derived(base.length ? indexSites(base) : null);
+  let baseLevel = -1;
 
   /** The pins closer than this at the zoom merge, px. */
   const STACK_RADIUS = 16;
@@ -106,7 +110,10 @@
       }
       markers.push(new maplibregl.Marker({ element: node, anchor: 'center' }).setLngLat(lngLatOf(first)).addTo(m));
     }
-    for (const cluster of clusters) {
+    const b = m.getBounds();
+    baseLevel = Math.floor(m.getZoom());
+    const groups = baseIndex ? groupsIn(baseIndex, [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], m.getZoom()) : { sites: [], clusters: [] };
+    for (const cluster of groups.clusters) {
       const node = document.createElement('button');
       node.type = 'button';
       node.className = 'bc-desktop-site-map--shared-cluster';
@@ -114,11 +121,11 @@
       node.setAttribute('aria-label', t('sharedSites.clusterLabel', { n: cluster.count }));
       node.addEventListener('click', (e) => {
         e.stopPropagation();
-        m.easeTo({ center: [cluster.lon, cluster.lat], zoom: Math.min(m.getZoom() + 2, m.getMaxZoom()) });
+        m.easeTo({ center: [cluster.lon, cluster.lat], zoom: Math.min(Math.max(openingZoom(/** @type {any} */ (baseIndex), cluster.id), m.getZoom() + 1), m.getMaxZoom()) });
       });
       markers.push(new maplibregl.Marker({ element: node, anchor: 'center' }).setLngLat([cluster.lon, cluster.lat]).addTo(m));
     }
-    for (const site of base) {
+    for (const site of groups.sites) {
       const node = document.createElement('button');
       node.type = 'button';
       node.className = 'bc-desktop-site-map--shared';
@@ -205,6 +212,8 @@
     frame();
     render();
     m.on('moveend', () => { render(); reportView(); });
+    // The shared map's groups follow the zoom: drawn again at each whole level, not only once the map stops.
+    m.on('zoom', () => { if (baseIndex && Math.floor(m.getZoom()) !== baseLevel) render(); });
     m.on('click', () => {
       stack = null;
       onclear();
@@ -219,8 +228,7 @@
 
   $effect(() => {
     sites;
-    base;
-    clusters;
+    baseIndex;
     common;
     if (map) {
       if (!framed) frame();
