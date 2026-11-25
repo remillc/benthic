@@ -6580,8 +6580,11 @@
       "one": "{n} site of the shared map in this area",
       "other": "{n} sites of the shared map in this area"
     },
+    "mapLabel": {
+      "one": "Shared map: {n} site.",
+      "other": "Shared map: {n} sites."
+    },
     "fewDives": "Fewer than 5 dives",
-    "inYourSites": "In your sites",
     "offlineTitle": "Shared map unavailable",
     "offline": "Connect to the internet to see sites on the shared map.",
     "failed": "The shared map does not answer. Try again later.",

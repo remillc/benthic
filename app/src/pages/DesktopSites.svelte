@@ -48,7 +48,6 @@
   import { t } from '../lib/i18n.js';
   import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
-  import { inYourSites } from '../lib/shared-sites.js';
   import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
   import { distanceKm } from '../lib/geo.js';
   import { openBenthicPlus } from '../lib/open-offer.svelte.js';
@@ -164,7 +163,7 @@
   let baseState = $state(/** @type {'idle'|'loading'|'ready'|'offer'|'failed'} */ ('idle'));
   let baseAsk = 0;
   const baseSelected = $derived(baseBox.find((s) => s.id === baseSelectedId) ?? null);
-  const baseLayer = $derived(common ? baseBox.map((s) => ({ id: s.id, name: s.name, lat: s.lat, lon: s.lon, mine: inYourSites(s.id, sharedSites.links) })) : []);
+  const baseLayer = $derived(common ? baseBox.map((s) => ({ id: s.id, name: s.name, lat: s.lat, lon: s.lon })) : []);
 
   $effect(() => {
     const view = mapView;
@@ -456,7 +455,7 @@
               {#each baseList as site (site.id)}
                 <a class="bc-desktop-sites--shared-row" href="/sites/base/{encodeURIComponent(site.id)}">
                   <span>{site.name}</span>
-                  <span class="bc-desktop-sites--muted">{baseRowText(site, sharedSites.links, logbook.prefs)}</span>
+                  <span class="bc-desktop-sites--muted">{baseRowText(site, logbook.prefs)}</span>
                 </a>
               {:else}
                 <p class="bc-desktop-sites--state">{t('sites.noMatch')}</p>
@@ -513,7 +512,7 @@
       <div class="bc-desktop-sites--right">
         <!-- The map stays mounted under the other panes, so that its view is kept. -->
         <div class="bc-desktop-sites--pane" hidden={pane !== 'sites' || sel.mode === 'sheet'}>
-          <DesktopSiteMap sites={sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} base={baseLayer} clusters={common ? baseClusters : []} {common} onview={(view) => mapView = view} onbaseselect={(id) => { select({ type: 'clear' }); baseSelectedId = id; }} onselect={(uuid) => { baseSelectedId = null; select({ type: 'pin' }, uuid); }} onclear={() => { baseSelectedId = null; select({ type: 'clear' }); }}>
+          <DesktopSiteMap sites={common ? [] : sites.filter((s) => s.hasLocation)} selected={sel.selected} {matching} base={baseLayer} clusters={common ? baseClusters : []} {common} onview={(view) => mapView = view} onbaseselect={(id) => { select({ type: 'clear' }); baseSelectedId = id; }} onselect={(uuid) => { baseSelectedId = null; select({ type: 'pin' }, uuid); }} onclear={() => { baseSelectedId = null; select({ type: 'clear' }); }}>
             {#snippet overlay()}
               {#if canCommon}
                 <div class="bc-desktop-sites--mode" role="group" aria-label={t('sharedSites.show')}>

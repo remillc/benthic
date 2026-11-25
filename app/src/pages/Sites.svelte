@@ -35,7 +35,7 @@ import { placeAt } from '../lib/place-lookup.js';
 import { language } from '../lib/i18n.js';
 import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
 import { loadLinks, setSitesMode, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
-import { inYourSites, readAreaSites } from '../lib/shared-sites.js';
+import { readAreaSites } from '../lib/shared-sites.js';
 import { baseCardLine, baseRowText } from '../lib/shared-sites-format.js';
 import { openBenthicPlus } from '../lib/open-offer.svelte.js';
 import FoldingSearch from '../components/FoldingSearch.svelte';
@@ -454,11 +454,21 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   const baseLayer = $derived(
     common && baseBox
       ? {
-          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, mine: inYourSites(x.id, sharedSites.links), label: `${x.name}, ${baseCardLine(x, false)}` })),
+          sites: baseBox.sites.map((x) => ({ id: x.id, name: x.name, lat: x.lat, lon: x.lon, label: `${x.name}, ${baseCardLine(x, false)}` })),
           clusters: baseBox.clusters,
         }
       : null,
   );
+
+  /**
+   * On « Carte commune » the map draws the shared sites only, yours among them like any other
+   * (task 2026-11-24-394), and its accessible name counts them.
+   */
+  const commonMapLabel = $derived.by(() => {
+    if (!common || !baseBox) return undefined;
+    const count = t('sharedSites.mapLabel', { n: baseBox.total });
+    return baseSelected ? `${count} ${t('sites.mapSelected', { name: baseSelected.name })}` : count;
+  });
 
   /** @param {string} id */
   const openBase = (id) => f7.views.current?.router.navigate(`/sites/base/${encodeURIComponent(id)}`);
@@ -500,7 +510,8 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
            several under the finger open a sheet. The shared map shows names from zoom 13. -->
       <SiteMap
         bind:this={siteMap}
-        sites={located}
+        sites={common ? [] : located}
+        label={commonMapLabel}
         names={common ? 'atZoom' : 'atZoomOrFewInFullScreen'}
         hideDiveCounts={common}
         groupSites
@@ -584,11 +595,11 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
             {#each baseVisible.items as b, i (b.id)}
               <li data-virtual-list-index={baseVisible.from + i} aria-posinset={baseVisible.from + i + 1} aria-setsize={baseList.length} style:top="{baseVisible.top}px">
                 <a href="/sites/base/{encodeURIComponent(b.id)}" class="item-link item-content">
-                  <span class="bc-sites--common-dot" class:bc-sites--common-mine={inYourSites(b.id, sharedSites.links)} aria-hidden="true"></span>
+                  <span class="bc-sites--common-dot" aria-hidden="true"></span>
                   <div class="item-inner">
                     <div class="bc-sites--text">
                       <div class="item-title bc-site-name">{b.name}</div>
-                      <div class="item-text">{baseRowText(b, sharedSites.links, logbook.prefs)}</div>
+                      <div class="item-text">{baseRowText(b, logbook.prefs)}</div>
                     </div>
                   </div>
                 </a>
@@ -1104,9 +1115,6 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
       margin-right: 16px;
       border-radius: 6px;
       background: var(--bc-shared-site);
-    }
-    .bc-sites--common-mine {
-      background: var(--bc-text);
     }
     .bc-sites--common-offer {
       margin: 16px 24px;

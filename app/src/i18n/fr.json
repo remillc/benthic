@@ -6583,8 +6583,11 @@
       "one": "{n} site de la carte commune dans cette zone",
       "other": "{n} sites de la carte commune dans cette zone"
     },
+    "mapLabel": {
+      "one": "Carte commune : {n} site.",
+      "other": "Carte commune : {n} sites."
+    },
     "fewDives": "Moins de 5 plongées",
-    "inYourSites": "Dans vos sites",
     "offlineTitle": "Carte commune indisponible",
     "offline": "Connectez-vous à Internet pour afficher les sites de la carte commune.",
     "failed": "La carte commune ne répond pas. Réessayez plus tard.",

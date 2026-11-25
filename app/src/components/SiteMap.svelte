@@ -52,7 +52,7 @@
    *   fullscreenLabel?: string,
    *   closerInFullScreen?: boolean,
    *   pinsFromZoom?: number,
-   *   base?: { sites: { id: string, name: string, lat: number, lon: number, mine: boolean, label: string }[], clusters: { lat: number, lon: number, count: number }[] }|null,
+   *   base?: { sites: { id: string, name: string, lat: number, lon: number, label: string }[], clusters: { lat: number, lon: number, count: number }[] }|null,
    *   baseSelected?: string|null,
    *   onbaseselect?: (id: string) => void,
    * }}
@@ -458,7 +458,6 @@
       baseMarkers.push(new maplibregl.Marker({ element: el }).setLngLat([c.lon, c.lat]).addTo(m));
     }
     for (const s of base.sites) {
-      if (s.mine) continue;
       const el = document.createElement('button');
       el.type = 'button';
       el.className = 'bc-site-map--base bc-site-map--base-site';

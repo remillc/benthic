@@ -3,7 +3,7 @@
 import { t } from './i18n.js';
 import { formatNumber } from './format.js';
 import { distanceParts } from './site-distance.js';
-import { diveCountOf, inYourSites } from './shared-sites.js';
+import { diveCountOf } from './shared-sites.js';
 
 /** @param {{ dives: number|null, fewDives: boolean }} site */
 export function baseDivesText(site) {
@@ -27,11 +27,9 @@ export const distanceText = (metres, prefs) => t('sites.chooseAway', { distance:
 /**
  * The second line of a base site in a list.
  * @param {import('./shared-sites.js').BaseSite} site
- * @param {Record<string, string>} links
  * @param {{ length?: string }} prefs
  */
-export function baseRowText(site, links, prefs) {
-  if (inYourSites(site.id, links)) return t('sharedSites.inYourSites');
+export function baseRowText(site, prefs) {
   return site.distanceM !== undefined ? distanceText(site.distanceM, prefs) : '';
 }
 
