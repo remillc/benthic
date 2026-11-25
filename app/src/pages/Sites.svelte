@@ -89,8 +89,8 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
    * magnifier while the page scrolls; there is no « open search » state, the box is always there.
    */
   const fold = $derived(!theme.ios && layout.phone && !desktopApp);
-  /** The box itself: not on the shared map, which lists other sites than the ones it searches. */
-  const folding = $derived(fold && !common);
+  /** The box itself, on « Mes sites » and on « Carte commune » (there it searches the whole shared map). */
+  const folding = $derived(fold);
   const typed = $derived((folding || searching) && query.trim() !== '');
   /** The search takes the page: the list of things to do and the + button give way. */
   const finding = $derived(fold ? typed : searching);
@@ -318,10 +318,10 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
   const common = $derived(canCommon && sharedSites.mode === 'common');
   /** The whole shared map, grouped on the device by the map (lib/shared-clusters.js). */
   let wholeMap = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]|null} */ (null));
-  /** The base sites in the visible area, nearest the centre first (each time the map stops). */
+  /** The base sites in the visible area, or matching the search anywhere, nearest the centre first. */
   const baseList = $derived(
     common && wholeMap && view
-      ? sitesInView(wholeMap, normalizeBbox(view.bounds))
+      ? (typed ? wholeMap.filter((s) => matchesSite(s, query)) : sitesInView(wholeMap, normalizeBbox(view.bounds)))
           .map((s) => ({ ...s, distanceM: distanceKm(view.center[0], view.center[1], s.lon, s.lat) * 1000 }))
           .sort((a, b) => a.distanceM - b.distanceM)
       : [],

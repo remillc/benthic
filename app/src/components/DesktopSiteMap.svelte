@@ -332,13 +332,17 @@
       background: var(--bc-shared-site);
       cursor: pointer;
     }
+    /* Round whatever the count: the width follows the digits, the height follows the width. */
     :global(.bc-desktop-site-map--shared-cluster) {
+      display: grid;
+      place-items: center;
       min-width: 32px;
       width: auto;
-      height: 32px;
-      padding: 0 6px;
+      height: auto;
+      aspect-ratio: 1;
+      padding: 0 5px;
       border: 2px solid var(--bc-on-shared-site);
-      border-radius: 16px;
+      border-radius: 50%;
       background: var(--bc-shared-site);
       color: var(--bc-on-shared-site);
       font: inherit;
@@ -373,9 +377,11 @@
     :global(.bc-desktop-site-map--stack) {
       display: grid;
       place-items: center;
-      width: 32px;
-      height: 32px;
-      padding: 0;
+      min-width: 32px;
+      width: auto;
+      height: auto;
+      aspect-ratio: 1;
+      padding: 0 5px;
       border: 2px solid var(--bc-surface);
       border-radius: 50%;
       background: var(--bc-secondary);
