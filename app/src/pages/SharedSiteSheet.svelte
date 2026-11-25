@@ -133,7 +133,7 @@
       <SiteMap
         ratio={2.1}
         frame={[[site.lon, site.lat]]}
-        base={{ sites: [{ id: site.id, name: site.name, lat: site.lat, lon: site.lon, mine: false, label: `${site.name}, ${baseCardLine(site)}` }], clusters: [] }}
+        base={{ sites: [{ id: site.id, name: site.name, lat: site.lat, lon: site.lon, label: `${site.name}, ${baseCardLine(site)}` }], clusters: [] }}
         label={t('sharedSites.card.mapLabel', { name: site.name })}
       />
     </div>

@@ -21,7 +21,7 @@
    *   matching: Set<number>|null,
    *   onselect: (uuid: number) => void,
    *   onclear: () => void,
-   *   base?: { id: string, name: string, lat: number, lon: number, mine: boolean }[],
+   *   base?: { id: string, name: string, lat: number, lon: number }[],
    *   clusters?: { lat: number, lon: number, count: number }[],
    *   common?: boolean,
    *   onbaseselect?: (id: string) => void,
@@ -119,7 +119,6 @@
       markers.push(new maplibregl.Marker({ element: node, anchor: 'center' }).setLngLat([cluster.lon, cluster.lat]).addTo(m));
     }
     for (const site of base) {
-      if (site.mine) continue;
       const node = document.createElement('button');
       node.type = 'button';
       node.className = 'bc-desktop-site-map--shared';

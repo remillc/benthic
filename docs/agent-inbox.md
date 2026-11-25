@@ -7550,7 +7550,7 @@ Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-
 
 Christian asked for this on 24 November 2026. Work in `main`. On desktop (Windows/Linux and macOS), the line « Métrique et Impérial règlent toutes les unités d’un coup. Changer une unité passe en Personnalisé. » leaves the white card: the card holds only « Système d’unités » and its button group (task 392). The line sits right under the card, 13 px #4B4A47, aligned with the section title (4 px inset), as a note on the card, not part of the row. Mock-ups: `docs/mockups/bureau-reglages.dc.html`, `docs/mockups/bureau-reglages-macos.dc.html`.
 
-## [ ] 2026-11-24-394 Sites › « Carte commune »: your sites look like the others; fewer tablet portrait mock-ups
+## [x] 2026-11-24-394 Sites › « Carte commune »: your sites look like the others; fewer tablet portrait mock-ups
 
 **Wait** (Christian, 24 November 2026): point 1 waits until the merge algorithm of the shared map has been discussed. The aim stays: personal sites are not added to « Carte commune » as such; a site that reached it through the merge is drawn with the same pin and colour as the other shared sites. Point 2 needs no code.
 
