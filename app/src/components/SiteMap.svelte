@@ -621,9 +621,10 @@
   /**
    * Centres the map on a position ("centre on my position" of the Sites map).
    * @param {{latUdeg: number, lonUdeg: number}} p
+   * @param {number} [above] px: the position shows this far above the centre (a card covers the bottom of the map)
    */
-  export function centreOn(p) {
-    map?.easeTo({ center: lngLat(p), zoom: Math.max(map.getZoom(), 11) }, { programmatic: true });
+  export function centreOn(p, above = 0) {
+    map?.easeTo({ center: lngLat(p), zoom: Math.max(map.getZoom(), 11), offset: [0, -above] }, { programmatic: true });
   }
 
   /** Frames a region. @param {[number, number, number, number]} bbox west, south, east, north */

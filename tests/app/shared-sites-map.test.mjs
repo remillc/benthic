@@ -8,7 +8,7 @@ test('the shared map hides dive counts without changing the personal map or site
   const sites = read('pages/Sites.svelte');
   assert.match(sites, /names=\{common \? 'atZoom' : 'atZoomOrFewInFullScreen'\}/);
   assert.match(sites, /hideDiveCounts=\{common\}/);
-  assert.match(sites, /baseCardLine\(baseSelected, false\)/);
+  assert.match(sites, /<SharedSiteCard site=\{baseSelected\}/);
   assert.match(sites, /baseCardLine\(x, false\)/);
   assert.match(sites, /summary=\{common \? '' :/);
   assert.doesNotMatch(sites, /sharedSites\.areaCount/);
@@ -68,7 +68,8 @@ test('desktop shared mode loads nearby sites and connects map markers to site sh
   const map = read('components/DesktopSiteMap.svelte');
   assert.match(desktop, /readWholeMap\(\)/);
   assert.match(desktop, /api\.nearby\(token/);
-  assert.match(desktop, /href="\/sites\/base\/\{encodeURIComponent\(site\.id\)\}"/);
+  assert.match(desktop, /onclick=\{\(\) => pickBase\(site\)\}/);
+  assert.match(desktop, /<SharedSiteCard site=\{baseSelected\} desktop/);
   assert.match(map, /groupsIn\(baseIndex, /);
   assert.match(map, /Math\.floor\(m\.getZoom\(\)\) !== baseLevel\) render\(\)/);
   assert.match(map, /onbaseselect\?\.\(site\.id\)/);
