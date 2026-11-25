@@ -924,11 +924,16 @@
       transform: scale(1.4);
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--bc-shared-site) 35%, transparent);
     }
+    /* Round whatever the count: the width follows the digits, the height follows the width. */
     :global(.bc-site-map--base-cluster) {
+      display: grid;
+      place-items: center;
       min-width: 32px;
       width: auto;
-      height: 32px;
-      padding: 0 6px;
+      height: auto;
+      aspect-ratio: 1;
+      padding: 0 5px;
+      border-radius: 50%;
       font: inherit;
       font-size: 13px;
       font-weight: 700;
@@ -939,10 +944,11 @@
       place-items: center;
       min-width: 32px;
       width: auto;
-      height: 32px;
-      padding: 0 6px;
+      height: auto;
+      aspect-ratio: 1;
+      padding: 0 5px;
       border: 2px solid var(--bc-surface);
-      border-radius: 16px;
+      border-radius: 50%;
       /* Like the desktop's: dark blue with a translucent blue halo. */
       background: var(--bc-secondary);
       color: var(--bc-on-secondary);
