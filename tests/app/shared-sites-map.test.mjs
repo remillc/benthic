@@ -71,3 +71,14 @@ test('desktop shared mode loads nearby sites and connects map markers to site sh
   assert.match(map, /onbaseselect\?\.\(site\.id\)/);
   assert.match(map, /#if common\}\{t\('sharedSites\.mapCredits'\)/);
 });
+
+test('on the shared map your sites look like the others (task 2026-11-24-394)', () => {
+  const sites = read('pages/Sites.svelte');
+  assert.match(sites, /sites=\{common \? \[\] : located\}/);
+  assert.doesNotMatch(sites, /inYourSites|common-mine/);
+  assert.match(sites, /sharedSites\.mapLabel', \{ n: baseBox\.total \}/);
+  assert.doesNotMatch(read('lib/shared-sites-format.js'), /inYourSites/);
+  assert.doesNotMatch(read('components/SiteMap.svelte'), /s\.mine/);
+  assert.doesNotMatch(read('components/DesktopSiteMap.svelte'), /site\.mine/);
+  assert.match(read('pages/DesktopSites.svelte'), /sites=\{common \? \[\] :/);
+});
