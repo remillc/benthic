@@ -16,6 +16,7 @@
   import Icon from './Icon.svelte';
   import { buildMapStyle, showLabelsInLanguage } from '../lib/map-style.js';
   import { stackPins } from '../lib/desktop-sites.js';
+  import { groupsIn, indexSites, openingZoom } from '../lib/shared-clusters.js';
 
   // Loaded when a map is first shown: about 800 KB the start-up does not need.
   /** @type {typeof import('maplibre-gl')} */
@@ -52,12 +53,13 @@
    *   fullscreenLabel?: string,
    *   closerInFullScreen?: boolean,
    *   pinsFromZoom?: number,
-   *   base?: { sites: { id: string, name: string, lat: number, lon: number, label: string }[], clusters: { lat: number, lon: number, count: number }[] }|null,
+   *   base?: { sites: { id: string, name: string, lat: number, lon: number, label: string }[] }|null,
    *   baseSelected?: string|null,
    *   onbaseselect?: (id: string) => void,
    * }}
-   * base: the shared map of dive sites (task 2026-11-19-315): its sites as teal dots (a base site the diver already has is
-   *   not drawn: the diver's own pin is there) and its crowded cells as numbered teal clusters; a tap on a cluster zooms in.
+   * base: the whole shared map of dive sites (task 2026-11-19-315): its sites as teal dots, grouped on the device into
+   *   numbered teal clusters at each whole zoom level while the map zooms (lib/shared-clusters.js); a tap on a cluster
+   *   zooms to where it opens.
    * baseSelected: the base site whose dot is selected; onbaseselect: a tap on a dot.
    * pinsFromZoom: the pins show only from this zoom, and the heat fades out over the zoom
    *   level before it (the heat map up close, task 2026-11-14-155); 0: always.
@@ -437,15 +439,22 @@
 
   /** @type {import('maplibre-gl').Marker[]} */
   let baseMarkers = [];
+  /** The shared map grouped on the device, and the whole zoom level its markers were drawn for. */
+  const baseIndex = $derived(base ? indexSites(base.sites) : null);
+  let baseLevel = -1;
 
   /** The shared map's dots (16 dp) and clusters (32 dp, the count inside), teal with a white ring. */
   function drawBase() {
     if (!map) return;
     for (const m of baseMarkers) m.remove();
     baseMarkers = [];
-    if (!base) return;
+    const index = baseIndex;
+    if (!index) return;
     const m = map;
-    for (const c of base.clusters) {
+    const b = m.getBounds();
+    baseLevel = Math.floor(m.getZoom());
+    const groups = groupsIn(index, [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], m.getZoom());
+    for (const c of groups.clusters) {
       const el = document.createElement('button');
       el.type = 'button';
       el.className = 'bc-site-map--base bc-site-map--base-cluster';
@@ -453,11 +462,11 @@
       el.setAttribute('aria-label', t('sharedSites.clusterLabel', { n: c.count }));
       el.addEventListener('click', (e) => {
         e.stopPropagation();
-        m.easeTo({ center: [c.lon, c.lat], zoom: Math.min(m.getZoom() + 2, 16) });
+        m.easeTo({ center: [c.lon, c.lat], zoom: Math.max(openingZoom(index, c.id), m.getZoom() + 1) });
       });
       baseMarkers.push(new maplibregl.Marker({ element: el }).setLngLat([c.lon, c.lat]).addTo(m));
     }
-    for (const s of base.sites) {
+    for (const s of groups.sites) {
       const el = document.createElement('button');
       el.type = 'button';
       el.className = 'bc-site-map--base bc-site-map--base-site';
@@ -478,7 +487,7 @@
   }
 
   $effect(() => {
-    base;
+    baseIndex;
     if (map?.loaded()) drawBase();
   });
 
@@ -570,6 +579,8 @@
     m.on('move', scheduleHeat);
     m.on('zoom', () => {
       zoomLayers();
+      // The shared map's groups follow the zoom: drawn again at each whole level, not only once the map stops.
+      if (baseIndex && Math.floor(m.getZoom()) !== baseLevel) drawBase();
       if (names === 'atZoom' || names === 'atZoomOrFewInFullScreen') updateNames();
     });
     m.on('resize', scheduleHeat);
@@ -577,6 +588,7 @@
     m.on('moveend', () => {
       readBounds();
       if (groupSites) drawSites();
+      if (baseIndex) drawBase();
       updateNames();
       const b = m.getBounds();
       const c = m.getCenter();

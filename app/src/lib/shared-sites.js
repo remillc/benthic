@@ -53,6 +53,18 @@ const num = (/** @type {unknown} */ v) => (typeof v === 'number' && Number.isFin
  * @param {any} r
  * @returns {BaseSite|null}
  */
+/**
+ * A row of the whole map: [id, lat, lon, name, country, dives (null under 5), closed (1|0)].
+ * @param {any} r @returns {BaseSite|null}
+ */
+export function compactSiteOf(r) {
+  if (!Array.isArray(r)) return null;
+  const [id, lat, lon, name, country, dives, closed] = r;
+  if (typeof id !== 'string' || num(lat) === null || num(lon) === null) return null;
+  const count = num(dives);
+  return { id, name: text(name), lat, lon, country: text(country), region: '', waterType: '', closed: closed === 1, dives: count, fewDives: count === null };
+}
+
 export function baseSiteOf(r) {
   const lat = num(r?.lat);
   const lon = num(r?.lon);
@@ -155,6 +167,19 @@ export function createSharedSitesApi({ baseUrl, transport }) {
       const links = {};
       for (const s of /** @type {any[]} */ (Array.isArray(r.sites) ? r.sites : [])) if (s && s.id !== undefined && s.baseSiteId !== undefined && s.baseSiteId !== null) links[String(s.id)] = String(s.baseSiteId);
       return { links, total: num(r.total) ?? 0 };
+    },
+    /**
+     * The whole shared map, for grouping on the device (lib/shared-clusters.js). since: the version held; when it is still
+     * current the server sends no rows and sites is null.
+     * @param {string} token @param {string} [since]
+     * @returns {Promise<{ version: string, sites: BaseSite[]|null }>}
+     */
+    async wholeMap(token, since) {
+      const r = await call(token, 'GET', `/v1/sites/base/all${since ? `?${qs({ since })}` : ''}`);
+      if (typeof r?.version !== 'string' || !r.version) throw new SharedSitesError('UNREACHABLE', 0);
+      if (r.unchanged === true) return { version: r.version, sites: null };
+      if (!Array.isArray(r.sites)) throw new SharedSitesError('UNREACHABLE', 0);
+      return { version: r.version, sites: r.sites.map(compactSiteOf).filter((s) => s !== null) };
     },
     /**
      * The base in a box of the map.

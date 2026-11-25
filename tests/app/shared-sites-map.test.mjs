@@ -35,7 +35,9 @@ test('shared and personal pin names follow the same zoom threshold, with site cl
   assert.match(map, /text\.className = 'bc-site-map--base-name'/);
   assert.match(map, /text\.textContent = s\.name/);
   const sites = read('pages/Sites.svelte');
-  assert.match(sites, /clusters: baseBox\.clusters/);
+  assert.match(sites, /sites: wholeMap\.map\(/);
+  assert.match(map, /groupsIn\(index, /);
+  assert.match(map, /Math\.floor\(m\.getZoom\(\)\) !== baseLevel\) drawBase\(\)/);
   assert.match(sites, /\s+groupSites\s/);
   assert.match(map, /stackPins\(ordered\.map/);
   assert.match(map, /onstack\?\.\(group\.uuids/);
@@ -64,10 +66,11 @@ test('the shared map mode control has 48 dp targets and clears the locate button
 test('desktop shared mode loads nearby sites and connects map markers to site sheets', () => {
   const desktop = read('pages/DesktopSites.svelte');
   const map = read('components/DesktopSiteMap.svelte');
-  assert.match(desktop, /api\.inBox\(token/);
+  assert.match(desktop, /readWholeMap\(\)/);
   assert.match(desktop, /api\.nearby\(token/);
   assert.match(desktop, /href="\/sites\/base\/\{encodeURIComponent\(site\.id\)\}"/);
-  assert.match(desktop, /clusters=\{common \? baseClusters : \[\]\}/);
+  assert.match(map, /groupsIn\(baseIndex, /);
+  assert.match(map, /Math\.floor\(m\.getZoom\(\)\) !== baseLevel\) render\(\)/);
   assert.match(map, /onbaseselect\?\.\(site\.id\)/);
   assert.match(map, /#if common\}\{t\('sharedSites\.mapCredits'\)/);
 });
@@ -76,7 +79,7 @@ test('on the shared map your sites look like the others (task 2026-11-24-394)', 
   const sites = read('pages/Sites.svelte');
   assert.match(sites, /sites=\{common \? \[\] : located\}/);
   assert.doesNotMatch(sites, /inYourSites|common-mine/);
-  assert.match(sites, /sharedSites\.mapLabel', \{ n: baseBox\.total \}/);
+  assert.match(sites, /sharedSites\.mapLabel', \{ n: baseList\.length \}/);
   assert.doesNotMatch(read('lib/shared-sites-format.js'), /inYourSites/);
   assert.doesNotMatch(read('components/SiteMap.svelte'), /s\.mine/);
   assert.doesNotMatch(read('components/DesktopSiteMap.svelte'), /site\.mine/);
