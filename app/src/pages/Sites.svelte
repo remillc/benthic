@@ -1189,15 +1189,17 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
       --bc-map-button-right: 16px;
     }
 
-    /* Android phone (task 2026-11-23-339): the band is taller (it holds the search box), so the full-screen button
-       leaves the top of the map for the bottom right, just above « Centrer sur ma position ». */
-    :global(.bc-sites--fold) .bc-sites--map {
-      --bc-map-button-top: auto;
-      --bc-map-button-bottom: 80px;
+    /* Android phone (task 2026-11-25-399): the full-screen button at the top right of the map and « Mes sites |
+       Carte commune » level with it at the top left; a shared site's card starts under them. */
+    :global(.bc-sites--fold) .bc-sites--mode,
+    :global(.bc-sites--fold) .bc-sites--card-open .bc-sites--mode {
+      top: 34px;
+      bottom: auto;
+    }
 
-      &.bc-sites--card-open {
-        --bc-map-button-bottom: 164px;
-      }
+    /* The card covers « Centrer sur ma position » while it is open. */
+    :global(.bc-sites--fold) .bc-sites--shared-card-open .bc-sites--locate {
+      visibility: hidden;
     }
 
     /* Tablets: the map is its own pane, the button 16 dp from its top right; the

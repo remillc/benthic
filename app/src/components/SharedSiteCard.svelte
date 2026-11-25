@@ -5,13 +5,17 @@
   // A shared site only has a name and a position, so the card holds its actions instead of opening a page: the
   // coordinates (copied with one button), « Itinéraire » (the device's maps app; on the desktop, the map web page) and
   // « Ajouter à mes sites » (the diver's own copy, linked to the base site; once there, « Dans vos sites » opens it).
+  // « Signaler une erreur » (task 2026-11-25-399) opens the report of a shared site (components/SharedSiteReport.svelte).
   // Back closes it (lib/back-button.js sends bc-cancel to it).
   import { f7, theme } from 'framework7-svelte';
   import Icon from './Icon.svelte';
+  import SharedSiteReport from './SharedSiteReport.svelte';
+  import { BenthicCore } from 'benthic-core';
+  import { connection } from '../lib/online.svelte.js';
   import { t } from '../lib/i18n.js';
   import { formatCoordinates, openInMapsApp } from '../lib/sites.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
-  import { addBaseSite, sharedSites } from '../lib/shared-sites.svelte.js';
+  import { addBaseSite, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { localSiteOf } from '../lib/shared-sites.js';
   import { baseDivesText } from '../lib/shared-sites-format.js';
   /**
@@ -56,6 +60,34 @@
     }
   }
 
+  let reporting = $state(false);
+
+  /**
+   * Sends the report. For « Mauvaise position » the diver's own position of the site goes with it when the logbook has it.
+   * @param {{ reason: import('../lib/shared-sites.js').ReportReason, details: string }} r
+   */
+  async function sendReport({ reason, details }) {
+    const id = site.id;
+    /** @type {{ lat: number, lon: number }|undefined} */
+    let position;
+    if (reason === 'wrong_position' && mine !== null) {
+      try {
+        const own = await BenthicCore.siteQuery({ kind: 'site', uuid: mine });
+        if (own?.hasLocation) position = { lat: own.latUdeg / 1e6, lon: own.lonUdeg / 1e6 };
+      } catch {
+        // Sent without a position.
+      }
+    }
+    try {
+      await withSession((api, token) => api.report(token, id, { reason, details, position }));
+      reporting = false;
+      showSnackbar(t('sharedSites.report.sent'));
+    } catch (e) {
+      const code = /** @type {any} */ (e)?.code;
+      showSnackbar(t(code === 'TOO_MANY_REPORTS' ? 'sharedSites.report.tooMany' : 'sharedSites.report.failed'));
+    }
+  }
+
   const openMine = () => mine !== null && f7.views.current?.router.navigate(`/sites/${mine}`);
 
   /** Back closes the card. @param {HTMLElement} node */
@@ -89,10 +121,14 @@
     {#if mine !== null}
       <button type="button" class="bc-shared-site-card--add bc-shared-site-card--mine" onclick={openMine}><Icon name="check" size={18} weight={2} />{t('sharedSites.card.inYourSites')}</button>
     {:else}
-      <button type="button" class="bc-shared-site-card--add" disabled={adding} onclick={add}>{t('sharedSites.card.add')}</button>
+      <button type="button" class="bc-shared-site-card--add" disabled={adding} onclick={add}><Icon name="addLocation" size={18} />{t('sharedSites.card.add')}</button>
     {/if}
   </div>
+  <button type="button" class="bc-shared-site-card--report" disabled={!connection.online} onclick={() => (reporting = true)}><Icon name="flag" size={18} />{t('sharedSites.card.reportError')}</button>
 </div>
+{#if reporting}
+  <SharedSiteReport name={site.name} onsend={sendReport} oncancel={() => (reporting = false)} />
+{/if}
 
 <style>
   @layer bc.components {
@@ -233,14 +269,39 @@
       color: var(--bc-text);
     }
 
+    /* Wider than « Itinéraire », so that both labels stay on one line on a phone (1.6 : 1; iOS 1.7 : 1). */
     .bc-shared-site-card--add {
-      flex: 1.4;
+      flex: 1.6;
       border: none;
       background: var(--bc-primary-action);
       color: var(--bc-on-primary-action);
 
       &:disabled {
         opacity: 0.6;
+      }
+    }
+
+    /* A text button under the two, aligned left: grey (iOS: the system blue). */
+    .bc-shared-site-card--report {
+      align-self: flex-start;
+      height: 40px;
+      margin: -4px 0 -8px -12px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--bc-text-2);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.5;
       }
     }
 
@@ -259,6 +320,14 @@
         color: var(--bc-text-2);
       }
 
+      .bc-shared-site-card--add {
+        flex: 1.7;
+      }
+
+      .bc-shared-site-card--report {
+        color: var(--bc-action);
+      }
+
       .bc-shared-site-card--directions {
         border: none;
         background: color-mix(in srgb, var(--bc-action) 14%, transparent);
@@ -271,6 +340,17 @@
     .bc-shared-site-card--desktop {
       right: auto;
       width: min(400px, calc(100% - 32px));
+    }
+
+    /* Android phone: under « Mes sites | Carte commune » and the full-screen button, at the top of the map (task 399). */
+    :global(.bc-sites--fold) .bc-shared-site-card {
+      top: 86px;
+      bottom: auto;
+    }
+
+    /* iPhone: a little higher than the bottom of the map, above the credits. */
+    .bc-shared-site-card--ios {
+      bottom: 28px;
     }
 
     /* Tablet: above « Mes sites | Carte commune » (40 dp, 32 dp from the bottom); desktop (the control is at the top):

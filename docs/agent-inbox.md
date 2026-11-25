@@ -7607,7 +7607,7 @@ Christian asked for this on 25 November 2026. Work in `main`. A shared site only
 
 Every device: Android phone `sites-commun-android`; iPhone `ios-sites-commun` (iOS segmented control « Mes sites | Carte commune », grey circular close button, tinted « Itinéraire »); Android tablet `android-tablette-sites-commun-paysage` and iPad `ipad-sites-commun` (the list on the left shows the shared sites, the card floats at the bottom left of the map); desktop `bureau-sites-commun` (the table lists the shared sites with a « Distance » column, the card at the bottom left of the map pane). All in `docs/mockups/`.
 
-## [ ] 2026-11-25-399 Correction to 398: « Signaler une erreur » and an icon on every action of the shared site card
+## [x] 2026-11-25-399 Correction to 398: « Signaler une erreur » and an icon on every action of the shared site card
 
 Christian asked for this on 25 November 2026. Work in `main`. Adds to task 398 (the shared site card on « Carte commune »), on every device:
 
