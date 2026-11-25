@@ -651,7 +651,7 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
 {/snippet}
 
 {#snippet fab()}
-    <!-- MD3 FAB, 56 dp, over the list panel: a new site. -->
+    <!-- MD3 FAB, 56 dp: a new site. Phone: over the list panel; tablet: at the bottom right of the map. -->
     <div class="fab fab-right-bottom bc-fab-add bc-sites--fab" class:bc-sites--hidden={finding} bind:this={fabEl}>
       <a href="/sites/new" aria-label={t('sites.newSite')}><i class="icon"><Icon name="plus" /></i></a>
     </div>
@@ -711,9 +711,8 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
         <div class="bc-sites--list-pane" style="width: {listWidth + (ios ? 0 : 20)}px">
           <!-- Like the Carnet: the band tops the list pane, the map stays beside it. -->
           <div class="bc-sites--scroll" data-bc-scroll>{@render band(false)}{@render panel()}</div>
-          {@render fab()}
         </div>
-        <div class="bc-sites--map-pane">{@render mapBlock('100%')}</div>
+        <div class="bc-sites--map-pane">{@render mapBlock('100%')}{#if !selection.length}{@render fab()}{/if}</div>
       </div>
     {/if}
   {/snippet}
@@ -839,8 +838,25 @@ import FoldingSearch from '../components/FoldingSearch.svelte';
       height: 44px;
     }
 
+    /* Tablet: the FAB at the bottom right of the map pane (24 dp from the side, above the map credits), « Centrer sur ma position » above it;
+       both move up above the site card while it is open. */
     .bc-sites--split :global(.bc-fab-add) {
       position: absolute;
+      z-index: 3;
+      right: 24px;
+      bottom: 64px;
+    }
+
+    .bc-sites--split:not(.ios) .bc-sites--locate {
+      bottom: 136px;
+    }
+
+    .bc-sites--split:has(.bc-sites--card-open) :global(.bc-fab-add) {
+      bottom: 116px;
+    }
+
+    .bc-sites--split:not(.ios) .bc-sites--card-open .bc-sites--locate {
+      bottom: 188px;
     }
 
     /* The open search, in the top bar's place (spec, "Sites, search open and its

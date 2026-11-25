@@ -943,11 +943,14 @@
       padding: 0 6px;
       border: 2px solid var(--bc-surface);
       border-radius: 16px;
-      background: var(--bc-text);
-      color: var(--bc-surface);
+      /* Like the desktop's: dark blue with a translucent blue halo. */
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
       font: inherit;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      box-shadow: 0 0 0 7px color-mix(in srgb, var(--bc-secondary) 22%, transparent);
       cursor: pointer;
     }
     :global(.bc-site-map--personal-cluster)::after,
