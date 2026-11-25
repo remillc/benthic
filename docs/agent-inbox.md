@@ -7606,3 +7606,13 @@ Christian asked for this on 25 November 2026. Work in `main`. A shared site only
 - In the list of shared sites, a row has no chevron: tapping it selects the site on the map and shows this card.
 
 Every device: Android phone `sites-commun-android`; iPhone `ios-sites-commun` (iOS segmented control « Mes sites | Carte commune », grey circular close button, tinted « Itinéraire »); Android tablet `android-tablette-sites-commun-paysage` and iPad `ipad-sites-commun` (the list on the left shows the shared sites, the card floats at the bottom left of the map); desktop `bureau-sites-commun` (the table lists the shared sites with a « Distance » column, the card at the bottom left of the map pane). All in `docs/mockups/`.
+
+## [ ] 2026-11-25-399 Correction to 398: « Signaler une erreur » and an icon on every action of the shared site card
+
+Christian asked for this on 25 November 2026. Work in `main`. Adds to task 398 (the shared site card on « Carte commune »), on every device:
+
+1. Under the two buttons, a text button « Signaler une erreur » with a flag icon, aligned left (Android, tablet, desktop: grey text; iPhone, iPad: iOS blue). It opens the existing report flow for a shared site (`sites-commun-signaler-android` if present, else a sheet with the reasons and a comment).
+2. Every action has an icon: Fermer (×), Copier les coordonnées (copy), Itinéraire (directions), Ajouter à mes sites (Material Symbols `add_location`, white on the filled button), Signaler une erreur (flag). « Ajouter à mes sites » is wider than « Itinéraire » (about 1.6 : 1 on Android, 1.7 : 1 on iOS) so both labels stay on one line on a phone.
+3. Android phone: the « Mes sites | Carte commune » toggle sits just under the header, level with the full-screen button, and the taller card starts under it. iPhone: the card starts a little higher, still above the OpenStreetMap credit and the list.
+
+Mock-ups: `sites-commun-android`, `ios-sites-commun`, `android-tablette-sites-commun-paysage`, `ipad-sites-commun`, `bureau-sites-commun` in `docs/mockups/`.
