@@ -132,7 +132,10 @@
     try {
       await change((inv) => inv.deleteGear(id));
       showSnackbar(t('gear.piece.deleted'));
-      f7router.back('/profile/gear/', { force: true });
+      // One page to undo: back to where the piece was opened from (the list, a dive's detail…). A forced back to the
+      // URL of the previous page left Framework7's history ending on the deleted piece (error report of 26 Nov 2026).
+      if (f7router.history.length > 1) f7router.back();
+      else f7router.navigate('/profile/gear/', { reloadCurrent: true });
     } catch (e) {
       showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
     }

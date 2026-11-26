@@ -125,3 +125,10 @@ test('the screens: retire everywhere, offer deletion and keep the retired piece 
   const app = read('App.svelte');
   assert.ok(app.indexOf("'/profile/gear/retired/'") < app.indexOf("'/profile/gear/:id'"), 'retired before :id');
 });
+
+test('deleting a piece goes back one page, never a forced back to the list (it left the history ending on the deleted piece)', () => {
+  const piece = read('pages/ProfilePiece.svelte');
+  const remove = piece.slice(piece.indexOf('async function removeForGood'), piece.indexOf('async function removeForGood') + 900);
+  assert.doesNotMatch(remove, /back\([^)]*force: true/);
+  assert.match(remove, /if \(f7router\.history\.length > 1\) f7router\.back\(\);/);
+});
