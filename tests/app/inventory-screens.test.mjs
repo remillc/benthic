@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { gearCsv } from '../../app/src/lib/gear-export.js';
+import { gearCsv, gearHtml } from '../../app/src/lib/gear-export.js';
 
 const root = new URL('../../app/src/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -73,6 +73,27 @@ test('the read-only switch is development only', () => {
 test('the CSV has a header, quotes where needed and a line per piece', () => {
   const csv = gearCsv([{ type: 'regulator', name: 'Apeks, "XTX"', retired: true }], ['T', 'N'], (t) => t.toUpperCase());
   assert.equal(csv, 'T,N\r\nREGULATOR,"Apeks, ""XTX"""\r\n'.replace('REGULATOR,"Apeks, ""XTX"""', 'REGULATOR,"Apeks, ""XTX""",,,,,,,1'));
+});
+
+test('the equipment PDF has a table per type, the retired mark, the paper and no markup from the names', () => {
+  const html = gearHtml(
+    [{ group: 'breathing', items: [{ id: 'a', type: 'regulator', name: 'Apeks <XTX>', brand: 'Apeks', model: 'XTX50', serial: 'S1', purchasedOn: '2024-05-02', retired: true }] }, { group: 'other', items: [] }],
+    { title: 'Équipement', exportedOn: 'Exporté le 26 nov.', letter: true, columns: ['Nom', 'Marque et modèle', 'N°', 'Achat', 'Note'], groupName: (g) => g.toUpperCase(), date: (d) => 'le ' + d, retired: 'archivée' },
+  );
+  assert.match(html, /size: letter/);
+  assert.match(html, /<h2[^>]*>BREATHING<\/h2>/);
+  assert.doesNotMatch(html, /OTHER/, 'an empty group has no table');
+  assert.match(html, /Apeks &lt;XTX&gt; <span[^>]*>· archivée<\/span>/);
+  assert.match(html, /Apeks XTX50/);
+  assert.match(html, /le 2024-05-02/);
+});
+
+test('« Exporter ou imprimer » chooses PDF or CSV, can check all, and is a dialog on wide screens', () => {
+  const sheet = read('components/GearExportSheet.svelte');
+  assert.match(sheet, /value: 'pdf'[\s\S]*value: 'csv'/);
+  assert.match(sheet, /exportCheckAll/);
+  assert.match(sheet, /\{#if profileWide\(\)\}[\s\S]*<Md3Dialog class="bc-gear-export"/);
+  assert.match(sheet, /BenthicCore\.htmlToPdf/);
 });
 
 test('the release notes mention the profile and the equipment', () => {
