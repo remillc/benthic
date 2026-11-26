@@ -123,15 +123,19 @@
     if (!equipment) return;
     const before = cloneEquipment(equipment);
     const beforeSuit = dive.suit ?? '';
+    const beforeWeights = weightRows(dive.weights ?? []);
     /** @type {import('../lib/inventory.js').DiveEquipment} */
     let next;
     let message = '';
     if (id === KIT_PREVIOUS) {
       if (!previousDive) return;
       const previous = equipmentOf(previousDive);
+      const previousFull = await BenthicCore.getDive({ id: previousDive.id }).catch(() => null);
       let suit = previous.suitGearId ? (gearMap().get(previous.suitGearId)?.name ?? '') : '';
-      if (!suit) suit = (await BenthicCore.getDive({ id: previousDive.id }).catch(() => null))?.suit ?? '';
-      if (equipmentIsEmpty(previous) && !suit) {
+      if (!suit) suit = previousFull?.suit ?? '';
+      // The weights too: the same diver in the same gear carries the same lead.
+      const previousWeights = weightRows(previousFull?.weights ?? []);
+      if (equipmentIsEmpty(previous) && !suit && !previousWeights.length) {
         showSnackbar(t('gear.diveGear.previousEmpty'));
         return;
       }
@@ -139,6 +143,7 @@
       message = t('gear.diveGear.copied');
       await saveEquipment(next);
       if (suit !== beforeSuit) await save('suit', suit);
+      if (previousWeights.length) await saveWeights(previousWeights);
     } else {
       const kit = gear.kits.find((k) => k.id === id);
       if (!kit) return;
@@ -154,6 +159,7 @@
       onAction: async () => {
         await saveEquipment(before);
         if ((dive.suit ?? '') !== beforeSuit) await save('suit', beforeSuit);
+        await saveWeights(beforeWeights);
       },
     });
   }
@@ -318,6 +324,11 @@
   const checker = (key) => (/** @type {string} */ text) => fieldChanges(dive, key, text, prefs).ok;
 
   // --- Équipement: the weights, « Ce lest était ». -----------------------------------------------
+  /**
+   * Weights as the rows saveWeights takes, each kept to the gram (its text unchanged).
+   * @param {{ grams: number, description: string }[]} list
+   */
+  const weightRows = (list) => list.map((w) => ({ description: w.description, text: weightText(w.grams, prefs), grams0: w.grams, text0: weightText(w.grams, prefs) }));
   /** @param {{ description: string, text: string, grams0: number, text0: string }[]} rows */
   async function saveWeights(rows) {
     const result = weightChanges(dive, rows, prefs);

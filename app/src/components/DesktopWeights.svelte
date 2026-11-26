@@ -7,6 +7,7 @@
   // in place (place and weight); Entrée or leaving the field keeps it and saves it at once, Échap restores it. `onsave` gets the rows of desktop-edit.js
   // weightChanges and returns false when the change could not be saved.
   import { tick } from 'svelte';
+  import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import { weightChips, weightPlaceName } from '../lib/desktop-detail.js';
   import { parseTyped, weightText } from '../lib/desktop-edit.js';
@@ -22,7 +23,19 @@
    */
   let { weights, prefs, label, onsave } = $props();
 
+  /** Subsurface's own weight types: the list when the core cannot give the logbook's. */
   const PLACES = ['integrated', 'belt', 'ankle', 'backplate', 'clip-on'];
+  /**
+   * The logbook's weight types, each with the weight last used for it (Subsurface's ws_info table: its own types and those
+   * of the earlier dives), as the dive editor offered them.
+   * @type {{ name: string, grams: number }[]}
+   */
+  let types = $state([]);
+  BenthicCore.toolQuery({ kind: 'weights' }).then(
+    (/** @type {{ types: { name: string, grams: number }[] }} */ list) => (types = Array.isArray(list?.types) ? list.types.filter((w) => w.name) : []),
+    (/** @type {unknown} */ e) => console.error('Weight types', e),
+  );
+  const names = $derived(types.length ? types.map((w) => w.name) : PLACES);
   const shown = $derived(weightChips(weights, prefs));
   const unit = $derived(prefs.weight === 'lbs' ? t('units.pounds') : t('units.kilograms'));
   const limit = $derived(prefs.weight === 'lbs' ? 400 : 200);
@@ -34,9 +47,9 @@
   let box = $state();
 
   const placeOptions = $derived.by(() => {
-    const list = PLACES.map((value) => ({ value, label: weightPlaceName(value) }));
+    const list = names.map((value) => ({ value, label: weightPlaceName(value) }));
     const d = editing?.description ?? '';
-    if (d && !PLACES.includes(d)) list.unshift({ value: d, label: weightPlaceName(d) });
+    if (d && !names.includes(d)) list.unshift({ value: d, label: weightPlaceName(d) });
     return list;
   });
   const valid = $derived(!editing || !editing.text.trim() || (parseTyped(editing.text) >= 0 && parseTyped(editing.text) <= limit));
@@ -48,7 +61,9 @@
     focusEditor();
   }
   function add() {
-    editing = { index: -1, description: 'belt', text: '' };
+    // As the dive editor did: the logbook's first weight type, with the weight last used for it.
+    const first = types[0];
+    editing = { index: -1, description: first?.name ?? 'belt', text: first?.grams ? weightText(first.grams, prefs) : '' };
     focusEditor();
   }
   function focusEditor() {
