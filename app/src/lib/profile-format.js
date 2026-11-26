@@ -23,7 +23,10 @@ export function formatFieldDate(iso) {
 /** The year, 0-based month and day the date picker starts on. @param {string} iso @param {number} fallbackYear */
 export function partsOf(iso, fallbackYear) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
-  return m ? { year: Number(m[1]), month: Number(m[2]) - 1, day: Number(m[3]) } : { year: fallbackYear - 30, month: 0, day: 1 };
+  if (m) return { year: Number(m[1]), month: Number(m[2]) - 1, day: Number(m[3]) };
+  // No date yet: the picker opens on today (26 November 2026), or on the last day allowed when today is past it.
+  const now = new Date();
+  return now.getFullYear() > fallbackYear ? { year: fallbackYear, month: 11, day: 31 } : { year: now.getFullYear(), month: now.getMonth(), day: now.getDate() };
 }
 
 /** YYYY-MM-DD from the picker's year, 0-based month and day. @param {{ year: number, month: number, day: number }} d */
