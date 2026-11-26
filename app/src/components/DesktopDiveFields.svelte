@@ -13,6 +13,7 @@
   import ButtonGroup from './ButtonGroup.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
   import DiveWeightRows from './DiveWeightRows.svelte';
+  import DetailSheet from './DetailSheet.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
   import DesktopEquipmentCard from './DesktopEquipmentCard.svelte';
   import DesktopChipsField from './DesktopChipsField.svelte';
@@ -28,7 +29,7 @@
   import DesktopConsumption from './DesktopConsumption.svelte';
   import SiteMap from './SiteMap.svelte';
   import Icon from './Icon.svelte';
-  import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
+  import { logbook, saveDiveChanges, isSubscriber, tripChange } from '../lib/logbook.svelte.js';
   import { ios, layout } from '../lib/layout.svelte.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
   import CylinderDeleteDialog from './CylinderDeleteDialog.svelte';
@@ -605,6 +606,61 @@
     }
   }
 
+  // --- Informations: « Voyage » (task 2026-11-26-403). The trips are the logbook's, by name; a new name makes a new trip. ---
+  /** The logbook's trips, by location (the first one of each name). */
+  const trips = $derived.by(() => {
+    /** @type {Map<string, number>} */
+    const byName = new Map();
+    for (const d of logbook.dives) if (d.trip?.location && !byName.has(d.trip.location)) byName.set(d.trip.location, d.trip.id);
+    return byName;
+  });
+  const tripName = $derived(dive.trip?.location ?? '');
+  const tripOptions = $derived([{ value: '', label: t('edit.tripNone') }, ...[...trips.keys()].map((name) => ({ value: name, label: name }))]);
+  /** The dive as the core has it now, after a change the dive page does not hear about (a trip is not an edit of the dive). */
+  async function refreshDive() {
+    logbook.edited = { id: dive.id, dive: await BenthicCore.getDive({ id: dive.id }) };
+  }
+  /** Puts the dive in a trip (an existing one, or a new one of that name) or takes it out (an empty name). @param {string} name */
+  async function saveTrip(name) {
+    const next = name.trim();
+    if (next === tripName) return true;
+    let steps = 0;
+    try {
+      if (!next) {
+        if (dive.trip) {
+          await tripChange({ action: 'remove', diveIds: [dive.id] });
+          steps++;
+        }
+      } else if (trips.has(next)) {
+        await tripChange({ action: 'add', tripId: /** @type {number} */ (trips.get(next)), diveIds: [dive.id] });
+        steps++;
+      } else {
+        const created = await tripChange({ action: 'create', diveIds: [dive.id] });
+        steps++;
+        const tripId = created.trip?.tripId;
+        if (tripId) {
+          await tripChange({ action: 'location', tripId, value: next });
+          steps++;
+        }
+      }
+      await refreshDive();
+      if (steps > 1) offerUndo(t('edit.saved'), undefined, 6000, steps);
+      return true;
+    } catch (e) {
+      failure(e);
+      return false;
+    }
+  }
+  /** The sheet of the trips on a phone, and the cross that takes the dive out of its trip. */
+  let tripSheet = $state(false);
+  /** @param {string} value */
+  async function pickTrip(value) {
+    tripSheet = false;
+    await saveTrip(value);
+  }
+  /** « Plongée invalide »: excluded from the statistics, hidden as the setting says. @param {boolean} on */
+  const saveInvalid = (on) => write({ invalid: on ? 1 : 0 });
+
   // --- Informations and Carte: the site card. -------------------------------------------------
   const siteRow = $derived(sites.find((x) => x.name === dive.site));
   const country = $derived(dive.siteLocation?.country || siteRow?.country || '');
@@ -650,6 +706,21 @@
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
         <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
+        {#if layout.phone}
+          <!-- A grey field that opens the sheet of the trips; its cross takes the dive out of its trip (mock-up detail-onglets-android). -->
+          <div class="bc-desktop-dive-fields--trip" data-field="trip">
+            <span class="bc-desktop-dive-fields--trip-label">{t('desktopDetail.label.trip')}</span>
+            <div class="bc-desktop-dive-fields--trip-row">
+              <button type="button" class="bc-desktop-dive-fields--trip-field" aria-haspopup="dialog" aria-label="{t('desktopDetail.label.trip')} : {tripName || t('edit.tripNone')}" disabled={preview} onclick={() => (tripSheet = true)}>
+                <span class="bc-desktop-dive-fields--trip-name" class:bc-desktop-dive-fields--trip-empty={!tripName} class:bc-desktop-dive-fields--trip-has={!!tripName}>{tripName || t('edit.tripNone')}</span>
+                <Icon name="arrowDown" size={20} />
+              </button>
+              {#if tripName}<button type="button" class="bc-desktop-dive-fields--trip-clear" aria-label={t('edit.tripClear')} onclick={() => saveTrip('')}><Icon name="close" size={20} /></button>{/if}
+            </div>
+          </div>
+        {:else}
+          <DesktopEditField stacked tall name="trip" kind="choice" label={t('desktopDetail.label.trip')} value={tripName} invitation={t('edit.tripNone')} options={tripOptions} onsave={(v) => saveTrip(String(v))} />
+        {/if}
       </DesktopEquipmentCard>
 
       <DesktopEquipmentCard name="people" title={t('desktopDetail.card.people')}>
@@ -689,13 +760,20 @@
           {/if}
           {#if dive.cns > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.cns')} value={`${formatNumber(dive.cns, 0)} %`} />{/if}
           {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
-          {#if trip}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.trip')} value={trip} />{/if}
         </div>
       </DesktopEquipmentCard>
 
       <DesktopEquipmentCard name="tags" title={t('desktopDetail.card.tags')}>
         {#snippet icon()}<Icon name="tag" size={22} />{/snippet}
         <DesktopChipsField name="tags" variant="tag" showLabel={false} label={t('desktopDetail.label.tags')} value={/** @type {string[]} */ (fieldValue(dive, 'tags', prefs))} known={known.tag} newLabel={t('desktopDetail.newTag')} onsave={(v) => save('tags', v)} />
+      </DesktopEquipmentCard>
+
+      <!-- Ends the tab (mock-up detail-onglets-android): a switch that excludes the dive from the statistics. -->
+      <DesktopEquipmentCard name="invalid" title={t('edit.invalid')} subtitle={t('edit.invalidText')}>
+        {#snippet icon()}<svg class="bc-desktop-dive-fields--invalid-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M5.6 5.6l12.8 12.8" /></svg>{/snippet}
+        {#snippet action()}
+          <label class="toggle"><input type="checkbox" role="switch" aria-label={t('edit.invalid')} checked={dive.invalid} disabled={preview} onchange={(e) => saveInvalid(e.currentTarget.checked)} /><span class="toggle-icon"></span></label>
+        {/snippet}
       </DesktopEquipmentCard>
     </div>
   {:else if tab === 'equipment'}
@@ -875,6 +953,10 @@
   />
 {/if}
 
+{#if tripSheet}
+  <DetailSheet title={t('desktopDetail.label.trip')} options={tripOptions} value={tripName} search newLabel={t('desktopDetail.newTrip')} onselect={pickTrip} onclose={() => (tripSheet = false)} />
+{/if}
+
 {#if picking}
   <DiveDateTimeDialogs date={startIso} kind={picking} onconfirm={saveDate} onclose={() => (picking = null)} />
 {/if}
@@ -1047,6 +1129,89 @@
     }
 
     /* The weights total, in the card's header. */
+    /* « Voyage » (a phone): the label, a 48 px grey field with the trip, its cross and a chevron. */
+    .bc-desktop-dive-fields--trip {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bc-desktop-dive-fields--trip-label {
+      margin: 0 0 6px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
+    }
+
+    .bc-desktop-dive-fields--trip-row {
+      position: relative;
+      display: flex;
+    }
+
+    .bc-desktop-dive-fields--trip-field {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 48px;
+      margin: 0;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--bc-field-rest);
+      color: var(--bc-text);
+      font: inherit;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: start;
+
+      :global(svg) {
+        flex: none;
+        color: var(--bc-text-2);
+      }
+    }
+
+    .bc-desktop-dive-fields--trip-name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bc-desktop-dive-fields--trip-has {
+      padding-inline-end: 36px;
+    }
+
+    .bc-desktop-dive-fields--trip-empty {
+      color: var(--bc-text-2);
+    }
+
+    /* The cross sits before the chevron, 40 dp, pulled into the field's padding. */
+    .bc-desktop-dive-fields--trip-clear {
+      position: absolute;
+      inset-inline-end: 28px;
+      top: 4px;
+      width: 40px;
+      height: 40px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--bc-text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bc-desktop-dive-fields--invalid-icon {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .bc-desktop-dive-fields--total {
       display: inline-flex;
       align-items: baseline;

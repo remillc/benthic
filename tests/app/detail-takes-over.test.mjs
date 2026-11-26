@@ -94,3 +94,21 @@ test('sources: the Lest card as rows with the amber suggestion on an Android pho
   }
   assert.equal(JSON.parse(source('i18n/fr.json')).desktopDetail.weightRowsNote, 'Un type choisi part du poids de la plongée précédente, sinon de son poids dans Réglages › Types de lest.');
 });
+
+test('sources: Voyage in the Site card with its cross, the invalid switch ends the Informations tab', () => {
+  const fields = source('components/DesktopDiveFields.svelte');
+  const info = fields.slice(fields.indexOf("<div class=\"bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info\">"), fields.indexOf("{:else if tab === 'equipment'}"));
+  assert.ok(info.indexOf('name="site"') < info.indexOf('data-field="trip"'), 'Voyage follows the site, in its card');
+  assert.ok(info.indexOf('data-field="trip"') < info.indexOf('name="people"'), 'and sits before the next card');
+  assert.match(info, /aria-label=\{t\('edit\.tripClear'\)\}/);
+  assert.doesNotMatch(info, /readonly label=\{t\('desktopDetail\.label\.trip'\)\}/, 'the read-only trip line of Conditions is gone');
+  assert.ok(info.lastIndexOf('name="invalid"') > info.lastIndexOf('name="tags"'), 'the invalid card is the last one');
+  assert.match(info, /role="switch"[^>]*checked=\{dive\.invalid\}/);
+  assert.match(fields, /write\(\{ invalid: on \? 1 : 0 \}\)/);
+  assert.match(fields, /tripChange\(\{ action: 'remove', diveIds: \[dive\.id\] \}\)/);
+  for (const lang of ['fr', 'en']) {
+    const d = JSON.parse(source(`i18n/${lang}.json`));
+    assert.ok(d.desktopDetail.newTrip && d.edit.tripClear && d.edit.invalid && d.edit.invalidText, lang);
+  }
+  assert.equal(JSON.parse(source('i18n/fr.json')).edit.invalidText, 'Exclue des statistiques et masquée selon le réglage');
+});
