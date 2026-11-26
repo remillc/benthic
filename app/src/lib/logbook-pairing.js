@@ -4,6 +4,7 @@
 // `computerModel` and `computerSerial` (as a download does), to suits by `suitNames`, the logbook's texts, kept in the
 // piece's file so the links are synced with the inventory. A logbook value is tied to at most one piece. Pure functions.
 import { modelKey, serialKey, sameComputer } from './dc-model.js';
+import { suitNorm } from './suit-pieces.js';
 
 /** @typedef {import('./inventory.js').Gear} Gear */
 
@@ -28,8 +29,8 @@ import { modelKey, serialKey, sameComputer } from './dc-model.js';
  * @property {string} [linkedTo] the id of the piece that already has it
  */
 
-/** A suit text as comparable text: trimmed, lower case. @param {string} name */
-export const suitKey = (name) => String(name ?? '').trim().toLowerCase();
+/** A suit text as comparable text: accents, case and spaces ignored (lib/suit-pieces.js). @param {string} name */
+export const suitKey = suitNorm;
 
 /** The key under which the dives of a suit text are counted in the map of `computerDiveCounts`. @param {string} name */
 export const suitCountKey = (name) => `suit\u0000${suitKey(name)}`;
@@ -211,8 +212,8 @@ export function linkProblem(pieces, gearId, link) {
  * « 140 plongées, 2016 à 2026 ». The wording comes from the caller (translated texts).
  * @param {'computer'|'suit'} kind
  * @param {(LogbookComputerItem|LogbookSuitItem)[]} items
- * @param {{ serial: (serial: string) => string, dives: (n: number) => string, range: (first: number, last: number) => string }} text
- * @returns {{ key: string, title: string, detail: string, linked: boolean }[]}
+ * @param {{ serial: (serial: string) => string, dives: (n: number) => string, range: (first: number, last: number) => string, owner?: (id: string) => string }} text `owner` (suits): the name of the piece that has a text; such a text can be moved, so its row is not greyed and carries the name
+ * @returns {{ key: string, title: string, detail: string, linked: boolean, tag?: string }[]}
  */
 export function pairRows(kind, items, text) {
   return items.map((item) => {
@@ -223,6 +224,7 @@ export function pairRows(kind, items, text) {
       return { key: computerKey(c), title: c.model, detail: [c.serial ? text.serial(c.serial) : '', count].filter(Boolean).join(' · '), linked: !!c.linkedTo };
     }
     const s = /** @type {LogbookSuitItem} */ (item);
+    if (text.owner && s.linkedTo) return { key: s.name, title: s.name, detail: count, linked: false, tag: text.owner(s.linkedTo) };
     return { key: s.name, title: s.name, detail: count, linked: !!s.linkedTo };
   });
 }

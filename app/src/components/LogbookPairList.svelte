@@ -7,7 +7,7 @@
 
   /**
    * @type {{
-   *   items: { key: string, title: string, detail: string, linked?: boolean }[],
+   *   items: { key: string, title: string, detail: string, linked?: boolean, tag?: string }[],
    *   multiple?: boolean,
    *   selected: string[],
    *   label: string,
@@ -33,7 +33,7 @@
           <span class="bc-logbook-pair-list--title">{item.title}</span>
           <span class="bc-logbook-pair-list--detail">{item.detail}</span>
         </span>
-        {#if item.linked}<span class="bc-logbook-pair-list--tag">{t('gear.pair.linked')}</span>{/if}
+        {#if item.tag}<span class="bc-logbook-pair-list--tag">{item.tag}</span>{:else if item.linked}<span class="bc-logbook-pair-list--tag">{t('gear.pair.linked')}</span>{/if}
       </label>
     </li>
   {/each}

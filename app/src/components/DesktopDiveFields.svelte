@@ -40,7 +40,7 @@
   import { OTHER_TYPE } from '../lib/cylinder-card.js';
   import { deletionOutcome, gasChangeMoments } from '../lib/gas-group.js';
   import { isRelease } from '../lib/edition.js';
-  import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
+  import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear, figuresOf, computerDiveCounts, suitPieceFor, syncSuitPieces } from '../lib/inventory.svelte.js';
   import { applyKit, cloneEquipment, diveKeyOf, equipmentIsEmpty, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
   import { BenthicCore } from 'benthic-core';
   import { openOver } from '../lib/navigation.svelte.js';
@@ -106,6 +106,44 @@
   /** The menu's last entry: a new undersuit in the inventory (the field shows to a subscriber even with none yet). */
   const ADD_UNDERSUIT = ':add-undersuit';
   const undersuitOptions = $derived([...undersuits.map((g) => ({ value: g.id, label: g.name })), { value: ADD_UNDERSUIT, label: t('desktopDetail.addUndersuit') }]);
+  // Combinaison, for a subscriber: the diver's suit pieces (every suit text of the logbook is one, task 2026-11-26-406).
+  const suitPieces = $derived(visibleGear().filter((g) => g.type === 'suit'));
+  let suitCounts = $state(/** @type {Map<string, number>} */ (new Map()));
+  $effect(() => {
+    if (!plus || preview || !gear.ready) return;
+    void gear.pieces;
+    let current = true;
+    untrack(() => computerDiveCounts().then((m) => current && (suitCounts = m)));
+    return () => (current = false);
+  });
+  const suitKnown = $derived(
+    suitPieces
+      .map((g) => ({ key: g.name, dives: figuresOf(g, suitCounts).dives }))
+      .sort((a, b) => a.key.localeCompare(b.key, undefined, { sensitivity: 'base' })),
+  );
+
+  /** A choice or a new name in Combinaison: the dive's text is the piece's name (Subsurface reads it) and the dive's equipment names the piece. @param {string|string[]|number} value */
+  async function saveSuit(value) {
+    const name = String(value).trim();
+    if (!equipment || !plus) return save('suit', name);
+    if (!name) {
+      const ok = await save('suit', '');
+      if (ok && equipment.suitGearId) await saveEquipment({ ...equipment, suitGearId: '' });
+      return ok;
+    }
+    try {
+      const piece = await suitPieceFor(name);
+      if (!piece) return false;
+      const ok = await save('suit', piece.name);
+      if (ok && equipment && equipment.suitGearId !== piece.id) await saveEquipment({ ...equipment, suitGearId: piece.id });
+      if (ok) syncSuitPieces().catch(() => {});
+      return ok;
+    } catch (e) {
+      // Read only: the text alone is kept.
+      if (/** @type {any} */ (e)?.name !== 'ReadOnlyError') console.error('Suit piece', e);
+      return save('suit', name);
+    }
+  }
   /** The dive that comes just before this one in the logbook: « Plongée précédente » copies its equipment. */
   const previousDive = $derived(logbook.dives.filter((d) => d.date < dive.date).sort((x, y) => (x.date < y.date ? 1 : -1))[0] ?? null);
   /** The previous dive's weights: a weight type chosen here starts from them (components/DesktopWeights.svelte). */
@@ -881,7 +919,11 @@
       <DesktopEquipmentCard name="protection" title={t('desktopDetail.section.protection')}>
         {#snippet icon()}<GearIcon type="suit" size={22} />{/snippet}
         <div class="bc-desktop-dive-fields--two-columns">
-          <DesktopEditField stacked tall name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
+          {#if plus && equipment}
+            <DesktopEditField stacked tall name="suit" kind="site" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} known={suitKnown} newLabel={t('desktopDetail.newSuit')} manage={{ label: t('desktopDetail.manageGear'), onclick: () => openOver('/profile/gear/') }} showHint={false} onsave={(v) => saveSuit(v)} />
+          {:else}
+            <DesktopEditField stacked tall name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
+          {/if}
           {#if plus && equipment}
             <DesktopEditField stacked tall name="undersuit" kind="choice" label={t('desktopDetail.label.undersuit')} value={equipment.undersuitGearId} options={undersuitOptions} invitation={t('desktopDetail.invitation.undersuit')} showHint={false} onsave={(v) => saveUndersuit(v)} />
           {/if}

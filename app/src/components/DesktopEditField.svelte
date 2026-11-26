@@ -49,11 +49,12 @@
    *   openLabel?: string,
    *   openChoiceOnClick?: boolean,
    *   showHint?: boolean,
+   *   manage?: { label: string, onclick: () => void }|null,
    *   leading?: import('svelte').Snippet,
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, manage = null, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -90,6 +91,8 @@
   // On a phone a list field (a choice, the site) opens a bottom sheet instead of an input (task 2026-11-24-386): the list with
   // the current value checked, a search when it is long, « Nouveau … » when one can be created. A choice saves at once.
   let sheetOpen = $state(false);
+  /** The value of the last row of a list that opens another page (`manage`). */
+  const MANAGE = ':manage';
   const sheetKind = $derived(layout.phone && (kind === 'choice' || kind === 'site'));
   /**
    * The known values once each: two sites of the logbook can share a name (the lists are keyed by it, and a site is chosen
@@ -107,11 +110,12 @@
   });
   const sheetOptions = $derived(
     kind === 'site'
-      ? knownOnce.map((k) => ({ value: k.key, label: k.key, example: t('desktopDetail.diveCount', { n: k.dives }) }))
+      ? knownOnce.map((k) => ({ value: k.key, label: k.key, example: t('desktopDetail.diveCount', { n: k.dives }) })).concat(manage ? [{ value: MANAGE, label: manage.label, example: '', divider: true }] : [])
       : [{ value: '', label: invitation || t('edit.notSet') }, ...options],
   );
   /** @param {string} v */
   async function sheetPick(v) {
+    if (v === MANAGE) return manage?.onclick();
     if (v === (typeof value === 'string' ? value : '')) return;
     saving = true;
     try {
@@ -343,7 +347,7 @@
         {/if}
       </div>
       {#if invalid || (showHint && kind !== 'choice' && kind !== 'stars')}<p class="bc-desktop-edit-field--hint" class:bc-desktop-edit-field--hint-invalid={invalid}>{invalid ? t('desktopDetail.invalid') : hint}</p>{/if}
-      {#if (kind === 'list' || kind === 'site') && rows.length}
+      {#if (kind === 'list' || kind === 'site') && (rows.length || manage)}
         <ul class="bc-desktop-edit-field--suggestions" role="listbox" aria-label={label} use:floatMenu>
           {#each rows as row, i (row.add ? `add-${row.key}` : row.key)}
             <li role="option" aria-selected={highlighted === i}>
@@ -356,6 +360,11 @@
               </button>
             </li>
           {/each}
+          {#if manage}
+            <li role="option" aria-selected="false">
+              <button type="button" class="bc-desktop-edit-field--suggestion bc-desktop-edit-field--manage" onmousedown={(e) => e.preventDefault()} onclick={() => manage.onclick()}>{manage.label}</button>
+            </li>
+          {/if}
         </ul>
       {/if}
     </div>
@@ -676,6 +685,11 @@
       border-radius: 8px;
       background: var(--bc-surface);
       box-shadow: 0 2px 12px rgb(0 0 0 / 0.22);
+    }
+
+    .bc-desktop-edit-field--manage {
+      color: var(--bc-action);
+      font-weight: 500;
     }
 
     .bc-desktop-edit-field--suggestion {

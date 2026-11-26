@@ -8,7 +8,7 @@
   import { onMount } from 'svelte';
   import Md3Dialog from './Md3Dialog.svelte';
   import LogbookPairList from './LogbookPairList.svelte';
-  import { logbookPairing, pairWithLogbook } from '../lib/inventory.svelte.js';
+  import { logbookPairing, pairWithLogbook, moveSuitNames, gearMap } from '../lib/inventory.svelte.js';
   import { pairRows, computerKey, candidatesFor, computerResembles, suitResembles, totalDives } from '../lib/logbook-pairing.js';
   import { profileWide } from '../lib/profile-frame.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -29,7 +29,8 @@
   onMount(async () => {
     const found = await logbookPairing(piece.id);
     const all = /** @type {any[]} */ (computer ? found.computers : found.suits);
-    items = candidatesFor(all, (i) => (computer ? computerResembles(piece, i) : suitResembles(piece, i.name)));
+    // A suit text already paired with another piece is listed too, with that piece's name: choosing it moves it here.
+    items = computer ? candidatesFor(all, (i) => computerResembles(piece, i)) : [...candidatesFor(all, (i) => suitResembles(piece, i.name)), ...all.filter((i) => i.linkedTo)];
     loaded = true;
     opened = true;
   });
@@ -39,6 +40,7 @@
       serial: (serial) => t('gear.pair.serial', { serial }),
       dives: (n) => t('gear.pair.dives', { n }),
       range: (first, last) => t('gear.pair.years', { first: String(first), last: String(last) }),
+      owner: (id) => t('gear.pair.alreadyIn', { name: gearMap().get(id)?.name ?? '' }),
     }),
   );
   const picked = $derived(items.filter((i) => chosen.includes(computer ? computerKey(/** @type {any} */ (i)) : /** @type {any} */ (i).name)));
@@ -48,7 +50,8 @@
     if (!picked.length || saving) return;
     saving = true;
     try {
-      await pairWithLogbook(piece.id, computer ? { computer: { model: /** @type {any} */ (picked[0]).model, serial: /** @type {any} */ (picked[0]).serial } } : { suitNames: picked.map((i) => /** @type {any} */ (i).name) });
+      if (computer) await pairWithLogbook(piece.id, { computer: { model: /** @type {any} */ (picked[0]).model, serial: /** @type {any} */ (picked[0]).serial } });
+      else await moveSuitNames(piece.id, picked.map((i) => /** @type {any} */ (i).name));
       showSnackbar(t('gear.pair.done'));
       onclose();
     } catch (e) {
