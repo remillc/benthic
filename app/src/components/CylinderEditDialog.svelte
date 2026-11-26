@@ -15,7 +15,8 @@
   import TextField from './TextField.svelte';
   import GaugeSheet from './GaugeSheet.svelte';
   import { t } from '../lib/i18n.js';
-  import { consumption, draftErrors, hasErrors, mixHelper, modMm, pressureText } from '../lib/cylinder-dialog.js';
+  import { chooseType, consumption, draftErrors, hasErrors, mixHelper, modMm, pressureText } from '../lib/cylinder-dialog.js';
+  import { OTHER_TYPE } from '../lib/cylinder-card.js';
   import { gaugeCameraAvailable, runGaugeCamera } from '../lib/gauge-photo.js';
   import { readGauges } from '../lib/gauge-reading.js';
   import { formatDepth, formatPressure } from '../lib/format.js';
@@ -32,31 +33,38 @@
    *   parts: { key: string, heading: string, badge?: string, oxygenOnly?: boolean, draft: import('../lib/cylinder-dialog.js').CylinderDraft }[],
    *   typeOptions: (draft: import('../lib/cylinder-dialog.js').CylinderDraft) => { value: string, label: string }[],
    *   roles?: { value: string, label: string }[],
-   *   prefs: { pressure: string, length?: string },
-   *   manual: boolean,
+   *   prefs: { pressure: string, length?: string, volume?: string },
+   *   types?: { name: string, ml: number, workingPressureMbar: number }[],
    *   mod?: { surfaceMbar: number, salinity: number },
    *   footnote?: string,
    *   onsave: () => void,
    *   onclose: () => void,
    *   onremove?: () => void,
+   *   onmove?: (step: -1|1) => void,
+   *   canMove?: { up: boolean, down: boolean },
    * }}
    */
-  let { title, parts = $bindable(), typeOptions, roles, prefs, manual, mod = { surfaceMbar: 1013, salinity: 10300 }, footnote = '', onsave, onclose, onremove } = $props();
+  let { title, parts = $bindable(), typeOptions, roles, prefs, types = [], mod = { surfaceMbar: 1013, salinity: 10300 }, footnote = '', onsave, onclose, onremove, onmove, canMove = { up: true, down: true } } = $props();
 
   const id = `bc-cylinder-dialog-${Math.random().toString(36).slice(2, 9)}`;
   const words = $derived({ air: t('edit.gasName.air'), oxygen: t('edit.gasName.oxygen'), nitrox: t('edit.gasName.nitrox'), trimix: t('edit.gasName.trimix') });
-  const errors = $derived(parts.map((p) => draftErrors(p.draft, prefs, { manual, oxygenOnly: p.oxygenOnly })));
+  const errors = $derived(parts.map((p) => draftErrors(p.draft, prefs, { oxygenOnly: p.oxygenOnly })));
   const invalid = $derived(errors.some(hasErrors));
   const unit = $derived(prefs.pressure === 'psi' ? t('units.psi') : t('units.bar'));
   const depthUnit = $derived(prefs.length === 'ft' ? t('units.feet') : t('units.meters'));
-  /** The camera of Début and Fin: a dive logged by hand, on a device that has the gauge camera (not on an iPhone). */
-  const camera = $derived(manual && !ios && gaugeCameraAvailable());
+  /** The camera of Début and Fin: every dive, on a device that has the gauge camera (not on an iPhone). */
+  const camera = $derived(!ios && gaugeCameraAvailable());
   /** The menu of a grey row of the iOS sheet: the cylinder type or the role of a part. @type {{ key: string, field: 'description'|'use' }|null} */
   let picking = $state(null);
   const pickingPart = $derived(picking ? parts.find((p) => p.key === picking?.key) : undefined);
-  const pickingOptions = $derived(pickingPart && picking ? (picking.field === 'use' ? (roles ?? []) : typeOptions(pickingPart.draft)) : []);
+  /** The types of the table, then « Autre… » (a cylinder outside it, with its own size and working pressure). @param {import('../lib/cylinder-dialog.js').CylinderDraft} draft */
+  const typeList = (draft) => [...typeOptions(draft), { value: OTHER_TYPE, label: t('edit.otherType') }];
+  /** @param {import('../lib/cylinder-dialog.js').CylinderDraft} draft */
+  const typeValue = (draft) => (draft.custom ? OTHER_TYPE : draft.description);
+  const volumeUnit = $derived(prefs.volume === 'cuft' ? t('units.cubicFeet') : t('units.liters'));
+  const pickingOptions = $derived(pickingPart && picking ? (picking.field === 'use' ? (roles ?? []) : typeList(pickingPart.draft)) : []);
   /** The shown label of a menu row. @param {typeof parts[number]} part @param {'description'|'use'} field */
-  const menuLabel = (part, field) => (field === 'use' ? roles : typeOptions(part.draft))?.find((o) => o.value === part.draft[field])?.label ?? part.draft[field];
+  const menuLabel = (part, field) => (field === 'use' ? roles : typeList(part.draft))?.find((o) => o.value === (field === 'use' ? part.draft.use : typeValue(part.draft)))?.label ?? part.draft[field];
 
   /** « MOD 132 pi à ppO₂ 1,6 » for a typed O₂, empty while it is not a mix. @param {{ o2: string }} draft */
   function modLine(draft) {
@@ -172,6 +180,7 @@
               <span class="bc-cylinder-dialog--ios-value">{menuLabel(part, 'description')}</span>
               <Icon name="expand" size={18} />
             </button>
+            {#if part.draft.custom}{@render iosCustom(part, error)}{/if}
             {#if several}
               {@render iosGas(part, error)}
               {@render iosPressures(part, error, true)}
@@ -199,6 +208,12 @@
           {#if usedLine(part.draft)}<p class="bc-cylinder-dialog--ios-helper" data-field="cylinder-consumed">{usedLine(part.draft)}</p>{/if}
         </section>
       {/each}
+      {#if onmove}
+        <div class="bc-cylinder-dialog--ios-list bc-cylinder-dialog--ios-remove" data-field="cylinder-move">
+          <button type="button" class="bc-cylinder-dialog--ios-row" disabled={!canMove.up} onclick={() => onmove(-1)}>{t('desktopDetail.moveUp')}</button>
+          <button type="button" class="bc-cylinder-dialog--ios-row" disabled={!canMove.down} onclick={() => onmove(1)}>{t('desktopDetail.moveDown')}</button>
+        </div>
+      {/if}
       {#if onremove}
         <div class="bc-cylinder-dialog--ios-list bc-cylinder-dialog--ios-remove">
           <button type="button" class="bc-cylinder-dialog--ios-row bc-cylinder-dialog--ios-destructive" onclick={onremove}>{t('desktopDetail.removeCylinder')}</button>
@@ -210,9 +225,10 @@
       <DetailSheet
         title={picking.field === 'use' ? t('desktopDetail.cylinderDialog.role') : t('desktopDetail.label.cylinderType')}
         options={pickingOptions}
-        value={pickingPart.draft[picking.field]}
+        value={picking.field === 'description' ? typeValue(pickingPart.draft) : pickingPart.draft[picking.field]}
         onselect={(v) => {
-          if (picking) pickingPart.draft[picking.field] = v;
+          if (picking?.field === 'description') chooseType(pickingPart.draft, v, types, prefs);
+          else if (picking) pickingPart.draft[picking.field] = v;
           picking = null;
         }}
         onclose={() => (picking = null)}
@@ -238,7 +254,21 @@
           {#if roles}
             <div data-field="cylinder-role"><SelectField label={t('desktopDetail.cylinderDialog.role')} bind:value={part.draft.use} options={roles} /></div>
           {/if}
-          <div data-field="cylinder-type"><SelectField label={t('desktopDetail.label.cylinderType')} bind:value={part.draft.description} options={typeOptions(part.draft)} /></div>
+          <div data-field="cylinder-type"><SelectField label={t('desktopDetail.label.cylinderType')} value={typeValue(part.draft)} options={typeList(part.draft)} onchange={(v) => chooseType(part.draft, v, types, prefs)} /></div>
+          {#if part.draft.custom}
+            <div class="bc-cylinder-dialog--pair">
+              <div data-field="cylinder-size">
+                <TextField label={t('edit.size')} bind:value={part.draft.size} inputmode="decimal" invalid={error.size}>
+                  {#snippet trailing()}<span class="bc-cylinder-dialog--unit">{volumeUnit}</span>{/snippet}
+                </TextField>
+              </div>
+              <div data-field="cylinder-working-pressure">
+                <TextField label={t('edit.workingPressure')} bind:value={part.draft.workingPressure} inputmode="decimal" invalid={error.workingPressure}>
+                  {#snippet trailing()}<span class="bc-cylinder-dialog--unit">{unit}</span>{/snippet}
+                </TextField>
+              </div>
+            </div>
+          {/if}
           <div class="bc-cylinder-dialog--pair">
             <div data-field="cylinder-o2">
               <TextField label={t('desktopDetail.cylinderDialog.o2')} bind:value={part.draft.o2} inputmode="decimal" invalid={error.o2}>
@@ -268,12 +298,12 @@
           {/if}
           <div class="bc-cylinder-dialog--pair">
             <div data-field="cylinder-start">
-              <TextField label={t('edit.start')} bind:value={part.draft.start} inputmode="decimal" invalid={error.start} disabled={!manual}>
+              <TextField label={t('edit.start')} bind:value={part.draft.start} inputmode="decimal" invalid={error.start}>
                 {#snippet trailing()}{@render pressureEnd(part, 'start')}{/snippet}
               </TextField>
             </div>
             <div data-field="cylinder-end">
-              <TextField label={t('edit.end')} bind:value={part.draft.end} inputmode="decimal" invalid={error.end} disabled={!manual}>
+              <TextField label={t('edit.end')} bind:value={part.draft.end} inputmode="decimal" invalid={error.end}>
                 {#snippet trailing()}{@render pressureEnd(part, 'end')}{/snippet}
               </TextField>
             </div>
@@ -282,6 +312,12 @@
         </section>
       {/each}
     </div>
+    {#if onmove}
+      <div class="bc-cylinder-dialog--remove" data-field="cylinder-move">
+        <button type="button" class="bc-cylinder-dialog--remove-button" disabled={!canMove.up} onclick={() => onmove(-1)}><Icon name="arrowUp" size={20} />{t('desktopDetail.moveUp')}</button>
+        <button type="button" class="bc-cylinder-dialog--remove-button" disabled={!canMove.down} onclick={() => onmove(1)}><Icon name="arrowDown" size={20} />{t('desktopDetail.moveDown')}</button>
+      </div>
+    {/if}
     {#if onremove}
       <div class="bc-cylinder-dialog--remove">
         <button type="button" class="bc-cylinder-dialog--remove-button" onclick={onremove}><Icon name="delete" size={20} />{t('desktopDetail.removeCylinder')}</button>
@@ -291,6 +327,19 @@
   </div>
   {/if}
 </div>
+
+{#snippet iosCustom(/** @type {typeof parts[number]} */ part, /** @type {ReturnType<typeof draftErrors>} */ error)}
+  <label class="bc-cylinder-dialog--ios-row" data-field="cylinder-size">
+    <span class="bc-cylinder-dialog--ios-label">{t('edit.size')}</span>
+    <input class="bc-cylinder-dialog--ios-input" inputmode="decimal" aria-invalid={error.size} bind:value={part.draft.size} />
+    <span class="bc-cylinder-dialog--ios-unit">{volumeUnit}</span>
+  </label>
+  <label class="bc-cylinder-dialog--ios-row" data-field="cylinder-working-pressure">
+    <span class="bc-cylinder-dialog--ios-label">{t('edit.workingPressure')}</span>
+    <input class="bc-cylinder-dialog--ios-input" inputmode="decimal" aria-invalid={error.workingPressure} bind:value={part.draft.workingPressure} />
+    <span class="bc-cylinder-dialog--ios-unit">{unit}</span>
+  </label>
+{/snippet}
 
 {#snippet iosGas(/** @type {typeof parts[number]} */ part, /** @type {ReturnType<typeof draftErrors>} */ error)}
   <label class="bc-cylinder-dialog--ios-row" data-field="cylinder-o2">
@@ -310,12 +359,12 @@
 {#snippet iosPressures(/** @type {typeof parts[number]} */ part, /** @type {ReturnType<typeof draftErrors>} */ error, /** @type {boolean} */ long)}
   <label class="bc-cylinder-dialog--ios-row" data-field="cylinder-start">
     <span class="bc-cylinder-dialog--ios-label">{t(long ? 'desktopDetail.cylinderDialog.start' : 'desktopDetail.cylinderDialog.startShort')}</span>
-    <input class="bc-cylinder-dialog--ios-input" inputmode="decimal" disabled={!manual} aria-invalid={error.start} bind:value={part.draft.start} />
+    <input class="bc-cylinder-dialog--ios-input" inputmode="decimal" aria-invalid={error.start} bind:value={part.draft.start} />
     <span class="bc-cylinder-dialog--ios-unit">{unit}</span>
   </label>
   <label class="bc-cylinder-dialog--ios-row" data-field="cylinder-end">
     <span class="bc-cylinder-dialog--ios-label">{t(long ? 'desktopDetail.cylinderDialog.end' : 'desktopDetail.cylinderDialog.endShort')}</span>
-    <input class="bc-cylinder-dialog--ios-input" inputmode="decimal" disabled={!manual} aria-invalid={error.end} bind:value={part.draft.end} />
+    <input class="bc-cylinder-dialog--ios-input" inputmode="decimal" aria-invalid={error.end} bind:value={part.draft.end} />
     <span class="bc-cylinder-dialog--ios-unit">{unit}</span>
   </label>
 {/snippet}
@@ -651,6 +700,8 @@
     .bc-cylinder-dialog--remove {
       margin: 24px 16px 0;
       display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
       justify-content: center;
     }
 

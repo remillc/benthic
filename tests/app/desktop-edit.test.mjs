@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  configuredCylinderRows,
   cylinderChanges,
   editKeyAction,
   fieldChanges,
@@ -165,8 +166,8 @@ test('the cylinders: add, remove, reorder and change a field', () => {
   // The mix: both parts together, within 100 %.
   assert.equal(cylinderChanges(d, [{ index: 0, patch: { o2Permille: 320, hePermille: 0 } }, keep[1]]).ok, true);
   assert.deepEqual(cylinderChanges(d, [{ index: 0, patch: { o2Permille: 800, hePermille: 400 } }, keep[1]]), { ok: false, error: 'invalid' });
-  // The pressures are recorded values.
-  assert.deepEqual(cylinderChanges(d, [{ index: 0, patch: { endMbar: 50000 } }, keep[1]]), { ok: false, error: 'readonly' });
+  // The pressures are edited on every dive, a computer's included (decided 26 November 2026).
+  assert.deepEqual(JSON.parse(/** @type {any} */ (cylinderChanges(d, [{ index: 0, patch: { endMbar: 50000 } }, keep[1]])).changes.cylinders[0]), { index: 0, endMbar: 50000 });
   assert.equal(cylinderChanges(dive({ manual: true }), [{ index: 0, patch: { endMbar: 50000 } }, keep[1]]).ok, true);
 });
 
@@ -219,4 +220,16 @@ test('two sites of the same name show once in the site sheet and the suggestions
   assert.match(field, /listSuggestions\(knownOnce,/);
   assert.match(field, /\? knownOnce\.map\(\(k\) => \(\{ value: k\.key/);
   assert.doesNotMatch(field, /[^a-zA-Z]known\.(map|length)/);
+});
+
+test('a dive that becomes a rebreather dive gets the cylinders of Settings, once', () => {
+  const defaults = { defaultDiluent: 'AL40', defaultOxygen: 'AL13', defaultBailout: ['AL80', ''] };
+  const types = [{ name: 'AL40', ml: 5700, workingPressureMbar: 207000 }, { name: 'AL13', ml: 1700, workingPressureMbar: 207000 }];
+  const rows = configuredCylinderRows(dive({ cylinders: [] }), 'CCR', defaults, types);
+  assert.deepEqual(rows.map((r) => [r.index, r.patch.use, r.patch.description, r.patch.o2Permille]), [[-1, 'diluent', 'AL40', 210], [-1, 'oxygen', 'AL13', 1000], [-1, 'OC-gas', 'AL80', 210]]);
+  assert.equal(rows[0].patch.sizeMl, 5700);
+  assert.equal(rows[2].patch.sizeMl, undefined, 'a type missing from the table keeps no size');
+  assert.deepEqual(configuredCylinderRows(dive({ cylinders: [] }), 'OC', defaults, types), []);
+  const had = dive({ cylinders: [{ description: 'AL40', use: 'diluent' }] });
+  assert.deepEqual(configuredCylinderRows(had, 'PSCR', defaults, types).map((r) => r.patch.use), ['oxygen', 'OC-gas']);
 });

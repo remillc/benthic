@@ -310,16 +310,15 @@ export const weightText = (grams, prefs) => (grams ? typed(prefs.weight === 'lbs
  * The cylinders of the dive from the Gaz tab's rows, in their new order. A row is a cylinder
  * of the dive (`index`) with the fields the diver changed (`patch`, in the core's units), or a new
  * one (`index` -1, all its fields are sent). Nothing is sent when no cylinder was added, removed,
- * moved or changed. The pressures are recorded values: refused unless the dive was logged by hand.
+ * moved or changed. The pressures are edited on every dive.
  * @param {any} dive
  * @param {{ index: number, patch: Record<string, string|number> }[]} rows
- * @returns {{ ok: true, changes: Record<string, string[]>|null } | { ok: false, error: 'readonly'|'invalid' }}
+ * @returns {{ ok: true, changes: Record<string, string[]>|null } | { ok: false, error: 'invalid' }}
  */
 export function cylinderChanges(dive, rows) {
   const items = [];
   for (const row of rows) {
     const patch = row.patch;
-    if (!dive.manual && ('startMbar' in patch || 'endMbar' in patch)) return { ok: false, error: 'readonly' };
     if ('o2Permille' in patch || 'hePermille' in patch) {
       const old = row.index >= 0 ? dive.cylinders[row.index] : null;
       const o2 = Number('o2Permille' in patch ? patch.o2Permille : (old?.o2Permille || 210));
@@ -338,6 +337,31 @@ export function cylinderChanges(dive, rows) {
   const touched = items.some((item) => Object.keys(item).length > 1);
   if (!removed && !reordered && !touched) return { ok: true, changes: null };
   return { ok: true, changes: { cylinders: items.map((i) => JSON.stringify(i)) } };
+}
+
+/**
+ * The cylinders of Settings a dive gets when it becomes a rebreather dive (diluent, oxygen, bailouts), as new rows for
+ * `cylinderChanges`; one the dive already has (same use and type) is not added again. Nothing for another mode.
+ * @param {any} dive
+ * @param {string} mode
+ * @param {{ defaultDiluent: string, defaultOxygen: string, defaultBailout: string[] }} defaults
+ * @param {{ name: string, ml: number, workingPressureMbar: number }[]} types the diver's cylinder types
+ * @returns {{ index: number, patch: Record<string, string|number> }[]}
+ */
+export function configuredCylinderRows(dive, mode, defaults, types) {
+  if (mode !== 'CCR' && mode !== 'PSCR') return [];
+  /** @type {{ index: number, patch: Record<string, string|number> }[]} */
+  const rows = [];
+  /** @param {string} use @param {string} name @param {number} o2 */
+  const add = (use, name, o2) => {
+    if (!name || dive.cylinders.some((/** @type {any} */ c) => c.use === use && c.description === name) || rows.some((r) => r.patch.use === use && r.patch.description === name)) return;
+    const type = types.find((x) => x.name === name);
+    rows.push({ index: -1, patch: { description: name, use, o2Permille: o2 * 10, hePermille: 0, ...(type ? { sizeMl: type.ml, workingPressureMbar: type.workingPressureMbar } : {}) } });
+  };
+  add('diluent', defaults.defaultDiluent, 21);
+  add('oxygen', defaults.defaultOxygen, 100);
+  for (const name of defaults.defaultBailout ?? []) add('OC-gas', name, 21);
+  return rows;
 }
 
 /**

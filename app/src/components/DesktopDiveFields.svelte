@@ -36,7 +36,8 @@
   import { ios, layout } from '../lib/layout.svelte.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
   import CylinderDeleteDialog from './CylinderDeleteDialog.svelte';
-  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft, pressureText as draftPressureText } from '../lib/cylinder-dialog.js';
+  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft, pressureText as draftPressureText, sizeMlOf, sizeText } from '../lib/cylinder-dialog.js';
+  import { OTHER_TYPE } from '../lib/cylinder-card.js';
   import { deletionOutcome, gasChangeMoments } from '../lib/gas-group.js';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
@@ -46,7 +47,7 @@
   import { siteChange } from '../lib/sites.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
-  import { cylinderChanges, fieldChanges, fieldValue, parseTyped, pressureMbarOf, siteChoice, weightChanges, weightText } from '../lib/desktop-edit.js';
+  import { configuredCylinderRows, cylinderChanges, fieldChanges, fieldValue, parseTyped, pressureMbarOf, siteChoice, weightChanges, weightText } from '../lib/desktop-edit.js';
   import { FEEDBACK_CHOICES, feedbackOf, withFeedback, withoutFeedbackTags } from '../lib/weight-feedback.js';
   import { cylinderKey, isMostRecent, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
   import { scanWeightSources } from '../lib/weight-suggestion-scan.js';
@@ -440,8 +441,36 @@
     if (c.description && !list.some((o) => o.value === c.description)) list.unshift({ value: c.description, label: cylinderTypeLabel(c.description) });
     return list;
   };
+  /** The types, then « Autre… » (a cylinder outside the table: its size and working pressure are typed). @param {{ description: string }} c */
+  const typeOptionsWithOther = (c) => [...typeOptions(c), { value: OTHER_TYPE, label: t('edit.otherType') }];
+  /** The cylinders where « Autre… » was just chosen, by index: they show Size and Working pressure before any size is typed. */
+  let otherChosen = $state(/** @type {number[]} */ ([]));
+  /** A cylinder with no type name and a size is « Autre… »: its size and working pressure are fields. @param {number} index @param {import('benthic-core').Cylinder} c */
+  const isOther = (index, c) => !c.description && (c.sizeMl > 0 || otherChosen.includes(index));
+  /** @param {number} index @param {import('benthic-core').Cylinder} c */
+  const typeValueOf = (index, c) => (isOther(index, c) ? OTHER_TYPE : c.description);
+  /** @param {number} index @param {string} text */
+  function saveSize(index, text) {
+    const c = dive.cylinders[index];
+    const ml = sizeMlOf(text, c.workingPressureMbar, prefs);
+    return Number.isNaN(ml) ? false : saveCylinder(index, { sizeMl: ml, workingPressureMbar: c.workingPressureMbar });
+  }
+  /** The working pressure: a size in cubic feet is kept as shown, so its volume of water follows. @param {number} index @param {string} text */
+  function saveWorkingPressure(index, text) {
+    const c = dive.cylinders[index];
+    const wp = text.trim() ? pressureMbarOf(text, prefs) : 0;
+    if (Number.isNaN(wp)) return false;
+    return saveCylinder(index, { sizeMl: sizeMlOf(sizeText(c.sizeMl, c.workingPressureMbar, prefs), wp, prefs) || 0, workingPressureMbar: wp });
+  }
+  const sizeOk = (/** @type {string} */ text) => !Number.isNaN(sizeMlOf(text, 0, prefs));
+  const workingPressureOk = (/** @type {string} */ text) => !text.trim() || !Number.isNaN(pressureMbarOf(text, prefs));
   /** @param {number} index @param {string} name */
   function chooseType(index, name) {
+    if (name === OTHER_TYPE) {
+      if (!otherChosen.includes(index)) otherChosen = [...otherChosen, index];
+      return dive.cylinders[index].description ? saveCylinder(index, { description: '' }) : true;
+    }
+    otherChosen = otherChosen.filter((i) => i !== index);
     const type = cylinderTypes.find((x) => x.name === name);
     return saveCylinder(index, type ? { description: name, sizeMl: type.ml, workingPressureMbar: type.workingPressureMbar } : { description: name });
   }
@@ -479,7 +508,12 @@
   const shortTypes = $derived(layout.phone || (layout.split && !layout.desktop && layout.portrait) || (!layout.desktop && paneWidth < (columns ? 1000 : 560)));
   const modeOptions = $derived(diveTypeOptions(shortTypes));
   /** Writes the dive's mode (the core keeps every cylinder). @param {string} value */
-  const saveMode = (value) => write({ divemode: value });
+  async function saveMode(value) {
+    // A rebreather dive gets the cylinders of Settings (diluent, oxygen, bailouts), in the same undoable step.
+    const added = configuredCylinderRows(dive, value, settings, cylinderTypes);
+    const result = added.length ? cylinderChanges(dive, [...cylinderRows, ...added]) : null;
+    return write({ divemode: value, ...(result?.ok && result.changes ? result.changes : {}) });
+  }
   const tiles = $derived(gasTiles(dive.cylinders, mode, prefs));
   const cards = $derived(gasCards(dive.cylinders, prefs));
   let selectedKey = $state('');
@@ -535,7 +569,7 @@
   async function saveEditing() {
     const current = editing;
     if (!current) return;
-    const options = (/** @type {number} */ i) => ({ manual, oxygenOnly: !!current.parts[i].oxygenOnly });
+    const options = (/** @type {number} */ i) => ({ oxygenOnly: !!current.parts[i].oxygenOnly });
     const patches = new Map(current.indexes.filter((index) => index >= 0).map((index) => [index, draftPatch(dive.cylinders[index], current.parts[current.indexes.indexOf(index)].draft, cylinderTypes, prefs, options(current.indexes.indexOf(index)))]));
     const added = current.indexes.flatMap((index, i) => (index < 0 ? [{ index: -1, patch: draftPatch(blankCylinder(), current.parts[i].draft, cylinderTypes, prefs, options(i)) }] : []));
     if (await saveCylinders([...cylinderRows.map((r) => ({ ...r, patch: patches.get(r.index) ?? r.patch })), ...added])) editing = null;
@@ -562,6 +596,16 @@
       notBreathed: !c.used,
     };
   });
+  /** « Monter » and « Descendre » in a cylinder's dialog: the cylinder moves at once, the dialog follows it (what was typed stays). @param {-1|1} step */
+  async function moveEditing(step) {
+    const current = editing;
+    const from = current?.indexes[0] ?? -1;
+    if (!current || from < 0) return;
+    if (await moveCylinder(from, step)) {
+      selectedKey = `c${from + step}`;
+      editing = { ...current, indexes: [from + step] };
+    }
+  }
   async function removeConfirmed() {
     const index = removing;
     removing = -1;
@@ -949,11 +993,13 @@
     typeOptions={(draft) => typeOptions({ description: draft.description })}
     roles={editing.single ? useOptions : undefined}
     {prefs}
-    {manual}
+    types={cylinderTypes}
     footnote={editing.single ? '' : t('desktopDetail.cylinderDialog.footnote')}
     onsave={saveEditing}
     onclose={() => (editing = null)}
     onremove={editing.single ? askRemove : undefined}
+    onmove={editing.single ? moveEditing : undefined}
+    canMove={{ up: (editing.indexes[0] ?? 0) > 0, down: (editing.indexes[0] ?? 0) < dive.cylinders.length - 1 }}
     mod={{ surfaceMbar: dive.surfacePressureMbar || 1013, salinity: dive.userSalinity || 10300 }}
   />
 {/if}
@@ -1024,13 +1070,15 @@
         {/if}
       </header>
       {#key index}
-        <DesktopEditField name="cylinder-type" kind="choice" label={t('desktopDetail.label.cylinderType')} value={c.description} options={typeOptions(c)} note={[c.sizeMl ? formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) : '', c.workingPressureMbar ? formatPressure(c.workingPressureMbar, prefs) : ''].filter(Boolean).join(' · ')} invitation={t('desktopDetail.invitation.cylinderType')} onsave={(v) => chooseType(index, /** @type {string} */ (v))} />
-        <DesktopEditField name="cylinder-mix" kind="text" label={t('desktopDetail.label.mix')} value={gasText(c.o2Permille, c.hePermille)} display={cards[index]?.gas} note={t('desktopDetail.mixNote', { o2: percentText(c.o2Permille || 210), he: percentText(c.hePermille) })} invitation={t('desktopDetail.invitation.mix')} valid={mixOk} onsave={(v) => saveMix(index, /** @type {string} */ (v))} />
-        {#if manual}
-          <DesktopEditField name="cylinder-pressure" kind="text" label={t('desktopDetail.label.pressure')} value={pairText(c)} display={c.startMbar ? cards[index]?.range : ''} note={t('desktopDetail.pressureNote')} invitation={t('desktopDetail.invitation.pressure')} valid={pairOk} onsave={(v) => savePair(index, /** @type {string} */ (v))} />
-        {:else}
-          <DesktopEditField name="cylinder-pressure" kind="text" readonly label={t('desktopDetail.label.pressure')} value={cards[index]?.range ?? ''} />
+        <DesktopEditField name="cylinder-type" kind="choice" label={t('desktopDetail.label.cylinderType')} value={typeValueOf(index, c)} options={typeOptionsWithOther(c)} note={[c.sizeMl ? formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) : '', c.workingPressureMbar ? formatPressure(c.workingPressureMbar, prefs) : ''].filter(Boolean).join(' · ')} invitation={t('desktopDetail.invitation.cylinderType')} onsave={(v) => chooseType(index, /** @type {string} */ (v))} />
+        {#if isOther(index, c)}
+          <div class="bc-desktop-dive-fields--two-columns">
+            <DesktopEditField stacked name="cylinder-size" kind="text" label={t('edit.size')} value={sizeText(c.sizeMl, c.workingPressureMbar, prefs)} unit={prefs.volume === 'cuft' ? t('units.cubicFeet') : t('units.liters')} invitation={t('desktopDetail.invitation.cylinderSize')} valid={sizeOk} onsave={(v) => saveSize(index, /** @type {string} */ (v))} />
+            <DesktopEditField stacked name="cylinder-working-pressure" kind="text" label={t('edit.workingPressure')} value={pressureText(c.workingPressureMbar)} unit={pressureUnitText} invitation={t('desktopDetail.invitation.cylinderWorkingPressure')} valid={workingPressureOk} onsave={(v) => saveWorkingPressure(index, /** @type {string} */ (v))} />
+          </div>
         {/if}
+        <DesktopEditField name="cylinder-mix" kind="text" label={t('desktopDetail.label.mix')} value={gasText(c.o2Permille, c.hePermille)} display={cards[index]?.gas} note={t('desktopDetail.mixNote', { o2: percentText(c.o2Permille || 210), he: percentText(c.hePermille) })} invitation={t('desktopDetail.invitation.mix')} valid={mixOk} onsave={(v) => saveMix(index, /** @type {string} */ (v))} />
+        <DesktopEditField name="cylinder-pressure" kind="text" label={t('desktopDetail.label.pressure')} value={pairText(c)} display={c.startMbar ? cards[index]?.range : ''} note={t('desktopDetail.pressureNote')} invitation={t('desktopDetail.invitation.pressure')} valid={pairOk} onsave={(v) => savePair(index, /** @type {string} */ (v))} />
         {#if own}
           <DesktopEditField name="cylinder-use" kind="choice" label={t('desktopDetail.label.use')} value={c.use} options={useOptions} onsave={(v) => saveCylinder(index, { use: /** @type {string} */ (v) || 'OC-gas' })} />
         {/if}
