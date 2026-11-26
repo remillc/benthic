@@ -35,6 +35,19 @@ export const cylinderDraft = (c, prefs) => ({
 });
 
 /**
+ * A cylinder that is not in the dive yet, as the core's new one: the base of the patch that adds it.
+ * @param {string} use
+ * @returns {import('benthic-core').Cylinder}
+ */
+export const blankCylinder = () => /** @type {any} */ ({ description: '', sizeMl: 0, workingPressureMbar: 0, startMbar: 0, endMbar: 0, o2Permille: 210, hePermille: 0, use: 'OC-gas', used: false, protected: false });
+
+/**
+ * The texts of an empty cylinder of a rebreather (the diluent or the oxygen that the dive lacks): oxygen starts at 100 %.
+ * @param {'diluent'|'oxygen'} role @param {{ pressure: string }} prefs
+ */
+export const newPartDraft = (role, prefs) => ({ ...cylinderDraft(blankCylinder(), prefs), o2: role === 'oxygen' ? '100' : '21', use: role });
+
+/**
  * Whether the typed percentages make a breathable mix: O₂ from 1 to 100 %, He from 0 to 99 %, together 100 % at most.
  * @param {{ o2: string, he: string }} draft
  * @param {boolean} [oxygenOnly] the oxygen cylinder of a rebreather: only O₂ is entered

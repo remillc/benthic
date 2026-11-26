@@ -162,8 +162,10 @@
       align-items: center;
     }
 
+    /* Framework7 stretches every button to the full width (an unlayered rule): the sizes are set here. */
     .bc-cylinder-dialog--close {
       width: 48px;
+      flex: none;
       height: 48px;
       border: none;
       border-radius: 24px;
@@ -179,6 +181,8 @@
     }
 
     .bc-cylinder-dialog--save {
+      width: auto;
+      flex: none;
       height: 40px;
       margin-inline-end: 8px;
       padding: 0 20px;
@@ -284,6 +288,7 @@
     }
 
     .bc-cylinder-dialog--remove-button {
+      width: auto;
       height: 48px;
       padding: 0 20px;
       border: 1px solid var(--bc-outline);

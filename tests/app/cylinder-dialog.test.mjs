@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { cylinderDraft, draftErrors, draftPatch, hasErrors, mixHelper, percentText, pressureText } from '../../app/src/lib/cylinder-dialog.js';
+import { blankCylinder, newPartDraft, cylinderDraft, draftErrors, draftPatch, hasErrors, mixHelper, percentText, pressureText } from '../../app/src/lib/cylinder-dialog.js';
 import { cylinderChanges } from '../../app/src/lib/desktop-edit.js';
 
 const metric = { pressure: 'bar' };
@@ -68,6 +68,23 @@ test('the patches of a rebreather\'s two cylinders go through one cylinderChange
   assert.equal(sent.length, 2);
   assert.equal(sent[0].o2Permille, 180);
   assert.equal(sent[1].endMbar, 120000);
+});
+
+test('a rebreather dive without an oxygen cylinder gets an empty oxygen card that Save adds', () => {
+  const dil = cyl({ use: 'diluent', o2Permille: 210 });
+  const draft = newPartDraft('oxygen', metric);
+  assert.deepEqual(draft, { description: '', o2: '100', he: '0', start: '', end: '', use: 'oxygen' });
+  assert.equal(newPartDraft('diluent', metric).o2, '21');
+  const patch = draftPatch(blankCylinder(), { ...draft, start: '200', end: '150' }, types, metric, { manual: true, oxygenOnly: true });
+  assert.deepEqual(patch, { o2Permille: 1000, hePermille: 0, startMbar: 200000, endMbar: 150000, use: 'oxygen' });
+  const result = cylinderChanges(dive([dil]), [{ index: 0, patch: {} }, { index: -1, patch }]);
+  assert.equal(result.ok, true);
+  const sent = result.changes.cylinders.map((x) => JSON.parse(x));
+  assert.equal(sent.length, 2);
+  assert.equal(sent[1].use, 'oxygen');
+  assert.equal(sent[1].o2Permille, 1000);
+  const empty = draftPatch(blankCylinder(), { ...draft }, types, metric, { manual: true, oxygenOnly: true });
+  assert.deepEqual(empty, { o2Permille: 1000, hePermille: 0, use: 'oxygen' }, 'untouched, the card still adds an oxygen cylinder');
 });
 
 test('sources: the chevron, the dialogs on Android phones, the dashed tile without chevron', () => {

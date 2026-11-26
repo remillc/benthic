@@ -30,7 +30,7 @@
   import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
   import { ios, layout } from '../lib/layout.svelte.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
-  import { cylinderDraft, draftPatch } from '../lib/cylinder-dialog.js';
+  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft } from '../lib/cylinder-dialog.js';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
   import { applyKit, cloneEquipment, diveKeyOf, equipmentIsEmpty, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
@@ -461,17 +461,23 @@
       if (c) editing = { title: t('desktopDetail.cylinderDialog.single'), indexes: [index], single: true, parts: [{ key: 'c' + index, heading: t('desktopDetail.cylinderDialog.cylinder'), draft: cylinderDraft(c, prefs) }] };
       return;
     }
-    const parts = tile.parts.map((part, i) => ({ part, index: tile.indexes[i] })).filter(({ index }) => dive.cylinders[index]);
+    // A closed-circuit unit always shows both cylinders: one the dive lacks is an empty card, added on Save (index -1).
+    const roles = tile.kind === 'ccr' ? /** @type {const} */ (['diluent', 'oxygen']) : /** @type {const} */ (['mix']);
+    const parts = roles.map((role, i) => {
+      const part = tile.parts.find((p) => p.role === role);
+      const index = part ? tile.indexes[tile.parts.indexOf(part)] : -1;
+      return { role, index, title: part?.title ?? t('desktopDetail.role.' + role) };
+    }).filter(({ role, index }) => index >= 0 || role !== 'mix');
     editing = {
       title: t(tile.kind === 'pscr' ? 'desktopDetail.cylinderDialog.mix' : 'desktopDetail.cylinderDialog.rebreather'),
       indexes: parts.map((p) => p.index),
       single: false,
-      parts: parts.map(({ part, index }) => ({
-        key: 'c' + index,
-        heading: part.title,
-        badge: part.role === 'diluent' ? t('desktopDetail.cylinderDialog.badgeDiluent') : part.role === 'oxygen' ? t('desktopDetail.cylinderDialog.badgeOxygen') : undefined,
-        oxygenOnly: part.role === 'oxygen',
-        draft: cylinderDraft(dive.cylinders[index], prefs),
+      parts: parts.map(({ role, index, title }) => ({
+        key: index >= 0 ? 'c' + index : 'new-' + role,
+        heading: title,
+        badge: role === 'diluent' ? t('desktopDetail.cylinderDialog.badgeDiluent') : role === 'oxygen' ? t('desktopDetail.cylinderDialog.badgeOxygen') : undefined,
+        oxygenOnly: role === 'oxygen',
+        draft: index >= 0 ? cylinderDraft(dive.cylinders[index], prefs) : newPartDraft(/** @type {'diluent'|'oxygen'} */ (role), prefs),
       })),
     };
   }
@@ -479,8 +485,10 @@
   async function saveEditing() {
     const current = editing;
     if (!current) return;
-    const patches = new Map(current.indexes.map((index, i) => [index, draftPatch(dive.cylinders[index], current.parts[i].draft, cylinderTypes, prefs, { manual, oxygenOnly: !!current.parts[i].oxygenOnly })]));
-    if (await saveCylinders(cylinderRows.map((r) => ({ ...r, patch: patches.get(r.index) ?? r.patch })))) editing = null;
+    const options = (/** @type {number} */ i) => ({ manual, oxygenOnly: !!current.parts[i].oxygenOnly });
+    const patches = new Map(current.indexes.filter((index) => index >= 0).map((index) => [index, draftPatch(dive.cylinders[index], current.parts[current.indexes.indexOf(index)].draft, cylinderTypes, prefs, options(current.indexes.indexOf(index)))]));
+    const added = current.indexes.flatMap((index, i) => (index < 0 ? [{ index: -1, patch: draftPatch(blankCylinder(), current.parts[i].draft, cylinderTypes, prefs, options(i)) }] : []));
+    if (await saveCylinders([...cylinderRows.map((r) => ({ ...r, patch: patches.get(r.index) ?? r.patch })), ...added])) editing = null;
   }
   async function removeEditing() {
     const index = editing?.indexes[0] ?? -1;
