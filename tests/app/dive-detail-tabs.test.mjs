@@ -37,6 +37,9 @@ test('CCR: one wide tile with the diluent and the oxygen, the others as bailout 
   assert.deepEqual(tiles[0].parts.map((p) => p.role), ['oxygen', 'diluent'], 'oxygen first (task 2026-11-26-403)');
   assert.deepEqual(tiles[0].indexes, [1, 0], 'the oxygen cylinder (1) comes before the diluent (0)');
   assert.match(tiles[1].lines[0], /EAN32/);
+  // 26 November 2026: pure oxygen is « O₂ » under the rebreather, « Oxygène · Faber FX15 (2 L) » ran too long.
+  assert.match(tiles[0].parts[0].lines[0], /^O₂( · |$)/);
+  assert.doesNotMatch(tiles[0].parts[0].lines[0], /Oxygène|Oxygen/);
 });
 
 test('pSCR: one tile with the mix (the diluent, else the first cylinder), the others as bailouts, no oxygen', () => {
