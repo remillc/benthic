@@ -4,7 +4,7 @@
   // within the same surface. The type is the only required field. A
   // computer's serial number and firmware are read at each download, so they are not typed. The name of a piece is its
   // brand and model (else its type); a cylinder, a weight belt and « Autre » have a name of their own.
-  import { dateHint, readTypedDate, typedDate } from '../lib/format.js';
+  import { typedDate } from '../lib/format.js';
   import { onMount, tick } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
@@ -52,9 +52,9 @@
   let brand = $state('');
   let model = $state('');
   let serial = $state('');
+  /** The purchase date as YYYY-MM-DD, chosen in the calendar (DateField), empty when none. */
   let purchasedOn = $state('');
-  /** The typed date as YYYY-MM-DD; the text itself when it is not a date, so that it is flagged. */
-  const purchasedIso = $derived(purchasedOn.trim() ? (readTypedDate(purchasedOn) ?? purchasedOn) : '');
+  const purchasedIso = $derived(purchasedOn.trim());
   let note = $state('');
   /** The fields of the type besides these (lib/gear-fields.js), as text; a switch is 'yes' or ''. @type {Record<string, string>} */
   let details = $state({});
@@ -111,7 +111,7 @@
       brand = g.brand ?? '';
       model = g.model ?? '';
       serial = g.serial ?? '';
-      purchasedOn = typedDate(g.purchasedOn ?? '');
+      purchasedOn = g.purchasedOn ?? '';
       note = g.note ?? '';
       if (g.photoId) {
         photoId = g.photoId;
@@ -416,7 +416,8 @@
 
   <div class="bc-piece-edit--fields">
     {#if hasPurchaseDate(/** @type {any} */ (type))}
-      <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
+      <!-- Every date of a piece is chosen in the calendar (Christian, 26 November 2026). -->
+      <DateField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} maxYear={new Date().getFullYear()} supporting={dateLive.error} />
     {/if}
     {#if type === 'o2Cells'}
       <div class="bc-piece-edit--date-row">
