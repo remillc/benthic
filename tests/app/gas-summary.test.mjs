@@ -166,3 +166,12 @@ test('two dive computers after a merge: both listed, the first main, the card op
   assert.deepEqual(computerList([{ model: '' }, { model: 'Shearwater Petrel 3' }]), [{ name: 'Shearwater Petrel 3', model: 'Shearwater Petrel 3', main: true }], 'a computer without a model is not listed');
   assert.deepEqual(computerList(undefined), []);
 });
+
+test('a cylinder without both its start and end pressures is drawn white, not hatched, open circuit and rebreather alike (26 November 2026)', async () => {
+  const { readFileSync } = await import('node:fs');
+  for (const name of ['CylinderDrawing', 'RebreatherDrawing']) {
+    const src = readFileSync(new URL(`../../app/src/components/${name}.svelte`, import.meta.url), 'utf8');
+    assert.doesNotMatch(src, /<pattern id="\{id\}-hatch"|-hatch\)|cylinder-no-pressure/, name);
+  }
+  assert.doesNotMatch(readFileSync(new URL('../../app/src/theme.css', import.meta.url), 'utf8'), /--bc-cylinder-no-pressure/);
+});

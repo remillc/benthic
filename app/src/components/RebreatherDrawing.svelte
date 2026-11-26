@@ -7,8 +7,8 @@
   // valves down. Other cylinders (bailout, stages) stand beside the unit,
   // open-circuit style, with their use written vertically. The fill marks are
   // those of CylinderDrawing: pale band between end and start, water gradient,
-  // dashed levels. A cylinder without both its start and end pressures is hatched in grey, with no
-  // level (task 2026-11-13-84). Decorative: the card carries the accessible name.
+  // dashed levels. A cylinder without both its start and end pressures is left white, with no
+  // level (task 2026-11-13-84; white instead of grey hatching since 26 November 2026). Decorative: the card carries the accessible name.
   //
   // Sizes (task 2026-11-13-84, docs/mockups/detail3-android-ccr.dc.html): the
   // drawing is 140 tall; the unit is drawn at 68.4 % and the cylinders beside it
@@ -103,7 +103,7 @@
 {/snippet}
 
 {#snippet cylinder(/** @type {ReturnType<typeof shape>} */ s)}
-  {@render outline(s, 'bc-rebreather-drawing--body', s.hatched ? `url(#${id}-hatch)` : null)}
+  {@render outline(s, 'bc-rebreather-drawing--body', null)}
   {#if s.startY !== null}
     <rect x={s.x} y={s.startY} width={s.width} height={s.bottom - s.startY} class="bc-rebreather-drawing--start-fill" clip-path="url(#{id}-{s.key})" />
     <line x1={s.x + 1} y1={s.lineStartY} x2={s.x + s.width - 1} y2={s.lineStartY} class="bc-rebreather-drawing--level" clip-path="url(#{id}-{s.key})" />
@@ -138,11 +138,6 @@
         {/if}
       </clipPath>
     {/each}
-    <!-- No pressure data: grey diagonal stripes, 8 wide, at 45°. -->
-    <pattern id="{id}-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <rect width="8" height="8" class="bc-rebreather-drawing--hatch-ground" />
-      <rect width="4" height="8" class="bc-rebreather-drawing--hatch-stripe" />
-    </pattern>
   </defs>
 
   <g transform="translate({UNIT_SCALE.x} {UNIT_SCALE.y}) scale({UNIT_SCALE.k})">
@@ -272,14 +267,6 @@
 
     .bc-rebreather-drawing--water-bottom {
       stop-color: var(--bc-cylinder-water-bottom);
-    }
-
-    .bc-rebreather-drawing--hatch-ground {
-      fill: var(--bc-cylinder-no-pressure);
-    }
-
-    .bc-rebreather-drawing--hatch-stripe {
-      fill: var(--bc-cylinder-no-pressure-stripe);
     }
 
     .bc-rebreather-drawing--start-fill {

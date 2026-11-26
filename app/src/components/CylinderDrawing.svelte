@@ -6,7 +6,7 @@
   // `startRatio` (the start pressure, same scale) a solid pale band shows what
   // was breathed between the end and the start level, and a dashed line marks
   // each level (task 46). `hatched`: the start and end pressures are not both
-  // known, so the body is hatched in grey with no level (13 November 2026).
+  // known, so the body is left white, with no level (26 November 2026; grey hatching since 13 November).
   // The outline is `stroke` wide in the drawing's own units (1.2 of the 44 x 76 viewBox, task 2026-11-24-379): it scales with `width`,
   // 1.2 px at 44 px and about 1.75 px at 64 px.
   // Decorative: the text next to it says the same.
@@ -38,12 +38,8 @@
       <stop offset="1" class="bc-cylinder-drawing--water-bottom" />
     </linearGradient>
     <clipPath id="{id}-clip"><path d={SHAPE} /></clipPath>
-    <pattern id="{id}-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <rect width="8" height="8" class="bc-cylinder-drawing--hatch-ground" />
-      <rect width="4" height="8" class="bc-cylinder-drawing--hatch-stripe" />
-    </pattern>
   </defs>
-  <path d={SHAPE} class="bc-cylinder-drawing--body" style:fill={hatched ? `url(#${id}-hatch)` : null} />
+  <path d={SHAPE} class="bc-cylinder-drawing--body" />
   {#if startLevel !== null && startLevel > 0}
     <rect x="6" y={startTop} width="32" height={BODY_TOP + BODY_HEIGHT - startTop} class="bc-cylinder-drawing--start-fill" clip-path="url(#{id}-clip)" />
     <line x1="7" y1={lineY(startTop)} x2="37" y2={lineY(startTop)} class="bc-cylinder-drawing--level" clip-path="url(#{id}-clip)" />
@@ -71,14 +67,6 @@
       fill: none;
       stroke: var(--bc-text);
       stroke-linejoin: round;
-    }
-
-    .bc-cylinder-drawing--hatch-ground {
-      fill: var(--bc-cylinder-no-pressure);
-    }
-
-    .bc-cylinder-drawing--hatch-stripe {
-      fill: var(--bc-cylinder-no-pressure-stripe);
     }
 
     /* The water gradient. */
