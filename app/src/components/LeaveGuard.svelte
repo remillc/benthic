@@ -22,7 +22,7 @@
 
   /**
    * @type {{
-   *   noun: 'plan'|'dive'|'cylinderType'|'computer'|'filter'|'site'|'statistic',
+   *   noun: 'plan'|'dive'|'cylinderType'|'weightType'|'computer'|'filter'|'site'|'statistic',
    *   dirty: () => boolean,
    *   save: () => void,
    *   leave: () => void,

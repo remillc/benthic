@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 203
+Next number: 204
 
 ## List
 
@@ -52,3 +52,4 @@ Next number: 203
 - #200 [design] design et code : constituer une base de données des modèles de recycleurs pour utilisation dans Équipement.
 - #201 [code] mettre en place une étape de validation de la version gratuite avant chaque release : parcourir l’APK de publication sans compte et vérifier qu’aucun serveur n’apparaît.
 - #202 [code] sur /sites/new, afficher sur la carte les sites communs. Une punaise peut être sélectionnée à la place de créer une nouvelle punaise.
+- #203 [code] lors du téléchargement d'une plongée, on nous offre d'ajouter l'ordinateur à notre équipement. À cette étape, on doit comparer le nouvel à ceux qui sont déjà dans l'inventaire du plongeur. Il est possible que l'ordinateur existe déjà, mais qu'il soit enregistré autrement. En cas de doute, offrir à l'usager la possibilité de « pairer », ou indiquer quel ordi de l'inventaire correspond au nouvel ordi et mettre à jour les informations du premier.

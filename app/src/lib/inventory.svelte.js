@@ -164,6 +164,19 @@ export async function changeCylinderTypes(files, removeIds = []) {
   signalAccountData('edit');
 }
 
+/** The weight type files of the diver (Settings › Types de lest). */
+export const readWeightTypes = () => open().listWeightTypes();
+
+/**
+ * Adds, changes and removes weight type files in one step; the sync follows. Not refused when the subscription ended.
+ * @param {import('./weight-type-files.js').WeightTypeFile[]} files
+ * @param {string[]} [removeIds]
+ */
+export async function changeWeightTypes(files, removeIds = []) {
+  await open().changeWeightTypes(files, removeIds);
+  signalAccountData('edit');
+}
+
 /** A photo kept in the inventory, as a data URL; '' when the file is gone. @param {string} photoId */
 export const readPhoto = (photoId) => open().readPhoto(photoId);
 

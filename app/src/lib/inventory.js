@@ -16,6 +16,7 @@ import { sameComputer } from './dc-model.js';
 import { isShortId, newId } from './short-id.js';
 import { migrateDiveIdsInStore } from './dive-id-migration.js';
 import { CYLINDER_TYPES_FOLDER, isTypeFile, pathOfType } from './cylinder-type-files.js';
+import { WEIGHT_TYPES_FOLDER, isWeightTypeFile, pathOfWeightType } from './weight-type-files.js';
 
 import { ruleProblems } from './maintenance.js';
 import { planO2Cells } from './o2-cells-migration.js';
@@ -582,6 +583,21 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
      */
     async changeCylinderTypes(files, removeIds = []) {
       await store.trackedBatch({ writes: files.map((f) => [pathOfType(f.id), f]), removes: removeIds.map(pathOfType) });
+    },
+
+    /** The weight types the diver added or gave a usual weight (lib/weight-type-files.js). @returns {Promise<import('./weight-type-files.js').WeightTypeFile[]>} */
+    async listWeightTypes() {
+      return (await store.readAll(WEIGHT_TYPES_FOLDER)).filter(isWeightTypeFile);
+    },
+
+    /**
+     * Writes and removes weight type files in one step, tracked for the sync. Like the cylinder types, a setting of the
+     * diver's list, not Benthic+ data.
+     * @param {import('./weight-type-files.js').WeightTypeFile[]} files
+     * @param {string[]} [removeIds]
+     */
+    async changeWeightTypes(files, removeIds = []) {
+      await store.trackedBatch({ writes: files.map((f) => [pathOfWeightType(f.id), f]), removes: removeIds.map(pathOfWeightType) });
     },
 
     /** @returns {Promise<{ id: string, name: string, gearIds: string[], createdAt: string, updatedAt: string }[]>} */

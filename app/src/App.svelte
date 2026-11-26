@@ -146,6 +146,9 @@
     { path: '/settings/cylinders/', ...lazy(() => import('./pages/CylinderTypes.svelte')) },
     { path: '/settings/cylinders/new', ...lazy(() => import('./pages/CylinderType.svelte')) },
     { path: '/settings/cylinders/type', ...lazy(() => import('./pages/CylinderType.svelte')) },
+    { path: '/settings/weights/', ...lazy(() => import('./pages/WeightTypes.svelte')) },
+    { path: '/settings/weights/new', ...lazy(() => import('./pages/WeightType.svelte')) },
+    { path: '/settings/weights/type', ...lazy(() => import('./pages/WeightType.svelte')) },
     // Offline maps: the list, adding a region (a rectangle drawn on the map).
     // Release edition: « Mon profil de plongeur » and the equipment inventory (task 2026-11-17-267).
     ...(isRelease

@@ -996,6 +996,31 @@
       "label": "Show unused cylinders",
       "text": "And include them in export, copy and merge"
     },
+    "weights": {
+      "title": "Weight types",
+      "intro": "The weight types of Subsurface and of your dives, and the ones you add. Offered when you enter a dive’s weights, with their usual weight.",
+      "add": "Add a type",
+      "newTitle": "New weight type",
+      "editTitle": "Edit the weight type",
+      "name": "Name",
+      "nameHelp": "For example “BCD pockets”",
+      "usual": "Usual weight",
+      "usualHelp": "Offered when you add this weight to a dive. Empty: the weight last used.",
+      "lastUsed": "Weight last used: {weight}",
+      "noWeight": "No usual weight",
+      "builtin": "Subsurface type",
+      "fromLogbook": "This type comes from Subsurface or from the logbook’s dives: its name cannot be changed here.",
+      "added": "Added by you",
+      "deleteType": "Delete this type",
+      "deleteUsual": "Clear the usual weight",
+      "nameInUse": "This name is already a type’s",
+      "nameMissing": "Enter a name",
+      "weightInvalid": "Enter a weight between 0 and {max} {unit}"
+    },
+    "weightTypes": {
+      "label": "Weight types",
+      "text": "Add, rename, usual weight"
+    },
     "cylinderTypes": {
       "label": "Cylinder types",
       "text": "Add, rename, remove"
@@ -2934,7 +2959,7 @@
       "Sync: automatic, with changes waiting while offline, failures explained and conflicts resolved in a dialog that shows the differences.",
       "Backup and restore: get back a deleted dive, a version of a dive or the whole logbook at a date, on a timeline.",
       "Photos and videos (Benthic+): each dive has its gallery, in shooting order with the profile depth, sent to the account (10 GB) and available on every device.",
-      "Profile and equipment (Benthic+): diver profile, certifications drawn like the cards, scanned documents, an emergency sheet, 20 types of equipment with kits, and maintenance reminders by time or by number of dives. “Get the dive signed” asks a buddy or an instructor to sign.",
+      "Profile and equipment (Benthic+): diver profile, certifications drawn like the cards, scanned documents, an emergency sheet, 20 types of equipment with kits, and maintenance reminders by time or by number of dives. “Get the dive signed” asks a buddy or an instructor to sign. Settings › Weight types: your weight types and their usual weight; a weight chosen starts from the previous dive’s.",
       "Computer (Windows, macOS, Linux): Benthic in three panes, with a logbook table that stays fast with thousands of dives, a dive in tabs, right-click menus and windows for several logbooks.",
       "iPhone and iPad: Benthic follows the iOS look, with the tab bar, dive computer download over Bluetooth, “Continue with Apple” and the import of an Apple Watch Ultra’s dives from Health.",
       "Android: bottom navigation (Logbook, Sites, Statistics, Tools), account avatar and Material 3 Expressive components.",
@@ -3068,6 +3093,7 @@
       "plan": "Changes made to this plan will be lost.",
       "dive": "Changes made to this dive will be lost.",
       "cylinderType": "Changes made to this cylinder type will be lost.",
+      "weightType": "The changes to this weight type will be lost.",
       "computer": "Changes made to this computer will be lost.",
       "filter": "Changes made to this filter will be lost.",
       "site": "Changes made to this site will be lost.",
@@ -4593,6 +4619,7 @@
     },
     "mixTile": "Mix",
     "rebreatherTile": "Rebreather",
+    "manageWeightTypes": "Manage the weight types",
     "ccrTileLabel": "Rebreather: {diluent}; {oxygen}",
     "pscrTileLabel": "pSCR rebreather: mix {mix}",
     "role": { "diluent": "Diluent", "oxygen": "Oxygen" },

@@ -93,6 +93,19 @@
   const undersuitOptions = $derived(undersuits.map((g) => ({ value: g.id, label: g.name })));
   /** The dive that comes just before this one in the logbook: « Plongée précédente » copies its equipment. */
   const previousDive = $derived(logbook.dives.filter((d) => d.date < dive.date).sort((x, y) => (x.date < y.date ? 1 : -1))[0] ?? null);
+  /** The previous dive's weights: a weight type chosen here starts from them (components/DesktopWeights.svelte). */
+  let previousWeights = $state(/** @type {{ grams: number, description: string }[]} */ ([]));
+  $effect(() => {
+    const id = previousDive?.id;
+    previousWeights = [];
+    if (id === undefined) return;
+    let current = true;
+    BenthicCore.getDive({ id }).then(
+      (/** @type {any} */ d) => current && (previousWeights = Array.isArray(d?.weights) ? d.weights : []),
+      () => {},
+    );
+    return () => (current = false);
+  });
   const kitOptions = $derived(
     kitMenuOptions(gear.kits, previousDive ? { number: previousDive.number } : null, {
       previous: t('desktopDetail.kitMenu.previous'),
@@ -134,8 +147,8 @@
       let suit = previous.suitGearId ? (gearMap().get(previous.suitGearId)?.name ?? '') : '';
       if (!suit) suit = previousFull?.suit ?? '';
       // The weights too: the same diver in the same gear carries the same lead.
-      const previousWeights = weightRows(previousFull?.weights ?? []);
-      if (equipmentIsEmpty(previous) && !suit && !previousWeights.length) {
+      const copiedWeights = weightRows(previousFull?.weights ?? []);
+      if (equipmentIsEmpty(previous) && !suit && !copiedWeights.length) {
         showSnackbar(t('gear.diveGear.previousEmpty'));
         return;
       }
@@ -143,7 +156,7 @@
       message = t('gear.diveGear.copied');
       await saveEquipment(next);
       if (suit !== beforeSuit) await save('suit', suit);
-      if (previousWeights.length) await saveWeights(previousWeights);
+      if (copiedWeights.length) await saveWeights(copiedWeights);
     } else {
       const kit = gear.kits.find((k) => k.id === id);
       if (!kit) return;
@@ -619,9 +632,9 @@
           {#if weightsShown.total}<span class="bc-desktop-dive-fields--total">{t('desktopDetail.weightTotal')}<strong>{weightsShown.total}</strong></span>{/if}
         {/snippet}
         <div data-field="weights">
-          <DesktopWeights weights={dive.weights ?? []} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
+          <DesktopWeights weights={dive.weights ?? []} previous={previousWeights} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
         </div>
-        {#if plus && dive.weights?.some((w) => w.grams > 0)}
+        {#if plus}
           <div class="bc-desktop-dive-fields--feedback">
             <span class="bc-desktop-dive-fields--feedback-label" id="bc-df-feedback">{t('weightFeedback.title')}</span>
             <div class="bc-desktop-dive-fields--feedback-group">

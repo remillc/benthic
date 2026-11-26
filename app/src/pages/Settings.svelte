@@ -574,6 +574,7 @@
       rows: [
         // "Types de bouteilles" first (task 2026-11-12-53).
         { kind: 'link', id: 'cylinderTypes', label: t('settings.cylinderTypes.label'), text: t('settings.cylinderTypes.text'), href: '/settings/cylinders/' },
+        { kind: 'link', id: 'weightTypes', label: t('settings.weightTypes.label'), text: t('settings.weightTypes.text'), href: '/settings/weights/' },
         {
           kind: 'choice',
           id: 'defaultCylinder',

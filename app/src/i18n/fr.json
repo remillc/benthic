@@ -996,6 +996,31 @@
       "label": "Afficher les bouteilles inutilisées",
       "text": "Et les inclure à l’export, la copie et la fusion"
     },
+    "weights": {
+      "title": "Types de lest",
+      "intro": "Les types de lest de Subsurface et de vos plongées, et ceux que vous ajoutez. Proposés quand on indique le lest d’une plongée, avec leur poids habituel.",
+      "add": "Ajouter un type",
+      "newTitle": "Nouveau type de lest",
+      "editTitle": "Modifier le type de lest",
+      "name": "Nom",
+      "nameHelp": "Par exemple « Poches de stab »",
+      "usual": "Poids habituel",
+      "usualHelp": "Proposé quand on ajoute ce lest à une plongée. Vide : le dernier poids utilisé.",
+      "lastUsed": "Dernier poids utilisé : {weight}",
+      "noWeight": "Aucun poids habituel",
+      "builtin": "Type de Subsurface",
+      "fromLogbook": "Ce type vient de Subsurface ou des plongées du carnet : son nom ne se change pas ici.",
+      "added": "Ajouté par vous",
+      "deleteType": "Supprimer ce type",
+      "deleteUsual": "Effacer le poids habituel",
+      "nameInUse": "Ce nom est déjà celui d’un type",
+      "nameMissing": "Indiquez un nom",
+      "weightInvalid": "Indiquez un poids entre 0 et {max} {unit}"
+    },
+    "weightTypes": {
+      "label": "Types de lest",
+      "text": "Ajouter, renommer, poids habituel"
+    },
     "cylinderTypes": {
       "label": "Types de bouteilles",
       "text": "Ajouter, renommer, retirer"
@@ -2934,7 +2959,7 @@
       "Synchronisation : automatique, avec les modifications en attente hors ligne, les échecs expliqués et les conflits résolus dans un dialogue qui montre les différences.",
       "Sauvegarde et restauration : retrouver une plongée supprimée, une version d’une plongée ou tout le carnet à une date, sur une ligne du temps.",
       "Photos et vidéos (Benthic+) : chaque plongée a sa galerie, dans l’ordre de prise de vue avec la profondeur du profil, envoyée au compte (10 Go) et disponible sur tous les appareils.",
-      "Profil et équipement (Benthic+) : fiche du plongeur, certifications dessinées comme les cartes, documents numérisés, fiche d’urgence, 20 types de pièces d’équipement avec kits, et rappels d’entretien par durée ou par nombre de plongées. « Faire signer la plongée » demande la signature d’un équipier ou d’un instructeur.",
+      "Profil et équipement (Benthic+) : fiche du plongeur, certifications dessinées comme les cartes, documents numérisés, fiche d’urgence, 20 types de pièces d’équipement avec kits, et rappels d’entretien par durée ou par nombre de plongées. « Faire signer la plongée » demande la signature d’un équipier ou d’un instructeur. Réglages › Types de lest : vos types de lest et leur poids habituel ; un lest choisi part du poids de la plongée précédente.",
       "Ordinateur (Windows, macOS, Linux) : Benthic en trois volets, avec un tableau du carnet rapide même avec des milliers de plongées, une plongée en onglets, des menus au clic droit et des fenêtres pour plusieurs carnets.",
       "iPhone et iPad : Benthic suit l’apparence d’iOS, avec la barre d’onglets, le téléchargement depuis un ordinateur de plongée en Bluetooth, « Continuer avec Apple » et l’import des plongées d’une Apple Watch Ultra depuis Santé.",
       "Android : navigation en bas (Carnet, Sites, Statistiques, Outils), avatar du compte et composants Material 3 Expressive.",
@@ -3068,6 +3093,7 @@
       "plan": "Les changements apportés à ce plan seront perdus.",
       "dive": "Les changements apportés à cette plongée seront perdus.",
       "cylinderType": "Les changements apportés à ce type de bouteille seront perdus.",
+      "weightType": "Les changements apportés à ce type de lest seront perdus.",
       "computer": "Les changements apportés à cet ordinateur seront perdus.",
       "filter": "Les changements apportés à ce filtre seront perdus.",
       "site": "Les changements apportés à ce site seront perdus.",
@@ -4593,6 +4619,7 @@
     },
     "mixTile": "Mélange",
     "rebreatherTile": "Recycleur",
+    "manageWeightTypes": "Gérer les types de lest",
     "ccrTileLabel": "Recycleur : {diluent} ; {oxygen}",
     "pscrTileLabel": "Recycleur pSCR : mélange {mix}",
     "role": { "diluent": "Diluant", "oxygen": "Oxygène" },
