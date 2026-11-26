@@ -11,7 +11,7 @@
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
   import { startKeyOf } from '../lib/inventory.js';
-  import { gear, loadInventory, change, evaluations, figuresOf, diveStartsOf } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, change, evaluations, figuresOf, suitFigures, diveStartsOf } from '../lib/inventory.svelte.js';
   import { suggestionsFor, leadDays, ownLeadDays, stampOf } from '../lib/maintenance.js';
   import { settings } from '../lib/settings.svelte.js';
   import { ruleText, taskLabel, tagText } from '../lib/maintenance-text.js';
@@ -27,13 +27,19 @@
   let { f7route, f7router } = $props();
 
   const id = f7route.params.id;
-  onMount(loadInventory);
+  /** A suit tied to the logbook's « Combinaison » texts counts the dives of those texts too. @type {{ dives: number, seconds: number }|null} */
+  let suitStats = $state(null);
+  onMount(async () => {
+    await loadInventory();
+    const g = gear.pieces.find((x) => x.id === id);
+    if (g) suitStats = await suitFigures(g);
+  });
 
   const piece = $derived(gear.pieces.find((g) => g.id === id));
   const all = $derived(evaluations().filter((e) => e.item.gearId === id));
   /** The cards in the order of the tasks: a bottle shows its inspection, then its hydrostatic test. */
   const withRule = $derived(all.filter((e) => e.active).sort((a, b) => ['o2Cells', 'service', 'inspection', 'hydrostatic', 'seals'].indexOf(a.item.task) - ['o2Cells', 'service', 'inspection', 'hydrostatic', 'seals'].indexOf(b.item.task)));
-  const figures = $derived(piece ? figuresOf(piece) : { dives: 0, seconds: 0 });
+  const figures = $derived(piece ? (suitStats ?? figuresOf(piece)) : { dives: 0, seconds: 0 });
   const isCylinder = $derived(piece?.type === 'cylinder');
 
   /** The date of a cylinder's hydrostatic test is known to the month (the stamp on the bottle). @param {import('../lib/maintenance.js').Evaluation} e @param {string} iso */
