@@ -509,7 +509,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       const known = new Map(all.map((g) => [g.id, g]));
       for (const c of plan.create) {
         if (known.has(c.id)) continue;
-        writes.push([`gear/${c.id}.json`, { format: 1, createdAt: stamp(), retired: false, id: c.id, name: c.name, type: 'suit', suitNames: c.suitNames, updatedAt: stamp() }]);
+        writes.push([`gear/${c.id}.json`, { format: 1, createdAt: stamp(), retired: false, id: c.id, name: c.name, model: c.name, type: 'suit', suitNames: c.suitNames, updatedAt: stamp() }]);
       }
       for (const e of plan.extend) {
         const piece = known.get(e.id);
@@ -537,7 +537,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
         if (!(found.suitNames ?? []).some((/** @type {string} */ n) => n.trim() === name)) await commit([[`gear/${found.id}.json`, { ...found, suitNames: [...(found.suitNames ?? []), name], updatedAt: stamp() }]], await undismissPaths([name]));
         return (await store.read(`gear/${found.id}.json`)) ?? found;
       }
-      const piece = { format: 1, createdAt: stamp(), retired: false, id: suitPieceId(name), name, type: 'suit', suitNames: [name], updatedAt: stamp() };
+      const piece = { format: 1, createdAt: stamp(), retired: false, id: suitPieceId(name), name, model: name, type: 'suit', suitNames: [name], updatedAt: stamp() };
       await commit([[`gear/${piece.id}.json`, piece]], await undismissPaths([name]));
       return piece;
     },

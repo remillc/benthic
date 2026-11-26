@@ -137,3 +137,12 @@ test('the screens: the detail field follows the inventory, the folder is synced,
     for (const text of [json.desktopDetail.newSuit, json.desktopDetail.manageGear, json.gear.pair.alreadyIn]) assert.ok(text);
   }
 });
+
+test('a suit made from the logbook has its text as its model, and the edit form shows it for the older ones', async () => {
+  const inv = inventory();
+  await inv.applySuitPlan(planSuitPieces(values, []));
+  assert.ok((await inv.listGear()).every((g) => g.model === g.name));
+  assert.equal((await inv.suitPieceFor('Semi-sec')).model, 'Semi-sec');
+  const edit = readFileSync(new URL('../../app/src/pages/ProfilePieceEdit.svelte', import.meta.url), 'utf8');
+  assert.match(edit, /model = g\.model \?\? \(!g\.brand && g\.suitNames\?\.length \? g\.name : ''\)/);
+});
