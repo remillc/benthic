@@ -7641,3 +7641,15 @@ Christian asked for this on 26 November 2026. Work in `main`. Editing cylinders 
 4. Saving updates the tile, the gas summaries and the profile's gas data.
 
 Mock-ups in `docs/mockups/`: `detail-onglets-gaz-android` (tiles with chevrons), `detail-bouteilles-recycleur-android`, `detail-bouteille-android`. Also updated: `detail3-android` is now a copy of the tabbed reference page (the duplicate board was removed from the canvas; links to it now land on the reference).
+
+## [ ] 2026-11-26-402 Correction to the weight types (commit f176335e): one list, the diver's, with no reference to Subsurface
+
+Christian asked for this on 26 November 2026. Work in `main`. Settings › Équipement › Types de lest, phone first (Android and iPhone):
+
+1. No reference to Subsurface anywhere. There is one list: the diver's weight types (those of the logbook's dives and those the diver added are the same kind of item). Remove « Type de Subsurface » and « Ajouté par vous », and the locked name (`fromLogbook`): every type can be renamed and deleted.
+2. Under each type's name: the number of dives it appears in, « Dans n plongées » (« Dans 1 plongée », « Dans aucune plongée »). At the right: its weight, then the chevron.
+3. Sort the list alphabetically, ignoring accents and case (fr-CA collation).
+4. « Poids habituel » becomes « Poids » everywhere: the field of the type's page, the Équipement row's supporting text (« Ajouter, renommer, poids »), the intro. New intro: « Vos types de lest, proposés quand on indique le lest d’une plongée, avec leur poids. Renommer un type renomme aussi ce lest dans les plongées du carnet. »
+5. The type's page (title « Modifier le type » on Android, « Modifier le type de lest » on iOS): Nom, Poids (unit from Réglages), then « Utilisé dans n plongées. Le renommer renomme aussi ce lest dans ces plongées. », then « Supprimer ce type ». Renaming a type renames the weights of that type in every dive. What deleting a type used in dives does to those dives is not decided yet: ask for confirmation and leave the dives' weights unchanged.
+
+Mock-ups in `docs/mockups/`: `reglages-equipement-android`, `reglages2-lest-android`, `reglages2-lest-modifier-android`, `ios-reglages-equipement`, `ios-reglages2-lest`, `ios-reglages2-lest-modifier`. Desktop mock-up to come.
