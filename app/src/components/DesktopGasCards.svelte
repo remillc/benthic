@@ -25,7 +25,7 @@
    *   onedit?: (key: string) => void,
    * }}
    * editable (a phone, tasks 2026-11-26-401 and 403): a touch on a tile opens its edit dialog (onedit). chevron: every tile shows the
-   * chevron at its right, vertically centred (phones and tablets; the desktop keeps its tiles plain). The rebreather tile names the
+   * chevron at its right, vertically centred (every device since task 2026-11-26-410, the desktop opening a dialog too). The rebreather tile names the
    * oxygen first: the drawing is mirrored and « Oxygène » is the left block, « Diluant » the right one.
    */
   let { tiles, selected, onselect, onadd, editable = false, chevron = false, onedit = () => {} } = $props();

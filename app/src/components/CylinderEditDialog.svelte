@@ -10,6 +10,9 @@
   // On an iPhone the same dialog is a sheet drawn as the iOS mock-ups do (ios-detail-bouteille and ios-detail-bouteilles-recycleur):
   // « Annuler », the title and « OK » in a bar, grouped lists with the label at the left and the value at the right, no camera. The dialog edits copies: nothing is written until « Enregistrer » (the page does it). Moved under <body>
   // like the other dialogs; Escape and the system Back close it (lib/back-button.js).
+  // `desktop` (task 2026-11-26-410; mock-ups bureau-detail-bouteille and bureau-detail-bouteilles-recycleur): a centred dialog
+  // over a scrim, 560 px for one cylinder and 760 px for a rebreather's two side by side (oxygen on the left), the title, the
+  // fields, then « Retirer la bouteille » at the left and « Annuler » / « Enregistrer » at the right; no camera, no move.
   import Icon from './Icon.svelte';
   import SelectField from './SelectField.svelte';
   import TextField from './TextField.svelte';
@@ -42,9 +45,10 @@
    *   onremove?: () => void,
    *   onmove?: (step: -1|1) => void,
    *   canMove?: { up: boolean, down: boolean },
+   *   desktop?: boolean,
    * }}
    */
-  let { title, parts = $bindable(), typeOptions, roles, prefs, types = [], mod = { surfaceMbar: 1013, salinity: 10300 }, footnote = '', onsave, onclose, onremove, onmove, canMove = { up: true, down: true } } = $props();
+  let { title, parts = $bindable(), typeOptions, roles, prefs, types = [], mod = { surfaceMbar: 1013, salinity: 10300 }, footnote = '', onsave, onclose, onremove, onmove, canMove = { up: true, down: true }, desktop = false } = $props();
 
   const id = `bc-cylinder-dialog-${Math.random().toString(36).slice(2, 9)}`;
   const words = $derived({ air: t('edit.gasName.air'), oxygen: t('edit.gasName.oxygen'), nitrox: t('edit.gasName.nitrox'), trimix: t('edit.gasName.trimix') });
@@ -53,7 +57,7 @@
   const unit = $derived(prefs.pressure === 'psi' ? t('units.psi') : t('units.bar'));
   const depthUnit = $derived(prefs.length === 'ft' ? t('units.feet') : t('units.meters'));
   /** The camera of Début and Fin: every dive, on a device that has the gauge camera (not on an iPhone). */
-  const camera = $derived(!ios && gaugeCameraAvailable());
+  const camera = $derived(!ios && !desktop && gaugeCameraAvailable());
   /** The menu of a grey row of the iOS sheet: the cylinder type or the role of a part. @type {{ key: string, field: 'description'|'use' }|null} */
   let picking = $state(null);
   const pickingPart = $derived(picking ? parts.find((p) => p.key === picking?.key) : undefined);
@@ -235,22 +239,27 @@
       />
     {/if}
   {:else}
-  <div class="bc-cylinder-dialog--surface" role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1" data-bc-scroll>
+  {#if desktop}<div class="bc-cylinder-dialog--scrim" aria-hidden="true" onclick={onclose}></div>{/if}
+  <div class="bc-cylinder-dialog--surface" class:bc-cylinder-dialog--desktop={desktop} class:bc-cylinder-dialog--wide={desktop && parts.length > 1} role="dialog" aria-modal="true" aria-labelledby={id} tabindex="-1" data-bc-scroll>
+    {#if !desktop}
     <div class="bc-cylinder-dialog--bar">
       <button type="button" class="bc-cylinder-dialog--close" aria-label={t('desktopDetail.cylinderDialog.closeWithoutSaving')} onclick={onclose}><Icon name="close" size={24} /></button>
       <span class="bc-cylinder-dialog--spacer"></span>
       <button type="button" class="bc-cylinder-dialog--save" disabled={invalid} onclick={onsave}>{t('desktopDetail.cylinderDialog.save')}</button>
     </div>
+    {/if}
     <h1 {id} class="bc-cylinder-dialog--title">{title}</h1>
     <div class="bc-cylinder-dialog--cards">
       {#each parts as part, i (part.key)}
         {@const error = errors[i]}
         {@const helper = mixHelper(part.draft, words, part.oxygenOnly)}
         <section class="bc-cylinder-dialog--card" data-cylinder-part={part.key}>
+          {#if !desktop || parts.length > 1}
           <div class="bc-cylinder-dialog--head">
             <span class="bc-cylinder-dialog--badge" aria-hidden="true">{#if part.badge}{part.badge}{:else}<svg class="bc-cylinder-dialog--badge-icon" width="22" height="22" viewBox="0 0 24 24"><path d="M10 3h4v3h-4z M8 9a4 4 0 0 1 8 0v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2z" /></svg>{/if}</span>
             <h2 class="bc-cylinder-dialog--heading">{part.heading}</h2>
           </div>
+          {/if}
           {#if roles}
             <div data-field="cylinder-role"><SelectField label={t('desktopDetail.cylinderDialog.role')} bind:value={part.draft.use} options={roles} /></div>
           {/if}
@@ -312,6 +321,15 @@
         </section>
       {/each}
     </div>
+    {#if desktop}
+      {#if footnote}<p class="bc-cylinder-dialog--footnote">{footnote}</p>{/if}
+      <div class="bc-cylinder-dialog--desktop-actions">
+        {#if onremove}<button type="button" class="bc-cylinder-dialog--remove-button" onclick={onremove}><Icon name="delete" size={18} />{t('desktopDetail.removeCylinder')}</button>{/if}
+        <span class="bc-cylinder-dialog--spacer"></span>
+        <button type="button" class="bc-cylinder-dialog--desktop-cancel" onclick={onclose}>{t('dialog.cancel')}</button>
+        <button type="button" class="bc-cylinder-dialog--desktop-save" disabled={invalid} onclick={onsave}>{t('desktopDetail.cylinderDialog.save')}</button>
+      </div>
+    {:else}
     {#if onmove}
       <div class="bc-cylinder-dialog--remove" data-field="cylinder-move">
         <button type="button" class="bc-cylinder-dialog--remove-button" disabled={!canMove.up} onclick={() => onmove(-1)}><Icon name="arrowUp" size={20} />{t('desktopDetail.moveUp')}</button>
@@ -324,6 +342,7 @@
       </div>
     {/if}
     {#if footnote}<p class="bc-cylinder-dialog--footnote">{footnote}</p>{/if}
+    {/if}
   </div>
   {/if}
 </div>
@@ -461,6 +480,88 @@
       font-size: 28px;
       line-height: 36px;
       font-weight: 500;
+    }
+
+    /* The desktop (task 2026-11-26-410): a centred dialog over a scrim. */
+    .bc-cylinder-dialog:has(.bc-cylinder-dialog--desktop) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bc-cylinder-dialog--scrim {
+      position: absolute;
+      inset: 0;
+      background: var(--bc-scrim);
+    }
+    .bc-cylinder-dialog--surface.bc-cylinder-dialog--desktop {
+      position: relative;
+      width: min(560px, calc(100% - 48px));
+      height: auto;
+      max-height: calc(100% - 96px);
+      padding: 24px;
+      border-radius: 28px;
+      background: var(--bc-dialog);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+    }
+    .bc-cylinder-dialog--surface.bc-cylinder-dialog--wide {
+      width: min(760px, calc(100% - 48px));
+    }
+    .bc-cylinder-dialog--desktop .bc-cylinder-dialog--title {
+      margin: 0 0 20px;
+      padding: 0;
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 400;
+    }
+    .bc-cylinder-dialog--desktop .bc-cylinder-dialog--cards {
+      margin: 0;
+    }
+    .bc-cylinder-dialog--wide .bc-cylinder-dialog--cards {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 16px;
+      & > * {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+    .bc-cylinder-dialog--desktop .bc-cylinder-dialog--footnote {
+      margin: 16px 0 0;
+      padding: 0;
+    }
+    .bc-cylinder-dialog--desktop-actions {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      .bc-cylinder-dialog--remove-button {
+        width: auto;
+        height: 40px;
+        font-size: 14px;
+      }
+    }
+    .bc-cylinder-dialog--desktop-cancel,
+    .bc-cylinder-dialog--desktop-save {
+      width: auto;
+      height: 40px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 20px;
+      background: none;
+      color: var(--bc-primary);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .bc-cylinder-dialog--desktop-save {
+      padding: 0 24px;
+      background: var(--bc-primary);
+      color: var(--bc-on-primary);
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
     }
 
     .bc-cylinder-dialog--cards {

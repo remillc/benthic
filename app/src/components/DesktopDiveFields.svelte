@@ -568,8 +568,9 @@
     const span = cylinderSpan(dive.samples, index);
     return span ? t('desktopDetail.cylinderSpan', { from: span.fromMin, to: span.toMin }) : '';
   };
-  // The edit dialogs of the tiles (task 2026-11-26-401), on a phone (a full-screen dialog on Android, a sheet on iPhone): one cylinder alone, or a rebreather's two together.
-  const dialogs = $derived(layout.phone);
+  // The edit dialogs of the tiles (task 2026-11-26-401), on a phone (a full-screen dialog on Android, a sheet on iPhone) and on
+  // the desktop (a centred dialog, task 2026-11-26-410): one cylinder alone, or a rebreather's two together.
+  const dialogs = $derived(layout.phone || layout.desktop);
   /** @type {{ title: string, indexes: number[], parts: { key: string, heading: string, badge?: string, oxygenOnly?: boolean, draft: import('../lib/cylinder-dialog.js').CylinderDraft }[], single: boolean }|null} */
   let editing = $state(null);
   /** @param {string} key a tile's key */
@@ -980,7 +981,7 @@
         </section>
       {:else}
         <div class="bc-desktop-dive-fields--card">
-          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} chevron={!layout.desktop} onedit={editTile} />
+          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} chevron onedit={editTile} />
         </div>
 
         {#if activeTile?.kind === 'cylinder' && chosen}
@@ -1040,7 +1041,8 @@
     onsave={saveEditing}
     onclose={() => (editing = null)}
     onremove={editing.single ? askRemove : undefined}
-    onmove={editing.single ? moveEditing : undefined}
+    onmove={editing.single && !layout.desktop ? moveEditing : undefined}
+    desktop={layout.desktop}
     canMove={{ up: (editing.indexes[0] ?? 0) > 0, down: (editing.indexes[0] ?? 0) < dive.cylinders.length - 1 }}
     mod={{ surfaceMbar: dive.surfacePressureMbar || 1013, salinity: dive.userSalinity || 10300 }}
   />
