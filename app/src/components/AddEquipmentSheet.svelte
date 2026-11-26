@@ -5,6 +5,8 @@
   // checkboxes, and the card « Pièce hors inventaire »: a name typed there is added to this dive only, never to
   // the inventory. « Ajouter à la plongée » puts the choice in the dive's equipment (saved with the dive).
   import { Sheet } from 'framework7-svelte';
+  import Md3Dialog from './Md3Dialog.svelte';
+  import { layout } from '../lib/layout.svelte.js';
   import GearPicker from './GearPicker.svelte';
   import Icon from './Icon.svelte';
   import SearchClear from './SearchClear.svelte';
@@ -68,9 +70,7 @@
   }
 </script>
 
-<Sheet class="bc-add-equipment" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('gear.addSheet.title')}>
-  <div class="bc-add-equipment--content">
-    <h2 class="bc-add-equipment--title">{t('gear.addSheet.title')}</h2>
+{#snippet fields()}
     <div class="bc-add-equipment--search">
       <Icon name="search" size={20} />
       <input type="search" bind:value={query} placeholder={t('gear.addSheet.search')} aria-label={t('gear.addSheet.search')} />
@@ -102,13 +102,28 @@
         <TextField label={t('gear.addSheet.adhocName')} bind:value={adhocName} />
       </div>
     </div>
+{/snippet}
 
-    <div class="bc-add-equipment--actions">
-      <button type="button" class="bc-add-equipment--text" onclick={onclose}>{t('gear.addSheet.cancel')}</button>
-      <button type="button" class="bc-add-equipment--main" disabled={!canAdd} onclick={add}>{t('gear.addSheet.confirm')}</button>
+{#snippet buttons()}
+  <button type="button" class="bc-add-equipment--text" onclick={onclose}>{t('gear.addSheet.cancel')}</button>
+  <button type="button" class="bc-add-equipment--main" disabled={!canAdd} onclick={add}>{t('gear.addSheet.confirm')}</button>
+{/snippet}
+
+<!-- A phone: the bottom sheet. A tablet or a desktop: a dialog (task 2026-11-26-404, mock-ups android-tablette-profil-plongee-ajout-paysage and bureau-profil-plongee-ajout). -->
+{#if layout.phone}
+  <Sheet class="bc-add-equipment" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('gear.addSheet.title')}>
+    <div class="bc-add-equipment--content">
+      <h2 class="bc-add-equipment--title">{t('gear.addSheet.title')}</h2>
+      {@render fields()}
+      <div class="bc-add-equipment--actions">{@render buttons()}</div>
     </div>
-  </div>
-</Sheet>
+  </Sheet>
+{:else if opened}
+  <Md3Dialog title={t('gear.addSheet.title')} class="bc-add-equipment-dialog" oncancel={onclose}>
+    <div class="bc-add-equipment--dialog-body">{@render fields()}</div>
+    {#snippet actions()}{@render buttons()}{/snippet}
+  </Md3Dialog>
+{/if}
 
 <style>
   @layer bc.components {
@@ -131,6 +146,18 @@
       font-size: 22px;
       line-height: 28px;
       font-weight: 400;
+    }
+
+    .bc-add-equipment--dialog-body {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      max-height: min(560px, 70vh);
+    }
+
+    :global(.bc-add-equipment-dialog) {
+      width: 560px;
+      max-width: calc(100vw - 48px);
     }
 
     .bc-add-equipment--search {
@@ -234,6 +261,7 @@
 
     .bc-add-equipment--text,
     .bc-add-equipment--main {
+      width: auto;
       height: 40px;
       padding: 0 20px;
       border: none;

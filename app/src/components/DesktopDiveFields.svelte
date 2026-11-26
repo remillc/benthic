@@ -89,9 +89,9 @@
       ? [
           ...equipment.gearIds.flatMap((id) => {
             const g = gearMap().get(id);
-            return g ? [{ id: `g:${id}`, name: g.name, type: g.type }] : [];
+            return g ? [{ id: `g:${id}`, name: g.name, type: g.type, line: t(`gear.inventory.type.${g.type}`) }] : [];
           }),
-          ...equipment.adhoc.map((p) => ({ id: `a:${p.id}`, name: p.name, type: /** @type {'other'} */ ('other') })),
+          ...equipment.adhoc.map((p) => ({ id: `a:${p.id}`, name: p.name, type: /** @type {'other'} */ ('other'), line: t('desktopDetail.otherGearBorrowed') })),
         ]
       : [],
   );
