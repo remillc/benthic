@@ -232,6 +232,20 @@ export async function renameCylinderType(name, newName) {
 }
 
 /**
+ * Renames a weight type in every dive of the log (one undoable step, saved and synced like an edit).
+ * @param {string} name
+ * @param {string} newName
+ */
+export async function renameWeightType(name, newName) {
+  const result = await BenthicCore.weightTypes({ action: 'rename', name, value: newName });
+  invalidateCoreCache();
+  logbook.undoText = result.undo;
+  logbook.redoText = result.redo ?? '';
+  await persistChanges();
+  return result;
+}
+
+/**
  * What deleting one of the diver's cylinder types would do to the dives: how many lose the
  * cylinder and how many keep it, with its type cleared (the dive's only cylinder, or one a gas
  * change or the pressure graph depends on). Nothing changes.

@@ -124,7 +124,7 @@ struct DiveListChange {
 };
 
 struct Step {
-	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER, DEVICES,
+	enum Kind { DIVE, TRIP_FIELD, MOVE, SITE_FIELD, SITES, CYLINDER_TYPE, WEIGHT_TYPE, DIVE_LIST, FILTER_PRESET, RENUMBER, DEVICES,
 		    MERGE, DIVES_EDIT } kind = DIVE;
 	// DIVE_LIST: as Subsurface's AddDive and ImportDives: what the next undo
 	// or redo puts in and takes out; for an import, the dive computers and
@@ -174,6 +174,7 @@ struct Step {
 	// CYLINDER_TYPE: as Subsurface's RenameCylinderType, the cylinders of that
 	// type in the log; after each undo or redo, `value` holds the name to put
 	// back and `type_name` the name in use.
+	// WEIGHT_TYPE: the same for the weight systems (`cylinders` holds their indexes).
 	std::vector<std::pair<dive *, int>> cylinders;
 	std::string type_name;
 	// DEVICES: the device table, the dives (by id) and the fingerprints' device
@@ -1534,6 +1535,71 @@ int cylinder_type_rename(const std::string &old_name, const std::string &new_nam
 	return cylinder_types(json);
 }
 
+// Weight types: the weight systems of one description, renamed in every dive (as the cylinder types above).
+static void apply_weight_type(Step &step)
+{
+	const std::string &from = step.type_name, &to = step.value;
+	for (auto &[d, idx]: step.cylinders) {
+		d->weightsystems[idx].description = to;
+		d->invalidate_cache(); // so that save-git writes this dive again
+	}
+	for (ws_info &info: ws_info_table)
+		if (info.name == from)
+			info.name = to;
+	std::swap(step.type_name, step.value);
+}
+
+int weight_type_rename(const std::string &old_name, const std::string &new_name_in, std::string &json,
+		       std::string &error)
+{
+	std::string new_name = trim(new_name_in);
+	if (new_name.empty() || new_name == old_name)
+		return weight_types(json);
+	auto listed = [](const std::string &name) {
+		return std::any_of(ws_info_table.begin(), ws_info_table.end(), [&](const ws_info &i) { return i.name == name; });
+	};
+	Step step;
+	step.kind = Step::WEIGHT_TYPE;
+	std::vector<dive *> affected;
+	bool new_used = false;
+	for (const auto &d: divelog.dives) {
+		bool hit = false;
+		for (size_t i = 0; i < d->weightsystems.size(); i++) {
+			if (d->weightsystems[i].description == old_name) {
+				step.cylinders.push_back({ d.get(), (int)i });
+				hit = true;
+			}
+			if (d->weightsystems[i].description == new_name)
+				new_used = true;
+		}
+		if (hit)
+			affected.push_back(d.get());
+	}
+	if (new_used || listed(new_name)) {
+		error = "NAME_IN_USE";
+		return -1;
+	}
+	if (step.cylinders.empty() && !listed(old_name)) {
+		error = "NOT_FOUND";
+		return -1;
+	}
+	step.text = affected.size() <= 1 ? "Rename weight type"
+					 : "Rename weight type (" + std::to_string(affected.size()) + " dive(s))";
+	step.type_name = old_name;
+	step.value = new_name;
+	apply_weight_type(step);
+	push_step(std::move(step));
+	return weight_types(json);
+}
+
+int weight_type_remove(const std::string &name, std::string &json)
+{
+	ws_info_table.erase(std::remove_if(ws_info_table.begin(), ws_info_table.end(),
+					   [&](const ws_info &i) { return i.name == name; }),
+			    ws_info_table.end());
+	return weight_types(json);
+}
+
 // Deleting one of the diver's cylinder types (a Benthic addition): the
 // cylinders of that type leave the dives that use them, with their pressures
 // and gas mix, unless taking one out would damage the dive. A cylinder stays
@@ -2352,6 +2418,10 @@ static int swap_step(Step &step, std::string &result_json, std::string &error)
 	if (step.kind == Step::CYLINDER_TYPE) {
 		apply_cylinder_type(step);
 		return cylinder_types(result_json);
+	}
+	if (step.kind == Step::WEIGHT_TYPE) {
+		apply_weight_type(step);
+		return weight_types(result_json);
 	}
 	if (step.kind == Step::MOVE) {
 		move_dives_between_trips(step);

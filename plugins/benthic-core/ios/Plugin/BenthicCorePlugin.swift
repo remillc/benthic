@@ -32,6 +32,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getPrefs", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setPrefs", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "cylinderTypes", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "weightTypes", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "configureCloud", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "probeCloud", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "listCloudDives", returnType: CAPPluginReturnPromise),
@@ -417,6 +418,16 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         let mbar = call.getInt("mbar") ?? 0
         onCoreThread(call, afterSetup: false) {
             let json = try BenthicNative.cylinderTypes(action: action, name: name, value: value, ml: ml, mbar: mbar)
+            call.resolve(["json": json])
+        }
+    }
+
+    @objc func weightTypes(_ call: CAPPluginCall) {
+        let action = call.getString("action") ?? ""
+        let name = call.getString("name") ?? ""
+        let value = call.getString("value") ?? ""
+        onCoreThread(call, afterSetup: false) {
+            let json = try BenthicNative.weightTypes(action: action, name: name, value: value)
             call.resolve(["json": json])
         }
     }

@@ -16,6 +16,7 @@ internal object NativeCore {
     external fun getPrefs(): String
     external fun setPrefs(changes: String)
     external fun cylinderTypes(action: String, name: String, value: String, ml: Int, mbar: Int): String
+    external fun weightTypes(action: String, name: String, value: String): String
     external fun plannerSetup(): String
     external fun planDive(request: String): String
     external fun listPlans(): String

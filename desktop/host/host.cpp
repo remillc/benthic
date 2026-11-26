@@ -170,6 +170,7 @@ Result edit_result(const std::string &dive_json)
 	const char *key = dive_json.rfind("{\"tripId\"", 0) == 0 ? "trip"
 			: dive_json.rfind("{\"uuid\"", 0) == 0 ? "site"
 			: dive_json.rfind("{\"types\"", 0) == 0 ? "cylinderTypes"
+			: dive_json.rfind("{\"weightTypes\"", 0) == 0 ? "weightTypes"
 			: dive_json.rfind("{\"listChange\"", 0) == 0 ? "list"
 			: dive_json.rfind("{\"presetList\"", 0) == 0 ? "presets" : "dive";
 	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":" + json_string(benthic::undo_text());
@@ -767,6 +768,24 @@ void register_methods()
 			ret = benthic::cylinder_type_delete(name, action == "deletePreview", json, error);
 		else
 			ret = benthic::cylinder_type_action(action, name, a.i32("ml"), a.i32("mbar"), json, error);
+		if (ret)
+			fail(error);
+		return edit_result(json);
+	});
+	// Weight types: list, rename, remove.
+	add("weightTypes", core, [](const Args &a) {
+		std::string action = a.str("action"), json, error;
+		int ret;
+		if (action == "list")
+			ret = benthic::weight_types(json);
+		else if (action == "rename")
+			ret = benthic::weight_type_rename(a.str("name"), a.str("value"), json, error);
+		else if (action == "remove")
+			ret = benthic::weight_type_remove(a.str("name"), json);
+		else {
+			ret = -1;
+			error = "BAD_REQUEST: unknown action " + action;
+		}
 		if (ret)
 			fail(error);
 		return edit_result(json);

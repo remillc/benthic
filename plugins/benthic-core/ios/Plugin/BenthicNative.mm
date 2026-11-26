@@ -92,6 +92,7 @@ static NSString *edit_result(const std::string &result_json)
 	const char *key = result_json.rfind("{\"tripId\"", 0) == 0 ? "trip"
 			: result_json.rfind("{\"uuid\"", 0) == 0 ? "site"
 			: result_json.rfind("{\"types\"", 0) == 0 ? "cylinderTypes"
+			: result_json.rfind("{\"weightTypes\"", 0) == 0 ? "weightTypes"
 			: result_json.rfind("{\"listChange\"", 0) == 0 ? "list"
 			: result_json.rfind("{\"presetList\"", 0) == 0 ? "presets" : "dive";
 	std::string json = std::string("{\"") + key + "\":" + result_json + ",\"undo\":\"" + quoted(benthic::undo_text());
@@ -246,6 +247,28 @@ static void send_sync_progress(const char *message)
 		ret = benthic::cylinder_type_delete(name, action == "deletePreview", json, message);
 	} else {
 		ret = benthic::cylinder_type_action(action, name, (int)ml, (int)mbar, json, message);
+	}
+	return edit_or_fail(ret, json, message, error);
+}
+
+// Returns {"weightTypes":..., "undo":..., "redo":...}.
++ (NSString *)weightTypes:(NSString *)actionIn
+		     name:(NSString *)nameIn
+		    value:(NSString *)valueIn
+		    error:(NSError **)error
+{
+	std::string action = str(actionIn), name = str(nameIn), value = str(valueIn);
+	std::string json, message;
+	int ret;
+	if (action == "list") {
+		ret = benthic::weight_types(json);
+	} else if (action == "rename") {
+		ret = benthic::weight_type_rename(name, value, json, message);
+	} else if (action == "remove") {
+		ret = benthic::weight_type_remove(name, json);
+	} else {
+		ret = -1;
+		message = "BAD_REQUEST: unknown action " + action;
 	}
 	return edit_or_fail(ret, json, message, error);
 }

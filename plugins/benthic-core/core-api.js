@@ -274,6 +274,13 @@ export { waterTypeOf };
  */
 
 /**
+ * @typedef {Object} WeightTypes
+ * @property {{name: string, grams: number, dives: number}[]} types in the table's order, then the dives' others; grams: the weight last used, 0 when none
+ * @property {string} undo
+ * @property {string} redo
+ */
+
+/**
  * @typedef {Object} CylinderTypes
  * @property {CylinderType[]} types the runtime table, sorted by name
  * @property {string[]} library the device's library, to keep as is and set again at start
@@ -760,7 +767,7 @@ export { waterTypeOf };
  *   offline} at lat/lon in the language text (Nominatim, else offline Natural Earth), or null.
  * @property {(options: {kind: 'cylinders'|'weights'|'desaturation'}) => Promise<any>} toolQuery
  *   Read-only tools (benthic.h): cylinders, the GasCylinderTypes;
- *   weights, {types: [{name, grams}]}: Subsurface's weight types (untranslated built-in names),
+ *   weights, {types: [{name, grams, dives}]}: Subsurface's weight types (untranslated built-in names),
  *   each with the weight last used for it (0 when none); desaturation, the Desaturation now.
  * @property {(options: {kind: 'options'} | {kind: 'search', fulltext: string} | {kind: 'dives', fulltext?: string, mode?: string, rules: FilterRule[]}) => Promise<any>} filterQuery
  *   "search": the Logbook's search box (search_dives), the matching dive ids.
@@ -839,6 +846,10 @@ export { waterTypeOf };
  *   The core's preferences: units (the loaded log's when it has them), the Settings values.
  * @property {(options: {changes: Partial<CorePrefValues> & {forgetDiveComputer?: number, diveComputerList?: string[]}}) => Promise<void>} setPrefs
  *   Sets core preferences (set_prefs in benthic.h); a device setting, kept by the app.
+ * @property {(options: {action: 'list'|'rename'|'remove', name?: string, value?: string}) => Promise<WeightTypes>} weightTypes
+ *   The weight types the dives use and the table of the dive editor, each with the number of dives it is in;
+ *   "rename" (to value) renames the weights of that type in every dive as one undoable step (NAME_IN_USE,
+ *   NOT_FOUND), "remove" drops it from the table (the dives keep their weights).
  * @property {(options: {action: 'list'|'library'|'added'|'defaults'|'standard'|'add'|'size'|'remove'|'rename'|'delete'|'deletePreview', name?: string, value?: string, ml?: number, mbar?: number}) => Promise<CylinderTypes>} cylinderTypes
  *   Cylinder types of Settings; "rename" (to value) changes the log as one undoable step,
  *   "delete" removes one of the diver's types and its cylinders from the dives (one undoable
@@ -1230,6 +1241,11 @@ export const BenthicCore = {
     // Sorted by name for the screen here, not in the façade (cylinder-sort.js).
     if (Array.isArray(list.types)) list.types = sortCylinderTypes(list.types);
     return { ...list, undo: result.undo, redo: result.redo };
+  },
+  async weightTypes(options) {
+    const result = JSON.parse((await native.weightTypes(options)).json);
+    const list = result.weightTypes ?? {};
+    return { types: Array.isArray(list.types) ? list.types : [], undo: result.undo, redo: result.redo };
   },
   async plannerSetup() {
     return JSON.parse((await native.plannerSetup()).json);

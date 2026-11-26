@@ -227,6 +227,16 @@ class BenthicCorePlugin : Plugin() {
         call.resolve(JSObject().put("json", json))
     }
 
+    /** Weight types of Settings: list, rename (in every dive), remove (see benthic.h). */
+    @PluginMethod
+    fun weightTypes(call: PluginCall) = onCoreThread(call, afterSetup = false) {
+        val json = NativeCore.weightTypes(
+            call.getString("action").orEmpty(),
+            call.getString("name").orEmpty(),
+            call.getString("value").orEmpty(),
+        )
+        call.resolve(JSObject().put("json", json))
+    }
 
     /**
      * The Subsurface cloud account of this device: the one signed in to

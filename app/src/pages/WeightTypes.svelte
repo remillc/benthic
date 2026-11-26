@@ -1,15 +1,15 @@
 <script>
   // @ts-check
-  // Settings › Équipement › Types de lest: one list, Subsurface's weight types and those of the logbook's dives (its ws_info
-  // table) united with the ones the diver added (lib/weight-types.svelte.js), each with its usual weight. A tap opens the
-  // type's page; « Ajouter un type » opens an empty one. Reached from Réglages and from the weight menu of a dive's detail
-  // (« Gérer les types de lest »). Same layout as Types de bouteilles.
+  // Settings › Équipement › Types de lest: one list, the diver's weight types (lib/weight-types.svelte.js), sorted by name,
+  // each with the number of dives it is in and its weight at the right. A tap opens the type's page; « Ajouter un type »
+  // opens an empty one. Reached from Réglages and from the weight menu of a dive's detail (« Gérer les types de lest »).
+  // Same layout as Types de bouteilles.
   import BackLink from '../components/BackLink.svelte';
   import { Page, Navbar, Link, f7 } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import { readWeightTypeRows } from '../lib/weight-types.svelte.js';
   import { weightPlaceName } from '../lib/desktop-detail.js';
-  import { formatWeight } from '../lib/format.js';
+  import { formatNumber, formatWeight } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
   import { ios } from '../lib/layout.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
@@ -25,8 +25,8 @@
     }
   }
 
-  /** « Type de Subsurface », « Ajouté par vous », or nothing for a type of the dives. @param {import('../lib/weight-type-files.js').WeightTypeRow} type */
-  const origin = (type) => (type.builtin ? t('settings.weights.builtin') : !type.inLogbook ? t('settings.weights.added') : '');
+  /** « Dans 12 plongées ». @param {import('../lib/weight-type-files.js').WeightTypeRow} type */
+  const inDives = ({ dives: n }) => t(n === 0 ? 'settings.weights.inNoDive' : n === 1 ? 'settings.weights.inOneDive' : 'settings.weights.inDives', { n: formatNumber(n, 0) });
 
   /** @param {string} name */
   function open(name) {
@@ -52,7 +52,7 @@
         <button type="button" class="bc-weight-types--row" onclick={() => open(type.name)}>
           <span class="bc-weight-types--texts">
             <span class="bc-weight-types--label">{weightPlaceName(type.name)}</span>
-            {#if origin(type)}<span class="bc-weight-types--supporting">{origin(type)}</span>{/if}
+            <span class="bc-weight-types--supporting">{inDives(type)}</span>
           </span>
           <span class="bc-weight-types--value bc-value">{type.grams ? formatWeight(type.grams, logbook.prefs) : ''}</span>
           <span class="bc-weight-types--chevron"><Icon name="chevron" size={20} /></span>

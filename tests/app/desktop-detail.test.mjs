@@ -218,10 +218,10 @@ test('the texts of the five tabs exist in French and English', () => {
   assert.equal(JSON.parse(read('app/src/i18n/fr.json')).desktopDetail.notRated, 'Non notée');
 });
 
-test('the weight types of the detail are the logbook ones (Subsurface ws_info, with the earlier dives), as the dive editor offered', () => {
+test('the weight types of the detail are the logbook ones (the descriptions of its dives and the core table), as the dive editor offered', () => {
   const weights = fs.readFileSync(new URL('../../app/src/components/DesktopWeights.svelte', import.meta.url), 'utf8');
   assert.match(weights, /readWeightTypeRows\(\)/);
-  assert.match(read('app/src/lib/weight-types.svelte.js'), /BenthicCore\.toolQuery\(\{ kind: 'weights' \}\)/);
+  assert.match(read('app/src/lib/weight-types.svelte.js'), /BenthicCore\.weightTypes\(\{ action: 'list' \}\)/);
   assert.match(weights, /const names = \$derived\(types\.length \? types\.map\(\(w\) => w\.name\) : PLACES\)/);
   assert.match(weights, /names\.map\(\(value\) => \{/);
   assert.match(weights, /return \{ value, label: weightPlaceName\(value\), example:/);

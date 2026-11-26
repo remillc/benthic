@@ -237,6 +237,43 @@ int main(int argc, char **argv)
 		benthic::gas_cylinder_types(types);
 		check_true("cylinder types of the log listed", types.find("\"name\":\"AL80\"") != std::string::npos);
 	}
+	// Weight types: the descriptions the dives use, with their dive counts; renaming one is a single undoable step.
+	{
+		weight_t w;
+		w.grams = 3000;
+		divelog.dives[0]->weightsystems.push_back(weightsystem_t(w, "Poches", false));
+		divelog.dives[0]->weightsystems.push_back(weightsystem_t(w, "Poches", false)); // twice in one dive: one dive
+		divelog.dives[1]->weightsystems.push_back(weightsystem_t(w, "Poches", false));
+		std::string types, err;
+		benthic::weight_types(types);
+		check_true("weight types: a description of the dives is listed with its count",
+			   types.find("{\"name\":\"Poches\",\"grams\":0,\"dives\":2}") != std::string::npos);
+		check_true("weight types: the table's own types are listed", types.find("\"name\":\"belt\"") != std::string::npos);
+		check_true("weight types: a type in use cannot take another's name",
+			   benthic::weight_type_rename("Poches", "belt", types, err) != 0 && err == "NAME_IN_USE");
+		check_true("weight types: an unknown type is not found",
+			   benthic::weight_type_rename("Nope", "Autre", types, err) != 0 && err == "NOT_FOUND");
+		check_true("weight types: rename", benthic::weight_type_rename("Poches", "Poches de stab", types, err) == 0);
+		check_true("weight types: renamed in every dive, both weights of the first",
+			   divelog.dives[0]->weightsystems[divelog.dives[0]->weightsystems.size() - 1].description == "Poches de stab" &&
+			   divelog.dives[0]->weightsystems[divelog.dives[0]->weightsystems.size() - 2].description == "Poches de stab" &&
+			   divelog.dives[1]->weightsystems.back().description == "Poches de stab");
+		check_true("weight types: the list follows",
+			   types.find("{\"name\":\"Poches de stab\",\"grams\":0,\"dives\":2}") != std::string::npos &&
+			   types.find("\"name\":\"Poches\"") == std::string::npos);
+		check_true("weight types: undo puts the name back", benthic::undo(types, err) == 0 &&
+			   divelog.dives[1]->weightsystems.back().description == "Poches" &&
+			   types.find("{\"weightTypes\":true") == 0);
+		check_true("weight types: redo renames again", benthic::redo(types, err) == 0 &&
+			   divelog.dives[1]->weightsystems.back().description == "Poches de stab");
+		benthic::weight_type_remove("belt", types);
+		check_true("weight types: removed from the table", types.find("\"name\":\"belt\"") == std::string::npos);
+		// Back to the log as loaded.
+		benthic::undo(types, err);
+		divelog.dives[0]->weightsystems.pop_back();
+		divelog.dives[0]->weightsystems.pop_back();
+		divelog.dives[1]->weightsystems.pop_back();
+	}
 	// End of the last dive of the log (dives are sorted by time).
 	size_t last = json.rfind("\"date\":\"");
 	size_t date = last + 8;

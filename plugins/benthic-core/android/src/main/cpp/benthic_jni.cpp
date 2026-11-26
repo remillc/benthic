@@ -491,6 +491,7 @@ static jstring edit_result(JNIEnv *env, const std::string &dive_json)
 	const char *key = dive_json.rfind("{\"tripId\"", 0) == 0 ? "trip"
 			: dive_json.rfind("{\"uuid\"", 0) == 0 ? "site"
 			: dive_json.rfind("{\"types\"", 0) == 0 ? "cylinderTypes"
+			: dive_json.rfind("{\"weightTypes\"", 0) == 0 ? "weightTypes"
 			: dive_json.rfind("{\"listChange\"", 0) == 0 ? "list"
 			: dive_json.rfind("{\"presetList\"", 0) == 0 ? "presets" : "dive";
 	std::string json = std::string("{\"") + key + "\":" + dive_json + ",\"undo\":\"" + quoted(benthic::undo_text());
@@ -1302,6 +1303,32 @@ Java_app_benthicdivelog_core_NativeCore_cylinderTypes(JNIEnv *env, jobject, jstr
 		ret = benthic::cylinder_type_delete(name, action == "deletePreview", json, error);
 	else
 		ret = benthic::cylinder_type_action(action, name, ml, mbar, json, error);
+	if (ret) {
+		throw_core_error(env, error);
+		return nullptr;
+	}
+	return edit_result(env, json);
+}
+
+// Weight types: list, rename (to `value`, one undoable step), remove. Each returns
+// {"weightTypes":…, "undo":…, "redo":…}.
+JNIEXPORT jstring JNICALL
+Java_app_benthicdivelog_core_NativeCore_weightTypes(JNIEnv *env, jobject, jstring actionIn, jstring nameIn,
+						   jstring valueIn)
+{
+	std::string action = to_string(env, actionIn), name = to_string(env, nameIn), value = to_string(env, valueIn);
+	std::string json, error;
+	int ret;
+	if (action == "list") {
+		ret = benthic::weight_types(json);
+	} else if (action == "rename") {
+		ret = benthic::weight_type_rename(name, value, json, error);
+	} else if (action == "remove") {
+		ret = benthic::weight_type_remove(name, json);
+	} else {
+		ret = -1;
+		error = "BAD_REQUEST: unknown action " + action;
+	}
 	if (ret) {
 		throw_core_error(env, error);
 		return nullptr;

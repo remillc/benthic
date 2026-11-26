@@ -4,16 +4,24 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { isWeightTypeFile, newWeightTypeFile, unionWeightTypes, weightTypeKey } from '../../app/src/lib/weight-type-files.js';
 
-const core = [{ name: 'integrated', grams: 0 }, { name: 'belt', grams: 6000 }, { name: 'Poches', grams: 2000 }];
+const core = [{ name: 'integrated', grams: 0, dives: 31 }, { name: 'belt', grams: 6000, dives: 18 }, { name: 'Poches', grams: 2000, dives: 1 }, { name: 'ankle', grams: 0, dives: 0 }];
 const file = (id, name, grams, updatedAt = '2026-11-26T10:00:00Z') => ({ id, name, grams, createdAt: updatedAt, updatedAt });
 const source = (path) => readFileSync(new URL(`../../app/src/${path}`, import.meta.url), 'utf8');
 
-test('the list: the core types in their order, then the added ones by name; a file gives a type its usual weight', () => {
-  const rows = unionWeightTypes(core, [file('a', 'Zz plombs', 1000), file('b', 'belt', 8000), file('c', 'Ankle weights', 500)]);
-  assert.deepEqual(rows.map((r) => r.name), ['integrated', 'belt', 'Poches', 'Ankle weights', 'Zz plombs']);
-  assert.deepEqual(rows.find((r) => r.name === 'belt'), { name: 'belt', grams: 8000, builtin: true, inLogbook: true, fileId: 'b' });
-  assert.deepEqual(rows.find((r) => r.name === 'Poches'), { name: 'Poches', grams: 2000, builtin: false, inLogbook: true, fileId: null });
-  assert.equal(rows.find((r) => r.name === 'Zz plombs')?.inLogbook, false);
+test('one list: the core types and the diver files, with their dive counts, sorted ignoring accents and case', () => {
+  const rows = unionWeightTypes(core, [file('a', 'Zz plombs', 1000), file('b', 'belt', 8000), file('c', 'Étoile', 500), file('d', 'abeille', 0)]);
+  assert.deepEqual(rows.map((r) => r.name), ['abeille', 'ankle', 'belt', 'Étoile', 'integrated', 'Poches', 'Zz plombs']);
+  assert.deepEqual(rows.find((r) => r.name === 'belt'), { name: 'belt', grams: 8000, dives: 18, fileId: 'b' });
+  assert.deepEqual(rows.find((r) => r.name === 'Poches'), { name: 'Poches', grams: 2000, dives: 1, fileId: null });
+  assert.deepEqual(rows.find((r) => r.name === 'Zz plombs'), { name: 'Zz plombs', grams: 1000, dives: 0, fileId: 'a' });
+  // A file with no weight leaves the weight last used.
+  assert.equal(unionWeightTypes(core, [file('e', 'belt', 0)]).find((r) => r.name === 'belt')?.grams, 6000);
+});
+
+test('the sort uses the name as shown', () => {
+  const shown = { belt: 'Ceinture', integrated: 'Intégré', ankle: 'Chevilles' };
+  const rows = unionWeightTypes(core, [file('a', 'Étoile', 0)], (name) => shown[name] ?? name);
+  assert.deepEqual(rows.map((r) => r.name), ['belt', 'ankle', 'Étoile', 'integrated', 'Poches']);
 });
 
 test('two files of one name (two devices) count once, the newer; names match whatever their case and spaces', () => {
@@ -44,4 +52,22 @@ test('the detail: a sheet of the types instead of the system list, « Gérer les
   assert.match(src, /const others = \$derived\(shown\.chips\.filter\(\(chip\) => chip\.index !== editing\?\.index\)\)/);
   assert.match(src, /\{#if !editing \|\| others\.length\}/);
   assert.match(src, /class="bc-desktop-weights--confirm".*onclick=\{\(\) => keep\(\)\}>\{editing\.index < 0 \? t\('desktopDetail\.add'\)/);
+});
+
+test('the pages: one list with no mention of Subsurface, a name that can always be changed, a confirmation for a type in use', () => {
+  const list = source('pages/WeightTypes.svelte');
+  assert.doesNotMatch(list, /builtin|settings\.weights\.added/);
+  assert.match(list, /settings\.weights\.inNoDive.*settings\.weights\.inOneDive.*settings\.weights\.inDives/);
+  const page = source('pages/WeightType.svelte');
+  assert.doesNotMatch(page, /nameLocked|fromLogbook|inLogbook/);
+  assert.match(page, /settings\.weights\.editTitleIos/);
+  assert.match(page, /if \(!type\.dives\) \{\s*removeNow\(\);/);
+  assert.match(page, /confirmActionSheet|confirmAction\(/);
+  for (const lang of ['fr', 'en']) {
+    const json = JSON.parse(readFileSync(new URL(`../../app/src/i18n/${lang}.json`, import.meta.url), 'utf8'));
+    for (const key of ['builtin', 'fromLogbook', 'added', 'noWeight', 'deleteUsual']) assert.equal(json.settings.weights[key], undefined);
+    assert.doesNotMatch(JSON.stringify(json.settings.weights) + JSON.stringify(json.settings.weightTypes), /habituel|usual|Subsurface/i);
+  }
+  assert.match(source('lib/weight-types.svelte.js'), /BenthicCore\.weightTypes\(\{ action: 'list' \}\)/);
+  assert.match(source('lib/logbook.svelte.js'), /BenthicCore\.weightTypes\(\{ action: 'rename'/);
 });
