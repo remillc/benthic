@@ -122,17 +122,33 @@
         <span class="bc-gear-page--chevron"><Icon name="chevron" size={20} /></span>
       </a>
     {/if}
-    <h2 class="bc-gear-page--title">{t('gear.inventory.kits')}</h2>
-    <div class="bc-gear-page--chips">
-      {#each gear.kits as kit (kit.id)}
-        <a href={`/profile/kits/${kit.id}`} class="bc-gear-page--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })}>
-          <Icon name="briefcase" size={18} />{kit.name}<span class="bc-gear-page--chip-count">{kit.gearIds.length}</span>
-        </a>
-      {/each}
-      <button type="button" class="bc-gear-page--chip bc-gear-page--chip-new" onclick={newKit}>
-        <Icon name="plus" size={18} />{t('gear.inventory.newKit')}
-      </button>
-    </div>
+    <h2 class="bc-gear-page--title bc-gear-page--title-kits">{t('gear.inventory.kits')}</h2>
+    {#if ios}
+      <!-- iPhone: the kits are a grouped list (name, count, chevron), « Nouveau kit » a row in the accent colour. -->
+      <div class="bc-gear-page--list bc-gear-page--kit-list">
+        {#each gear.kits as kit (kit.id)}
+          <a href={`/profile/kits/${kit.id}`} class="bc-gear-page--row" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })}>
+            <span class="bc-gear-page--texts"><span class="bc-gear-page--name">{kit.name}</span></span>
+            <span class="bc-gear-page--kit-count">{kit.gearIds.length}</span>
+            <span class="bc-gear-page--chevron"><Icon name="chevron" size={20} /></span>
+          </a>
+        {/each}
+        <button type="button" class="bc-gear-page--row bc-gear-page--kit-new" onclick={newKit}>
+          <span class="bc-gear-page--texts"><span class="bc-gear-page--name">{t('gear.inventory.newKit')}</span></span>
+        </button>
+      </div>
+    {:else}
+      <div class="bc-gear-page--chips">
+        {#each gear.kits as kit (kit.id)}
+          <a href={`/profile/kits/${kit.id}`} class="bc-gear-page--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })}>
+            <Icon name="briefcase" size={18} />{kit.name}<span class="bc-gear-page--chip-count">{kit.gearIds.length}</span>
+          </a>
+        {/each}
+        <button type="button" class="bc-gear-page--chip bc-gear-page--chip-new" onclick={newKit}>
+          <Icon name="plus" size={18} />{t('gear.inventory.newKit')}
+        </button>
+      </div>
+    {/if}
   {/if}
 
   {#if empty}
@@ -211,7 +227,7 @@
     <!-- Read only: the button goes away (hidden, not removed: the slot is drawn once). -->
     <div class="fab fab-right-bottom fab-extended bc-fab-add" style:display={gear.readOnly || ios || profileWide() ? 'none' : null}>
       <a href="/profile/gear/new">
-        <i class="icon"><Icon name="plus" /></i>
+        <i class="icon"><Icon name="plus" size={24} /></i>
         <div class="fab-text">{t('gear.inventory.add')}</div>
       </a>
     </div>
@@ -307,32 +323,46 @@
 
     .bc-gear-page--title {
       margin: 0;
-      padding: 20px 20px 8px;
+      padding: 20px 32px 8px;
       font-size: 14px;
       line-height: 20px;
       font-weight: 600;
       color: var(--bc-text-2);
+
+      /* iPhone: a small uppercase header over the grouped list. */
+      :global(.ios) & {
+        padding: 22px 32px 6px;
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
     }
 
+    .bc-gear-page--title-kits {
+      padding-top: 16px;
+    }
+
+    /* The kits wrap onto several lines, none is hidden off screen. */
     .bc-gear-page--chips {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       padding: 0 16px;
-      overflow-x: auto;
-      scrollbar-width: none;
     }
 
     .bc-gear-page--chip {
       flex: none;
       width: auto;
       height: 40px;
-      padding: 0 14px;
-      border: var(--bc-outline-width) solid var(--bc-outline);
+      padding: 0 14px 0 10px;
+      box-sizing: border-box;
+      border: 1px solid var(--bc-separator);
       border-radius: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: none;
+      background: var(--bc-surface);
       color: var(--bc-text);
       font: inherit;
       font-size: 14px;
@@ -341,27 +371,54 @@
       white-space: nowrap;
     }
 
-    .bc-gear-page--chip-count {
-      min-width: 20px;
-      height: 20px;
-      padding: 0 6px;
-      box-sizing: border-box;
-      border-radius: 10px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bc-tonal);
-      font-size: 12px;
+    .bc-gear-page--chip :global(svg) {
+      color: var(--bc-secondary);
     }
 
+    .bc-gear-page--chip-count {
+      color: var(--bc-text-2);
+      font-weight: 400;
+    }
+
+    /* « Nouveau kit »: dashed, no fill, ink icon and label. */
     .bc-gear-page--chip-new {
+      gap: 6px;
       border-style: dashed;
+      border-color: var(--bc-outline);
+      background: none;
+      color: var(--bc-text);
+      :global(svg) {
+        color: var(--bc-text);
+      }
+    }
+
+    /* iPhone kit list: 44 pt rows, the count right-aligned before the chevron, « Nouveau kit » in the accent colour. */
+    .bc-gear-page--kit-list .bc-gear-page--row {
+      min-height: 44px;
+      padding-block: 0;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .bc-gear-page--name {
+      font-size: 16px;
+    }
+    .bc-gear-page--kit-count {
+      flex: none;
+      color: var(--bc-text-2);
+      font-size: 17px;
+      white-space: nowrap;
+    }
+    .bc-gear-page--kit-new {
       color: var(--bc-secondary);
     }
 
     .bc-gear-page--list {
       margin: 0 16px;
       border-radius: 20px;
+
+      :global(.ios) & {
+        border-radius: 10px;
+      }
       background: var(--bc-surface);
       overflow: hidden;
     }
@@ -457,6 +514,20 @@
       text-align: center;
       font-size: 14px;
       color: var(--bc-text-2);
+    }
+
+    /* « Ajouter une pièce »: extended FAB in the secondary container (56 dp, 16 dp corners, 16 / 600 label). */
+    :global(.bc-gear-page .bc-fab-add) {
+      --f7-fab-bg-color: var(--bc-secondary-container);
+      --f7-fab-text-color: var(--bc-secondary);
+      --f7-fab-extended-text-font-size: 16px;
+      --f7-fab-extended-text-font-weight: 600;
+      --f7-fab-extended-text-padding: 0 20px 0 0;
+    }
+
+    /* 16 dp, the 24 dp icon, 12 dp, then the label. */
+    :global(.bc-gear-page .bc-fab-add i ~ .fab-text) {
+      padding-left: 52px;
     }
 
     .bc-gear-page--bottom {

@@ -93,3 +93,16 @@ test('the BCD has the vest icon, the buoy the board tapered icon, and « Nouvell
   assert.doesNotMatch(edit, /gear\.pieceNew\.photoAdd/, 'no « Ajouter une photo »');
   assert.ok(!/fetch\(|https?:\/\//.test(edit.split('<style>')[0].replace(/\/\/.*/g, '')), 'no product photo from the web');
 });
+
+test('Équipement follows the mock-ups: wrapping kit chips, iPhone kit list, secondary-container add button', () => {
+  const page = read('pages/ProfileGear.svelte');
+  assert.match(page, /\.bc-gear-page--chips \{[^}]*flex-wrap: wrap/);
+  assert.doesNotMatch(page, /overflow-x: auto/);
+  assert.match(page, /\{#if ios\}[\s\S]{0,200}bc-gear-page--kit-list/);
+  assert.match(page, /--f7-fab-bg-color: var\(--bc-secondary-container\)/);
+  const list = read('components/ProfileGearList.svelte');
+  assert.match(list, /gear\.addSheet\.kitChip/);
+  assert.match(list, /\.bc-gear-list--chip \{\s*height: 32px/);
+  assert.match(list, /inset-inline-end: 24px;\s*bottom: 24px/);
+  assert.match(list, /background: var\(--bc-secondary-container\)/);
+});
