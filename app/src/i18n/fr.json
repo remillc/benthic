@@ -4681,7 +4681,11 @@
       "start": "Pression au départ",
       "end": "Pression à la sortie",
       "footnote": "Un recycleur a toujours un oxygène et un diluant.",
-      "notBreathed": "Pas respirée pendant la plongée"
+      "notBreathed": "Pas respirée pendant la plongée",
+      "gas": "Gaz",
+      "pressure": "Pression",
+      "startShort": "Au départ",
+      "endShort": "À la sortie"
     },
     "removeCylinder": "Retirer la bouteille",
     "removeCylinderTitle": "Retirer cette bouteille ?",

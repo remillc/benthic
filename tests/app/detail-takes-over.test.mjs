@@ -131,3 +131,15 @@ test('sources: Réglages › Équipement lists the oxygen before the diluent, an
   assert.match(dialog, /removeWeightType\(type\)/);
   for (const lang of ['fr', 'en']) assert.ok(JSON.parse(source(`i18n/${lang}.json`)).settings.weights.noteDesktop, lang);
 });
+
+test('sources: the iPhone sheet of the cylinder dialog follows the iOS mock-ups, without the camera', () => {
+  const dialog = source('components/CylinderEditDialog.svelte');
+  assert.match(dialog, /\{#if ios\}\s*<div class="bc-cylinder-dialog--surface bc-cylinder-dialog--ios"/);
+  assert.match(dialog, /const camera = \$derived\(manual && !ios && gaugeCameraAvailable\(\)\)/);
+  for (const key of ['dialog.cancel', 'dialog.ok', 'desktopDetail.cylinderDialog.startShort', 'desktopDetail.cylinderDialog.endShort', 'desktopDetail.cylinderDialog.gas', 'desktopDetail.cylinderDialog.pressure']) assert.ok(dialog.includes(key), key);
+  for (const lang of ['fr', 'en']) {
+    const d = JSON.parse(source(`i18n/${lang}.json`)).desktopDetail.cylinderDialog;
+    for (const key of ['gas', 'pressure', 'startShort', 'endShort']) assert.ok(d[key], `${lang}: ${key}`);
+  }
+  assert.equal(JSON.parse(source('i18n/fr.json')).desktopDetail.cylinderDialog.startShort, 'Au départ');
+});

@@ -87,14 +87,14 @@ test('a rebreather dive without an oxygen cylinder gets an empty oxygen card tha
   assert.deepEqual(empty, { o2Permille: 1000, hePermille: 0, use: 'oxygen' }, 'untouched, the card still adds an oxygen cylinder');
 });
 
-test('sources: the chevron, the dialogs on Android phones, the dashed tile without chevron', () => {
+test('sources: the chevron, the dialogs on phones, the dashed tile without chevron', () => {
   const cards = source('components/DesktopGasCards.svelte');
   assert.match(cards, /\{#if chevron \|\| editable\}<span class="bc-desktop-gas-cards--chevron"[^>]*><Icon name="chevron" size=\{24\}/);
   assert.match(cards, /inset-inline-end: 8px;/);
   assert.match(cards, /top: 50%;/);
   assert.ok(cards.indexOf('class="bc-desktop-gas-cards--add"') > cards.lastIndexOf('{/each}'), 'the add tile is outside the tiles loop, so it has no chevron');
   const fields = source('components/DesktopDiveFields.svelte');
-  assert.match(fields, /const dialogs = \$derived\(layout\.phone && !ios\)/);
+  assert.match(fields, /const dialogs = \$derived\(layout\.phone\)/);
   assert.match(fields, /editable=\{dialogs\} chevron=\{!layout\.desktop\} onedit=\{editTile\}/);
   assert.match(fields, /roles=\{editing\.single \? useOptions : undefined\}/);
   assert.match(fields, /onremove=\{editing\.single \? askRemove : undefined\}/);

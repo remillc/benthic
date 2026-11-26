@@ -493,8 +493,8 @@
     const span = cylinderSpan(dive.samples, index);
     return span ? t('desktopDetail.cylinderSpan', { from: span.fromMin, to: span.toMin }) : '';
   };
-  // The edit dialogs of the tiles (task 2026-11-26-401), on an Android phone: one cylinder alone, or a rebreather's two together.
-  const dialogs = $derived(layout.phone && !ios);
+  // The edit dialogs of the tiles (task 2026-11-26-401), on a phone (a full-screen dialog on Android, a sheet on iPhone): one cylinder alone, or a rebreather's two together.
+  const dialogs = $derived(layout.phone);
   /** @type {{ title: string, indexes: number[], parts: { key: string, heading: string, badge?: string, oxygenOnly?: boolean, draft: import('../lib/cylinder-dialog.js').CylinderDraft }[], single: boolean }|null} */
   let editing = $state(null);
   /** @param {string} key a tile's key */

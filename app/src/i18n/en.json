@@ -4681,7 +4681,11 @@
       "start": "Pressure at start",
       "end": "Pressure at end",
       "footnote": "A rebreather always has an oxygen and a diluent.",
-      "notBreathed": "Not breathed during the dive"
+      "notBreathed": "Not breathed during the dive",
+      "gas": "Gas",
+      "pressure": "Pressure",
+      "startShort": "At start",
+      "endShort": "At end"
     },
     "removeCylinder": "Remove the cylinder",
     "removeCylinderTitle": "Remove this cylinder?",
