@@ -226,3 +226,10 @@ test('the weight types of the detail are the logbook ones (Subsurface ws_info, w
   assert.match(weights, /names\.map\(\(value\) => \{/);
   assert.match(weights, /return \{ value, label: weightPlaceName\(value\), example:/);
 });
+
+test('Benthic+: the undersuit field shows even with no undersuit in the inventory, and its menu can add one', () => {
+  const fields = read('app/src/components/DesktopDiveFields.svelte');
+  assert.doesNotMatch(fields, /undersuits\.length \|\| equipment\.undersuitGearId/);
+  assert.match(fields, /\{ value: ADD_UNDERSUIT, label: t\('desktopDetail\.addUndersuit'\) \}/);
+  assert.match(fields, /if \(String\(id\) === ADD_UNDERSUIT\) \{\s*openOver\('\/profile\/gear\/new'\)/);
+});

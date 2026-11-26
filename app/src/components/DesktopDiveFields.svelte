@@ -92,7 +92,9 @@
   // are not in the tab at all.
   const plus = $derived(isSubscriber());
   const undersuits = $derived(visibleGear().filter((g) => g.type === 'undersuit'));
-  const undersuitOptions = $derived(undersuits.map((g) => ({ value: g.id, label: g.name })));
+  /** The menu's last entry: a new undersuit in the inventory (the field shows to a subscriber even with none yet). */
+  const ADD_UNDERSUIT = ':add-undersuit';
+  const undersuitOptions = $derived([...undersuits.map((g) => ({ value: g.id, label: g.name })), { value: ADD_UNDERSUIT, label: t('desktopDetail.addUndersuit') }]);
   /** The dive that comes just before this one in the logbook: « Plongée précédente » copies its equipment. */
   const previousDive = $derived(logbook.dives.filter((d) => d.date < dive.date).sort((x, y) => (x.date < y.date ? 1 : -1))[0] ?? null);
   /** The previous dive's weights: a weight type chosen here starts from them (components/DesktopWeights.svelte). */
@@ -120,6 +122,10 @@
 
   /** The undersuit of this dive. @param {string|string[]|number} id */
   async function saveUndersuit(id) {
+    if (String(id) === ADD_UNDERSUIT) {
+      openOver('/profile/gear/new');
+      return;
+    }
     if (!equipment) return;
     await saveEquipment({ ...equipment, undersuitGearId: String(id) });
   }
@@ -674,7 +680,7 @@
         {#snippet icon()}<GearIcon type="suit" size={22} />{/snippet}
         <div class="bc-desktop-dive-fields--two-columns">
           <DesktopEditField stacked tall name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
-          {#if plus && equipment && (undersuits.length || equipment.undersuitGearId)}
+          {#if plus && equipment}
             <DesktopEditField stacked tall name="undersuit" kind="choice" label={t('desktopDetail.label.undersuit')} value={equipment.undersuitGearId} options={undersuitOptions} invitation={t('desktopDetail.invitation.undersuit')} showHint={false} onsave={(v) => saveUndersuit(v)} />
           {/if}
         </div>

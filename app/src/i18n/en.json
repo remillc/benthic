@@ -4620,6 +4620,7 @@
     "mixTile": "Mix",
     "rebreatherTile": "Rebreather",
     "manageWeightTypes": "Manage the weight types",
+    "addUndersuit": "Add an undersuit…",
     "ccrTileLabel": "Rebreather: {diluent}; {oxygen}",
     "pscrTileLabel": "pSCR rebreather: mix {mix}",
     "role": { "diluent": "Diluent", "oxygen": "Oxygen" },
