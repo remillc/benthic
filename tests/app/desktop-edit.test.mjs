@@ -60,6 +60,15 @@ test('a field edit builds the changes of the phone editor', () => {
   assert.deepEqual(fieldChanges(dive(), 'surfacePressure', '1013', metric), { ok: true, changes: { surfacePressureMbar: 1013 } });
 });
 
+test('the four conditions ratings are edited like the visibility', () => {
+  const d = dive({ conditions: { current: 2, wavesize: 0, surge: 1, chill: 4 } });
+  assert.equal(fieldValue(d, 'chill', metric), 4);
+  assert.equal(fieldValue(dive(), 'current', metric), 0);
+  for (const key of ['current', 'wavesize', 'surge', 'chill']) assert.deepEqual(fieldChanges(d, key, 5, metric), { ok: true, changes: { [key]: 5 } });
+  assert.deepEqual(fieldChanges(d, 'current', 2, metric), { ok: true, changes: null });
+  assert.deepEqual(fieldChanges(d, 'surge', 0, metric), { ok: true, changes: { surge: 0 } });
+});
+
 test('a value that did not change writes nothing', () => {
   assert.deepEqual(fieldChanges(dive(), 'suit', 'Étanche', metric), { ok: true, changes: null });
   assert.deepEqual(fieldChanges(dive(), 'buddies', ['Michael'], metric), { ok: true, changes: null });

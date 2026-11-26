@@ -30,6 +30,7 @@
   import SiteMap from './SiteMap.svelte';
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges, isSubscriber, tripChange } from '../lib/logbook.svelte.js';
+  import { settings } from '../lib/settings.svelte.js';
   import { ios, layout } from '../lib/layout.svelte.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
   import CylinderDeleteDialog from './CylinderDeleteDialog.svelte';
@@ -737,6 +738,9 @@
         {#snippet icon()}<Icon name="star" size={22} />{/snippet}
         <DesktopStarsRow name="rating" label={t('desktopDetail.label.note')} value={dive.rating} onsave={(v) => save('rating', v)} />
         <DesktopStarsRow name="visibility" label={t('desktopDetail.label.visibility')} value={dive.visibility} onsave={(v) => save('visibility', v)} />
+        {#each ['current', ...(settings.extraConditions ? ['wavesize', 'surge', 'chill'] : [])] as key (key)}
+          <DesktopStarsRow name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
+        {/each}
       </DesktopEquipmentCard>
 
       <DesktopEquipmentCard name="conditions" title={t('desktopDetail.card.conditions')}>

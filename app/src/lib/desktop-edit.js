@@ -31,6 +31,10 @@ export const FIELD_KINDS = {
   tags: 'list',
   waterType: 'choice',
   visibility: 'stars',
+  current: 'stars',
+  wavesize: 'stars',
+  surge: 'stars',
+  chill: 'stars',
   rating: 'stars',
   suit: 'text',
   notes: 'multiline',
@@ -91,6 +95,11 @@ export function fieldValue(dive, key, prefs) {
       return dive.visibility ?? 0;
     case 'rating':
       return dive.rating ?? 0;
+    case 'current':
+    case 'wavesize':
+    case 'surge':
+    case 'chill':
+      return dive.conditions?.[key] ?? 0;
     case 'suit':
       return dive.suit ?? '';
     case 'notes':
@@ -164,6 +173,12 @@ export function fieldChanges(dive, key, value, prefs) {
       break;
     case 'rating':
       changes.rating = Number(value);
+      break;
+    case 'current':
+    case 'wavesize':
+    case 'surge':
+    case 'chill':
+      changes[key] = Number(value);
       break;
     case 'suit':
       changes.suit = text.trim();
