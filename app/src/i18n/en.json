@@ -4628,7 +4628,7 @@
     "rebreatherTile": "Rebreather",
     "manageWeightTypes": "Manage the weight types",
     "addUndersuit": "Add an undersuit…",
-    "ccrTileLabel": "Rebreather: {diluent}; {oxygen}",
+    "ccrTileLabel": "Rebreather: {oxygen}; {diluent}",
     "pscrTileLabel": "pSCR rebreather: mix {mix}",
     "role": { "diluent": "Diluent", "oxygen": "Oxygen" },
     "rebreatherCard": { "title": "Rebreather", "low": "Low setpoint", "high": "High setpoint" },
@@ -4678,9 +4678,13 @@
       "he": "He",
       "start": "Pressure at start",
       "end": "Pressure at end",
-      "footnote": "A rebreather always has a diluent and an oxygen."
+      "footnote": "A rebreather always has an oxygen and a diluent.",
+      "notBreathed": "Not breathed during the dive"
     },
     "removeCylinder": "Remove the cylinder",
+    "removeCylinderTitle": "Remove this cylinder?",
+    "removeCylinderConfirm": "Remove",
+    "removeCylinderPlain": "It was not breathed during the dive: the profile does not change.",
     "moveUp": "Move the cylinder up",
     "moveDown": "Move the cylinder down",
     "cylinder": "Cylinder {n}",

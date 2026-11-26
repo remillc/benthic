@@ -34,8 +34,8 @@ test('CCR: one wide tile with the diluent and the oxygen, the others as bailout 
   const cylinders = [cyl({ use: 'diluent' }), cyl({ use: 'oxygen', o2Permille: 1000 }), cyl({ o2Permille: 320 })];
   const tiles = gasTiles(cylinders, 'CCR', metric);
   assert.deepEqual(tiles.map((x) => [x.key, x.kind]), [['unit', 'ccr'], ['c2', 'cylinder']]);
-  assert.deepEqual(tiles[0].parts.map((p) => p.role), ['diluent', 'oxygen']);
-  assert.deepEqual(tiles[0].indexes, [0, 1]);
+  assert.deepEqual(tiles[0].parts.map((p) => p.role), ['oxygen', 'diluent'], 'oxygen first (task 2026-11-26-403)');
+  assert.deepEqual(tiles[0].indexes, [1, 0], 'the oxygen cylinder (1) comes before the diluent (0)');
   assert.match(tiles[1].lines[0], /EAN32/);
 });
 

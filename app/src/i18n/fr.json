@@ -4628,7 +4628,7 @@
     "rebreatherTile": "Recycleur",
     "manageWeightTypes": "Gérer les types de lest",
     "addUndersuit": "Ajouter un sous-vêtement…",
-    "ccrTileLabel": "Recycleur : {diluent} ; {oxygen}",
+    "ccrTileLabel": "Recycleur : {oxygen} ; {diluent}",
     "pscrTileLabel": "Recycleur pSCR : mélange {mix}",
     "role": { "diluent": "Diluant", "oxygen": "Oxygène" },
     "rebreatherCard": { "title": "Recycleur", "low": "Consigne basse", "high": "Consigne haute" },
@@ -4678,9 +4678,13 @@
       "he": "He",
       "start": "Pression au départ",
       "end": "Pression à la sortie",
-      "footnote": "Un recycleur a toujours un diluant et un oxygène."
+      "footnote": "Un recycleur a toujours un oxygène et un diluant.",
+      "notBreathed": "Pas respirée pendant la plongée"
     },
     "removeCylinder": "Retirer la bouteille",
+    "removeCylinderTitle": "Retirer cette bouteille ?",
+    "removeCylinderConfirm": "Retirer",
+    "removeCylinderPlain": "Elle n’a pas été respirée pendant la plongée : le profil ne change pas.",
     "moveUp": "Monter la bouteille",
     "moveDown": "Descendre la bouteille",
     "cylinder": "Bouteille {n}",

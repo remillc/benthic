@@ -17,14 +17,15 @@
   //
   // Dive detail's Gaz tab (task 2026-11-24-382): `compact` crops the drawing to the unit alone (170 or 92 px wide,
   // 140 tall) for the tile; `variant="pscr"` draws a semi-closed unit: one cylinder, one hose, no oxygen cylinder
-  // and no mark inside.
+  // and no mark inside. `mirrored` (task 2026-11-26-403): the whole unit flipped, so that the oxygen cylinder is on the
+  // left and the diluent on the right, as the tile of the rebreather names the oxygen first.
 
   import { REBREATHER_COLUMN, rebreatherWidth } from '../lib/rebreather-gas.js';
 
   /** @typedef {{ ratio: number, startRatio: number|null, hatched?: boolean }} Fill */
 
-  /** @type {{ diluent?: Fill|null, oxygen?: Fill|null, others?: Fill[], marks: { diluent: string, oxygen: string, bailout: string }, variant?: 'ccr'|'pscr', compact?: boolean }} */
-  let { diluent = null, oxygen = null, others = [], marks, variant = 'ccr', compact = false } = $props();
+  /** @type {{ diluent?: Fill|null, oxygen?: Fill|null, others?: Fill[], marks: { diluent: string, oxygen: string, bailout: string }, variant?: 'ccr'|'pscr', compact?: boolean, mirrored?: boolean }} */
+  let { diluent = null, oxygen = null, others = [], marks, variant = 'ccr', compact = false, mirrored = false } = $props();
   const pscr = $derived(variant === 'pscr');
   /** The tile's crop: the unit only (x from 30 or 54), at its natural size. */
   const crop = $derived(pscr ? { x: 54, width: 92 } : { x: 30, width: 170 });
@@ -50,8 +51,8 @@
   const unitPoint = (x, y) => ({ x: UNIT_SCALE.x + x * UNIT_SCALE.k, y: UNIT_SCALE.y + y * UNIT_SCALE.k });
   // At the middle of their cylinder (48..84 and 134..170 wide, 6..170 tall),
   // centred on the text (task 2026-11-13-88).
-  const dilMark = unitPoint(66, 88);
-  const oxyMark = unitPoint(152, 88);
+  const dilMark = $derived(unitPoint(mirrored ? 152 : 66, 88));
+  const oxyMark = $derived(unitPoint(mirrored ? 66 : 152, 88));
   const width = $derived(rebreatherWidth(others.length));
 
   /**
@@ -145,6 +146,7 @@
   </defs>
 
   <g transform="translate({UNIT_SCALE.x} {UNIT_SCALE.y}) scale({UNIT_SCALE.k})">
+   <g transform={mirrored ? 'translate(218 0) scale(-1 1)' : undefined}>
     <!-- Breathing hoses to the shoulders, and the stand. -->
     <path d="M98 30 C 94 16, 80 10, 58 8" class="bc-rebreather-drawing--hose" />
     {#if !pscr}<path d="M120 30 C 124 16, 138 10, 160 8" class="bc-rebreather-drawing--hose" />{/if}
@@ -161,6 +163,7 @@
     <rect x="86" y="24" width="46" height="152" rx="7" class="bc-rebreather-drawing--canister" />
     <rect x="86" y="24" width="46" height="18" rx="6" class="bc-rebreather-drawing--head" />
     <rect x="103" y="66" width="12" height="20" rx="2" class="bc-rebreather-drawing--display" />
+   </g>
   </g>
   {#if !pscr}
     <text x={dilMark.x} y={dilMark.y} text-anchor="middle" dominant-baseline="central" class="bc-rebreather-drawing--mark">{marks.diluent}</text>

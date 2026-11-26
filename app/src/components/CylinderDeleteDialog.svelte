@@ -6,6 +6,8 @@
   // cylinder, one sentence says how many moments disappear from the profile.
   // When the core refuses (the profile uses the cylinder, CYLINDER_IN_USE) the
   // dialog says so and offers nothing destructive.
+  // The dive detail's « Retirer cette bouteille ? » (task 2026-11-26-403, mock-up detail-bouteille-retirer-android) is the same
+  // dialog with its own title, button and sentence for a cylinder that was not breathed, and no drawing in the card.
   import Md3Dialog from './Md3Dialog.svelte';
   import CylinderIcon from './CylinderIcon.svelte';
   import { t } from '../lib/i18n.js';
@@ -13,6 +15,10 @@
   /**
    * @type {{
    *   n: number,
+   *   title?: string,
+   *   confirmLabel?: string,
+   *   plain?: string,
+   *   icon?: boolean,
    *   gas: string,
    *   line: string,
    *   ratio: number,
@@ -22,13 +28,13 @@
    *   onconfirm: () => void,
    * }}
    */
-  let { n, gas, line, ratio, outcome, moments, oncancel, onconfirm } = $props();
+  let { n, title = '', confirmLabel = '', plain = '', icon = true, gas, line, ratio, outcome, moments, oncancel, onconfirm } = $props();
 </script>
 
-<Md3Dialog title={t('edit.deleteCylinderTitle', { n })} role="alertdialog" class="bc-cylinder-delete" {oncancel}>
+<Md3Dialog title={title || t('edit.deleteCylinderTitle', { n })} role="alertdialog" class="bc-cylinder-delete" {oncancel}>
   <div class="bc-cylinder-delete--content">
     <div class="bc-cylinder-delete--card">
-      <CylinderIcon />
+      {#if icon}<CylinderIcon />{/if}
       <span class="bc-cylinder-delete--texts">
         <span class="bc-cylinder-delete--gas bc-value">{gas}</span>
         {#if line}<span class="bc-cylinder-delete--line bc-value">{line}</span>{/if}
@@ -38,6 +44,8 @@
       <p class="bc-cylinder-delete--text">{t('edit.deleteCylinderRefused')}</p>
     {:else if outcome === 'moments'}
       <p class="bc-cylinder-delete--text">{t('edit.deleteCylinderMoments', { n: moments })}</p>
+    {:else if plain}
+      <p class="bc-cylinder-delete--text">{plain}</p>
     {/if}
   </div>
   {#snippet actions()}
@@ -45,7 +53,7 @@
       <button type="button" onclick={oncancel}>{t('dialog.ok')}</button>
     {:else}
       <button type="button" onclick={oncancel}>{t('dialog.cancel')}</button>
-      <button type="button" class="bc-cylinder-delete--confirm" onclick={onconfirm}>{t('edit.deleteCylinderConfirm')}</button>
+      <button type="button" class="bc-cylinder-delete--confirm" onclick={onconfirm}>{confirmLabel || t('edit.deleteCylinderConfirm')}</button>
     {/if}
   {/snippet}
 </Md3Dialog>

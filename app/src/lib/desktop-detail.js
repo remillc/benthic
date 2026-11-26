@@ -210,7 +210,8 @@ export function gasTiles(cylinders, mode, prefs) {
     /** @type {ReturnType<typeof gasTiles>} */
     const out = [];
     if (diluent >= 0 || oxygen >= 0) {
-      const used = [diluent, oxygen].filter((i) => i >= 0);
+      // Oxygen first (task 2026-11-26-403): the unit is drawn with the oxygen cylinder on the left and every list names it first.
+      const used = [oxygen, diluent].filter((i) => i >= 0);
       const named = (/** @type {string} */ role, /** @type {number} */ i) => (i >= 0 ? `${role} ${gasLine(i)}${cards[i].range ? `, ${cards[i].range}` : ''}` : '');
       out.push({
         key: 'unit',
@@ -218,11 +219,11 @@ export function gasTiles(cylinders, mode, prefs) {
         indexes: used,
         title: t(pscr ? 'desktopDetail.mixTile' : 'desktopDetail.rebreatherTile'),
         lines: [],
-        label: pscr ? t('desktopDetail.pscrTileLabel', { mix: named('', diluent).trim() }) : t('desktopDetail.ccrTileLabel', { diluent: named(t('desktopDetail.role.diluent').toLocaleLowerCase(), diluent), oxygen: named(t('desktopDetail.role.oxygen').toLocaleLowerCase(), oxygen) }),
+        label: pscr ? t('desktopDetail.pscrTileLabel', { mix: named('', diluent).trim() }) : t('desktopDetail.ccrTileLabel', { oxygen: named(t('desktopDetail.role.oxygen').toLocaleLowerCase(), oxygen), diluent: named(t('desktopDetail.role.diluent').toLocaleLowerCase(), diluent) }),
         card: null,
         parts: [
-          ...(diluent >= 0 ? [{ role: /** @type {const} */ (pscr ? 'mix' : 'diluent'), title: t(pscr ? 'desktopDetail.mixTile' : 'desktopDetail.role.diluent'), lines: [gasLine(diluent), cards[diluent].range].filter(Boolean), card: cards[diluent] }] : []),
           ...(oxygen >= 0 ? [{ role: /** @type {const} */ ('oxygen'), title: t('desktopDetail.role.oxygen'), lines: [gasLine(oxygen), cards[oxygen].range].filter(Boolean), card: cards[oxygen] }] : []),
+          ...(diluent >= 0 ? [{ role: /** @type {const} */ (pscr ? 'mix' : 'diluent'), title: t(pscr ? 'desktopDetail.mixTile' : 'desktopDetail.role.diluent'), lines: [gasLine(diluent), cards[diluent].range].filter(Boolean), card: cards[diluent] }] : []),
         ],
       });
     }

@@ -30,7 +30,9 @@
   import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
   import { ios, layout } from '../lib/layout.svelte.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
-  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft } from '../lib/cylinder-dialog.js';
+  import CylinderDeleteDialog from './CylinderDeleteDialog.svelte';
+  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft, pressureText as draftPressureText } from '../lib/cylinder-dialog.js';
+  import { deletionOutcome, gasChangeMoments } from '../lib/gas-group.js';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
   import { applyKit, cloneEquipment, diveKeyOf, equipmentIsEmpty, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
@@ -468,7 +470,8 @@
       return;
     }
     // A closed-circuit unit always shows both cylinders: one the dive lacks is an empty card, added on Save (index -1).
-    const roles = tile.kind === 'ccr' ? /** @type {const} */ (['diluent', 'oxygen']) : /** @type {const} */ (['mix']);
+    // Oxygen first, as the tile and the panes name it (task 2026-11-26-403).
+    const roles = tile.kind === 'ccr' ? /** @type {const} */ (['oxygen', 'diluent']) : /** @type {const} */ (['mix']);
     const parts = roles.map((role, i) => {
       const part = tile.parts.find((p) => p.role === role);
       const index = part ? tile.indexes[tile.parts.indexOf(part)] : -1;
@@ -496,14 +499,32 @@
     const added = current.indexes.flatMap((index, i) => (index < 0 ? [{ index: -1, patch: draftPatch(blankCylinder(), current.parts[i].draft, cylinderTypes, prefs, options(i)) }] : []));
     if (await saveCylinders([...cylinderRows.map((r) => ({ ...r, patch: patches.get(r.index) ?? r.patch })), ...added])) editing = null;
   }
-  async function removeEditing() {
+  /** « Retirer la bouteille » asks first (mock-up detail-bouteille-retirer-android): the cylinder being removed, by its index. */
+  let removing = $state(-1);
+  function askRemove() {
     const index = editing?.indexes[0] ?? -1;
-    if (index < 0) return;
-    if (dive.cylinders[index]?.protected) {
-      showSnackbar(t('edit.cylinderInUse'));
-      return;
-    }
-    if (await removeCylinder(index)) editing = null;
+    if (index >= 0) removing = index;
+  }
+  /** What the confirmation says about the cylinder: its role and gas, its type and pressures, what the profile loses. */
+  const removal = $derived.by(() => {
+    const c = removing >= 0 ? dive.cylinders[removing] : undefined;
+    if (!c) return null;
+    const card = cards[removing];
+    const moments = gasChangeMoments(dive.events ?? [], removing);
+    const pressures = c.startMbar > 0 || c.endMbar > 0 ? `${draftPressureText(c.startMbar, prefs) || '–'} → ${draftPressureText(c.endMbar, prefs) || '–'} ${pressureUnitText}` : '';
+    return {
+      gas: [t(useKey(c.use || 'OC-gas', dive.divemode)), card?.gas].filter(Boolean).join(' · '),
+      line: [cylinderTypeLabel(c.description) || formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), pressures].filter(Boolean).join(', '),
+      moments,
+      outcome: deletionOutcome({ protected: !!c.protected, moments }),
+      // Said only of a cylinder that was not breathed: for a breathed one the profile may change in ways the dialog does not claim.
+      notBreathed: !c.used,
+    };
+  });
+  async function removeConfirmed() {
+    const index = removing;
+    removing = -1;
+    if (index >= 0 && (await removeCylinder(index))) editing = null;
   }
   async function addCylinderAndSelect() {
     const at = dive.cylinders.length;
@@ -732,7 +753,7 @@
         </section>
       {:else}
         <div class="bc-desktop-dive-fields--card">
-          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} onedit={editTile} />
+          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} chevron={!layout.desktop} onedit={editTile} />
         </div>
 
         {#if activeTile?.kind === 'cylinder' && chosen}
@@ -791,7 +812,25 @@
     footnote={editing.single ? '' : t('desktopDetail.cylinderDialog.footnote')}
     onsave={saveEditing}
     onclose={() => (editing = null)}
-    onremove={editing.single ? removeEditing : undefined}
+    onremove={editing.single ? askRemove : undefined}
+    mod={{ surfaceMbar: dive.surfacePressureMbar || 1013, salinity: dive.userSalinity || 10300 }}
+  />
+{/if}
+
+{#if removal}
+  <CylinderDeleteDialog
+    n={removing + 1}
+    title={t('desktopDetail.removeCylinderTitle')}
+    confirmLabel={t('desktopDetail.removeCylinderConfirm')}
+    plain={removal.notBreathed ? t('desktopDetail.removeCylinderPlain') : ''}
+    icon={false}
+    gas={removal.gas}
+    line={removal.line}
+    ratio={0}
+    outcome={removal.outcome}
+    moments={removal.moments}
+    oncancel={() => (removing = -1)}
+    onconfirm={removeConfirmed}
   />
 {/if}
 

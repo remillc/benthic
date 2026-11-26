@@ -15,7 +15,7 @@ const dive = (cylinders, manual = true) => ({ manual, cylinders });
 const source = (path) => readFileSync(new URL(`../../app/src/${path}`, import.meta.url), 'utf8');
 
 test('the draft holds the texts in the diver\'s unit', () => {
-  assert.deepEqual(cylinderDraft(cyl(), metric), { description: 'AL80', o2: '32', he: '0', start: '200', end: '50', use: 'OC-gas' });
+  assert.deepEqual(cylinderDraft(cyl(), metric), { description: 'AL80', o2: '32', he: '0', start: '200', end: '50', use: 'OC-gas', depth: '' });
   assert.equal(pressureText(206843, imperial), '3000');
   assert.equal(pressureText(0, metric), '');
   assert.equal(percentText(215), '21,5');
@@ -73,7 +73,7 @@ test('the patches of a rebreather\'s two cylinders go through one cylinderChange
 test('a rebreather dive without an oxygen cylinder gets an empty oxygen card that Save adds', () => {
   const dil = cyl({ use: 'diluent', o2Permille: 210 });
   const draft = newPartDraft('oxygen', metric);
-  assert.deepEqual(draft, { description: '', o2: '100', he: '0', start: '', end: '', use: 'oxygen' });
+  assert.deepEqual(draft, { description: '', o2: '100', he: '0', start: '', end: '', use: 'oxygen', depth: '' });
   assert.equal(newPartDraft('diluent', metric).o2, '21');
   const patch = draftPatch(blankCylinder(), { ...draft, start: '200', end: '150' }, types, metric, { manual: true, oxygenOnly: true });
   assert.deepEqual(patch, { o2Permille: 1000, hePermille: 0, startMbar: 200000, endMbar: 150000, use: 'oxygen' });
@@ -89,15 +89,15 @@ test('a rebreather dive without an oxygen cylinder gets an empty oxygen card tha
 
 test('sources: the chevron, the dialogs on Android phones, the dashed tile without chevron', () => {
   const cards = source('components/DesktopGasCards.svelte');
-  assert.match(cards, /\{#if editable\}<span class="bc-desktop-gas-cards--chevron"[^>]*><Icon name="chevron" size=\{24\}/);
+  assert.match(cards, /\{#if chevron \|\| editable\}<span class="bc-desktop-gas-cards--chevron"[^>]*><Icon name="chevron" size=\{24\}/);
   assert.match(cards, /inset-inline-end: 8px;/);
   assert.match(cards, /top: 50%;/);
   assert.ok(cards.indexOf('class="bc-desktop-gas-cards--add"') > cards.lastIndexOf('{/each}'), 'the add tile is outside the tiles loop, so it has no chevron');
   const fields = source('components/DesktopDiveFields.svelte');
   assert.match(fields, /const dialogs = \$derived\(layout\.phone && !ios\)/);
-  assert.match(fields, /editable=\{dialogs\} onedit=\{editTile\}/);
+  assert.match(fields, /editable=\{dialogs\} chevron=\{!layout\.desktop\} onedit=\{editTile\}/);
   assert.match(fields, /roles=\{editing\.single \? useOptions : undefined\}/);
-  assert.match(fields, /onremove=\{editing\.single \? removeEditing : undefined\}/);
+  assert.match(fields, /onremove=\{editing\.single \? askRemove : undefined\}/);
   const dialog = source('components/CylinderEditDialog.svelte');
   assert.match(dialog, /bc-cylinder-dialog--remove-button/);
   assert.match(fields, /desktopDetail\.cylinderDialog\.footnote/);
