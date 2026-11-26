@@ -115,7 +115,7 @@
       <div class="bc-gear-list--chips">
         {#each gear.kits as kit (kit.id)}
           <button type="button" class="bc-gear-list--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })} onclick={() => showProfilePath(`/profile/kits/${kit.id}`)}>
-            <Icon name="briefcase" size={18} />{kit.name}<span>{kit.gearIds.length}</span>
+            <Icon name="briefcase" size={18} />{t('gear.addSheet.kitChip', { name: kit.name, n: kit.gearIds.length })}
           </button>
         {/each}
         <button type="button" class="bc-gear-list--chip" onclick={newKit}><Icon name="plus" size={18} />{t('gear.inventory.newKit')}</button>
@@ -153,7 +153,7 @@
     <div class="bc-gear-list--bottom"></div>
   </div>
   {#if !gear.readOnly}
-    <button type="button" class="bc-gear-list--add" onclick={() => push('/profile/gear/new')}><Icon name="plus" size={22} />{t('gear.inventory.add')}</button>
+    <button type="button" class="bc-gear-list--add" onclick={() => push('/profile/gear/new')}><Icon name="plus" size={24} />{t('gear.inventory.add')}</button>
   {/if}
 </section>
 
@@ -253,20 +253,23 @@
       flex-wrap: wrap;
       gap: 8px;
     }
+    /* Mock-up: 32 px high, 8 px corners, a grey icon, « name · count » in one text. */
     .bc-gear-list--chip {
-      min-height: 36px;
+      height: 32px;
       padding: 0 12px;
-      border: 1px solid var(--bc-separator);
+      box-sizing: border-box;
+      border: 1px solid var(--bc-outline);
       border-radius: 8px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: none;
       color: var(--bc-text);
       font: inherit;
       font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
-      & span {
+      & :global(svg) {
         color: var(--bc-text-2);
       }
     }
@@ -337,19 +340,20 @@
     }
     .bc-gear-list--add {
       position: absolute;
-      inset-inline-end: 16px;
-      bottom: 16px;
+      inset-inline-end: 24px;
+      bottom: 24px;
       height: 56px;
-      padding: 0 20px;
+      padding: 0 20px 0 16px;
       border: 0;
       border-radius: 16px;
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: var(--bc-selected-container);
-      color: var(--bc-text);
+      background: var(--bc-secondary-container);
+      color: var(--bc-secondary);
       font: inherit;
-      font-weight: 500;
+      font-size: 16px;
+      font-weight: 600;
       box-shadow: var(--bc-tile-shadow);
       cursor: pointer;
     }
