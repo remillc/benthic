@@ -29,7 +29,7 @@ export const BRANCH = 'benthic';
  * key's file, the pairing files) is not in this list on purpose: those files never enter the local store; the engine
  * reads and writes them in the working copy only (`KEYS_PREFIX`, `readKeys`, `commitKeyFiles`).
  */
-export const SYNCED_PREFIXES = ['profile/', 'certifications/', 'documents/', 'gear/', 'gear-photos/', 'kits/', 'maintenance/', 'dive-equipment/', 'dive-validations/', 'media/', 'cylinder-types/'];
+export const SYNCED_PREFIXES = ['profile/', 'certifications/', 'documents/', 'gear/', 'gear-photos/', 'kits/', 'maintenance/', 'dive-equipment/', 'dive-validations/', 'media/', 'cylinder-types/', 'weight-types/'];
 
 /** The folder of the key files in the working copy (docs/account-sync.md, « QR payloads and key files »). */
 export const KEYS_PREFIX = 'keys/';

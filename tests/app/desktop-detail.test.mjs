@@ -220,7 +220,9 @@ test('the texts of the five tabs exist in French and English', () => {
 
 test('the weight types of the detail are the logbook ones (Subsurface ws_info, with the earlier dives), as the dive editor offered', () => {
   const weights = fs.readFileSync(new URL('../../app/src/components/DesktopWeights.svelte', import.meta.url), 'utf8');
-  assert.match(weights, /BenthicCore\.toolQuery\(\{ kind: 'weights' \}\)/);
+  assert.match(weights, /readWeightTypeRows\(\)/);
+  assert.match(read('app/src/lib/weight-types.svelte.js'), /BenthicCore\.toolQuery\(\{ kind: 'weights' \}\)/);
   assert.match(weights, /const names = \$derived\(types\.length \? types\.map\(\(w\) => w\.name\) : PLACES\)/);
-  assert.match(weights, /names\.map\(\(value\) => \(\{ value, label: weightPlaceName\(value\) \}\)\)/);
+  assert.match(weights, /names\.map\(\(value\) => \{/);
+  assert.match(weights, /return \{ value, label: weightPlaceName\(value\), example:/);
 });
