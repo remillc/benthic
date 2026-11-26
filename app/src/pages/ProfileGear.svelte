@@ -384,7 +384,7 @@
     .bc-gear-page--chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 12px;
       padding: 0 16px;
     }
 
