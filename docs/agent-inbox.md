@@ -7739,3 +7739,11 @@ Christian asked for this on 26 November 2026. Work in `main`. Replace the `rebre
 `M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM16.47 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM9.47 5.89H14.53V19.89H9.47zM10.9 19.89L9.9 22.40H14.1L13.1 19.89`
 
 Nothing else uses its own copy of this drawing in the app; if something does, use the new path there too. Mock-up: `docs/mockups/icones-gearicon-svelte`.
+
+## [ ] 2026-11-26-409 GearIcon: one stroke width, 1.35, for every gear icon
+
+Christian asked for this on 26 November 2026. Work in `main`. All the icons drawn by GearIcon.svelte now have a 1.35 stroke (it was 1.8, and 1.5 for `suit`, `bcd` and `o2Cells`). Set `stroke-width: 1.35` on `.bc-gear-icon`, remove the `THIN` set and the `--thin` modifier, and check that the computer icon snippet follows the same width. Leave the other icons (Icon.svelte: arrows, chevrons…) as they are.
+
+The screen mock-ups now show the `o2Cells` icon (task 407) where a type « Cellules O₂ » appears, in place of the old three-circles drawing: make sure the app does the same.
+
+Mock-ups: `docs/mockups/icones-gearicon-svelte` and the equipment, kit, maintenance and pairing screens on every device.
