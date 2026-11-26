@@ -7628,3 +7628,14 @@ Christian asked for this on 26 November 2026. Work in `main`. The tabbed dive de
 5. Fragments that show one section (recycleur gas, conditions) start with the tab bar, with the right tab selected.
 
 Mock-ups in `docs/mockups/`. Android: `detail-onglets-android` (reference), `detail3-android` (top of page), `detail3-android-curseur` (profile touched), `detail3-android-sombre`, `detail2-android-menu`, `detail3-android-ccr`, `detail3-android-ccr-sans-pression`, `detail3-android-conditions`. iPhone: `ios-detail-onglets` (reference), `detail3-ios` (whole page), `detail3-ios-sombre`, `detail2-ios-menu`.
+
+## [ ] 2026-11-26-401 Dive detail, Gaz tab: chevrons on the cylinder tiles and a dialog to edit cylinders (rebreather: both cylinders in one dialog)
+
+Christian asked for this on 26 November 2026. Work in `main`. Editing cylinders from the dive detail is not friendly. On Android (phone) first:
+
+1. Every cylinder tile in the « Bouteilles » card of the Gaz tab gets a `chevron_right` icon (24 dp, `#4B4A47`), 8 dp from the right edge and vertically centred on the tile. Touching a tile opens its edit dialog. The dashed « Ajouter une bouteille » tile has no chevron.
+2. Rebreather tile (diluent + oxygen): a full-screen dialog « Bouteilles du recycleur » (× close without saving, filled « Enregistrer »). Two cards, Diluant and Oxygène, each with: Bouteille (dropdown of the diver's cylinder types), O₂ % and He % side by side (the oxygen card shows O₂ only), a helper with the mix name (« Air », « EAN32 »…), then Pression au départ and Pression à la sortie side by side. Units follow Réglages. No remove button: a rebreather always has both cylinders. Footnote: « Un recycleur a toujours un diluant et un oxygène. »
+3. Any other cylinder (bailout, deco, stage…): a full-screen dialog « Modifier la bouteille » with Rôle (dropdown: Principale, Secours, Déco, Relais…), Bouteille, O₂ % / He % with the mix name, the two pressures, and an outlined « Retirer la bouteille » button.
+4. Saving updates the tile, the gas summaries and the profile's gas data.
+
+Mock-ups in `docs/mockups/`: `detail-onglets-gaz-android` (tiles with chevrons), `detail-bouteilles-recycleur-android`, `detail-bouteille-android`. Also updated: `detail3-android` is now a copy of the tabbed reference page (the duplicate board was removed from the canvas; links to it now land on the reference).
