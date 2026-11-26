@@ -52,4 +52,3 @@ Next number: 204
 - #200 [design] design et code : constituer une base de données des modèles de recycleurs pour utilisation dans Équipement.
 - #201 [code] mettre en place une étape de validation de la version gratuite avant chaque release : parcourir l’APK de publication sans compte et vérifier qu’aucun serveur n’apparaît.
 - #202 [code] sur /sites/new, afficher sur la carte les sites communs. Une punaise peut être sélectionnée à la place de créer une nouvelle punaise.
-- #203 [code] lors du téléchargement d'une plongée, on nous offre d'ajouter l'ordinateur à notre équipement. À cette étape, on doit comparer le nouvel à ceux qui sont déjà dans l'inventaire du plongeur. Il est possible que l'ordinateur existe déjà, mais qu'il soit enregistré autrement. En cas de doute, offrir à l'usager la possibilité de « pairer », ou indiquer quel ordi de l'inventaire correspond au nouvel ordi et mettre à jour les informations du premier.
