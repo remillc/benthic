@@ -4620,6 +4620,7 @@
     "mixTile": "Mélange",
     "rebreatherTile": "Recycleur",
     "manageWeightTypes": "Gérer les types de lest",
+    "addUndersuit": "Ajouter un sous-vêtement…",
     "ccrTileLabel": "Recycleur : {diluent} ; {oxygen}",
     "pscrTileLabel": "Recycleur pSCR : mélange {mix}",
     "role": { "diluent": "Diluant", "oxygen": "Oxygène" },
