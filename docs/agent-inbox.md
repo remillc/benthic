@@ -7616,3 +7616,15 @@ Christian asked for this on 25 November 2026. Work in `main`. Adds to task 398 (
 3. Android phone: the « Mes sites | Carte commune » toggle sits just under the header, level with the full-screen button, and the taller card starts under it. iPhone: the card starts a little higher, still above the OpenStreetMap credit and the list.
 
 Mock-ups: `sites-commun-android`, `ios-sites-commun`, `android-tablette-sites-commun-paysage`, `ipad-sites-commun`, `bureau-sites-commun` in `docs/mockups/`.
+
+## [ ] 2026-11-26-400 Dive detail: the sections follow the tab order; group titles never look like tabs (check Android and iOS)
+
+Christian asked for this on 26 November 2026. Work in `main`. The tabbed dive detail is already in the app (tasks 382 and 386). The old detail mock-ups stacked group titles (Personnes, Notes, Étiquettes, Gaz, Équipement…) styled like the tabs and in another order, so it was unclear whether « Notes » or « Gaz » was a tab or a group. They are now rebuilt on the reference page. Check the app against them and fix what differs:
+
+1. Under the sticky tab bar, the page has one level-1 section per tab, with the tab's name and in the tab's order: Informations, Équipement, Gaz, Notes, Carte. Touching a tab scrolls to its section, and the selected tab follows the scroll.
+2. Groups are card titles inside their section (level 3, with an icon), never styled like a tab or a section title. Informations holds Date et heure, Site, Personnes, Signatures, Appréciation and Étiquettes; the other sections hold their own groups as in the reference.
+3. Dark mode: the whole page, tab bar included, uses the dark palette (Android `detail3-android-sombre`, iPhone `detail3-ios-sombre`).
+4. « Plus d'options » menu (⋮ on Android, ⋯ on iOS, top right): « Planifier depuis cette plongée », « Partager », then « Renuméroter la plongée », « Retirer du voyage » (only when the dive is in a trip), then « Supprimer la plongée » (red on iOS). There is no floating toolbar any more.
+5. Fragments that show one section (recycleur gas, conditions) start with the tab bar, with the right tab selected.
+
+Mock-ups in `docs/mockups/`. Android: `detail-onglets-android` (reference), `detail3-android` (top of page), `detail3-android-curseur` (profile touched), `detail3-android-sombre`, `detail2-android-menu`, `detail3-android-ccr`, `detail3-android-ccr-sans-pression`, `detail3-android-conditions`. iPhone: `ios-detail-onglets` (reference), `detail3-ios` (whole page), `detail3-ios-sombre`, `detail2-ios-menu`.
