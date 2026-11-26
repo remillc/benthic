@@ -7617,7 +7617,7 @@ Christian asked for this on 25 November 2026. Work in `main`. Adds to task 398 (
 
 Mock-ups: `sites-commun-android`, `ios-sites-commun`, `android-tablette-sites-commun-paysage`, `ipad-sites-commun`, `bureau-sites-commun` in `docs/mockups/`.
 
-## [ ] 2026-11-26-400 Dive detail: the sections follow the tab order; group titles never look like tabs (check Android and iOS)
+## [x] 2026-11-26-400 Dive detail: the sections follow the tab order; group titles never look like tabs (check Android and iOS)
 
 Christian asked for this on 26 November 2026. Work in `main`. The tabbed dive detail is already in the app (tasks 382 and 386). The old detail mock-ups stacked group titles (Personnes, Notes, Étiquettes, Gaz, Équipement…) styled like the tabs and in another order, so it was unclear whether « Notes » or « Gaz » was a tab or a group. They are now rebuilt on the reference page. Check the app against them and fix what differs:
 
@@ -7628,6 +7628,8 @@ Christian asked for this on 26 November 2026. Work in `main`. The tabbed dive de
 5. Fragments that show one section (recycleur gas, conditions) start with the tab bar, with the right tab selected.
 
 Mock-ups in `docs/mockups/`. Android: `detail-onglets-android` (reference), `detail3-android` (top of page), `detail3-android-curseur` (profile touched), `detail3-android-sombre`, `detail2-android-menu`, `detail3-android-ccr`, `detail3-android-ccr-sans-pression`, `detail3-android-conditions`. iPhone: `ios-detail-onglets` (reference), `detail3-ios` (whole page), `detail3-ios-sombre`, `detail2-ios-menu`.
+
+Done (26 November 2026): checked the app against the mock-ups. Already matching: one h2 section per tab in the tab order under the sticky bar, a tap scrolling to its section and the selected tab following the scroll, level-3 card titles with a round icon, the six Informations cards in order, dark palette through `--bc-*` variables, no floating toolbar, the ⋮ / ⋯ menu. Changed: the section titles are 14 sp weight 600 with 8 px under them; the Android tab row uses 12 px tab padding, a 4 px row padding and a 6 px indicator inset; the iPhone segmented control is 28 pt high inside a sticky band padded 8/12 with a 0.5 px line (the compound selector also fixes margin and padding that the tab row's rules overrode). Not changed: the menu keeps « Renuméroter à partir d'ici » and, for Benthic+, the dive versions (tested choices, not in the mock-ups); the Informations tab keeps its Conditions card (water type, temperatures, CNS, trip: editable data the mock-ups do not show); the one-section fragments (`detail3-android-ccr*`, `-conditions`) are mock-up cuts of the Gaz profile row and Conditions card, with no screen of their own in the app. Not checked on a device or in the emulator.
 
 ## [ ] 2026-11-26-401 Dive detail, Gaz tab: chevrons on the cylinder tiles and a dialog to edit cylinders (rebreather: both cylinders in one dialog)
 
