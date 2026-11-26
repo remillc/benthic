@@ -4780,6 +4780,7 @@
     "serial": "n° {serial}",
     "addComputer": "Ajouter un ordinateur",
     "kitFilled": "A rempli les champs ci-dessous ; chacun reste modifiable.",
+    "manageComputers": "Ordinateur principal et noms",
     "addSecondComputer": "+ Ajouter un deuxième ordinateur",
     "addFirstComputer": "+ Ajouter un ordinateur",
     "removeWeightNamed": "Retirer {name}",

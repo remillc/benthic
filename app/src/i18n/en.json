@@ -4780,6 +4780,7 @@
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
     "kitFilled": "Filled the fields below; each can still be changed.",
+    "manageComputers": "Main computer and names",
     "addSecondComputer": "+ Add a second computer",
     "addFirstComputer": "+ Add a computer",
     "removeWeightNamed": "Remove {name}",

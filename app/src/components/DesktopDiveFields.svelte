@@ -20,6 +20,8 @@
   import DesktopStarsRow from './DesktopStarsRow.svelte';
   import GearIcon from './GearIcon.svelte';
   import AddEquipmentSheet from './AddEquipmentSheet.svelte';
+  import ComputersSheet from './ComputersSheet.svelte';
+  import RenameComputerDialog from './RenameComputerDialog.svelte';
   import DesktopGasCards from './DesktopGasCards.svelte';
   import DesktopSegments from './DesktopSegments.svelte';
   import DesktopKitField from './DesktopKitField.svelte';
@@ -654,6 +656,18 @@
   }
   /** The sheet of the trips on a phone, and the cross that takes the dive out of its trip. */
   let tripSheet = $state(false);
+  let computersSheet = $state(false);
+  let computerBusy = $state(false);
+  /** @type {{ model: string, serial: string, nickname: string }|null} */
+  let renamingComputer = $state(null);
+
+  /** Subsurface's « Move dive computer to front »: its own undoable step. @param {number} index */
+  async function makeMainComputer(index) {
+    if (computerBusy || index <= 0) return;
+    computerBusy = true;
+    await write({ mainComputer: index });
+    computerBusy = false;
+  }
   /** @param {string} value */
   async function pickTrip(value) {
     tripSheet = false;
@@ -813,6 +827,10 @@
           </div>
         {/each}
         <!-- Computers join a dive when it is downloaded: nothing to type here. -->
+        {#if computers.length}
+          <!-- The main computer of a dive that has several, and the computers' names (the sheet of the phone's detail). -->
+          <button type="button" class="bc-desktop-dive-fields--text-button bc-desktop-dive-fields--add-computer" data-field="computer-manage" disabled={preview} onclick={() => (computersSheet = true)}>{t('desktopDetail.manageComputers')}</button>
+        {/if}
         <button type="button" class="bc-desktop-dive-fields--text-button bc-desktop-dive-fields--add-computer" data-field="computer-add" disabled title={t('desktopDetail.addComputer')}>{t(computers.length ? 'desktopDetail.addSecondComputer' : 'desktopDetail.addFirstComputer')}</button>
       </DesktopEquipmentCard>
 
@@ -959,6 +977,33 @@
 
 {#if tripSheet}
   <DetailSheet title={t('desktopDetail.label.trip')} options={tripOptions} value={tripName} search newLabel={t('desktopDetail.newTrip')} onselect={pickTrip} onclose={() => (tripSheet = false)} />
+{/if}
+
+<ComputersSheet
+  opened={computersSheet}
+  title={dive.site || t('desktop.noSite')}
+  date={dive.date}
+  computers={dive.diveComputers ?? []}
+  busy={computerBusy}
+  onclose={() => (computersSheet = false)}
+  onmain={makeMainComputer}
+  onrename={(c) => (renamingComputer = /** @type {any} */ (dive.diveComputers ?? []).find((/** @type {any} */ d) => d.model === c.model && d.serial === c.serial) ?? null)}
+/>
+
+{#if renamingComputer}
+  <RenameComputerDialog
+    computer={renamingComputer}
+    oncancel={() => (renamingComputer = null)}
+    ondone={async () => {
+      renamingComputer = null;
+      // The dive's computers, read again under their new name.
+      try {
+        logbook.edited = { id: dive.id, dive: await BenthicCore.getDive({ id: dive.id }) };
+      } catch (e) {
+        console.error('Reading the computers again', e);
+      }
+    }}
+  />
 {/if}
 
 {#if picking}

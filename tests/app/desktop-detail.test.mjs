@@ -233,3 +233,11 @@ test('Benthic+: the undersuit field shows even with no undersuit in the inventor
   assert.match(fields, /\{ value: ADD_UNDERSUIT, label: t\('desktopDetail\.addUndersuit'\) \}/);
   assert.match(fields, /if \(String\(id\) === ADD_UNDERSUIT\) \{\s*openOver\('\/profile\/gear\/new'\)/);
 });
+
+test('the Informations tab edits the four conditions ratings, the Équipement tab the main computer and the names', () => {
+  const fields = read('app/src/components/DesktopDiveFields.svelte');
+  assert.match(fields, /\['current', \.\.\.\(settings\.extraConditions \? \['wavesize', 'surge', 'chill'\] : \[\]\)\]/);
+  assert.match(fields, /<ComputersSheet/);
+  assert.match(fields, /mainComputer: index/);
+  assert.match(fields, /<RenameComputerDialog/);
+});
