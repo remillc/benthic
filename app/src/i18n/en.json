@@ -4091,6 +4091,7 @@
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
     "chooseYear": "Choose year",
+    "chooseMonth": "Choose the month",
     "chooseDay": "Choose day",
     "field": "Date",
     "format": "{pattern}",

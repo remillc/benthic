@@ -2,8 +2,9 @@
   // @ts-check
   // Material 3 modal date picker (Android; docs/system-design.md, section 8,
   // "Date and time fields"): a header with the selected date and a pencil that
-  // switches to a typed date, then a calendar with a month and year row (the
-  // year opens a grid of years), 40 dp day cells and Cancel / OK. Months are
+  // switches to a typed date, then a calendar with a month button and a year
+  // button (each opens a grid of months or of years, 26 November 2026), the
+  // previous and next month arrows, 40 dp day cells and Cancel / OK. Months are
   // 0-based. Confirms with { year, month, day }.
   import { tick } from 'svelte';
   import Md3Dialog from './Md3Dialog.svelte';
@@ -30,7 +31,8 @@
   // svelte-ignore state_referenced_locally
   let focused = $state({ ...selected });
   let mode = $state(/** @type {'calendar'|'input'} */ ('calendar'));
-  let yearGrid = $state(false);
+  /** The grid over the days: none, the twelve months, or the years. @type {'none'|'months'|'years'} */
+  let grid = $state('none');
   // svelte-ignore state_referenced_locally
   let text = $state(formatDateInput(selected, locale, settings.dateFormat));
   let touched = $state(false);
@@ -52,7 +54,10 @@
   const utc = (y, m, d) => new Date(Date.UTC(y, m, d));
   const headline = $derived(`${weekdayShort.format(utc(selected.year, selected.month, selected.day))} ${formatDateChoice(utc(selected.year, selected.month, selected.day), settings.dateFormat)}`);
   const monthLabel = $derived(monthFormat.format(utc(view.year, view.month, 1)));
-  const monthName = $derived(new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC' }).format(utc(view.year, view.month, 1)));
+  const monthLong = new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC' });
+  const monthShort = new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' });
+  const monthName = $derived(monthLong.format(utc(view.year, view.month, 1)));
+  const months = Array.from({ length: 12 }, (_, m) => ({ m, short: monthShort.format(utc(2023, m, 1)), long: monthLong.format(utc(2023, m, 1)) }));
   const canPrev = $derived(view.year * 12 + view.month > minYear * 12);
   const canNext = $derived(view.year * 12 + view.month < maxYear * 12 + 11);
   const parsed = $derived(parseDateInput(text, locale, minYear, maxYear, settings.dateFormat));
@@ -110,18 +115,29 @@
   }
 
   async function openYears() {
-    yearGrid = !yearGrid;
-    if (yearGrid) {
+    grid = grid === 'years' ? 'none' : 'years';
+    if (grid === 'years') {
       await tick();
       /** @type {HTMLElement|null} */ (document.querySelector('.bc-date-picker--year[aria-pressed="true"]'))?.scrollIntoView({ block: 'center' });
     }
+  }
+
+  function openMonths() {
+    grid = grid === 'months' ? 'none' : 'months';
   }
 
   /** @param {number} y */
   function chooseYear(y) {
     view = { year: y, month: view.month };
     focused = { year: y, month: view.month, day: Math.min(focused.day, daysInMonth(y, view.month)) };
-    yearGrid = false;
+    grid = 'none';
+  }
+
+  /** @param {number} m */
+  function chooseMonth(m) {
+    view = { year: view.year, month: m };
+    focused = { year: view.year, month: m, day: Math.min(focused.day, daysInMonth(view.year, m)) };
+    grid = 'none';
   }
 
   function toggleMode() {
@@ -197,18 +213,30 @@
     </div>
   {:else}
     <div class="bc-date-picker--month-row">
-      <button type="button" class="bc-date-picker--month-button" aria-expanded={yearGrid} aria-label={`${monthLabel}, ${t('datePicker.chooseYear')}`} onclick={openYears}>
-        <span>{monthLabel}</span>
-        <span class="bc-date-picker--drop" class:bc-date-picker--open={yearGrid}><Icon name="chevron" size={18} /></span>
-      </button>
-      {#if !yearGrid}
+      <span class="bc-date-picker--choosers">
+        <button type="button" class="bc-date-picker--month-button" aria-expanded={grid === 'months'} aria-label={`${monthName}, ${t('datePicker.chooseMonth')}`} onclick={openMonths}>
+          <span>{monthName}</span>
+          <span class="bc-date-picker--drop" class:bc-date-picker--open={grid === 'months'}><Icon name="chevron" size={18} /></span>
+        </button>
+        <button type="button" class="bc-date-picker--month-button" aria-expanded={grid === 'years'} aria-label={`${view.year}, ${t('datePicker.chooseYear')}`} onclick={openYears}>
+          <span>{view.year}</span>
+          <span class="bc-date-picker--drop" class:bc-date-picker--open={grid === 'years'}><Icon name="chevron" size={18} /></span>
+        </button>
+      </span>
+      {#if grid === 'none'}
         <span class="bc-date-picker--arrows">
           <button type="button" class="bc-date-picker--arrow bc-date-picker--prev" aria-label={t('datePicker.previousMonth')} disabled={!canPrev} onclick={() => shift(-1)}><Icon name="chevron" /></button>
           <button type="button" class="bc-date-picker--arrow" aria-label={t('datePicker.nextMonth')} disabled={!canNext} onclick={() => shift(1)}><Icon name="chevron" /></button>
         </span>
       {/if}
     </div>
-    {#if yearGrid}
+    {#if grid === 'months'}
+      <div class="bc-date-picker--years bc-date-picker--months" role="group" aria-label={t('datePicker.chooseMonth')}>
+        {#each months as mo (mo.m)}
+          <button type="button" class="bc-date-picker--year" aria-pressed={mo.m === view.month} aria-label={mo.long} disabled={view.year * 12 + mo.m > maxYear * 12 + 11} onclick={() => chooseMonth(mo.m)}>{mo.short}</button>
+        {/each}
+      </div>
+    {:else if grid === 'years'}
       <div class="bc-date-picker--years" role="group" aria-label={t('datePicker.chooseYear')}>
         {#each years as y (y)}
           <button type="button" class="bc-date-picker--year" aria-pressed={y === view.year} onclick={() => chooseYear(y)}>{y}</button>
@@ -325,6 +353,21 @@
       min-height: 48px;
     }
 
+    /* Month and year side by side, each opening its grid. */
+    .bc-date-picker--choosers {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bc-date-picker--months {
+      height: auto;
+      gap: 16px 0;
+      padding-block: 16px;
+    }
+    .bc-date-picker--year:disabled {
+      opacity: 0.38;
+      cursor: default;
+    }
     .bc-date-picker--month-button {
       display: flex;
       align-items: center;
