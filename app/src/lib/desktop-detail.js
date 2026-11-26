@@ -5,7 +5,7 @@
 // What is written to the core is decided in desktop-edit.js; this file only prepares what is shown.
 
 import { fillLevels } from './gas-summary.js';
-import { gasName, pressureUsed, typeHelper } from './cylinder-card.js';
+import { gasKind, gasName, pressureUsed, typeHelper } from './cylinder-card.js';
 import { formatCylinderSize, formatNumber, formatPressure, formatSac, formatWeight } from './format.js';
 import { t, tIfExists } from './i18n.js';
 import { cylinderTypeLabel } from './cylinder-types.js';
@@ -193,8 +193,11 @@ export const knownMode = (mode) => (/** @type {readonly string[]} */ (DIVE_MODES
  */
 export function gasTiles(cylinders, mode, prefs) {
   const cards = gasCards(cylinders, prefs);
-  /** The gas and the cylinder type, « Air · ALU 3L »; the size when the cylinder has no type name. @param {number} i */
-  const gasLine = (i) => [cards[i].gas, cylinderTypeLabel(cylinders[i].description) || formatCylinderSize(cylinders[i].sizeMl, cylinders[i].workingPressureMbar, prefs)].filter(Boolean).join(' · ');
+  /**
+   * The gas and the cylinder type, « Air · ALU 3L »; the size when the cylinder has no type name. Pure oxygen is « O₂ », short
+   * enough under a rebreather (« O₂ · Faber FX15 (2 L) », 26 November 2026). @param {number} i
+   */
+  const gasLine = (i) => [gasKind(cylinders[i].o2Permille || 210, cylinders[i].hePermille).kind === 'oxygen' ? t('desktopDetail.cylinderDialog.badgeOxygen') : cards[i].gas, cylinderTypeLabel(cylinders[i].description) || formatCylinderSize(cylinders[i].sizeMl, cylinders[i].workingPressureMbar, prefs)].filter(Boolean).join(' · ');
   /** @param {number} i */
   const tile = (i) => ({ key: `c${i}`, kind: /** @type {const} */ ('cylinder'), indexes: [i], title: cards[i].gas, lines: [cards[i].type, cards[i].range].filter(Boolean), label: cards[i].label, card: cards[i], parts: [] });
   /** @param {number} i */
