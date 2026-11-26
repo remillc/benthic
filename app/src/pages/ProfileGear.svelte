@@ -112,8 +112,10 @@
 
   {#if !searching}
     {#if hasActiveMaintenance()}
-      <a href="/profile/maintenance/" class="bc-gear-page--upkeep">
-        <span class="bc-gear-page--tile"><Icon name="clock" size={22} /></span>
+      <!-- profil-equipement-android: a tinted card (the late tint when an upkeep is overdue), the icon without a tile;
+           ios-profil-equipement: a row of a grouped list. -->
+      <a href="/profile/maintenance/" class="bc-gear-page--upkeep" class:bc-gear-page--upkeep-late={upkeep.overdue > 0}>
+        <span class="bc-gear-page--upkeep-icon"><Icon name="clock" size={22} /></span>
         <span class="bc-gear-page--texts">
           <span class="bc-gear-page--name">{t('maintenance.entry')}</span>
           <span class="bc-gear-page--supporting" class:bc-gear-page--late={upkeep.overdue > 0}>{upkeepLine}</span>
@@ -238,17 +240,52 @@
 
 <style>
   @layer bc.components {
+    /* Entretien (profil-equipement-android): a tinted card, 64 dp, 20 dp corners, the icon alone (no tile), the name
+       16/600; the late tint when an upkeep is overdue, else the blue one. */
     .bc-gear-page--upkeep {
+      box-sizing: border-box;
       margin: 8px 16px 0;
       min-height: 64px;
-      padding: 8px 16px;
+      padding: 10px 16px;
       border-radius: 20px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: var(--bc-surface);
+      gap: 14px;
+      background: var(--bc-secondary-container);
       color: var(--bc-text);
       text-decoration: none;
+
+      .bc-gear-page--name {
+        font-weight: 600;
+      }
+
+      &.bc-gear-page--upkeep-late {
+        background: var(--bc-late-tint);
+      }
+
+      /* iPhone (ios-profil-equipement): a 44 pt row of a white grouped list with 10 pt corners. */
+      :global(.ios) & {
+        min-height: 44px;
+        padding: 8px 16px;
+        gap: 12px;
+        border-radius: 10px;
+        background: var(--bc-surface);
+
+        .bc-gear-page--name {
+          font-size: 17px;
+          font-weight: 400;
+        }
+      }
+    }
+
+    .bc-gear-page--upkeep-icon {
+      flex: none;
+      display: flex;
+      color: var(--bc-secondary);
+
+      .bc-gear-page--upkeep-late & {
+        color: var(--bc-late);
+      }
     }
 
     .bc-gear-page--late {
@@ -439,6 +476,16 @@
       cursor: pointer;
       & + .bc-gear-page--row {
         border-top: 1px solid var(--bc-separator);
+      }
+
+      /* iPhone (ios-profil-equipement): 44 pt rows (two lines make about 57), 12 pt gaps, the name in 17 pt. */
+      :global(.ios) & {
+        min-height: 44px;
+        gap: 12px;
+
+        .bc-gear-page--name {
+          font-size: 17px;
+        }
       }
     }
 
