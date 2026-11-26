@@ -17,6 +17,7 @@ import { isRelease } from './edition.js';
 import { benthicPlusAccount } from './benthic-plus-state.svelte.js';
 import { autoSyncing, logbook } from './logbook.svelte.js';
 import { onSyncAllowedAgain } from './sync-network.svelte.js';
+import { onPushLive } from './push-state.js';
 import { accountDataDeps, loadProfile } from './profile.svelte.js';
 import { loadInventory } from './inventory.svelte.js';
 import { startToIdMap } from './dive-id-migration.js';
@@ -58,6 +59,7 @@ function build() {
     engine,
     state: accountSync,
     allowed,
+    hasPending: async () => ((await store.read('meta/pending.json'))?.paths?.length ?? 0) > 0,
     afterRun: async () => {
       await Promise.all([loadInventory(), loadProfile()]);
       // Dive photos and videos: new references from another device, uploads waiting (quiet, never blocks).
@@ -83,6 +85,10 @@ export function startAccountSync() {
     refreshMedia();
   });
   if (typeof window !== 'undefined') window.addEventListener('online', () => r.trigger('network'));
+  // The server's push channel is live again after the sync found it out of reach: send what waits (26 November 2026).
+  onPushLive((live) => {
+    if (live && accountSync.status === 'offline') r.trigger('network');
+  });
   CapacitorApp.addListener('resume', () => r.trigger('resume')).catch((/** @type {unknown} */ e) => console.error('App resume', e));
   r.trigger('start');
 }
