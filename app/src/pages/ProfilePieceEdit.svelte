@@ -22,7 +22,9 @@
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
   import RetirePieceDialog from '../components/RetirePieceDialog.svelte';
   import MaintenanceRuleSheet from '../components/MaintenanceRuleSheet.svelte';
-  import { gear, loadInventory, change, readPhoto } from '../lib/inventory.svelte.js';
+  import { gear, loadInventory, change, readPhoto, logbookPairing } from '../lib/inventory.svelte.js';
+  import LogbookPairList from '../components/LogbookPairList.svelte';
+  import { pairRows, computerKey, totalDives, splitBrandModel, linkFields } from '../lib/logbook-pairing.js';
   import { GEAR_TYPES, gearProblems } from '../lib/inventory.js';
   import { SPECS, detailFields, isNamedByHand, hasPurchaseDate, CELLS_DATE_KEYS, derivedName, detailProblems, detailsToKeep, parseStampText, stampText } from '../lib/gear-fields.js';
   import { cylinderChoices } from '../lib/cylinder-choices.js';
@@ -74,9 +76,19 @@
   /** The reminder set in the card (a new piece only), saved with the piece. @type {{ task: import('../lib/maintenance.js').Task, months: number|null, dives: number|null, notifyDays: 14|30|60, warnInDive: boolean }|null} */
   let reminder = $state(null);
   let choosingType = $state(!id);
+  /** « Déjà dans votre carnet » (task 2026-11-26-405): the step after the type of a computer or a suit, when the logbook has values no piece has. */
+  let pairing = $state(false);
+  /** @type {{ computers: import('../lib/logbook-pairing.js').LogbookComputerItem[], suits: import('../lib/logbook-pairing.js').LogbookSuitItem[] }} */
+  let pairData = $state({ computers: [], suits: [] });
+  /** The keys chosen in the card. @type {string[]} */
+  let pairChosen = $state([]);
+  /** What the new piece is tied to once the card is answered. @type {{ computer?: { model: string, serial: string }, suitNames?: string[], dives: number }|null} */
+  let link = $state(null);
   let direction = 'forward';
   /** @type {HTMLElement|undefined} */
   let stage = $state();
+  /** The step on screen: the type grid, the card of the logbook's values, the form. */
+  const stepName = $derived(choosingType ? 'choose' : pairing ? 'pair' : 'form');
 
   $effect(() => {
     const node = stage;
@@ -195,10 +207,62 @@
       type = next;
       return;
     }
-    if (type !== next) reminder = null;
+    if (type !== next) {
+      reminder = null;
+      link = null;
+    }
     type = next;
     direction = 'forward';
+    pairing = false;
+    if ((next === 'computer' || next === 'suit') && !link) {
+      pairChosen = [];
+      pairData = await logbookPairing();
+      pairing = pairItems.some((i) => !i.linkedTo);
+    }
     choosingType = false;
+    await tick();
+    /** @type {HTMLElement|null|undefined} */ (steps ? dialogTitle : stage?.querySelector('.bc-piece-edit--form-title'))?.focus({ preventScroll: true });
+    const scroller = stage?.closest('[data-bc-scroll], .bc-pf--box, .page-content');
+    if (scroller) scroller.scrollTop = 0;
+  }
+
+  /** The logbook's values of the chosen type, for the card. */
+  const pairItems = $derived(/** @type {(import('../lib/logbook-pairing.js').LogbookComputerItem|import('../lib/logbook-pairing.js').LogbookSuitItem)[]} */ (type === 'computer' ? pairData.computers : type === 'suit' ? pairData.suits : []));
+  const pairList = $derived(
+    pairRows(type === 'computer' ? 'computer' : 'suit', pairItems, {
+      serial: (serial) => t('gear.pair.serial', { serial }),
+      dives: (n) => t('gear.pair.dives', { n }),
+      range: (first, last) => t('gear.pair.years', { first: String(first), last: String(last) }),
+    }),
+  );
+  const pairPicked = $derived(pairItems.filter((i) => pairChosen.includes(type === 'computer' ? computerKey(/** @type {any} */ (i)) : /** @type {any} */ (i).name)));
+  const pairLine = $derived(type === 'suit' && pairPicked.length ? `${t('gear.pair.checked', { n: pairPicked.length })} · ${t('gear.pair.dives', { n: totalDives(pairPicked) })}` : '');
+
+  /** « Créer à partir de celui-ci » / « de celles-ci »: the form opens prefilled, the new piece is tied to those dives. */
+  async function createFromLogbook() {
+    if (!pairPicked.length) return;
+    if (type === 'computer') {
+      const c = /** @type {import('../lib/logbook-pairing.js').LogbookComputerItem} */ (pairPicked[0]);
+      const split = splitBrandModel(c.model, lists.vendors);
+      brand = split.brand;
+      model = split.model;
+      serial = c.serial;
+      link = { computer: { model: c.model, serial: c.serial }, dives: c.dives };
+    } else {
+      link = { suitNames: pairPicked.map((i) => /** @type {any} */ (i).name), dives: totalDives(pairPicked) };
+    }
+    await leavePairing();
+  }
+
+  /** « C'est un autre ordinateur » / « une autre combinaison »: the empty form, as without the card. */
+  async function skipPairing() {
+    link = null;
+    await leavePairing();
+  }
+
+  async function leavePairing() {
+    direction = 'forward';
+    pairing = false;
     await tick();
     /** @type {HTMLElement|null|undefined} */ (steps ? dialogTitle : stage?.querySelector('.bc-piece-edit--form-title'))?.focus({ preventScroll: true });
     const scroller = stage?.closest('[data-bc-scroll], .bc-pf--box, .page-content');
@@ -207,6 +271,8 @@
 
   async function chooseAgain() {
     direction = 'back';
+    pairing = false;
+    link = null;
     choosingType = true;
     await tick();
     /** @type {HTMLElement|null|undefined} */ (steps ? dialogTitle : stage?.querySelector('.bc-piece-edit--type-heading'))?.focus({ preventScroll: true });
@@ -272,6 +338,7 @@
           note,
           details: kept,
           photoId: nextPhoto || undefined,
+          ...(!id && link ? linkFields(undefined, link) : {}),
         });
         if (!id && (type === 'rebreather' || type === 'o2Cells')) {
           // A rebreather always gets its service reminder, the O₂ cells their replacement; the one the diver set in the card replaces the first rule.
@@ -315,7 +382,7 @@
       f7router.back();
       if (!id && (reminder || type === 'rebreather' || type === 'o2Cells') && (type === 'regulator' || type === 'cylinder' || type === 'rebreather' || type === 'o2Cells') && saved) afterReminderSaved();
     } catch (e) {
-      showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : 'gear.inventory.saveFailed'));
+      showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : String(/** @type {any} */ (e)?.message).startsWith('LINKED_ELSEWHERE') ? 'gear.pair.taken' : 'gear.inventory.saveFailed'));
     } finally {
       saving = false;
     }
@@ -407,11 +474,29 @@
     </div>
 {/snippet}
 
+{#snippet pairCard()}
+  {#if !steps}
+    <button type="button" class="bc-piece-edit--change-type" onclick={chooseAgain}><Icon name="arrowBack" size={20} />{t('gear.pieceNew.changeType')}</button>
+    <h2 class="bc-piece-edit--title bc-piece-edit--form-title" tabindex="-1">{typeLabel}</h2>
+  {/if}
+  <section class="bc-piece-edit--pair" aria-labelledby="bc-piece-pair-title">
+    <h3 class="bc-piece-edit--pair-title" id="bc-piece-pair-title">{t('gear.pair.title')}</h3>
+    <p class="bc-piece-edit--pair-lead">{t(type === 'computer' ? 'gear.pair.leadComputer' : 'gear.pair.leadSuit')}</p>
+    <LogbookPairList items={pairList} multiple={type === 'suit'} selected={pairChosen} label={t('gear.pair.title')} onchange={(keys) => (pairChosen = keys)} />
+    {#if pairLine}<p class="bc-piece-edit--pair-count" aria-live="polite">{pairLine}</p>{/if}
+    <div class="bc-piece-edit--pair-actions">
+      <button type="button" class="bc-piece-edit--pair-create" disabled={!pairPicked.length || gear.readOnly} onclick={createFromLogbook}>{t(type === 'computer' ? 'gear.pair.createComputer' : 'gear.pair.createSuit')}</button>
+      <button type="button" class="bc-piece-edit--pair-other" onclick={skipPairing}>{t(type === 'computer' ? 'gear.pair.otherComputer' : 'gear.pair.otherSuit')}</button>
+    </div>
+  </section>
+{/snippet}
+
 {#snippet form()}
   {#if !id && !steps}
     <button type="button" class="bc-piece-edit--change-type" onclick={chooseAgain}><Icon name="arrowBack" size={20} />{t('gear.pieceNew.changeType')}</button>
     <h2 class="bc-piece-edit--title bc-piece-edit--form-title" tabindex="-1">{typeLabel}</h2>
   {/if}
+  {#if link}<p class="bc-piece-edit--help bc-piece-edit--linked">{t('gear.pair.formNote', { dives: t('gear.pair.dives', { n: link.dives }) })}</p>{/if}
   {#if type}{@render typeFields()}{/if}
 
   <div class="bc-piece-edit--fields">
@@ -478,10 +563,10 @@
     </div>
     {@render form()}
   {:else}
-    <div class="bc-piece-edit--stage" bind:this={stage} data-step={choosingType ? 'choose' : 'form'}>
-      {#key choosingType}
+    <div class="bc-piece-edit--stage" bind:this={stage} data-step={stepName}>
+      {#key stepName}
         <section class="bc-piece-edit--step" in:moveStep={{ kind: 'in' }} out:moveStep={{ kind: 'out' }}>
-          {#if choosingType}{@render typeGrid()}{:else}{@render form()}{/if}
+          {#if choosingType}{@render typeGrid()}{:else if pairing}{@render pairCard()}{:else}{@render form()}{/if}
         </section>
       {/key}
     </div>
@@ -568,7 +653,7 @@
     </header>
     <div class="bc-piece-edit--steps-body" data-bc-scroll>{@render body()}</div>
     <footer class="bc-piece-edit--steps-footer">
-      {#if choosingType}
+      {#if choosingType || pairing}
         <button type="button" class="bc-piece-edit--cancel" onclick={() => f7router.back()}>{t('dialog.cancel')}</button>
       {:else}
         <button type="button" class="bc-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>
@@ -587,7 +672,7 @@
     {/snippet}
     {#snippet title()}{id ? t('gear.pieceEdit.editTitle') : t('gear.pieceEdit.addTitle')}{/snippet}
     {#snippet right()}
-      {#if id || !choosingType}<button type="button" class="bc-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>{/if}
+      {#if id || (!choosingType && !pairing)}<button type="button" class="bc-piece-edit--save" disabled={!canSave} onclick={save}>{t('gear.pieceEdit.save')}</button>{/if}
     {/snippet}
   </Navbar>
   {/if}
@@ -1078,6 +1163,65 @@
       font-size: 13px;
       line-height: 18px;
       color: var(--bc-text-2);
+    }
+
+    .bc-piece-edit--pair {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 8px 16px 24px;
+    }
+    .bc-piece-edit--pair-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 28px;
+      font-weight: 500;
+      color: var(--bc-text);
+    }
+    .bc-piece-edit--pair-lead {
+      margin: 0;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--bc-text-2);
+    }
+    .bc-piece-edit--pair-count {
+      margin: 0;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--bc-text);
+    }
+    .bc-piece-edit--pair-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .bc-piece-edit--pair-create,
+    .bc-piece-edit--pair-other {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 24px;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .bc-piece-edit--pair-create {
+      background: var(--bc-secondary);
+      color: var(--bc-on-secondary);
+      &:disabled {
+        opacity: 0.38;
+        cursor: default;
+      }
+    }
+    .bc-piece-edit--pair-other {
+      background: none;
+      color: var(--bc-action);
+    }
+    .bc-piece-edit--linked {
+      margin-top: 12px;
     }
 
     .bc-piece-edit--help {

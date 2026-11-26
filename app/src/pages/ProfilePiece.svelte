@@ -14,6 +14,7 @@
   import DcTile from '../components/DcTile.svelte';
   import RetirePieceDialog from '../components/RetirePieceDialog.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
+  import PairLogbookDialog from '../components/PairLogbookDialog.svelte';
   import Md3Dialog from '../components/Md3Dialog.svelte';
   import { gear, loadInventory, change, figuresOf, computerFigures, computerDiveCounts, kitsOf, evaluations, readPhoto } from '../lib/inventory.svelte.js';
   import { tagText } from '../lib/maintenance-text.js';
@@ -37,6 +38,7 @@
   let loaded = $state(false);
   let confirmRetire = $state(false);
   let confirmForever = $state(false);
+  let pairing = $state(false);
   let exportingHistory = $state(false);
   /** @type {{ dives: number, seconds: number, deepestMm: number, last: string }|null} */
   let computerStats = $state(null);
@@ -56,16 +58,25 @@
   onMount(async () => {
     await loadInventory();
     loaded = true;
+    await readFigures();
+  });
+
+  /** The figures of a computer (from its dives) and the counts of the suit texts tied to a suit. */
+  async function readFigures() {
     const g = gear.pieces.find((x) => x.id === id);
     if (g?.type === 'computer') {
       const counts = await computerDiveCounts();
       const found = await computerFigures(g);
       const fromRecords = figuresOf(g, counts);
       computerStats = found ? { ...found, dives: Math.max(found.dives, fromRecords.dives) } : fromRecords;
+    } else if (g?.suitNames?.length) {
+      counts = await computerDiveCounts();
     }
-  });
+  }
+  /** The dives of the logbook's values tied to the piece, by key (lib/inventory.svelte.js `computerDiveCounts`). @type {Map<string, number>|undefined} */
+  let counts = $state();
 
-  const figures = $derived(piece ? (piece.type === 'computer' && computerStats ? computerStats : figuresOf(piece)) : { dives: 0, seconds: 0, deepestMm: 0, last: '' });
+  const figures = $derived(piece ? (piece.type === 'computer' && computerStats ? computerStats : figuresOf(piece, counts)) : { dives: 0, seconds: 0, deepestMm: 0, last: '' });
   const lastDive = $derived(figures.last ? logbook.dives.find((d) => d.date === figures.last) : undefined);
   /** A dive computer has its own edit screen (task 2026-11-19-303). */
   const editPath = $derived(`/profile/gear/${id}/${piece?.type === 'computer' ? 'edit-computer' : 'edit'}`);
@@ -186,6 +197,7 @@
       [
         { label: t('gear.piece.share'), onclick: share },
         { label: t('maintenance.export.menu'), onclick: exportPieceHistory },
+        ...(!retired && ((piece.type === 'computer' && !piece.computerModel) || piece.type === 'suit') ? [{ label: t('gear.pair.menu'), onclick: () => (gear.readOnly ? refused() : (pairing = true)) }] : []),
         ...(retired ? [] : [{ label: t('gear.retire.button'), onclick: () => (gear.readOnly ? refused() : (confirmRetire = true)) }]),
         { label: t('gear.piece.delete'), onclick: () => (gear.readOnly ? refused() : (confirmForever = true)), danger: true },
       ],
@@ -300,6 +312,9 @@
 
 {#if confirmRetire && piece}
   <RetirePieceDialog name={piece.name} computer={piece.type === 'computer'} oncancel={() => (confirmRetire = false)} onconfirm={retire} />
+{/if}
+{#if pairing && piece}
+  <PairLogbookDialog {piece} onclose={() => ((pairing = false), readFigures())} />
 {/if}
 {#if confirmForever && piece}
   <Md3Dialog class="bc-piece-forever" title={t('gear.forever.title')} text={t('gear.forever.text', { name: piece.name })} role="alertdialog" oncancel={() => (confirmForever = false)}>

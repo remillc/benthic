@@ -2967,7 +2967,7 @@
       "Sync: automatic, with changes waiting while offline, failures explained and conflicts resolved in a dialog that shows the differences.",
       "Backup and restore: get back a deleted dive, a version of a dive or the whole logbook at a date, on a timeline.",
       "Photos and videos (Benthic+): each dive has its gallery, in shooting order with the profile depth, sent to the account (10 GB) and available on every device.",
-      "Profile and equipment (Benthic+): diver profile, certifications drawn like the cards, scanned documents, an emergency sheet, 20 types of equipment with kits, and maintenance reminders by time or by number of dives. A dive’s Equipment tab fills the gear with a kit or the previous dive’s, and lists the other gear. “Get the dive signed” asks a buddy or an instructor to sign. Settings › Weight types (on the desktop too): your weight types and their weight; a weight chosen starts from the previous dive’s.",
+      "Profile and equipment (Benthic+): diver profile, certifications drawn like the cards, scanned documents, an emergency sheet, 20 types of equipment with kits, and maintenance reminders by time or by number of dives. A dive’s Equipment tab fills the gear with a kit or the previous dive’s, and lists the other gear. A new or an existing piece can be paired with the computers and suits already in the logbook. “Get the dive signed” asks a buddy or an instructor to sign. Settings › Weight types (on the desktop too): your weight types and their weight; a weight chosen starts from the previous dive’s.",
       "Computer (Windows, macOS, Linux): Benthic in three panes, with a logbook table that stays fast with thousands of dives, a dive in tabs, right-click menus and windows for several logbooks.",
       "iPhone and iPad: Benthic follows the iOS look, with the tab bar, dive computer download over Bluetooth, “Continue with Apple” and the import of an Apple Watch Ultra’s dives from Health.",
       "Android: bottom navigation (Logbook, Sites, Statistics, Tools), account avatar and Material 3 Expressive components.",
@@ -5853,6 +5853,40 @@
       "copyName": "{name} (copy)",
       "copyNameN": "{name} (copy {n})",
       "duplicated": "Kit duplicated"
+    },
+    "pair": {
+      "title": "Already in your logbook",
+      "leadComputer": "These computers were used in your dives. If the new piece is one of them, choose it: it will count its dives from the start.",
+      "leadSuit": "These suits are written in your dives, sometimes in several ways. Check the ones that name the new piece: they will be grouped under it.",
+      "dives": {
+        "one": "{n} dive",
+        "other": "{n} dives"
+      },
+      "checked": {
+        "one": "{n} name checked",
+        "other": "{n} names checked"
+      },
+      "serial": "No. {serial}",
+      "years": "{first} to {last}",
+      "linked": "Already in your equipment",
+      "createComputer": "Create from this one",
+      "createSuit": "Create from these",
+      "otherComputer": "It is another computer",
+      "otherSuit": "It is another suit",
+      "menu": "Pair with logbook dives",
+      "leadPieceComputer": "Computers from your dives that look like this piece and are paired with no other.",
+      "leadPieceSuit": "Suits from your dives that look like this piece and are paired with no other.",
+      "serialNote": "The piece’s serial number will be the chosen computer’s.",
+      "noneComputer": "No computer from your dives is free: each one is already paired with a piece.",
+      "noneSuit": "No suit from your dives is free: each one is already paired with a piece.",
+      "cancel": "Cancel",
+      "confirm": {
+        "one": "Pair {n} dive",
+        "other": "Pair {n} dives"
+      },
+      "done": "Dives paired",
+      "taken": "This logbook value is already paired with another piece.",
+      "formNote": "Paired with {dives} from your logbook: they count for this piece as soon as it is saved."
     },
     "piece": {
       "yes": "Yes",

@@ -13,6 +13,7 @@
 // file is read as an object, the keys the app owns are changed, and the object is written back.
 
 import { sameComputer } from './dc-model.js';
+import { linkProblem } from './logbook-pairing.js';
 import { isShortId, newId } from './short-id.js';
 import { migrateDiveIdsInStore } from './dive-id-migration.js';
 import { CYLINDER_TYPES_FOLDER, isTypeFile, pathOfType } from './cylinder-type-files.js';
@@ -43,6 +44,7 @@ import { rekey as rekeyValidations } from './validation.js';
  * @property {string} [firmwareReadAt] ISO date of that download
  * @property {string} [computerModel] a computer's name in the logbook, with `computerSerial`, which ties it to the dives
  * @property {string} [computerSerial]
+ * @property {string[]} [suitNames] a suit's: the texts of the dives' « Combinaison » field that stand for this piece (task 2026-11-26-405); a text is tied to one piece only
  * @property {string} [purchasedOn] YYYY-MM-DD
  * @property {string} [note] the line under the name
  * @property {Record<string, string>} [details] the fields of the piece's type besides these (lib/gear-fields.js)
@@ -432,6 +434,12 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       const problems = gearProblems(fields);
       if (problems.name || problems.purchasedOn) throw new Error(`INVALID_GEAR:${Object.keys(problems).join(',')}`);
       const existing = fields.id ? await store.read(`gear/${fields.id}.json`) : null;
+      // A logbook value is tied to one piece at most (task 2026-11-26-405).
+      const bad = linkProblem(await store.readAll('gear/'), existing?.id ?? '', {
+        suitNames: fields.suitNames?.filter((n) => !(existing?.suitNames ?? []).includes(n)),
+        computer: fields.computerModel && fields.computerModel !== existing?.computerModel ? { model: fields.computerModel, serial: fields.computerSerial ?? '' } : undefined,
+      });
+      if (bad) throw new Error(`LINKED_ELSEWHERE:${bad}`);
       /** @type {Gear} */
       const piece = {
         ...(existing ?? { format: 1, createdAt: stamp(), retired: false }),
@@ -448,6 +456,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
         }
       }
       if (piece.details && !Object.keys(piece.details).length) delete piece.details;
+      if (piece.suitNames && !piece.suitNames.length) delete piece.suitNames;
       await commit([[`gear/${piece.id}.json`, piece]]);
       return piece;
     },

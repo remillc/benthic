@@ -6,6 +6,7 @@
 import { BenthicCore } from 'benthic-core';
 import { createFileStore, indexedDbBackend, memoryBackend, requestPersistence } from './file-store.js';
 import { sameComputer } from './dc-model.js';
+import { suitCountKey, computerItems, suitItems, linkFields } from './logbook-pairing.js';
 import { deviceStore } from './device-store.js';
 import { createInventory, diveKeyOf, recordKey, startKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
 import { logbook } from './logbook.svelte.js';
@@ -101,6 +102,7 @@ export async function loadInventory() {
   gear.pending = pending.length;
   gear.ready = true;
   scheduleNotifications();
+  if (pieces.some((g) => g.suitNames?.length || (g.type === 'computer' && g.computerModel))) refreshLinkedDives().then(scheduleNotifications);
 }
 
 /**
@@ -208,7 +210,8 @@ export const diveKeysOf = (gearId) =>
  */
 export function diveStartsOf(gearId) {
   const starts = new Map(logbook.dives.map((d) => [diveKeyOf(d), startKeyOf(d)]));
-  return diveKeysOf(gearId).map((k) => (isShortId(k) ? starts.get(k) ?? '' : k)).filter(Boolean);
+  const own = diveKeysOf(gearId).map((k) => (isShortId(k) ? starts.get(k) ?? '' : k)).filter(Boolean);
+  return [...new Set([...own, ...(linked.starts[gearId] ?? [])])];
 }
 
 /** The kits that hold a piece. @param {string} gearId */
@@ -226,17 +229,134 @@ export function figuresOf(g, computerDives) {
     }
     figures.dives = Math.max(figures.dives, recorded);
   }
+  if (g.suitNames?.length) {
+    // The dives whose « Combinaison » text is one of those tied to the piece (task 2026-11-26-405); a dive holds one text.
+    let tied = 0;
+    for (const name of g.suitNames) tied += computerDives?.get(suitCountKey(name)) ?? 0;
+    figures.dives = Math.max(figures.dives, tied);
+  }
   return figures;
 }
 
-/** The dives each dive computer of the logbook recorded, by `model|serial`: « Ordinateurs du carnet ». @returns {Promise<Map<string, number>>} */
+/**
+ * The dives each dive computer of the logbook recorded, by `model|serial`: « Ordinateurs du carnet ». The dives of each suit
+ * text are counted in the same map under `suitCountKey(text)`, for the suits tied to a piece.
+ * @returns {Promise<Map<string, number>>}
+ */
 export async function computerDiveCounts() {
+  /** @type {Map<string, number>} */
+  const counts = new Map();
   try {
     const list = await BenthicCore.diveComputers();
-    return new Map(list.map((c) => [`${c.model}|${c.serial}`, c.dives]));
+    for (const c of list) counts.set(`${c.model}|${c.serial}`, c.dives);
   } catch {
-    return new Map();
+    // no computer figures
   }
+  try {
+    if (gear.pieces.some((g) => g.suitNames?.length)) {
+      /** @type {{ key: string, dives: number }[]} */
+      const values = await BenthicCore.statsQuery({ kind: 'values', field: 'suit' });
+      for (const v of values) if (v.key) counts.set(suitCountKey(v.key), v.dives);
+    }
+  } catch {
+    // no suit figures
+  }
+  return counts;
+}
+
+/** The years of the first and the latest dive among the dives of the rows that the filter keeps. @param {Set<number>} ids */
+function yearsOf(ids) {
+  let first = 0;
+  let last = 0;
+  for (const d of logbook.dives) {
+    if (!ids.has(d.id)) continue;
+    const y = Number(d.date.slice(0, 4));
+    if (!first || y < first) first = y;
+    if (y > last) last = y;
+  }
+  return { first, last };
+}
+
+/** The dives a filter rule keeps, as ids. @param {string} type @param {string[]} names */
+async function divesOfRule(type, names) {
+  const data = names.map((n) => `${n}
+`).join('');
+  return new Set(/** @type {number[]} */ (await BenthicCore.filterQuery({ kind: 'dives', rules: [{ type, stringMode: 'exact', data }] })));
+}
+
+/**
+ * What the logbook holds that a piece can be paired with (task 2026-11-26-405): its dive computers (model, serial, dives,
+ * first and latest year) and the texts of the suits, each with the piece that already has it. The years of a computer are
+ * those of its model (the core's filter knows computers by name). Empty lists when the core cannot answer.
+ * @param {string} [exceptId] a piece whose own links are not counted as taken
+ * @returns {Promise<{ computers: import('./logbook-pairing.js').LogbookComputerItem[], suits: import('./logbook-pairing.js').LogbookSuitItem[] }>}
+ */
+export async function logbookPairing(exceptId = '') {
+  await loadInventory();
+  const [computers, suits] = await Promise.all([
+    BenthicCore.diveComputers().then((list) => computerItems(list, gear.pieces, exceptId)).catch(() => []),
+    BenthicCore.statsQuery({ kind: 'values', field: 'suit' }).then((values) => suitItems(values, gear.pieces, exceptId)).catch(() => []),
+  ]);
+  const options = await BenthicCore.filterQuery({ kind: 'options' }).catch(() => ({ computers: [] }));
+  const names = /** @type {string[]} */ (options.computers ?? []);
+  await Promise.all([
+    ...computers.map(async (c) => {
+      try {
+        const matching = names.filter((n) => n.toLowerCase().includes(c.model.toLowerCase()));
+        if (matching.length) Object.assign(c, yearsOf(await divesOfRule('dive_computer', matching)));
+      } catch {
+        // no years
+      }
+    }),
+    ...suits.map(async (s) => {
+      try {
+        Object.assign(s, yearsOf(await divesOfRule('suit', [s.name])));
+      } catch {
+        // no years
+      }
+    }),
+  ]);
+  return { computers, suits };
+}
+
+/**
+ * « Associer aux plongées du carnet »: ties an existing piece to computers or suit texts of the logbook. The piece's file
+ * holds the links, so they are synced; the dives count for it at once. Throws `LINKED_ELSEWHERE:…` when a value is tied to another piece.
+ * @param {string} gearId
+ * @param {{ computer?: { model: string, serial: string }, suitNames?: string[] }} link
+ */
+export async function pairWithLogbook(gearId, link) {
+  const piece = gear.pieces.find((g) => g.id === gearId);
+  if (!piece) return;
+  await change((inv) => inv.saveGear({ ...piece, ...linkFields(piece, link) }));
+}
+
+/** The start of each dive tied to a piece through the logbook's values (computer model, suit texts), by piece id: they count for its reminders. @type {{ starts: Record<string, string[]> }} */
+const linked = $state({ starts: {} });
+
+/** Reads again which dives the tied pieces have; the reminders follow. */
+export async function refreshLinkedDives() {
+  /** @type {Record<string, string[]>} */
+  const starts = {};
+  try {
+    const startOf = new Map(logbook.dives.map((d) => [d.id, startKeyOf(d)]));
+    for (const g of gear.pieces) {
+      let rule = null;
+      if (g.type === 'computer' && g.computerModel) {
+        const options = await BenthicCore.filterQuery({ kind: 'options' });
+        const model = g.computerModel.toLowerCase();
+        const names = /** @type {string[]} */ ((options.computers ?? []).filter((n) => n.toLowerCase().includes(model)));
+        if (names.length) rule = { type: 'dive_computer', names };
+      } else if (g.suitNames?.length) rule = { type: 'suit', names: g.suitNames };
+      if (!rule) continue;
+      const ids = await divesOfRule(rule.type, rule.names);
+      starts[g.id] = [...ids].map((i) => startOf.get(i) ?? '').filter(Boolean);
+    }
+  } catch (e) {
+    console.error('Reading the dives tied to the pieces', e);
+    return;
+  }
+  linked.starts = starts;
 }
 
 /**
