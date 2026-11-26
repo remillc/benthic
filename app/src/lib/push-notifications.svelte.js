@@ -71,9 +71,20 @@ export const pushClient = createPush({
   sessionToken,
   permission: async () => (await (await plugins()).local.checkPermissions()).display,
   requestPermission: async () => (await (await plugins()).local.requestPermissions()).display,
-  register: async () => (await plugins()).push.register(),
+  register: async () => {
+    // A build without Firebase (no google-services.json) would crash in the push plugin's register.
+    if (!(await pushAvailable())) throw new Error('PUSH_UNAVAILABLE: this build has no Firebase set up');
+    return (await plugins()).push.register();
+  },
   unregister: async () => (await plugins()).push.unregister(),
 });
+
+/** @type {Promise<boolean>|null} Whether this build can register for push notifications (BenthicCore.pushAvailable), asked once. */
+let availability = null;
+const pushAvailable = () =>
+  (availability ??= BenthicCore.pushAvailable()
+    .then((r) => !!r?.available)
+    .catch(() => false));
 
 /** Reads the system's state again (the diver may have changed it in the system settings). */
 export async function refreshPushPermission() {
