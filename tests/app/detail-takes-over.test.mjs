@@ -72,3 +72,25 @@ test('sources: the camera on Début and Fin, the confirmation to remove, the mir
   }
   assert.equal(JSON.parse(source('i18n/fr.json')).desktopDetail.cylinderDialog.footnote, 'Un recycleur a toujours un oxygène et un diluant.');
 });
+
+test('sources: the Lest card as rows with the amber suggestion on an Android phone, the chips elsewhere', () => {
+  const fields = source('components/DesktopDiveFields.svelte');
+  assert.match(fields, /const rowsLayout = \$derived\(layout\.phone && !ios\)/);
+  assert.match(fields, /\{#if rowsLayout\}\s*<DiveWeightRows[^>]*suggestion=\{suggestionShown\}[^>]*ondismiss=/);
+  assert.match(fields, /\{:else\}\s*<DesktopWeights/);
+  assert.match(fields, /isMostRecent\(dive\.id, logbook\.dives\)/, 'the suggestion is only offered on the most recent dive, as the old editor did');
+  const rows = source('components/DiveWeightRows.svelte');
+  assert.match(rows, /\{#if n === 0\}<span class="bc-dive-weight-rows--label">\{t\('desktopDetail\.weightType'\)\}/, 'labels above the first row only');
+  assert.match(rows, /\{#if n === 0\}<span class="bc-dive-weight-rows--label">\{t\('edit\.weight'\)\}/);
+  assert.match(rows, /bc-dive-weight-rows--suggestion-close/);
+  assert.match(rows, /desktopDetail\.manageWeightTypes/);
+  assert.match(rows, /desktopDetail\.weightRowsNote/);
+  assert.match(rows, /flex: 0 0 96px/);
+  assert.match(rows, /border: 1px solid var\(--bc-outline\)/, 'the add button is outlined');
+  assert.doesNotMatch(rows, /#[0-9A-Fa-f]{3,6}\b/, 'colours are --bc-* variables');
+  for (const lang of ['fr', 'en']) {
+    const d = JSON.parse(source(`i18n/${lang}.json`)).desktopDetail;
+    for (const key of ['weightType', 'weightRowsNote', 'weightSuggestionClose', 'addWeight', 'removeWeight']) assert.ok(d[key], `${lang}: ${key}`);
+  }
+  assert.equal(JSON.parse(source('i18n/fr.json')).desktopDetail.weightRowsNote, 'Un type choisi part du poids de la plongée précédente, sinon de son poids dans Réglages › Types de lest.');
+});

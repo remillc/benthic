@@ -12,6 +12,7 @@
   import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
   import ButtonGroup from './ButtonGroup.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
+  import DiveWeightRows from './DiveWeightRows.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
   import DesktopEquipmentCard from './DesktopEquipmentCard.svelte';
   import DesktopChipsField from './DesktopChipsField.svelte';
@@ -43,6 +44,9 @@
   import { offerUndo } from '../lib/undo.js';
   import { cylinderChanges, fieldChanges, fieldValue, parseTyped, pressureMbarOf, siteChoice, weightChanges, weightText } from '../lib/desktop-edit.js';
   import { FEEDBACK_CHOICES, feedbackOf, withFeedback, withoutFeedbackTags } from '../lib/weight-feedback.js';
+  import { cylinderKey, isMostRecent, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
+  import { scanWeightSources } from '../lib/weight-suggestion-scan.js';
+  import { formatDate, formatWeight } from '../lib/format.js';
   import { WATER_TYPES, waterTypeName } from '../lib/tools.js';
   import { computerList } from '../lib/gas-summary.js';
   import { useKey } from '../lib/cylinder-use.js';
@@ -362,6 +366,39 @@
     return result.changes ? write(result.changes) : true;
   }
   const weightsShown = $derived(weightChips(dive.weights, prefs));
+
+  // The weights as rows with the amber suggestion on an Android phone (task 2026-11-26-403, mock-ups detail-onglets-equipement-android
+  // and detail3-android); the other devices keep the chips their mock-ups draw. The suggestion is the weight of the latest dive of
+  // the logbook with the same suit, cylinders and water, as the old editor offered it, and only on the logbook's most recent dive.
+  const rowsLayout = $derived(layout.phone && !ios);
+  /** @type {Map<number, import('../lib/weight-suggestion.js').WeightSource>} */
+  const sourceCache = new Map();
+  let sources = $state(/** @type {import('../lib/weight-suggestion.js').WeightSource[]} */ ([]));
+  /** The suggestion the diver dismissed, by the dive and the rule it was for: a new suit or cylinder brings it back. */
+  let dismissedFor = $state('');
+  const ruleDive = $derived({ id: dive.id, suit: dive.suit ?? '', waterType: dive.waterType ?? '', cylinders: dive.cylinders.map((c) => ({ sizeMl: c.sizeMl })) });
+  const ruleKey = $derived(`${dive.id}|${ruleDive.suit}|${ruleDive.waterType}|${cylinderKey(ruleDive.cylinders)}`);
+  const suggestionAllowed = $derived(rowsLayout && !preview && isMostRecent(dive.id, logbook.dives));
+  $effect(() => {
+    if (!suggestionAllowed || tab !== 'equipment') return;
+    const key = ruleKey;
+    const current = untrack(() => ruleDive);
+    const timer = setTimeout(async () => {
+      const read = await scanWeightSources({ current, dives: untrack(() => logbook.dives), cache: sourceCache, isStale: () => key !== ruleKey });
+      if (read && key === ruleKey) sources = read;
+    }, 300);
+    return () => clearTimeout(timer);
+  });
+  const suggestion = $derived(suggestionAllowed ? suggestWeight(ruleDive, sources, prefs.weight, plus) : null);
+  const weightsNow = $derived((dive.weights ?? []).reduce((sum, w) => sum + Math.max(0, w.grams), 0));
+  const suggestionShown = $derived(!!suggestion && dismissedFor !== ruleKey && showSuggestion(suggestion, weightsNow, prefs.weight)
+    ? { weight: formatWeight(suggestion.grams, prefs), date: formatDate(suggestion.from.date) }
+    : null);
+  /** « Utiliser »: the earlier dive's weights, adjusted, replace this dive's weights. */
+  function useSuggestion() {
+    if (!suggestion) return;
+    saveWeights(weightRows(suggestion.weights));
+  }
   const feedback = $derived(feedbackOf(dive.tags));
   const feedbackOptions = $derived(FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) })));
   /** @param {string} value */
@@ -713,7 +750,11 @@
           {#if weightsShown.total}<span class="bc-desktop-dive-fields--total">{t('desktopDetail.weightTotal')}<strong>{weightsShown.total}</strong></span>{/if}
         {/snippet}
         <div data-field="weights">
-          <DesktopWeights weights={dive.weights ?? []} previous={previousWeights} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
+          {#if rowsLayout}
+            <DiveWeightRows weights={dive.weights ?? []} previous={previousWeights} {prefs} suggestion={suggestionShown} onuse={useSuggestion} ondismiss={() => (dismissedFor = ruleKey)} onsave={(rows) => saveWeights(rows)} />
+          {:else}
+            <DesktopWeights weights={dive.weights ?? []} previous={previousWeights} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
+          {/if}
         </div>
         {#if plus}
           <div class="bc-desktop-dive-fields--feedback">
