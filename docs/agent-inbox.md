@@ -7723,3 +7723,11 @@ Christian asked for this on 26 November 2026. Work in `main`.
 2. **« Kits » row** in Profil › Équipement (tablet and desktop): each kit button and « Nouveau kit » becomes a 40 dp high outlined button (radius 20, padding 0 16 0 12, 20 dp icon, 8 dp icon gap), 12 dp between buttons, wrapping to a second line when needed. Phone: keep its 40 dp buttons, 12 dp between them.
 
 Mock-ups in `docs/mockups/`: `icones-gearicon-svelte` (the icon sheet), and every Profil › Équipement, kit, piece and maintenance mock-up on the three devices (`profil-*-android`, `android-tablette-profil-*-paysage`, `bureau-profil-*`, `bureau-carnet-onglet-equipement`, `bureau-photo*`).
+
+## [ ] 2026-11-26-407 GearIcon: an `o2Cells` icon
+
+Christian asked for this on 26 November 2026. Work in `main`. The « Cellules O₂ » piece type (task 397) has no icon of its own. Add `o2Cells` to GearIcon.svelte, drawn after a real cell (side view, upright: cylindrical body with its label band, O-ring and narrower threaded neck on top, small connector below), 1.5 stroke like the new `suit` and `bcd` (task 406):
+
+`M8 9h8a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5H8a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 8 9zM8.5 7.5h7M9.5 7.5V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3M10 19v1.5a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V19M6.5 11.5h11M6.5 16.5h11`
+
+Use it wherever a gear icon stands for an O₂ cells piece (type menus and tiles, equipment lists, kits, maintenance). Mock-up: `docs/mockups/icones-gearicon-svelte`.
