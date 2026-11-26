@@ -13,7 +13,7 @@
 
   /**
    * @type {{
-   *   items?: { id: string, name: string, type?: import('../lib/inventory.js').GearType }[],
+   *   items?: { id: string, name: string, type?: import('../lib/inventory.js').GearType, line?: string }[],
    *   onremove?: (id: string) => void,
    * }}
    */
@@ -24,7 +24,7 @@
   {#each items as item (item.id)}
     <div class="bc-desktop-other-gear--tile" role="listitem">
       <span class="bc-desktop-other-gear--icon" aria-hidden="true"><GearIcon type={item.type ?? 'other'} name={item.name} size={20} /></span>
-      <span class="bc-desktop-other-gear--name">{item.name}</span>
+      <span class="bc-desktop-other-gear--texts"><span class="bc-desktop-other-gear--name">{item.name}</span>{#if item.line}<span class="bc-desktop-other-gear--line">{item.line}</span>{/if}</span>
       {#if onremove}
         <button type="button" class="bc-desktop-other-gear--remove" aria-label={t('desktopDetail.otherGearRemove', { name: item.name })} title={t('desktopDetail.otherGearRemoveTip')} onclick={() => onremove?.(item.id)}><Icon name="close" size={20} /></button>
       {/if}
@@ -65,12 +65,24 @@
       color: var(--bc-on-table-selected);
     }
 
-    .bc-desktop-other-gear--name {
+    .bc-desktop-other-gear--texts {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bc-desktop-other-gear--name,
+    .bc-desktop-other-gear--line {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .bc-desktop-other-gear--line {
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--bc-text-2);
     }
 
     .bc-desktop-other-gear--remove {

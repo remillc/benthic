@@ -7684,7 +7684,7 @@ Done (26 November 2026), in `feature/403-detail-takes-over-edit`, compared with 
 
 **What `EditDive.svelte` still has that the detail lacks:** the four conditions stars (courant, vagues, ressac, froid), the choice of the main dive computer and renaming a computer, a cylinder type's « Autre… » with its own size and working pressure, reordering cylinders by drag (the detail's selected-tile fields keep the up/down buttons; the dialogs do not), and the dedicated « Gaz » overview page. Everything else it offered (site, trip, people, tags, notes, rating, visibility, date and time, water type, temperatures, pressure, mode, suit, undersuit, kit, weights with the suggestion, « Ce lest était », other gear, cylinders with camera, gas change depth, invalid flag) is in the detail now. Not run on a device or in the emulator; the sources are covered by `tests/app/detail-takes-over.test.mjs`.
 
-## [ ] 2026-11-26-404 Benthic+ equipment of a dive lives in the detail's Équipement tab; no « Image du modèle » caption
+## [x] 2026-11-26-404 Benthic+ equipment of a dive lives in the detail's Équipement tab; no « Image du modèle » caption
 
 Christian asked for this on 26 November 2026. Work in `main`. Follows task 403 (the detail replaces « Modifier une plongée »).
 
@@ -7693,6 +7693,8 @@ Christian asked for this on 26 November 2026. Work in `main`. Follows task 403 (
 3. **Piece page**: remove the caption « Image du modèle » under the piece's name and on its picture (piece page, new, edit, remove, removed, delete for good, new kit). Keep the picture's accessible name.
 
 Mock-ups in `docs/mockups/`. Phone: `detail-onglets-equipement-android`, `edition-equipement-plus-android` (now the whole Équipement tab), `edition-kit-menu-android` (kit menu open), `equipement-ajout-android`, `equipement-ajout-retard-android`, and the other `detail*-android` boards. Tablet: `android-tablette-detail-onglet-equipement-paysage`, `android-tablette-profil-plongee-ajout-paysage`, `android-tablette-profil-plongee-ajout-retard-paysage`. Desktop: `bureau-profil-plongee-kit`, `bureau-profil-plongee-ajout`, `bureau-profil-plongee-ajout-retard`. Piece pages: `profil-piece*-android`, `android-tablette-profil-*-paysage`, `bureau-profil-*`.
+
+**Done (26 November 2026):** (1) the Kit card already had the one menu on every device (`DesktopKitField`: previous dive, kits with piece counts and the current one checked, divider, « Gérer les kits »; sheet on a phone); a test now pins it. (2) Autre équipement rows now carry a sub-line (the type, or « Hors inventaire · empruntée »); « Ajouter de l’équipement » is the bottom sheet on a phone and a 560 px dialog (`Md3Dialog`) on tablet and desktop, overdue-maintenance warnings included (`AddEquipmentSheet.svelte`). (3) The app drew no visible « Image du modèle » caption (it was only the picture's accessible name, kept), so nothing was removed; the older mock-ups still draw it. Not checked on a device or in the e2e runs (`tests/e2e/desktop-equipment.mjs` reads the rows, whose height is unchanged at 56 px).
 
 ## [ ] 2026-11-26-405 Pair a new piece of equipment with what the logbook already has (computers, suits), and pair an existing piece afterwards
 
