@@ -9,7 +9,8 @@ import { sameComputer } from './dc-model.js';
 import { suitCountKey, computerItems, suitItems, linkFields } from './logbook-pairing.js';
 import { deviceStore } from './device-store.js';
 import { createInventory, diveKeyOf, recordKey, startKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
-import { logbook } from './logbook.svelte.js';
+import { logbook, isSubscriber } from './logbook.svelte.js';
+import { planSuitPieces, planIsEmpty } from './suit-pieces.js';
 import { evaluateAll, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
 import { settings } from './settings.svelte.js';
 import { readSnoozed } from './maintenance-snooze.js';
@@ -103,6 +104,61 @@ export async function loadInventory() {
   gear.ready = true;
   scheduleNotifications();
   if (pieces.some((g) => g.suitNames?.length || (g.type === 'computer' && g.computerModel))) refreshLinkedDives().then(scheduleNotifications);
+  syncSuitPieces().catch((e) => console.error('Making the logbook suits into pieces', e));
+}
+
+let suitSyncRunning = false;
+let suitSyncAgain = false;
+
+/**
+ * Every distinct suit text of the logbook is a piece of type suit (task 2026-11-26-406), for a Benthic+ account: the texts no
+ * piece has become pieces, tied through `suitNames`; the texts the diver deleted stay deleted. Idempotent; run at the load of
+ * the inventory and after a dive's suit changes. Nothing happens read only, without the core, or for a free account.
+ */
+export async function syncSuitPieces() {
+  if (suitSyncRunning) {
+    suitSyncAgain = true;
+    return;
+  }
+  if (!gear.ready || gear.readOnly || !isSubscriber()) return;
+  suitSyncRunning = true;
+  try {
+    do {
+      suitSyncAgain = false;
+      /** @type {{ key: string, dives: number }[]} */
+      let values;
+      try {
+        values = await BenthicCore.statsQuery({ kind: 'values', field: 'suit' });
+      } catch {
+        return;
+      }
+      const inv = open();
+      const plan = planSuitPieces(values, await inv.listGear(), await inv.dismissedSuits());
+      if (planIsEmpty(plan)) continue;
+      await inv.applySuitPlan(plan);
+      await loadInventory();
+      signalAccountData('edit');
+    } while (suitSyncAgain);
+  } finally {
+    suitSyncRunning = false;
+  }
+}
+
+/**
+ * The suit piece for a text typed in a dive's Combinaison field (a new one when none has it), tied to the text.
+ * @param {string} text
+ * @returns {Promise<Gear|null>}
+ */
+export async function suitPieceFor(text) {
+  const piece = await change((inv) => inv.suitPieceFor(text));
+  refreshLinkedDives().then(scheduleNotifications);
+  return piece;
+}
+
+/** « Associer aux plongées du carnet »: moves suit texts to a piece, away from the piece that had them. @param {string} gearId @param {string[]} names */
+export async function moveSuitNames(gearId, names) {
+  await change((inv) => inv.moveSuitNames(gearId, names));
+  refreshLinkedDives().then(scheduleNotifications);
 }
 
 /**
@@ -232,7 +288,8 @@ export function figuresOf(g, computerDives) {
   if (g.suitNames?.length) {
     // The dives whose « Combinaison » text is one of those tied to the piece (task 2026-11-26-405); a dive holds one text.
     let tied = 0;
-    for (const name of g.suitNames) tied += computerDives?.get(suitCountKey(name)) ?? 0;
+    // Spellings of one text (case, accents) share one count.
+    for (const key of new Set(g.suitNames.map(suitCountKey))) tied += computerDives?.get(key) ?? 0;
     figures.dives = Math.max(figures.dives, tied);
   }
   return figures;
@@ -256,7 +313,7 @@ export async function computerDiveCounts() {
     if (gear.pieces.some((g) => g.suitNames?.length)) {
       /** @type {{ key: string, dives: number }[]} */
       const values = await BenthicCore.statsQuery({ kind: 'values', field: 'suit' });
-      for (const v of values) if (v.key) counts.set(suitCountKey(v.key), v.dives);
+      for (const v of values) if (v.key) counts.set(suitCountKey(v.key), (counts.get(suitCountKey(v.key)) ?? 0) + v.dives);
     }
   } catch {
     // no suit figures

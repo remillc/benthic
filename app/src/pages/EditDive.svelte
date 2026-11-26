@@ -54,7 +54,7 @@
   import DiveGearOther from '../components/DiveGearOther.svelte';
   import RenameComputerDialog from '../components/RenameComputerDialog.svelte';
   import { isRelease } from '../lib/edition.js';
-  import { loadInventory, change as changeInventory, equipmentOf } from '../lib/inventory.svelte.js';
+  import { loadInventory, change as changeInventory, equipmentOf, syncSuitPieces } from '../lib/inventory.svelte.js';
   import { coreIdOfParam } from '../lib/dive-id.js';
   import { cloneEquipment, diveKeyOf, emptyEquipment, sameEquipment } from '../lib/inventory.js';
   import ButtonGroup from '../components/ButtonGroup.svelte';
@@ -988,6 +988,8 @@
       } else if (isRelease && isoDate !== initialDate) {
         await changeInventory((inv) => inv.rekeyDive(diveKeyOf({ date: initialDate, benthicId: dive?.benthicId }), diveKeyOf({ date: isoDate, benthicId: dive?.benthicId })));
       }
+      // A new suit text becomes a piece (Benthic+).
+      if (isRelease && changed('suit')) syncSuitPieces().catch(() => {});
       leave();
       if (steps) offerUndo(t('edit.saved'), undefined, 6000, steps);
       else if (equipmentSaved) toast(t('edit.saved'));

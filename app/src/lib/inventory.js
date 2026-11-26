@@ -17,6 +17,7 @@ import { linkProblem } from './logbook-pairing.js';
 import { isShortId, newId } from './short-id.js';
 import { migrateDiveIdsInStore } from './dive-id-migration.js';
 import { CYLINDER_TYPES_FOLDER, isTypeFile, pathOfType } from './cylinder-type-files.js';
+import { DISMISSED_SUITS_FOLDER, dismissedSuitPath, newDismissedSuit, dismissedKeys, suitPieceId, suitNorm } from './suit-pieces.js';
 import { WEIGHT_TYPES_FOLDER, isWeightTypeFile, pathOfWeightType } from './weight-type-files.js';
 
 import { ruleProblems } from './maintenance.js';
@@ -377,6 +378,14 @@ export function readOnlyInfo(state, now = new Date()) {
 export function createInventory(store, { now = () => new Date(), id = newId } = {}) {
   const stamp = () => now().toISOString().replace(/\.\d{3}Z$/, 'Z');
 
+  /** The files that remember deleted suit texts, among those of `names`: removed when the texts are tied to a piece again. @param {string[]} names @returns {Promise<string[]>} */
+  async function undismissPaths(names) {
+    const paths = [...new Set(names.map(dismissedSuitPath))];
+    if (!paths.length) return [];
+    const present = new Set(await store.list(DISMISSED_SUITS_FOLDER));
+    return paths.filter((p) => present.has(p));
+  }
+
   /** @returns {Promise<InventoryState>} */
   async function readState() {
     const s = await store.read('meta/state.json');
@@ -457,7 +466,7 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       }
       if (piece.details && !Object.keys(piece.details).length) delete piece.details;
       if (piece.suitNames && !piece.suitNames.length) delete piece.suitNames;
-      await commit([[`gear/${piece.id}.json`, piece]]);
+      await commit([[`gear/${piece.id}.json`, piece]], await undismissPaths(piece.suitNames ?? []));
       return piece;
     },
 
@@ -481,6 +490,79 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       if (!piece) return;
       const { retiredOn, retiredReason, ...rest } = piece;
       await commit([[`gear/${gearId}.json`, { ...rest, retired: false, updatedAt: stamp() }]]);
+    },
+
+    /** The comparable suit texts the diver deleted (task 2026-11-26-406). @returns {Promise<Set<string>>} */
+    async dismissedSuits() {
+      return dismissedKeys(await store.readAll(DISMISSED_SUITS_FOLDER));
+    },
+
+    /**
+     * Applies a plan of lib/suit-pieces.js: new suit pieces for the logbook's suit texts, and spellings added to the pieces that
+     * have them. Idempotent: the ids come from the text, a piece that exists is extended, never made twice. @param {{ create: { id: string, name: string, suitNames: string[] }[], extend: { id: string, suitNames: string[] }[] }} plan
+     * @returns {Promise<number>} the files written
+     */
+    async applySuitPlan(plan) {
+      /** @type {[string, unknown][]} */
+      const writes = [];
+      const all = await store.readAll('gear/');
+      const known = new Map(all.map((g) => [g.id, g]));
+      for (const c of plan.create) {
+        if (known.has(c.id)) continue;
+        writes.push([`gear/${c.id}.json`, { format: 1, createdAt: stamp(), retired: false, id: c.id, name: c.name, type: 'suit', suitNames: c.suitNames, updatedAt: stamp() }]);
+      }
+      for (const e of plan.extend) {
+        const piece = known.get(e.id);
+        if (!piece) continue;
+        const have = new Set((piece.suitNames ?? []).map((/** @type {string} */ n) => n.trim()));
+        const add = e.suitNames.filter((n) => !have.has(n.trim()));
+        if (add.length) writes.push([`gear/${piece.id}.json`, { ...piece, suitNames: [...(piece.suitNames ?? []), ...add], updatedAt: stamp() }]);
+      }
+      if (!writes.length) return 0;
+      await commit(writes, await undismissPaths(plan.create.flatMap((c) => c.suitNames)));
+      return writes.length;
+    },
+
+    /**
+     * The suit piece for a text typed in a dive: the piece that holds the text (or a suit of that name), else a new one. The text is
+     * tied to it, so its dives count. @param {string} text @returns {Promise<Gear|null>}
+     */
+    async suitPieceFor(text) {
+      const name = text.trim();
+      if (!suitNorm(name)) return null;
+      const all = await store.readAll('gear/');
+      const key = suitNorm(name);
+      const found = all.find((g) => (g.suitNames ?? []).some((/** @type {string} */ n) => suitNorm(n) === key)) ?? all.find((g) => g.type === 'suit' && !g.retired && suitNorm(g.name) === key);
+      if (found) {
+        if (!(found.suitNames ?? []).some((/** @type {string} */ n) => n.trim() === name)) await commit([[`gear/${found.id}.json`, { ...found, suitNames: [...(found.suitNames ?? []), name], updatedAt: stamp() }]], await undismissPaths([name]));
+        return (await store.read(`gear/${found.id}.json`)) ?? found;
+      }
+      const piece = { format: 1, createdAt: stamp(), retired: false, id: suitPieceId(name), name, type: 'suit', suitNames: [name], updatedAt: stamp() };
+      await commit([[`gear/${piece.id}.json`, piece]], await undismissPaths([name]));
+      return piece;
+    },
+
+    /**
+     * Moves suit texts to a piece: they leave the piece that had them. One transaction. @param {string} gearId @param {string[]} names
+     */
+    async moveSuitNames(gearId, names) {
+      const all = await store.readAll('gear/');
+      const target = all.find((g) => g.id === gearId);
+      if (!target) return;
+      const keys = new Set(names.map(suitNorm));
+      /** @type {[string, unknown][]} */
+      const writes = [];
+      for (const g of all) {
+        if (g.id === gearId || !(g.suitNames ?? []).some((/** @type {string} */ n) => keys.has(suitNorm(n)))) continue;
+        const rest = g.suitNames.filter((/** @type {string} */ n) => !keys.has(suitNorm(n)));
+        const next = { ...g, updatedAt: stamp() };
+        if (rest.length) next.suitNames = rest;
+        else delete next.suitNames;
+        writes.push([`gear/${g.id}.json`, next]);
+      }
+      const have = new Set((target.suitNames ?? []).map((/** @type {string} */ n) => n.trim()));
+      writes.push([`gear/${gearId}.json`, { ...target, suitNames: [...(target.suitNames ?? []), ...names.map((n) => n.trim()).filter((n) => n && !have.has(n))], updatedAt: stamp() }]);
+      await commit(writes, await undismissPaths(names));
     },
 
     /** @param {string} gearId @param {boolean} retired */
@@ -520,6 +602,8 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       const removes = [`gear/${gearId}.json`];
       const piece = await store.read(`gear/${gearId}.json`);
       if (piece?.photoId) removes.push(`gear-photos/${piece.photoId}.json`);
+      // The texts of a deleted suit are not made into a piece again (task 2026-11-26-406).
+      for (const name of new Map((piece?.suitNames ?? []).map((/** @type {string} */ n) => [suitNorm(n), n])).values()) writes.push([dismissedSuitPath(name), newDismissedSuit(name, stamp())]);
       for (const m of await store.readAll('maintenance/')) {
         if (m.gearId !== gearId) continue;
         removes.push(`maintenance/${m.id}.json`);
