@@ -52,7 +52,10 @@ that share a normalised name (earliest id stays, the size with the later `update
 
 **When it runs:** at start once the logbook is open; about 3 s after a change (`inventory.svelte.js` `change()`,
 `profile.svelte.js` `changeProfile()`, same debounce as `persistChanges`); right after each dives sync (`syncEdits`);
-on resume; when the network allows sync again (`onSyncAllowedAgain`); always on « Synchroniser maintenant ». Same gating
+on resume; when the network allows sync again (`onSyncAllowedAgain`); when the server's push channel is live again
+while the last run found the server out of reach; offline with changes waiting, again after 15 s, 30 s, 1 min, 2 min, then
+every 5 min (`OFFLINE_RETRY_MS`, 26 November 2026: the device's network may never drop while the server is out of reach);
+always on « Synchroniser maintenant ». Same gating
 as the dives (`autoSyncing()`); pull only when the subscription ended (`meta/state.json readOnlyFrom`); never while a
 version is browsed. Instant push between devices is #173, separate.
 

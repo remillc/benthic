@@ -10,6 +10,12 @@ export const EDIT_DELAY_MS = 3000;
 export const RETRY_DELAY_MS = 5000;
 /** Retries in a row. */
 const MAX_RETRIES = 3;
+/**
+ * Offline with changes waiting (26 November 2026): the next tries, then every 5 min. The device's network may never drop
+ * while the server is out of reach (a server down, a Wi-Fi without the Internet, adb reverse off), so no « online »
+ * event would come.
+ */
+export const OFFLINE_RETRY_MS = [15000, 30000, 60000, 120000, 300000];
 
 /**
  * What the screens read.
@@ -50,18 +56,20 @@ export const initialState = () => ({
  * @property {AccountSyncState} state mutated in place (a Svelte `$state` object in the app)
  * @property {(options: { manual: boolean }) => boolean} allowed whether a sync may start: signed in, logbook open, not browsing a version; for an automatic one, also `autoSyncing()`
  * @property {(result: import('./account-sync.js').SyncResult) => Promise<void>|void} [afterRun] reads the data again after a run that changed it
+ * @property {() => Promise<boolean>|boolean} [hasPending] whether changes of this device wait to be sent (the offline retries run only then)
  * @property {() => Date} [now]
  * @property {(fn: () => void, ms: number) => unknown} [setTimer]
  * @property {(handle: unknown) => void} [clearTimer]
  */
 
 /** @param {RunnerDeps} deps */
-export function createAccountSyncRunner({ engine, state, allowed, afterRun, now = () => new Date(), setTimer = (fn, ms) => setTimeout(fn, ms), clearTimer = (h) => clearTimeout(/** @type {any} */ (h)) }) {
+export function createAccountSyncRunner({ engine, state, allowed, afterRun, hasPending = () => false, now = () => new Date(), setTimer = (fn, ms) => setTimeout(fn, ms), clearTimer = (h) => clearTimeout(/** @type {any} */ (h)) }) {
   /** @type {unknown} */
   let timer = null;
   let running = false;
   let again = false;
   let retries = 0;
+  let offlineTries = 0;
 
   /** @param {number} ms */
   function schedule(ms) {
@@ -100,6 +108,7 @@ export function createAccountSyncRunner({ engine, state, allowed, afterRun, now 
       running = false;
     }
     if (result.status === 'synced' && !result.retry) retries = 0;
+    if (result.status !== 'offline') offlineTries = 0;
     if (result.retry && result.status !== 'offline' && !state.pullOnly && retries < MAX_RETRIES) {
       retries++;
       again = false;
@@ -107,8 +116,19 @@ export function createAccountSyncRunner({ engine, state, allowed, afterRun, now 
     } else if (again) {
       again = false;
       schedule(0);
+    } else if (result.status === 'offline' && !state.pullOnly && (await pendingNow())) {
+      schedule(OFFLINE_RETRY_MS[Math.min(offlineTries, OFFLINE_RETRY_MS.length - 1)]);
+      offlineTries++;
     }
     return result;
+  }
+
+  async function pendingNow() {
+    try {
+      return !!(await hasPending());
+    } catch {
+      return false;
+    }
   }
 
   /** @param {import('./account-sync.js').SyncResult} result */

@@ -2,7 +2,7 @@
 // the screens read, and what follows a run. The engine and the timers are fakes.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createAccountSyncRunner, initialState, EDIT_DELAY_MS, RETRY_DELAY_MS } from '../../app/src/lib/account-sync-runner.js';
+import { createAccountSyncRunner, initialState, EDIT_DELAY_MS, RETRY_DELAY_MS, OFFLINE_RETRY_MS } from '../../app/src/lib/account-sync-runner.js';
 import { onAccountData, signalAccountData } from '../../app/src/lib/account-sync-signal.js';
 
 /** Timers the test moves by hand. */
@@ -34,7 +34,7 @@ function clock() {
   };
 }
 
-function setup({ results = [{ status: 'synced', received: 0 }], allowed = () => true } = {}) {
+function setup({ results = [{ status: 'synced', received: 0 }], allowed = () => true, hasPending = () => false } = {}) {
   const c = clock();
   const calls = { run: 0, after: 0 };
   const queue = [...results];
@@ -44,6 +44,7 @@ function setup({ results = [{ status: 'synced', received: 0 }], allowed = () => 
     state,
     allowed,
     afterRun: async () => { calls.after++; },
+    hasPending,
     now: () => new Date('2026-11-23T10:00:00Z'),
     setTimer: c.setTimer,
     clearTimer: c.clearTimer,
@@ -146,7 +147,7 @@ test('the states the screens read: join needed, a different account, conflicts, 
   off.runner.trigger('start');
   await off.c.advance(0);
   assert.equal(off.state.status, 'offline');
-  assert.equal(off.c.pending(), 0, 'offline waits for the network event, not for a timer');
+  assert.equal(off.c.pending(), 0, 'offline with nothing waiting waits for the network event, not for a timer');
 
   const before = calls.run;
   runner.resolved();
@@ -180,4 +181,27 @@ test('the signal door tells every listener, and a listener that throws does not 
   assert.deepEqual(heard, ['edit', 'dives']);
   signalAccountData('edit');
   assert.deepEqual(heard, ['edit', 'dives'], 'a stopped listener hears nothing');
+});
+
+test('offline with changes waiting tries again after 15 s, 30 s, 1 min, 2 min, then every 5 min, until a run gets through', async () => {
+  let waiting = true;
+  const results = [...Array(7).fill({ status: 'offline', error: 'UNREACHABLE', retry: true }), { status: 'synced', received: 0 }];
+  const { c, calls, runner, state } = setup({ results, hasPending: () => waiting });
+  runner.trigger('start');
+  await c.advance(0);
+  assert.equal(state.status, 'offline');
+  assert.equal(calls.run, 1);
+  const expected = [...OFFLINE_RETRY_MS, OFFLINE_RETRY_MS.at(-1)];
+  assert.deepEqual(OFFLINE_RETRY_MS, [15000, 30000, 60000, 120000, 300000]);
+  for (const [i, ms] of expected.entries()) {
+    await c.advance(ms - 1);
+    assert.equal(calls.run, i + 1, `not before ${ms} ms`);
+    await c.advance(1);
+    assert.equal(calls.run, i + 2, `after ${ms} ms`);
+  }
+  // The seventh retry got through: no timer left.
+  await c.advance(OFFLINE_RETRY_MS.at(-1) * 2);
+  assert.equal(state.status, 'synced');
+  assert.equal(calls.run, 8);
+  waiting = false;
 });
