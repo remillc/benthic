@@ -106,7 +106,9 @@ test('the BCD has the vest icon, the buoy the board tapered icon, and « Nouvell
   // Task 2026-11-26-406: the jacket BCD seen from the front (it replaced the vest of task 324), and the drysuit; both at a 1.5 stroke.
   assert.match(icon, /bcd: 'M9 3\.5C7\.5 3\.5 6 4 5\.5 5\.5L5 8v11/, 'jacket: two halves, chest strap, pockets, hose');
   assert.match(icon, /suit: 'M10 3h4l3\.5 2 1\.8 7\.5/, 'drysuit: arms, legs, boots, valves');
-  assert.match(icon, /THIN = new Set\(\['suit', 'bcd'\]\)/);
+  assert.match(icon, /THIN = new Set\(\['suit', 'bcd', 'o2Cells'\]\)/);
+  // Task 2026-11-26-407: the O₂ cell seen from the side, at the same 1.5 stroke.
+  assert.match(icon, /o2Cells: 'M8 9h8a1\.5 1\.5 0 0 1 1\.5 1\.5v7/);
   assert.match(icon, /\.bc-gear-icon--thin \{\s*stroke-width: 1\.5;/);
   // Task 2026-11-22-324: the icons are the type board's (android-tablette-profil-piece-nouvelle-type-paysage); a buoy is drawn as « Parachute de palier ».
   assert.match(icon, /dsmb: 'M7 3h10l-2 14H9zM12 17v4'/, 'buoy: the board tapered tube');

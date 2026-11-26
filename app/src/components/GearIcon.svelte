@@ -28,7 +28,8 @@
     cylinder: 'M10 2.5h4M12 2.5V5M9 8a3 3 0 0 1 6 0v12a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 20zM9 11.5h6',
     rebreather: 'M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM16.47 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM9.47 3.89H14.53V19.89H9.47zM10.9 19.89L9.9 22.40H14.1L13.1 19.89M10.74 3.89C10.42 2.63 9.16 2.21 7.89 2.11M13.26 3.89C13.58 2.63 14.84 2.21 16.11 2.11',
     // Three cells on a line (mock-up profil-piece-nouvelle-type-menu-android).
-    o2Cells: 'M2.8 12a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M8.8 12a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M14.8 12a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M3 18h18',
+    // A rebreather's O₂ cell from the side, upright: body with its label band, O-ring, narrower threaded neck, connector below (task 2026-11-26-407).
+    o2Cells: 'M8 9h8a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5H8a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 8 9zM8.5 7.5h7M9.5 7.5V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3M10 19v1.5a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V19M6.5 11.5h11M6.5 16.5h11',
     // A jacket BCD from the front: chest strap, two weight pockets with handles, hose from the left shoulder to the inflator (task 2026-11-26-406).
     bcd: 'M9 3.5C7.5 3.5 6 4 5.5 5.5L5 8v11a1.5 1.5 0 0 0 1.5 1.5h4V9zM15 3.5c1.5 0 3 .5 3.5 2L19 8v11a1.5 1.5 0 0 1-1.5 1.5h-4V9zM9 3.5c.7 1.2 1.7 1.8 3 1.8s2.3-.6 3-1.8M5 16h5.5M13.5 16H19M7 16v-1.3h2V16M15 16v-1.3h2V16M10.5 10.5h3M6.5 4.8C4.3 5.8 3.3 8 3.3 10.5v1.5M2.3 12h2v3.5h-2zM3.3 15.5V17',
     light: 'M4 8.5h7a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1 -1.5 1.5h-7a1.5 1.5 0 0 1 -1.5 -1.5v-3a1.5 1.5 0 0 1 1.5 -1.5zM13.5 7h1.5a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-1.5a1 1 0 0 1 -1 -1v-7a1 1 0 0 1 1 -1zM5.5 14.5V20a1.5 1.5 0 0 0 3 0v-5.5M18.5 7.5l2.5-1.5M19 11.5h2.5M18.5 15.5l2.5 1.5',
@@ -47,8 +48,8 @@
   // An « Autre » piece named like a surface marker buoy shows the buoy of « Parachute de palier ».
   const shown = $derived(type === 'buoy' || (type === 'other' && isBuoyName(name)) ? 'dsmb' : type);
   const path = $derived(paths[shown]);
-  /** The icons drawn with a finer stroke than the others (task 2026-11-26-406). */
-  const THIN = new Set(['suit', 'bcd']);
+  /** The icons drawn with a finer stroke than the others (tasks 2026-11-26-406 and 407). */
+  const THIN = new Set(['suit', 'bcd', 'o2Cells']);
 </script>
 
 {#snippet computerIcon()}
