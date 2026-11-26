@@ -109,7 +109,9 @@ Done in Add the Sites screens and undoable site changes
 
 Build the four Sites screens from `docs/mockups/sites-fiche-android.dc.html`, `sites-edition-android.dc.html`, `sites-sans-site-android.dc.html` and `sites-nettoyer-android.dc.html`, following section 4, "Sites", and add the duplicates row and links to `android-sites.dc.html`. Use the core functions named there; country and region lookup goes through GeoNames like Subsurface. Merging and deleting sites change the logbook: confirm before each, and test on the test account only.
 
-## [ ] 2026-11-06-15 Implement every screen of the mock-ups
+## [x] 2026-11-06-15 Implement every screen of the mock-ups
+
+**Closed as obsolete (Christian, 26 November 2026):** the later tasks replaced it.
 
 Christian asks for every interface designed so far to be built. After tasks 11 to 14, go through `docs/mockups/README.md` and build each screen not built yet, in this order, one commit per screen (or per small group), ticking nothing here until all are done:
 
@@ -7709,7 +7711,7 @@ Mock-ups in `docs/mockups/`: phone `profil-piece-associer-ordinateur-android`, `
 
 Done (26 November 2026), in `feature/405-pair-pieces`: a new Ordinateur or Combinaison piece shows « Déjà dans votre carnet » after the type (skipped when every value is already tied): radio for computers (model, serial, dives, years; tied ones greyed with « Déjà dans votre équipement »), checkboxes and a count line for suits; « Créer à partir de… » opens the form prefilled (brand and model split on the known brands, serial) and the piece is tied to those dives, « C’est un autre… » opens the empty form. The piece's ⋮ menu has « Associer aux plongées du carnet » (computers not yet tied to a download, and suits): a sheet on a phone, a dialog on a tablet and desktop, with the values that resemble the piece and no other piece has (every free value when none resembles it), the serial note for a computer and « Associer n plongées ». Links: a computer by `computerModel`/`computerSerial` (as a download does), suits by `suitNames` in the piece's file (synced with the inventory); `saveGear` refuses a value tied to another piece. Dives count for the piece's figures and for its dive-count reminders. Data from `diveComputers`, `statsQuery` (suit values) and `filterQuery` (years, dive start); no new C++. Limits: the years of a computer are those of its model (the filter knows computers by name), and a suit's hours and depth are not summed (only its dives). Logic in `app/src/lib/logbook-pairing.js`, tests in `tests/app/logbook-pairing.test.mjs`.
 
-## [ ] 2026-11-26-406 New `suit` and `bcd` gear icons; taller « Kits » buttons in Profil › Équipement
+## [x] 2026-11-26-406 New `suit` and `bcd` gear icons; taller « Kits » buttons in Profil › Équipement
 
 Christian asked for this on 26 November 2026. Work in `main`.
 

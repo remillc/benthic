@@ -117,10 +117,10 @@
       <div class="bc-gear-list--chips">
         {#each gear.kits as kit (kit.id)}
           <button type="button" class="bc-gear-list--chip" aria-label={t('gear.inventory.kitChip', { name: kit.name, n: kit.gearIds.length })} onclick={() => showProfilePath(`/profile/kits/${kit.id}`)}>
-            <Icon name="briefcase" size={18} />{t('gear.addSheet.kitChip', { name: kit.name, n: kit.gearIds.length })}
+            <Icon name="briefcase" size={20} />{t('gear.addSheet.kitChip', { name: kit.name, n: kit.gearIds.length })}
           </button>
         {/each}
-        <button type="button" class="bc-gear-list--chip" onclick={newKit}><Icon name="plus" size={18} />{t('gear.inventory.newKit')}</button>
+        <button type="button" class="bc-gear-list--chip" onclick={newKit}><Icon name="plus" size={20} />{t('gear.inventory.newKit')}</button>
       </div>
     {/if}
     {#if empty}
@@ -271,20 +271,20 @@
       padding: 0 8px;
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 12px;
     }
-    /* Mock-up: 32 px high, 8 px corners, a grey icon, « name · count » in one text. */
+    /* An outlined button 40 dp high (task 2026-11-26-406): 20 dp corners, a grey 20 dp icon, « name · count » in one text. */
     .bc-gear-list--chip {
       flex: none;
       width: auto;
-      height: 32px;
-      padding: 0 12px;
+      height: 40px;
+      padding: 0 16px 0 12px;
       box-sizing: border-box;
       border: 1px solid var(--bc-outline);
-      border-radius: 8px;
+      border-radius: 20px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       background: none;
       color: var(--bc-text);
       font: inherit;

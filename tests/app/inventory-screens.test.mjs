@@ -82,7 +82,11 @@ test('the release notes mention the profile and the equipment', () => {
 test('the BCD has the vest icon, the buoy the board tapered icon, and « Nouvelle pièce » a large model picture', async () => {
   const { readFileSync } = await import('node:fs');
   const icon = readFileSync(new URL('../../app/src/components/GearIcon.svelte', import.meta.url), 'utf8');
-  assert.match(icon, /bcd: 'M8\.5 3L5 5\.5V19/, 'vest: collar, centre opening, straps');
+  // Task 2026-11-26-406: the jacket BCD seen from the front (it replaced the vest of task 324), and the drysuit; both at a 1.5 stroke.
+  assert.match(icon, /bcd: 'M9 3\.5C7\.5 3\.5 6 4 5\.5 5\.5L5 8v11/, 'jacket: two halves, chest strap, pockets, hose');
+  assert.match(icon, /suit: 'M10 3h4l3\.5 2 1\.8 7\.5/, 'drysuit: arms, legs, boots, valves');
+  assert.match(icon, /THIN = new Set\(\['suit', 'bcd'\]\)/);
+  assert.match(icon, /\.bc-gear-icon--thin \{\s*stroke-width: 1\.5;/);
   // Task 2026-11-22-324: the icons are the type board's (android-tablette-profil-piece-nouvelle-type-paysage); a buoy is drawn as « Parachute de palier ».
   assert.match(icon, /dsmb: 'M7 3h10l-2 14H9zM12 17v4'/, 'buoy: the board tapered tube');
   assert.match(icon, /floatBuoy: 'M10 3h4v13a2 2 0 0 1-4 0zM12 18v4'/, 'float buoy: the board flat-top tube');
@@ -102,7 +106,10 @@ test('Équipement follows the mock-ups: wrapping kit chips, iPhone kit list, sec
   assert.match(page, /--f7-fab-bg-color: var\(--bc-secondary-container\)/);
   const list = read('components/ProfileGearList.svelte');
   assert.match(list, /gear\.addSheet\.kitChip/);
-  assert.match(list, /\.bc-gear-list--chip \{[^}]*height: 32px/);
+  // Task 2026-11-26-406: outlined buttons 40 dp high with 20 dp corners, 12 dp apart (32 dp chips 8 dp apart before); the phone's 12 dp apart too.
+  assert.match(list, /\.bc-gear-list--chip \{[^}]*height: 40px;[^}]*border-radius: 20px/);
+  assert.match(list, /\.bc-gear-list--chips \{[^}]*gap: 12px/);
+  assert.match(page, /\.bc-gear-page--chips \{[^}]*gap: 12px/);
   // Side by side, not stretched by Framework7's unlayered button { width: 100% }.
   assert.match(list, /\.bc-gear-list--chip \{\s*flex: none;\s*width: auto;/);
   assert.match(list, /inset-inline-end: 24px;\s*bottom: 24px/);
