@@ -7732,7 +7732,7 @@ Christian asked for this on 26 November 2026. Work in `main`. The « Cellules O�
 
 Use it wherever a gear icon stands for an O₂ cells piece (type menus and tiles, equipment lists, kits, maintenance). Mock-up: `docs/mockups/icones-gearicon-svelte`.
 
-## [ ] 2026-11-26-408 GearIcon: a redrawn `rebreather` icon
+## [x] 2026-11-26-408 GearIcon: a redrawn `rebreather` icon
 
 Christian asked for this on 26 November 2026. Work in `main`. Replace the `rebreather` path in GearIcon.svelte with this one: the two cylinders are unchanged, the hoses are gone and the body is shorter at the top. Keep the stroke width the icon has now.
 
