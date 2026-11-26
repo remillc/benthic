@@ -194,7 +194,7 @@
       [
         { label: t('gear.piece.share'), onclick: share },
         { label: t('maintenance.export.menu'), onclick: exportPieceHistory },
-        ...(!retired && ((piece.type === 'computer' && !piece.computerModel) || piece.type === 'suit') ? [{ label: t('gear.pair.menu'), onclick: () => (gear.readOnly ? refused() : (pairing = true)) }] : []),
+        ...(!retired && ((piece.type === 'computer' && !piece.computerModel) || piece.type === 'suit') ? [{ label: t(piece.type === 'suit' ? 'gear.pair.menuSuit' : 'gear.pair.menu'), onclick: () => (gear.readOnly ? refused() : (pairing = true)) }] : []),
         ...(retired ? [] : [{ label: t('gear.retire.button'), onclick: () => (gear.readOnly ? refused() : (confirmRetire = true)) }]),
         { label: t('gear.piece.delete'), onclick: () => (gear.readOnly ? refused() : (confirmForever = true)), danger: true },
       ],
