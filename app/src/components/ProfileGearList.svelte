@@ -102,8 +102,10 @@
     <ReadOnlyNotice onexport={() => (exporting = true)} />
     {#if !searching}
       {#if hasActiveMaintenance()}
-        <button type="button" class="bc-gear-list--upkeep" onclick={() => showProfilePath('/profile/maintenance/')}>
-          <span class="bc-gear-list--tile bc-gear-list--tile-late"><Icon name="clock" size={22} /></span>
+        <!-- android-tablette-profil-equipement-paysage: a tinted card, the icon alone (no tile); the late tint only when an
+             upkeep is overdue. -->
+        <button type="button" class="bc-gear-list--upkeep" class:bc-gear-list--upkeep-late={upkeep.overdue > 0} onclick={() => showProfilePath('/profile/maintenance/')}>
+          <span class="bc-gear-list--upkeep-icon"><Icon name="clock" size={22} /></span>
           <span class="bc-gear-list--texts">
             <span class="bc-gear-list--name">{t('maintenance.entry')}</span>
             <span class="bc-gear-list--supporting">{upkeepLine}</span>
@@ -229,17 +231,35 @@
     .bc-gear-list--upkeep {
       width: 100%;
       min-height: 64px;
-      padding: 8px 16px;
+      padding: 12px 16px;
       border: 0;
-      border-radius: 20px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--bc-maintenance);
+      background: var(--bc-secondary-container);
+
+      .bc-gear-list--name {
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      &.bc-gear-list--upkeep-late {
+        background: var(--bc-late-tint);
+      }
       color: var(--bc-text);
       font: inherit;
       text-align: start;
       cursor: pointer;
+    }
+    .bc-gear-list--upkeep-icon {
+      flex: none;
+      display: flex;
+      color: var(--bc-secondary);
+
+      .bc-gear-list--upkeep-late & {
+        color: var(--bc-late);
+      }
     }
     .bc-gear-list--group {
       margin: 16px 12px 4px;
@@ -255,6 +275,8 @@
     }
     /* Mock-up: 32 px high, 8 px corners, a grey icon, « name · count » in one text. */
     .bc-gear-list--chip {
+      flex: none;
+      width: auto;
       height: 32px;
       padding: 0 12px;
       box-sizing: border-box;
@@ -302,10 +324,6 @@
       border-radius: 12px;
       display: grid;
       place-items: center;
-    }
-    .bc-gear-list--tile-late {
-      background: var(--bc-surface);
-      color: var(--bc-maintenance-icon);
     }
     .bc-gear-list--texts {
       flex: 1;
