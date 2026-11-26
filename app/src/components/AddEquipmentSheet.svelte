@@ -155,11 +155,6 @@
       max-height: min(560px, 70vh);
     }
 
-    :global(.bc-add-equipment-dialog) {
-      width: 560px;
-      max-width: calc(100vw - 48px);
-    }
-
     .bc-add-equipment--search {
       margin: 0 16px;
       height: 48px;
