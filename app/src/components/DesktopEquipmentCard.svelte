@@ -11,17 +11,26 @@
    *   icon: import('svelte').Snippet,
    *   action?: import('svelte').Snippet,
    *   indent?: boolean,
+   *   subtitle?: string,
    *   children?: import('svelte').Snippet,
    * }}
+   * `subtitle`: a line under the title in the header (« Plongée invalide »: what the switch at the right does).
    */
-  let { title, name = '', icon, action, indent = false, children } = $props();
+  let { title, name = '', icon, action, indent = false, subtitle = '', children } = $props();
   const uid = $props.id();
 </script>
 
 <section class="bc-desktop-equipment-card" aria-labelledby="bc-eq-{uid}" data-card={name || undefined}>
   <header class="bc-desktop-equipment-card--header">
     <span class="bc-desktop-equipment-card--icon" aria-hidden="true">{@render icon()}</span>
-    <h3 class="bc-desktop-equipment-card--title" id="bc-eq-{uid}">{title}</h3>
+    {#if subtitle}
+      <div class="bc-desktop-equipment-card--texts">
+        <h3 class="bc-desktop-equipment-card--title" id="bc-eq-{uid}">{title}</h3>
+        <span class="bc-desktop-equipment-card--subtitle">{subtitle}</span>
+      </div>
+    {:else}
+      <h3 class="bc-desktop-equipment-card--title" id="bc-eq-{uid}">{title}</h3>
+    {/if}
     {#if action}<div class="bc-desktop-equipment-card--action">{@render action()}</div>{/if}
   </header>
   {#if children}
@@ -68,6 +77,19 @@
       line-height: 24px;
       font-weight: 600;
       color: var(--bc-text);
+    }
+
+    .bc-desktop-equipment-card--texts {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bc-desktop-equipment-card--subtitle {
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
     }
 
     .bc-desktop-equipment-card--action {

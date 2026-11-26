@@ -12,6 +12,8 @@
   import { ownComputerPhoto } from '../lib/gear-photos.svelte.js';
   import ButtonGroup from './ButtonGroup.svelte';
   import DesktopWeights from './DesktopWeights.svelte';
+  import DiveWeightRows from './DiveWeightRows.svelte';
+  import DetailSheet from './DetailSheet.svelte';
   import DesktopOtherGear from './DesktopOtherGear.svelte';
   import DesktopEquipmentCard from './DesktopEquipmentCard.svelte';
   import DesktopChipsField from './DesktopChipsField.svelte';
@@ -27,10 +29,12 @@
   import DesktopConsumption from './DesktopConsumption.svelte';
   import SiteMap from './SiteMap.svelte';
   import Icon from './Icon.svelte';
-  import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
+  import { logbook, saveDiveChanges, isSubscriber, tripChange } from '../lib/logbook.svelte.js';
   import { ios, layout } from '../lib/layout.svelte.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
-  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft } from '../lib/cylinder-dialog.js';
+  import CylinderDeleteDialog from './CylinderDeleteDialog.svelte';
+  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft, pressureText as draftPressureText } from '../lib/cylinder-dialog.js';
+  import { deletionOutcome, gasChangeMoments } from '../lib/gas-group.js';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
   import { applyKit, cloneEquipment, diveKeyOf, equipmentIsEmpty, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
@@ -41,6 +45,9 @@
   import { offerUndo } from '../lib/undo.js';
   import { cylinderChanges, fieldChanges, fieldValue, parseTyped, pressureMbarOf, siteChoice, weightChanges, weightText } from '../lib/desktop-edit.js';
   import { FEEDBACK_CHOICES, feedbackOf, withFeedback, withoutFeedbackTags } from '../lib/weight-feedback.js';
+  import { cylinderKey, isMostRecent, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
+  import { scanWeightSources } from '../lib/weight-suggestion-scan.js';
+  import { formatDate, formatWeight } from '../lib/format.js';
   import { WATER_TYPES, waterTypeName } from '../lib/tools.js';
   import { computerList } from '../lib/gas-summary.js';
   import { useKey } from '../lib/cylinder-use.js';
@@ -360,6 +367,39 @@
     return result.changes ? write(result.changes) : true;
   }
   const weightsShown = $derived(weightChips(dive.weights, prefs));
+
+  // The weights as rows with the amber suggestion on an Android phone (task 2026-11-26-403, mock-ups detail-onglets-equipement-android
+  // and detail3-android); the other devices keep the chips their mock-ups draw. The suggestion is the weight of the latest dive of
+  // the logbook with the same suit, cylinders and water, as the old editor offered it, and only on the logbook's most recent dive.
+  const rowsLayout = $derived(layout.phone && !ios);
+  /** @type {Map<number, import('../lib/weight-suggestion.js').WeightSource>} */
+  const sourceCache = new Map();
+  let sources = $state(/** @type {import('../lib/weight-suggestion.js').WeightSource[]} */ ([]));
+  /** The suggestion the diver dismissed, by the dive and the rule it was for: a new suit or cylinder brings it back. */
+  let dismissedFor = $state('');
+  const ruleDive = $derived({ id: dive.id, suit: dive.suit ?? '', waterType: dive.waterType ?? '', cylinders: dive.cylinders.map((c) => ({ sizeMl: c.sizeMl })) });
+  const ruleKey = $derived(`${dive.id}|${ruleDive.suit}|${ruleDive.waterType}|${cylinderKey(ruleDive.cylinders)}`);
+  const suggestionAllowed = $derived(rowsLayout && !preview && isMostRecent(dive.id, logbook.dives));
+  $effect(() => {
+    if (!suggestionAllowed || tab !== 'equipment') return;
+    const key = ruleKey;
+    const current = untrack(() => ruleDive);
+    const timer = setTimeout(async () => {
+      const read = await scanWeightSources({ current, dives: untrack(() => logbook.dives), cache: sourceCache, isStale: () => key !== ruleKey });
+      if (read && key === ruleKey) sources = read;
+    }, 300);
+    return () => clearTimeout(timer);
+  });
+  const suggestion = $derived(suggestionAllowed ? suggestWeight(ruleDive, sources, prefs.weight, plus) : null);
+  const weightsNow = $derived((dive.weights ?? []).reduce((sum, w) => sum + Math.max(0, w.grams), 0));
+  const suggestionShown = $derived(!!suggestion && dismissedFor !== ruleKey && showSuggestion(suggestion, weightsNow, prefs.weight)
+    ? { weight: formatWeight(suggestion.grams, prefs), date: formatDate(suggestion.from.date) }
+    : null);
+  /** « Utiliser »: the earlier dive's weights, adjusted, replace this dive's weights. */
+  function useSuggestion() {
+    if (!suggestion) return;
+    saveWeights(weightRows(suggestion.weights));
+  }
   const feedback = $derived(feedbackOf(dive.tags));
   const feedbackOptions = $derived(FEEDBACK_CHOICES.map((value) => ({ value, label: t(`weightFeedback.${value === 'too-light' ? 'tooLight' : value === 'ok' ? 'ok' : 'tooHeavy'}`) })));
   /** @param {string} value */
@@ -453,8 +493,8 @@
     const span = cylinderSpan(dive.samples, index);
     return span ? t('desktopDetail.cylinderSpan', { from: span.fromMin, to: span.toMin }) : '';
   };
-  // The edit dialogs of the tiles (task 2026-11-26-401), on an Android phone: one cylinder alone, or a rebreather's two together.
-  const dialogs = $derived(layout.phone && !ios);
+  // The edit dialogs of the tiles (task 2026-11-26-401), on a phone (a full-screen dialog on Android, a sheet on iPhone): one cylinder alone, or a rebreather's two together.
+  const dialogs = $derived(layout.phone);
   /** @type {{ title: string, indexes: number[], parts: { key: string, heading: string, badge?: string, oxygenOnly?: boolean, draft: import('../lib/cylinder-dialog.js').CylinderDraft }[], single: boolean }|null} */
   let editing = $state(null);
   /** @param {string} key a tile's key */
@@ -468,7 +508,8 @@
       return;
     }
     // A closed-circuit unit always shows both cylinders: one the dive lacks is an empty card, added on Save (index -1).
-    const roles = tile.kind === 'ccr' ? /** @type {const} */ (['diluent', 'oxygen']) : /** @type {const} */ (['mix']);
+    // Oxygen first, as the tile and the panes name it (task 2026-11-26-403).
+    const roles = tile.kind === 'ccr' ? /** @type {const} */ (['oxygen', 'diluent']) : /** @type {const} */ (['mix']);
     const parts = roles.map((role, i) => {
       const part = tile.parts.find((p) => p.role === role);
       const index = part ? tile.indexes[tile.parts.indexOf(part)] : -1;
@@ -496,14 +537,32 @@
     const added = current.indexes.flatMap((index, i) => (index < 0 ? [{ index: -1, patch: draftPatch(blankCylinder(), current.parts[i].draft, cylinderTypes, prefs, options(i)) }] : []));
     if (await saveCylinders([...cylinderRows.map((r) => ({ ...r, patch: patches.get(r.index) ?? r.patch })), ...added])) editing = null;
   }
-  async function removeEditing() {
+  /** « Retirer la bouteille » asks first (mock-up detail-bouteille-retirer-android): the cylinder being removed, by its index. */
+  let removing = $state(-1);
+  function askRemove() {
     const index = editing?.indexes[0] ?? -1;
-    if (index < 0) return;
-    if (dive.cylinders[index]?.protected) {
-      showSnackbar(t('edit.cylinderInUse'));
-      return;
-    }
-    if (await removeCylinder(index)) editing = null;
+    if (index >= 0) removing = index;
+  }
+  /** What the confirmation says about the cylinder: its role and gas, its type and pressures, what the profile loses. */
+  const removal = $derived.by(() => {
+    const c = removing >= 0 ? dive.cylinders[removing] : undefined;
+    if (!c) return null;
+    const card = cards[removing];
+    const moments = gasChangeMoments(dive.events ?? [], removing);
+    const pressures = c.startMbar > 0 || c.endMbar > 0 ? `${draftPressureText(c.startMbar, prefs) || '–'} → ${draftPressureText(c.endMbar, prefs) || '–'} ${pressureUnitText}` : '';
+    return {
+      gas: [t(useKey(c.use || 'OC-gas', dive.divemode)), card?.gas].filter(Boolean).join(' · '),
+      line: [cylinderTypeLabel(c.description) || formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs), pressures].filter(Boolean).join(', '),
+      moments,
+      outcome: deletionOutcome({ protected: !!c.protected, moments }),
+      // Said only of a cylinder that was not breathed: for a breathed one the profile may change in ways the dialog does not claim.
+      notBreathed: !c.used,
+    };
+  });
+  async function removeConfirmed() {
+    const index = removing;
+    removing = -1;
+    if (index >= 0 && (await removeCylinder(index))) editing = null;
   }
   async function addCylinderAndSelect() {
     const at = dive.cylinders.length;
@@ -546,6 +605,61 @@
       }
     }
   }
+
+  // --- Informations: « Voyage » (task 2026-11-26-403). The trips are the logbook's, by name; a new name makes a new trip. ---
+  /** The logbook's trips, by location (the first one of each name). */
+  const trips = $derived.by(() => {
+    /** @type {Map<string, number>} */
+    const byName = new Map();
+    for (const d of logbook.dives) if (d.trip?.location && !byName.has(d.trip.location)) byName.set(d.trip.location, d.trip.id);
+    return byName;
+  });
+  const tripName = $derived(dive.trip?.location ?? '');
+  const tripOptions = $derived([{ value: '', label: t('edit.tripNone') }, ...[...trips.keys()].map((name) => ({ value: name, label: name }))]);
+  /** The dive as the core has it now, after a change the dive page does not hear about (a trip is not an edit of the dive). */
+  async function refreshDive() {
+    logbook.edited = { id: dive.id, dive: await BenthicCore.getDive({ id: dive.id }) };
+  }
+  /** Puts the dive in a trip (an existing one, or a new one of that name) or takes it out (an empty name). @param {string} name */
+  async function saveTrip(name) {
+    const next = name.trim();
+    if (next === tripName) return true;
+    let steps = 0;
+    try {
+      if (!next) {
+        if (dive.trip) {
+          await tripChange({ action: 'remove', diveIds: [dive.id] });
+          steps++;
+        }
+      } else if (trips.has(next)) {
+        await tripChange({ action: 'add', tripId: /** @type {number} */ (trips.get(next)), diveIds: [dive.id] });
+        steps++;
+      } else {
+        const created = await tripChange({ action: 'create', diveIds: [dive.id] });
+        steps++;
+        const tripId = created.trip?.tripId;
+        if (tripId) {
+          await tripChange({ action: 'location', tripId, value: next });
+          steps++;
+        }
+      }
+      await refreshDive();
+      if (steps > 1) offerUndo(t('edit.saved'), undefined, 6000, steps);
+      return true;
+    } catch (e) {
+      failure(e);
+      return false;
+    }
+  }
+  /** The sheet of the trips on a phone, and the cross that takes the dive out of its trip. */
+  let tripSheet = $state(false);
+  /** @param {string} value */
+  async function pickTrip(value) {
+    tripSheet = false;
+    await saveTrip(value);
+  }
+  /** « Plongée invalide »: excluded from the statistics, hidden as the setting says. @param {boolean} on */
+  const saveInvalid = (on) => write({ invalid: on ? 1 : 0 });
 
   // --- Informations and Carte: the site card. -------------------------------------------------
   const siteRow = $derived(sites.find((x) => x.name === dive.site));
@@ -592,6 +706,21 @@
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
         <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
+        {#if layout.phone}
+          <!-- A grey field that opens the sheet of the trips; its cross takes the dive out of its trip (mock-up detail-onglets-android). -->
+          <div class="bc-desktop-dive-fields--trip" data-field="trip">
+            <span class="bc-desktop-dive-fields--trip-label">{t('desktopDetail.label.trip')}</span>
+            <div class="bc-desktop-dive-fields--trip-row">
+              <button type="button" class="bc-desktop-dive-fields--trip-field" aria-haspopup="dialog" aria-label="{t('desktopDetail.label.trip')} : {tripName || t('edit.tripNone')}" disabled={preview} onclick={() => (tripSheet = true)}>
+                <span class="bc-desktop-dive-fields--trip-name" class:bc-desktop-dive-fields--trip-empty={!tripName} class:bc-desktop-dive-fields--trip-has={!!tripName}>{tripName || t('edit.tripNone')}</span>
+                <Icon name="arrowDown" size={20} />
+              </button>
+              {#if tripName}<button type="button" class="bc-desktop-dive-fields--trip-clear" aria-label={t('edit.tripClear')} onclick={() => saveTrip('')}><Icon name="close" size={20} /></button>{/if}
+            </div>
+          </div>
+        {:else}
+          <DesktopEditField stacked tall name="trip" kind="choice" label={t('desktopDetail.label.trip')} value={tripName} invitation={t('edit.tripNone')} options={tripOptions} onsave={(v) => saveTrip(String(v))} />
+        {/if}
       </DesktopEquipmentCard>
 
       <DesktopEquipmentCard name="people" title={t('desktopDetail.card.people')}>
@@ -631,13 +760,20 @@
           {/if}
           {#if dive.cns > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.cns')} value={`${formatNumber(dive.cns, 0)} %`} />{/if}
           {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
-          {#if trip}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.trip')} value={trip} />{/if}
         </div>
       </DesktopEquipmentCard>
 
       <DesktopEquipmentCard name="tags" title={t('desktopDetail.card.tags')}>
         {#snippet icon()}<Icon name="tag" size={22} />{/snippet}
         <DesktopChipsField name="tags" variant="tag" showLabel={false} label={t('desktopDetail.label.tags')} value={/** @type {string[]} */ (fieldValue(dive, 'tags', prefs))} known={known.tag} newLabel={t('desktopDetail.newTag')} onsave={(v) => save('tags', v)} />
+      </DesktopEquipmentCard>
+
+      <!-- Ends the tab (mock-up detail-onglets-android): a switch that excludes the dive from the statistics. -->
+      <DesktopEquipmentCard name="invalid" title={t('edit.invalid')} subtitle={t('edit.invalidText')}>
+        {#snippet icon()}<svg class="bc-desktop-dive-fields--invalid-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M5.6 5.6l12.8 12.8" /></svg>{/snippet}
+        {#snippet action()}
+          <label class="toggle"><input type="checkbox" role="switch" aria-label={t('edit.invalid')} checked={dive.invalid} disabled={preview} onchange={(e) => saveInvalid(e.currentTarget.checked)} /><span class="toggle-icon"></span></label>
+        {/snippet}
       </DesktopEquipmentCard>
     </div>
   {:else if tab === 'equipment'}
@@ -692,7 +828,11 @@
           {#if weightsShown.total}<span class="bc-desktop-dive-fields--total">{t('desktopDetail.weightTotal')}<strong>{weightsShown.total}</strong></span>{/if}
         {/snippet}
         <div data-field="weights">
-          <DesktopWeights weights={dive.weights ?? []} previous={previousWeights} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
+          {#if rowsLayout}
+            <DiveWeightRows weights={dive.weights ?? []} previous={previousWeights} {prefs} suggestion={suggestionShown} onuse={useSuggestion} ondismiss={() => (dismissedFor = ruleKey)} onsave={(rows) => saveWeights(rows)} />
+          {:else}
+            <DesktopWeights weights={dive.weights ?? []} previous={previousWeights} {prefs} label={t('desktopDetail.label.weights')} onsave={(rows) => saveWeights(rows)} />
+          {/if}
         </div>
         {#if plus}
           <div class="bc-desktop-dive-fields--feedback">
@@ -732,7 +872,7 @@
         </section>
       {:else}
         <div class="bc-desktop-dive-fields--card">
-          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} onedit={editTile} />
+          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} chevron={!layout.desktop} onedit={editTile} />
         </div>
 
         {#if activeTile?.kind === 'cylinder' && chosen}
@@ -791,8 +931,30 @@
     footnote={editing.single ? '' : t('desktopDetail.cylinderDialog.footnote')}
     onsave={saveEditing}
     onclose={() => (editing = null)}
-    onremove={editing.single ? removeEditing : undefined}
+    onremove={editing.single ? askRemove : undefined}
+    mod={{ surfaceMbar: dive.surfacePressureMbar || 1013, salinity: dive.userSalinity || 10300 }}
   />
+{/if}
+
+{#if removal}
+  <CylinderDeleteDialog
+    n={removing + 1}
+    title={t('desktopDetail.removeCylinderTitle')}
+    confirmLabel={t('desktopDetail.removeCylinderConfirm')}
+    plain={removal.notBreathed ? t('desktopDetail.removeCylinderPlain') : ''}
+    icon={false}
+    gas={removal.gas}
+    line={removal.line}
+    ratio={0}
+    outcome={removal.outcome}
+    moments={removal.moments}
+    oncancel={() => (removing = -1)}
+    onconfirm={removeConfirmed}
+  />
+{/if}
+
+{#if tripSheet}
+  <DetailSheet title={t('desktopDetail.label.trip')} options={tripOptions} value={tripName} search newLabel={t('desktopDetail.newTrip')} onselect={pickTrip} onclose={() => (tripSheet = false)} />
 {/if}
 
 {#if picking}
@@ -967,6 +1129,89 @@
     }
 
     /* The weights total, in the card's header. */
+    /* « Voyage » (a phone): the label, a 48 px grey field with the trip, its cross and a chevron. */
+    .bc-desktop-dive-fields--trip {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bc-desktop-dive-fields--trip-label {
+      margin: 0 0 6px;
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--bc-text-2);
+    }
+
+    .bc-desktop-dive-fields--trip-row {
+      position: relative;
+      display: flex;
+    }
+
+    .bc-desktop-dive-fields--trip-field {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 48px;
+      margin: 0;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--bc-field-rest);
+      color: var(--bc-text);
+      font: inherit;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: start;
+
+      :global(svg) {
+        flex: none;
+        color: var(--bc-text-2);
+      }
+    }
+
+    .bc-desktop-dive-fields--trip-name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bc-desktop-dive-fields--trip-has {
+      padding-inline-end: 36px;
+    }
+
+    .bc-desktop-dive-fields--trip-empty {
+      color: var(--bc-text-2);
+    }
+
+    /* The cross sits before the chevron, 40 dp, pulled into the field's padding. */
+    .bc-desktop-dive-fields--trip-clear {
+      position: absolute;
+      inset-inline-end: 28px;
+      top: 4px;
+      width: 40px;
+      height: 40px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--bc-text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bc-desktop-dive-fields--invalid-icon {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .bc-desktop-dive-fields--total {
       display: inline-flex;
       align-items: baseline;

@@ -21,11 +21,14 @@
    *   onselect: (key: string) => void,
    *   onadd: () => void,
    *   editable?: boolean,
+   *   chevron?: boolean,
    *   onedit?: (key: string) => void,
    * }}
-   * editable (an Android phone, task 2026-11-26-401): every cylinder tile gets a chevron and a touch opens its edit dialog (onedit).
+   * editable (a phone, tasks 2026-11-26-401 and 403): a touch on a tile opens its edit dialog (onedit). chevron: every tile shows the
+   * chevron at its right, vertically centred (phones and tablets; the desktop keeps its tiles plain). The rebreather tile names the
+   * oxygen first: the drawing is mirrored and « Oxygène » is the left block, « Diluant » the right one.
    */
-  let { tiles, selected, onselect, onadd, editable = false, onedit = () => {} } = $props();
+  let { tiles, selected, onselect, onadd, editable = false, chevron = false, onedit = () => {} } = $props();
 
   const marks = $derived({ diluent: t('detail.rebreatherMarks.diluent'), oxygen: t('detail.rebreatherMarks.oxygen'), bailout: t('detail.rebreatherMarks.bailout') });
   /** The drawing's fill of a card. @param {{ ratio: number, startRatio: number|null, hatched: boolean }|undefined} card */
@@ -39,7 +42,7 @@
       class="bc-desktop-gas-cards--card"
       class:bc-desktop-gas-cards--selected={tile.key === selected}
       class:bc-desktop-gas-cards--wide={tile.kind === 'ccr'}
-      class:bc-desktop-gas-cards--editable={editable}
+      class:bc-desktop-gas-cards--editable={chevron || editable}
       data-tile={tile.key}
       aria-pressed={tile.key === selected}
       aria-label={tile.label}
@@ -48,7 +51,7 @@
         if (editable) onedit(tile.key);
       }}
     >
-      {#if editable}<span class="bc-desktop-gas-cards--chevron" aria-hidden="true"><Icon name="chevron" size={24} /></span>{/if}
+      {#if chevron || editable}<span class="bc-desktop-gas-cards--chevron" aria-hidden="true"><Icon name="chevron" size={24} /></span>{/if}
       {#if tile.kind === 'cylinder' && tile.card}
         <CylinderDrawing ratio={tile.card.ratio} startRatio={tile.card.startRatio} hatched={tile.card.hatched} width={64} />
         <span class="bc-desktop-gas-cards--gas">{tile.title}</span>
@@ -56,19 +59,19 @@
       {:else if tile.kind === 'ccr'}
         {@const dil = tile.parts.find((p) => p.role === 'diluent')}
         {@const oxy = tile.parts.find((p) => p.role === 'oxygen')}
-        <RebreatherDrawing compact diluent={fill(dil?.card)} oxygen={fill(oxy?.card)} {marks} />
-        <!-- Diluant ends at the diluent cylinder, Oxygène starts at the oxygen cylinder (the cylinders are 108 and 96 px from the text box's right and left edges). -->
+        <RebreatherDrawing compact mirrored diluent={fill(dil?.card)} oxygen={fill(oxy?.card)} {marks} />
+        <!-- Oxygène (left) ends at the oxygen cylinder, Diluant (right) starts at the diluent cylinder (the cylinders are 108 and 96 px from the text box's right and left edges). -->
         <span class="bc-desktop-gas-cards--unit-text">
-          {#if dil}
-            <span class="bc-desktop-gas-cards--part bc-desktop-gas-cards--part-dil">
-              <span class="bc-desktop-gas-cards--gas">{dil.title}</span>
-              {#each dil.lines as line, i (i)}<span class="bc-desktop-gas-cards--line" class:bc-value={i > 0}>{line}</span>{/each}
-            </span>
-          {/if}
           {#if oxy}
             <span class="bc-desktop-gas-cards--part bc-desktop-gas-cards--part-oxy">
               <span class="bc-desktop-gas-cards--gas">{oxy.title}</span>
               {#each oxy.lines as line, i (i)}<span class="bc-desktop-gas-cards--line" class:bc-value={i > 0}>{line}</span>{/each}
+            </span>
+          {/if}
+          {#if dil}
+            <span class="bc-desktop-gas-cards--part bc-desktop-gas-cards--part-dil">
+              <span class="bc-desktop-gas-cards--gas">{dil.title}</span>
+              {#each dil.lines as line, i (i)}<span class="bc-desktop-gas-cards--line" class:bc-value={i > 0}>{line}</span>{/each}
             </span>
           {/if}
         </span>
@@ -166,12 +169,12 @@
       white-space: nowrap;
     }
 
-    .bc-desktop-gas-cards--part-dil {
+    .bc-desktop-gas-cards--part-oxy {
       right: 108px;
       align-items: flex-end;
     }
 
-    .bc-desktop-gas-cards--part-oxy {
+    .bc-desktop-gas-cards--part-dil {
       left: 96px;
       align-items: flex-start;
     }

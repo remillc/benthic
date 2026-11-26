@@ -65,7 +65,8 @@ test('the Informations cards come in the mock-up order and every card title is a
   const names = [...info.matchAll(/<DesktopEquipmentCard name="(\w+)"|<DiveSignatures/g)].map((m) => m[1] ?? 'signatures');
   const order = ['datetime', 'site', 'people', 'signatures', 'rating'];
   assert.deepEqual(names.filter((n) => order.includes(n)), order);
-  assert.equal(names.at(-1), 'tags');
+  // « Plongée invalide » ends the tab (task 2026-11-26-403), right after the tags.
+  assert.deepEqual(names.slice(-2), ['tags', 'invalid']);
   const card = readFileSync(new URL('../../app/src/components/DesktopEquipmentCard.svelte', import.meta.url), 'utf8');
   assert.match(card, /<h3 class="bc-desktop-equipment-card--title"/);
   assert.match(card, /bc-desktop-equipment-card--icon/);
