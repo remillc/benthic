@@ -448,6 +448,32 @@ export async function computerFigures(g) {
   }
 }
 
+/**
+ * The figures of a suit tied to the logbook's « Combinaison » texts (task 2026-11-26-405): the dives whose text is one of
+ * the piece's, found by the logbook's filter, together with the dives the piece was ticked on. Every figure (dives, hours,
+ * deepest, last dive) comes from the same dives. Null when the piece has no text or the core cannot answer.
+ * @param {Gear} g
+ * @returns {Promise<{ dives: number, seconds: number, deepestMm: number, last: string }|null>}
+ */
+export async function suitFigures(g) {
+  if (!g.suitNames?.length) return null;
+  try {
+    const ids = await divesOfRule('suit', g.suitNames);
+    const own = new Set(diveKeysOf(g.id));
+    const figures = { dives: 0, seconds: 0, deepestMm: 0, last: '' };
+    for (const d of logbook.dives) {
+      if (!ids.has(d.id) && !own.has(diveKeyOf(d) ?? '')) continue;
+      figures.dives++;
+      figures.seconds += d.durationSeconds;
+      figures.deepestMm = Math.max(figures.deepestMm, d.maxDepthMm);
+      if (d.date > figures.last) figures.last = d.date;
+    }
+    return figures;
+  } catch {
+    return null;
+  }
+}
+
 /** Sets or lifts the read-only state: what the end of a Benthic+ subscription will do (no billing exists yet). @param {boolean} on */
 export const setReadOnly = (on) => change((inv) => inv.setReadOnly(on));
 
