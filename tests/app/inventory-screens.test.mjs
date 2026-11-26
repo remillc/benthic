@@ -136,3 +136,10 @@ test('Équipement follows the mock-ups: wrapping kit chips, iPhone kit list, sec
   assert.match(list, /inset-inline-end: 24px;\s*bottom: 24px/);
   assert.match(list, /background: var\(--bc-secondary-container\)/);
 });
+
+test('on wide screens « Pièces retirées » opens under its row, its pieces drawn as the list rows', () => {
+  const list = read('components/ProfileGearList.svelte');
+  assert.match(list, /bc-gear-list--retired" aria-expanded=\{retiredOpen\}/);
+  assert.match(list, /\{#if retiredOpen\}[\s\S]*\{#each retired as g \(g\.id\)\}[\s\S]*class="bc-gear-list--row"[\s\S]*retiredLine\(g\)/);
+  assert.doesNotMatch(list, /showProfilePath\('\/profile\/gear\/retired\/'\)/, 'no page of its own on wide screens');
+});
