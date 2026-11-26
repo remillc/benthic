@@ -6,7 +6,10 @@
   // button (each opens a grid of months or of years, 26 November 2026), the
   // previous and next month arrows, 40 dp day cells and Cancel / OK. Months are
   // 0-based. Confirms with { year, month, day }.
-  import { tick } from 'svelte';
+  // iPhone and iPad (decided on 26 November 2026): the system's own date picker instead, through a hidden
+  // <input type="date"> opened at once with showPicker(); should iOS refuse to open it, this calendar shows.
+  import { tick, onMount } from 'svelte';
+  import { ios } from '../lib/layout.svelte.js';
   import Md3Dialog from './Md3Dialog.svelte';
   import Icon from './Icon.svelte';
   import { t } from '../lib/i18n.js';
@@ -23,6 +26,36 @@
    * }}
    */
   let { year, month, day, minYear = 1950, maxYear = new Date().getFullYear() + 1, onconfirm, oncancel } = $props();
+
+  /** iOS: the system's picker is open (false once it could not be opened: this calendar then shows). */
+  let native = $state(ios);
+  /** @type {HTMLInputElement|undefined} */
+  let nativeInput = $state();
+  let nativeDone = false;
+  onMount(() => {
+    if (!native || !nativeInput) return;
+    try {
+      nativeInput.showPicker();
+    } catch (e) {
+      console.info('The system date picker did not open: the calendar shows', e);
+      native = false;
+    }
+  });
+  /** @param {Event} e */
+  function nativeChange(e) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(/** @type {HTMLInputElement} */ (e.currentTarget).value);
+    if (!m || nativeDone) return;
+    nativeDone = true;
+    onconfirm({ year: Number(m[1]), month: Number(m[2]) - 1, day: Number(m[3]) });
+  }
+  function nativeClosed() {
+    // The picker closed without a date (« Annuler », a tap outside).
+    if (nativeDone) return;
+    nativeDone = true;
+    oncancel();
+  }
+  /** @param {number} n */
+  const two = (n) => String(n).padStart(2, '0');
 
   // svelte-ignore state_referenced_locally
   let selected = $state({ year: Math.min(Math.max(year, minYear), maxYear), month, day: Math.min(day, daysInMonth(Math.min(Math.max(year, minYear), maxYear), month)) });
@@ -180,6 +213,21 @@
   );
 </script>
 
+{#if native}
+  <input
+    bind:this={nativeInput}
+    class="bc-date-picker--native"
+    type="date"
+    tabindex="-1"
+    aria-hidden="true"
+    min={`${minYear}-01-01`}
+    max={`${maxYear}-12-31`}
+    value={`${String(selected.year).padStart(4, '0')}-${two(selected.month + 1)}-${two(selected.day)}`}
+    onchange={nativeChange}
+    onblur={nativeClosed}
+    oncancel={nativeClosed}
+  />
+{:else}
 <Md3Dialog class="bc-date-picker" title={mode === 'input' ? t('datePicker.titleInput') : t('datePicker.title')} {oncancel}>
   <div class="bc-date-picker--header">
     <span class="bc-date-picker--headline">{headline}</span>
@@ -281,9 +329,23 @@
     <button type="button" onclick={confirm} disabled={invalid}>{t('dialog.ok')}</button>
   {/snippet}
 </Md3Dialog>
+{/if}
 
 <style>
   @layer bc.components {
+    /* iOS: the system picker's anchor, not seen and taking no room. */
+    .bc-date-picker--native {
+      position: fixed;
+      inset-inline-start: 50%;
+      top: 50%;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
     :global(.bc-date-picker .bc-md3-dialog--surface) {
       width: min(360px, calc(100% - 48px));
       padding-top: 16px;
