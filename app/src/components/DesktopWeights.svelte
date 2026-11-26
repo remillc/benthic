@@ -178,7 +178,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="bc-desktop-weights--editing" bind:this={box} onfocusout={focusout} onkeydown={keydown}>
       <button type="button" class="bc-desktop-weights--place" aria-label={t('desktopDetail.weightPlace')} aria-haspopup="listbox" onclick={() => (choosing = true)}>
-        <span class="bc-desktop-weights--place-name">{weightPlaceName(editing.description)}</span><Icon name="arrowDown" size={18} />
+        <span class="bc-desktop-weights--place-name">{weightPlaceName(editing.description)}</span><Icon name="expand" size={20} />
       </button>
       <input class="bc-desktop-weights--input" type="text" inputmode="decimal" aria-label={label} aria-invalid={!valid} value={editing.text} oninput={(e) => editing && (editing.text = e.currentTarget.value)} />
       <span class="bc-desktop-weights--unit">{unit}</span>

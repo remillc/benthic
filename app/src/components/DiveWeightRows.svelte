@@ -170,7 +170,7 @@
         {#if n === 0}<span class="bc-dive-weight-rows--label">{t('desktopDetail.weightType')}</span>{/if}
         <button type="button" class="bc-dive-weight-rows--field bc-dive-weight-rows--type-field" aria-haspopup="dialog" aria-label={`${t('desktopDetail.weightType')} : ${weightPlaceName(row.description)}`} onclick={() => (choosing = { index: row.i })}>
           <span class="bc-dive-weight-rows--type-name">{weightPlaceName(row.description)}</span>
-          <Icon name="arrowDown" size={20} />
+          <Icon name="expand" size={24} />
         </button>
       </div>
       <div class="bc-dive-weight-rows--amount">
