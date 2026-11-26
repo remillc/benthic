@@ -1909,17 +1909,19 @@ async function certsFabFlows(expect) {
     await sleep(500);
     const sheet = await tab.run(() => document.querySelectorAll('.bc-doc-choice.modal-in .bc-doc-choice--option').length);
     expect(`${label}: Add opens the document choices`, { count: 4 }, { count: sheet });
+    // Through the inventory, not on the state alone: since 26 November 2026 the Équipement page stands behind on wide
+    // screens, and its next load reads the read-only state back from the inventory.
     await tab.run(async () => {
-      const { gear } = await import('/src/lib/inventory.svelte.js');
-      gear.readOnly = true;
+      const { setReadOnly } = await import('/src/lib/inventory.svelte.js');
+      await setReadOnly(true);
     });
     await sleep(100);
     const hidden = await tab.run(() => getComputedStyle(document.querySelector('.page-current.bc-docs .bc-fab-add')).display === 'none');
     expect(`${label}: read-only hides Add`, { hidden: true }, { hidden });
     await tab.run(async () => {
-      const { gear } = await import('/src/lib/inventory.svelte.js');
+      const { setReadOnly } = await import('/src/lib/inventory.svelte.js');
       const { changeProfile } = await import('/src/lib/profile.svelte.js');
-      gear.readOnly = false;
+      await setReadOnly(false);
       await changeProfile((profile) => profile.saveCertification({ agency: 'PADI', level: 'Open Water', number: 'test-1' }));
     });
     await sleep(300);
@@ -2728,7 +2730,8 @@ async function gearDeleteFlows(expect) {
       const { gear } = await import('/src/lib/inventory.svelte.js');
       const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
       return {
-        route: view?.f7View?.router?.currentRoute?.url,
+        // The path: since 26 November 2026 /profile/gear/ is the view's first page on wide screens, whose url keeps the test page's ?theme=.
+        route: view?.f7View?.router?.currentRoute?.path,
         piece: gear.pieces.some((p) => p.id === fixture.id),
         reminder: gear.maintenance.some((m) => m.id === fixture.reminder),
         kitLink: gear.kits.find((k) => k.id === fixture.kit)?.gearIds.includes(fixture.id),
