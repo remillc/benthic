@@ -431,10 +431,20 @@ int gas_cylinder_types(std::string &json);
 
 // Dive editor, weights: the weight types of Subsurface's list (ws_info_table),
 // each with the weight last used for it in the log (fixup_dive() records it
-// dive after dive, EditWeight on each edit; 0 when none):
-// {"types": [{"name", "grams"}]}. The built-in names are untranslated
+// dive after dive, EditWeight on each edit; 0 when none), then the descriptions the dives use that the table
+// does not list (0 grams), each with the number of dives it is in (plans left out):
+// {"weightTypes":true,"types": [{"name", "grams", "dives"}]}. The built-in names are untranslated
 // ("integrated", "belt", "ankle", "backplate", "clip-on"). Read only.
 int weight_types(std::string &json);
+// Renames a weight type (a Benthic addition, as cylinder_type_rename): the weight systems of that description in
+// every dive (plans included) and its row of the table; one undoable step. Nothing changes when the new name is
+// empty or the same; NAME_IN_USE when the new name is already a type's, NOT_FOUND when nothing has the old one.
+// Writes weight_types().
+int weight_type_rename(const std::string &old_name, const std::string &new_name, std::string &json,
+		       std::string &error);
+// Drops a type from the table (nothing else: the dives keep their weights, and the table is rebuilt at start). Not
+// undoable. Writes weight_types().
+int weight_type_remove(const std::string &name, std::string &json);
 
 // Tissues at `now` (local wall-clock seconds, as the core's dive times; 0 for
 // the current time), loaded by the core's init_decompression() with the

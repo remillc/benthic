@@ -245,6 +245,16 @@ export class BenthicCoreDesktop extends WebPlugin {
     return { json };
   }
 
+  /** @param {{action?: string, name?: string, value?: string}} options */
+  async weightTypes(options) {
+    const json = await this.core('weightTypes', {
+      action: options?.action ?? '',
+      name: options?.name ?? '',
+      value: options?.value ?? '',
+    });
+    return { json };
+  }
+
   // --- Cloud account and own git repository ---
 
   /**

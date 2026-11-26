@@ -35,6 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
 				  ml:(NSInteger)ml
 				mbar:(NSInteger)mbar
 			       error:(NSError **)error NS_SWIFT_NAME(cylinderTypes(action:name:value:ml:mbar:));
++ (nullable NSString *)weightTypes:(NSString *)action
+			       name:(NSString *)name
+			      value:(NSString *)value
+			      error:(NSError **)error NS_SWIFT_NAME(weightTypes(action:name:value:));
 
 // Planner
 + (NSString *)plannerSetup;

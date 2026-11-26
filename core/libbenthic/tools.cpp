@@ -23,6 +23,8 @@
 #include <cmath>
 #include <cstdio>
 #include <ctime>
+#include <map>
+#include <set>
 
 namespace benthic {
 
@@ -103,14 +105,37 @@ int gas_cylinder_types(std::string &json)
 
 int weight_types(std::string &json)
 {
-	// WSInfoModel (qt-models/weightsysteminfomodel.cpp): ws_info_table in order.
-	json = "{\"types\":[";
-	for (size_t i = 0; i < ws_info_table.size(); i++) {
+	// WSInfoModel (qt-models/weightsysteminfomodel.cpp): ws_info_table in order, then the descriptions the dives use
+	// that it does not list; each with the number of dives it is in (plans left out).
+	std::vector<std::string> names;
+	std::vector<int> grams;
+	for (const ws_info &info: ws_info_table) {
+		names.push_back(info.name);
+		grams.push_back(info.weight.grams);
+	}
+	std::map<std::string, int> dives_using;
+	for (const auto &d: divelog.dives) {
+		if (internal::is_plan_only(*d))
+			continue;
+		std::set<std::string> used;
+		for (const weightsystem_t &ws: d->weightsystems)
+			if (!ws.description.empty())
+				used.insert(ws.description);
+		for (const std::string &n: used) {
+			dives_using[n]++;
+			if (std::find(names.begin(), names.end(), n) == names.end()) {
+				names.push_back(n);
+				grams.push_back(0);
+			}
+		}
+	}
+	json = "{\"weightTypes\":true,\"types\":[";
+	for (size_t i = 0; i < names.size(); i++) {
 		if (i)
 			json += ',';
 		json += "{\"name\":";
-		tools_json_string(json, ws_info_table[i].name);
-		json += ",\"grams\":" + std::to_string(ws_info_table[i].weight.grams) + '}';
+		tools_json_string(json, names[i]);
+		json += ",\"grams\":" + std::to_string(grams[i]) + ",\"dives\":" + std::to_string(dives_using[names[i]]) + '}';
 	}
 	json += "]}";
 	return 0;

@@ -1,9 +1,8 @@
 <script>
   // @ts-check
-  // Page of a weight type (Settings › Équipement › Types de lest): its name and its usual weight, the weight offered when
-  // the type is added to a dive. A type the diver added is renamed or removed here; a type of Subsurface or of the
-  // logbook's dives keeps its name (renaming it in every dive is not offered yet), and only its usual weight is the diver's.
-  // The diver's types and usual weights are files of the account data (lib/weight-types.svelte.js), synced.
+  // Page of a weight type (Settings › Équipement › Types de lest): its name and its weight, the weight offered when the
+  // type is added to a dive. Every type is renamed (the weights of that type are renamed in every dive) and deleted here.
+  // The diver's types and weights are files of the account data (lib/weight-types.svelte.js), synced.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -17,7 +16,8 @@
   import { addWeightType, readWeightTypeRows, removeWeightType, saveWeightType } from '../lib/weight-types.svelte.js';
   import { weightPlaceName } from '../lib/desktop-detail.js';
   import { parseTyped, weightText } from '../lib/desktop-edit.js';
-  import { formatWeight } from '../lib/format.js';
+  import { formatNumber, formatWeight } from '../lib/format.js';
+  import { confirmAction, confirmActionSheet } from '../lib/dialogs.js';
   import { ios } from '../lib/layout.svelte.js';
 
   /** @type {{ f7route: { query: { name?: string } }, f7router: any }} */
@@ -35,7 +35,9 @@
   let type = $state(null);
   /** The weight the core last saw for this type, when the diver gave it none. */
   let lastUsedGrams = $state(0);
-  let name = $state(original);
+  // The name as shown (a built-in name is translated): left as it is, the type keeps the name it has in the dives.
+  // svelte-ignore state_referenced_locally
+  let name = $state(original ? weightPlaceName(original) : '');
   let weight = $state('');
   let error = $state('');
   let saving = $state(false);
@@ -86,23 +88,18 @@
     }
   }
 
-  const nameLocked = $derived(editing && !!type?.inLogbook);
-
   async function save() {
     const g = grams();
     if (g === null) return;
     const trimmed = name.trim();
-    if (!nameLocked && !trimmed) {
+    if (!trimmed) {
       error = t('settings.weights.nameMissing');
       return;
     }
     saving = true;
     try {
       if (!editing || !type) await addWeightType({ name: trimmed, grams: g });
-      else if (type.inLogbook && !weight.trim()) {
-        // No usual weight: the type goes back to the weight last used.
-        await removeWeightType(type);
-      } else await saveWeightType(type, { name: trimmed, grams: g });
+      else await saveWeightType(type, { name: trimmed === weightPlaceName(original) ? original : trimmed, grams: g });
       f7router.back();
     } catch (e) {
       failure(e);
@@ -111,7 +108,15 @@
     }
   }
 
-  async function remove() {
+  /** « Utilisé dans 3 plongées. » and what renaming does. */
+  const usageNote = $derived.by(() => {
+    if (!type) return '';
+    const n = type.dives;
+    const use = t(n === 0 ? 'settings.weights.usedInNoDive' : n === 1 ? 'settings.weights.usedInOneDive' : 'settings.weights.usedInDives', { n: formatNumber(n, 0) });
+    return t('settings.weights.note', { use });
+  });
+
+  async function removeNow() {
     if (!type) return;
     try {
       await removeWeightType(type);
@@ -120,10 +125,23 @@
       failure(e);
     }
   }
+
+  /** A type no dive uses goes at once; one the dives use asks first (the dives keep their weights). */
+  function remove() {
+    if (!type) return;
+    if (!type.dives) {
+      removeNow();
+      return;
+    }
+    const text = t('settings.weights.deleteUsed');
+    const shown = weightPlaceName(original);
+    if (ios) confirmActionSheet({ text, action: t('settings.weights.deleteSheet', { name: shown }), onConfirm: removeNow });
+    else confirmAction({ title: t('settings.weights.deleteTitle', { name: shown }), text, action: t('settings.weights.deleteAction'), danger: true, onConfirm: removeNow });
+  }
 </script>
 
 <Page class="bc-weight-type">
-  <Navbar title={editing ? t('settings.weights.editTitle') : t('settings.weights.newTitle')}>
+  <Navbar title={editing ? t(ios ? 'settings.weights.editTitleIos' : 'settings.weights.editTitle') : t('settings.weights.newTitle')}>
     {#snippet left()}
       {#if ios}
         <Link onClick={() => guard?.attempt()}>{t('dialog.cancel')}</Link>
@@ -141,18 +159,15 @@
   <LeaveGuard bind:this={guard} noun="weightType" {dirty} {save} leave={() => f7router.back()} />
 
   <div class="bc-form-surface">
-    {#if nameLocked}
-      <TextField label={t('settings.weights.name')} value={weightPlaceName(original)} disabled supporting={t('settings.weights.fromLogbook')} />
-    {:else}
-      <TextField label={t('settings.weights.name')} bind:value={name} supporting={error || t('settings.weights.nameHelp')} invalid={!!error} />
-    {/if}
-    <TextField label={t('settings.weights.usual')} bind:value={weight} inputmode="decimal" invalid={!!weightLive.error}
-      supporting={weightLive.error || (lastUsedGrams && !weight.trim() ? t('settings.weights.lastUsed', { weight: formatWeight(lastUsedGrams, logbook.prefs) }) : t('settings.weights.usualHelp'))}>
+    <TextField label={t('settings.weights.name')} bind:value={name} supporting={error || t('settings.weights.nameHelp')} invalid={!!error} />
+    <TextField label={t('settings.weights.weight')} bind:value={weight} inputmode="decimal" invalid={!!weightLive.error}
+      supporting={weightLive.error || (lastUsedGrams && !weight.trim() ? t('settings.weights.lastUsed', { weight: formatWeight(lastUsedGrams, logbook.prefs) }) : t('settings.weights.weightHelp'))}>
       {#snippet trailing()}<span class="bc-weight-type--unit">{unit}</span>{/snippet}
     </TextField>
   </div>
 
-  {#if editing && type && !type.inLogbook}
+  {#if editing && type}
+    <p class="bc-weight-type--note">{usageNote}</p>
     <div class="bc-weight-type--action">
       <button type="button" class={ios ? 'bc-weight-type--delete-ios' : 'bc-outlined-button bc-danger bc-weight-type--delete'} onclick={remove}>
         {#if !ios}<Icon name="delete" size={18} />{/if}
@@ -167,6 +182,13 @@
     .bc-weight-type--unit {
       padding-inline-end: 12px;
       font-size: 14px;
+      color: var(--bc-text-2);
+    }
+
+    .bc-weight-type--note {
+      margin: 12px 20px 0;
+      font-size: 14px;
+      line-height: 20px;
       color: var(--bc-text-2);
     }
 

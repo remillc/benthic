@@ -1,11 +1,13 @@
 // @ts-check
-// Settings › Équipement › Types de lest, the operations: one list, Subsurface's weight types and those of the logbook's
-// dives (its ws_info table, read through the core) united with the diver's files (lib/weight-type-files.js). A type the
-// logbook has keeps its name here (renaming it in every dive is not offered yet): only its usual weight is the diver's.
-// A type the diver added is a file only: renamed, given a usual weight, removed.
+// Settings › Équipement › Types de lest, the operations: one list, the diver's weight types. The core gives the
+// descriptions the logbook's dives use, with their dive counts (`BenthicCore.weightTypes`); the diver's files
+// (lib/weight-type-files.js) give the weights and the types no dive uses. Renaming a type renames its weights in every
+// dive (one undoable step of the core, as for the cylinder types) and its file follows.
 import { BenthicCore } from 'benthic-core';
 import { newId } from './inventory.js';
 import { readWeightTypes, changeWeightTypes } from './inventory.svelte.js';
+import { weightPlaceName } from './desktop-detail.js';
+import { renameWeightType } from './logbook.svelte.js';
 import { BUILTIN_WEIGHT_TYPES, newWeightTypeFile, unionWeightTypes, weightTypeKey } from './weight-type-files.js';
 
 const stamp = () => new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
@@ -13,7 +15,7 @@ const stamp = () => new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
 /** @returns {Promise<import('./weight-type-files.js').WeightTypeRow[]>} */
 export async function readWeightTypeRows() {
   const [core, files] = await Promise.all([
-    BenthicCore.toolQuery({ kind: 'weights' }).catch((/** @type {unknown} */ e) => {
+    BenthicCore.weightTypes({ action: 'list' }).catch((/** @type {unknown} */ e) => {
       console.error('Weight types of the core', e);
       return null;
     }),
@@ -22,8 +24,8 @@ export async function readWeightTypeRows() {
       return [];
     }),
   ]);
-  const types = Array.isArray(core?.types) && core.types.length ? core.types : BUILTIN_WEIGHT_TYPES.map((name) => ({ name, grams: 0 }));
-  return unionWeightTypes(types, files);
+  const types = core?.types?.length ? core.types : BUILTIN_WEIGHT_TYPES.map((name) => ({ name, grams: 0, dives: 0 }));
+  return unionWeightTypes(types, files, weightPlaceName);
 }
 
 /** @param {string} name @param {import('./weight-type-files.js').WeightTypeRow[]} rows @param {string|null} except */
@@ -39,13 +41,18 @@ export async function addWeightType({ name, grams }) {
 }
 
 /**
- * Saves a type: its usual weight, and its name when it is one the diver added.
+ * Saves a type: its weight, and its name, which renames the weights of that type in every dive.
  * @param {import('./weight-type-files.js').WeightTypeRow} row
  * @param {{ name: string, grams: number }} next
  */
 export async function saveWeightType(row, { name, grams }) {
-  const finalName = row.inLogbook ? row.name : name.trim().replace(/\s+/g, ' ');
-  if (!row.inLogbook && nameTaken(finalName, await readWeightTypeRows(), row.name)) throw new Error('NAME_IN_USE');
+  const finalName = name.trim().replace(/\s+/g, ' ');
+  const renamed = finalName !== row.name;
+  if (renamed && nameTaken(finalName, await readWeightTypeRows(), row.name)) throw new Error('NAME_IN_USE');
+  if (renamed) await renameWeightType(row.name, finalName).catch((/** @type {unknown} */ e) => {
+    // A type only its file knows is not in the core: nothing to rename there.
+    if (!String(/** @type {any} */ (e)?.message ?? e).includes('NOT_FOUND')) throw e;
+  });
   const files = await readWeightTypes();
   const own = files.find((f) => f.id === row.fileId);
   const now = stamp();
@@ -56,9 +63,11 @@ export async function saveWeightType(row, { name, grams }) {
 }
 
 /**
- * Removes a type the diver added, or the usual weight of a type the logbook has (it goes back to the weight last used).
+ * Deletes a type: its file and its row of the core's table. The dives keep their weights (a type some dive uses stays in
+ * the list, without a weight of its own).
  * @param {import('./weight-type-files.js').WeightTypeRow} row
  */
 export async function removeWeightType(row) {
   if (row.fileId) await changeWeightTypes([], [row.fileId]);
+  await BenthicCore.weightTypes({ action: 'remove', name: row.name }).catch((/** @type {unknown} */ e) => console.error('Removing the weight type of the core', e));
 }
