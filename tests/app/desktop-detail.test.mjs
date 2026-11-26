@@ -217,3 +217,10 @@ test('the texts of the five tabs exist in French and English', () => {
   }
   assert.equal(JSON.parse(read('app/src/i18n/fr.json')).desktopDetail.notRated, 'Non notée');
 });
+
+test('the weight types of the detail are the logbook ones (Subsurface ws_info, with the earlier dives), as the dive editor offered', () => {
+  const weights = fs.readFileSync(new URL('../../app/src/components/DesktopWeights.svelte', import.meta.url), 'utf8');
+  assert.match(weights, /BenthicCore\.toolQuery\(\{ kind: 'weights' \}\)/);
+  assert.match(weights, /const names = \$derived\(types\.length \? types\.map\(\(w\) => w\.name\) : PLACES\)/);
+  assert.match(weights, /names\.map\(\(value\) => \(\{ value, label: weightPlaceName\(value\) \}\)\)/);
+});
