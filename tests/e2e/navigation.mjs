@@ -1909,17 +1909,19 @@ async function certsFabFlows(expect) {
     await sleep(500);
     const sheet = await tab.run(() => document.querySelectorAll('.bc-doc-choice.modal-in .bc-doc-choice--option').length);
     expect(`${label}: Add opens the document choices`, { count: 4 }, { count: sheet });
+    // Through the inventory, not on the state alone: since 26 November 2026 the Équipement page stands behind on wide
+    // screens, and its next load reads the read-only state back from the inventory.
     await tab.run(async () => {
-      const { gear } = await import('/src/lib/inventory.svelte.js');
-      gear.readOnly = true;
+      const { setReadOnly } = await import('/src/lib/inventory.svelte.js');
+      await setReadOnly(true);
     });
     await sleep(100);
     const hidden = await tab.run(() => getComputedStyle(document.querySelector('.page-current.bc-docs .bc-fab-add')).display === 'none');
     expect(`${label}: read-only hides Add`, { hidden: true }, { hidden });
     await tab.run(async () => {
-      const { gear } = await import('/src/lib/inventory.svelte.js');
+      const { setReadOnly } = await import('/src/lib/inventory.svelte.js');
       const { changeProfile } = await import('/src/lib/profile.svelte.js');
-      gear.readOnly = false;
+      await setReadOnly(false);
       await changeProfile((profile) => profile.saveCertification({ agency: 'PADI', level: 'Open Water', number: 'test-1' }));
     });
     await sleep(300);
@@ -2728,7 +2730,8 @@ async function gearDeleteFlows(expect) {
       const { gear } = await import('/src/lib/inventory.svelte.js');
       const view = document.querySelector('.views .tab-active.view, .views > .view.tab-active') || document.querySelector('.view-main');
       return {
-        route: view?.f7View?.router?.currentRoute?.url,
+        // The path: since 26 November 2026 /profile/gear/ is the view's first page on wide screens, whose url keeps the test page's ?theme=.
+        route: view?.f7View?.router?.currentRoute?.path,
         piece: gear.pieces.some((p) => p.id === fixture.id),
         reminder: gear.maintenance.some((m) => m.id === fixture.reminder),
         kitLink: gear.kits.find((k) => k.id === fixture.kit)?.gearIds.includes(fixture.id),
@@ -2905,7 +2908,7 @@ async function profileSectionFlows(expect) {
     await sleep(1500);
     const home = await where(tab);
     const wide = !phone && (desktop || width > height);
-    expect(`${label}: Profil opens its own view${wide ? ' on a pane (Informations)' : ''}`, { view: 'view-profile', route: wide ? '/profile/info' : '/profile', back: false }, home);
+    expect(`${label}: Profil opens its own view${wide ? ' on a pane (Équipement)' : ''}`, { view: 'view-profile', route: wide ? '/profile/gear/' : '/profile', back: false }, home);
     if (phone) expect(`${label}: the bottom bar stays on the profile home`, { bar: true, badge: '1' }, home);
     await settled(tab, `${label}: the profile home is a sound page stack`, { setup: false });
     if (process.env.BC_SHOTS) await shot(tab, `347-${label.replace(/ /g, '-')}-profile`);
@@ -2944,7 +2947,7 @@ async function profileSectionFlows(expect) {
 
 /**
  * Task: the broken states of the Android tablet (reports 33 and 35). A cold start with a Benthic+ account, so the Profil
- * view exists from the first screen: its home opens Informations beside the list while it is still hidden, and no view may
+ * view exists from the first screen: its home opens Équipement beside the list while it is still hidden, and no view may
  * end with two current pages. Read on every view, not on the one on screen only.
  */
 async function coldProfileFlows(expect) {
@@ -2972,7 +2975,7 @@ async function coldProfileFlows(expect) {
     expect(`${label}: the app found nothing broken at start`, { broken: '' }, { broken: await broken(tab) });
     // The view starts on its default pane: nothing navigates in a view that is still hidden (a page replaced in place while
     // the app starts is the race of report 35, which a loaded or slow device loses).
-    expect(`${label}: the Profil view opens on Informations without a navigation`, { navigations: '', route: '/profile/info', history: 1 }, {
+    expect(`${label}: the Profil view opens on Équipement without a navigation`, { navigations: '', route: '/profile/gear/', history: 1 }, {
       navigations: await tab.run(async () => (await import('/src/lib/nav-trace.js')).traceEvents().filter((e) => e.type.startsWith('nav') && /^profile /.test(e.detail)).map((e) => e.detail).join(' | ')),
       route: list.find((v) => v.id === 'view-profile')?.route,
       history: await tab.run(() => document.querySelector('#view-profile').f7View.router.history.length),
@@ -2980,7 +2983,7 @@ async function coldProfileFlows(expect) {
     await tab.run(() => document.querySelector('[href="#profile"]')?.click());
     await settled(tab, `${label}: Profil shown after a cold start`, { split: true });
     const shown = (await views(tab)).find((v) => v.id === 'view-profile');
-    expect(`${label}: Profil opens on Informations`, { route: '/profile/info' }, { route: shown?.route });
+    expect(`${label}: Profil opens on Équipement`, { route: '/profile/gear/' }, { route: shown?.route });
     expect(`${label}: the app found nothing broken once Profil is shown`, { broken: '' }, { broken: await broken(tab) });
     tab.ws.close();
   }

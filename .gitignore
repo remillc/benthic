@@ -43,3 +43,6 @@ benthic.code-workspace
 
 # Firebase configuration of the Android app (kept out of git; a copy is in F:\projets\benthic-keys\firebase)
 app/android/app/google-services.json
+
+# Local install script (device serials of the owner)
+tools/dev/install-phone.ps1

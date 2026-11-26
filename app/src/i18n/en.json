@@ -6077,7 +6077,6 @@
   "maintenance": {
     "late": "{task} overdue",
     "export": {
-      "menu": "Export the history",
       "button": "Export the history",
       "title": "Service history · exported on {date}",
       "dives": "Dives",

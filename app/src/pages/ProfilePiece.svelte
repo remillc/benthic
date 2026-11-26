@@ -20,9 +20,6 @@
   import { tagText } from '../lib/maintenance-text.js';
   import { hasReminders } from '../lib/maintenance.js';
   import { detailRows } from '../lib/gear-fields.js';
-  import { historyRows, exportHistory } from '../lib/maintenance-export.js';
-  import { letterPaper } from '../lib/share.js';
-  import { desktopApp } from '../lib/layout.svelte.js';
   import { logbook } from '../lib/logbook.svelte.js';
   import { formatDepth, formatDate, formatNumber, formatHours } from '../lib/format.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
@@ -39,7 +36,6 @@
   let confirmRetire = $state(false);
   let confirmForever = $state(false);
   let pairing = $state(false);
-  let exportingHistory = $state(false);
   /** The figures read from the logbook: a computer's dives, a suit's dives by its « Combinaison » texts. @type {{ dives: number, seconds: number, deepestMm: number, last: string }|null} */
   let tiedStats = $state(null);
 
@@ -149,42 +145,6 @@
     }
   }
 
-  /** The next maintenance of the piece in words, for the PDF: « 12 décembre 2026 ou dans 18 plongées ». */
-  function nextText() {
-    const e = worst;
-    if (!e) return '';
-    const date = e.dueDate ? formatDate(e.dueDate) : '';
-    if (date && e.divesLeft != null) return t('maintenance.export.nextBoth', { date, n: e.divesLeft });
-    if (date) return date;
-    return e.divesLeft != null ? t('maintenance.export.nextDives', { n: e.divesLeft }) : '';
-  }
-
-  /** « Exporter l'historique »: the PDF of the maintenance history (task 2026-11-19-308, ent-historique-pdf). */
-  async function exportPieceHistory() {
-    if (!piece || exportingHistory) return;
-    exportingHistory = true;
-    try {
-      await exportHistory(
-        {
-          name: piece.name,
-          typeLabel: t(`gear.inventory.type.${piece.type}`),
-          note: piece.note,
-          serial: piece.serial,
-          purchasedOn: piece.purchasedOn,
-          dives: figures.dives,
-          next: nextText(),
-          rows: historyRows(gear.maintenance.filter((m) => m.gearId === piece.id)),
-        },
-        { letter: letterPaper(), readPhoto, desktop: desktopApp },
-      );
-    } catch (e) {
-      console.error('Export the maintenance history', e);
-      showSnackbar(t('maintenance.export.failed'));
-    } finally {
-      exportingHistory = false;
-    }
-  }
-
   /** @param {MouseEvent} e */
   function more(e) {
     if (!piece) return;
@@ -193,7 +153,6 @@
       /** @type {HTMLElement} */ (e.currentTarget),
       [
         { label: t('gear.piece.share'), onclick: share },
-        { label: t('maintenance.export.menu'), onclick: exportPieceHistory },
         ...(!retired && ((piece.type === 'computer' && !piece.computerModel) || piece.type === 'suit') ? [{ label: t(piece.type === 'suit' ? 'gear.pair.menuSuit' : 'gear.pair.menu'), onclick: () => (gear.readOnly ? refused() : (pairing = true)) }] : []),
         ...(retired ? [] : [{ label: t('gear.retire.button'), onclick: () => (gear.readOnly ? refused() : (confirmRetire = true)) }]),
         { label: t('gear.piece.delete'), onclick: () => (gear.readOnly ? refused() : (confirmForever = true)), danger: true },
@@ -218,12 +177,11 @@
     <p class="bc-piece-page--type">{t(`gear.inventory.type.${piece.type}`)}</p>
     <h2 class="bc-piece-page--name">{piece.name}</h2>
     {#if piece.retired}
-      <!-- A retired piece (profil-piece-retiree-android): when and why, put back in service, export, no pencil. -->
+      <!-- A retired piece (profil-piece-retiree-android): when and why, put back in service, no pencil. -->
       <p class="bc-piece-page--retired">{piece.retiredOn ? t('gear.retire.retiredOn', { date: formatDate(piece.retiredOn) }) : t('gear.retire.retired')}</p>
       <p class="bc-piece-page--retired-line">{[piece.retiredReason ? t(`gear.retire.reason.${piece.retiredReason}`) : '', t('gear.retire.noReminders')].filter(Boolean).join('. ')}</p>
       <div class="bc-piece-page--retired-buttons">
         <button type="button" class="bc-piece-page--filled" disabled={gear.readOnly} onclick={restore}><Icon name="undo" size={20} />{t('gear.retire.restore')}</button>
-        <button type="button" class="bc-piece-page--outlined" disabled={exportingHistory} onclick={exportPieceHistory}><Icon name="export" size={20} />{t('maintenance.export.button')}</button>
       </div>
     {/if}
 

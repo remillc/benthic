@@ -563,7 +563,7 @@
     <!-- Profil (Benthic+, task 2026-11-23-347): the diver profile, after Sites; it exists only for a subscriber. -->
     <!-- A wide screen opens on its default pane (Informations) at once: replacing the home page in place at start raced with the
          view's own start and left two current pages on a loaded tablet (report 35). -->
-    {#if navigation.profile}<View id="view-profile" tab url={profileWide() ? '/profile/info' : '/profile'} />{/if}
+    {#if navigation.profile}<View id="view-profile" tab url={profileWide() ? '/profile/gear/' : '/profile'} />{/if}
     <View
       id="view-statistics"
       tab

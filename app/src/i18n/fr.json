@@ -6080,7 +6080,6 @@
   "maintenance": {
     "late": "{task} en retard",
     "export": {
-      "menu": "Exporter l’historique",
       "button": "Exporter l’historique",
       "title": "Historique de révision · exporté le {date}",
       "dives": "Plongées",
