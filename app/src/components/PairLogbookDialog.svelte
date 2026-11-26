@@ -2,13 +2,14 @@
   // @ts-check
   // « Associer aux plongées du carnet » (task 2026-11-26-405, docs/mockups/profil-piece-associer-android.dc.html and the tablet
   // and desktop files): from a piece's ⋮ menu, the values of the logbook of the piece's type that resemble it and are tied to
-  // no other piece. A computer: one choice, and the piece takes its serial number. A suit: several texts. A sheet on a phone,
-  // a dialog on a tablet and on the desktop. The button says what it does: « Associer 212 plongées ».
+  // no other piece. A computer: one choice, and the piece takes its serial number. A suit: several texts, a merge (26 November
+  // 2026): a piece left with no text and no dive of its own is offered for deletion, one at a time. A sheet on a phone,
+  // a dialog on a tablet and on the desktop. The button says what it does: « Associer 212 plongées », « Fusionner 212 plongées ».
   import { Sheet } from 'framework7-svelte';
   import { onMount } from 'svelte';
   import Md3Dialog from './Md3Dialog.svelte';
   import LogbookPairList from './LogbookPairList.svelte';
-  import { logbookPairing, pairWithLogbook, moveSuitNames, gearMap } from '../lib/inventory.svelte.js';
+  import { logbookPairing, pairWithLogbook, moveSuitNames, gearMap, gear, diveKeysOf, change } from '../lib/inventory.svelte.js';
   import { pairRows, computerKey, candidatesFor, computerResembles, suitResembles, totalDives } from '../lib/logbook-pairing.js';
   import { profileWide } from '../lib/profile-frame.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -25,6 +26,9 @@
   let chosen = $state([]);
   let saving = $state(false);
   let opened = $state(false);
+  /** The pieces the merge left with no text and no dive of their own, still to ask about. @type {{ id: string, name: string }[]} */
+  let emptied = $state([]);
+  const title = $derived(t(computer ? 'gear.pair.menu' : 'gear.pair.menuSuit'));
 
   onMount(async () => {
     const found = await logbookPairing(piece.id);
@@ -51,44 +55,90 @@
     saving = true;
     try {
       if (computer) await pairWithLogbook(piece.id, { computer: { model: /** @type {any} */ (picked[0]).model, serial: /** @type {any} */ (picked[0]).serial } });
-      else await moveSuitNames(piece.id, picked.map((i) => /** @type {any} */ (i).name));
-      showSnackbar(t('gear.pair.done'));
-      onclose();
+      else {
+        const owners = new Set(picked.map((i) => /** @type {any} */ (i).linkedTo).filter(Boolean));
+        await moveSuitNames(piece.id, picked.map((i) => /** @type {any} */ (i).name));
+        emptied = gear.pieces
+          .filter((g) => owners.has(g.id) && g.id !== piece.id && !g.suitNames?.length && !diveKeysOf(g.id).length)
+          .map((g) => ({ id: g.id, name: g.name }));
+      }
+      showSnackbar(t(computer ? 'gear.pair.done' : 'gear.pair.doneSuit'));
+      if (!emptied.length) onclose();
     } catch (e) {
       showSnackbar(t(/** @type {any} */ (e)?.name === 'ReadOnlyError' ? 'gear.inventory.readOnlyRefused' : String(/** @type {any} */ (e)?.message).startsWith('LINKED_ELSEWHERE') ? 'gear.pair.taken' : 'gear.inventory.saveFailed'));
     } finally {
       saving = false;
     }
   }
+
+  /** The answer about the first emptied piece: delete it or keep it; the dialog closes after the last. @param {boolean} remove */
+  async function answerEmptied(remove) {
+    const [first, ...rest] = emptied;
+    if (!first || saving) return;
+    if (remove) {
+      saving = true;
+      try {
+        await change((inv) => inv.deleteGear(first.id));
+        showSnackbar(t('gear.piece.deleted'));
+      } catch {
+        showSnackbar(t('gear.inventory.saveFailed'));
+      } finally {
+        saving = false;
+      }
+    }
+    emptied = rest;
+    if (!rest.length) {
+      if (profileWide()) onclose();
+      else opened = false;
+    }
+  }
 </script>
 
 {#snippet body()}
+  {#if emptied.length}
+    <p class="bc-pair-dialog--lead">{t('gear.pair.emptiedText', { target: piece.name })}</p>
+  {:else}
   <p class="bc-pair-dialog--lead">{t(computer ? 'gear.pair.leadPieceComputer' : 'gear.pair.leadPieceSuit')}</p>
   {#if loaded && !rows.length}
     <p class="bc-pair-dialog--none">{t(computer ? 'gear.pair.noneComputer' : 'gear.pair.noneSuit')}</p>
   {:else}
-    <LogbookPairList items={rows} multiple={!computer} selected={chosen} label={t('gear.pair.menu')} onchange={(keys) => (chosen = keys)} />
+    <LogbookPairList items={rows} multiple={!computer} selected={chosen} label={title} onchange={(keys) => (chosen = keys)} />
   {/if}
   {#if computer && rows.length}<p class="bc-pair-dialog--note">{t('gear.pair.serialNote')}</p>{/if}
+  {/if}
+{/snippet}
+
+{#snippet emptiedActions()}
+  <button type="button" disabled={saving} onclick={() => answerEmptied(false)}>{t('gear.pair.emptiedKeep')}</button>
+  <button type="button" disabled={saving} onclick={() => answerEmptied(true)}>{t('gear.pair.emptiedDelete')}</button>
 {/snippet}
 
 {#if loaded}
   {#if profileWide()}
-    <Md3Dialog class="bc-pair-dialog" title={t('gear.pair.menu')} oncancel={onclose}>
+    <Md3Dialog class="bc-pair-dialog" title={emptied.length ? t('gear.pair.emptiedTitle', { name: emptied[0].name }) : title} oncancel={onclose}>
       <div class="bc-pair-dialog--body">{@render body()}</div>
       {#snippet actions()}
-        <button type="button" onclick={onclose}>{t('gear.pair.cancel')}</button>
-        <button type="button" disabled={!picked.length || saving} onclick={confirm}>{t('gear.pair.confirm', { n: count })}</button>
+        {#if emptied.length}
+          {@render emptiedActions()}
+        {:else}
+          <button type="button" onclick={onclose}>{t('gear.pair.cancel')}</button>
+          <button type="button" disabled={!picked.length || saving} onclick={confirm}>{t(computer ? 'gear.pair.confirm' : 'gear.pair.confirmSuit', { n: count })}</button>
+        {/if}
       {/snippet}
     </Md3Dialog>
   {:else}
-    <Sheet class="bc-pair-sheet" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={t('gear.pair.menu')}>
+    <Sheet class="bc-pair-sheet" {opened} onSheetClosed={onclose} backdrop swipeToClose push={false} aria-label={title}>
       <div class="bc-pair-dialog--content">
-        <h2 class="bc-pair-dialog--title">{t('gear.pair.menu')}</h2>
+        <h2 class="bc-pair-dialog--title">{emptied.length ? t('gear.pair.emptiedTitle', { name: emptied[0].name }) : title}</h2>
         <div class="bc-pair-dialog--scroll bc-pair-dialog--body" data-bc-scroll>{@render body()}</div>
         <div class="bc-pair-dialog--actions">
-          <button type="button" class="bc-pair-dialog--text" onclick={() => (opened = false)}>{t('gear.pair.cancel')}</button>
-          <button type="button" class="bc-pair-dialog--main" disabled={!picked.length || saving} onclick={confirm}>{t('gear.pair.confirm', { n: count })}</button>
+          {#if emptied.length}
+            <button type="button" class="bc-pair-dialog--text" disabled={saving} onclick={() => answerEmptied(false)}>{t('gear.pair.emptiedKeep')}</button>
+            <button type="button" class="bc-pair-dialog--main" disabled={saving} onclick={() => answerEmptied(true)}>{t('gear.pair.emptiedDelete')}</button>
+          {:else}
+            <button type="button" class="bc-pair-dialog--text" onclick={() => (opened = false)}>{t('gear.pair.cancel')}</button>
+            <button type="button" class="bc-pair-dialog--main" disabled={!picked.length || saving} onclick={confirm}>{t(computer ? 'gear.pair.confirm' : 'gear.pair.confirmSuit', { n: count })}</button>
+          {/if}
         </div>
       </div>
     </Sheet>
