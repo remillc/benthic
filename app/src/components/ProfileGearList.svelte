@@ -16,6 +16,7 @@
   import { showProfilePath } from '../lib/profile-frame.js';
   import { openPopupMenu } from '../lib/popup-menu.js';
   import { showSnackbar } from '../lib/snackbar.js';
+  import { formatDate } from '../lib/format.js';
   import { t } from '../lib/i18n.js';
 
   /** The tint of a type's tile, the same as the new piece dialog's. @type {Record<string, string>} */
@@ -44,6 +45,16 @@
   const empty = $derived(gear.ready && !gear.pieces.some((g) => !g.retired) && !retired.length);
   /** « Pièces retirées »: the row at the end of the list (task 2026-11-19-308). */
   const retired = $derived(retiredGear());
+  /**
+   * The retired pieces open under their row, drawn as the list's rows (26 November 2026); open at first when the piece in
+   * the right pane is one of them.
+   */
+  let retiredOpen = $state(false);
+  $effect(() => {
+    if (selected && retired.some((g) => g.id === selected)) retiredOpen = true;
+  });
+  /** A retired piece's line: the day and the reason, as on the phone's page. @param {import('../lib/inventory.js').Gear} g */
+  const retiredLine = (g) => [g.retiredOn ? t('gear.retire.retiredOn', { date: formatDate(g.retiredOn) }) : t('gear.retire.retired'), g.retiredReason ? t(`gear.retire.reason.${g.retiredReason}`) : ''].filter(Boolean).join(' · ');
 
   onMount(async () => {
     await loadInventory();
@@ -144,13 +155,27 @@
       {/each}
     {/each}
     {#if retired.length && !searching}
-      <button type="button" class="bc-gear-list--row bc-gear-list--retired" class:bc-gear-list--on={selected === 'retired'} onclick={() => showProfilePath('/profile/gear/retired/')}>
+      <button type="button" class="bc-gear-list--row bc-gear-list--retired" aria-expanded={retiredOpen} aria-controls="bc-gear-list-retired" onclick={() => (retiredOpen = !retiredOpen)}>
         <span class="bc-gear-list--tile"><Icon name="archive" size={22} /></span>
         <span class="bc-gear-list--texts">
           <span class="bc-gear-list--name">{t('gear.inventory.retiredRow')}</span>
           <span class="bc-gear-list--supporting">{t('gear.inventory.retiredCount', { n: retired.length })}</span>
         </span>
+        <span class="bc-gear-list--disclosure" class:bc-gear-list--disclosure-open={retiredOpen} aria-hidden="true"><Icon name="chevron" size={20} /></span>
       </button>
+      {#if retiredOpen}
+        <div id="bc-gear-list-retired">
+          {#each retired as g (g.id)}
+            <button type="button" class="bc-gear-list--row" class:bc-gear-list--on={selected === g.id} aria-current={selected === g.id ? 'true' : undefined} onclick={() => showProfilePath(`/profile/gear/${g.id}`)}>
+              <span class="bc-gear-list--tile" style:background={TONES[g.type] ?? 'var(--bc-background)'}><GearIcon type={g.type} name={g.name} size={22} piece={g} tile={40} /></span>
+              <span class="bc-gear-list--texts">
+                <span class="bc-gear-list--name">{g.name}</span>
+                <span class="bc-gear-list--supporting">{retiredLine(g)}</span>
+              </span>
+            </button>
+          {/each}
+        </div>
+      {/if}
     {/if}
     <div class="bc-gear-list--bottom"></div>
   </div>
@@ -347,6 +372,17 @@
     }
     .bc-gear-list--retired {
       margin-top: 16px;
+    }
+    /* The chevron of « Pièces retirées »: points right when closed, down when open. */
+    .bc-gear-list--disclosure {
+      flex: none;
+      display: inline-flex;
+      margin-inline-start: auto;
+      color: var(--bc-text-2);
+      transition: transform 200ms;
+    }
+    .bc-gear-list--disclosure-open {
+      transform: rotate(90deg);
     }
     .bc-gear-list--empty {
       margin: 24px 16px;
