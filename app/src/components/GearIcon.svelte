@@ -49,8 +49,6 @@
   // An « Autre » piece named like a surface marker buoy shows the buoy of « Parachute de palier ».
   const shown = $derived(type === 'buoy' || (type === 'other' && isBuoyName(name)) ? 'dsmb' : type);
   const path = $derived(paths[shown]);
-  /** The icons drawn with a finer stroke than the others (tasks 2026-11-26-406 and 407). */
-  const THIN = new Set(['suit', 'bcd', 'o2Cells']);
 </script>
 
 {#snippet computerIcon()}
@@ -60,9 +58,9 @@
 {#if type === 'computer' && piece && tile}
   <DcTile model={piece.computerModel || piece.name || name} size={tile} {radius} photo={ownPhoto(piece.photoId)} fallback={computerIcon} />
 {:else if type === 'kit'}
-  <Icon name="briefcase" {size} weight={1.8} />
+  <Icon name="briefcase" {size} weight={1.35} />
 {:else}
-  <svg class="bc-gear-icon" class:bc-gear-icon--thin={THIN.has(shown)} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={path ?? paths.other} /></svg>
+  <svg class="bc-gear-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={path ?? paths.other} /></svg>
 {/if}
 
 <style>
@@ -71,12 +69,10 @@
       flex: none;
       fill: none;
       stroke: currentColor;
-      stroke-width: 1.8;
+      /* One width for every gear icon (task 2026-11-26-409). */
+      stroke-width: 1.35;
       stroke-linecap: round;
       stroke-linejoin: round;
-    }
-    .bc-gear-icon--thin {
-      stroke-width: 1.5;
     }
   }
 </style>

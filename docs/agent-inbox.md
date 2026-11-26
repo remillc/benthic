@@ -7740,7 +7740,7 @@ Christian asked for this on 26 November 2026. Work in `main`. Replace the `rebre
 
 Nothing else uses its own copy of this drawing in the app; if something does, use the new path there too. Mock-up: `docs/mockups/icones-gearicon-svelte`.
 
-## [ ] 2026-11-26-409 GearIcon: one stroke width, 1.35, for every gear icon
+## [x] 2026-11-26-409 GearIcon: one stroke width, 1.35, for every gear icon
 
 Christian asked for this on 26 November 2026. Work in `main`. All the icons drawn by GearIcon.svelte now have a 1.35 stroke (it was 1.8, and 1.5 for `suit`, `bcd` and `o2Cells`). Set `stroke-width: 1.35` on `.bc-gear-icon`, remove the `THIN` set and the `--thin` modifier, and check that the computer icon snippet follows the same width. Leave the other icons (Icon.svelte: arrows, chevrons…) as they are.
 

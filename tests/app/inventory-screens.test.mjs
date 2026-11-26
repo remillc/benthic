@@ -103,13 +103,15 @@ test('the release notes mention the profile and the equipment', () => {
 test('the BCD has the vest icon, the buoy the board tapered icon, and « Nouvelle pièce » a large model picture', async () => {
   const { readFileSync } = await import('node:fs');
   const icon = readFileSync(new URL('../../app/src/components/GearIcon.svelte', import.meta.url), 'utf8');
-  // Task 2026-11-26-406: the jacket BCD seen from the front (it replaced the vest of task 324), and the drysuit; both at a 1.5 stroke.
+  // Task 2026-11-26-406: the jacket BCD seen from the front (it replaced the vest of task 324), and the drysuit.
   assert.match(icon, /bcd: 'M9 3\.5C7\.5 3\.5 6 4 5\.5 5\.5L5 8v11/, 'jacket: two halves, chest strap, pockets, hose');
   assert.match(icon, /suit: 'M10 3h4l3\.5 2 1\.8 7\.5/, 'drysuit: arms, legs, boots, valves');
-  assert.match(icon, /THIN = new Set\(\['suit', 'bcd', 'o2Cells'\]\)/);
-  // Task 2026-11-26-407: the O₂ cell seen from the side, at the same 1.5 stroke.
+  // Task 2026-11-26-407: the O₂ cell seen from the side.
   assert.match(icon, /o2Cells: 'M8 9h8a1\.5 1\.5 0 0 1 1\.5 1\.5v7/);
-  assert.match(icon, /\.bc-gear-icon--thin \{\s*stroke-width: 1\.5;/);
+  // Task 2026-11-26-409: one 1.35 stroke for every gear icon (1.8, and 1.5 for suit, bcd and o2Cells, before), the kit's too.
+  assert.match(icon, /\.bc-gear-icon \{[^}]*stroke-width: 1\.35;/);
+  assert.doesNotMatch(icon, /THIN|bc-gear-icon--thin/);
+  assert.match(icon, /<Icon name="briefcase" \{size\} weight=\{1\.35\} \/>/);
   // Task 2026-11-22-324: the icons are the type board's (android-tablette-profil-piece-nouvelle-type-paysage); a buoy is drawn as « Parachute de palier ».
   assert.match(icon, /dsmb: 'M7 3h10l-2 14H9zM12 17v4'/, 'buoy: the board tapered tube');
   assert.match(icon, /floatBuoy: 'M10 3h4v13a2 2 0 0 1-4 0zM12 18v4'/, 'float buoy: the board flat-top tube');
