@@ -35,11 +35,14 @@
     .bc-desktop-pick-field--rest {
       box-sizing: border-box;
       width: 100%;
+      /* A long value (« Mercredi 25 nov. 2026 » in half the phone's width) wraps inside the field, which grows with it. */
+      height: auto;
       min-height: 40px;
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 0 10px;
+      padding: 8px 10px;
+      line-height: 20px;
       border: 0;
       border-radius: 8px;
       background: var(--bc-field-rest);
