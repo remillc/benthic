@@ -28,7 +28,9 @@
   import SiteMap from './SiteMap.svelte';
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges, isSubscriber } from '../lib/logbook.svelte.js';
-  import { layout } from '../lib/layout.svelte.js';
+  import { ios, layout } from '../lib/layout.svelte.js';
+  import CylinderEditDialog from './CylinderEditDialog.svelte';
+  import { blankCylinder, cylinderDraft, draftPatch, newPartDraft } from '../lib/cylinder-dialog.js';
   import { isRelease } from '../lib/edition.js';
   import { loadInventory, change as changeInventory, equipmentOf, gear, gearMap, visibleGear } from '../lib/inventory.svelte.js';
   import { applyKit, cloneEquipment, diveKeyOf, equipmentIsEmpty, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
@@ -383,7 +385,7 @@
     [rows[from], rows[to]] = [rows[to], rows[from]];
     return saveCylinders(rows);
   }
-  /** @param {import('benthic-core').Cylinder} c */
+  /** @param {{ description: string }} c */
   const typeOptions = (c) => {
     const list = cylinderTypes.map((x) => ({ value: x.name, label: cylinderTypeLabel(x.name) }));
     if (c.description && !list.some((o) => o.value === c.description)) list.unshift({ value: c.description, label: cylinderTypeLabel(c.description) });
@@ -445,6 +447,58 @@
     const span = cylinderSpan(dive.samples, index);
     return span ? t('desktopDetail.cylinderSpan', { from: span.fromMin, to: span.toMin }) : '';
   };
+  // The edit dialogs of the tiles (task 2026-11-26-401), on an Android phone: one cylinder alone, or a rebreather's two together.
+  const dialogs = $derived(layout.phone && !ios);
+  /** @type {{ title: string, indexes: number[], parts: { key: string, heading: string, badge?: string, oxygenOnly?: boolean, draft: import('../lib/cylinder-dialog.js').CylinderDraft }[], single: boolean }|null} */
+  let editing = $state(null);
+  /** @param {string} key a tile's key */
+  function editTile(key) {
+    const tile = tiles.find((x) => x.key === key);
+    if (!tile) return;
+    if (tile.kind === 'cylinder') {
+      const index = tile.indexes[0];
+      const c = dive.cylinders[index];
+      if (c) editing = { title: t('desktopDetail.cylinderDialog.single'), indexes: [index], single: true, parts: [{ key: 'c' + index, heading: t('desktopDetail.cylinderDialog.cylinder'), draft: cylinderDraft(c, prefs) }] };
+      return;
+    }
+    // A closed-circuit unit always shows both cylinders: one the dive lacks is an empty card, added on Save (index -1).
+    const roles = tile.kind === 'ccr' ? /** @type {const} */ (['diluent', 'oxygen']) : /** @type {const} */ (['mix']);
+    const parts = roles.map((role, i) => {
+      const part = tile.parts.find((p) => p.role === role);
+      const index = part ? tile.indexes[tile.parts.indexOf(part)] : -1;
+      return { role, index, title: part?.title ?? t('desktopDetail.role.' + role) };
+    }).filter(({ role, index }) => index >= 0 || role !== 'mix');
+    editing = {
+      title: t(tile.kind === 'pscr' ? 'desktopDetail.cylinderDialog.mix' : 'desktopDetail.cylinderDialog.rebreather'),
+      indexes: parts.map((p) => p.index),
+      single: false,
+      parts: parts.map(({ role, index, title }) => ({
+        key: index >= 0 ? 'c' + index : 'new-' + role,
+        heading: title,
+        badge: role === 'diluent' ? t('desktopDetail.cylinderDialog.badgeDiluent') : role === 'oxygen' ? t('desktopDetail.cylinderDialog.badgeOxygen') : undefined,
+        oxygenOnly: role === 'oxygen',
+        draft: index >= 0 ? cylinderDraft(dive.cylinders[index], prefs) : newPartDraft(/** @type {'diluent'|'oxygen'} */ (role), prefs),
+      })),
+    };
+  }
+  /** Saves every cylinder of the dialog at once, so one write updates the tile, the summaries and the profile's gas data. */
+  async function saveEditing() {
+    const current = editing;
+    if (!current) return;
+    const options = (/** @type {number} */ i) => ({ manual, oxygenOnly: !!current.parts[i].oxygenOnly });
+    const patches = new Map(current.indexes.filter((index) => index >= 0).map((index) => [index, draftPatch(dive.cylinders[index], current.parts[current.indexes.indexOf(index)].draft, cylinderTypes, prefs, options(current.indexes.indexOf(index)))]));
+    const added = current.indexes.flatMap((index, i) => (index < 0 ? [{ index: -1, patch: draftPatch(blankCylinder(), current.parts[i].draft, cylinderTypes, prefs, options(i)) }] : []));
+    if (await saveCylinders([...cylinderRows.map((r) => ({ ...r, patch: patches.get(r.index) ?? r.patch })), ...added])) editing = null;
+  }
+  async function removeEditing() {
+    const index = editing?.indexes[0] ?? -1;
+    if (index < 0) return;
+    if (dive.cylinders[index]?.protected) {
+      showSnackbar(t('edit.cylinderInUse'));
+      return;
+    }
+    if (await removeCylinder(index)) editing = null;
+  }
   async function addCylinderAndSelect() {
     const at = dive.cylinders.length;
     const ok = await addCylinder();
@@ -672,7 +726,7 @@
         </section>
       {:else}
         <div class="bc-desktop-dive-fields--card">
-          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} />
+          <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} onedit={editTile} />
         </div>
 
         {#if activeTile?.kind === 'cylinder' && chosen}
@@ -719,6 +773,21 @@
     {#if siteRow}<button type="button" class="bc-desktop-dive-fields--link" onclick={openSite}>{t('desktopDetail.openSiteLink')}</button>{/if}
   {/if}
 </div>
+
+{#if editing}
+  <CylinderEditDialog
+    title={editing.title}
+    bind:parts={editing.parts}
+    typeOptions={(draft) => typeOptions({ description: draft.description })}
+    roles={editing.single ? useOptions : undefined}
+    {prefs}
+    {manual}
+    footnote={editing.single ? '' : t('desktopDetail.cylinderDialog.footnote')}
+    onsave={saveEditing}
+    onclose={() => (editing = null)}
+    onremove={editing.single ? removeEditing : undefined}
+  />
+{/if}
 
 {#if picking}
   <DiveDateTimeDialogs date={startIso} kind={picking} onconfirm={saveDate} onclose={() => (picking = null)} />

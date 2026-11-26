@@ -20,9 +20,12 @@
    *   selected: string,
    *   onselect: (key: string) => void,
    *   onadd: () => void,
+   *   editable?: boolean,
+   *   onedit?: (key: string) => void,
    * }}
+   * editable (an Android phone, task 2026-11-26-401): every cylinder tile gets a chevron and a touch opens its edit dialog (onedit).
    */
-  let { tiles, selected, onselect, onadd } = $props();
+  let { tiles, selected, onselect, onadd, editable = false, onedit = () => {} } = $props();
 
   const marks = $derived({ diluent: t('detail.rebreatherMarks.diluent'), oxygen: t('detail.rebreatherMarks.oxygen'), bailout: t('detail.rebreatherMarks.bailout') });
   /** The drawing's fill of a card. @param {{ ratio: number, startRatio: number|null, hatched: boolean }|undefined} card */
@@ -36,11 +39,16 @@
       class="bc-desktop-gas-cards--card"
       class:bc-desktop-gas-cards--selected={tile.key === selected}
       class:bc-desktop-gas-cards--wide={tile.kind === 'ccr'}
+      class:bc-desktop-gas-cards--editable={editable}
       data-tile={tile.key}
       aria-pressed={tile.key === selected}
       aria-label={tile.label}
-      onclick={() => onselect(tile.key)}
+      onclick={() => {
+        onselect(tile.key);
+        if (editable) onedit(tile.key);
+      }}
     >
+      {#if editable}<span class="bc-desktop-gas-cards--chevron" aria-hidden="true"><Icon name="chevron" size={24} /></span>{/if}
       {#if tile.kind === 'cylinder' && tile.card}
         <CylinderDrawing ratio={tile.card.ratio} startRatio={tile.card.startRatio} hatched={tile.card.hatched} width={64} />
         <span class="bc-desktop-gas-cards--gas">{tile.title}</span>
@@ -111,6 +119,20 @@
       align-items: center;
       gap: 3px;
       cursor: pointer;
+    }
+
+    /* The chevron of an editable tile: 24 dp, 8 dp from the right edge, centred on the tile (task 2026-11-26-401). */
+    .bc-desktop-gas-cards--editable {
+      position: relative;
+    }
+
+    .bc-desktop-gas-cards--chevron {
+      position: absolute;
+      top: 50%;
+      inset-inline-end: 8px;
+      transform: translateY(-50%);
+      display: flex;
+      color: var(--bc-text-2);
     }
 
     .bc-desktop-gas-cards--card:hover {

@@ -7631,7 +7631,7 @@ Mock-ups in `docs/mockups/`. Android: `detail-onglets-android` (reference), `det
 
 Done (26 November 2026): checked the app against the mock-ups. Already matching: one h2 section per tab in the tab order under the sticky bar, a tap scrolling to its section and the selected tab following the scroll, level-3 card titles with a round icon, the six Informations cards in order, dark palette through `--bc-*` variables, no floating toolbar, the ⋮ / ⋯ menu. Changed: the section titles are 14 sp weight 600 with 8 px under them; the Android tab row uses 12 px tab padding, a 4 px row padding and a 6 px indicator inset; the iPhone segmented control is 28 pt high inside a sticky band padded 8/12 with a 0.5 px line (the compound selector also fixes margin and padding that the tab row's rules overrode). Not changed: the menu keeps « Renuméroter à partir d'ici » and, for Benthic+, the dive versions (tested choices, not in the mock-ups); the Informations tab keeps its Conditions card (water type, temperatures, CNS, trip: editable data the mock-ups do not show); the one-section fragments (`detail3-android-ccr*`, `-conditions`) are mock-up cuts of the Gaz profile row and Conditions card, with no screen of their own in the app. Not checked on a device or in the emulator.
 
-## [ ] 2026-11-26-401 Dive detail, Gaz tab: chevrons on the cylinder tiles and a dialog to edit cylinders (rebreather: both cylinders in one dialog)
+## [x] 2026-11-26-401 Dive detail, Gaz tab: chevrons on the cylinder tiles and a dialog to edit cylinders (rebreather: both cylinders in one dialog)
 
 Christian asked for this on 26 November 2026. Work in `main`. Editing cylinders from the dive detail is not friendly. On Android (phone) first:
 
@@ -7641,6 +7641,8 @@ Christian asked for this on 26 November 2026. Work in `main`. Editing cylinders 
 4. Saving updates the tile, the gas summaries and the profile's gas data.
 
 Mock-ups in `docs/mockups/`: `detail-onglets-gaz-android` (tiles with chevrons), `detail-bouteilles-recycleur-android`, `detail-bouteille-android`. Also updated: `detail3-android` is now a copy of the tabbed reference page (the duplicate board was removed from the canvas; links to it now land on the reference).
+
+Done (26 November 2026): on an Android phone (`layout.phone && !ios`), every cylinder tile of the « Bouteilles » card has a 24 dp chevron (`bc-desktop-gas-cards--chevron`, 8 dp from the right, centred) and a touch opens a full-screen dialog (`components/CylinderEditDialog.svelte`, logic in `lib/cylinder-dialog.js`): « Modifier la bouteille » (role, type, O₂/He with the mix name, pressures, « Retirer la bouteille ») or « Bouteilles du recycleur » (Diluant and Oxygène cards, oxygen with O₂ only, footnote, no remove). Save sends one `cylinderChanges` write for all the cylinders of the dialog; the tile, summaries and profile gas data follow the dive. Not done: (1) tablet, desktop and iPhone keep the selected-tile fields below the tiles, with no chevron and no dialog (the task asked for Android phones first); (2) the Rôle list holds the uses the core stores (circuit ouvert or secours, diluant, oxygène, non utilisée): « Déco » and « Relais » do not exist in the logbook format, so they are not offered; (3) the pressures are read-only for a dive read from a computer, as in the inline fields; (4) not run on a device or in the emulator.
 
 ## [ ] 2026-11-26-402 Correction to the weight types (commit f176335e): one list, the diver's, with no reference to Subsurface
 
