@@ -8,7 +8,10 @@
   // Numéro de série, Date d’achat, Notes and « Supprimer la pièce ». No maintenance reminder for a computer.
   // The diver’s photo belongs to this piece: it is kept in the inventory (account data, compressed), never added to
   // the shared catalog of computer images (docs/architecture.md, section 12).
-  import { dateHint, readTypedDate, typedDate } from '../lib/format.js';
+  import { dateHint, typedDate } from '../lib/format.js';
+  import DateField from '../components/DateField.svelte';
+  import DatePickerDialog from '../components/DatePickerDialog.svelte';
+  import { formatFieldDate, partsOf, isoOf } from '../lib/profile-format.js';
   import { onMount } from 'svelte';
   import { Page, Navbar } from 'framework7-svelte';
   import { BenthicCore } from 'benthic-core';
@@ -39,7 +42,11 @@
   let serial = $state('');
   let purchasedOn = $state('');
   /** The typed date as YYYY-MM-DD; the text itself when it is not a date, so that it is flagged. */
-  const purchasedIso = $derived(purchasedOn.trim() ? (readTypedDate(purchasedOn) ?? purchasedOn) : '');
+  // The purchase date as YYYY-MM-DD, chosen in the calendar (Christian, 26 November 2026).
+  const purchasedIso = $derived(purchasedOn.trim());
+  /** iPhone: the calendar of the purchase date is open. */
+  let pickingDate = $state(false);
+  const purchasedParts = $derived(partsOf(purchasedOn, new Date().getFullYear()));
   let note = $state('');
   let saving = $state(false);
   let confirmDelete = $state(false);
@@ -60,7 +67,7 @@
       brand = g.brand ?? '';
       model = g.model ?? '';
       serial = g.serial ?? '';
-      purchasedOn = typedDate(g.purchasedOn ?? '');
+      purchasedOn = g.purchasedOn ?? '';
       note = g.note ?? '';
       if (g.photoId) {
         photoId = g.photoId;
@@ -190,7 +197,7 @@
   {:else}
     <TextField label={t('gear.pieceEdit.serial')} bind:value={serial} supporting={t('gear.pieceNew.serialHintComputer')} />
   {/if}
-  <TextField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || dateHint()} />
+  <DateField label={t('gear.pieceEdit.purchasedOn')} bind:value={purchasedOn} maxYear={new Date().getFullYear()} supporting={dateLive.error} />
   <div class="bc-computer-edit--wide-note"><TextField label={t('gear.pieceEdit.note')} bind:value={note} supporting={t('gear.computerEdit.noteHint')} /></div>
 {/snippet}
 
@@ -205,7 +212,7 @@
   <p class="bc-computer-edit--ios-footer">{t('gear.computerEdit.suggestHint')}</p>
   <div class="bc-computer-edit--group" role="list">
     <label class="bc-computer-edit--ios-row"><span>{t('gear.computerEdit.serialShort')}</span><input bind:value={serial} disabled={tied} /></label>
-    <label class="bc-computer-edit--ios-row"><span>{t('gear.pieceEdit.purchasedOn')}</span><input bind:value={purchasedOn} inputmode="numeric" placeholder={dateHint()} aria-invalid={dateLive.error ? 'true' : undefined} /></label>
+    <button type="button" class="bc-computer-edit--ios-row bc-computer-edit--ios-date" onclick={() => (pickingDate = true)}><span>{t('gear.pieceEdit.purchasedOn')}</span><span class="bc-computer-edit--ios-value">{purchasedOn ? formatFieldDate(purchasedOn) : dateHint()}</span></button>
     <label class="bc-computer-edit--ios-row"><span>{t('gear.computerEdit.noteShort')}</span><input bind:value={note} placeholder={t('gear.computerEdit.optional')} /></label>
   </div>
   {#if dateLive.error}<p class="bc-computer-edit--ios-footer bc-computer-edit--ios-error">{dateLive.error}</p>{/if}
@@ -274,6 +281,21 @@
 
 {#if confirmDelete && piece}
   <RetirePieceDialog name={piece.name} computer oncancel={() => (confirmDelete = false)} onconfirm={retire} />
+{/if}
+
+{#if pickingDate}
+  <DatePickerDialog
+    year={purchasedParts.year}
+    month={purchasedParts.month}
+    day={purchasedParts.day}
+    minYear={1920}
+    maxYear={new Date().getFullYear()}
+    oncancel={() => (pickingDate = false)}
+    onconfirm={(d) => {
+      purchasedOn = isoOf(d);
+      pickingDate = false;
+    }}
+  />
 {/if}
 
 <style>
@@ -462,6 +484,26 @@
         border-top: 0.5px solid var(--bc-row-divider);
         margin-inline-start: 16px;
         padding-inline-start: 0;
+      }
+
+      /* The purchase date: a row that opens the calendar. */
+      &.bc-computer-edit--ios-date {
+        width: 100%;
+        border-right: none;
+        border-bottom: none;
+        border-left: none;
+        background: none;
+        font: inherit;
+        font-size: 17px;
+        text-align: start;
+        cursor: pointer;
+
+        > .bc-computer-edit--ios-value {
+          flex: 1;
+          width: auto;
+          min-width: 0;
+          color: var(--bc-text);
+        }
       }
     }
 

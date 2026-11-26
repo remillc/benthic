@@ -9,6 +9,7 @@
   import { Page, Navbar } from 'framework7-svelte';
   import Icon from '../components/Icon.svelte';
   import ButtonGroup from '../components/ButtonGroup.svelte';
+  import DateField from '../components/DateField.svelte';
   import TextField from '../components/TextField.svelte';
   import ComboField from '../components/ComboField.svelte';
   import ReadOnlyNotice from '../components/ReadOnlyNotice.svelte';
@@ -33,6 +34,8 @@
   /** @type {'service'|'inspection'|'other'} */
   let kind = $state('service');
   let doneOn = $state(typedDate(todayIso()));
+  /** The day, chosen in the calendar (every note but a hydrostatic test, which also takes a stamp typed by hand). */
+  let doneDay = $state(todayIso());
   let doneBy = $state('');
   let cost = $state('');
   let notes = $state('');
@@ -51,7 +54,7 @@
   );
   /** A hydrostatic test is dated by the stamp on the bottle (« 03/22 »: the first of March 2022), or by a full date. */
   const hydro = $derived(item?.task === 'hydrostatic');
-  const effectiveDate = $derived((hydro ? parseStamp(doneOn) : null) ?? readTypedDate(doneOn) ?? doneOn);
+  const effectiveDate = $derived(hydro ? (parseStamp(doneOn) ?? readTypedDate(doneOn) ?? doneOn) : doneDay);
   const problems = $derived(entryProblems({ doneOn: effectiveDate, cost }));
   const dateLive = liveError(
     () => doneOn,
@@ -126,7 +129,11 @@
     />
     <p class="bc-maintenance-note--help">{t(`maintenance.kindHelp.${kind}`)}</p>
 
-    <TextField label={t('maintenance.note.date')} bind:value={doneOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || hydro ? t('maintenance.note.stampHint', { format: dateHint() }) : dateHint()} />
+    {#if hydro}
+      <TextField label={t('maintenance.note.date')} bind:value={doneOn} inputmode="numeric" invalid={!!dateLive.error} supporting={dateLive.error || t('maintenance.note.stampHint', { format: dateHint() })} />
+    {:else}
+      <DateField label={t('maintenance.note.date')} bind:value={doneDay} maxYear={new Date().getFullYear()} supporting={dateLive.error} />
+    {/if}
     <ComboField label={t('maintenance.note.doneBy')} bind:value={doneBy} options={shops} supporting={t('maintenance.note.doneByHint')} />
     <TextField label={t('maintenance.note.cost')} bind:value={cost} inputmode="decimal" invalid={!!costLive.error} supporting={costLive.error} />
     <TextField label={t('maintenance.note.notes')} bind:value={notes} multiline />
