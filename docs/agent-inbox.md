@@ -7731,3 +7731,11 @@ Christian asked for this on 26 November 2026. Work in `main`. The « Cellules O�
 `M8 9h8a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5H8a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 8 9zM8.5 7.5h7M9.5 7.5V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3M10 19v1.5a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V19M6.5 11.5h11M6.5 16.5h11`
 
 Use it wherever a gear icon stands for an O₂ cells piece (type menus and tiles, equipment lists, kits, maintenance). Mock-up: `docs/mockups/icones-gearicon-svelte`.
+
+## [ ] 2026-11-26-408 GearIcon: a redrawn `rebreather` icon
+
+Christian asked for this on 26 November 2026. Work in `main`. Replace the `rebreather` path in GearIcon.svelte with this one: the two cylinders are unchanged, the hoses are gone and the body is shorter at the top. Keep the stroke width the icon has now.
+
+`M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM16.47 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM9.47 5.89H14.53V19.89H9.47zM10.9 19.89L9.9 22.40H14.1L13.1 19.89`
+
+Nothing else uses its own copy of this drawing in the app; if something does, use the new path there too. Mock-up: `docs/mockups/icones-gearicon-svelte`.
