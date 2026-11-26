@@ -2171,6 +2171,17 @@ class BenthicCorePlugin : Plugin() {
     }
 
     /**
+     * Whether this build can register for push notifications: the push plugin needs Firebase, set up only when the build had
+     * google-services.json (the Google Services Gradle plugin then generates the google_app_id resource). Without it, the push
+     * plugin's register throws on its own thread and the app crashes, so the app does not call it.
+     */
+    @PluginMethod
+    fun pushAvailable(call: PluginCall) {
+        val id = context.resources.getIdentifier("google_app_id", "string", context.packageName)
+        call.resolve(JSObject().put("available", id != 0))
+    }
+
+    /**
      * Opens the system's notification settings for Benthic (the app's notification page), where the diver turns notifications back
      * on after refusing them. Falls back to the app's details page.
      */

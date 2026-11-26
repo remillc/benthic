@@ -1120,6 +1120,11 @@ export class BenthicCoreDesktop extends WebPlugin {
     await this.core('downloadCancel');
   }
 
+  /** The desktop has no push notification. */
+  async pushAvailable() {
+    return { available: false };
+  }
+
   /** The desktop has no push notification: nothing to open. */
   async openNotificationSettings() {}
 

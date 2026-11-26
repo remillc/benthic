@@ -935,6 +935,8 @@ export { waterTypeOf };
  *   The dives received before a download failed or was cancelled: count ({dives}), keep (one
  *   undoable step, a DownloadResult) or discard. Rejects with NO_PARTIAL.
  * @property {() => Promise<void>} cancelDownload
+ * @property {() => Promise<{available: boolean}>} pushAvailable whether this build can register for push notifications (Android: Firebase
+ *   is set up, i.e. the build had google-services.json; without it the push plugin's register crashes the app). iOS: always true.
  * @property {() => Promise<void>} openNotificationSettings opens the system's notification settings for Benthic (Android: the app's
  *   notification page; iOS: the app's page in Settings); the desktop has none. Inbox task 2026-11-23-356, part 4.
  * @property {(event: 'bluetoothDevice'|'bluetoothScanStopped'|'downloadProgress'|'syncProgress'|'gitProgress'|'sharedFile'|'stageProgress'|'pushStream'|'accessRequestOpened', listener: (data: any) => void) => Promise<{remove: () => Promise<void>}>} addListener
@@ -1291,6 +1293,7 @@ export const BenthicCore = {
     return JSON.parse((await native.downloadPartial(options)).json);
   },
   cancelDownload: () => native.cancelDownload(),
+  pushAvailable: () => native.pushAvailable(),
   openNotificationSettings: () => native.openNotificationSettings(),
   addListener(event, listener) {
     if (event === 'bluetoothDevice')

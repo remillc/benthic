@@ -148,6 +148,7 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "exportDives", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "htmlToPdf", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openNotificationSettings", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pushAvailable", returnType: CAPPluginReturnPromise),
     ]
 
     /// The core is not reentrant: only this queue calls it.
@@ -1597,6 +1598,11 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.main.async {
             call.resolve(["level": UIAccessibility.isDarkerSystemColorsEnabled ? 1.0 : 0.0])
         }
+    }
+
+    /// Whether this build can register for push notifications. iOS registers with APNs directly (no Firebase): always true.
+    @objc func pushAvailable(_ call: CAPPluginCall) {
+        call.resolve(["available": true])
     }
 
     /// Opens the system's notification settings for Benthic (iOS 16 and later: the app's notification page; before: the app's page in
