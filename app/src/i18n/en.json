@@ -4592,6 +4592,7 @@
       "text": "A freedive is made without a cylinder: there is no cylinder, mix or pressure to note."
     },
     "mixTile": "Mix",
+    "rebreatherTile": "Rebreather",
     "ccrTileLabel": "Rebreather: {diluent}; {oxygen}",
     "pscrTileLabel": "pSCR rebreather: mix {mix}",
     "role": { "diluent": "Diluent", "oxygen": "Oxygen" },

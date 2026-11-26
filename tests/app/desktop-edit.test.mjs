@@ -1,6 +1,7 @@
 // Editing a dive in place in the desktop detail pane (tasks 2026-11-15-172, 184, 191, 183):
 // what a field edit sends to the core, the recorded values refused, the keys of an edit, the
 // chips choice and the tab remembered.
+import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
@@ -201,4 +202,12 @@ test('the detail tab last chosen is kept; ← → wrap round the five tabs', () 
   assert.equal(stepTab('info', 'ArrowRight'), 'equipment');
   assert.equal(stepTab('info', 'ArrowLeft'), 'map');
   assert.equal(stepTab('map', 'ArrowRight'), 'info');
+});
+
+test('two sites of the same name show once in the site sheet and the suggestions (Svelte keys them by name)', () => {
+  const field = readFileSync(new URL('../../app/src/components/DesktopEditField.svelte', import.meta.url), 'utf8');
+  assert.match(field, /const knownOnce = \$derived\.by/);
+  assert.match(field, /listSuggestions\(knownOnce,/);
+  assert.match(field, /\? knownOnce\.map\(\(k\) => \(\{ value: k\.key/);
+  assert.doesNotMatch(field, /[^a-zA-Z]known\.(map|length)/);
 });

@@ -77,7 +77,7 @@
   const invalid = $derived((kind === 'text' || kind === 'multiline') && editing && !valid(text));
   const suggestions = $derived(
     kind === 'list' || kind === 'site'
-      ? listSuggestions(known, Array.isArray(draft) ? draft : [], typed || (kind === 'site' && typeof draft === 'string' && editing ? draft : ''))
+      ? listSuggestions(knownOnce, Array.isArray(draft) ? draft : [], typed || (kind === 'site' && typeof draft === 'string' && editing ? draft : ''))
       : { matches: [], addNew: null },
   );
   /** The rows of the list under the field: the known values, then « Ajouter … ». */
@@ -91,9 +91,23 @@
   // the current value checked, a search when it is long, « Nouveau … » when one can be created. A choice saves at once.
   let sheetOpen = $state(false);
   const sheetKind = $derived(layout.phone && (kind === 'choice' || kind === 'site'));
+  /**
+   * The known values once each: two sites of the logbook can share a name (the lists are keyed by it, and a site is chosen
+   * by its name), so their dives add up.
+   */
+  const knownOnce = $derived.by(() => {
+    /** @type {Map<string, { key: string, dives: number }>} */
+    const byKey = new Map();
+    for (const k of known) {
+      const seen = byKey.get(k.key);
+      if (seen) seen.dives += k.dives;
+      else byKey.set(k.key, { key: k.key, dives: k.dives });
+    }
+    return [...byKey.values()];
+  });
   const sheetOptions = $derived(
     kind === 'site'
-      ? known.map((k) => ({ value: k.key, label: k.key, example: t('desktopDetail.diveCount', { n: k.dives }) }))
+      ? knownOnce.map((k) => ({ value: k.key, label: k.key, example: t('desktopDetail.diveCount', { n: k.dives }) }))
       : [{ value: '', label: invitation || t('edit.notSet') }, ...options],
   );
   /** @param {string} v */
@@ -349,7 +363,7 @@
 </div>
 
 {#if sheetOpen}
-  <DetailSheet title={label} options={sheetOptions} value={typeof value === 'string' ? value : ''} search={kind === 'site' && known.length > 6} newLabel={kind === 'site' ? newLabel : ''} onselect={sheetPick} onclose={sheetClosed} />
+  <DetailSheet title={label} options={sheetOptions} value={typeof value === 'string' ? value : ''} search={kind === 'site' && knownOnce.length > 6} newLabel={kind === 'site' ? newLabel : ''} onselect={sheetPick} onclose={sheetClosed} />
 {/if}
 
 <style>

@@ -4592,6 +4592,7 @@
       "text": "Une plongée en apnée se fait sans bouteille : il n’y a ni bouteille, ni mélange, ni pression à noter."
     },
     "mixTile": "Mélange",
+    "rebreatherTile": "Recycleur",
     "ccrTileLabel": "Recycleur : {diluent} ; {oxygen}",
     "pscrTileLabel": "Recycleur pSCR : mélange {mix}",
     "role": { "diluent": "Diluant", "oxygen": "Oxygène" },
