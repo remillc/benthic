@@ -1015,6 +1015,7 @@
       "usedInOneDive": "Used in 1 dive",
       "usedInDives": "Used in {n} dives",
       "note": "{use}. Renaming it also renames this weight in those dives.",
+      "noteDesktop": "{use}. Renaming it also renames this weight in those dives. The weight is offered when you add this weight to a dive.",
       "deleteType": "Delete this type",
       "deleteTitle": "Delete “{name}”?",
       "deleteAction": "Delete",

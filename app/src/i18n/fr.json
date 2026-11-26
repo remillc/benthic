@@ -1015,6 +1015,7 @@
       "usedInOneDive": "Utilisé dans 1 plongée",
       "usedInDives": "Utilisé dans {n} plongées",
       "note": "{use}. Le renommer renomme aussi ce lest dans ces plongées.",
+      "noteDesktop": "{use}. Le renommer renomme aussi ce lest dans ces plongées. Le poids est proposé quand on ajoute ce lest à une plongée.",
       "deleteType": "Supprimer ce type",
       "deleteTitle": "Supprimer « {name} » ?",
       "deleteAction": "Supprimer",

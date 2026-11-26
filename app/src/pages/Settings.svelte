@@ -57,6 +57,7 @@
   import { afterDocumentNotifyChange } from '../lib/document-notify.js';
   import { cylinderChoices, ensureCylinderType } from '../lib/cylinder-choices.js';
   import DesktopCylinderTypes from '../components/DesktopCylinderTypes.svelte';
+  import DesktopWeightTypes from '../components/DesktopWeightTypes.svelte';
   import NotifyRefusedBanner from '../components/NotifyRefusedBanner.svelte';
   import { pushState, refreshPushPermission } from '../lib/push-notifications.svelte.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
@@ -588,8 +589,9 @@
             setCore({ defaultCylinder: v });
           },
         },
-        rebreatherRow('defaultDiluent', t('settings.defaultCylinder.diluent')),
+        // Oxygen first, as the dive detail names the rebreather's cylinders (task 2026-11-26-403).
         rebreatherRow('defaultOxygen', t('settings.defaultCylinder.oxygen')),
+        rebreatherRow('defaultDiluent', t('settings.defaultCylinder.diluent')),
         {
           kind: 'link',
           id: 'defaultBailout',
@@ -1163,6 +1165,13 @@
                 .map((row) => (row.id === 'defaultBailout' ? { ...row, kind: 'bailout', text: row.value, value: '' } : row)),
             }
           : null;
+      // Types de lest (task 2026-11-26-403, bureau-reglages-equipement-lest): the list is the card itself; the one row is what the search finds.
+      case 'weightTypes':
+        return {
+          title: t('settings.weights.title'),
+          custom: 'weightTypes',
+          rows: [{ kind: 'weightTypes', id: 'weightTypesList', label: t('settings.weights.title'), text: t('settings.weights.intro') }],
+        };
       case 'cylinderTypes':
         return {
           title: t('settings.cylinders.title'),
@@ -1509,6 +1518,8 @@
                     <DesktopCylinderTypes>
                       {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
                     </DesktopCylinderTypes>
+                  {:else if block.custom === 'weightTypes'}
+                    <DesktopWeightTypes />
                   {:else}
                     {#each block.rows as row (row.id)}{@render deskRow(row, '')}{/each}
                   {/if}

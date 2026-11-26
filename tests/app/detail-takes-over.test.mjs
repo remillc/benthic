@@ -112,3 +112,22 @@ test('sources: Voyage in the Site card with its cross, the invalid switch ends t
   }
   assert.equal(JSON.parse(source('i18n/fr.json')).edit.invalidText, 'Exclue des statistiques et masquée selon le réglage');
 });
+
+test('sources: Réglages › Équipement lists the oxygen before the diluent, and the desktop gets the Types de lest card', () => {
+  const settings = source('pages/Settings.svelte');
+  assert.ok(settings.indexOf("rebreatherRow('defaultOxygen'") < settings.indexOf("rebreatherRow('defaultDiluent'"), 'Oxygène, recycleur comes first');
+  assert.match(settings, /case 'weightTypes':[\s\S]*custom: 'weightTypes'/);
+  assert.match(settings, /block\.custom === 'weightTypes'\}\s*<DesktopWeightTypes \/>/);
+  const categories = source('lib/desktop-settings.js');
+  assert.match(categories, /groups: \['equipment', 'cylinderTypes', 'weightTypes'\]/, 'under Types de bouteilles');
+  const list = source('components/DesktopWeightTypes.svelte');
+  assert.match(list, /settings\.weights\.intro/);
+  assert.match(list, /readWeightTypeRows/);
+  assert.match(list, /settings\.weights\.add/);
+  assert.match(list, /formatWeight\(type\.grams, logbook\.prefs\)/);
+  const dialog = source('components/DesktopWeightTypeDialog.svelte');
+  for (const key of ['settings.weights.name', 'settings.weights.weight', 'settings.weights.deleteType', 'dialog.cancel', 'edit.save', 'settings.weights.noteDesktop']) assert.ok(dialog.includes(key), key);
+  assert.match(dialog, /saveWeightType\(type/);
+  assert.match(dialog, /removeWeightType\(type\)/);
+  for (const lang of ['fr', 'en']) assert.ok(JSON.parse(source(`i18n/${lang}.json`)).settings.weights.noteDesktop, lang);
+});
