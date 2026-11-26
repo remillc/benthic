@@ -7747,3 +7747,15 @@ Christian asked for this on 26 November 2026. Work in `main`. All the icons draw
 The screen mock-ups now show the `o2Cells` icon (task 407) where a type « Cellules O₂ » appears, in place of the old three-circles drawing: make sure the app does the same.
 
 Mock-ups: `docs/mockups/icones-gearicon-svelte` and the equipment, kit, maintenance and pairing screens on every device.
+
+## [ ] 2026-11-26-410 Desktop: edit cylinders in a dialog, as on the phone (task 401)
+
+Christian asked for this on 26 November 2026. Work in `main`. On the desktop dive detail, Gaz tab, the cylinder tiles get the same workflow as on the phone (task 401):
+
+- Every cylinder tile (open circuit, CCR, pSCR) shows a right chevron, centred vertically, and opens a dialog.
+- Rebreather tile → « Bouteilles du recycleur »: Oxygène and Diluant side by side (Oxygène on the left), each with Bouteille, O₂ (and He for the diluant), Début and Fin, and the pressure used. Note: « Un recycleur a toujours un oxygène et un diluant. »
+- Any other cylinder → « Modifier la bouteille »: Rôle, Bouteille, O₂, He and mix name, « Changement de gaz à » with the MOD at ppO₂ 1,6, Début, Fin, « Pas respirée pendant la plongée » when it applies, and « Retirer la bouteille », which asks for confirmation (« Retirer cette bouteille ? », with whether the profile changes).
+- Annuler / Enregistrer; nothing changes until Enregistrer. Units follow the user's settings (the mock-ups show bar and m).
+- No « Lire la pression sur une photo » button on desktop for now.
+
+Mock-ups: `docs/mockups/bureau-carnet-onglet-gaz`, `-ccr`, `-pscr`, `bureau-detail-bouteilles-recycleur`, `bureau-detail-bouteille`, `bureau-detail-bouteille-retirer`.
