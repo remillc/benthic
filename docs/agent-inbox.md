@@ -7724,7 +7724,7 @@ Christian asked for this on 26 November 2026. Work in `main`.
 
 Mock-ups in `docs/mockups/`: `icones-gearicon-svelte` (the icon sheet), and every Profil › Équipement, kit, piece and maintenance mock-up on the three devices (`profil-*-android`, `android-tablette-profil-*-paysage`, `bureau-profil-*`, `bureau-carnet-onglet-equipement`, `bureau-photo*`).
 
-## [ ] 2026-11-26-407 GearIcon: an `o2Cells` icon
+## [x] 2026-11-26-407 GearIcon: an `o2Cells` icon
 
 Christian asked for this on 26 November 2026. Work in `main`. The « Cellules O₂ » piece type (task 397) has no icon of its own. Add `o2Cells` to GearIcon.svelte, drawn after a real cell (side view, upright: cylindrical body with its label band, O-ring and narrower threaded neck on top, small connector below), 1.5 stroke like the new `suit` and `bcd` (task 406):
 
