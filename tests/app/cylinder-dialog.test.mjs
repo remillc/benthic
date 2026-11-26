@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { blankCylinder, newPartDraft, cylinderDraft, draftErrors, draftPatch, hasErrors, mixHelper, percentText, pressureText } from '../../app/src/lib/cylinder-dialog.js';
+import { blankCylinder, chooseType, newPartDraft, cylinderDraft, sizeMlOf, sizeText, draftErrors, draftPatch, hasErrors, mixHelper, percentText, pressureText } from '../../app/src/lib/cylinder-dialog.js';
 import { cylinderChanges } from '../../app/src/lib/desktop-edit.js';
 
 const metric = { pressure: 'bar' };
@@ -15,7 +15,7 @@ const dive = (cylinders, manual = true) => ({ manual, cylinders });
 const source = (path) => readFileSync(new URL(`../../app/src/${path}`, import.meta.url), 'utf8');
 
 test('the draft holds the texts in the diver\'s unit', () => {
-  assert.deepEqual(cylinderDraft(cyl(), metric), { description: 'AL80', o2: '32', he: '0', start: '200', end: '50', use: 'OC-gas', depth: '' });
+  assert.deepEqual(cylinderDraft(cyl(), metric), { description: 'AL80', o2: '32', he: '0', start: '200', end: '50', use: 'OC-gas', depth: '', custom: false, size: '11,1', workingPressure: '207' });
   assert.equal(pressureText(206843, imperial), '3000');
   assert.equal(pressureText(0, metric), '');
   assert.equal(percentText(215), '21,5');
@@ -37,7 +37,7 @@ test('invalid entries are found, and a computer\'s pressures are not entered', (
   assert.equal(draftErrors({ ...draft, o2: '0' }, metric, { manual: true }).o2, true);
   assert.equal(draftErrors({ ...draft, o2: '60', he: '50' }, metric, { manual: true }).he, true);
   assert.equal(draftErrors({ ...draft, start: '9999' }, metric, { manual: true }).start, true);
-  assert.equal(draftErrors({ ...draft, start: '9999' }, metric, { manual: false }).start, false);
+  assert.equal(draftErrors({ ...draft, start: '9999' }, metric, {}).start, true, 'the pressures are checked on every dive');
   assert.equal(draftErrors({ ...draft, he: '' }, metric, { manual: true, oxygenOnly: true }).he, false, 'the oxygen cylinder has no He field');
 });
 
@@ -49,7 +49,7 @@ test('the patch holds only what changed', () => {
   assert.deepEqual(draftPatch(c, { ...draft, o2: '36' }, types, metric, { manual: true }), { o2Permille: 360, hePermille: 0 });
   assert.deepEqual(draftPatch(c, { ...draft, o2: '18', he: '45' }, types, metric, { manual: true }), { o2Permille: 180, hePermille: 450 });
   assert.deepEqual(draftPatch(c, { ...draft, start: '210', end: '' }, types, metric, { manual: true }), { startMbar: 210000, endMbar: 0 });
-  assert.deepEqual(draftPatch(c, { ...draft, start: '210' }, types, metric, { manual: false }), {}, 'a computer\'s pressures stay');
+  assert.deepEqual(draftPatch(c, { ...draft, start: '210' }, types, metric, {}), { startMbar: 210000 }, "a computer's pressures are edited too");
   assert.deepEqual(draftPatch(c, { ...draft, use: 'not used' }, types, metric, { manual: true }), { use: 'not used' });
   const he = cyl({ hePermille: 100 });
   assert.deepEqual(draftPatch(he, { ...cylinderDraft(he, metric), o2: '100' }, types, metric, { manual: true, oxygenOnly: true }), { o2Permille: 1000, hePermille: 100 }, 'the oxygen cylinder keeps its He');
@@ -73,7 +73,7 @@ test('the patches of a rebreather\'s two cylinders go through one cylinderChange
 test('a rebreather dive without an oxygen cylinder gets an empty oxygen card that Save adds', () => {
   const dil = cyl({ use: 'diluent', o2Permille: 210 });
   const draft = newPartDraft('oxygen', metric);
-  assert.deepEqual(draft, { description: '', o2: '100', he: '0', start: '', end: '', use: 'oxygen', depth: '' });
+  assert.deepEqual(draft, { description: '', o2: '100', he: '0', start: '', end: '', use: 'oxygen', depth: '', custom: false, size: '', workingPressure: '' });
   assert.equal(newPartDraft('diluent', metric).o2, '21');
   const patch = draftPatch(blankCylinder(), { ...draft, start: '200', end: '150' }, types, metric, { manual: true, oxygenOnly: true });
   assert.deepEqual(patch, { o2Permille: 1000, hePermille: 0, startMbar: 200000, endMbar: 150000, use: 'oxygen' });
@@ -111,4 +111,34 @@ test('the dialog texts exist in both languages', () => {
   const fr = JSON.parse(source('i18n/fr.json')).desktopDetail.cylinderDialog;
   assert.equal(fr.single, 'Modifier la bouteille');
   assert.equal(fr.rebreather, 'Bouteilles du recycleur');
+});
+
+test('« Autre… »: a cylinder outside the table of types has its own size and working pressure', () => {
+  const other = cylinderDraft(cyl({ description: '' }), metric);
+  assert.equal(other.custom, true, 'no type name and a size: Autre…');
+  assert.equal(cylinderDraft(cyl({ description: '', sizeMl: 0 }), metric).custom, false);
+  // Choosing « Autre… » drops the name and keeps the size; choosing a type fills size and pressure.
+  const draft = cylinderDraft(cyl(), metric);
+  chooseType(draft, '__other__', types, metric);
+  assert.deepEqual([draft.custom, draft.description, draft.size, draft.workingPressure], [true, '', '11,1', '207']);
+  chooseType(draft, 'HP100', types, metric);
+  assert.deepEqual([draft.custom, draft.description, draft.size, draft.workingPressure], [false, 'HP100', '12', '232']);
+  // The patch sends the size and the working pressure together.
+  const c = cyl({ description: '' });
+  assert.deepEqual(draftPatch(c, { ...other, size: '15', workingPressure: '300' }, types, metric, {}), { sizeMl: 15000, workingPressureMbar: 300000 });
+  assert.deepEqual(draftPatch(c, other, types, metric, {}), {});
+  assert.deepEqual(draftPatch(cyl(), { ...cylinderDraft(cyl(), metric), custom: true, description: '' }, types, metric, {}), { description: '' }, 'AL80 to Autre…: the size stays');
+  // Validation, only while Autre… is chosen.
+  assert.equal(draftErrors({ ...other, size: '150' }, metric, {}).size, true);
+  assert.equal(draftErrors({ ...other, workingPressure: '9999' }, metric, {}).workingPressure, true);
+  assert.equal(draftErrors({ ...cylinderDraft(cyl(), metric), size: '150' }, metric, {}).size, false);
+  assert.equal(hasErrors(draftErrors({ ...other, size: 'x' }, metric, {})), true);
+});
+
+test('sizes in cubic feet follow the working pressure, as in the phone editor', () => {
+  const cuft = { pressure: 'psi', volume: 'cuft' };
+  assert.equal(sizeText(11100, 207000, cuft), '80,1');
+  assert.equal(sizeMlOf('80,1', 207000, cuft), 11103);
+  assert.equal(sizeMlOf('11,1', 207000, { pressure: 'bar' }), 11100);
+  assert.ok(Number.isNaN(sizeMlOf('500', 0, cuft)));
 });

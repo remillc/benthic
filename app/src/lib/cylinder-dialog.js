@@ -4,16 +4,55 @@
 // O₂ and He, which entries are valid, and the patch a Save sends to cylinderChanges (lib/desktop-edit.js). The dialog
 // (components/CylinderEditDialog.svelte) and tests/app/cylinder-dialog.test.mjs call it.
 
-import { gasName } from './cylinder-card.js';
+import { gasName, OTHER_TYPE } from './cylinder-card.js';
 import { parseTyped, pressureMbarOf } from './desktop-edit.js';
 import { pressureUsed } from './cylinder-card.js';
 
 const MBAR_PER_PSI = 68.9476;
 
 /**
- * @typedef {{ description: string, o2: string, he: string, start: string, end: string, use: string, depth: string }} CylinderDraft
+ * @typedef {{ description: string, o2: string, he: string, start: string, end: string, use: string, depth: string, custom: boolean, size: string, workingPressure: string }} CylinderDraft
  * The texts of one cylinder's fields, as typed: percentages, pressures and the gas-change depth in the diver's units.
+ * `custom`: the type is « Autre… » (a cylinder outside the table of types): `size` and `workingPressure` are typed too.
  */
+
+const ML_PER_CUFT = 28316.8466;
+const cuftOf = (/** @type {{ volume?: string }} */ prefs) => prefs.volume === 'cuft';
+
+/** A size as typed back: litres of water, or in cubic feet the gas at the working pressure (Subsurface). @param {number} ml @param {number} wpMbar @param {{ volume?: string }} prefs */
+export function sizeText(ml, wpMbar, prefs) {
+  if (!(ml > 0)) return '';
+  const v = cuftOf(prefs) ? (wpMbar ? (ml * (wpMbar / 1000 / 1.01325)) / ML_PER_CUFT : ml / ML_PER_CUFT) : ml / 1000;
+  return String(Number(v.toFixed(1))).replace('.', ',');
+}
+
+/** A typed size in ml; 0 for none, NaN when it is not a size (up to 100 L, 400 cu ft). @param {string} text @param {number} wpMbar @param {{ volume?: string }} prefs */
+export function sizeMlOf(text, wpMbar, prefs) {
+  if (!text.trim()) return 0;
+  const v = parseTyped(text);
+  const cuft = cuftOf(prefs);
+  if (!(v >= 0 && v <= (cuft ? 400 : 100))) return NaN;
+  return Math.round(!cuft ? v * 1000 : wpMbar ? (v * ML_PER_CUFT) / (wpMbar / 1000 / 1.01325) : v * ML_PER_CUFT);
+}
+
+/**
+ * A cylinder type chosen in the dialog, as the phone's editor did: « Autre… » drops the type's name and shows the size and the
+ * working pressure (they keep their values); a type fills them. Mutates the draft.
+ * @param {CylinderDraft} draft @param {string} name @param {{ name: string, ml: number, workingPressureMbar: number }[]} types @param {{ pressure: string, volume?: string }} prefs
+ */
+export function chooseType(draft, name, types, prefs) {
+  if (name === OTHER_TYPE) {
+    draft.custom = true;
+    draft.description = '';
+    return;
+  }
+  draft.custom = false;
+  draft.description = name;
+  const type = types.find((x) => x.name === name);
+  if (!type) return;
+  draft.workingPressure = pressureText(type.workingPressureMbar, prefs);
+  draft.size = sizeText(type.ml, type.workingPressureMbar, prefs);
+}
 
 const MM_PER_FOOT = 304.8;
 const feetOf = (/** @type {{ length: string }} */ prefs) => prefs.length === 'ft';
@@ -62,7 +101,7 @@ export const pressureText = (mbar, prefs) => (mbar > 0 ? String(Math.round(prefs
 
 /**
  * The dialog's starting texts for a cylinder.
- * @param {import('benthic-core').Cylinder} c @param {{ pressure: string }} prefs
+ * @param {import('benthic-core').Cylinder} c @param {{ pressure: string, length?: string, volume?: string }} prefs
  * @returns {CylinderDraft}
  */
 export const cylinderDraft = (c, prefs) => ({
@@ -73,6 +112,9 @@ export const cylinderDraft = (c, prefs) => ({
   end: pressureText(c.endMbar, prefs),
   use: c.use || 'OC-gas',
   depth: depthText(c.depthMm || 0, prefs),
+  custom: !c.description && !!c.sizeMl,
+  size: sizeText(c.sizeMl, c.workingPressureMbar, prefs),
+  workingPressure: pressureText(c.workingPressureMbar, prefs),
 });
 
 /**
@@ -115,26 +157,30 @@ export function mixHelper(draft, words, oxygenOnly = false) {
 }
 
 /**
- * Which entries are not valid. Pressures are only entered for a dive logged by hand: a computer's are read-only.
- * @param {CylinderDraft} draft @param {{ pressure: string }} prefs @param {{ manual: boolean, oxygenOnly?: boolean }} options
+ * Which entries are not valid. The pressures are entered on every dive (a computer's included).
+ * @param {CylinderDraft} draft @param {{ pressure: string, volume?: string }} prefs @param {{ oxygenOnly?: boolean }} options
  */
 export function draftErrors(draft, prefs, options) {
   const mix = mixErrors(draft, options.oxygenOnly);
-  const pressure = (/** @type {string} */ text) => !!options.manual && text.trim() !== '' && Number.isNaN(pressureMbarOf(text, prefs));
-  return { o2: mix.o2, he: mix.he, start: pressure(draft.start), end: pressure(draft.end), depth: Number.isNaN(depthMmOf(draft.depth, prefs)) };
+  const pressure = (/** @type {string} */ text) => text.trim() !== '' && Number.isNaN(pressureMbarOf(text, prefs));
+  // « Autre… »: the size and the working pressure are typed (the working pressure first: a size in cubic feet depends on it).
+  const wp = draft.custom ? pressure(draft.workingPressure) : false;
+  const wpMbar = draft.custom && !wp && draft.workingPressure.trim() ? pressureMbarOf(draft.workingPressure, prefs) : 0;
+  const size = draft.custom && Number.isNaN(sizeMlOf(draft.size, wpMbar, prefs));
+  return { o2: mix.o2, he: mix.he, start: pressure(draft.start), end: pressure(draft.end), depth: Number.isNaN(depthMmOf(draft.depth, prefs)), size, workingPressure: wp };
 }
 
 /** @param {ReturnType<typeof draftErrors>} errors */
-export const hasErrors = (errors) => errors.o2 || errors.he || errors.start || errors.end || errors.depth;
+export const hasErrors = (errors) => errors.o2 || errors.he || errors.start || errors.end || errors.depth || errors.size || errors.workingPressure;
 
 /**
  * What changed in a cylinder, as the patch `cylinderChanges` takes; `{}` when nothing did. A new cylinder type brings its
- * size and working pressure; the mix is always sent whole (both parts); the pressures only for a dive logged by hand.
+ * size and working pressure; the mix is always sent whole (both parts); the pressures on every dive.
  * @param {import('benthic-core').Cylinder} c the cylinder as it is
  * @param {CylinderDraft} draft
  * @param {{ name: string, ml: number, workingPressureMbar: number }[]} types the diver's cylinder types
- * @param {{ pressure: string }} prefs
- * @param {{ manual: boolean, oxygenOnly?: boolean }} options
+ * @param {{ pressure: string, length?: string, volume?: string }} prefs
+ * @param {{ oxygenOnly?: boolean }} options
  * @returns {Record<string, string|number>}
  */
 export function draftPatch(c, draft, types, prefs, options) {
@@ -149,10 +195,14 @@ export function draftPatch(c, draft, types, prefs, options) {
     patch.o2Permille = Math.round(parseTyped(draft.o2) * 10);
     patch.hePermille = options.oxygenOnly ? (c.hePermille || 0) : Math.round(parseTyped(draft.he) * 10);
   }
-  if (options.manual) {
-    for (const [field, key] of /** @type {const} */ ([['start', 'startMbar'], ['end', 'endMbar']])) {
-      if (draft[field] !== before[field]) patch[key] = draft[field].trim() ? pressureMbarOf(draft[field], prefs) : 0;
-    }
+  for (const [field, key] of /** @type {const} */ ([['start', 'startMbar'], ['end', 'endMbar']])) {
+    if (draft[field] !== before[field]) patch[key] = draft[field].trim() ? pressureMbarOf(draft[field], prefs) : 0;
+  }
+  // « Autre… »: the size and the working pressure go together (a size in cubic feet depends on the pressure).
+  if (draft.custom && (draft.size !== before.size || draft.workingPressure !== before.workingPressure)) {
+    const wp = draft.workingPressure.trim() ? pressureMbarOf(draft.workingPressure, prefs) : 0;
+    patch.sizeMl = sizeMlOf(draft.size, wp, prefs);
+    patch.workingPressureMbar = wp;
   }
   if (draft.use !== before.use) patch.use = draft.use || 'OC-gas';
   // The gas-change depth only applies to a cylinder breathed in open circuit: the dialog hides it for a rebreather's own.

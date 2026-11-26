@@ -80,9 +80,12 @@
               {#if ios}<Icon name="check" size={22} />{:else}<span class="bc-computers-sheet--main">{t('detail.mainBadge')}</span>{/if}
             {/if}
           </svelte:element>
-          <button type="button" class="bc-computers-sheet--rename" aria-label={t('detail.renameComputer', { name: c.name })} onclick={() => onrename(c)}>
-            <Icon name="edit" size={20} />
-          </button>
+          <!-- The name is kept by serial number: a computer without one cannot be named. -->
+          {#if c.serial}
+            <button type="button" class="bc-computers-sheet--rename" aria-label={t('detail.renameComputer', { name: c.name })} onclick={() => onrename(c)}>
+              <Icon name="edit" size={20} />
+            </button>
+          {/if}
           {#if !ios && !main}
             <button type="button" class="bc-outlined-button bc-computers-sheet--make-main" disabled={busy} onclick={() => onmain(c.index)}>{t('detail.makeMain')}</button>
           {/if}
