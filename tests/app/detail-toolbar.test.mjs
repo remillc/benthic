@@ -45,3 +45,28 @@ test('the tablet and the phone show the desktop’s tabs: the chosen one on a ta
     assert.ok(d.detail.tabs && d.desktop.tab.infoShort && d.desktopDetail.diveType.title, l);
   }
 });
+
+// Task 2026-11-26-400: one level-1 section per tab, in the tab's order, under the sticky bar; the groups are level-3 card titles
+// with an icon, never styled like a tab or a section title.
+const fields = readFileSync(new URL('../../app/src/components/DesktopDiveFields.svelte', import.meta.url), 'utf8');
+const detailTab = readFileSync(new URL('../../app/src/lib/detail-tab.js', import.meta.url), 'utf8');
+
+test('the phone page has one h2 section per tab, in the tab order, after the sticky bar', () => {
+  assert.match(detailTab, /DETAIL_TABS = .*\['info', 'equipment', 'gas', 'notes', 'map'\]/);
+  const bar = src.indexOf('bc-dive-detail--tabs-wrap');
+  const sections = src.indexOf('<section class="bc-dive-detail--group-tab"');
+  assert.ok(bar > 0 && sections > bar, 'the sections come after the tab bar');
+  assert.match(src, /<h2 class="bc-dive-detail--group-title"[^>]*>\{t\(`desktop\.tab\.\$\{key\}`\)\}<\/h2>/);
+  assert.match(src, /\.bc-dive-detail--group-title \{[^}]*font-size: 14px;[^}]*font-weight: 600;/);
+});
+
+test('the Informations cards come in the mock-up order and every card title is a level-3 heading with an icon', () => {
+  const info = fields.slice(fields.indexOf("{#if tab === 'info'}"), fields.indexOf("{:else if tab === 'equipment'}"));
+  const names = [...info.matchAll(/<DesktopEquipmentCard name="(\w+)"|<DiveSignatures/g)].map((m) => m[1] ?? 'signatures');
+  const order = ['datetime', 'site', 'people', 'signatures', 'rating'];
+  assert.deepEqual(names.filter((n) => order.includes(n)), order);
+  assert.equal(names.at(-1), 'tags');
+  const card = readFileSync(new URL('../../app/src/components/DesktopEquipmentCard.svelte', import.meta.url), 'utf8');
+  assert.match(card, /<h3 class="bc-desktop-equipment-card--title"/);
+  assert.match(card, /bc-desktop-equipment-card--icon/);
+});

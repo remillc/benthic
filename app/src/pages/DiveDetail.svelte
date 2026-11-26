@@ -1250,11 +1250,15 @@
       top: 0;
       z-index: 5;
       background: var(--bc-background);
+      &:has(.bc-dive-detail--segmented) {
+        padding: 8px 12px;
+        border-bottom: 0.5px solid var(--bc-separator);
+      }
     }
 
-    /* iPhone: a segmented control, 32 pt high, 8 pt corners, the selected segment raised on the grouped background. */
-    .bc-dive-detail--segmented {
-      margin: 0 16px;
+    /* iPhone: a segmented control, 28 pt high, 7 pt segments, the selected segment raised (mock-up ios-detail-onglets). */
+    .bc-dive-detail--tabs.bc-dive-detail--segmented {
+      margin: 0;
       padding: 2px;
       overflow: hidden;
       gap: 0;
@@ -1262,8 +1266,8 @@
       border-radius: 9px;
       background: var(--bc-field-rest);
       & button {
-        flex: 1;
-        height: 32px;
+        flex: auto;
+        height: 28px;
         padding: 0 4px;
         border-radius: 7px;
         font-size: 13px;
@@ -1287,7 +1291,7 @@
     /* Scrollable MD3 primary tabs: the row scrolls sideways when the five labels do not fit. */
     .bc-dive-detail--tabs {
       margin: 0;
-      padding: 0 8px;
+      padding: 0 4px;
       overflow-x: auto;
       scrollbar-width: none;
       &::-webkit-scrollbar {
@@ -1296,6 +1300,12 @@
       & button {
         flex: none;
         width: auto;
+        padding: 0 12px;
+        &[aria-selected='true']::after {
+          left: 6px;
+          right: 6px;
+          bottom: 0;
+        }
       }
     }
 
@@ -1312,10 +1322,10 @@
     }
 
     .bc-dive-detail--group-title {
-      margin: 20px 16px 0;
+      margin: 20px 16px 8px;
       font-family: var(--bc-title-font);
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       line-height: 20px;
       color: var(--bc-text-2);
     }
