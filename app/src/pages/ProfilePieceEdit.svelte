@@ -121,7 +121,8 @@
       type = g.type;
       name = g.name;
       brand = g.brand ?? '';
-      model = g.model ?? '';
+      // A suit made from the logbook's texts (before 26 November 2026 it had only a name): its name is the model.
+      model = g.model ?? (!g.brand && g.suitNames?.length ? g.name : '');
       serial = g.serial ?? '';
       purchasedOn = g.purchasedOn ?? '';
       note = g.note ?? '';
