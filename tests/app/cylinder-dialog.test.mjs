@@ -94,8 +94,11 @@ test('sources: the chevron, the dialogs on phones, the dashed tile without chevr
   assert.match(cards, /top: 50%;/);
   assert.ok(cards.indexOf('class="bc-desktop-gas-cards--add"') > cards.lastIndexOf('{/each}'), 'the add tile is outside the tiles loop, so it has no chevron');
   const fields = source('components/DesktopDiveFields.svelte');
-  assert.match(fields, /const dialogs = \$derived\(layout\.phone\)/);
-  assert.match(fields, /editable=\{dialogs\} chevron=\{!layout\.desktop\} onedit=\{editTile\}/);
+  // Task 2026-11-26-410: the desktop opens the same dialogs, and every tile has the chevron (phones only, tablets and phones before).
+  assert.match(fields, /const dialogs = \$derived\(layout\.phone \|\| layout\.desktop\)/);
+  assert.match(fields, /editable=\{dialogs\} chevron onedit=\{editTile\}/);
+  assert.match(fields, /desktop=\{layout\.desktop\}/);
+  assert.match(fields, /onmove=\{editing\.single && !layout\.desktop \? moveEditing : undefined\}/, 'no move buttons on the desktop dialog');
   assert.match(fields, /roles=\{editing\.single \? useOptions : undefined\}/);
   assert.match(fields, /onremove=\{editing\.single \? askRemove : undefined\}/);
   const dialog = source('components/CylinderEditDialog.svelte');
@@ -141,4 +144,15 @@ test('sizes in cubic feet follow the working pressure, as in the phone editor', 
   assert.equal(sizeMlOf('80,1', 207000, cuft), 11103);
   assert.equal(sizeMlOf('11,1', 207000, { pressure: 'bar' }), 11100);
   assert.ok(Number.isNaN(sizeMlOf('500', 0, cuft)));
+});
+
+test('the desktop dialog: centred over a scrim, 560 px or 760 px with the parts side by side, Retirer at the left, Annuler and Enregistrer at the right', () => {
+  const dialog = source('components/CylinderEditDialog.svelte');
+  assert.match(dialog, /\{#if desktop\}<div class="bc-cylinder-dialog--scrim"/);
+  assert.match(dialog, /class:bc-cylinder-dialog--wide=\{desktop && parts\.length > 1\}/);
+  assert.match(dialog, /\.bc-cylinder-dialog--surface\.bc-cylinder-dialog--desktop \{[^}]*width: min\(560px/);
+  assert.match(dialog, /\.bc-cylinder-dialog--surface\.bc-cylinder-dialog--wide \{[^}]*width: min\(760px/);
+  assert.match(dialog, /\.bc-cylinder-dialog--wide \.bc-cylinder-dialog--cards \{[^}]*flex-direction: row/);
+  const actions = dialog.slice(dialog.indexOf('bc-cylinder-dialog--desktop-actions">'));
+  assert.ok(actions.indexOf('removeCylinder') < actions.indexOf("t('dialog.cancel')") && actions.indexOf("t('dialog.cancel')") < actions.indexOf('cylinderDialog.save'), 'Retirer, then Annuler, then Enregistrer');
 });

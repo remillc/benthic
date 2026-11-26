@@ -7748,7 +7748,7 @@ The screen mock-ups now show the `o2Cells` icon (task 407) where a type « Cellu
 
 Mock-ups: `docs/mockups/icones-gearicon-svelte` and the equipment, kit, maintenance and pairing screens on every device.
 
-## [ ] 2026-11-26-410 Desktop: edit cylinders in a dialog, as on the phone (task 401)
+## [x] 2026-11-26-410 Desktop: edit cylinders in a dialog, as on the phone (task 401)
 
 Christian asked for this on 26 November 2026. Work in `main`. On the desktop dive detail, Gaz tab, the cylinder tiles get the same workflow as on the phone (task 401):
 
