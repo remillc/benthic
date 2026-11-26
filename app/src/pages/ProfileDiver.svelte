@@ -32,10 +32,10 @@
     gear.ready && visibleGear().length ? `${t('gear.inventory.pieces', { n: visibleGear().length })} · ${t('gear.inventory.kitCount', { n: gear.kits.length })}` : t('gear.profile.noPiece'),
   );
 
-  /** Tablet in landscape and desktop: the home page is the list beside a page, « Informations » by default (task 2026-11-23-347). */
+  /** Tablet in landscape and desktop: the home page is the list beside a page, « Équipement », its first row, by default (26 November 2026). */
   function showDefaultPane() {
     // Only while the home page is still the one shown: a page opened over it at start (a notification) stays.
-    if (profileWide() && f7router?.currentRoute?.path === '/profile') f7router.navigate('/profile/info', { reloadCurrent: true, animate: false });
+    if (profileWide() && f7router?.currentRoute?.path === '/profile') f7router.navigate('/profile/gear/', { reloadCurrent: true, animate: false });
   }
 </script>
 
