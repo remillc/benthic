@@ -102,7 +102,9 @@ test('Équipement follows the mock-ups: wrapping kit chips, iPhone kit list, sec
   assert.match(page, /--f7-fab-bg-color: var\(--bc-secondary-container\)/);
   const list = read('components/ProfileGearList.svelte');
   assert.match(list, /gear\.addSheet\.kitChip/);
-  assert.match(list, /\.bc-gear-list--chip \{\s*height: 32px/);
+  assert.match(list, /\.bc-gear-list--chip \{[^}]*height: 32px/);
+  // Side by side, not stretched by Framework7's unlayered button { width: 100% }.
+  assert.match(list, /\.bc-gear-list--chip \{\s*flex: none;\s*width: auto;/);
   assert.match(list, /inset-inline-end: 24px;\s*bottom: 24px/);
   assert.match(list, /background: var\(--bc-secondary-container\)/);
 });
