@@ -7671,3 +7671,13 @@ Christian asked for this on 26 November 2026. Work in `main`. The dive detail is
 7. **Weight types on desktop** (task 402 for the desktop): Réglages › Équipement gets a « Types de lest » section under « Types de bouteilles » (intro, the alphabetical list with « Dans n plongées » and the weight, « Ajouter un type »); a type opens a dialog with Nom and Poids, the usage note, « Supprimer ce type », « Annuler », « Enregistrer » (`bureau-reglages-equipement`, `bureau-reglages-equipement-lest`).
 
 When the detail has everything `EditDive.svelte` offered, tell Christian; whether to remove the separate edit page is his call.
+
+## [ ] 2026-11-26-404 Benthic+ equipment of a dive lives in the detail's Équipement tab; no « Image du modèle » caption
+
+Christian asked for this on 26 November 2026. Work in `main`. Follows task 403 (the detail replaces « Modifier une plongée »).
+
+1. **Kit card** (Équipement tab, every device): the kit field opens a menu whose first choice is « Plongée précédente — même équipement que la plongée n° n », then the diver's kits (the current one checked, each with its number of pieces), a separator and « Gérer les kits ». There is no separate « Un kit ▾ | Plongée précédente » button pair any more. Choosing fills the fields below; each stays editable.
+2. **Autre équipement card** (Benthic+): one row per piece in the grey in-place style (icon, name, type or « Hors inventaire · empruntée », × to take it off this dive); « Ajouter » at the top right opens « Ajouter de l’équipement » (the existing sheet on a phone, a dialog on tablet and desktop, including the case of a piece overdue for maintenance), now opened over the detail.
+3. **Piece page**: remove the caption « Image du modèle » under the piece's name and on its picture (piece page, new, edit, remove, removed, delete for good, new kit). Keep the picture's accessible name.
+
+Mock-ups in `docs/mockups/`. Phone: `detail-onglets-equipement-android`, `edition-equipement-plus-android` (now the whole Équipement tab), `edition-kit-menu-android` (kit menu open), `equipement-ajout-android`, `equipement-ajout-retard-android`, and the other `detail*-android` boards. Tablet: `android-tablette-detail-onglet-equipement-paysage`, `android-tablette-profil-plongee-ajout-paysage`, `android-tablette-profil-plongee-ajout-retard-paysage`. Desktop: `bureau-profil-plongee-kit`, `bureau-profil-plongee-ajout`, `bureau-profil-plongee-ajout-retard`. Piece pages: `profil-piece*-android`, `android-tablette-profil-*-paysage`, `bureau-profil-*`.
