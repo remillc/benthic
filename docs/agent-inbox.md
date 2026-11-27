@@ -7938,3 +7938,23 @@ Christian asked for this on 27 November 2026. Work in `main`.
 - Desktop, Informations tab: a « Voyage » row right after « Site »; when the dive is in no trip it shows « Ajouter à un voyage » in grey. Clicking it opens the same trip choice.
 
 Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-ios`, `detail3-ios-sombre`, `ios-detail-onglets`, `detail2-ios-menu`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
+
+## [ ] 2026-11-27-422 Dive detail, Informations: « Conditions » card and « Plongée invalide »
+
+Christian asked for this on 27 November 2026. Work in `main`.
+
+**Conditions (phone, tablet)**
+- A new card « Conditions » (wave icon) in the Informations tab, with six fields on two columns: « Type d’eau » (dropdown) | « Pression en surface »; « Air » | « Eau » (temperatures); « CNS » | « OTU ».
+- Type d’eau, Pression en surface, Air and Eau are editable grey fields, like the other fields of the detail. CNS and OTU are computed: shown read-only, with a thin outline (no grey fill).
+- Order: phone, after « Étiquettes »; tablet, right column, under « Signatures » (left column: Date et heure, Site, Appréciation, Étiquettes, Plongée invalide).
+- When the setting « Visibilité, courant, vagues de surface, flux-reflux et froid » is on (task 420), the five-star conditions go in this card, under CNS and OTU.
+
+**Conditions (desktop)**
+- In the Informations list, after « Type d’eau »: « Pression en surface », « Air », « Eau » (editable), then « CNS » and « OTU » (read-only, outlined).
+
+**Plongée invalide (every device)**
+- Phone and iPhone: the « Plongée invalide » card (switch, « Exclue des statistiques et masquée selon le réglage ») is the last card of the Informations tab, after Conditions, as on Android today.
+- Tablet: same card, left column, under « Étiquettes ».
+- Desktop: a last row « Plongée invalide » with a switch and the same supporting text.
+
+Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-android`, `detail3-ios` and their variants, `detail-onglets-android`, `ios-detail-onglets`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
