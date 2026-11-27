@@ -22,3 +22,13 @@ export function mapsLinks(latUdeg, lonUdeg, name, ios = false) {
   const geo = `geo:${lat},${lon}?q=${lat},${lon}(${encodeURIComponent(name)})`;
   return { primary: geo, fallback: geo };
 }
+
+/**
+ * The web page that shows a position, for the desktop app (the system browser; geo: and maps: links mean nothing there).
+ * @param {number} latUdeg @param {number} lonUdeg
+ */
+export function webMapUrl(latUdeg, lonUdeg) {
+  const lat = latUdeg / 1e6;
+  const lon = lonUdeg / 1e6;
+  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=15/${lat}/${lon}`;
+}

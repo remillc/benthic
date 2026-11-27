@@ -1,0 +1,41 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+// Task 2026-11-27-415 and its correction 2026-11-27-416: the dive's map (Carte tab / group).
+const read = (p) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
+const fields = read('app/src/components/DesktopDiveFields.svelte');
+const map = read('app/src/components/SiteMap.svelte');
+
+test('the dive map has the site map\'s full-screen button, round and 44 px', () => {
+  assert.match(fields, /<SiteMap pin=\{dive\.siteCoordinates\}[^>]*roundButton/);
+  assert.match(map, /\.bc-site-map--round-button \.bc-map-fullscreen-button[^{]*\{\s*width: 44px;\s*height: 44px;\s*border-radius: 50%;/);
+  assert.match(map, /<Icon name=\{full \? 'exitFullscreen' : 'fullscreen'\}/);
+});
+
+test('Back and Escape close the full-screen map through the shared mechanisms', () => {
+  assert.match(read('app/src/lib/back-button.js'), /document\.querySelector\('\.bc-map-fullscreen'\)[\s\S]{0,80}'map-fullscreen'/);
+  assert.match(map, /full && e\.key === 'Escape'\) setFull\(false\)/);
+});
+
+test('the map is 5:3 on a tablet, 220 px on a phone and 300 px on the desktop', () => {
+  assert.match(fields, /const tabletMap = \$derived\(!layout\.phone && !desktopApp\)/);
+  assert.match(fields, /ratio=\{tabletMap \? 5 \/ 3 : 0\}/);
+  assert.match(fields, /height=\{layout\.phone \? '220px' : '300px'\}/);
+  assert.match(fields, /--map\.bc-desktop-dive-fields--map-tablet \{\s*height: auto;/);
+  assert.match(fields, /--map\.bc-desktop-dive-fields--map-phone \{\s*height: 220px;/);
+});
+
+test('« Ouvrir dans Maps » is an accent text link with the open-externally icon, after Coordonnées', () => {
+  const at = (s) => fields.indexOf(s);
+  assert.ok(at("label={t('desktopDetail.label.coordinates')}") < at('bc-desktop-dive-fields--maps-link external'));
+  assert.match(fields, /<Icon name="openInNew" size=\{18\} \/>\{t\(ios \? 'sites\.openInPlans' : 'sites\.openInMaps'\)\}/);
+  assert.match(fields, /\.bc-desktop-dive-fields--maps-link \{[^}]*color: var\(--bc-code-active\)/);
+  assert.match(fields, /href=\{desktopApp \? webMapUrl\(latUdeg, lonUdeg\) : mapsLink\(/);
+});
+
+test('the desktop link opens the browser at the dive\'s coordinates', async () => {
+  const { webMapUrl, mapsLinks } = await import('../../app/src/lib/maps-link.js');
+  assert.equal(webMapUrl(-43380000, 171520000), 'https://www.openstreetmap.org/?mlat=-43.38&mlon=171.52#map=15/-43.38/171.52');
+  assert.match(mapsLinks(-43380000, 171520000, 'X').primary, /^geo:-43\.38,171\.52/);
+});

@@ -7869,7 +7869,7 @@ Christian decided this on 27 November 2026. Work in benthic-server. Depends on t
 - « Retirer cet accès ? »: names the product; says the other rights stay (for example « L’abonnement Benthic+ par Google Play reste, et avec lui l’app sur ordinateur. »).
 - Rights log wording: « Benthic Desktop jusqu’au … », « Achat web de Benthic Desktop ».
 
-## [ ] 2026-11-27-415 Dive detail, Carte: full-screen button; 5:4 map on tablet
+## [x] 2026-11-27-415 Dive detail, Carte: full-screen button; 5:4 map on tablet
 
 Christian asked for this on 27 November 2026. Work in `main`.
 - The map of the dive (Carte tab on tablet and desktop, Carte group on the phone) gets a full-screen button at its top right: a round white 44 px button with the « expand » icon (four corners), the same as on the « Nouveau site » map. It opens the map full screen; the system back or Échap closes it.
@@ -7877,7 +7877,7 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` (and their dark and menu variants).
 
-## [ ] 2026-11-27-416 Correction to 415: tablet map in 5:3, and « Ouvrir dans Maps » as drawn
+## [x] 2026-11-27-416 Correction to 415: tablet map in 5:3, and « Ouvrir dans Maps » as drawn
 
 Christian asked for this on 27 November 2026. Work in `main`. Corrects task 2026-11-27-415.
 - Tablet, dive detail, Carte tab: the map keeps a **5:3** ratio (width:height), not 5:4. With it, the whole tab (map, Site, Coordonnées, « Ouvrir dans Maps ») fits in a landscape tablet screen.
