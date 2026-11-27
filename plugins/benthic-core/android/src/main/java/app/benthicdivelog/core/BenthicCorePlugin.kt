@@ -49,6 +49,9 @@ class BenthicCorePlugin : Plugin() {
 
     /** Network only (probeCloud): runs while the core thread loads the log. */
     private val networkThread: ExecutorService = Executors.newSingleThreadExecutor()
+
+    /** Sends large answers to the web layer (their quoting is slow) without holding the core's thread. */
+    private val resolveThread: ExecutorService = Executors.newSingleThreadExecutor()
     private val repoDir: File by lazy { File(context.filesDir, "carnet") }
     private val repo: String by lazy { "${repoDir.absolutePath}[main]" }
     private val credentialStore: CredentialStore by lazy { CredentialStore(context) }
@@ -176,7 +179,10 @@ class BenthicCorePlugin : Plugin() {
             call.reject("Missing dive id", "BAD_ARGUMENT")
             return@onCoreThread
         }
-        call.resolve(JSObject(NativeCore.getDive(id)))
+        // The text as the core wrote it, parsed in JavaScript (core-api.js): parsing it here into a JSObject took 430 to
+        // 680 ms of the core's thread at start on a tablet, the core itself a few ms (start-up measures, 27 November 2026).
+        val result = JSObject().put("json", NativeCore.getDive(id))
+        resolveThread.execute { call.resolve(result) }
     }
 
     /** Planner settings as the core's preferences hold them (plan.cpp). */
@@ -320,7 +326,10 @@ class BenthicCorePlugin : Plugin() {
             }
         }
         Log.i(TAG, "listCloudDives(cached=$cached): ${json.length} chars, ${System.currentTimeMillis() - start} ms")
-        call.resolve(JSObject().put("available", true).put("json", json))
+        // Quoting the logbook (800 kB) for the bridge took about a second on a tablet: done off the core's thread, which
+        // the calls after it wait for (start-up measures, 27 November 2026).
+        val result = JSObject().put("available", true).put("json", json)
+        resolveThread.execute { call.resolve(result) }
     }
 
     /**
@@ -2139,7 +2148,9 @@ class BenthicCorePlugin : Plugin() {
      * regions, and does not wait for the certificates (start of the logbook).
      */
     private fun onCoreThread(call: PluginCall, afterSetup: Boolean = true, block: () -> Unit) {
+        val queued = System.currentTimeMillis()
         coreThread.execute {
+            val started = System.currentTimeMillis()
             try {
                 if (afterSetup) setupDone.await()
                 block()
@@ -2147,6 +2158,9 @@ class BenthicCorePlugin : Plugin() {
                 Log.e(TAG, "Core error", e)
                 call.reject(e.message, "CORE_ERROR", e)
             }
+            // The core has one thread: a slow call holds every call after it (start-up measures, 27 November 2026).
+            val ran = System.currentTimeMillis() - started
+            if (ran >= 100 || started - queued >= 100) Log.i(TAG, "perf: core ${call.methodName} waited ${started - queued} ms, ran $ran ms")
         }
     }
 

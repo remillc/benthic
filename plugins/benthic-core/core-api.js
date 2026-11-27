@@ -1230,7 +1230,10 @@ export const BenthicCore = {
   },
   /** One dive in full; its water type is named here from the core's salinity. */
   async getDive(options) {
-    const dive = await native.getDive(options);
+    // The native side sends the core's text (`json`), parsed here: parsing it in Kotlin took 430 to 680 ms of the core's
+    // thread at start on a tablet, against a few ms for the core itself (27 November 2026). An object is still taken.
+    const answer = await native.getDive(options);
+    const dive = typeof answer?.json === 'string' ? JSON.parse(answer.json) : answer;
     return { ...dive, waterType: waterTypeOf(dive.salinity) };
   },
   async getPrefs() {

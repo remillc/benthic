@@ -1517,7 +1517,9 @@ async function loadCloud(force, pre = null) {
     if (cached.server) logbook.server = cached.server;
     if (cached.dives) {
       logbook.dives = cached.dives;
+      mark('divesSet');
       logbook.prefs = await prefsAfterLoad();
+      mark('prefsLoaded');
       logbook.syncProgress = null;
       logbook.sync = 'syncing';
       logbook.pulling = true;

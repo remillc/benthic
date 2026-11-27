@@ -7,6 +7,7 @@
 //
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
+import { mark } from './perf.js';
 import { deviceStore } from './device-store.js';
 import { BenthicCore } from 'benthic-core';
 import { invalidateCoreCache } from './core-cache.js';
@@ -203,8 +204,13 @@ export function applyDeviceSettings() {
     send('Restoring the dive computers of this device', () => BenthicCore.setPrefs({ changes: { diveComputerList: computers } }));
   }
   // The cylinder types the diver added are files of the account data: migrated from the old device library once, then
-  // given to the core (lib/cylinder-type-library.svelte.js).
-  send('Restoring the cylinder types of this device', () => import('./cylinder-type-library.svelte.js').then((m) => m.startCylinderTypes()));
+  // given to the core (lib/cylinder-type-library.svelte.js). Not awaited: the core's table of types is in memory only and
+  // reading the logbook does not use it, and its call would queue behind the logbook read on the core's one thread (about
+  // a second at start on a tablet with 1,358 dives). The inventory gives the core the list again after each load.
+  import('./cylinder-type-library.svelte.js')
+    .then((m) => m.startCylinderTypes())
+    .then(() => mark('cylinderTypes'))
+    .catch((/** @type {unknown} */ e) => console.error('Restoring the cylinder types of this device', e));
   return Promise.all(calls).then(() => {});
 }
 
