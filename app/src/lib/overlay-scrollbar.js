@@ -30,14 +30,15 @@ function takesRoom() {
 
 /**
  * Replaces the bar of `scroller` by a thumb laid over its right edge. The thumb lives in the scroller's parent, which
- * must be its offset parent (a Framework7 page, a positioned pane); otherwise, and on the desktop app (its own thin
+ * must be positioned (a Framework7 page, a positioned pane); otherwise, and on the desktop app (its own thin
  * bars) and where bars already overlay, nothing changes.
  * @param {HTMLElement} scroller
  * @returns {() => void} undoes it
  */
 export function overlayScrollbar(scroller) {
   const parent = scroller.parentElement;
-  if (!parent || scroller.offsetParent !== parent) return () => {};
+  // Not `offsetParent`: the page of a tab that is not shown has none.
+  if (!parent || getComputedStyle(parent).position === 'static') return () => {};
   if (document.documentElement.classList.contains('bc-desktop-app') || !takesRoom()) return () => {};
   // Several bands may share one scrolling area: one thumb, removed with the last of them.
   const shared = /** @type {any} */ (scroller).bcOverlayScrollbar;
