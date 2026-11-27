@@ -7884,3 +7884,11 @@ Christian asked for this on 27 November 2026. Work in `main`. Corrects task 2026
 - Check that « Ouvrir dans Maps » matches the mock-up on every device: a text link with the « open externally » icon (square with an arrow), below the Site and Coordonnées fields, in the accent blue; it opens the device's maps app (or the browser on desktop) at the dive's coordinates. Fix any difference.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, and the Carte part of `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`.
+
+## [ ] 2026-11-27-417 Dive detail, Carte: the Site field shows a chevron and opens « Site de la plongée »
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- In the map part of the dive detail (Carte tab on tablet and desktop, Carte group on the phone), the Site field gets a right chevron, like the Site card of the Informations tab.
+- Tapping or clicking it opens « Site de la plongée » (task 2026-11-27-412): search, « Nouveau site », the logbook's sites, the shared map's sites (Benthic+), « Plongée sans site ». Same behaviour as from the Informations tab.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage` (with an orange note on the canvas), `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
