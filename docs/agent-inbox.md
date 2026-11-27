@@ -7930,3 +7930,11 @@ Christian asked for this on 27 November 2026. Work in `main`.
 - Tags in the detail look like the people chips in « Personnes »: grey filled (`#ECEAE4`, dark `#2A2B2E`), no border, 40 px high, fully rounded corners, 15 px text, and a ✕ button at the end (32 px, accessible name « Retirer l’étiquette … ») that removes the tag. « + Ajouter » keeps its dashed outline.
 
 Mock-ups: `android-tablette-site-nouveau-plongee-paysage`, `nouveau-site-plongee-android`, `ios-nouveau-site-plongee`, `bureau-site-nouveau-plongee`, `bureau-sites-nouveau`; `detail3-android`, `detail3-ios`, `detail-onglets-android`, `ios-detail-onglets`, `android-tablette-detail-onglets-paysage` and their variants (dark, menu, portrait); `bureau-carnet-edition-sur-place`; `android-tablette-reglages-paysage`, `android-reglages`, `reglages-carnet-android`, `bureau-reglages-carnet`.
+
+## [ ] 2026-11-27-421 Dive detail, Informations: « Voyage » field under Site on every device
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- The Site card of the Informations tab gets a « Voyage » field right under the site, on tablet and iPhone too (the Android phone already has it): label « Voyage », grey field with the trip name, a ✕ « Retirer du voyage » and a down arrow that opens the trip choice. Same behaviour as on the Android phone.
+- Desktop, Informations tab: a « Voyage » row right after « Site »; when the dive is in no trip it shows « Ajouter à un voyage » in grey. Clicking it opens the same trip choice.
+
+Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-ios`, `detail3-ios-sombre`, `ios-detail-onglets`, `detail2-ios-menu`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
