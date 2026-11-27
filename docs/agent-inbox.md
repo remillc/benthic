@@ -7828,3 +7828,59 @@ What to build:
 Out of scope for now: the Mac App Store (Christian will decide later), the choice of the payment provider, prices.
 
 Mock-ups (desktop canvas, page « Pour commencer », row « Accès à la version Desktop »): `bureau-acces-connexion-requise`, `bureau-acces-avertissement`, `bureau-acces-lecture-seule`.
+
+## [ ] 2026-11-27-415 Admin console: new « Comptes » section (support for Benthic+ and desktop access)
+
+Christian asked for this on 27 November 2026. Work in benthic-server (`api/src/console.js`, `docs/console.md`). **Depends on task 414** (the « accès bureau » right on the server): do 414 first, or at least its entitlement model.
+
+Why: the section is for support only (who has which right, give free access, fix mistakes). It does **no billing**: prices, invoices, refunds and cancellations stay in the Google Play, App Store and payment provider consoles.
+
+Look: exactly the console's existing pages (same header, sidebar, tables, chips, buttons, type, date format `2026-11-27 14:22`). The sidebar gets a separator and a « Comptes » entry at the end, on every console page.
+
+Screens (mock-ups in `docs/mockups/admin/`):
+1. **Search** (`admin-comptes-recherche`): field « Rechercher un compte par courriel » (exact address or its beginning, case-insensitive) and « Rechercher ». Results table: Courriel (link to the account), Benthic+ (Oui / Non, with « jusqu’au … », « terminé le … » or « jamais eu »), Accès bureau (same), Créé le. A right that ends within 7 days shows a yellow chip with the days left. Empty state (`admin-comptes-recherche-vide`): « Aucun compte pour ce courriel ». Error state (`admin-comptes-recherche-erreur`): red banner « La recherche a échoué : la base des comptes ne répond pas. Aucun compte n’a été modifié. » with « Réessayer ».
+2. **Account page** (`admin-comptes-fiche`): back link « Comptes »; the address; « Créé le … · Dernière vérification par l’app de bureau : … » (or « jamais »); buttons « Revérifier » (reads the state again from the store or the payment provider, then logs it) and « Accorder un accès ». Two blocks, Benthic+ and Accès bureau, each with its status (active until, ended on, never had) and a table of its sources: Google Play, App Store, achat web du bureau, achat de l’app mobile, Benthic+ (for desktop access), accordé à la main; each with its end date. Only a source « accordé à la main » has « Retirer cet accès ». Then « Journal des droits », most recent first: achat reçu, renouvellement, fin d’abonnement, vérification by the desktop app, webhook accepté or refusé (with the reason), accès accordé or retiré (with the admin and the reason). A refused webhook row is highlighted in red.
+3. **« Accorder un accès »** dialog (`admin-comptes-accorder`): right (Benthic+, Accès bureau, Les deux), end date (required, `YYYY-MM-DD`, the access lasts through that day), reason (required: Bêta-testeur, Partenaire, Geste commercial, Autre; « Autre » shows a required text field). Button « Accorder ».
+4. **« Retirer cet accès ? »** confirmation (`admin-comptes-retirer`), for a hand-granted access only: it names the right, the dates and the reason, says it ends at once and that the store rights stay. Red button « Retirer cet accès ». Rights from a store or a purchase cannot be removed here.
+
+Privacy: the section shows the address and the rights only, never anything from the logbook (dives, sites, notes, equipment), nor the shared-map fingerprints. Nothing in it may link an account to the shared site map. Reword the sentence of `docs/console.md` « No page shows a diver's name… »: it holds for the shared-map pages; the « Comptes » section shows the address and the rights, nothing from the logbook.
+
+Every action (grant, remove, re-check) is a POST with the console's CSRF token and is written to the account's rights log with the admin's name.
+
+Tests: search (exact, prefix, none, error), grant with end date and reason required (refused without either), the right stays active through the end date and stops the day after, removal of a hand-granted access only (a store right cannot be removed), the rights log entries, CSRF refused without a token, every page and action refused without the console's sign-in.
+
+## [ ] 2026-11-27-416 Correction to task 414: two products, Benthic+ and Benthic Desktop
+
+Christian decided this on 27 November 2026. Work in `main` and in benthic-server. It replaces the business rules of task 414; the rest of 414 (grace period, read-only mode, tests) stays.
+
+- **Benthic+** is an annual subscription, bought in the app stores (Google Play now, App Store later). It opens the app on phone, tablet and desktop.
+- **Benthic Desktop** is a one-time purchase on the web (Paddle or Lemon Squeezy, not chosen yet). It opens the app on desktop only, with no end date. The buyer signs in with a Benthic account that holds this purchase.
+- There is no other way in: buying the phone or tablet app means buying Benthic+, so « a phone or tablet purchase gives desktop access » is gone as a separate source.
+- The desktop app opens when the account has an active Benthic+ or Benthic Desktop. The server returns the two rights separately (`benthicPlus` with its end date, `benthicDesktop` with its purchase date), and the desktop access is computed from them.
+- Texts in the desktop app: « Benthic sur ordinateur demande Benthic+ ou Benthic Desktop »; the buy button reads « Acheter Benthic Desktop ». In read-only mode, the grey banner names what ended (« Votre abonnement Benthic+ a pris fin le … »); a Benthic Desktop purchase never ends, so it never leads to read-only mode (only the offline grace period can).
+- Tests: Benthic+ only, Benthic Desktop only, both, neither, Benthic+ ended with Benthic Desktop still bought.
+
+## [ ] 2026-11-27-417 Correction to task 415: the « Comptes » section shows Benthic+ and Benthic Desktop
+
+Christian decided this on 27 November 2026. Work in benthic-server. Depends on task 416. Replace « Accès bureau » with the two products everywhere in the section (mock-ups updated in `docs/mockups/admin/admin-comptes-*`):
+- Search results: columns Benthic+ (« jusqu’au … », « terminé le … », « jamais eu ») and Benthic Desktop (« acheté le … », « jamais acheté », or « accordé jusqu’au … »).
+- Account page: block **Benthic+** (« Abonnement annuel. Ouvre l’app sur téléphone, tablette et ordinateur. »), sources Google Play, App Store, accordé à la main, each with its end date. Block **Benthic Desktop** (« Achat unique sur le web. Ouvre l’app sur ordinateur seulement. »), sources achat web (no end date, show the purchase date) or accordé à la main (with its end date). The source « achat de l’app mobile » is gone.
+- « Accorder un accès »: two choices, « Benthic+ : téléphone, tablette et ordinateur » and « Benthic Desktop : ordinateur seulement » (« Les deux » is gone). End date and reason stay required: a hand-granted Benthic Desktop has an end date too.
+- « Retirer cet accès ? »: names the product; says the other rights stay (for example « L’abonnement Benthic+ par Google Play reste, et avec lui l’app sur ordinateur. »).
+- Rights log wording: « Benthic Desktop jusqu’au … », « Achat web de Benthic Desktop ».
+
+## [ ] 2026-11-27-415 Dive detail, Carte: full-screen button; 5:4 map on tablet
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- The map of the dive (Carte tab on tablet and desktop, Carte group on the phone) gets a full-screen button at its top right: a round white 44 px button with the « expand » icon (four corners), the same as on the « Nouveau site » map. It opens the map full screen; the system back or Échap closes it.
+- Tablet: the map in the Carte tab keeps a 5:4 ratio (width:height) instead of a fixed height; the rest of the tab scrolls below it.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` (and their dark and menu variants).
+
+## [ ] 2026-11-27-416 Correction to 415: tablet map in 5:3, and « Ouvrir dans Maps » as drawn
+
+Christian asked for this on 27 November 2026. Work in `main`. Corrects task 2026-11-27-415.
+- Tablet, dive detail, Carte tab: the map keeps a **5:3** ratio (width:height), not 5:4. With it, the whole tab (map, Site, Coordonnées, « Ouvrir dans Maps ») fits in a landscape tablet screen.
+- Check that « Ouvrir dans Maps » matches the mock-up on every device: a text link with the « open externally » icon (square with an arrow), below the Site and Coordonnées fields, in the accent blue; it opens the device's maps app (or the browser on desktop) at the dive's coordinates. Fix any difference.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage`, and the Carte part of `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`.
