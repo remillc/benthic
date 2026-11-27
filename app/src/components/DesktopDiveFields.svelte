@@ -968,6 +968,8 @@
   {:else if tab === 'gas'}
     <!-- Gaz (task 2026-11-24-382; mock-ups bureau-carnet-onglet-gaz and its CCR, pSCR and apnée variants): the dive type, then the cards of that type. -->
     <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--gas">
+      <!-- The dive type and the cylinders; the rest beside them on a tablet in landscape (a wider first column, 27 November 2026). -->
+      <div class="bc-desktop-dive-fields--gas-main">
       <section class="bc-desktop-dive-fields--card bc-desktop-dive-fields--type" aria-label={t('desktopDetail.diveType.title')}>
         <h3 class="bc-desktop-dive-fields--card-title">{t('desktopDetail.diveType.title')}</h3>
         <div data-field="divemode">
@@ -984,9 +986,11 @@
         <div class="bc-desktop-dive-fields--card">
           <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} chevron onedit={editTile} />
         </div>
-
         <!-- The cylinders are edited in their dialogs only (task 2026-11-27-411): no fields under the tiles. -->
-
+      {/if}
+      </div>
+      <div class="bc-desktop-dive-fields--gas-side">
+      {#if mode !== 'Freedive'}
         {#if mode === 'OC'}
           <DesktopConsumption data={used} />
         {:else if mode === 'CCR'}
@@ -1000,6 +1004,7 @@
         {/if}
       {/if}
       {#if gasChanges && mode === 'OC'}<DesktopEditField kind="text" readonly label={t('desktopDetail.label.gasChanges')} value={gasChanges} />{/if}
+      </div>
     </div>
   {:else if tab === 'notes'}
     <!-- Notes (task 2026-11-23-376): the notes; the rating and the tags are in the Informations tab's cards. -->
@@ -1130,6 +1135,28 @@
       & > :global(*) {
         break-inside: avoid;
         margin-bottom: 14px;
+      }
+    }
+
+    /* The Gaz tab's two groups stack as the cards do; on a tablet in landscape they sit side by side, the dive type and the
+       cylinders in a wider first column (27 November 2026). */
+    .bc-desktop-dive-fields--gas-main,
+    .bc-desktop-dive-fields--gas-side {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+    .bc-desktop-dive-fields--gas-side:empty {
+      display: none;
+    }
+    .bc-desktop-dive-fields--cols .bc-desktop-dive-fields--equipment.bc-desktop-dive-fields--gas {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      column-gap: 14px;
+      align-items: start;
+      & > :global(*) {
+        margin-bottom: 0;
       }
     }
 
