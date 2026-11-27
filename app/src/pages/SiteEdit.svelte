@@ -15,7 +15,7 @@
   // and the new site as a red cross. Country and region suggest values while typed and keep any value.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { ios } from '../lib/layout.svelte.js';
+  import { ios, layout } from '../lib/layout.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
@@ -88,6 +88,8 @@
   const completeCountry = (text) => completions(text, countryCounts, worldNames);
   /** @param {string} text */
   const completeRegion = (text) => completions(text, regionsOfCountry(known, deskSites.regions, country, language), []);
+  /** The map of a new site from a dive: square on a phone (358 x 360), wide on a tablet (1128 x 400); other forms 2.1 : 1. */
+  const mapRatio = $derived(forDive ? (layout.phone ? 1 : 2.8) : 2.1);
   const pins = $derived(forDive ? known.filter((x) => x.hasLocation && x.uuid !== editing) : []);
 
   /** The shared map's sites around the position (Benthic+, online), for the map of a new site from a dive. */
@@ -374,7 +376,7 @@
 
   <!-- Full screen (SiteMap's button): the pin still moves, and the new position is kept. -->
   <div class="bc-site-edit--map-card">
-    <SiteMap pin={position} editable cross={!!forDive} sites={pins} hideDiveCounts base={baseLayer} onbaseselect={pickShared} label={forDive ? t('diveSite.mapLabel') : undefined} onmove={setPosition} ratio={forDive ? 1 : 2.1}>
+    <SiteMap pin={position} editable cross={!!forDive} sites={pins} hideDiveCounts names="atZoom" namesFromZoom={12} base={baseLayer} onbaseselect={pickShared} label={forDive ? t('diveSite.mapLabel') : undefined} onmove={setPosition} ratio={mapRatio}>
       {#snippet overlay(/** @type {boolean} */ full)}
         {#if forDive}
           <MapPlaceSearch onpick={setPosition} />

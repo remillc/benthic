@@ -377,9 +377,19 @@
     siteChooser = true;
     try {
       const without = dive.site ? [] : await BenthicCore.siteQuery({ kind: 'without' });
-      const own = dive.site ? sites.find((x) => x.name === dive.site) : undefined;
-      const detail = own && !own.hasLocation ? await BenthicCore.siteQuery({ kind: 'site', uuid: own.uuid }) : null;
-      if (dive.id === id) divePosition = recordedPosition(id, without, detail, dive.siteCoordinates);
+      // Two sites can share the dive's site name: the computer's position is in the detail of the one without coordinates.
+      const same = dive.site ? sites.filter((x) => x.name === dive.site) : [];
+      let detail = null;
+      for (const s of same.filter((x) => !x.hasLocation)) {
+        const d = await BenthicCore.siteQuery({ kind: 'site', uuid: s.uuid });
+        if (recordedPosition(id, [], d, null)) {
+          detail = d;
+          break;
+        }
+      }
+      const placed = same.find((x) => x.hasLocation);
+      const fallback = dive.siteCoordinates ?? (placed ? { latUdeg: placed.latUdeg, lonUdeg: placed.lonUdeg } : null);
+      if (dive.id === id) divePosition = recordedPosition(id, without, detail, fallback);
     } catch (e) {
       console.error('Dive position', e);
     }

@@ -467,6 +467,8 @@
     }
     .bc-dive-site-chooser--none-button,
     .bc-dive-site-chooser--text-button {
+      flex: none;
+      width: auto;
       min-height: 40px;
       padding: 0 16px;
       border: 0;

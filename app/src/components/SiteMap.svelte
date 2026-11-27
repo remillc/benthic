@@ -704,6 +704,7 @@
   class:bc-site-map--quiet={names !== 'always'}
   class:bc-site-map--desaturated={desaturated}
   class:bc-site-map--pins-hidden={pinsHidden}
+  class:bc-site-map--form={cross}
   class:bc-site-map--names-on={namesOn}
   style:height={full ? '100%' : ratio ? 'auto' : height}
   style:aspect-ratio={!full && ratio ? `${ratio} / 1` : null}
@@ -1037,6 +1038,18 @@
     /* A pin per site (no grouping, even when pins overlap): ink, with the number of
        dives, white, 13 sp, bold, in its head; the name beside it, ink with a 4 dp
        white halo. */
+    /* The map of a site form (a new site from a dive): the diver's sites as smaller blue pins (nouveau-site-plongee-android). */
+    .bc-site-map--form :global(.bc-site-map--pin) {
+      transform: scale(0.72);
+      transform-origin: 50% 100%;
+    }
+    .bc-site-map--form :global(.bc-site-map--pin path) {
+      fill: var(--bc-secondary);
+    }
+    .bc-site-map--form :global(.bc-site-map--pin-name) {
+      font-size: 12px;
+    }
+
     :global(.bc-site-map--site-marker) {
       width: 32px;
       height: 42px;
