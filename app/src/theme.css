@@ -1066,6 +1066,17 @@ html.ios {
       background: color-mix(in srgb, var(--bc-text) 30%, transparent);
     }
   }
+
+  /* Under a section band, the gutter of that bar shows the band's gradient, down to the band's bottom (SectionBand.svelte
+     sets the place and the size, and moves them with the band at each scroll). */
+  html:not(.bc-desktop-app) .page-content.bc-has-band {
+    /* Only in the gutter, at the right edge: under the band itself its wavy bottom is see-through. */
+    background-image: var(--bc-band-gradient);
+    background-origin: border-box;
+    background-size: 4px var(--bc-gutter-band-size);
+    background-position: right 0 top var(--bc-gutter-band-top);
+    background-repeat: no-repeat;
+  }
 }
 
 @layer bc.base {
