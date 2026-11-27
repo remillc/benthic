@@ -956,8 +956,8 @@
       "text": "Par exemple les plongées en piscine marquées invalides"
     },
     "extraConditions": {
-      "label": "Vagues de surface, flux-reflux et froid",
-      "text": "Ajoute ces trois conditions à Modifier une plongée"
+      "label": "Visibilité, courant, vagues de surface, flux-reflux et froid",
+      "text": "Ajoute ces cinq conditions à l’onglet Informations"
     },
     "salinity": {
       "label": "Choisir le type d’eau dans l’éditeur",
@@ -2956,7 +2956,7 @@
       "Android : navigation en bas (Carnet, Sites, Statistiques, Outils), avatar du compte et composants Material 3 Expressive.",
       "Carnet : plongées groupées par année, voyages sélectionnables, fusion, modification groupée et décalage de la date et de l’heure de plusieurs plongées, délai avant de voler au-dessus de la liste.",
       "Planificateur : refait, avec des plongées planifiées enregistrées dans le carnet, plusieurs paliers et gaz, le volume par gaz avec la réserve, et le partage (ardoise à imprimer, PDF, image, fichier .ssrf, codes QR).",
-      "Plongée : cylindres dessinés avec leur gaz, recycleur vu de dos avec l’oxygène en premier, une bouteille ouvre son dialogue de modification sur téléphone (les deux d’un recycleur ensemble), lest en lignes avec suggestion sur Android, voyage et plongée invalide dans Informations, ordinateurs de plongée multiples (choix du principal, renommage), courant, vagues, ressac et froid notés, tout type de bouteille avec son volume, bouteilles dans l’ordre voulu, pressions modifiables sur toutes les plongées, lecture d’un manomètre numérique par l’appareil photo (Android), plan de site derrière l’en-tête.",
+      "Plongée : cylindres dessinés avec leur gaz, recycleur vu de dos avec l’oxygène en premier, une bouteille ouvre son dialogue de modification sur téléphone (les deux d’un recycleur ensemble), lest en lignes avec suggestion sur Android, voyage et plongée invalide dans Informations, ordinateurs de plongée multiples (choix du principal, renommage), visibilité, courant, vagues, ressac et froid notés à la demande (Réglages › Carnet), signatures en cartes, tout type de bouteille avec son volume, bouteilles dans l’ordre voulu, pressions modifiables sur toutes les plongées, lecture d’un manomètre numérique par l’appareil photo (Android), plan de site derrière l’en-tête.",
       "Sites : carte partagée des sites de plongée à côté des vôtres, « Nettoyer les sites » pour fusionner les doublons et rattacher les plongées sans site ; sur tablette et ordinateur, « Nouveau site » est un bouton flottant sur la carte ; un site de la carte commune touché montre ses coordonnées à copier, « Itinéraire », « Ajouter à mes sites » et « Signaler une erreur » ; le site d’une plongée se choisit dans le carnet ou la carte commune, ou se crée depuis la plongée, et les coordonnées se saisissent en degrés décimaux, minutes ou secondes.",
       "Statistiques : chaque ligne ouvre ses plongées, et la carte de chaleur « Où je plonge le plus » montre où se concentrent vos plongées.",
       "Importer et exporter : le fichier .benthic contient tout le carnet et vos données ; import de plusieurs fichiers, des montres Garmin (.fit) et de l’application Suunto ; envoi vers divelogs.de.",
@@ -4644,6 +4644,7 @@
     "readOnly": "Cette valeur vient de l’ordinateur de plongée.",
     "starsLabel": "{label} : {n} sur 5",
     "removeItem": "Retirer {name}",
+    "removeTag": "Retirer l’étiquette {name}",
     "diveCount": {
       "one": "{n} plongée",
       "other": "{n} plongées"
@@ -6632,6 +6633,7 @@
     },
     "modified": "Modifiée après la validation",
     "remove": "Retirer la validation",
+    "removeOf": "Retirer la signature de {name}",
     "removeTitle": "Retirer cette validation ?",
     "removeText": "{name} ne figurera plus sur cette plongée.",
     "removePendingText": "Elle ne pourra plus arriver.",

@@ -161,7 +161,7 @@ export const settings = $state({
   ...storedApp,
   ...reserve,
   /**
-   * "Surface waves, surge and chill" (spec, section 4, "Conditions"), the
+   * "Visibility, current, surface waves, surge and chill" (spec, section 4, "Conditions"), the
    * core's extraEnvironmentalDefault: off by default. On, editing adds these
    * three conditions; the detail shows filled-in conditions either way.
    */

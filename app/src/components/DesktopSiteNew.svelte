@@ -191,8 +191,8 @@
   <h2 class="bc-site-form--title">{t('sites.newSite')}</h2>
   <div class="bc-site-form--body">
     <div class="bc-site-form--left">
-      <DesktopSitePosMap position={preview ?? position} others={sites.filter((s) => s.hasLocation)} hint={dive ? t('diveSite.clickOrShared') : t('desktopSites.clickToPlace')} placeOnClick search={!!dive} legend={!!dive} shared={around} onshared={pickShared} onmove={setPosition} />
-      <p class="bc-site-form--explain">{t('desktopSites.placeExplain')}</p>
+      <DesktopSitePosMap position={preview ?? position} others={sites.filter((s) => s.hasLocation)} placeOnClick search={!!dive} legend={!!dive} shared={around} onshared={pickShared} onmove={setPosition} />
+      <!-- No instruction over the map and no supporting text under the fields (task 2026-11-27-420). -->
     </div>
     <div class="bc-site-form--right">
       <div class="bc-site-form--fields">
@@ -200,13 +200,13 @@
         <DesktopSiteField id="bc-new-name" form bind:this={nameField} value={name} oninput={(v) => (name = v)} onkeep={(v) => (name = v)} />
 
         <label for="bc-new-coords">{t('sites.coordinates')}</label>
-        <DesktopSiteField id="bc-new-coords" form value={coordsText} note={fromComputer ? t('diveSite.computerPosition') : t('desktopSites.coordinatesExample')} error={coordsError} oninput={(text) => (preview = parseCoordinates(text))} onkeep={typedCoordinates} oncancel={() => (preview = null)} />
+        <DesktopSiteField id="bc-new-coords" form value={coordsText} error={coordsError} oninput={(text) => (preview = parseCoordinates(text))} onkeep={typedCoordinates} oncancel={() => (preview = null)} />
 
         <label for="bc-new-country">{t('sites.country')}</label>
-        <DesktopSiteField id="bc-new-country" form value={country} note={country && country === autoCountry ? t('sites.fromPosition') : ''} complete={completeCountry} countText={siteCount} oninput={(v) => (country = v)} onkeep={(v) => (country = v)} />
+        <DesktopSiteField id="bc-new-country" form value={country} complete={completeCountry} countText={siteCount} oninput={(v) => (country = v)} onkeep={(v) => (country = v)} />
 
         <label for="bc-new-region">{t('sites.region')}</label>
-        <DesktopSiteField id="bc-new-region" form value={region} note={region && region === autoRegion ? t('sites.fromPosition') : ''} complete={completeRegion} countText={siteCount} oninput={(v) => (region = v)} onkeep={(v) => (region = v)} />
+        <DesktopSiteField id="bc-new-region" form value={region} complete={completeRegion} countText={siteCount} oninput={(v) => (region = v)} onkeep={(v) => (region = v)} />
 
         <label for="bc-new-description">{t('sites.description')}</label>
         <DesktopSiteField id="bc-new-description" form multiline value={description} oninput={(v) => (description = v)} onkeep={(v) => (description = v)} />

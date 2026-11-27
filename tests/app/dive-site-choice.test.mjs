@@ -148,7 +148,7 @@ test('the site form from a dive takes the typed name and the dive\'s position, a
   const edit = read('pages/SiteEdit.svelte');
   assert.match(edit, /let name = \$state\(f7route\.query\?\.name \?\? ''\)/);
   assert.match(edit, /await saveDiveChanges\(forDive, \{ site: uuid \}\)/);
-  assert.match(edit, /<MapPlaceSearch onpick=\{setPosition\} \/>/);
+  assert.match(edit, /<MapPlaceSearch onpick=\{setPosition\} wide=\{!layout\.phone\} \/>/);
   assert.match(edit, /cross=\{!!forDive\}/);
   assert.match(edit, /onbaseselect=\{pickShared\}/);
   const desktop = read('components/DesktopSiteNew.svelte');

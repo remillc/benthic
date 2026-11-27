@@ -214,6 +214,8 @@
     /* Desktop first launch (task 2026-11-16-246): the thin divider between the help link and the language button. */
     --bc-language-divider: #C8C6BF;
     --bc-trip-band: #ECEAE4;
+    /* The people and tag chips of the dive detail (task 2026-11-27-420). */
+    --bc-chip-fill: #ECEAE4;
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185): an editable field at rest, its hover outline,
        the average-depth line of the profile, a chip of a person in a field. */
     --bc-field-rest: #ECEAE4;
@@ -687,6 +689,7 @@
     --bc-table-divider: #3A3C40;
     --bc-scrollbar-thumb: #5A5C60;
     --bc-trip-band: #26282B;
+    --bc-chip-fill: #2A2B2E;
     /* Desktop detail pane (tasks 2026-11-15-172, 184, 185), dark. */
     --bc-field-rest: #2A2D31;
     --bc-field-hover: #8A8D91;

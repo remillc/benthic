@@ -8,8 +8,9 @@
   import { language, t } from '../lib/i18n.js';
   import { searchPlaces } from '../lib/place-search.js';
 
-  /** @type {{ onpick: (place: import('../lib/place-search.js').FoundPlace) => void }} */
-  let { onpick } = $props();
+  /** @type {{ onpick: (place: import('../lib/place-search.js').FoundPlace) => void, wide?: boolean }} */
+  // `wide`: about 420 px (a tablet's « Nouveau site », task 2026-11-27-420) instead of 282.
+  let { onpick, wide = false } = $props();
 
   let query = $state('');
   /** @type {import('../lib/place-search.js').FoundPlace[]|null} */
@@ -51,7 +52,7 @@
   }
 </script>
 
-<div class="bc-map-place-search">
+<div class="bc-map-place-search" class:bc-map-place-search--wide={wide}>
   <div class="bc-map-place-search--box">
     <button type="button" class="bc-map-place-search--go" aria-label={t('diveSite.mapSearchLabel')} disabled={busy} onclick={search}><Icon name="search" size={20} /></button>
     <input type="search" bind:value={query} placeholder={t('sites.searchPlace')} aria-label={t('diveSite.mapSearchLabel')} enterkeyhint="search" autocomplete="off" onkeydown={keydown} />
@@ -77,6 +78,9 @@
       left: 12px;
       top: 12px;
       width: min(282px, calc(100% - 80px));
+      &.bc-map-place-search--wide {
+        width: min(420px, calc(100% - 80px));
+      }
     }
     .bc-map-place-search--box {
       display: flex;

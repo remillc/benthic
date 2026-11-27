@@ -44,23 +44,35 @@
     <button type="button" class="bc-dive-signatures--sign" data-field="sign" onclick={onsign}><Icon name="plus" size={18} />{t('validation.add')}</button>
   {/snippet}
   {#each items as v (v.id)}
-    <!-- The row sits on the card's white (mock-ups android-tablette-detail-onglets-paysage, detail-onglets-android): the
-         signature first, 96 × 48 px in its white frame, then the name and the role, how it was signed, and the ×. -->
+    <!--
+      One card per signature (task 2026-11-27-420; mock-ups android-tablette-detail-onglets-paysage, detail-onglets-android):
+      a 1 px border, 12 px corners; the signature across the card in a 128 px area over a thin line, the « Retirer la signature
+      de … » × in its top-right corner (48 px); below, the name · role, then how and when it was signed. A validation waiting
+      for its answer has no picture: its × ends the text.
+    -->
+    {@const removeLabel = t('validation.removeOf', { name: v.name })}
     <div class="bc-dive-signatures--item" class:bc-dive-signatures--pending={v.pending} data-field="signature">
-      {#if v.signature}<img class="bc-dive-signatures--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />{/if}
-      <div class="bc-dive-signatures--text">
-        {#if v.pending}
-          <span class="bc-dive-signatures--name">{t('validation.pending')}</span>
-          <span class="bc-dive-signatures--detail">{t('validation.pendingText')}</span>
-        {:else}
-          <span class="bc-dive-signatures--name">{v.name} <span class="bc-dive-signatures--role">· {(tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase()}</span></span>
-          <span class="bc-dive-signatures--detail">{[t(`validation.method.${v.method}`), formatDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
-          {#if v.modified}<span class="bc-dive-signatures--modified">{t('validation.modified')}</span>{/if}
+      {#if v.signature}
+        <div class="bc-dive-signatures--picture">
+          <img class="bc-dive-signatures--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />
+          <button type="button" class="bc-dive-signatures--remove bc-dive-signatures--remove-corner" aria-label={removeLabel} title={removeLabel} onclick={() => confirmRemove(v)}><Icon name="close" size={20} /></button>
+        </div>
+      {/if}
+      <div class="bc-dive-signatures--text-row">
+        <div class="bc-dive-signatures--text">
+          {#if v.pending}
+            <span class="bc-dive-signatures--name">{t('validation.pending')}</span>
+            <span class="bc-dive-signatures--detail">{t('validation.pendingText')}</span>
+          {:else}
+            <span class="bc-dive-signatures--name">{v.name} <span class="bc-dive-signatures--role">· {(tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase()}</span></span>
+            <span class="bc-dive-signatures--detail">{[t(`validation.method.${v.method}`), formatDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
+            {#if v.modified}<span class="bc-dive-signatures--modified">{t('validation.modified')}</span>{/if}
+          {/if}
+        </div>
+        {#if !v.signature}
+          <button type="button" class="bc-dive-signatures--remove" aria-label={removeLabel} title={removeLabel} onclick={() => confirmRemove(v)}><Icon name="close" size={20} /></button>
         {/if}
       </div>
-      <button type="button" class="bc-dive-signatures--remove" onclick={() => confirmRemove(v)}>
-        <Icon name="close" size={20} /><span class="bc-sr-only">{t('validation.remove')}</span>
-      </button>
     </div>
   {/each}
 </DesktopEquipmentCard>
@@ -89,10 +101,28 @@
 
     .bc-dive-signatures--item {
       box-sizing: border-box;
-      min-height: 56px;
+      border: 1px solid var(--bc-separator);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* The signature's area: 128 px, the picture centred, a thin line under it. Drawn black on white in every mode: it
+       keeps its paper. */
+    .bc-dive-signatures--picture {
+      position: relative;
+      height: 128px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      border-bottom: 1px solid var(--bc-separator);
+      background: var(--bc-qr-paper);
+    }
+
+    .bc-dive-signatures--text-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 4px 12px 16px;
     }
 
     .bc-dive-signatures--text {
@@ -127,17 +157,19 @@
       color: var(--bc-alarm);
     }
 
-    /* The signature is drawn black on white, in every mode: it keeps its paper. */
     .bc-dive-signatures--signature {
-      flex: none;
       box-sizing: border-box;
-      width: 96px;
-      height: 48px;
-      padding: 4px 6px;
-      border-radius: 8px;
+      max-width: calc(100% - 112px);
+      max-height: 104px;
       object-fit: contain;
-      background: var(--bc-qr-paper);
-      border: 1px solid var(--bc-separator);
+    }
+
+    /* The × in the picture's top-right corner, on the paper: its ink stays dark in every mode. */
+    .bc-dive-signatures--remove.bc-dive-signatures--remove-corner {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      color: var(--bc-qr-ink);
     }
 
     .bc-dive-signatures--remove {
