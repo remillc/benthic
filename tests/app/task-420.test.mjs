@@ -87,3 +87,8 @@ test('task 423: the empty undersuit reads « Choisir… »', () => {
   assert.equal(fr.desktopDetail.invitation.undersuit, 'Choisir…');
   assert.equal(JSON.parse(read('app/src/i18n/en.json')).desktopDetail.invitation.undersuit, 'Choose…');
 });
+
+test('task 422: the tall text fields of Conditions have no arrow (they are no menu) and an empty one reads « Ajouter »', () => {
+  assert.match(read('app/src/components/DesktopEditField.svelte'), /\{:else if tall && kind === 'text'\}<!-- [^>]*-->\{:else if tall\}<span class="bc-desktop-edit-field--chevron"/);
+  for (const key of ['airTemp', 'waterTemp', 'surfacePressure']) assert.equal(fr.desktopDetail.invitation[key], 'Ajouter', key);
+});

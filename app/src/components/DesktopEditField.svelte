@@ -359,7 +359,7 @@
         {/if}
       </span>
       {#if note && !card && kind !== 'stars'}<span class="bc-desktop-edit-field--note">{note}</span>{/if}
-      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else if chevron}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="chevron" size={22} /></span>{:else if tall}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="expand" size={24} /></span>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
+      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else if chevron}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="chevron" size={22} /></span>{:else if tall && kind === 'text'}<!-- A tall text field (Conditions, task 2026-11-27-422): no arrow, it is no menu. -->{:else if tall}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="expand" size={24} /></span>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
     </div>
   {:else}
     <div class="bc-desktop-edit-field--edit-wrap">
