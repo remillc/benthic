@@ -1839,6 +1839,24 @@
     --f7-subnavbar-height: 76px;
   }
 
+  /*
+   * Tablet (mock-ups android-tablette-detail-onglets-paysage and the other detail boards; Christian, 27 November 2026):
+   * 16 px above the title's 64 px row, 16 px between the summary and the search field, 52 px of blue under it. The band's
+   * backdrop follows the navbar height and the band's own height, so it grows with them.
+   */
+  :global(.md .bc-tablet .bc-logbook) {
+    --f7-navbar-height: 80px;
+  }
+  :global(.md .bc-tablet .bc-logbook > .navbar .navbar-inner) {
+    padding-top: calc(var(--f7-safe-area-top) + 16px);
+  }
+  :global(.md .bc-tablet .bc-logbook .searchbar.bc-band-search) {
+    margin-top: 16px;
+  }
+  :global(.md .bc-tablet .bc-logbook .bc-section-band--band.bc-section-band--tall:has(.bc-band-search, .bc-folding-search--slot)) {
+    padding-bottom: 52px;
+  }
+
   /* The title and the search box at the top of their bands: the room is under the search box. */
   :global(.md .bc-logbook .title-large),
   :global(.md .bc-logbook .subnavbar) {
