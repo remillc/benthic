@@ -7806,3 +7806,25 @@ Christian asked for this on 27 November 2026. Work in `main`. On /dives/:id, the
 Same rules as before otherwise (Benthic+ only, not in the free version, the demo logbook or the preview).
 
 Mock-ups: `android-tablette-detail-onglet-notes-paysage`, `bureau-carnet-onglet-notes`, `detail3-ios`, `detail3-ios-sombre`, `detail3-android`.
+
+## [ ] 2026-11-27-414 Benthic+ and the desktop app: access, offline grace period, read-only mode
+
+Christian decided this on 27 November 2026. Work in `main` (and in benthic-server for the server parts).
+
+Business rules:
+- Benthic+ is an annual subscription.
+- The desktop app (Electron, `desktop/`) can be bought on its own; it then still needs a Benthic+ account to work. Buying the phone or tablet app also gives access to the desktop app, with the same account.
+- So the desktop app has no licence key: signing in to a Benthic account that has the right is what unlocks it.
+
+What to build:
+1. Entitlement on the server: an account has desktop access when it has an active Benthic+ subscription (Google Play now, App Store later), a desktop purchase made on the web, or a phone or tablet purchase. The account API returns this as its own right, separate from `subscribed`, so the app can tell the two apart.
+2. Web purchase of the desktop app: a webhook from the payment provider (Paddle or Lemon Squeezy, not chosen yet: keep it behind a small interface) records the purchase on the account. Put a test mode in place; no real provider keys yet.
+3. Desktop app, first launch: sign-in is required (« Benthic sur ordinateur demande un compte Benthic+ »), with the three sign-in ways, « Acheter la version Desktop » and « Ouvrir un carnet en lecture seule ». The app checks the right in the background each time it is online.
+4. Offline grace period: 30 days from the last successful check; the counter restarts at each success. From day 25, a yellow banner at the top of the window: « Connectez-vous à Internet d'ici 5 jours pour garder l'accès », with « Réessayer ».
+5. When access is not valid (never bought, subscription ended, or grace period over), the desktop app still opens the logbook in read-only mode: a grey banner (« Lecture seule. Votre accès Benthic+ a pris fin le … ») with « Exporter le carnet », « Se connecter » and « Renouveler »; dives can be viewed and the logbook exported (Subsurface, UDDF, CSV), but nothing can be added, edited or synced (no grey editable fields, empty fields show « — », no + button). Reuse what `ReadOnlyNotice.svelte` already does for the equipment, extended to the whole logbook.
+6. Never lock a user out of their own logbook data, whatever the account state.
+7. Tests: the rules above (who has access, grace period at 0, 25, 30 and 31 days, read-only mode) in `tests/`.
+
+Out of scope for now: the Mac App Store (Christian will decide later), the choice of the payment provider, prices.
+
+Mock-ups (desktop canvas, page « Pour commencer », row « Accès à la version Desktop »): `bureau-acces-connexion-requise`, `bureau-acces-avertissement`, `bureau-acces-lecture-seule`.
