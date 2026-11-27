@@ -42,6 +42,7 @@
    *   name?: string,
    *   stacked?: boolean,
    *   boxed?: boolean,
+   *   outlined?: boolean,
    *   chevron?: boolean,
    *   trailing?: import('svelte').Snippet,
    *   note?: string,
@@ -61,7 +62,7 @@
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, boxed = false, chevron = false, trailing, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, boxed = false, outlined = false, chevron = false, trailing, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -312,7 +313,7 @@
   <span class="bc-desktop-edit-field--label" class:bc-sr-only={card} id="bc-df-{uid}">{label}</span>
 
   {#if readonly}
-    <span class="bc-desktop-edit-field--value bc-value" class:bc-desktop-edit-field--boxed={boxed} aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}<span class="bc-desktop-edit-field--value-text">{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>{#if trailing}{@render trailing()}{/if}</span>
+    <span class="bc-desktop-edit-field--value bc-value" class:bc-desktop-edit-field--boxed={boxed} class:bc-desktop-edit-field--outlined={outlined} aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}<span class="bc-desktop-edit-field--value-text">{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>{#if trailing}{@render trailing()}{/if}</span>
   {:else if disabled}
     <!-- Not wired to any storage yet: grey and dimmed, nothing to edit. -->
     <div class="bc-desktop-edit-field--rest bc-desktop-edit-field--disabled" role="group" aria-disabled="true" aria-label="{label}, {restText}" title={invitation}>
@@ -524,6 +525,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+    }
+
+    /* A computed value (CNS, OTU, task 2026-11-27-422): the box's size, a thin outline, no fill. */
+    .bc-desktop-edit-field--value.bc-desktop-edit-field--boxed.bc-desktop-edit-field--outlined {
+      background: none;
+      box-shadow: inset 0 0 0 1px var(--bc-chip-outline);
     }
 
     .bc-desktop-edit-field--tall {

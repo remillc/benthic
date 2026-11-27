@@ -4601,6 +4601,7 @@
   },
   "desktopDetail": {
     "openInMaps": "Ouvrir dans Maps",
+    "addToTripShort": "Ajouter à un voyage",
     "copyCoordinates": "Copier les coordonnées",
     "coordinatesCopied": "Coordonnées copiées",
     "copyFailed": "Coordonnées non copiées.",
@@ -4730,7 +4731,7 @@
     },
     "invitation": {
       "kit": "Appliquer un kit",
-      "undersuit": "Choisir un sous-vêtement",
+      "undersuit": "Choisir…",
       "site": "Site à préciser",
       "buddies": "Ajouter des compagnons",
       "guides": "Ajouter un guide",

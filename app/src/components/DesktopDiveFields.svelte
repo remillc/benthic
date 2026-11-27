@@ -857,9 +857,9 @@
   {#if tab === 'info'}
     <!--
       Informations (tasks 2026-11-23-376 and 2026-11-27-420; mock-ups android-tablette-detail-onglets-paysage, detail-onglets-android):
-      a tablet in landscape has two columns as drawn, Date et heure, Site and Appréciation on the left, Personnes, Signatures and
-      Étiquettes on the right; Conditions and Plongée invalide, not drawn there, end each column. Elsewhere one column in the
-      phone's order: Date et heure, Site, Personnes, Signatures, Appréciation, Conditions, Étiquettes, Plongée invalide.
+      a tablet in landscape has two columns as drawn (task 2026-11-27-422), Date et heure, Site, Appréciation, Étiquettes and
+      Plongée invalide on the left, Personnes, Signatures and Conditions on the right. Elsewhere one column in the phone's order:
+      Date et heure, Site, Personnes, Signatures, Appréciation, Étiquettes, Conditions, Plongée invalide.
     -->
     {#snippet datetimeCard()}
       <DesktopEquipmentCard name="datetime" title={t('desktopDetail.card.datetime')}>
@@ -875,21 +875,20 @@
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
         <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} chevron />
-        {#if layout.phone}
-          <!-- A grey field that opens the sheet of the trips; its cross takes the dive out of its trip (mock-up detail-onglets-android). -->
-          <div class="bc-desktop-dive-fields--trip" data-field="trip">
-            <span class="bc-desktop-dive-fields--trip-label">{t('desktopDetail.label.trip')}</span>
-            <div class="bc-desktop-dive-fields--trip-row">
-              <button type="button" class="bc-desktop-dive-fields--trip-field" aria-haspopup="dialog" aria-label="{t('desktopDetail.label.trip')} : {tripName || t('edit.tripNone')}" disabled={preview} onclick={() => (tripSheet = true)}>
-                <span class="bc-desktop-dive-fields--trip-name" class:bc-desktop-dive-fields--trip-empty={!tripName} class:bc-desktop-dive-fields--trip-has={!!tripName}>{tripName || t('edit.tripNone')}</span>
-                <Icon name="expand" size={24} />
-              </button>
-              {#if tripName}<button type="button" class="bc-desktop-dive-fields--trip-clear" aria-label={t('edit.tripClear')} onclick={() => saveTrip('')}><Icon name="close" size={20} /></button>{/if}
-            </div>
+        <!-- « Voyage » under the site on every device (tasks 2026-11-27-421; mock-ups detail-onglets-android,
+             android-tablette-detail-onglets-paysage, ios-detail-onglets, bureau-carnet-edition-sur-place): a grey field that opens
+             the trips' choice, its × taking the dive out of its trip. Empty, it reads « Aucun », on the desktop « Ajouter à un voyage ». -->
+        {@const tripEmpty = t(layout.desktop ? 'desktopDetail.addToTripShort' : 'edit.tripNone')}
+        <div class="bc-desktop-dive-fields--trip" data-field="trip">
+          <span class="bc-desktop-dive-fields--trip-label">{t('desktopDetail.label.trip')}</span>
+          <div class="bc-desktop-dive-fields--trip-row">
+            <button type="button" class="bc-desktop-dive-fields--trip-field" aria-haspopup="dialog" aria-label="{t('desktopDetail.label.trip')} : {tripName || tripEmpty}" disabled={preview} onclick={() => (tripSheet = true)}>
+              <span class="bc-desktop-dive-fields--trip-name" class:bc-desktop-dive-fields--trip-empty={!tripName} class:bc-desktop-dive-fields--trip-has={!!tripName}>{tripName || tripEmpty}</span>
+              <Icon name="expand" size={24} />
+            </button>
+            {#if tripName}<button type="button" class="bc-desktop-dive-fields--trip-clear" aria-label={t('edit.tripClear')} onclick={() => saveTrip('')}><Icon name="close" size={20} /></button>{/if}
           </div>
-        {:else}
-          <DesktopEditField stacked tall name="trip" kind="choice" label={t('desktopDetail.label.trip')} value={tripName} invitation={t('edit.tripNone')} options={tripOptions} onsave={(v) => saveTrip(String(v))} />
-        {/if}
+        </div>
       </DesktopEquipmentCard>
     {/snippet}
     {#snippet peopleCard()}
@@ -911,33 +910,28 @@
       </DesktopEquipmentCard>
     {/snippet}
     {#snippet conditionsCard()}
+      <!-- Conditions (task 2026-11-27-422): Type d'eau | Pression en surface, Air | Eau, all four edited in place; CNS | OTU,
+           computed, read-only in an outline. A dive logged by hand also edits its depth and duration here. The five-star
+           conditions follow (task 2026-11-27-420). -->
       <DesktopEquipmentCard name="conditions" title={t('desktopDetail.card.conditions')}>
         {#snippet icon()}<Icon name="waves" size={22} />{/snippet}
+        <div class="bc-desktop-dive-fields--two-columns">
+          <DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
+          <DesktopEditField stacked tall name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
+          <DesktopEditField stacked tall name="airTemp" kind="text" label={t('desktopDetail.label.airTemp')} value={fieldValue(dive, 'airTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.airTemp')} valid={checker('airTemp')} onsave={(v) => save('airTemp', v)} />
+          <DesktopEditField stacked tall name="waterTemp" kind="text" label={t('desktopDetail.label.waterTemp')} value={fieldValue(dive, 'waterTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.waterTemp')} valid={checker('waterTemp')} onsave={(v) => save('waterTemp', v)} />
+          {#if manual}
+            <DesktopEditField stacked tall name="maxDepth" kind="text" label={t('desktopDetail.label.maxDepth')} value={fieldValue(dive, 'maxDepth', prefs)} unit={depthUnitText} invitation={t('desktopDetail.invitation.maxDepth')} valid={checker('maxDepth')} onsave={(v) => save('maxDepth', v)} />
+            <DesktopEditField stacked tall name="duration" kind="text" label={t('desktopDetail.label.duration')} value={fieldValue(dive, 'duration', prefs)} unit={t('units.minutes')} invitation={t('desktopDetail.invitation.duration')} valid={checker('duration')} onsave={(v) => save('duration', v)} />
+          {/if}
+          <DesktopEditField stacked boxed outlined kind="text" readonly label={t('desktopDetail.label.cns')} value={dive.cns > 0 ? `${formatNumber(dive.cns, 0)} %` : '—'} />
+          <DesktopEditField stacked boxed outlined kind="text" readonly label={t('desktopDetail.label.otu')} value={dive.otu > 0 ? formatNumber(dive.otu, 0) : '—'} />
+        </div>
         <!-- The five conditions (task 2026-11-27-420): every one with the Settings switch, else only those already filled in
-             (for example by Subsurface desktop). -->
+             (for example by Subsurface desktop); under CNS and OTU (task 2026-11-27-422). -->
         {#each starConditions as key (key)}
           <DesktopStarsRow inline={!layout.desktop} name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
         {/each}
-        <div class="bc-desktop-dive-fields--two-columns">
-          <DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
-          {#if manual}
-            <DesktopEditField stacked name="airTemp" kind="text" label={t('desktopDetail.label.airTemp')} value={fieldValue(dive, 'airTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.airTemp')} valid={checker('airTemp')} onsave={(v) => save('airTemp', v)} />
-          {:else}
-            <!-- What the dive computer recorded: plain text, no field (a dash when it recorded none). -->
-            <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.airTemp')} value={dive.airTempMk ? formatTemperature(dive.airTempMk, prefs) : '—'} />
-          {/if}
-          <DesktopEditField stacked name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
-          {#if manual}
-            <!-- A dive logged by hand has no recorded values: they are edited like the others. -->
-            <DesktopEditField stacked name="maxDepth" kind="text" label={t('desktopDetail.label.maxDepth')} value={fieldValue(dive, 'maxDepth', prefs)} unit={depthUnitText} invitation={t('desktopDetail.invitation.maxDepth')} valid={checker('maxDepth')} onsave={(v) => save('maxDepth', v)} />
-            <DesktopEditField stacked name="duration" kind="text" label={t('desktopDetail.label.duration')} value={fieldValue(dive, 'duration', prefs)} unit={t('units.minutes')} invitation={t('desktopDetail.invitation.duration')} valid={checker('duration')} onsave={(v) => save('duration', v)} />
-            <DesktopEditField stacked name="waterTemp" kind="text" label={t('desktopDetail.label.waterTemp')} value={fieldValue(dive, 'waterTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.waterTemp')} valid={checker('waterTemp')} onsave={(v) => save('waterTemp', v)} />
-          {:else if dive.waterTempMk}
-            <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.waterTemp')} value={formatTemperature(dive.waterTempMk, prefs)} />
-          {/if}
-          {#if dive.cns > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.cns')} value={`${formatNumber(dive.cns, 0)} %`} />{/if}
-          {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
-        </div>
       </DesktopEquipmentCard>
     {/snippet}
     {#snippet tagsCard()}
@@ -961,13 +955,13 @@
           {@render datetimeCard()}
           {@render siteCard()}
           {@render ratingCard()}
-          {@render conditionsCard()}
+          {@render tagsCard()}
+          {@render invalidCard()}
         </div>
         <div class="bc-desktop-dive-fields--info-column">
           {@render peopleCard()}
           {@render signaturesCard()}
-          {@render tagsCard()}
-          {@render invalidCard()}
+          {@render conditionsCard()}
         </div>
       </div>
     {:else}
@@ -977,8 +971,8 @@
         {@render peopleCard()}
         {@render signaturesCard()}
         {@render ratingCard()}
-        {@render conditionsCard()}
         {@render tagsCard()}
+        {@render conditionsCard()}
         {@render invalidCard()}
       </div>
     {/if}

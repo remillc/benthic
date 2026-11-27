@@ -7931,7 +7931,7 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-site-nouveau-plongee-paysage`, `nouveau-site-plongee-android`, `ios-nouveau-site-plongee`, `bureau-site-nouveau-plongee`, `bureau-sites-nouveau`; `detail3-android`, `detail3-ios`, `detail-onglets-android`, `ios-detail-onglets`, `android-tablette-detail-onglets-paysage` and their variants (dark, menu, portrait); `bureau-carnet-edition-sur-place`; `android-tablette-reglages-paysage`, `android-reglages`, `reglages-carnet-android`, `bureau-reglages-carnet`.
 
-## [ ] 2026-11-27-421 Dive detail, Informations: « Voyage » field under Site on every device
+## [x] 2026-11-27-421 Dive detail, Informations: « Voyage » field under Site on every device
 
 Christian asked for this on 27 November 2026. Work in `main`.
 - The Site card of the Informations tab gets a « Voyage » field right under the site, on tablet and iPhone too (the Android phone already has it): label « Voyage », grey field with the trip name, a ✕ « Retirer du voyage » and a down arrow that opens the trip choice. Same behaviour as on the Android phone.
@@ -7939,7 +7939,7 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-ios`, `detail3-ios-sombre`, `ios-detail-onglets`, `detail2-ios-menu`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
 
-## [ ] 2026-11-27-422 Dive detail, Informations: « Conditions » card and « Plongée invalide »
+## [x] 2026-11-27-422 Dive detail, Informations: « Conditions » card and « Plongée invalide »
 
 Christian asked for this on 27 November 2026. Work in `main`.
 
@@ -7959,7 +7959,7 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-android`, `detail3-ios` and their variants, `detail-onglets-android`, `ios-detail-onglets`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
 
-## [ ] 2026-11-27-423 Dive detail, Équipement: empty undersuit field reads « Choisir… »
+## [x] 2026-11-27-423 Dive detail, Équipement: empty undersuit field reads « Choisir… »
 
 Christian asked for this on 27 November 2026. Work in `main`.
 - In the Équipement tab of the dive detail, the empty undersuit field shows « Choisir… » instead of « Choisir un sous-vêtement »: change `invitation.undersuit` in `app/src/i18n/fr.json` (and « Choose… » in the English file).

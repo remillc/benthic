@@ -82,7 +82,10 @@ test('the weight feedback tag is kept when the tags change', () => {
 });
 
 test('what the dive computer recorded is refused, unless the dive was logged by hand', () => {
-  for (const key of ['maxDepth', 'duration', 'waterTemp', 'airTemp', 'startPressure', 'endPressure']) {
+  // The air and water temperatures are edited on any dive since task 2026-11-27-422, as Subsurface desktop does.
+  for (const key of ['waterTemp', 'airTemp']) assert.equal(isEditable(dive(), key), true, key);
+  assert.deepEqual(fieldChanges(dive(), 'waterTemp', '18', metric), { ok: true, changes: { waterTempMk: 291150 } });
+  for (const key of ['maxDepth', 'duration', 'startPressure', 'endPressure']) {
     assert.equal(isEditable(dive(), key), false, key);
     assert.deepEqual(fieldChanges(dive(), key, '12', metric), { ok: false, error: 'readonly' }, key);
   }

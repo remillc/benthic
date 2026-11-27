@@ -4601,6 +4601,7 @@
   },
   "desktopDetail": {
     "openInMaps": "Open in Maps",
+    "addToTripShort": "Add to a trip",
     "copyCoordinates": "Copy the coordinates",
     "coordinatesCopied": "Coordinates copied",
     "copyFailed": "Coordinates not copied.",
@@ -4730,7 +4731,7 @@
     },
     "invitation": {
       "kit": "Apply a kit",
-      "undersuit": "Choose an undersuit",
+      "undersuit": "Choose…",
       "site": "Site not set",
       "buddies": "Add buddies",
       "guides": "Add a guide",
