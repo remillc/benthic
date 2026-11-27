@@ -613,6 +613,16 @@
     else f7router.navigate('/plans/', { reloadCurrent: true });
   }
 
+  /**
+   * The ← (and the system Back through the guard): the screen the planner was opened from (a dive's « Planifier depuis cette
+   * plongée », Outils, the plans list; Christian's report of 27 November 2026: it always went to the plans list). With
+   * nothing under it, the plans list. Saving still goes to the list (`toList`).
+   */
+  function goBack() {
+    if ((f7router.history ?? []).length > 1) f7router.back();
+    else toList();
+  }
+
   // Leaving with changes asks first (components/LeaveGuard.svelte): the plan as
   // first computed, against the plan now.
   let guard = /** @type {LeaveGuard|undefined} */ (undefined);
@@ -687,7 +697,7 @@
       </Link>
     {/snippet}
   </Navbar>
-  <LeaveGuard bind:this={guard} noun="plan" {dirty} {save} leave={toList} canSave={() => canSave} />
+  <LeaveGuard bind:this={guard} noun="plan" {dirty} {save} leave={goBack} canSave={() => canSave} />
 
   <Popover id={menuId} class="bc-menu" backdrop={false}>
     <List noChevron>
