@@ -31,3 +31,22 @@ import Typography from 'framework7/components/typography';
 Framework7.use([Dialog, Popup, Popover, Actions, Sheet, Toast, Preloader, Progressbar, Swipeout, VirtualList, Tabs, Panel, Card, Chip, Form, Input, Checkbox, Radio, Toggle, Fab, Searchbar, Skeleton, Typography]);
 
 export default Framework7;
+
+/*
+ * Framework7 builds a Material palette for each of its sixteen named colours at start (primary, red, green...): about
+ * 330 ms on a tablet (start-up profile, 27 November 2026). Neither the app nor Framework7's CSS uses the palettes of the
+ * named colours (the app's colours are its --bc-* variables); only the primary one's is built, and the named colours stay
+ * as plain --f7-color-* variables.
+ */
+Framework7.prototype.setColors = function setColors() {
+  const app = /** @type {any} */ (this);
+  if (!app.colorsStyleEl) {
+    app.colorsStyleEl = document.createElement('style');
+    document.head.prepend(app.colorsStyleEl);
+  }
+  const named = Object.keys(app.colors)
+    .filter((name) => name !== 'primary')
+    .map((name) => `--f7-color-${name}: ${app.colors[name]};`)
+    .join('');
+  app.colorsStyleEl.textContent = app.utils.colorThemeCSSStyles({ primary: app.colors.primary }, app.mdColorScheme) + `:root{${named}}`;
+};

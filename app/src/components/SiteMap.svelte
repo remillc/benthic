@@ -550,8 +550,30 @@
     pinsHidden = z < pinsFromZoom;
   }
 
+  /**
+   * Resolves once the element has a size: a map in a hidden pane (the tablet's Sites and Statistics tabs, built at start)
+   * waits until it is shown. Building the two hidden maps took about half a second of the start on a tablet (start-up
+   * profile, 27 November 2026).
+   * @param {HTMLElement} el
+   * @returns {Promise<void>}
+   */
+  function whenSized(el) {
+    if (el.offsetWidth > 0 && el.offsetHeight > 0) return Promise.resolve();
+    return new Promise((resolve) => {
+      const watch = new ResizeObserver(() => {
+        if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+          watch.disconnect();
+          resolve();
+        }
+      });
+      watch.observe(el);
+    });
+  }
+
   onMount(async () => {
     if (!container) return;
+    await whenSized(container);
+    if (!container.isConnected) return;
     const module = await loadMapLibre();
     maplibregl = /** @type {any} */ (module).default ?? module;
     const { style } = await buildMapStyle(maplibregl);
