@@ -5,6 +5,9 @@
 import { registerPlugin } from '@capacitor/core';
 import { waterTypeOf } from './water-type.js';
 import { sortCylinderTypes } from './cylinder-sort.js';
+import { isBlocked, readOnlyError } from './read-only.js';
+
+export { setCoreReadOnly } from './read-only.js';
 
 export { waterTypeOf };
 
@@ -999,6 +1002,8 @@ const native = new Proxy(plugin, {
     const value = Reflect.get(target, name, receiver);
     if (typeof value !== 'function' || typeof name !== 'string' || name === 'then' || name.startsWith('add') || name.startsWith('remove')) return value;
     return (/** @type {any[]} */ ...args) => {
+      // The desktop app's read-only logbook (read-only.js): a write is refused here, whatever screen asks.
+      if (isBlocked(name)) return Promise.reject(readOnlyError(name));
       // The bridge's own stack only shows its frames: the caller's is kept for the report.
       const caller = new Error().stack ?? '';
       const result = value.apply(target, args);

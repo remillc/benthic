@@ -16,6 +16,8 @@
   import FabMenu from '../components/FabMenu.svelte';
   import ProfileThumbnail from '../components/ProfileThumbnail.svelte';
   import DesktopExportDialog from '../components/DesktopExportDialog.svelte';
+  import { access, desktopReadOnly } from '../lib/desktop-access.svelte.js';
+  import { WRITE_COMMANDS, readOnlyEntries } from '../lib/desktop-access.js';
   import DesktopEditTogetherDialog from '../components/DesktopEditTogetherDialog.svelte';
   import ShiftTimeDialog from '../components/ShiftTimeDialog.svelte';
   import DesktopLogbookSelector from '../components/DesktopLogbookSelector.svelte';
@@ -352,6 +354,9 @@
   let menuAt = $state(null);
   let renumberFrom = $state(/** @type {number|null} */ (null));
 
+  // The right to the desktop app (task 2026-11-27-414): without it the logbook is read only.
+  const readOnly = $derived(desktopReadOnly());
+
   /** @param {MouseEvent} e @param {number} id */
   function rowMenu(e, id) {
     e.preventDefault();
@@ -360,17 +365,20 @@
   }
 
   const mergeable = $derived(canMerge(logbook.dives, desk.selection.ids).ok);
-  const menuEntries = $derived(contextMenuEntries(desk.selection.ids.length, { mac: desktopMac, available, mergeable }));
+  const menuEntries = $derived.by(() => {
+    const entries = contextMenuEntries(desk.selection.ids.length, { mac: desktopMac, available, mergeable });
+    return readOnly ? readOnlyEntries(entries) : entries;
+  });
 
   // The right-click menu of the table's empty area: « Coller » (task 2026-11-15-178).
   /** @type {{x: number, y: number, canPaste: boolean}|null} */
   let emptyMenuAt = $state(null);
-  const emptyMenuEntries = $derived(emptyMenuAt ? emptyAreaMenuEntries({ mac: desktopMac, canPaste: emptyMenuAt.canPaste }) : []);
+  const emptyMenuEntries = $derived(emptyMenuAt && !readOnly ? emptyAreaMenuEntries({ mac: desktopMac, canPaste: emptyMenuAt.canPaste }) : []);
 
   /** @param {MouseEvent} e */
   async function areaMenu(e) {
     // A row, a header or a control has its own menu or none.
-    if (e.defaultPrevented || /** @type {HTMLElement} */ (e.target).closest('tr, thead, button, input, a, header, .bc-desktop-logbook--handle')) return;
+    if (readOnly || e.defaultPrevented || /** @type {HTMLElement} */ (e.target).closest('tr, thead, button, input, a, header, .bc-desktop-logbook--handle')) return;
     e.preventDefault();
     const { clientX: x, clientY: y } = e;
     emptyMenuAt = { x, y, canPaste: !!(await clipboardDives()) };
@@ -484,6 +492,17 @@
   let exporting = $state(false);
   let exportWhole = $state(false);
 
+  // The right to the desktop app (task 2026-11-27-414): without it the logbook is read only. Nothing that writes is offered here,
+  // and the core refuses the writes under the screens (plugins/benthic-core/read-only.js).
+  // « Exporter le carnet » of the read-only banner: the export dialog opens on the whole logbook.
+  let exportSeen = access.exportRequests;
+  $effect(() => {
+    if (access.exportRequests === exportSeen) return;
+    exportSeen = access.exportRequests;
+    exportWhole = true;
+    exporting = true;
+  });
+
   // « Ajouter à un voyage… »: the logbook's trips, newest first, or a new trip.
   let choosingTrip = $state(false);
   const tripOptions = $derived.by(() => {
@@ -526,6 +545,7 @@
 
   /** @param {string} key */
   function act(key) {
+    if (readOnly && WRITE_COMMANDS.has(key)) return;
     if (key === 'edit') editSelected();
     else if (key === 'delete') deleteSelected();
     else if (key === 'editTogether') editingTogether = true;
@@ -551,7 +571,7 @@
     const key = undoNameKey(which === 'undo' ? logbook.undoText : logbook.redoText);
     return key ? t(`desktop.${which}Named`, { action: t(key) }) : t(`desktop.${which}Plain`);
   }
-  const moreEntries = $derived(
+  const moreEntriesAll = $derived(
     /** @type {import('../lib/desktop-table.js').MenuEntry[]} */ ([
       { key: 'undo', label: '', text: undoEntryText('undo'), icon: 'undo', shortcut: desktopMac ? '⌘Z' : 'Ctrl+Z', disabled: !logbook.undoText },
       { key: 'redo', label: '', text: undoEntryText('redo'), icon: 'redo', shortcut: desktopMac ? '⇧⌘Z' : 'Ctrl+Maj+Z', disabled: !logbook.redoText },
@@ -568,6 +588,7 @@
       { key: 'about', label: '', text: t('desktopSettings.about'), icon: 'info' },
     ]),
   );
+  const moreEntries = $derived(readOnly ? readOnlyEntries(moreEntriesAll) : moreEntriesAll);
   const nearTrips = $derived(adjacentTrips(logbook.dives, desk.selection.ids));
   let renumbering = $state(false);
   /** @param {string} key */
@@ -804,6 +825,7 @@
       if (!e.dataTransfer?.files.length) return;
       e.preventDefault();
       dropping = false;
+      if (readOnly) return;
       for (const file of e.dataTransfer.files) await importOne(file);
     };
     window.addEventListener('dragover', over);
@@ -871,6 +893,11 @@
 
   /** @param {string} command a shortcut's or a menu item's command */
   function command(command) {
+    // Read only: a shortcut for something that writes does nothing but say so.
+    if (readOnly && WRITE_COMMANDS.has(command)) {
+      showSnackbar(t('desktopAccess.readOnly.snackbar'));
+      return true;
+    }
     switch (command) {
       case 'find':
         if (narrow && !searchField) openSearch();
@@ -1136,6 +1163,8 @@
         <p>{t('logbook.errorNothingChanged')}</p>
         <button type="button" class="bc-desktop-logbook--filled" onclick={() => loadLogbook({ force: true })}>{t('logbook.retry')}</button>
       </div>
+    {:else if !logbook.dives.length && ownLogbookWindow() && readOnly}
+      <div class="bc-desktop-logbook--state"><p>{t('desktopAccess.required.browseEmpty')}</p></div>
     {:else if !logbook.dives.length && ownLogbookWindow()}
       <DesktopLogbookReady ondownload={() => choose('download')} onimport={() => choose('import')} onmanual={() => choose('manual')} />
     {:else if !logbook.dives.length}
@@ -1285,7 +1314,7 @@
   </div>
 
   <input type="file" class="bc-sr-only" tabindex="-1" aria-hidden="true" bind:this={fileInput} onchange={fileChosen} />
-  {#if logbook.dives.length && !navigation.over}<FabMenu choices={addChoices} onchoose={choose} />{/if}
+  {#if logbook.dives.length && !navigation.over && !readOnly}<FabMenu choices={addChoices} onchoose={choose} />{/if}
   {#if moreAt}
     <DesktopContextMenu x={moreAt.x} y={moreAt.y} heading="" entries={moreEntries} onchoose={moreChoose} onclose={() => (moreAt = null)} />
   {/if}

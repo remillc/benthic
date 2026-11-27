@@ -58,6 +58,7 @@
   import { DROP_STEPS, droppedFiles, nameFromGitUrl, parkPending, pendingFromSource, signInFailure, signInTo, PENDING_IMPORT_KEY } from '../lib/desktop-first-launch.js';
   import { t, locale } from '../lib/i18n.js';
   import { formatInstantDate } from '../lib/format.js';
+  import { desktopReadOnly, showSignIn } from '../lib/desktop-access.svelte.js';
 
   /**
    * `recents`: the desktop window without a logbook, after first use (task 2026-11-16-241): the first step shows the
@@ -67,6 +68,8 @@
   let { f7router, recents = false, shown = true } = $props();
 
   const step = $derived(currentStep());
+  /** The desktop window without a logbook, opened read only (task 2026-11-27-414): nothing here creates or imports a logbook. */
+  const readOnlyBrowse = $derived(desktopApp && desktopReadOnly());
   /** « Retour » of the tablet's offer (task 2026-11-18-282), except right after a sign-in where the code is spent. */
   const tabletOfferBack = $derived(step === 'benthicPlusOffer' && !layout.phone && !desktopApp && offerShowsSignIn(flow.stack));
   /** The first step's rows are 12 dp high on an Android phone (mock-up android-premier-lancement-production). */
@@ -871,7 +874,7 @@
 </script>
 
 {#snippet backButton()}
-  {#if (hasBack(step, flow.origin === 'menu') && step !== 'benthicPlusAll') || tabletOfferBack}
+  {#if (hasBack(step, flow.origin === 'menu') && step !== 'benthicPlusAll' && !(flow.desktopAccess && step === 'benthicPlusConnect' && flow.stack.length <= 2)) || tabletOfferBack}
     <button type="button" class="bc-first-launch--back" onclick={step === 'start' ? leave : back}>
       <span class="bc-first-launch--back-icon"><Icon name="chevron" size={20} weight={2.2} /></span>{t('welcomeSteps.back')}
     </button>
@@ -1004,11 +1007,18 @@
         {#if step === 'start' && recents}
           <h3 class="bc-first-launch--or">{t('desktopLogbooks.recents.orElse')}</h3>
           <nav class="bc-first-launch--rows bc-first-launch--rows-compact" aria-label={t('desktopLogbooks.recents.otherChoices')}>
-            <ReleaseChoiceRow compact icon="plus" title={t('welcomeSteps.createTitle')} help={t('welcomeSteps.createHelp')} onclick={() => go('create')} />
-            <ReleaseChoiceRow compact icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
+            {#if !readOnlyBrowse}
+              <ReleaseChoiceRow compact icon="plus" title={t('welcomeSteps.createTitle')} help={t('welcomeSteps.createHelp')} onclick={() => go('create')} />
+              <ReleaseChoiceRow compact icon="upload" title={t('welcomeSteps.importTitle')} help={t('welcomeSteps.importHelp')} onclick={() => go('import')} />
+            {/if}
             <ReleaseChoiceRow compact icon="logbook" title={t('welcomeSteps.openTitle')} help={t('welcomeSteps.openHelp')} onclick={() => go('open')} />
           </nav>
-          {@render dropLine()}
+          {#if readOnlyBrowse}
+            <button type="button" class="bc-first-launch--text-button" onclick={showSignIn}>{t('desktopAccess.required.back')}</button>
+          {:else}{@render dropLine()}{/if}
+        {:else if step === 'start' && readOnlyBrowse}
+          <p class="bc-first-launch--lead">{t('desktopAccess.required.browseEmpty')}</p>
+          <button type="button" class="bc-first-launch--action" onclick={showSignIn}>{t('desktopAccess.required.back')}</button>
         {:else if step === 'start'}
           <nav class="bc-first-launch--rows bc-first-launch--rows-start" aria-label={t('welcomeSteps.startTitle')}>
             <!-- Task 2026-11-17-263: sign in (the Benthic+ chip above its title), then a logbook on the device, then the import. -->

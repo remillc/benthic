@@ -126,7 +126,7 @@
     try {
       const session = await api.verifyCode(s.email, s.code);
       // An account without a subscription goes to the offer, and nothing of it is kept on this device (task 2026-11-17-265).
-      if (afterSignIn(session.user) === 'offer') {
+      if (afterSignIn(session.user, desktopApp) === 'offer') {
         s.code = '';
         s.error = '';
         goOffer();

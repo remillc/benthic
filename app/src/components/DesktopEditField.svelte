@@ -14,6 +14,7 @@
   import { floatMenu } from '../lib/float-menu.js';
   import { tick } from 'svelte';
   import Icon from './Icon.svelte';
+  import { desktopReadOnly } from '../lib/desktop-access.svelte.js';
   import StarsInput from './StarsInput.svelte';
   import DetailSheet from './DetailSheet.svelte';
   import { layout } from '../lib/layout.svelte.js';
@@ -61,6 +62,9 @@
   let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
 
   const uid = $props.id();
+  // No right to the desktop app (task 2026-11-27-414): every field is plain text, an empty one shows « — ».
+  const locked = $derived(desktopReadOnly());
+  const ro = $derived(readonly || locked);
   let editing = $state(false);
   let saving = $state(false);
   /** The value being edited: a text, a list, or stars. @type {string|string[]|number} */
@@ -146,7 +150,7 @@
 
   /** @param {boolean} [openChoice] */
   function startEdit(openChoice = false) {
-    if (readonly || editing || quiet || sheetOpen || (onpick && picking)) {
+    if (ro || editing || quiet || sheetOpen || (onpick && picking)) {
       quiet = false;
       return;
     }
@@ -289,8 +293,8 @@
 <div class="bc-desktop-edit-field" class:bc-desktop-edit-field--multiline={multiline} class:bc-desktop-edit-field--stacked={stacked} class:bc-desktop-edit-field--card-root={card} class:bc-desktop-edit-field--tall={tall} data-field={name || undefined}>
   <span class="bc-desktop-edit-field--label" class:bc-sr-only={card} id="bc-df-{uid}">{label}</span>
 
-  {#if readonly}
-    <span class="bc-desktop-edit-field--value bc-value" aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>
+  {#if ro}
+    <span class="bc-desktop-edit-field--value bc-value" aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}{shownText || (Array.isArray(value) ? value.join(', ') : '') || (locked ? '—' : '')}</span>
   {:else if disabled}
     <!-- Not wired to any storage yet: grey and dimmed, nothing to edit. -->
     <div class="bc-desktop-edit-field--rest bc-desktop-edit-field--disabled" role="group" aria-disabled="true" aria-label="{label}, {restText}" title={invitation}>

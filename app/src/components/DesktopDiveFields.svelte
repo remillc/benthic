@@ -69,6 +69,7 @@
   import { focusSite } from '../lib/site-focus.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
+  import { desktopReadOnly } from '../lib/desktop-access.svelte.js';
 
   /**
    * `tab`: 'info', 'equipment', 'gas', 'notes' or 'map'. `location` and `trip` are the read-only lines of
@@ -842,7 +843,7 @@
 </script>
 
 <div class="bc-desktop-dive-fields" bind:clientWidth={paneWidth} class:bc-desktop-dive-fields--compact={!layout.desktop} class:bc-desktop-dive-fields--cols={layout.split && !layout.desktop && !layout.portrait} bind:this={root}>
-  {#if hint}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
+  {#if hint && !desktopReadOnly()}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
 
   {#if tab === 'info'}
     <!-- Informations (task 2026-11-23-376): five cards, laid out like the Équipement tab's: site, people, rating, conditions, tags. -->

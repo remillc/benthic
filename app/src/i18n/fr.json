@@ -2968,7 +2968,7 @@
       "Sauvegarde et restauration : retrouver une plongée supprimée, une version d’une plongée ou tout le carnet à une date, sur une ligne du temps.",
       "Photos et vidéos (Benthic+) : chaque plongée a sa galerie, dans l’ordre de prise de vue avec la profondeur du profil, envoyée au compte (10 Go) et disponible sur tous les appareils.",
       "Profil et équipement (Benthic+) : fiche du plongeur, certifications dessinées comme les cartes, documents numérisés, fiche d’urgence, 20 types de pièces d’équipement avec kits, et rappels d’entretien par durée ou par nombre de plongées. L’onglet Équipement d’une plongée remplit l’équipement avec un kit ou celui de la plongée précédente, et liste l’autre équipement. Une pièce s’associe aux ordinateurs déjà dans le carnet, et les combinaisons écrites de plusieurs façons se fusionnent en une seule pièce. Chaque combinaison écrite dans vos plongées et chaque ordinateur de plongée du carnet est une pièce, et le champ Combinaison d’une plongée propose les combinaisons. « Faire signer la plongée » demande la signature d’un équipier ou d’un instructeur. Réglages › Types de lest (aussi sur ordinateur) : vos types de lest et leur poids ; un lest choisi part du poids de la plongée précédente.",
-      "Ordinateur (Windows, macOS, Linux) : Benthic en trois volets, avec un tableau du carnet rapide même avec des milliers de plongées, une plongée en onglets, des menus au clic droit et des fenêtres pour plusieurs carnets.",
+      "Ordinateur (Windows, macOS, Linux) : Benthic en trois volets, avec un tableau du carnet rapide même avec des milliers de plongées, une plongée en onglets, des menus au clic droit, un carnet en lecture seule sans Benthic+ ni Benthic Desktop et des fenêtres pour plusieurs carnets.",
       "iPhone et iPad : Benthic suit l’apparence d’iOS, avec la barre d’onglets, le téléchargement depuis un ordinateur de plongée en Bluetooth, « Continuer avec Apple » et l’import des plongées d’une Apple Watch Ultra depuis Santé.",
       "Android : navigation en bas (Carnet, Sites, Statistiques, Outils), avatar du compte et composants Material 3 Expressive.",
       "Carnet : plongées groupées par année, voyages sélectionnables, fusion, modification groupée et décalage de la date et de l’heure de plusieurs plongées, délai avant de voler au-dessus de la liste.",
@@ -5393,6 +5393,39 @@
       "s5": "Touchez [kbd]Créer un dépôt[/kbd].",
       "s5Desktop": "Cliquez sur [kbd]Créer un dépôt[/kbd].",
       "s6": "Choisissez [kbd]HTTPS[/kbd] au-dessus de l’adresse du dépôt, puis copiez-la, par exemple [code]https://codeberg.org/vous/carnet-plongee.git[/code]."
+    }
+  },
+  "desktopAccess": {
+    "required": {
+      "title": "Benthic sur ordinateur demande Benthic+ ou Benthic Desktop",
+      "lead": "Connectez-vous avec le compte de votre abonnement Benthic+ ou de votre achat Benthic Desktop. Benthic+ ouvre aussi l’application sur téléphone et tablette.",
+      "noAccount": "Pas encore de compte ?",
+      "buy": "Acheter Benthic Desktop",
+      "noAccountAfter": "(un compte Benthic est créé à l’achat, sans date de fin)",
+      "readOnly": "Ouvrir un carnet en lecture seule",
+      "browseEmpty": "Aucun carnet sur cet ordinateur. Connectez-vous pour en créer un.",
+      "back": "Se connecter"
+    },
+    "warning": {
+      "text": "Benthic n’a pas pu vérifier votre compte depuis {days} jours.",
+      "action": {
+        "one": "Connectez-vous à Internet d’ici {n} jour pour garder l’accès.",
+        "other": "Connectez-vous à Internet d’ici {n} jours pour garder l’accès."
+      },
+      "retry": "Réessayer",
+      "stillOffline": "Benthic n’a pas pu joindre le serveur. Vérifiez la connexion à Internet."
+    },
+    "readOnly": {
+      "title": "Lecture seule.",
+      "ended": "Votre abonnement Benthic+ a pris fin le {date}.",
+      "never": "Aucun compte Benthic n’est connecté.",
+      "none": "Ce compte n’a ni Benthic+ ni Benthic Desktop.",
+      "graceOver": "Benthic n’a pas pu vérifier votre accès depuis plus de 30 jours.",
+      "tail": "Vous pouvez consulter et exporter le carnet ; rien ne s’ajoute, ne se modifie ni ne se synchronise.",
+      "export": "Exporter le carnet",
+      "signIn": "Se connecter",
+      "renew": "Renouveler",
+      "snackbar": "Lecture seule : connectez-vous avec un compte Benthic+ pour modifier le carnet."
     }
   },
   "benthicPlus": {

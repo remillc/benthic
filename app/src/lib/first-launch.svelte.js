@@ -31,6 +31,8 @@ export const flow = $state({
   stack: /** @type {Step[]} */ (['start']),
   /** Where the first launch was entered from: `'menu'` is the logbook's menu (it can be left), '' the first start. */
   origin: /** @type {''|'menu'} */ (''),
+  /** The desktop app's sign-in screen « Benthic sur ordinateur demande un compte Benthic+ » (task 2026-11-27-414): the Benthic+ connect step with its own texts. */
+  desktopAccess: false,
   /** The screen to show again when the first launch is left from its first step: the account sheet that opened it. */
   returnTo: /** @type {''|'account'} */ (''),
   /** The way the last move went, for the transition: the column slides the other way on « Retour ». */
@@ -183,6 +185,7 @@ export function enterFromMenu(first) {
 export function resetFlow() {
   flow.origin = '';
   flow.returnTo = '';
+  flow.desktopAccess = false;
   flow.stack = ['start'];
   flow.direction = 'forward';
   flow.name = t('welcomeSteps.defaultName');

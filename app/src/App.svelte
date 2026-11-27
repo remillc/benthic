@@ -28,6 +28,8 @@
   import DesktopSelection from './pages/DesktopSelection.svelte';
   import DesktopLogbookStart from './components/DesktopLogbookStart.svelte';
   import DesktopFirstLaunch from './components/DesktopFirstLaunch.svelte';
+  import DesktopAccessBanner from './components/DesktopAccessBanner.svelte';
+  import { access, accessEnforced, accessScreenShown, accountChanged, checkDesktopAccess, startDesktopAccess } from './lib/desktop-access.svelte.js';
   import AdaptivePage from './components/AdaptivePage.svelte';
   import { logbookToNarrow, settingsToNarrow, settingsToWide, statisticsToNarrow, statisticsToWide, toolsToNarrow, toolsToWide } from './lib/adaptive-handoff.js';
   import DesktopSites from './pages/DesktopSites.svelte';
@@ -450,10 +452,24 @@
     if (on) rememberHero(heroOf(logbook, benthicPlusAccount));
   });
 
+  // The right to the desktop app (task 2026-11-27-414): checked again each time the network returns and when the account changes.
+  $effect(() => {
+    if (!accessEnforced || !access.ready || !connection.online) return;
+    untrack(() => void checkDesktopAccess());
+  });
+  $effect(() => {
+    if (!accessEnforced || !access.ready) return;
+    const signedIn = benthicPlusAccount.signedIn;
+    untrack(() => {
+      if (signedIn !== access.signedIn) void accountChanged();
+    });
+  });
+
   onMount(() => {
     applyMotionTokens();
     // The Benthic+ account of the device (signed in, subscribed), whatever the place of the logbook.
     void loadBenthicPlusAccount();
+    void startDesktopAccess();
     // The desktop app's shortcuts and text size; the Mac's Réglages window stops there (task 2026-11-15-202).
     startDesktopShell();
     if (sideWindow) {
@@ -542,7 +558,8 @@
   <Welcome />
   <DemoHost />
   <!-- Desktop: a window with no logbook shows its start screen. The release edition shows « Pour commencer » (task 2026-11-16-228); the new-logbook dialog opens from the selector and the menu bar (task 2026-11-15-173). -->
-  {#if desktopApp && noLogbook}{#if isRelease}<DesktopFirstLaunch />{:else}<DesktopLogbookStart />{/if}{/if}
+  {#if desktopApp && (noLogbook || accessScreenShown(false))}{#if isRelease}<DesktopFirstLaunch />{:else}<DesktopLogbookStart />{/if}{/if}
+  {#if desktopApp && !sideWindow}<DesktopAccessBanner />{/if}
   {#if desktopApp && logbooks.dialog}{#await import('./components/DesktopNewLogbook.svelte') then { default: DesktopNewLogbook }}<DesktopNewLogbook onclose={() => (logbooks.dialog = false)} />{/await}{/if}
   {#if desktopApp && logbooks.renameDialog && logbooks.current}{#await import('./components/RenameLogbook.svelte') then { default: RenameLogbook }}<RenameLogbook initialName={displayName(logbooks.current, t)} onsave={renameLogbook} onclose={() => (logbooks.renameDialog = false)} />{/await}{/if}
   <Views tabs class="safe-areas {layout.rail ? 'bc-tablet' : ''}" style="--f7-page-master-width: {listWidth}px; --bc-no-dive: '{t('tablet.noDive')}'">

@@ -22,6 +22,9 @@
   import { navigation } from '../lib/navigation.svelte.js';
   import { logbooks, refreshRecent, checkRecent } from '../lib/desktop-logbooks.svelte.js';
   import { startMode } from '../lib/desktop-recents.js';
+  import { flow } from '../lib/first-launch.svelte.js';
+  import { accessScreenShown } from '../lib/desktop-access.svelte.js';
+  import { noLogbook } from '../lib/desktop-logbooks.svelte.js';
   import { t } from '../lib/i18n.js';
 
   /** A page is open over the start screen: the token help of the git step (About is a popup, above this screen). */
@@ -30,6 +33,18 @@
   /** The screen: the first launch, or the recent logbooks; null until the list is read. */
   const plusPanel = $derived(currentStep() === 'benthicPlusReady');
   const mode = $derived(startMode(logbooks.recentLoaded ? logbooks.recent : null));
+  // Task 2026-11-27-414: without the right to the desktop app the right column asks for a Benthic+ account (the Benthic+ connect
+  // step with its own texts); « Ouvrir un carnet en lecture seule » gives the start screen back, in read-only form.
+  const accessMode = $derived(accessScreenShown(noLogbook));
+  $effect(() => {
+    if (accessMode && !flow.desktopAccess) {
+      flow.desktopAccess = true;
+      flow.stack = ['start', 'benthicPlusConnect'];
+    } else if (!accessMode && flow.desktopAccess) {
+      flow.desktopAccess = false;
+      flow.stack = ['start'];
+    }
+  });
 
   /** The same router the pages use, read when it is needed (the views are built after this component). */
   const router = {
@@ -77,7 +92,7 @@
   </section>
 
   <div class="bc-desktop-first-launch--steps">
-    {#if mode}<FirstLaunchSteps f7router={router} recents={mode === 'recents'} />{/if}
+    {#if mode || accessMode}<FirstLaunchSteps f7router={router} recents={mode === 'recents'} />{/if}
   </div>
 </main>
 
@@ -88,6 +103,8 @@
       inset: 0;
       /* Above the rail (6000): the mock-ups show the first launch without it. */
       z-index: 6100;
+      /* The band about the right to the desktop app sits above (components/DesktopAccessBanner.svelte). */
+      top: var(--bc-access-banner-h, 0px);
       display: flex;
       background: var(--bc-background);
       color: var(--bc-text);
