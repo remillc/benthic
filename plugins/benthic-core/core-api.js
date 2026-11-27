@@ -9,6 +9,18 @@ import { sortCylinderTypes } from './cylinder-sort.js';
 export { waterTypeOf };
 
 /**
+ * An edit's or an undo's answer with its dive's water type named, as getDive does: the detail shows that dive at once,
+ * and without it the « Eau » fact under the profile went away after any edit, moving the page (27 November 2026).
+ * @template {{ dive?: any }} R
+ * @param {R} result
+ * @returns {R}
+ */
+export function withWaterType(result) {
+  if (result?.dive) result.dive = { ...result.dive, waterType: waterTypeOf(result.dive.salinity) };
+  return result;
+}
+
+/**
  * The column mapping of a CSV import (import_csv in core/libbenthic/benthic.h): `format` is `samples` (a
  * profile per file), `dives` (a dive per line), `seabear` or `poseidon`; `template` the stylesheet of `samples`
  * (`csv`, `SensusCSV`); the other keys are the stylesheets' own: a column index (`timeField`, `depthField`, ...,
@@ -1146,7 +1158,7 @@ export const BenthicCore = {
     return JSON.parse(json);
   },
   async editDive(options) {
-    return JSON.parse((await native.editDive(options)).json);
+    return withWaterType(JSON.parse((await native.editDive(options)).json));
   },
   async siteQuery(options) {
     return JSON.parse((await native.siteQuery(options)).json);
@@ -1211,7 +1223,7 @@ export const BenthicCore = {
     return JSON.parse((await native.tripAction(options)).json);
   },
   async undo(options = {}) {
-    return JSON.parse((await native.undo(options)).json);
+    return withWaterType(JSON.parse((await native.undo(options)).json));
   },
   saveLocal: () => native.saveLocal(),
   writeShareFile: (options) => native.writeShareFile(options),
