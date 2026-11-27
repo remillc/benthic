@@ -4802,6 +4802,7 @@
     },
     "gasCards": "Bouteilles de la plongée",
     "gasCardLabel": "Bouteille {n}, {gas}, {type}, {range}",
+    "editTileLabel": "Modifier : {label}",
     "addCylinderUses": "déco, relais, secours",
     "legendStart": "Au départ",
     "legendEnd": "À la sortie",

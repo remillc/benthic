@@ -94,11 +94,14 @@ test('sources: the chevron, the dialogs on phones, the dashed tile without chevr
   assert.match(cards, /top: 50%;/);
   assert.ok(cards.indexOf('class="bc-desktop-gas-cards--add"') > cards.lastIndexOf('{/each}'), 'the add tile is outside the tiles loop, so it has no chevron');
   const fields = source('components/DesktopDiveFields.svelte');
-  // Task 2026-11-26-410: the desktop opens the same dialogs, and every tile has the chevron (phones only, tablets and phones before).
-  assert.match(fields, /const dialogs = \$derived\(layout\.phone \|\| layout\.desktop\)/);
+  // Tasks 2026-11-26-410 and 2026-11-27-411: every device opens the dialogs (the desktop's layout on a tablet), every tile has
+  // the chevron and a name that starts with « Modifier », and no cylinder fields are left under the tiles.
+  assert.match(fields, /const dialogs = true;/);
+  assert.doesNotMatch(fields, /cylinderFields/);
   assert.match(fields, /editable=\{dialogs\} chevron onedit=\{editTile\}/);
-  assert.match(fields, /desktop=\{layout\.desktop\}/);
-  assert.match(fields, /onmove=\{editing\.single && !layout\.desktop \? moveEditing : undefined\}/, 'no move buttons on the desktop dialog');
+  assert.match(fields, /desktop=\{!layout\.phone\}/);
+  assert.match(fields, /onmove=\{editing\.single && layout\.phone \? moveEditing : undefined\}/, 'no move buttons on the tablet and desktop dialog');
+  assert.match(cards, /aria-label=\{editable \? t\('desktopDetail\.editTileLabel', \{ label: tile\.label \}\) : tile\.label\}/);
   assert.match(fields, /roles=\{editing\.single \? useOptions : undefined\}/);
   assert.match(fields, /onremove=\{editing\.single \? askRemove : undefined\}/);
   const dialog = source('components/CylinderEditDialog.svelte');

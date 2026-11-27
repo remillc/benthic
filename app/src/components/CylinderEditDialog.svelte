@@ -57,7 +57,8 @@
   const unit = $derived(prefs.pressure === 'psi' ? t('units.psi') : t('units.bar'));
   const depthUnit = $derived(prefs.length === 'ft' ? t('units.feet') : t('units.meters'));
   /** The camera of Début and Fin: every dive, on a device that has the gauge camera (not on an iPhone). */
-  const camera = $derived(!ios && !desktop && gaugeCameraAvailable());
+  /** Android phones and tablets (the tablet's dialog is the desktop's, task 2026-11-27-411); never the desktop app. */
+  const camera = $derived(!ios && gaugeCameraAvailable());
   /** The menu of a grey row of the iOS sheet: the cylinder type or the role of a part. @type {{ key: string, field: 'description'|'use' }|null} */
   let picking = $state(null);
   const pickingPart = $derived(picking ? parts.find((p) => p.key === picking?.key) : undefined);

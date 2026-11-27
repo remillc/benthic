@@ -568,9 +568,10 @@
     const span = cylinderSpan(dive.samples, index);
     return span ? t('desktopDetail.cylinderSpan', { from: span.fromMin, to: span.toMin }) : '';
   };
-  // The edit dialogs of the tiles (task 2026-11-26-401), on a phone (a full-screen dialog on Android, a sheet on iPhone) and on
-  // the desktop (a centred dialog, task 2026-11-26-410): one cylinder alone, or a rebreather's two together.
-  const dialogs = $derived(layout.phone || layout.desktop);
+  // The edit dialogs of the tiles (tasks 2026-11-26-401, 410 and 2026-11-27-411), the only way to edit a cylinder: a
+  // full-screen dialog on an Android phone, a sheet on an iPhone, a centred dialog on a tablet and on the desktop. One cylinder
+  // alone, or a rebreather's two together.
+  const dialogs = true;
   /** @type {{ title: string, indexes: number[], parts: { key: string, heading: string, badge?: string, oxygenOnly?: boolean, draft: import('../lib/cylinder-dialog.js').CylinderDraft }[], single: boolean }|null} */
   let editing = $state(null);
   /** @param {string} key a tile's key */
@@ -984,18 +985,7 @@
           <DesktopGasCards {tiles} selected={activeKey} onselect={(key) => (selectedKey = key)} onadd={addCylinderAndSelect} editable={dialogs} chevron onedit={editTile} />
         </div>
 
-        {#if activeTile?.kind === 'cylinder' && chosen}
-          <div class="bc-desktop-dive-fields--card bc-desktop-dive-fields--fields">
-            {@render cylinderFields(cylinderIndex, '', true)}
-          </div>
-        {:else if activeTile}
-          <!-- The rebreather unit: the diluent (or the mix), then the oxygen. -->
-          <div class="bc-desktop-dive-fields--card bc-desktop-dive-fields--fields">
-            {#each activeTile.parts as part, i (part.role)}
-              {@render cylinderFields(activeTile.indexes[i], part.title, false)}
-            {/each}
-          </div>
-        {/if}
+        <!-- The cylinders are edited in their dialogs only (task 2026-11-27-411): no fields under the tiles. -->
 
         {#if mode === 'OC'}
           <DesktopConsumption data={used} />
@@ -1041,8 +1031,8 @@
     onsave={saveEditing}
     onclose={() => (editing = null)}
     onremove={editing.single ? askRemove : undefined}
-    onmove={editing.single && !layout.desktop ? moveEditing : undefined}
-    desktop={layout.desktop}
+    onmove={editing.single && layout.phone ? moveEditing : undefined}
+    desktop={!layout.phone}
     canMove={{ up: (editing.indexes[0] ?? 0) > 0, down: (editing.indexes[0] ?? 0) < dive.cylinders.length - 1 }}
     mod={{ surfaceMbar: dive.surfacePressureMbar || 1013, salinity: dive.userSalinity || 10300 }}
   />
@@ -1100,36 +1090,6 @@
   <DiveDateTimeDialogs date={startIso} kind={picking} onconfirm={saveDate} onclose={() => (picking = null)} />
 {/if}
 
-{#snippet cylinderFields(/** @type {number} */ index, /** @type {string} */ role, /** @type {boolean} */ own)}
-  {@const c = dive.cylinders[index]}
-  {#if c}
-    {@const span = spanText(index)}
-    <div class="bc-desktop-dive-fields--cylinder" data-cylinder={index}>
-      <header class="bc-desktop-dive-fields--cylinder-head">
-        <p class="bc-desktop-dive-fields--cylinder-title">{role || t('desktopDetail.cylinder', { n: index + 1 })}<span class="bc-desktop-dive-fields--cylinder-sub">{[role ? '' : t(useKey(c.use, dive.divemode)), span].filter(Boolean).map((x, i) => (i ? x : ' · ' + x)).join(', ')}</span></p>
-        {#if own}
-          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveUp')} title={t('desktopDetail.moveUp')} disabled={index === 0} onclick={async () => { if (await moveCylinder(index, -1)) selectedKey = `c${index - 1}`; }}><Icon name="arrowUp" size={20} /></button>
-          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.moveDown')} title={t('desktopDetail.moveDown')} disabled={index === dive.cylinders.length - 1} onclick={async () => { if (await moveCylinder(index, 1)) selectedKey = `c${index + 1}`; }}><Icon name="arrowDown" size={20} /></button>
-          <button type="button" class="bc-desktop-dive-fields--icon" aria-label={t('desktopDetail.removeCylinder')} title={c.protected ? t('edit.cylinderInUse') : t('desktopDetail.removeCylinder')} disabled={c.protected} onclick={() => removeCylinder(index)}><Icon name="delete" size={20} /></button>
-        {/if}
-      </header>
-      {#key index}
-        <DesktopEditField name="cylinder-type" kind="choice" label={t('desktopDetail.label.cylinderType')} value={typeValueOf(index, c)} options={typeOptionsWithOther(c)} note={[c.sizeMl ? formatCylinderSize(c.sizeMl, c.workingPressureMbar, prefs) : '', c.workingPressureMbar ? formatPressure(c.workingPressureMbar, prefs) : ''].filter(Boolean).join(' · ')} invitation={t('desktopDetail.invitation.cylinderType')} onsave={(v) => chooseType(index, /** @type {string} */ (v))} />
-        {#if isOther(index, c)}
-          <div class="bc-desktop-dive-fields--two-columns">
-            <DesktopEditField stacked name="cylinder-size" kind="text" label={t('edit.size')} value={sizeText(c.sizeMl, c.workingPressureMbar, prefs)} unit={prefs.volume === 'cuft' ? t('units.cubicFeet') : t('units.liters')} invitation={t('desktopDetail.invitation.cylinderSize')} valid={sizeOk} onsave={(v) => saveSize(index, /** @type {string} */ (v))} />
-            <DesktopEditField stacked name="cylinder-working-pressure" kind="text" label={t('edit.workingPressure')} value={pressureText(c.workingPressureMbar)} unit={pressureUnitText} invitation={t('desktopDetail.invitation.cylinderWorkingPressure')} valid={workingPressureOk} onsave={(v) => saveWorkingPressure(index, /** @type {string} */ (v))} />
-          </div>
-        {/if}
-        <DesktopEditField name="cylinder-mix" kind="text" label={t('desktopDetail.label.mix')} value={gasText(c.o2Permille, c.hePermille)} display={cards[index]?.gas} note={t('desktopDetail.mixNote', { o2: percentText(c.o2Permille || 210), he: percentText(c.hePermille) })} invitation={t('desktopDetail.invitation.mix')} valid={mixOk} onsave={(v) => saveMix(index, /** @type {string} */ (v))} />
-        <DesktopEditField name="cylinder-pressure" kind="text" label={t('desktopDetail.label.pressure')} value={pairText(c)} display={c.startMbar ? cards[index]?.range : ''} note={t('desktopDetail.pressureNote')} invitation={t('desktopDetail.invitation.pressure')} valid={pairOk} onsave={(v) => savePair(index, /** @type {string} */ (v))} />
-        {#if own}
-          <DesktopEditField name="cylinder-use" kind="choice" label={t('desktopDetail.label.use')} value={c.use} options={useOptions} onsave={(v) => saveCylinder(index, { use: /** @type {string} */ (v) || 'OC-gas' })} />
-        {/if}
-      {/key}
-    </div>
-  {/if}
-{/snippet}
 
 <style>
   @layer bc.components {
@@ -1406,33 +1366,6 @@
       color: var(--bc-text-2);
     }
 
-    /* The cylinders' fields: the diluent's, then the oxygen's, as two blocks of the same card. */
-    .bc-desktop-dive-fields--cylinder + .bc-desktop-dive-fields--cylinder {
-      margin-top: 16px;
-      padding-top: 4px;
-      border-top: 1px solid var(--bc-separator);
-    }
-
-    .bc-desktop-dive-fields--cylinder-head {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      margin: 12px 0 8px;
-    }
-
-    .bc-desktop-dive-fields--cylinder-title {
-      flex: 1;
-      min-width: 0;
-      margin: 0;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .bc-desktop-dive-fields--cylinder-sub {
-      font-weight: 400;
-      color: var(--bc-text-2);
-    }
-
     /* The map keeps its height: it never shrinks in the pane. */
     .bc-desktop-dive-fields--map {
       flex: none;
@@ -1463,25 +1396,5 @@
       cursor: pointer;
     }
 
-    .bc-desktop-dive-fields--icon {
-      display: grid;
-      place-items: center;
-      width: 36px;
-      height: 36px;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      background: none;
-      color: var(--bc-text-2);
-      cursor: pointer;
-      &:hover:not(:disabled) {
-        background: color-mix(in srgb, var(--bc-text) 8%, transparent);
-        color: var(--bc-text);
-      }
-      &:disabled {
-        opacity: 0.38;
-        cursor: default;
-      }
-    }
   }
 </style>

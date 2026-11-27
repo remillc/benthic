@@ -371,8 +371,7 @@
       gap: 8px;
     }
 
-    .bc-piece-page--filled,
-    .bc-piece-page--outlined {
+    .bc-piece-page--filled {
       width: auto;
       height: 40px;
       padding: 0 20px 0 16px;
@@ -391,14 +390,7 @@
       color: var(--bc-on-secondary);
     }
 
-    .bc-piece-page--outlined {
-      border: var(--bc-outline-width) solid var(--bc-outline);
-      background: none;
-      color: var(--bc-secondary);
-    }
-
-    .bc-piece-page--filled:disabled,
-    .bc-piece-page--outlined:disabled {
+    .bc-piece-page--filled:disabled {
       opacity: 0.38;
     }
 
