@@ -1067,10 +1067,27 @@ html.ios {
     }
   }
 
-  /* Under a section band, the bar's track shows the band as it is drawn, layer by layer, right-aligned, down to the band's
-     visible bottom, then the page's colour (SectionBand.svelte writes it, and again at each scroll). */
-  html:not(.bc-desktop-app) .page-content.bc-has-band::-webkit-scrollbar-track {
-    background: var(--bc-gutter-band, transparent);
+  /* An area that starts with a section band: its bar takes no room, so the band reaches the right edge; the thumb is an
+     element laid over that edge, with the look of the bar above (lib/overlay-scrollbar.js, which explains why). */
+  html:not(.bc-desktop-app) :is(.page-content, [data-bc-scroll]).bc-overlay-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .bc-overlay-scrollbar--thumb {
+    position: absolute;
+    top: 0;
+    right: 0;
+    /* Above the scrolling area (Framework7's .page-content, z-index 1), under the bars. */
+    z-index: 2;
+    width: 4px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--bc-text) 30%, transparent);
+    pointer-events: none;
+
+    &[hidden] {
+      display: none;
+    }
   }
 }
 

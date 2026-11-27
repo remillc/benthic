@@ -10,75 +10,19 @@
   /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, syncLine?: boolean, children?: import('svelte').Snippet }} */
   import { ios } from '../lib/layout.svelte.js';
   import { BAND_PROFILE } from '../lib/band-profile.js';
+  import { overlayScrollbar } from '../lib/overlay-scrollbar.js';
   import SyncProfileLine from './SyncProfileLine.svelte';
   let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, syncLine = false, children } = $props();
 
   /** @type {HTMLElement|undefined} */
   let band = $state();
   /**
-   * Phones and tablets keep a 4 px scrollbar gutter at the right of a page that scrolls (theme.css): the band stops
-   * before it and the page's light background showed beside the blue (Christian's report of 27 November 2026, the
-   * logbook list on a tablet). The bar's track takes the band's gradient there, at the place and size the band draws it
-   * (on a tablet's Carnet, the band under the texts: BandBackdrop), right-aligned so that its 4 px are the band's own
-   * right edge; moved with the band at each scroll (theme.css, `bc-has-band`).
+   * The band reaches the right edge of its scrolling area: the area's scrollbar is laid over the content instead of
+   * taking a 4 px gutter beside it (Christian's report of 27 November 2026; lib/overlay-scrollbar.js).
    */
   $effect(() => {
-    const el = band;
-    const scroller = /** @type {HTMLElement|null} */ (el?.closest('.page-content') ?? null);
-    if (!el || !scroller) return;
-    /** The comma-separated layers of a computed background, split at the top level only. @param {string} value */
-    const layers = (value) => {
-      /** @type {string[]} */
-      const out = [];
-      let depth = 0;
-      let from = 0;
-      for (let i = 0; i < value.length; i++) {
-        if (value[i] === '(') depth++;
-        else if (value[i] === ')') depth--;
-        else if (value[i] === ',' && depth === 0) {
-          out.push(value.slice(from, i).trim());
-          from = i + 1;
-        }
-      }
-      out.push(value.slice(from).trim());
-      return out.filter((l) => l && l !== 'none');
-    };
-    const fit = () => {
-      const drawn = /** @type {HTMLElement} */ (scroller.querySelector('.bc-band-backdrop--fill') ?? el);
-      // What is seen of the band: BandBackdrop's layer clips its fill and folds up as the list scrolls.
-      const seen = /** @type {HTMLElement} */ (scroller.querySelector('.bc-band-backdrop--layer') ?? el);
-      const origin = scroller.getBoundingClientRect().top;
-      const box = drawn.getBoundingClientRect();
-      const cs = getComputedStyle(drawn);
-      const images = layers(cs.backgroundImage);
-      const sizes = layers(cs.backgroundSize);
-      const ys = layers(cs.backgroundPositionY);
-      const repeats = layers(cs.backgroundRepeat);
-      const bottom = Math.max(0, seen.getBoundingClientRect().bottom - origin);
-      const page = getComputedStyle(/** @type {HTMLElement} */ (scroller.closest('.page') ?? scroller)).backgroundColor;
-      const parts = [`linear-gradient(${page}, ${page}) 0 ${bottom}px / 100% 100% no-repeat`];
-      images.forEach((image, i) => {
-        const [w, h] = (sizes[i % sizes.length] ?? '').split(/\s+/);
-        const height = /^[\d.]+px$/.test(h ?? '') ? h : `${box.height}px`;
-        const width = /^[\d.]+px$/.test(w ?? '') ? w : `${box.width}px`;
-        const y = box.top - origin + (parseFloat(ys[i % ys.length] ?? '0') || 0);
-        parts.push(`${image} right 0 top ${y}px / ${width} ${height} ${repeats[i % repeats.length] ?? 'no-repeat'}`);
-      });
-      scroller.style.setProperty('--bc-gutter-band', parts.join(', '));
-      scroller.classList.add('bc-has-band');
-    };
-    fit();
-    const watch = new ResizeObserver(fit);
-    watch.observe(el);
-    // BandBackdrop sizes its layer after the band (in a frame of its own): follow it too.
-    const backdrop = scroller.querySelector('.bc-band-backdrop--layer');
-    if (backdrop) watch.observe(backdrop);
-    scroller.addEventListener('scroll', fit, { passive: true });
-    return () => {
-      watch.disconnect();
-      scroller.removeEventListener('scroll', fit);
-      scroller.classList.remove('bc-has-band');
-    };
+    const scroller = /** @type {HTMLElement|null} */ (band?.closest('.page-content, [data-bc-scroll]') ?? null);
+    if (scroller) return overlayScrollbar(scroller);
   });
 
   const PROFILE = BAND_PROFILE;
