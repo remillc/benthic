@@ -469,24 +469,7 @@
     "spokenNumber": "Plongée {number}",
     "screenReader": "{site}, {date}, durée {duration}, profondeur maximale {depth}",
     "screenReaderNoDepth": "{site}, {date}, durée {duration}",
-    "thumbnail": "Profil, {depth} au plus profond",
-    "pending": "{what}, en attente d'envoi",
-    "pendingSeveral": "Modifiée, en attente d'envoi",
-    "pendingFields": {
-      "notes": "Notes modifiées",
-      "suit": "Combinaison modifiée",
-      "rating": "Note modifiée",
-      "visibility": "Visibilité modifiée",
-      "wavesize": "Vagues de surface modifiées",
-      "current": "Courant modifié",
-      "surge": "Flux-reflux modifié",
-      "chill": "Froid modifié",
-      "buddies": "Compagnons modifiés",
-      "diveguide": "Guide modifié",
-      "tags": "Étiquettes modifiées",
-      "site": "Site modifié",
-      "dive": "Plongée modifiée"
-    }
+    "thumbnail": "Profil, {depth} au plus profond"
   },
   "trip": {
     "startingOn": "Voyage du {date}",
@@ -4788,7 +4771,6 @@
     "serial": "n° {serial}",
     "addComputer": "Ajouter un ordinateur",
     "kitFilled": "A rempli les champs ci-dessous ; chacun reste modifiable.",
-    "manageComputers": "Ordinateur principal et noms",
     "addSecondComputer": "+ Ajouter un deuxième ordinateur",
     "addFirstComputer": "+ Ajouter un ordinateur",
     "removeWeightNamed": "Retirer {name}",
