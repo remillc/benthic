@@ -7868,3 +7868,11 @@ Christian decided this on 27 November 2026. Work in benthic-server. Depends on t
 - « Accorder un accès »: two choices, « Benthic+ : téléphone, tablette et ordinateur » and « Benthic Desktop : ordinateur seulement » (« Les deux » is gone). End date and reason stay required: a hand-granted Benthic Desktop has an end date too.
 - « Retirer cet accès ? »: names the product; says the other rights stay (for example « L’abonnement Benthic+ par Google Play reste, et avec lui l’app sur ordinateur. »).
 - Rights log wording: « Benthic Desktop jusqu’au … », « Achat web de Benthic Desktop ».
+
+## [ ] 2026-11-27-415 Dive detail, Carte: full-screen button; 5:4 map on tablet
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- The map of the dive (Carte tab on tablet and desktop, Carte group on the phone) gets a full-screen button at its top right: a round white 44 px button with the « expand » icon (four corners), the same as on the « Nouveau site » map. It opens the map full screen; the system back or Échap closes it.
+- Tablet: the map in the Carte tab keeps a 5:4 ratio (width:height) instead of a fixed height; the rest of the tab scrolls below it.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` (and their dark and menu variants).
