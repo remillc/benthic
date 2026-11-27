@@ -179,13 +179,10 @@ class BenthicCorePlugin : Plugin() {
             call.reject("Missing dive id", "BAD_ARGUMENT")
             return@onCoreThread
         }
-        val t0 = System.currentTimeMillis()
-        val text = NativeCore.getDive(id)
-        val t1 = System.currentTimeMillis()
-        val obj = JSObject(text)
-        val t2 = System.currentTimeMillis()
-        call.resolve(obj)
-        Log.i(TAG, "perf: getDive $id: core ${t1 - t0} ms, ${text.length} chars, parse ${t2 - t1} ms, resolve ${System.currentTimeMillis() - t2} ms")
+        // The text as the core wrote it, parsed in JavaScript (core-api.js): parsing it here into a JSObject took 430 to
+        // 680 ms of the core's thread at start on a tablet, the core itself a few ms (start-up measures, 27 November 2026).
+        val result = JSObject().put("json", NativeCore.getDive(id))
+        resolveThread.execute { call.resolve(result) }
     }
 
     /** Planner settings as the core's preferences hold them (plan.cpp). */
