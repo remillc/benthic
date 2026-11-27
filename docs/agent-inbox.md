@@ -7958,3 +7958,8 @@ Christian asked for this on 27 November 2026. Work in `main`.
 - Desktop: a last row « Plongée invalide » with a switch and the same supporting text.
 
 Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-android`, `detail3-ios` and their variants, `detail-onglets-android`, `ios-detail-onglets`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
+
+## [ ] 2026-11-27-423 Dive detail, Équipement: empty undersuit field reads « Choisir… »
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- In the Équipement tab of the dive detail, the empty undersuit field shows « Choisir… » instead of « Choisir un sous-vêtement »: change `invitation.undersuit` in `app/src/i18n/fr.json` (and « Choose… » in the English file).
