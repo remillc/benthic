@@ -7885,7 +7885,7 @@ Christian asked for this on 27 November 2026. Work in `main`. Corrects task 2026
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, and the Carte part of `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`.
 
-## [ ] 2026-11-27-417 Dive detail, Carte: the Site field shows a chevron and opens « Site de la plongée »
+## [x] 2026-11-27-417 Dive detail, Carte: the Site field shows a chevron and opens « Site de la plongée »
 
 Christian asked for this on 27 November 2026. Work in `main`.
 - In the map part of the dive detail (Carte tab on tablet and desktop, Carte group on the phone), the Site field gets a right chevron, like the Site card of the Informations tab.
@@ -7893,7 +7893,7 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage` (with an orange note on the canvas), `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
 
-## [ ] 2026-11-27-418 Dive detail, Carte: a button to copy the coordinates
+## [x] 2026-11-27-418 Dive detail, Carte: a button to copy the coordinates
 
 Christian asked for this on 27 November 2026. Work in `main`.
 - In the map part of the dive detail (Carte tab on tablet and desktop, Carte group on the phone), the Coordonnées field gets a copy button at its right end: a 40 px icon button (two overlapping squares), accessible name and tooltip « Copier les coordonnées ».
@@ -7901,7 +7901,7 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
 
-## [ ] 2026-11-27-419 Tablet, dive detail, Carte tab: side margins around the map
+## [x] 2026-11-27-419 Tablet, dive detail, Carte tab: side margins around the map
 
 Christian asked for this on 27 November 2026. Work in `main`. Follows tasks 415 and 416.
 - Tablet, Carte tab: the map gets a 48 px margin on its left and right inside the Carte card, and keeps its 5:3 ratio (so it is narrower and less tall: about 675 × 405 px in the landscape mock-up). The Site and Coordonnées fields below keep the full card width.

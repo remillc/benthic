@@ -67,8 +67,6 @@
   import { formatDiveDay, formatTimeOfDay } from '../lib/format.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
   import { formatCoordinates, mapsLink, openInMapsApp } from '../lib/sites.svelte.js';
-  import { focusSite } from '../lib/site-focus.svelte.js';
-  import { goToSection } from '../lib/navigation.svelte.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
 
   /**
@@ -370,6 +368,18 @@
   /** Where the dive was recorded (see recordedPosition), read when the chooser opens. */
   let divePosition = $state(/** @type {{ latUdeg: number, lonUdeg: number }|null} */ (null));
   const currentSite = $derived(currentSiteUuid(sites, dive.site));
+
+  /** Copies the dive's coordinates as shown (task 2026-11-27-418). */
+  async function copyCoordinates() {
+    const c = dive.siteCoordinates;
+    if (!c) return;
+    try {
+      await navigator.clipboard.writeText(formatCoordinates(c.latUdeg, c.lonUdeg));
+      showSnackbar(t('desktopDetail.coordinatesCopied'));
+    } catch {
+      showSnackbar(t('desktopDetail.copyFailed'));
+    }
+  }
 
   async function openSiteChooser() {
     if (preview) return;
@@ -828,13 +838,6 @@
       .filter(Boolean)
       .join(' · '),
   );
-  /** Opens the Sites section on this dive's site. */
-  function openSite() {
-    if (!siteRow) return;
-    focusSite(siteRow.uuid);
-    goToSection('sites');
-  }
-
   /** Ctrl/⌘+E: the first editable field of the tab takes the focus (and starts its edit). */
   let root = $state(/** @type {HTMLElement|undefined} */ (undefined));
   $effect(() => {
@@ -861,7 +864,7 @@
 
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
-        <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} />
+        <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} chevron />
         {#if layout.phone}
           <!-- A grey field that opens the sheet of the trips; its cross takes the dive out of its trip (mock-up detail-onglets-android). -->
           <div class="bc-desktop-dive-fields--trip" data-field="trip">
@@ -1070,6 +1073,10 @@
     <!-- Carte (mock-ups bureau-carnet-onglet-carte, android-tablette-detail-onglet-carte-paysage, detail-onglets-android; tasks 2026-11-27-415
          and 416). Phone and tablet: one white card with its « Carte » header, the map (220 px on a phone, 5:3 on a tablet), Site and
          Coordonnées side by side with their labels above, then « Ouvrir dans Maps ». Desktop: the map 300 px high, then the fields in rows. -->
+    <!-- « Copier les coordonnées » (task 2026-11-27-418): copies them as shown, in the Settings' format; never opens the field. -->
+    {#snippet copyButton()}
+      <button type="button" class="bc-desktop-dive-fields--copy" aria-label={t('desktopDetail.copyCoordinates')} title={t('desktopDetail.copyCoordinates')} onclick={copyCoordinates}><Icon name="copy" size={20} /></button>
+    {/snippet}
     {#snippet mapLink()}
       {#if dive.siteCoordinates}
         {@const { latUdeg, lonUdeg } = dive.siteCoordinates}
@@ -1093,9 +1100,9 @@
       {:else}
         <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
       {/if}
-      <DesktopEditField name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
+      <DesktopEditField chevron name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
       {#if dive.siteCoordinates}
-        <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
+        <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} trailing={copyButton} />
       {/if}
       {@render mapLink()}
     {:else}
@@ -1109,9 +1116,9 @@
           <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
         {/if}
         <div class="bc-desktop-dive-fields--map-fields">
-          <DesktopEditField stacked tall name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
+          <DesktopEditField stacked tall chevron name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
           {#if dive.siteCoordinates}
-            <DesktopEditField stacked boxed kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
+            <DesktopEditField stacked boxed kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} trailing={copyButton} />
           {/if}
         </div>
         {@render mapLink()}
@@ -1504,6 +1511,26 @@
 
     .bc-desktop-dive-fields--map.bc-desktop-dive-fields--map-tablet {
       height: auto;
+      margin-inline: 48px;
+    }
+
+    /* 40 px round icon button at the end of Coordonnées (mock-ups of task 2026-11-27-418). */
+    .bc-desktop-dive-fields--copy {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      margin: -4px -8px -4px 0;
+      padding: 0;
+      border: 0;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--bc-text-2);
+      cursor: pointer;
+      &:hover {
+        background: var(--bc-surface-container-highest);
+      }
     }
 
     .bc-desktop-dive-fields--maps-link {
