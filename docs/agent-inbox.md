@@ -7759,3 +7759,15 @@ Christian asked for this on 26 November 2026. Work in `main`. On the desktop div
 - No « Lire la pression sur une photo » button on desktop for now.
 
 Mock-ups: `docs/mockups/bureau-carnet-onglet-gaz`, `-ccr`, `-pscr`, `bureau-detail-bouteilles-recycleur`, `bureau-detail-bouteille`, `bureau-detail-bouteille-retirer`.
+
+## [ ] 2026-11-27-411 Gaz tab: no cylinder fields under the tiles any more; tablet gets the cylinder dialogs
+
+Christian asked for this on 27 November 2026. Work in `main`. Follows tasks 401 and 410.
+
+- Cylinders are now edited only in the dialogs. In the dive detail, Gaz tab, remove the per-cylinder blocks under the tiles (heading « Oxygène · de 0 à 78 min » and its Bouteille / Mélange / Pression rows, one block per cylinder) on every device: phone (Android and iPhone), tablet and desktop. Keep what is not a cylinder field: the « Au départ / À la sortie » legend, the rebreather setpoints (« Recycleur », consigne basse et haute) and, on desktop, the consumption block (open circuit).
+- Tablet: tapping a cylinder tile opens the same dialogs as on the phone, laid out like the desktop ones (task 410): « Bouteilles du recycleur » with Oxygène and Diluant side by side, « Modifier la bouteille », and the « Retirer cette bouteille ? » confirmation. Keep the « Lire la pression sur une photo » button on the Début and Fin fields (the tablet has a camera). Each tile's accessible name starts with « Modifier… ».
+
+Mock-ups:
+- Tablet: `android-tablette-detail-onglet-gaz-paysage`, `-co-paysage`, `-pscr-paysage`, `android-tablette-detail-bouteilles-recycleur-paysage`, `android-tablette-detail-bouteille-paysage`, `android-tablette-detail-bouteille-retirer-paysage`.
+- Phone: `detail-onglets-gaz-android`, `ios-detail-onglets-gaz`, `detail3-android`, `detail3-ios` (and their variants).
+- Desktop: `bureau-carnet-onglet-gaz`, `-ccr`, `-pscr`.
