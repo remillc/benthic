@@ -45,7 +45,7 @@
       class:bc-desktop-gas-cards--editable={chevron || editable}
       data-tile={tile.key}
       aria-pressed={tile.key === selected}
-      aria-label={tile.label}
+      aria-label={editable ? t('desktopDetail.editTileLabel', { label: tile.label }) : tile.label}
       onclick={() => {
         onselect(tile.key);
         if (editable) onedit(tile.key);

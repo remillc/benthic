@@ -4802,6 +4802,7 @@
     },
     "gasCards": "Cylinders of the dive",
     "gasCardLabel": "Cylinder {n}, {gas}, {type}, {range}",
+    "editTileLabel": "Edit: {label}",
     "addCylinderUses": "deco, relay, bailout",
     "legendStart": "At the start",
     "legendEnd": "At the exit",

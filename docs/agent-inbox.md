@@ -7760,7 +7760,7 @@ Christian asked for this on 26 November 2026. Work in `main`. On the desktop div
 
 Mock-ups: `docs/mockups/bureau-carnet-onglet-gaz`, `-ccr`, `-pscr`, `bureau-detail-bouteilles-recycleur`, `bureau-detail-bouteille`, `bureau-detail-bouteille-retirer`.
 
-## [ ] 2026-11-27-411 Gaz tab: no cylinder fields under the tiles any more; tablet gets the cylinder dialogs
+## [x] 2026-11-27-411 Gaz tab: no cylinder fields under the tiles any more; tablet gets the cylinder dialogs
 
 Christian asked for this on 27 November 2026. Work in `main`. Follows tasks 401 and 410.
 
