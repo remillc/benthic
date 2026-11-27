@@ -7892,3 +7892,11 @@ Christian asked for this on 27 November 2026. Work in `main`.
 - Tapping or clicking it opens « Site de la plongée » (task 2026-11-27-412): search, « Nouveau site », the logbook's sites, the shared map's sites (Benthic+), « Plongée sans site ». Same behaviour as from the Informations tab.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage` (with an orange note on the canvas), `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
+
+## [ ] 2026-11-27-418 Dive detail, Carte: a button to copy the coordinates
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- In the map part of the dive detail (Carte tab on tablet and desktop, Carte group on the phone), the Coordonnées field gets a copy button at its right end: a 40 px icon button (two overlapping squares), accessible name and tooltip « Copier les coordonnées ».
+- It copies the coordinates as shown (in the format chosen in Settings) to the clipboard and confirms with a short snackbar « Coordonnées copiées ». It does not open the field for editing.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
