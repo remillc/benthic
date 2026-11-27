@@ -4618,6 +4618,9 @@
   },
   "desktopDetail": {
     "openInMaps": "Open in Maps",
+    "copyCoordinates": "Copy the coordinates",
+    "coordinatesCopied": "Coordinates copied",
+    "copyFailed": "Coordinates not copied.",
     "diveType": {
       "title": "Dive type",
       "long": { "OC": "Open circuit", "CCR": "CCR rebreather", "PSCR": "pSCR rebreather", "Freedive": "Freediving" },
@@ -4782,7 +4785,6 @@
     "weightType": "Type",
     "weightRowsNote": "A chosen type starts from the previous dive’s weight, otherwise from its weight in Settings › Weight types.",
     "weightSuggestionClose": "Close the suggestion",
-    "openSite": "Open the site",
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
     "kitFilled": "Filled the fields below; each can still be changed.",

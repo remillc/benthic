@@ -57,7 +57,38 @@ test('phone and tablet: the Carte tab is one card with its header, Site and Coor
   assert.equal(fr.desktopDetail.card.map, 'Carte');
   assert.equal(fr.desktopDetail.openInMaps, 'Ouvrir dans Maps');
   assert.match(fields, /<DesktopEquipmentCard name="map" title=\{t\('desktopDetail\.card\.map'\)\}>\s*\{#snippet icon\(\)\}<Icon name="map"/);
-  assert.match(fields, /<div class="bc-desktop-dive-fields--map-fields">\s*<DesktopEditField stacked tall name="site"[\s\S]*?<DesktopEditField stacked boxed kind="text" readonly label=\{t\('desktopDetail\.label\.coordinates'\)\}/);
+  assert.match(fields, /<div class="bc-desktop-dive-fields--map-fields">\s*<DesktopEditField stacked tall chevron name="site"[\s\S]*?<DesktopEditField stacked boxed kind="text" readonly label=\{t\('desktopDetail\.label\.coordinates'\)\}/);
   assert.match(fields, /\.bc-desktop-dive-fields--map-fields \{[^}]*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\);[^}]*gap: 12px;/);
   assert.match(fields, /\.bc-desktop-dive-fields--map\.bc-desktop-dive-fields--map-card \{[^}]*border-radius: 16px;/);
+});
+
+test('Carte: the Site field has a right chevron and opens « Site de la plongée », in both layouts (task 2026-11-27-417)', () => {
+  const site = fields.match(/<DesktopEditField [^>]*name="site" kind="site"[^>]*\/>/g) ?? [];
+  const inMap = site.filter((s) => / chevron /.test(s) && !/ card /.test(s));
+  assert.equal(inMap.length, 2, 'the desktop row and the phone and tablet card');
+  for (const s of inMap) assert.match(s, /onpick=\{openSiteChooser\}/);
+  const edit = read('app/src/components/DesktopEditField.svelte');
+  assert.match(edit, /\{:else if chevron\}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="chevron" size=\{22\} \/><\/span>/);
+});
+
+test('Carte: « Copier les coordonnées » copies them as shown and confirms, without opening the field (task 2026-11-27-418)', () => {
+  const fr = JSON.parse(read('app/src/i18n/fr.json'));
+  assert.equal(fr.desktopDetail.copyCoordinates, 'Copier les coordonnées');
+  assert.equal(fr.desktopDetail.coordinatesCopied, 'Coordonnées copiées');
+  assert.match(fields, /<button type="button" class="bc-desktop-dive-fields--copy" aria-label=\{t\('desktopDetail\.copyCoordinates'\)\} title=\{t\('desktopDetail\.copyCoordinates'\)\} onclick=\{copyCoordinates\}><Icon name="copy" size=\{20\} \/><\/button>/);
+  assert.equal(fields.match(/trailing=\{copyButton\}/g)?.length, 2, 'desktop row and card');
+  assert.match(fields, /navigator\.clipboard\.writeText\(formatCoordinates\(c\.latUdeg, c\.lonUdeg\)\);\s*showSnackbar\(t\('desktopDetail\.coordinatesCopied'\)\)/);
+  assert.match(fields, /\.bc-desktop-dive-fields--copy \{[^}]*width: 40px;\s*height: 40px;/);
+  // Read-only: the value never becomes an editor.
+  assert.match(fields, /<DesktopEditField stacked boxed kind="text" readonly /);
+});
+
+test('Carte on a tablet: 48 px each side of the map, which keeps 5:3 (task 2026-11-27-419)', () => {
+  assert.match(fields, /\.bc-desktop-dive-fields--map\.bc-desktop-dive-fields--map-tablet \{\s*height: auto;\s*margin-inline: 48px;/);
+  assert.match(fields, /ratio=\{tabletMap \? 5 \/ 3 : 0\}/);
+});
+
+test('Informations: the Site card\'s chevron opens « Site de la plongée », as in the Carte tab (Christian, 27 November 2026)', () => {
+  assert.match(fields, /<DesktopEditField card noLead name="site" kind="site"[^>]*onpick=\{openSiteChooser\}[^>]* chevron \/>/);
+  assert.doesNotMatch(fields, /openLabel=\{t\('desktopDetail\.openSite'\)\}/);
 });

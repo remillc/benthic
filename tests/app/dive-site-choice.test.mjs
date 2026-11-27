@@ -118,7 +118,7 @@ test('country and region suggest values on the phone form and keep any typed val
 test('the dive detail\'s Site card opens the chooser and links the dive through the save path of the other fields', () => {
   const fields = read('components/DesktopDiveFields.svelte');
   assert.match(fields, /<DesktopEditField card noLead name="site"[^>]*onpick=\{openSiteChooser\}/);
-  assert.match(fields, /<DesktopEditField name="site"[^>]*onpick=\{openSiteChooser\}/);
+  assert.match(fields, /<DesktopEditField chevron name="site"[^>]*onpick=\{openSiteChooser\}/);
   assert.match(fields, /write\(\{ site: uuid \}\)/);
   assert.match(fields, /<DiveSiteChooser /);
   assert.match(fields, /onnone=\{\(\) => linkSite\(0\)\}/);

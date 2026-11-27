@@ -42,6 +42,8 @@
    *   name?: string,
    *   stacked?: boolean,
    *   boxed?: boolean,
+   *   chevron?: boolean,
+   *   trailing?: import('svelte').Snippet,
    *   note?: string,
    *   disabled?: boolean,
    *   card?: boolean,
@@ -59,7 +61,7 @@
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, boxed = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, boxed = false, chevron = false, trailing, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -291,7 +293,7 @@
   <span class="bc-desktop-edit-field--label" class:bc-sr-only={card} id="bc-df-{uid}">{label}</span>
 
   {#if readonly}
-    <span class="bc-desktop-edit-field--value bc-value" class:bc-desktop-edit-field--boxed={boxed} aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>
+    <span class="bc-desktop-edit-field--value bc-value" class:bc-desktop-edit-field--boxed={boxed} aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}<span class="bc-desktop-edit-field--value-text">{shownText || (Array.isArray(value) ? value.join(', ') : '')}</span>{#if trailing}{@render trailing()}{/if}</span>
   {:else if disabled}
     <!-- Not wired to any storage yet: grey and dimmed, nothing to edit. -->
     <div class="bc-desktop-edit-field--rest bc-desktop-edit-field--disabled" role="group" aria-disabled="true" aria-label="{label}, {restText}" title={invitation}>
@@ -337,7 +339,7 @@
         {/if}
       </span>
       {#if note && !card && kind !== 'stars'}<span class="bc-desktop-edit-field--note">{note}</span>{/if}
-      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else if tall}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="expand" size={24} /></span>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
+      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else if chevron}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="chevron" size={22} /></span>{:else if tall}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="expand" size={24} /></span>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
     </div>
   {:else}
     <div class="bc-desktop-edit-field--edit-wrap">
@@ -496,9 +498,13 @@
       background: var(--bc-field-rest);
       color: var(--bc-text);
       font-size: 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      & .bc-desktop-edit-field--value-text {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     .bc-desktop-edit-field--tall {
