@@ -44,18 +44,20 @@
     <button type="button" class="bc-dive-signatures--sign" data-field="sign" onclick={onsign}><Icon name="plus" size={18} />{t('validation.add')}</button>
   {/snippet}
   {#each items as v (v.id)}
+    <!-- The row sits on the card's white (mock-ups android-tablette-detail-onglets-paysage, detail-onglets-android): the
+         signature first, 96 × 48 px in its white frame, then the name and the role, how it was signed, and the ×. -->
     <div class="bc-dive-signatures--item" class:bc-dive-signatures--pending={v.pending} data-field="signature">
+      {#if v.signature}<img class="bc-dive-signatures--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />{/if}
       <div class="bc-dive-signatures--text">
         {#if v.pending}
           <span class="bc-dive-signatures--name">{t('validation.pending')}</span>
           <span class="bc-dive-signatures--detail">{t('validation.pendingText')}</span>
         {:else}
-          <span class="bc-dive-signatures--name">{t('validation.itemName', { name: v.name, role: (tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase() })}</span>
+          <span class="bc-dive-signatures--name">{v.name} <span class="bc-dive-signatures--role">· {(tIfExists(`validation.roles.${v.role}`) ?? v.role).toLocaleLowerCase()}</span></span>
           <span class="bc-dive-signatures--detail">{[t(`validation.method.${v.method}`), formatDate(v.at), v.instructorNumber].filter(Boolean).join(' · ')}</span>
           {#if v.modified}<span class="bc-dive-signatures--modified">{t('validation.modified')}</span>{/if}
         {/if}
       </div>
-      {#if v.signature}<img class="bc-dive-signatures--signature" src={v.signature} alt={t('validation.signatureOf', { name: v.name })} />{/if}
       <button type="button" class="bc-dive-signatures--remove" onclick={() => confirmRemove(v)}>
         <Icon name="close" size={20} /><span class="bc-sr-only">{t('validation.remove')}</span>
       </button>
@@ -91,9 +93,6 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 8px 8px 8px 12px;
-      border-radius: 12px;
-      background: var(--bc-field-rest);
     }
 
     .bc-dive-signatures--text {
@@ -107,7 +106,13 @@
     .bc-dive-signatures--name {
       font-size: 15px;
       line-height: 20px;
+      font-weight: 500;
       color: var(--bc-text);
+    }
+
+    .bc-dive-signatures--role {
+      font-weight: 400;
+      color: var(--bc-text-2);
     }
 
     .bc-dive-signatures--detail {
@@ -125,9 +130,11 @@
     /* The signature is drawn black on white, in every mode: it keeps its paper. */
     .bc-dive-signatures--signature {
       flex: none;
-      width: 72px;
-      height: 29px;
-      border-radius: 6px;
+      box-sizing: border-box;
+      width: 96px;
+      height: 48px;
+      padding: 4px 6px;
+      border-radius: 8px;
       object-fit: contain;
       background: var(--bc-qr-paper);
       border: 1px solid var(--bc-separator);
@@ -135,11 +142,11 @@
 
     .bc-dive-signatures--remove {
       flex: none;
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       padding: 0;
       border: none;
-      border-radius: 20px;
+      border-radius: 24px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
