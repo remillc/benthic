@@ -7797,3 +7797,12 @@ Mock-ups:
 - Desktop: `bureau-detail-choisir-site`, `bureau-site-nouveau-plongee`.
 
 Also in this push, mock-ups only (already in the app or no app change needed): the tablet screens without the floating dive toolbar (⋮ menu at the top of the detail, current detail with tabs).
+
+## [ ] 2026-11-27-413 Dive detail: « Photos et vidéos » only in the Notes tab
+
+Christian asked for this on 27 November 2026. Work in `main`. On /dives/:id, the « Photos et vidéos » section (Benthic+, `DiveMediaSection`) moves into the Notes tab:
+- Tablet and desktop: shown only when the Notes tab is selected, after the notes (tablet: its own card after the Notes card; desktop: a « Photos et vidéos » row after Étiquettes). No longer under the other tabs.
+- Phone (one long page): at the end of the Notes group, before the Carte group, instead of at the very end of the page.
+Same rules as before otherwise (Benthic+ only, not in the free version, the demo logbook or the preview).
+
+Mock-ups: `android-tablette-detail-onglet-notes-paysage`, `bureau-carnet-onglet-notes`, `detail3-ios`, `detail3-ios-sombre`, `detail3-android`.
