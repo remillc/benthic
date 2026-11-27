@@ -52,3 +52,13 @@ test('while the logbook loads, the band keeps the place of its line: the last st
   assert.equal(band.match(/<span class:bc-section-band--placeholder=\{placeholder\}>\{summary\}<\/span>/g)?.length, 2);
   assert.match(band, /\.bc-section-band--placeholder \{\s*color: transparent;/);
 });
+
+test('an edit\'s and an undo\'s dive carry their water type, as getDive: the « Eau » fact stays after an edit', async () => {
+  const { withWaterType } = await import('../../plugins/benthic-core/core-api.js');
+  assert.equal(withWaterType({ dive: { id: 1, salinity: 10300 } }).dive.waterType, 'salt');
+  assert.equal(withWaterType({ dive: { id: 1, salinity: 10000 } }).dive.waterType, 'fresh');
+  assert.deepEqual(withWaterType({ list: true }), { list: true });
+  const api = read('plugins/benthic-core/core-api.js');
+  assert.match(api, /async editDive\(options\) \{\s*return withWaterType\(JSON\.parse\(\(await native\.editDive\(options\)\)\.json\)\);/);
+  assert.match(api, /async undo\(options = \{\}\) \{\s*return withWaterType\(JSON\.parse\(\(await native\.undo\(options\)\)\.json\)\);/);
+});
