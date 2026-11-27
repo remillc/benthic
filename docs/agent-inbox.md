@@ -7848,3 +7848,23 @@ Privacy: the section shows the address and the rights only, never anything from 
 Every action (grant, remove, re-check) is a POST with the console's CSRF token and is written to the account's rights log with the admin's name.
 
 Tests: search (exact, prefix, none, error), grant with end date and reason required (refused without either), the right stays active through the end date and stops the day after, removal of a hand-granted access only (a store right cannot be removed), the rights log entries, CSRF refused without a token, every page and action refused without the console's sign-in.
+
+## [ ] 2026-11-27-416 Correction to task 414: two products, Benthic+ and Benthic Desktop
+
+Christian decided this on 27 November 2026. Work in `main` and in benthic-server. It replaces the business rules of task 414; the rest of 414 (grace period, read-only mode, tests) stays.
+
+- **Benthic+** is an annual subscription, bought in the app stores (Google Play now, App Store later). It opens the app on phone, tablet and desktop.
+- **Benthic Desktop** is a one-time purchase on the web (Paddle or Lemon Squeezy, not chosen yet). It opens the app on desktop only, with no end date. The buyer signs in with a Benthic account that holds this purchase.
+- There is no other way in: buying the phone or tablet app means buying Benthic+, so « a phone or tablet purchase gives desktop access » is gone as a separate source.
+- The desktop app opens when the account has an active Benthic+ or Benthic Desktop. The server returns the two rights separately (`benthicPlus` with its end date, `benthicDesktop` with its purchase date), and the desktop access is computed from them.
+- Texts in the desktop app: « Benthic sur ordinateur demande Benthic+ ou Benthic Desktop »; the buy button reads « Acheter Benthic Desktop ». In read-only mode, the grey banner names what ended (« Votre abonnement Benthic+ a pris fin le … »); a Benthic Desktop purchase never ends, so it never leads to read-only mode (only the offline grace period can).
+- Tests: Benthic+ only, Benthic Desktop only, both, neither, Benthic+ ended with Benthic Desktop still bought.
+
+## [ ] 2026-11-27-417 Correction to task 415: the « Comptes » section shows Benthic+ and Benthic Desktop
+
+Christian decided this on 27 November 2026. Work in benthic-server. Depends on task 416. Replace « Accès bureau » with the two products everywhere in the section (mock-ups updated in `docs/mockups/admin/admin-comptes-*`):
+- Search results: columns Benthic+ (« jusqu’au … », « terminé le … », « jamais eu ») and Benthic Desktop (« acheté le … », « jamais acheté », or « accordé jusqu’au … »).
+- Account page: block **Benthic+** (« Abonnement annuel. Ouvre l’app sur téléphone, tablette et ordinateur. »), sources Google Play, App Store, accordé à la main, each with its end date. Block **Benthic Desktop** (« Achat unique sur le web. Ouvre l’app sur ordinateur seulement. »), sources achat web (no end date, show the purchase date) or accordé à la main (with its end date). The source « achat de l’app mobile » is gone.
+- « Accorder un accès »: two choices, « Benthic+ : téléphone, tablette et ordinateur » and « Benthic Desktop : ordinateur seulement » (« Les deux » is gone). End date and reason stay required: a hand-granted Benthic Desktop has an end date too.
+- « Retirer cet accès ? »: names the product; says the other rights stay (for example « L’abonnement Benthic+ par Google Play reste, et avec lui l’app sur ordinateur. »).
+- Rights log wording: « Benthic Desktop jusqu’au … », « Achat web de Benthic Desktop ».
