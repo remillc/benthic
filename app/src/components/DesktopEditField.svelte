@@ -70,6 +70,8 @@
   let draft = $state('');
   /** The text typed in the chips or site input. */
   let typed = $state('');
+  /** A site-kind field filters its list only once the text was changed: opened, it lists every known value (Christian, 27 November 2026). */
+  let siteTyped = $state(false);
   let hovered = $state(false);
   let highlighted = $state(-1);
   /** @type {HTMLElement|undefined} */
@@ -85,7 +87,7 @@
   const invalid = $derived((kind === 'text' || kind === 'multiline') && editing && !valid(text));
   const suggestions = $derived(
     kind === 'list' || kind === 'site'
-      ? listSuggestions(knownOnce, Array.isArray(draft) ? draft : [], typed || (kind === 'site' && typeof draft === 'string' && editing ? draft : ''))
+      ? listSuggestions(knownOnce, Array.isArray(draft) ? draft : [], typed || (kind === 'site' && typeof draft === 'string' && editing && siteTyped ? draft : ''))
       : { matches: [], addNew: null },
   );
   /** The rows of the list under the field: the known values, then « Ajouter … ». */
@@ -163,6 +165,7 @@
     }
     draft = Array.isArray(value) ? [...value] : value;
     typed = '';
+    siteTyped = false;
     highlighted = -1;
     editing = true;
     tick().then(() => {
@@ -351,7 +354,7 @@
           {/each}
           <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={typed} oninput={() => (highlighted = -1)} />
         {:else if kind === 'site'}
-          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={draft} oninput={() => (highlighted = -1)} />
+          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={draft} oninput={() => ((highlighted = -1), (siteTyped = true))} />
         {:else if kind === 'choice'}
           <select class="bc-desktop-edit-field--input" aria-labelledby="bc-df-{uid}" value={draft} onchange={(e) => chooseOption(/** @type {HTMLSelectElement} */ (e.currentTarget).value)}>
             <option value="">{invitation}</option>

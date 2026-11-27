@@ -25,3 +25,11 @@ test('« Ordinateurs de cette plongée » has a close button next to its title (
   const sheet = read('app/src/components/ComputersSheet.svelte');
   assert.match(sheet, /<h2 class="bc-computers-sheet--title">\{t\('detail\.computersTitle'\)\}<\/h2>\s*<button type="button" class="bc-computers-sheet--close" onclick=\{onclose\}><Icon name="close" \/><span class="bc-sr-only">\{t\('nav\.close'\)\}<\/span><\/button>/);
 });
+
+test('Combinaison lists every suit when it opens and filters only once the text changes; Sous-vêtement opens its menu on the first tap (Christian, 27 November 2026)', () => {
+  const field = read('app/src/components/DesktopEditField.svelte');
+  assert.match(field, /typed \|\| \(kind === 'site' && typeof draft === 'string' && editing && siteTyped \? draft : ''\)/);
+  assert.match(field, /draft = Array\.isArray\(value\) \? \[\.\.\.value\] : value;\s*typed = '';\s*siteTyped = false;/);
+  assert.match(field, /oninput=\{\(\) => \(\(highlighted = -1\), \(siteTyped = true\)\)\}/);
+  assert.match(read('app/src/components/DesktopDiveFields.svelte'), /name="undersuit" kind="choice" openChoiceOnClick /);
+});
