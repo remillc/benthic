@@ -507,7 +507,7 @@
         gap: 6px;
       }
       svg path {
-        fill: var(--bc-pin);
+        fill: var(--bc-secondary);
       }
     }
     .bc-site-edit--legend-dot {
