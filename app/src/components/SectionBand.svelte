@@ -41,6 +41,9 @@
     fit();
     const watch = new ResizeObserver(fit);
     watch.observe(el);
+    // BandBackdrop sizes its layer after the band (in a frame of its own): follow it too.
+    const backdrop = scroller.querySelector('.bc-band-backdrop--layer');
+    if (backdrop) watch.observe(backdrop);
     scroller.addEventListener('scroll', fit, { passive: true });
     return () => {
       watch.disconnect();
