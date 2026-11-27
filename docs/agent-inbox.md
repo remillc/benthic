@@ -7907,3 +7907,26 @@ Christian asked for this on 27 November 2026. Work in `main`. Follows tasks 415 
 - Tablet, Carte tab: the map gets a 48 px margin on its left and right inside the Carte card, and keeps its 5:3 ratio (so it is narrower and less tall: about 675 × 405 px in the landscape mock-up). The Site and Coordonnées fields below keep the full card width.
 
 Mock-up: `android-tablette-detail-onglet-carte-paysage`.
+
+## [ ] 2026-11-27-420 « Nouveau site » map, Visibilité and Courant moved to a setting, signatures, tags
+
+Christian asked for this on 27 November 2026. Work in `main`.
+
+**« Nouveau site » (from a dive and from Sites), every device**
+- The instruction over the map (« Touchez la carte pour placer la croix… », « Cliquez sur la carte… ») is removed.
+- No supporting text under the fields: remove « Position de la plongée, relevée par l’ordinateur », « Rempli d’après la position » (Pays, Région) and the paragraph about Pays and Région being updated. The behaviour itself does not change.
+- Tablet: the map takes the full width of the content, like the fields below it, with the same rounded corners on all four sides; it is 320 px high in landscape instead of 400. The search box over the map is narrower: about 420 px instead of the whole width.
+
+**Visibilité and Courant become optional conditions**
+- Dive detail, Informations tab: the « Appréciation » card keeps only « Note ». Visibilité moves out of it (phone, tablet), and the Visibilité row is removed from the Informations tab on desktop.
+- Settings › Carnet: the switch « Vagues de surface, flux-reflux et froid » becomes **« Visibilité, courant, vagues de surface, flux-reflux et froid »**, supporting text « Ajoute ces cinq conditions à l’onglet Informations ». Still off by default (`extraEnvironmentalDefault`). When on, the five conditions show as five-star rows in the Informations tab.
+- As today, a condition already filled in (for example by Subsurface desktop) still shows in the detail whatever the switch.
+- Update `docs/ui-specification.md` (Conditions, and the Settings table) and `fr.json` to match.
+
+**Signatures (phone, tablet)**
+- Each signature is a card with a 1 px border and 12 px corners. On top, the signature image takes the full width of the card in a 128 px high area, with a thin line; the « Retirer la signature de … » button (✕, 48 px target) sits in the image's top-right corner. Below a divider: the name and role (« Taylor · guide de palanquée »), then « Signée au doigt · date ».
+
+**Étiquettes (phone, tablet)**
+- Tags in the detail look like the people chips in « Personnes »: grey filled (`#ECEAE4`, dark `#2A2B2E`), no border, 40 px high, fully rounded corners, 15 px text, and a ✕ button at the end (32 px, accessible name « Retirer l’étiquette … ») that removes the tag. « + Ajouter » keeps its dashed outline.
+
+Mock-ups: `android-tablette-site-nouveau-plongee-paysage`, `nouveau-site-plongee-android`, `ios-nouveau-site-plongee`, `bureau-site-nouveau-plongee`, `bureau-sites-nouveau`; `detail3-android`, `detail3-ios`, `detail-onglets-android`, `ios-detail-onglets`, `android-tablette-detail-onglets-paysage` and their variants (dark, menu, portrait); `bureau-carnet-edition-sur-place`; `android-tablette-reglages-paysage`, `android-reglages`, `reglages-carnet-android`, `bureau-reglages-carnet`.
