@@ -62,3 +62,12 @@ test('an edit\'s and an undo\'s dive carry their water type, as getDive: the « 
   assert.match(api, /async editDive\(options\) \{\s*return withWaterType\(JSON\.parse\(\(await native\.editDive\(options\)\)\.json\)\);/);
   assert.match(api, /async undo\(options = \{\}\) \{\s*return withWaterType\(JSON\.parse\(\(await native\.undo\(options\)\)\.json\)\);/);
 });
+
+test('a signature row sits on the card\'s white: the signature first, 96 × 48 px, then the name · role, and a 48 px × (mock-ups)', () => {
+  const sig = read('app/src/components/DiveSignatures.svelte');
+  assert.match(sig, /data-field="signature">\s*\{#if v\.signature\}<img class="bc-dive-signatures--signature"[^>]*\/>\{\/if\}\s*<div class="bc-dive-signatures--text">/);
+  assert.match(sig, /\.bc-dive-signatures--item \{[^}]*gap: 12px;\s*\}/);
+  assert.doesNotMatch(sig, /\.bc-dive-signatures--item \{[^}]*background/);
+  assert.match(sig, /\.bc-dive-signatures--signature \{[^}]*width: 96px;\s*height: 48px;/);
+  assert.match(sig, /<span class="bc-dive-signatures--role">· /);
+});
