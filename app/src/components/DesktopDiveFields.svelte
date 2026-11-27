@@ -962,19 +962,17 @@
         {#snippet icon()}<Icon name="diveComputer" size={22} />{/snippet}
         {#snippet noComputerPhoto()}{/snippet}
         {#each dive.diveComputers ?? [] as dc, i (i)}
-          <div class="bc-desktop-dive-fields--computer" data-field="computer">
+          <!-- A tap opens « Ordinateurs de cette plongée »: the main computer and the names (Christian, 27 November 2026). -->
+          <button type="button" class="bc-desktop-dive-fields--computer" data-field="computer" aria-haspopup="dialog" disabled={preview} onclick={() => (computersSheet = true)}>
             <span class="bc-desktop-dive-fields--computer-tile" aria-hidden="true">{#if dc.model}<DcTile model={dc.model} size={48} radius={10} photo={ownComputerPhoto(dc.model, dc.serial)} fallback={dive.diveComputers?.length === 1 ? noComputerPhoto : undefined} />{/if}</span>
             <span class="bc-desktop-dive-fields--computer-text">
               <span class="bc-desktop-dive-fields--computer-name">{dc.nickname || dc.model}</span>
               <span class="bc-desktop-dive-fields--computer-role">{[computerRole(i), dc.serial ? t('desktopDetail.serial', { serial: dc.serial }) : ''].filter(Boolean).join(' · ')}</span>
             </span>
-          </div>
+            <span class="bc-desktop-dive-fields--computer-chevron" aria-hidden="true"><Icon name="chevron" size={22} /></span>
+          </button>
         {/each}
         <!-- Computers join a dive when it is downloaded: nothing to type here. -->
-        {#if computers.length}
-          <!-- The main computer of a dive that has several, and the computers' names (the sheet of the phone's detail). -->
-          <button type="button" class="bc-desktop-dive-fields--text-button bc-desktop-dive-fields--add-computer" data-field="computer-manage" disabled={preview} onclick={() => (computersSheet = true)}>{t('desktopDetail.manageComputers')}</button>
-        {/if}
         <button type="button" class="bc-desktop-dive-fields--text-button bc-desktop-dive-fields--add-computer" data-field="computer-add" disabled title={t('desktopDetail.addComputer')}>{t(computers.length ? 'desktopDetail.addSecondComputer' : 'desktopDetail.addFirstComputer')}</button>
       </DesktopEquipmentCard>
 
@@ -1320,13 +1318,29 @@
     /* A dive computer: 64 px grey row, its photo on a 48 px white tile, its name and its role. */
     .bc-desktop-dive-fields--computer {
       box-sizing: border-box;
+      width: 100%;
       height: 64px;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 0 8px;
+      border: 0;
       border-radius: 12px;
       background: var(--bc-field-rest);
+      color: inherit;
+      font: inherit;
+      text-align: start;
+      cursor: pointer;
+      &:disabled {
+        cursor: default;
+      }
+    }
+
+    .bc-desktop-dive-fields--computer-chevron {
+      flex: none;
+      display: grid;
+      margin-inline-start: auto;
+      color: var(--bc-text-2);
     }
 
     .bc-desktop-dive-fields--computer-tile {

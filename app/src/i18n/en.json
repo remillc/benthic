@@ -469,24 +469,7 @@
     "spokenNumber": "Dive {number}",
     "screenReader": "{site}, {date}, duration {duration}, max. depth {depth}",
     "screenReaderNoDepth": "{site}, {date}, duration {duration}",
-    "thumbnail": "Profile, {depth} max. depth",
-    "pending": "{what}, waiting to be sent",
-    "pendingSeveral": "Edited, waiting to be sent",
-    "pendingFields": {
-      "notes": "Notes edited",
-      "suit": "Suit edited",
-      "rating": "Rating edited",
-      "visibility": "Visibility edited",
-      "wavesize": "Surface waves edited",
-      "current": "Current edited",
-      "surge": "Surge edited",
-      "chill": "Chill edited",
-      "buddies": "Buddies edited",
-      "diveguide": "Dive guide edited",
-      "tags": "Tags edited",
-      "site": "Site edited",
-      "dive": "Dive edited"
-    }
+    "thumbnail": "Profile, {depth} max. depth"
   },
   "trip": {
     "startingOn": "Trip starting {date}",
@@ -4788,7 +4771,6 @@
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
     "kitFilled": "Filled the fields below; each can still be changed.",
-    "manageComputers": "Main computer and names",
     "addSecondComputer": "+ Add a second computer",
     "addFirstComputer": "+ Add a computer",
     "removeWeightNamed": "Remove {name}",

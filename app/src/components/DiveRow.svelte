@@ -23,7 +23,6 @@
    *   inTrip?: boolean,
    *   index?: number,
    *   top?: number,
-   *   pending?: string[],
    *   selecting?: boolean,
    *   checked?: boolean,
    *   appear?: boolean,
@@ -34,7 +33,6 @@
    *   cardLast?: boolean,
    *   gapBefore?: boolean,
    * }}
-   * `pending`: fields edited and not sent yet; the date gives way to them.
    * `selecting`: the logbook's selection mode, a check box before the row;
    * the logbook handles the taps (data-dive gives the dive).
    * `appear`: the row of a trip just expanded slides into place (accordion).
@@ -42,16 +40,7 @@
    * `card`: the phone logbook's row (task 2026-11-18-278): date block, site, number and time, then the profile
    * and the values; `cardFirst`, `cardLast`: the ends of its white card, `gapBefore`: another card ends above it.
    */
-  let { dive, prefs, inTrip = false, index = undefined, top = undefined, pending = [], selecting = false, checked = false, appear = false, tripFirst = false, tripLast = false, card = false, cardFirst = false, cardLast = false, gapBefore = false } = $props();
-
-  // "Notes edited, waiting to be sent" (spec, section 4, <DiveRow>).
-  const pendingText = $derived(
-    pending.length === 0
-      ? ''
-      : pending.length === 1
-        ? t('dive.pending', { what: t(`dive.pendingFields.${pending[0]}`) })
-        : t('dive.pendingSeveral'),
-  );
+  let { dive, prefs, inTrip = false, index = undefined, top = undefined, selecting = false, checked = false, appear = false, tripFirst = false, tripLast = false, card = false, cardFirst = false, cardLast = false, gapBefore = false } = $props();
 
   // Dive number as in the detail ("N° 1234"); 0 means not numbered.
   const number = $derived(dive.number ? t('detail.number', { number: String(dive.number) }) : '');
@@ -68,7 +57,7 @@
   );
   // A dive a buddy or an instructor validated carries a small mark (task 2026-11-19-309, point 2).
   const validated = $derived(isValidated(dive));
-  const label = $derived(card ? [diveRowLabel(dive, prefs), validated ? t('validation.mark') : '', pendingText].filter(Boolean).join(', ') : [number, details, validated ? t('validation.mark') : '', pendingText].filter(Boolean).join(', '));
+  const label = $derived(card ? [diveRowLabel(dive, prefs), validated ? t('validation.mark') : ''].filter(Boolean).join(', ') : [number, details, validated ? t('validation.mark') : ''].filter(Boolean).join(', '));
 </script>
 
 {#if card}
@@ -108,7 +97,6 @@
           <span class="bc-dive-row--site bc-dive-row--site-not-set"><span class="bc-dive-row--pin"><Icon name="pinOff" size={14} weight={2} /></span><span class="bc-dive-row--site-text">{t('dive.siteNotSet')}</span></span>
         {/if}
         <span class="bc-dive-row--meta">{#if number}<strong class="bc-dive-row--number">{number}</strong>{/if}<span class="bc-dive-row--time">{formatTimeOfDay(dive.date)}</span>{#if validated}<span class="bc-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</span>
-        {#if pendingText}<span class="bc-dive-row--meta bc-dive-row--pending">{pendingText}</span>{/if}
       </span>
       <span class="bc-dive-row--right" aria-hidden="true">
         {#if theme.ios}
@@ -149,7 +137,6 @@
           {#if dive.site}{dive.site}{:else}<span class="bc-dive-row--not-set">{t('dive.siteNotSet')}</span>{/if}
         </div>
         <div class="item-text">{#if number}{number}<span class="bc-dive-row--separator" aria-hidden="true">·</span>{/if}{formatDateTime(dive.date)}{#if validated}<span class="bc-dive-row--validated"><Icon name="checkCircle" size={14} weight={2} /></span>{/if}</div>
-        {#if pendingText}<div class="item-text bc-dive-row--pending">{pendingText}</div>{/if}
       </div>
       <div class="bc-dive-row--values bc-value">
         {#if theme.ios}
@@ -360,10 +347,6 @@
       color: var(--bc-text-2);
     }
 
-    .bc-dive-row--card .bc-dive-row--pending {
-      color: var(--bc-tertiary);
-    }
-
     /* The right column gives way before the site does: at a large text size it wraps its two figures. */
     .bc-dive-row--right {
       flex: 0 1 auto;
@@ -493,10 +476,6 @@
 
     .bc-dive-row--separator {
       margin: 0 0.4em;
-    }
-
-    .item-text.bc-dive-row--pending {
-      color: var(--bc-tertiary);
     }
 
     .bc-dive-row--not-set {

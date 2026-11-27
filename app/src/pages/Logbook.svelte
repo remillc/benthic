@@ -1727,7 +1727,6 @@
               inTrip={row.kind === 'inTrip'}
               index={row.index}
               top={visible.topPosition}
-              pending={row.dive.number ? (logbook.pendingByDive[row.dive.number] ?? []) : []}
               {selecting}
               checked={!!checked[row.dive.id]}
               appear={row.kind === 'inTrip' && row.dive.trip?.id === appearing}

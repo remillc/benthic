@@ -55,7 +55,10 @@
         <button type="button" class="bc-computers-sheet--ok" onclick={onclose}>{t('dialog.ok')}</button>
       </div>
     {:else}
-      <h2 class="bc-computers-sheet--title">{t('detail.computersTitle')}</h2>
+      <div class="bc-computers-sheet--header">
+        <h2 class="bc-computers-sheet--title">{t('detail.computersTitle')}</h2>
+        <button type="button" class="bc-computers-sheet--close" onclick={onclose}><Icon name="close" /><span class="bc-sr-only">{t('nav.close')}</span></button>
+      </div>
     {/if}
     <p class="bc-computers-sheet--subtitle">{[title, date ? formatDate(date) : ''].filter(Boolean).join(' · ')}</p>
 
@@ -123,6 +126,28 @@
     .bc-computers-sheet--content {
       padding: 20px 16px calc(16px + var(--bc-safe-bottom));
       overflow-y: auto;
+    }
+
+    /* The title and its close button (Christian, 27 November 2026). */
+    .bc-computers-sheet--header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bc-computers-sheet--close {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      margin-inline-start: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 24px;
+      background: transparent;
+      color: var(--bc-text);
+      cursor: pointer;
     }
 
     .bc-computers-sheet--title {
