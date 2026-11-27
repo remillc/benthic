@@ -168,6 +168,14 @@ export async function goToSection(section) {
 }
 
 /**
+ * A page opened over a section from another section's view (a tablet: « Versions de cette plongée » from a dive beside
+ * the list opens Sauvegarde et restauration in the Account view): its url and the section it came from. Back from that
+ * page shows that section again (Christian's report of 27 November 2026: the arrow led to the Account page).
+ * @type {{ url: string, section: Section }|null}
+ */
+let over = null;
+
+/**
  * Opens Settings or About over the current section. On a tablet, a section
  * with a list and a detail (Logbook, Statistics, Tools) would show it beside
  * its list: it opens full width in the Account section instead.
@@ -184,6 +192,8 @@ export function openOver(path, options) {
   // Réglages on a tablet: always in the Account view, where its overview and a subpage sit
   // side by side (task 2026-11-13-111).
   if (view?.el?.classList.contains('view-master-detail') || (layout.split && path === '/settings/' && view?.el?.id !== 'view-account')) {
+    const from = navigation.section;
+    over = path !== '/settings/' && from !== 'account' ? { url: path, section: from } : null;
     showSection('account');
     view = f7.views.get('#view-account');
   }
@@ -257,7 +267,17 @@ export function trackSection() {
   f7.on('tabShow', (/** @type {HTMLElement} */ el) => {
     const section = /** @type {Section} */ (el.id?.replace('view-', ''));
     if (allSections.includes(section)) navigation.section = section;
+    // Another section chosen by hand: Back from the page opened over no longer leads back there.
+    if (over && section !== 'account') over = null;
     updateAtRoot();
+  });
+  // Back from a page opened over another section (`over`): that section shows again as the page leaves.
+  f7.on('pageBeforeOut', (/** @type {any} */ page) => {
+    if (!over || page?.direction !== 'backward' || page?.view?.el?.id !== 'view-account' || page?.route?.url !== over.url) return;
+    const section = over.section;
+    over = null;
+    trace('over-return', section);
+    showSection(section);
   });
   // A page pushed or left in any view: whether the bottom bar shows.
   f7.on('routeChanged', updateAtRoot);
