@@ -9,19 +9,19 @@ import { parseCoordinates } from '../../app/src/lib/coordinates.js';
 const read = (p) => readFileSync(new URL(`../../app/src/${p}`, import.meta.url), 'utf8');
 
 const SITES = [
-  { uuid: 5, name: 'Poor Knights', country: 'Nouvelle-Zélande', dives: 0 },
-  { uuid: 2, name: 'hälvälä', country: 'Finlande', dives: 1 },
-  { uuid: 7, name: 'Goat Island', country: 'Nouvelle-Zélande', dives: 0 },
-  { uuid: 9, name: '', country: '', dives: 3 },
-  { uuid: 11, name: '', country: '', dives: 0 },
-  { uuid: 3, name: 'Lake Coleridge', country: 'Nouvelle-Zélande', dives: 1 },
-  { uuid: 4, name: 'Site 10', country: 'Canada', dives: 1 },
-  { uuid: 6, name: 'Site 2', country: 'Canada', dives: 1 },
+  { uuid: 5, name: 'Poor Knights', country: 'Nouvelle-Zélande', dives: 0, lastDate: '' },
+  { uuid: 2, name: 'hälvälä', country: 'Finlande', dives: 1, lastDate: '2019-06-01T10:00:00' },
+  { uuid: 7, name: 'Goat Island', country: 'Nouvelle-Zélande', dives: 0, lastDate: '' },
+  { uuid: 9, name: '', country: '', dives: 3, lastDate: '2026-01-01T10:00:00' },
+  { uuid: 11, name: '', country: '', dives: 0, lastDate: '' },
+  { uuid: 3, name: 'Lake Coleridge', country: 'Nouvelle-Zélande', dives: 1, lastDate: '2024-03-02T09:00:00' },
+  { uuid: 4, name: 'Site 10', country: 'Canada', dives: 1, lastDate: '2025-11-20T11:42:00' },
+  { uuid: 6, name: 'Site 2', country: 'Canada', dives: 1, lastDate: '2024-03-02T09:00:00' },
 ];
 const names = (list) => list.map((s) => s.name);
 
-test('« Dans votre carnet » is alphabetical, accents and case ignored, numbers in order, unnamed sites last', () => {
-  assert.deepEqual(names(logbookChoice(SITES, new Map(), '', 'fr')), ['Goat Island', 'hälvälä', 'Lake Coleridge', 'Poor Knights', 'Site 2', 'Site 10', '']);
+test('« Dans votre carnet » follows the logbook, the latest dive first; same date or no dive: alphabetical (accents and case ignored, numbers in order); unnamed sites last', () => {
+  assert.deepEqual(names(logbookChoice(SITES, new Map(), '', 'fr')), ['Site 10', 'Lake Coleridge', 'Site 2', 'hälvälä', 'Goat Island', 'Poor Knights', '']);
 });
 
 test('a site with neither a name nor a dive is not listed', () => {
@@ -33,7 +33,7 @@ test('the search filters on the name, the region and the country', () => {
   assert.deepEqual(names(logbookChoice(SITES, regions, 'goat', 'fr')), ['Goat Island']);
   assert.deepEqual(names(logbookChoice(SITES, regions, 'halv', 'fr')), ['hälvälä']);
   assert.deepEqual(names(logbookChoice(SITES, regions, 'canter', 'fr')), ['Lake Coleridge']);
-  assert.deepEqual(names(logbookChoice(SITES, regions, 'zelande', 'fr')), ['Goat Island', 'Lake Coleridge', 'Poor Knights']);
+  assert.deepEqual(names(logbookChoice(SITES, regions, 'zelande', 'fr')), ['Lake Coleridge', 'Goat Island', 'Poor Knights']);
   assert.deepEqual(names(logbookChoice(SITES, regions, 'finlande', 'fr')), ['hälvälä']);
   assert.deepEqual(logbookChoice(SITES, regions, 'zzz', 'fr'), []);
 });
