@@ -1850,6 +1850,11 @@
   :global(.md .bc-tablet .bc-logbook > .navbar .navbar-inner) {
     padding-top: calc(var(--f7-safe-area-top) + 16px);
   }
+  /* The band's backdrop (BandBackdrop) paints the whole band, the bar included: the bar's own gradient, sized for the
+     phone, showed a seam at its bottom once the bar was taller. */
+  :global(.md .bc-tablet .bc-logbook > .navbar .navbar-bg) {
+    background-image: none;
+  }
   :global(.md .bc-tablet .bc-logbook .searchbar.bc-band-search) {
     margin-top: 16px;
   }
