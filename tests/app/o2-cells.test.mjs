@@ -72,11 +72,12 @@ test('editing a piece shows the type as a menu on every device; the tiles stay i
   assert.equal(json('fr').gear.pieceEdit.type, 'Type');
 });
 
-test('the type list holds « Cellules O₂ » after « Recycleur », with its three cells on a line', () => {
+test('the type list holds « Cellules O₂ » after « Recycleur », with its own icon', () => {
   const icons = read('components/GearIcon.svelte');
   const keys = [...icons.slice(icons.indexOf('const paths = {')).matchAll(/^\s*([a-zA-Z0-9]+): '/gm)].map((m) => m[1]);
   assert.equal(keys[keys.indexOf('rebreather') + 1], 'o2Cells');
-  assert.match(icons, /o2Cells: 'M2\.8 12a3\.2 3\.2 0 1 0 6\.4 0/, 'three circles of radius 3.2 and the line at y = 18');
+  // Task 2026-11-26-407: an O₂ cell seen from the side replaced the three cells on a line.
+  assert.match(icons, /o2Cells: 'M8 9h8a1\.5 1\.5 0 0 1 1\.5 1\.5v7/, 'the cell from the side');
   for (const l of ['fr', 'en']) assert.ok(json(l).gear.pieceNew.tile.o2Cells);
   assert.equal(json('fr').gear.pieceNew.tile.o2Cells, 'Cellules O₂');
 });

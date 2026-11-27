@@ -128,8 +128,9 @@ test('every first-launch form is a grouped inset list on an iPhone: rows, 12 pt 
 
 test('« Un fichier » opens the system picker: a plain file input, several files, no custom screen', () => {
   const steps = src('components/FirstLaunchSteps.svelte');
-  assert.match(steps, /<input type="file" multiple class="bc-first-launch--file"/);
-  assert.doesNotMatch(steps.match(/<input type="file"[^>]*>/)[0], /accept=/, 'no accept list: every file shows in Files, an unreadable one gets the alert');
+  // Since 24 November 2026 (commit 90e51367) an accept list on iOS only, so that the photo library is not offered; none
+  // elsewhere (lib/import-formats.js importAccept, tested in import-formats.test.mjs).
+  assert.match(steps, /<input type="file" multiple accept=\{importAccept\(Capacitor\.getPlatform\(\)\)\} class="bc-first-launch--file"/);
   assert.match(steps, /onclick=\{\(\) => fileInput\?\.click\(\)\}/);
 });
 

@@ -28,7 +28,6 @@
     cylinder: 'M10 2.5h4M12 2.5V5M9 8a3 3 0 0 1 6 0v12a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 20zM9 11.5h6',
     // Two cylinders and a shorter body, no hoses (task 2026-11-26-408).
     rebreather: 'M7.53 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM16.47 2.00a1.95 1.95 0 0 1 1.95 1.95V17.32a1.95 1.95 0 0 1 -3.89 0V3.95a1.95 1.95 0 0 1 1.95 -1.95zM9.47 5.89H14.53V19.89H9.47zM10.9 19.89L9.9 22.40H14.1L13.1 19.89',
-    // Three cells on a line (mock-up profil-piece-nouvelle-type-menu-android).
     // A rebreather's O₂ cell from the side, upright: body with its label band, O-ring, narrower threaded neck, connector below (task 2026-11-26-407).
     o2Cells: 'M8 9h8a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5H8a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 8 9zM8.5 7.5h7M9.5 7.5V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3M10 19v1.5a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V19M6.5 11.5h11M6.5 16.5h11',
     // A jacket BCD from the front: chest strap, two weight pockets with handles, hose from the left shoulder to the inflator (task 2026-11-26-406).
