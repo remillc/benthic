@@ -9,7 +9,9 @@
 /** @typedef {import('benthic-core').Prefs} Prefs */
 /**
  * @typedef {{ type: 'dive', dive: Dive } | { type: 'trip', location: string, dives: Dive[] }} SnapshotEntry
- * @typedef {{ v: 1, total: number, prefs: Prefs, entries: SnapshotEntry[] }} Snapshot
+ * @typedef {{ v: 1, total: number, prefs: Prefs, entries: SnapshotEntry[], summary?: string }} Snapshot
+ * `summary`: the band's line (« 1 358 plongées · 236 sites · … »), drawn as a placeholder of the same size while the
+ * logbook loads (Christian, 27 November 2026).
  */
 
 import { logbookKey } from './window-logbook.js';
@@ -29,9 +31,10 @@ const TRIP_PROFILES = 4;
  * and trips, most recent first (the same grouping as Logbook.svelte).
  * @param {Dive[]} sortedDives from the most recent to the oldest
  * @param {Prefs} prefs
+ * @param {string} [summary] the band's line
  * @returns {Snapshot}
  */
-export function buildSnapshot(sortedDives, prefs) {
+export function buildSnapshot(sortedDives, prefs, summary = '') {
   /** @type {SnapshotEntry[]} */
   const entries = [];
   /** @type {Map<number, Extract<SnapshotEntry, {type: 'trip'}>>} */
@@ -59,7 +62,7 @@ export function buildSnapshot(sortedDives, prefs) {
   }
   // A trip of one dive is drawn as that dive, as in the logbook.
   const drawn = entries.map((e) => (e.type === 'trip' && e.dives.length === 1 ? { type: /** @type {const} */ ('dive'), dive: e.dives[0] } : e));
-  return { v: VERSION, total: sortedDives.length, prefs, entries: drawn };
+  return { v: VERSION, total: sortedDives.length, prefs, entries: drawn, summary };
 }
 
 /** @param {Snapshot|null} snapshot null forgets it */

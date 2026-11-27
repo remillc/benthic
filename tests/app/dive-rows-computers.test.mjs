@@ -40,3 +40,15 @@ test('a menu that opens on the first tap waits for the finger\'s lift (Chrome\'s
   assert.match(field, /onfocus=\{\(\) => startEdit\(fingerDown\)\}/);
   assert.match(field, /try \{\s*input\.showPicker\(\);\s*\} catch \{/);
 });
+
+test('while the logbook loads, the band keeps the place of its line: the last start\'s line as grey blocks (Christian, 27 November 2026)', async () => {
+  const { buildSnapshot } = await import('../../app/src/lib/snapshot.js');
+  assert.equal(buildSnapshot([], {}, '1 358 plongées · 236 sites').summary, '1 358 plongées · 236 sites');
+  const page = read('app/src/pages/Logbook.svelte');
+  assert.match(page, /buildSnapshot\(list, \$state\.snapshot\(prefs\), logbookSummary\(list\)\)/);
+  assert.match(page, /const summaryLoading = \$derived\(logbook\.loading && !logbook\.error && logbook\.dives\.length === 0 && !releaseEmpty\);/);
+  assert.match(page, /summary=\{bandSummary\} placeholder=\{summaryLoading\}>/);
+  const band = read('app/src/components/SectionBand.svelte');
+  assert.equal(band.match(/<span class:bc-section-band--placeholder=\{placeholder\}>\{summary\}<\/span>/g)?.length, 2);
+  assert.match(band, /\.bc-section-band--placeholder \{\s*color: transparent;/);
+});

@@ -126,7 +126,7 @@
     const list = all;
     const prefs = logbook.prefs;
     const timer = setTimeout(() => {
-      saveSnapshot(list.length ? buildSnapshot(list, $state.snapshot(prefs)) : null);
+      saveSnapshot(list.length ? buildSnapshot(list, $state.snapshot(prefs), logbookSummary(list)) : null);
       // Beside the list, the pane shows the first dive: its detail is kept too (lib/detail-snapshot.js).
       const first = layout.split ? firstDiveOf(list) : null;
       if (first && navigation.dive === String(first.id)) rememberFirstDetail(first, orderOf(false), loadDive).catch((e) => console.warn('Keeping the detail', e));
@@ -1017,8 +1017,19 @@
     return `${name} · ${where}\n${t('welcomeSteps.bandNoDives')}`;
   });
 
+  /**
+   * While the logbook loads, the band keeps the place of its line (Christian, 27 November 2026): the line of the last start
+   * (the snapshot), else one of a usual length, drawn as grey blocks and replaced by the real line, so nothing below moves.
+   */
+  const summaryLoading = $derived(logbook.loading && !logbook.error && logbook.dives.length === 0 && !releaseEmpty);
   /** "9 plongées · 4 sites · dernière plongée il y a 9 mois" (the band). */
-  const bandSummary = $derived(releaseEmpty ? emptyBand : logbookSummary(logbook.dives));
+  const bandSummary = $derived(
+    releaseEmpty
+      ? emptyBand
+      : summaryLoading
+        ? logbook.preview?.summary || [t('band.dives', { n: 1000 }), t('band.sites', { n: 100 })].join(' · ')
+        : logbookSummary(logbook.dives),
+  );
 
   /** Number of dives shown: follows the search (the filter row counts the filter). */
   const count = $derived(
@@ -1409,7 +1420,7 @@
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} syncLine />{/if}
-  <SectionBand tall pill={showPill} bare={!theme.ios} syncLine={theme.ios} summary={bandSummary}>
+  <SectionBand tall pill={showPill} bare={!theme.ios} syncLine={theme.ios} summary={bandSummary} placeholder={summaryLoading}>
     {#if showPill}
       {#if conflictWaits}
         <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />
