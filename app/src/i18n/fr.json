@@ -4617,6 +4617,7 @@
     }
   },
   "desktopDetail": {
+    "openInMaps": "Ouvrir dans Maps",
     "diveType": {
       "title": "Type de plongée",
       "long": { "OC": "Circuit ouvert", "CCR": "Recycleur CCR", "PSCR": "Recycleur pSCR", "Freedive": "Apnée" },
@@ -4767,6 +4768,7 @@
     "notRated": "Non notée",
     "starsOf": "{n} sur 5",
     "card": {
+      "map": "Carte",
       "datetime": "Date et heure",
       "site": "Site",
       "people": "Personnes",
@@ -4781,7 +4783,6 @@
     "weightRowsNote": "Un type choisi part du poids de la plongée précédente, sinon de son poids dans Réglages › Types de lest.",
     "weightSuggestionClose": "Fermer la suggestion",
     "openSite": "Ouvrir la fiche du site",
-    "openSiteLink": "Voir le site dans Sites",
     "serial": "n° {serial}",
     "addComputer": "Ajouter un ordinateur",
     "kitFilled": "A rempli les champs ci-dessous ; chacun reste modifiable.",

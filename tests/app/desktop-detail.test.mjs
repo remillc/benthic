@@ -203,7 +203,7 @@ test('Autre équipement: a seam of two props, no storage of its own, absent with
   assert.match(fields, /<DesktopOtherGear items=\{otherItems\} onremove=\{removeGear\} \/>/); // the release edition
 });
 
-test('the Carte tab keeps its height and the tab content replaces the old map block', () => {
+test('the Carte tab keeps its desktop height (a phone and a tablet have their own, task 2026-11-27-416) and the tab content replaces the old map block', () => {
   const fields = read('app/src/components/DesktopDiveFields.svelte');
   assert.match(fields, /\.bc-desktop-dive-fields--map \{\s*flex: none;\s*height: 300px;/);
   assert.doesNotMatch(read('app/src/pages/DiveDetail.svelte'), /desk-map/);
@@ -212,7 +212,7 @@ test('the Carte tab keeps its height and the tab content replaces the old map bl
 test('the texts of the five tabs exist in French and English', () => {
   for (const lang of ['fr', 'en']) {
     const d = JSON.parse(read(`app/src/i18n/${lang}.json`)).desktopDetail;
-    for (const key of ['notRated', 'weightTotal', 'consumption', 'legendStart', 'legendEnd', 'otherGearAdd', 'openSiteLink', 'addCylinder']) assert.ok(d[key], `${lang} ${key}`);
+    for (const key of ['notRated', 'weightTotal', 'consumption', 'legendStart', 'legendEnd', 'otherGearAdd', 'addCylinder']) assert.ok(d[key], `${lang} ${key}`);
     for (const key of ['weights', 'mix', 'pressure', 'coordinates']) assert.ok(d.label[key], `${lang} label.${key}`);
   }
   assert.equal(JSON.parse(read('app/src/i18n/fr.json')).desktopDetail.notRated, 'Non notée');

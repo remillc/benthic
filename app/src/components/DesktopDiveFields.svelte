@@ -35,7 +35,8 @@
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges, isSubscriber, tripChange } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
-  import { ios, layout } from '../lib/layout.svelte.js';
+  import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
+  import { webMapUrl } from '../lib/maps-link.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
   import CylinderDeleteDialog from './CylinderDeleteDialog.svelte';
   import { blankCylinder, cylinderDraft, draftPatch, newPartDraft, pressureText as draftPressureText, sizeMlOf, sizeText } from '../lib/cylinder-dialog.js';
@@ -65,7 +66,7 @@
   import { copyEquipment } from '../lib/inventory.js';
   import { formatDiveDay, formatTimeOfDay } from '../lib/format.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
-  import { formatCoordinates } from '../lib/sites.svelte.js';
+  import { formatCoordinates, mapsLink, openInMapsApp } from '../lib/sites.svelte.js';
   import { focusSite } from '../lib/site-focus.svelte.js';
   import { goToSection } from '../lib/navigation.svelte.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
@@ -468,6 +469,8 @@
   // and detail3-android); the other devices keep the chips their mock-ups draw. The suggestion is the weight of the latest dive of
   // the logbook with the same suit, cylinders and water, as the old editor offered it, and only on the logbook's most recent dive.
   const rowsLayout = $derived(layout.phone && !ios);
+  /** The dive's map keeps a 5:3 ratio on a tablet (task 2026-11-27-416). */
+  const tabletMap = $derived(!layout.phone && !desktopApp);
   /** @type {Map<number, import('../lib/weight-suggestion.js').WeightSource>} */
   const sourceCache = new Map();
   let sources = $state(/** @type {import('../lib/weight-suggestion.js').WeightSource[]} */ ([]));
@@ -1064,17 +1067,56 @@
     <!-- Notes (task 2026-11-23-376): the notes; the rating and the tags are in the Informations tab's cards. -->
     <DesktopEditField name="notes" kind="multiline" label={t('desktopDetail.label.notes')} value={dive.notes} invitation={t('desktopDetail.invitation.notes')} onsave={(v) => save('notes', v)} />
   {:else if tab === 'map'}
-    <!-- Carte (mock-up bureau-carnet-onglet-carte): the map keeps its height, then the site and its position. -->
-    {#if dive.siteCoordinates}
-      <div class="bc-desktop-dive-fields--map"><SiteMap pin={dive.siteCoordinates} height="300px" /></div>
+    <!-- Carte (mock-ups bureau-carnet-onglet-carte, android-tablette-detail-onglet-carte-paysage, detail-onglets-android; tasks 2026-11-27-415
+         and 416). Phone and tablet: one white card with its « Carte » header, the map (220 px on a phone, 5:3 on a tablet), Site and
+         Coordonnées side by side with their labels above, then « Ouvrir dans Maps ». Desktop: the map 300 px high, then the fields in rows. -->
+    {#snippet mapLink()}
+      {#if dive.siteCoordinates}
+        {@const { latUdeg, lonUdeg } = dive.siteCoordinates}
+        <!-- « Ouvrir dans Maps »: the device's maps app on a phone or tablet, the browser on the desktop. -->
+        <a
+          class="bc-desktop-dive-fields--maps-link external"
+          href={desktopApp ? webMapUrl(latUdeg, lonUdeg) : mapsLink(latUdeg, lonUdeg, dive.site ?? '')}
+          target={desktopApp ? '_blank' : undefined}
+          rel={desktopApp ? 'noopener' : undefined}
+          onclick={ios && !desktopApp ? (e) => (e.preventDefault(), openInMapsApp(latUdeg, lonUdeg, dive.site ?? '')) : undefined}
+        >
+          <Icon name="openInNew" size={18} />{t(ios ? 'sites.openInPlans' : 'desktopDetail.openInMaps')}<span class="bc-sr-only">, {t('sites.opensElsewhere')}</span>
+        </a>
+      {/if}
+    {/snippet}
+    {#if desktopApp}
+      {#if dive.siteCoordinates}
+        <div class="bc-desktop-dive-fields--map">
+          <SiteMap pin={dive.siteCoordinates} height="300px" roundButton />
+        </div>
+      {:else}
+        <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
+      {/if}
+      <DesktopEditField name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
+      {#if dive.siteCoordinates}
+        <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
+      {/if}
+      {@render mapLink()}
     {:else}
-      <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
+      <DesktopEquipmentCard name="map" title={t('desktopDetail.card.map')}>
+        {#snippet icon()}<Icon name="map" size={22} />{/snippet}
+        {#if dive.siteCoordinates}
+          <div class="bc-desktop-dive-fields--map bc-desktop-dive-fields--map-card" class:bc-desktop-dive-fields--map-phone={layout.phone} class:bc-desktop-dive-fields--map-tablet={tabletMap}>
+            <SiteMap pin={dive.siteCoordinates} height={layout.phone ? '220px' : '300px'} ratio={tabletMap ? 5 / 3 : 0} roundButton />
+          </div>
+        {:else}
+          <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
+        {/if}
+        <div class="bc-desktop-dive-fields--map-fields">
+          <DesktopEditField stacked tall name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
+          {#if dive.siteCoordinates}
+            <DesktopEditField stacked boxed kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
+          {/if}
+        </div>
+        {@render mapLink()}
+      </DesktopEquipmentCard>
     {/if}
-    <DesktopEditField name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
-    {#if dive.siteCoordinates}
-      <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
-    {/if}
-    {#if siteRow}<button type="button" class="bc-desktop-dive-fields--link" onclick={openSite}>{t('desktopDetail.openSiteLink')}</button>{/if}
   {/if}
 </div>
 
@@ -1455,6 +1497,43 @@
       color: var(--bc-text-2);
     }
 
+    /* The map keeps its height: it never shrinks in the pane. A phone's is 220 px; a tablet's keeps 5:3 (task 2026-11-27-416). */
+    .bc-desktop-dive-fields--map.bc-desktop-dive-fields--map-phone {
+      height: 220px;
+    }
+
+    .bc-desktop-dive-fields--map.bc-desktop-dive-fields--map-tablet {
+      height: auto;
+    }
+
+    .bc-desktop-dive-fields--maps-link {
+      align-self: flex-start;
+      min-height: 40px;
+      padding: 0 12px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--bc-code-active);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* In the phone and tablet card: 16 px corners, no border (mock-ups detail-onglets-android, android-tablette-detail-onglet-carte-paysage). */
+    .bc-desktop-dive-fields--map.bc-desktop-dive-fields--map-card {
+      margin-bottom: 0;
+      border: 0;
+      border-radius: 16px;
+    }
+
+    /* Site and Coordonnées side by side, their labels above. */
+    .bc-desktop-dive-fields--map-fields {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
     /* The map keeps its height: it never shrinks in the pane. */
     .bc-desktop-dive-fields--map {
       flex: none;
@@ -1468,21 +1547,6 @@
     .bc-desktop-dive-fields--no-map {
       margin: 8px 0 12px;
       color: var(--bc-text-2);
-    }
-
-    .bc-desktop-dive-fields--link {
-      align-self: flex-start;
-      width: auto;
-      min-height: 40px;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: var(--bc-code-active);
-      font: inherit;
-      font-size: 14px;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      cursor: pointer;
     }
 
   }
