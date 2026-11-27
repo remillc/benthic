@@ -7964,7 +7964,7 @@ Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards
 Christian asked for this on 27 November 2026. Work in `main`.
 - In the Équipement tab of the dive detail, the empty undersuit field shows « Choisir… » instead of « Choisir un sous-vêtement »: change `invitation.undersuit` in `app/src/i18n/fr.json` (and « Choose… » in the English file).
 
-## [ ] 2026-11-27-424 Dive detail: 12 px between chip rows
+## [x] 2026-11-27-424 Dive detail: 12 px between chip rows
 
 Christian asked for this on 27 November 2026. Work in `main`.
 - In « Personnes » (Guide de palanquée, Compagnons) and « Étiquettes », when the chips wrap, the vertical gap between rows is 12 px; the horizontal gap stays 8 px (`gap: 12px 8px`). Phone and tablet.
