@@ -127,7 +127,8 @@
   }
 
   /**
-   * Phone (Christian's request of 14 November 2026): the two dives side by side. As soon as the
+   * Phone (Christian's request of 14 November 2026), and the tablet's pane beside the list (27 November 2026: the content
+   * slid away first and left a white block before the next dive came): the two dives side by side. As soon as the
    * finger moves, the neighbour dive's page opens without animation beside this one (its detail is
    * preloaded), and both follow the finger (the --bc-push-dx of theme.css, as Réglages → À propos).
    * Through: this page leaves the history, so that back still goes to the list. Not through: back
@@ -151,13 +152,15 @@
           const id = neighbourId(dx);
           const view = /** @type {HTMLElement|null} */ (pageEl.parentElement);
           if (id === undefined || !view) return false;
-          push = { view, dir: dx < 0 ? -1 : 1, width: view.clientWidth };
+          // Beside the list the dive pages move in their pane only: the list stays, and the pages are cut at its edge (theme.css).
+          push = { view, dir: dx < 0 ? -1 : 1, width: layout.split ? pageEl.clientWidth : view.clientWidth };
           // Until this swipe has settled, a Back or a link waits (or is ignored): the history is rewritten at the end.
           unlock = lockRouter(f7router, 'dive-swipe');
           trace('swipe', 'dive');
           pageEl.classList.add('bc-push-from');
           view.style.setProperty('--bc-push-dx', '0px');
           view.classList.add('bc-pushing');
+          if (layout.split) view.classList.add('bc-pushing-split');
           if (push.dir > 0) view.classList.add('bc-pushing-back');
           const base = f7route.url.replace(/[^/?]+(\?.*)?$/, '');
           heldNavigate(f7router, `${base}${id}`, { animate: false });
@@ -204,7 +207,7 @@
         else if (!through && intact) heldBack(f7router, { animate: false });
       } finally {
         unstackMaster(view);
-        view.classList.remove('bc-pushing', 'bc-pushing-back', 'bc-push-settle');
+        view.classList.remove('bc-pushing', 'bc-pushing-split', 'bc-pushing-back', 'bc-push-settle');
         for (const p of ['--bc-push-dx', '--bc-push-ease', '--bc-push-ms']) view.style.removeProperty(p);
         pageEl.classList.remove('bc-push-from');
         unlock();
@@ -235,20 +238,20 @@
     horizontalSwipe(content, {
       accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.bc-dive-profile--profile')) && !document.querySelector('.modal-in:not(.toast)'),
       move(dx) {
-        if (!layout.split && pair.move(dx)) return;
+        if (pair.move(dx)) return;
         const shown = hasNeighbour(dx) ? dx : dx / 3;
         content.style.transition = '';
         content.style.transform = `translateX(${shown}px)`;
         content.style.opacity = String(1 - Math.min(Math.abs(shown) / content.clientWidth, 1) / 2);
       },
       cancel() {
-        if (!layout.split && pair.cancel()) return;
+        if (pair.cancel()) return;
         content.style.transition = '';
         content.style.transform = '';
         content.style.opacity = '';
       },
       end(dx, velocity) {
-        if (!layout.split && pair.end(dx, velocity)) return;
+        if (pair.end(dx, velocity)) return;
         const width = content.clientWidth;
         const neighbour = hasNeighbour(dx);
         const through = neighbour && swipeGoesThrough(dx, velocity, width);

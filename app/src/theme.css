@@ -1981,6 +1981,25 @@ html.md {
     /* The spring set by the swipe (lib/swipe.js, settle). */
     transition: transform var(--bc-push-ms, 180ms) var(--bc-push-ease, ease-out);
   }
+
+  /*
+   * Beside the list (tablet, 27 November 2026): the list stays, the dive pages move in their pane and are cut at its
+   * left edge, so that neither passes over the list.
+   */
+  .view.bc-pushing.bc-pushing-split > .page.page-master {
+    transform: none;
+  }
+  .view.bc-pushing.bc-pushing-split > .page.bc-push-from {
+    clip-path: inset(0 0 0 max(0px, calc(-1 * var(--bc-push-dx))));
+  }
+  .view.bc-pushing.bc-pushing-split.bc-pushing-back > .page:not(.bc-push-from):not(.page-master) {
+    clip-path: inset(0 0 0 calc(100% - var(--bc-push-dx)));
+  }
+  .view.bc-pushing-split.bc-push-settle > .page:not(.page-master) {
+    transition:
+      transform var(--bc-push-ms, 180ms) var(--bc-push-ease, ease-out),
+      clip-path var(--bc-push-ms, 180ms) var(--bc-push-ease, ease-out);
+  }
 }
 
 /* The top bar of a section continues into its band (SectionBand.svelte). Out of
