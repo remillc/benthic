@@ -11,7 +11,8 @@ test('the sections are Carnet, Sites, Profil, Statistiques, Outils; Profil only 
   assert.match(nav, /export const sections = \(\) => sectionOrder\.filter\(\(s\) => s !== 'profile' \|\| navigation\.profile\)/);
   const app = read('App.svelte');
   // The view starts on its default pane on a wide screen: nothing navigates at start (report 35 of 24 November 2026).
-  assert.match(app, /\{#if navigation\.profile\}<View id="view-profile" tab url=\{profileWide\(\) \? '\/profile\/info' : '\/profile'\} \/>\{\/if\}/);
+  // Its default pane is Équipement, the first row of the list, since 26 November 2026 (Informations before).
+  assert.match(app, /\{#if navigation\.profile\}<View id="view-profile" tab url=\{profileWide\(\) \? '\/profile\/gear\/' : '\/profile'\} \/>\{\/if\}/);
   assert.match(app, /navigation\.profile = on/);
   for (const file of ['components/NavigationBar.svelte', 'components/NavRail.svelte', 'components/NavMenu.svelte']) assert.match(read(file), /sections\(\)/, file);
 });
