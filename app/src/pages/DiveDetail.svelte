@@ -892,6 +892,17 @@
 
 </script>
 
+<!--
+  Benthic+ only (tasks 2026-11-23-359 and 370): the thumbnails of the dive's photos and videos, synced. Never in the free
+  version, the demo logbook or a preview; the pictures referenced in the logbook stay untouched. Only with the notes
+  (task 2026-11-27-413).
+-->
+{#snippet media()}
+  {#if dive && diveMediaEnabled() && !preview}
+    <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} dive={{ number: diveNumber, site: dive.site, date: dive.date, samples: dive.samples, siteCoordinates: dive.siteCoordinates }} {prefs} />
+  {/if}
+{/snippet}
+
 <!-- no-swipeback: here a swipe to the right shows the previous dive. -->
 <Page data-bc-scroll onPageInit={watchSwipes} class="bc-dive-detail no-swipeback {desk ? 'bc-dive-detail--desk' : ''} {imageShown && !scrolled ? 'bc-dive-detail--on-image' : ''} {slide ? `bc-slide-${slide}` : ''}">
   <Navbar>
@@ -1089,6 +1100,7 @@
           <section class="bc-dive-detail--group-tab" data-group={key} aria-labelledby="bc-group-{uid}-{key}">
             <h2 class="bc-dive-detail--group-title" id="bc-group-{uid}-{key}">{t(`desktop.tab.${key}`)}</h2>
             <DesktopDiveFields {...fieldProps} tab={key} hint={false} />
+            {#if key === 'notes'}{@render media()}{/if}
           </section>
         {/each}
       {:else}
@@ -1101,12 +1113,8 @@
       <DesktopDiveFields {dive} {prefs} {tab} preview={!!preview} trip={tripText} {sac} gasChanges={gasChangesLine} onsign={startValidation} />
     {/if}
 
-    <!-- Benthic+ only (tasks 2026-11-23-359 and 370): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
-         the line about references on another device is gone. The pictures referenced in the logbook stay untouched. -->
-    <!-- Not under the Gaz tab on a tablet or the desktop (27 November 2026); the phone, one long page, keeps it at its end. -->
-    {#if diveMediaEnabled() && !preview && (layout.phone || tab !== 'gas')}
-      <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} dive={{ number: diveNumber, site: dive.site, date: dive.date, samples: dive.samples, siteCoordinates: dive.siteCoordinates }} {prefs} />
-    {/if}
+    <!-- Tablet and desktop: under the Notes tab only, after the notes (task 2026-11-27-413); the phone has it in its Notes group. -->
+    {#if !layout.phone && tab === 'notes'}{@render media()}{/if}
 
     <div class="bc-dive-detail--end" aria-hidden="true"></div>
   {/if}
