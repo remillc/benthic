@@ -7876,3 +7876,11 @@ Christian asked for this on 27 November 2026. Work in `main`.
 - Tablet: the map in the Carte tab keeps a 5:4 ratio (width:height) instead of a fixed height; the rest of the tab scrolls below it.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` (and their dark and menu variants).
+
+## [ ] 2026-11-27-416 Correction to 415: tablet map in 5:3, and « Ouvrir dans Maps » as drawn
+
+Christian asked for this on 27 November 2026. Work in `main`. Corrects task 2026-11-27-415.
+- Tablet, dive detail, Carte tab: the map keeps a **5:3** ratio (width:height), not 5:4. With it, the whole tab (map, Site, Coordonnées, « Ouvrir dans Maps ») fits in a landscape tablet screen.
+- Check that « Ouvrir dans Maps » matches the mock-up on every device: a text link with the « open externally » icon (square with an arrow), below the Site and Coordonnées fields, in the accent blue; it opens the device's maps app (or the browser on desktop) at the dive's coordinates. Fix any difference.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage`, and the Carte part of `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`.
