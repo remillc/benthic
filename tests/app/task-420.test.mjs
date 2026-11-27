@@ -96,3 +96,10 @@ test('task 422: the tall text fields of Conditions have no arrow (they are no me
 test('task 424: 12 px between wrapped chip rows, 8 px between chips', () => {
   assert.match(read('app/src/components/DesktopChipsField.svelte'), /\.bc-desktop-chips--row \{[^}]*gap: 12px 8px;/);
 });
+
+test('white is for the cards: the tablet\'s detail keeps the page colour; no « Les champs gris… » line on a phone or a tablet', () => {
+  const page = read('app/src/pages/DiveDetail.svelte');
+  assert.match(page, /:global\(\.view-master-detail \.page-master-detail\.bc-dive-detail\) \{\s*background: var\(--bc-background\);/);
+  assert.doesNotMatch(page, /desktopDetail\.fieldsHint/);
+  assert.match(fields, /\{#if hint && layout\.desktop\}<p class="bc-desktop-dive-fields--hint">/);
+});

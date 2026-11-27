@@ -852,7 +852,8 @@
 </script>
 
 <div class="bc-desktop-dive-fields" bind:clientWidth={paneWidth} class:bc-desktop-dive-fields--compact={!layout.desktop} class:bc-desktop-dive-fields--cols={layout.split && !layout.desktop && !layout.portrait} bind:this={root}>
-  {#if hint}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
+  <!-- « Les champs gris se modifient… »: on the desktop only; a phone and a tablet go without it (Christian, 27 November 2026). -->
+  {#if hint && layout.desktop}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
 
   {#if tab === 'info'}
     <!--

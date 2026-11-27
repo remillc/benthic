@@ -1096,7 +1096,6 @@
         </div>
       </div>
       {#if layout.phone}
-        <p class="bc-dive-detail--fields-hint">{t('desktopDetail.fieldsHint')}</p>
         {#each deskTabs as key (key)}
           <section class="bc-dive-detail--group-tab" data-group={key} aria-labelledby="bc-group-{uid}-{key}">
             <h2 class="bc-dive-detail--group-title" id="bc-group-{uid}-{key}">{t(`desktop.tab.${key}`)}</h2>
@@ -1189,7 +1188,9 @@
     }
     /* The master-detail pane paints --bc-surface (App.svelte); the desktop detail keeps the page colour, so the only white
        surface around the profile is its own card (task 2026-11-23-375). */
-    :global(.view-master-detail .page-master-detail.bc-dive-detail--desk) {
+    /* The tablet's too (Christian, 27 November 2026): white is for the cards only, the page around them keeps its colour. */
+    :global(.view-master-detail .page-master-detail.bc-dive-detail--desk),
+    :global(.view-master-detail .page-master-detail.bc-dive-detail) {
       background: var(--bc-background);
     }
     :global(.bc-dive-detail--desk > .navbar) {
@@ -1470,13 +1471,6 @@
           bottom: 0;
         }
       }
-    }
-
-    .bc-dive-detail--fields-hint {
-      margin: 12px 16px 0;
-      font-size: 13px;
-      line-height: 18px;
-      color: var(--bc-text-2);
     }
 
     /* A group of the phone's page: its 14 sp title, then its cards. A tap on a tab scrolls here, under the sticky row. */
