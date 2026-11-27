@@ -1066,6 +1066,18 @@ html.ios {
       background: color-mix(in srgb, var(--bc-text) 30%, transparent);
     }
   }
+
+  /* Under a section band, the gutter of that bar shows the band's gradient, down to the band's bottom, scrolling with it
+     (SectionBand.svelte sets the place and the size). */
+  html:not(.bc-desktop-app) .page-content.bc-has-band {
+    background-image:
+      linear-gradient(transparent var(--bc-gutter-band-bottom), var(--f7-page-bg-color, var(--bc-background)) var(--bc-gutter-band-bottom)),
+      var(--bc-band-gradient);
+    background-size: 100% 100%, 100% var(--bc-gutter-band-size);
+    background-position: 0 0, 0 var(--bc-gutter-band-top);
+    background-repeat: no-repeat;
+    background-attachment: local;
+  }
 }
 
 @layer bc.base {

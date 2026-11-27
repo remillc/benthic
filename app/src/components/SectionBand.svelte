@@ -13,6 +13,37 @@
   import SyncProfileLine from './SyncProfileLine.svelte';
   let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, syncLine = false, children } = $props();
 
+  /** @type {HTMLElement|undefined} */
+  let band = $state();
+  /**
+   * Phones and tablets keep a 4 px scrollbar gutter at the right of a page that scrolls (theme.css): the band stops
+   * before it and the page's light background showed beside the blue (Christian's report of 27 November 2026, the
+   * logbook list on a tablet). The page's scrolling part gets the band's gradient behind the gutter, at the band's place
+   * and size, down to the band's bottom; it scrolls with the band (theme.css, `bc-has-band`).
+   */
+  $effect(() => {
+    const el = band;
+    const scroller = /** @type {HTMLElement|null} */ (el?.closest('.page-content') ?? null);
+    if (!el || !scroller) return;
+    const fit = () => {
+      const cs = getComputedStyle(el);
+      const size = cs.backgroundSize.split(',')[1]?.trim().split(/\s+/)[1] ?? '';
+      const y = parseFloat(cs.backgroundPositionY.split(',')[1] ?? '0') || 0;
+      const top = el.offsetTop;
+      scroller.style.setProperty('--bc-gutter-band-top', `${top + y}px`);
+      scroller.style.setProperty('--bc-gutter-band-size', size || `${el.offsetHeight}px`);
+      scroller.style.setProperty('--bc-gutter-band-bottom', `${top + el.offsetHeight}px`);
+      scroller.classList.add('bc-has-band');
+    };
+    fit();
+    const watch = new ResizeObserver(fit);
+    watch.observe(el);
+    return () => {
+      watch.disconnect();
+      scroller.classList.remove('bc-has-band');
+    };
+  });
+
   const PROFILE = BAND_PROFILE;
 </script>
 
@@ -28,7 +59,7 @@
     {#if syncLine}<SyncProfileLine edge />{/if}
   </div>
 {:else}
-<div class="bc-section-band bc-section-band--band" class:bc-section-band--tall={tall} class:bc-section-band--over-map={overMap} class:bc-section-band--pill={pill} class:bc-section-band--with-chip={chip} class:bc-section-band--bare={bare}>
+<div bind:this={band} class="bc-section-band bc-section-band--band" class:bc-section-band--tall={tall} class:bc-section-band--over-map={overMap} class:bc-section-band--pill={pill} class:bc-section-band--with-chip={chip} class:bc-section-band--bare={bare}>
   {#if !bare}
     <svg class="bc-section-band--profile" width="300" height="34" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
       <path d="{PROFILE} V140 H0 Z" class="bc-section-band--area" />
