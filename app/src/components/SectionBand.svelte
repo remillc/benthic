@@ -18,8 +18,8 @@
   /**
    * Phones and tablets keep a 4 px scrollbar gutter at the right of a page that scrolls (theme.css): the band stops
    * before it and the page's light background showed beside the blue (Christian's report of 27 November 2026, the
-   * logbook list on a tablet). The page's scrolling part gets the band's gradient behind the gutter, at the band's place
-   * and size, down to the band's bottom, moved with the band at each scroll (theme.css, `bc-has-band`: a background that
+   * logbook list on a tablet). The page's scrolling part gets the band's gradient in the gutter only, at the band's place
+   * and size, moved with the band at each scroll (theme.css, `bc-has-band`: a background that
    * scrolls with the content is not painted under the bar).
    */
   $effect(() => {
@@ -33,7 +33,6 @@
       const top = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
       scroller.style.setProperty('--bc-gutter-band-top', `${top + y}px`);
       scroller.style.setProperty('--bc-gutter-band-size', size || `${el.offsetHeight}px`);
-      scroller.style.setProperty('--bc-gutter-band-bottom', `${top + el.offsetHeight}px`);
       scroller.classList.add('bc-has-band');
     };
     fit();
