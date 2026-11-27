@@ -190,3 +190,9 @@ test('a server that is down never throws and leaves the work for the next run', 
   assert.equal(r.offline, true);
   assert.equal(r.uploaded + r.downloaded, 0);
 });
+
+test('the Photos et vidéos section is not under the Gaz tab on a tablet or the desktop; the phone keeps it (27 November 2026)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const page = readFileSync(new URL('../../app/src/pages/DiveDetail.svelte', import.meta.url), 'utf8');
+  assert.match(page, /\{#if diveMediaEnabled\(\) && !preview && \(layout\.phone \|\| tab !== 'gas'\)\}\s*<DiveMediaSection/);
+});

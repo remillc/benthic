@@ -960,7 +960,8 @@
 
     <!-- Benthic+ only (tasks 2026-11-23-359 and 370): the thumbnails of the dive's photos and videos, synced. Never in the free version or the demo logbook;
          the line about references on another device is gone. The pictures referenced in the logbook stay untouched. -->
-    {#if diveMediaEnabled() && !preview}
+    <!-- Not under the Gaz tab on a tablet or the desktop (27 November 2026); the phone, one long page, keeps it at its end. -->
+    {#if diveMediaEnabled() && !preview && (layout.phone || tab !== 'gas')}
       <DiveMediaSection diveId={diveKeyOf(dive)} readOnly={gear.readOnly} dive={{ number: diveNumber, site: dive.site, date: dive.date, samples: dive.samples, siteCoordinates: dive.siteCoordinates }} {prefs} />
     {/if}
 
