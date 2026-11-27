@@ -1093,7 +1093,6 @@
         <Icon name="openInNew" size={18} />{t(ios ? 'sites.openInPlans' : 'sites.openInMaps')}<span class="bc-sr-only">, {t('sites.opensElsewhere')}</span>
       </a>
     {/if}
-    {#if siteRow}<button type="button" class="bc-desktop-dive-fields--link" onclick={openSite}>{t('desktopDetail.openSiteLink')}</button>{/if}
   {/if}
 </div>
 
@@ -1510,21 +1509,6 @@
     .bc-desktop-dive-fields--no-map {
       margin: 8px 0 12px;
       color: var(--bc-text-2);
-    }
-
-    .bc-desktop-dive-fields--link {
-      align-self: flex-start;
-      width: auto;
-      min-height: 40px;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: var(--bc-code-active);
-      font: inherit;
-      font-size: 14px;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      cursor: pointer;
     }
 
   }

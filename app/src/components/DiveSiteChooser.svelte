@@ -280,7 +280,8 @@
       position: relative;
       box-sizing: border-box;
       width: min(880px, calc(100% - 48px));
-      max-height: calc(100% - 48px);
+      /* Not the whole screen: a margin above and below, the lists scroll inside with a visible bar (27 November 2026). */
+      max-height: min(720px, calc(100% - 96px));
       display: flex;
       flex-direction: column;
       padding: 24px;
@@ -336,6 +337,14 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 24px;
       overflow: auto;
+      scrollbar-gutter: stable;
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: color-mix(in srgb, var(--bc-text) 35%, transparent);
+      }
       &.bc-dive-site-chooser--one {
         grid-template-columns: minmax(0, 1fr);
       }

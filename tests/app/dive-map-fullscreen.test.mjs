@@ -39,3 +39,12 @@ test('the desktop link opens the browser at the dive\'s coordinates', async () =
   assert.equal(webMapUrl(-43380000, 171520000), 'https://www.openstreetmap.org/?mlat=-43.38&mlon=171.52#map=15/-43.38/171.52');
   assert.match(mapsLinks(-43380000, 171520000, 'X').primary, /^geo:-43\.38,171\.52/);
 });
+
+test('the Carte tab has no « Voir le site dans Sites » link; the site chooser dialog keeps a margin and a visible scrollbar (27 November 2026)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const fields = readFileSync(new URL('../../app/src/components/DesktopDiveFields.svelte', import.meta.url), 'utf8');
+  assert.doesNotMatch(fields, /openSiteLink/);
+  const chooser = readFileSync(new URL('../../app/src/components/DiveSiteChooser.svelte', import.meta.url), 'utf8');
+  assert.match(chooser, /max-height: min\(720px, calc\(100% - 96px\)\)/);
+  assert.match(chooser, /\.bc-dive-site-chooser--columns \{[^}]*overflow: auto;[\s\S]*?&::-webkit-scrollbar \{\s*width: 8px;/);
+});

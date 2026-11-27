@@ -212,7 +212,7 @@ test('the Carte tab keeps its desktop height (a phone and a tablet have their ow
 test('the texts of the five tabs exist in French and English', () => {
   for (const lang of ['fr', 'en']) {
     const d = JSON.parse(read(`app/src/i18n/${lang}.json`)).desktopDetail;
-    for (const key of ['notRated', 'weightTotal', 'consumption', 'legendStart', 'legendEnd', 'otherGearAdd', 'openSiteLink', 'addCylinder']) assert.ok(d[key], `${lang} ${key}`);
+    for (const key of ['notRated', 'weightTotal', 'consumption', 'legendStart', 'legendEnd', 'otherGearAdd', 'addCylinder']) assert.ok(d[key], `${lang} ${key}`);
     for (const key of ['weights', 'mix', 'pressure', 'coordinates']) assert.ok(d.label[key], `${lang} label.${key}`);
   }
   assert.equal(JSON.parse(read('app/src/i18n/fr.json')).desktopDetail.notRated, 'Non notée');
