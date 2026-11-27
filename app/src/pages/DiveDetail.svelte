@@ -152,7 +152,7 @@
           const id = neighbourId(dx);
           const view = /** @type {HTMLElement|null} */ (pageEl.parentElement);
           if (id === undefined || !view) return false;
-          // Beside the list the dive pages move in their pane only: the list stays, and the pages are cut at its edge (theme.css).
+          // Beside the list the dive pages move in their pane only: the list stays above them (theme.css).
           push = { view, dir: dx < 0 ? -1 : 1, width: layout.split ? pageEl.clientWidth : view.clientWidth };
           // Until this swipe has settled, a Back or a link waits (or is ignored): the history is rewritten at the end.
           unlock = lockRouter(f7router, 'dive-swipe');
