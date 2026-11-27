@@ -4617,6 +4617,7 @@
     }
   },
   "desktopDetail": {
+    "openInMaps": "Ouvrir dans Maps",
     "diveType": {
       "title": "Type de plongée",
       "long": { "OC": "Circuit ouvert", "CCR": "Recycleur CCR", "PSCR": "Recycleur pSCR", "Freedive": "Apnée" },
@@ -4767,6 +4768,7 @@
     "notRated": "Non notée",
     "starsOf": "{n} sur 5",
     "card": {
+      "map": "Carte",
       "datetime": "Date et heure",
       "site": "Site",
       "people": "Personnes",

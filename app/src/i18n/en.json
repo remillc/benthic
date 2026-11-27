@@ -4617,6 +4617,7 @@
     }
   },
   "desktopDetail": {
+    "openInMaps": "Open in Maps",
     "diveType": {
       "title": "Dive type",
       "long": { "OC": "Open circuit", "CCR": "CCR rebreather", "PSCR": "pSCR rebreather", "Freedive": "Freediving" },
@@ -4767,6 +4768,7 @@
     "notRated": "Not rated",
     "starsOf": "{n} of 5",
     "card": {
+      "map": "Map",
       "datetime": "Date and time",
       "site": "Site",
       "people": "People",

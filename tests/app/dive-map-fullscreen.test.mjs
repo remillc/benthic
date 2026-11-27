@@ -27,9 +27,12 @@ test('the map is 5:3 on a tablet, 220 px on a phone and 300 px on the desktop', 
 });
 
 test('« Ouvrir dans Maps » is an accent text link with the open-externally icon, after Coordonnées', () => {
-  const at = (s) => fields.indexOf(s);
-  assert.ok(at("label={t('desktopDetail.label.coordinates')}") < at('bc-desktop-dive-fields--maps-link external'));
-  assert.match(fields, /<Icon name="openInNew" size=\{18\} \/>\{t\(ios \? 'sites\.openInPlans' : 'sites\.openInMaps'\)\}/);
+  // The link is a snippet drawn after Coordonnées in both layouts (desktop rows; phone and tablet card).
+  const last = (s) => fields.lastIndexOf(s);
+  assert.ok(last("label={t('desktopDetail.label.coordinates')}") < last('{@render mapLink()}'));
+  assert.equal(fields.match(/\{@render mapLink\(\)\}/g)?.length, 2);
+  // Android and the desktop read « Ouvrir dans Maps » as drawn (task 2026-11-27-416); iOS keeps « Ouvrir dans Plans ».
+  assert.match(fields, /<Icon name="openInNew" size=\{18\} \/>\{t\(ios \? 'sites\.openInPlans' : 'desktopDetail\.openInMaps'\)\}/);
   assert.match(fields, /\.bc-desktop-dive-fields--maps-link \{[^}]*color: var\(--bc-code-active\)/);
   assert.match(fields, /href=\{desktopApp \? webMapUrl\(latUdeg, lonUdeg\) : mapsLink\(/);
 });
@@ -47,4 +50,14 @@ test('the Carte tab has no « Voir le site dans Sites » link; the site chooser 
   const chooser = readFileSync(new URL('../../app/src/components/DiveSiteChooser.svelte', import.meta.url), 'utf8');
   assert.match(chooser, /max-height: min\(720px, calc\(100% - 96px\)\)/);
   assert.match(chooser, /\.bc-dive-site-chooser--columns \{[^}]*overflow: auto;[\s\S]*?&::-webkit-scrollbar \{\s*width: 8px;/);
+});
+
+test('phone and tablet: the Carte tab is one card with its header, Site and Coordonnées side by side with labels above (mock-ups detail-onglets-android, android-tablette-detail-onglet-carte-paysage)', () => {
+  const fr = JSON.parse(read('app/src/i18n/fr.json'));
+  assert.equal(fr.desktopDetail.card.map, 'Carte');
+  assert.equal(fr.desktopDetail.openInMaps, 'Ouvrir dans Maps');
+  assert.match(fields, /<DesktopEquipmentCard name="map" title=\{t\('desktopDetail\.card\.map'\)\}>\s*\{#snippet icon\(\)\}<Icon name="map"/);
+  assert.match(fields, /<div class="bc-desktop-dive-fields--map-fields">\s*<DesktopEditField stacked tall name="site"[\s\S]*?<DesktopEditField stacked boxed kind="text" readonly label=\{t\('desktopDetail\.label\.coordinates'\)\}/);
+  assert.match(fields, /\.bc-desktop-dive-fields--map-fields \{[^}]*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\);[^}]*gap: 12px;/);
+  assert.match(fields, /\.bc-desktop-dive-fields--map\.bc-desktop-dive-fields--map-card \{[^}]*border-radius: 16px;/);
 });
