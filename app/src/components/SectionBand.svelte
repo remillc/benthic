@@ -26,16 +26,45 @@
     const el = band;
     const scroller = /** @type {HTMLElement|null} */ (el?.closest('.page-content') ?? null);
     if (!el || !scroller) return;
+    /** The comma-separated layers of a computed background, split at the top level only. @param {string} value */
+    const layers = (value) => {
+      /** @type {string[]} */
+      const out = [];
+      let depth = 0;
+      let from = 0;
+      for (let i = 0; i < value.length; i++) {
+        if (value[i] === '(') depth++;
+        else if (value[i] === ')') depth--;
+        else if (value[i] === ',' && depth === 0) {
+          out.push(value.slice(from, i).trim());
+          from = i + 1;
+        }
+      }
+      out.push(value.slice(from).trim());
+      return out.filter((l) => l && l !== 'none');
+    };
     const fit = () => {
       const drawn = /** @type {HTMLElement} */ (scroller.querySelector('.bc-band-backdrop--fill') ?? el);
+      // What is seen of the band: BandBackdrop's layer clips its fill and folds up as the list scrolls.
+      const seen = /** @type {HTMLElement} */ (scroller.querySelector('.bc-band-backdrop--layer') ?? el);
+      const origin = scroller.getBoundingClientRect().top;
       const box = drawn.getBoundingClientRect();
       const cs = getComputedStyle(drawn);
-      // The gradient's own size and offset when the element states them in px, else its box.
-      const sized = cs.backgroundSize.split(',')[1]?.trim().split(/\s+/) ?? [];
-      const height = /^[\d.]+px$/.test(sized[1] ?? '') ? parseFloat(sized[1]) : box.height;
-      const y = parseFloat(cs.backgroundPositionY.split(',')[1] ?? '0') || 0;
-      scroller.style.setProperty('--bc-gutter-band-top', `${box.top - scroller.getBoundingClientRect().top + y}px`);
-      scroller.style.setProperty('--bc-gutter-band-size', `${box.width}px ${height}px`);
+      const images = layers(cs.backgroundImage);
+      const sizes = layers(cs.backgroundSize);
+      const ys = layers(cs.backgroundPositionY);
+      const repeats = layers(cs.backgroundRepeat);
+      const bottom = Math.max(0, seen.getBoundingClientRect().bottom - origin);
+      const page = getComputedStyle(/** @type {HTMLElement} */ (scroller.closest('.page') ?? scroller)).backgroundColor;
+      const parts = [`linear-gradient(${page}, ${page}) 0 ${bottom}px / 100% 100% no-repeat`];
+      images.forEach((image, i) => {
+        const [w, h] = (sizes[i % sizes.length] ?? '').split(/\s+/);
+        const height = /^[\d.]+px$/.test(h ?? '') ? h : `${box.height}px`;
+        const width = /^[\d.]+px$/.test(w ?? '') ? w : `${box.width}px`;
+        const y = box.top - origin + (parseFloat(ys[i % ys.length] ?? '0') || 0);
+        parts.push(`${image} right 0 top ${y}px / ${width} ${height} ${repeats[i % repeats.length] ?? 'no-repeat'}`);
+      });
+      scroller.style.setProperty('--bc-gutter-band', parts.join(', '));
       scroller.classList.add('bc-has-band');
     };
     fit();

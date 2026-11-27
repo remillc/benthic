@@ -1067,13 +1067,10 @@ html.ios {
     }
   }
 
-  /* Under a section band, the bar's track shows the band's gradient at the band's size, right-aligned: its 4 px are the
-     band's own right edge (SectionBand.svelte sets the place and the size, and moves them with the band at each scroll). */
+  /* Under a section band, the bar's track shows the band as it is drawn, layer by layer, right-aligned, down to the band's
+     visible bottom, then the page's colour (SectionBand.svelte writes it, and again at each scroll). */
   html:not(.bc-desktop-app) .page-content.bc-has-band::-webkit-scrollbar-track {
-    background-image: var(--bc-band-gradient);
-    background-size: var(--bc-gutter-band-size);
-    background-position: right 0 top var(--bc-gutter-band-top);
-    background-repeat: no-repeat;
+    background: var(--bc-gutter-band, transparent);
   }
 }
 
