@@ -7771,3 +7771,29 @@ Mock-ups:
 - Tablet: `android-tablette-detail-onglet-gaz-paysage`, `-co-paysage`, `-pscr-paysage`, `android-tablette-detail-bouteilles-recycleur-paysage`, `android-tablette-detail-bouteille-paysage`, `android-tablette-detail-bouteille-retirer-paysage`.
 - Phone: `detail-onglets-gaz-android`, `ios-detail-onglets-gaz`, `detail3-android`, `detail3-ios` (and their variants).
 - Desktop: `bureau-carnet-onglet-gaz`, `-ccr`, `-pscr`.
+
+## [ ] 2026-11-27-412 Dive detail: choose the dive site, or create one; site fields
+
+Christian asked for this on 27 November 2026. Work in `main`.
+
+**Choose a site.** In the dive detail, Informations tab, the « Site » card opens « Site de la plongée »: a full screen on the phone (Android, iPhone), a dialog on tablet and desktop.
+- Search field « Rechercher un site », which filters both lists below (name, region, country).
+- « Nouveau site » button (replaces « Créer un site à ma position actuelle »).
+- « Dans votre carnet »: the logbook's own sites only, **in alphabetical order**, the current one checked. Never the shared map's sites here.
+- « Dans la carte commune » (Benthic+): shared-map sites near the dive, in their own list (second column on tablet and desktop, below on the phone). Choosing one adds it to the user's sites and links it to the dive.
+- « Plongée sans site » removes the site from the dive. Choosing any site links it right away and returns to the detail.
+
+**New site from a dive.** « Nouveau site » opens the site form (full screen on the phone and tablet, a large dialog on desktop), prefilled with the name typed in the search and the dive's GPS position from the computer, when there is one. Saving creates the site and links it to the dive.
+- The map has a search box (« Chercher un lieu… ») and shows both the user's sites (blue pins) and the shared map's sites (green dots, Benthic+), with a legend; the new site is the red cross. Clicking a shared site reuses it.
+
+**Site fields, everywhere a site is edited** (new site, edit site, new site from a dive):
+- Coordinates: accept several formats (decimal degrees, degrees-minutes, degrees-minutes-seconds, with or without N/S/E/W) and, on blur, rewrite the value in the format chosen in Settings (« Coordonnées GPS »).
+- Country and region: suggestions while typing (autocomplete), and any other value is accepted.
+These two points are notes on the canvases, not drawn.
+
+Mock-ups:
+- Phone: `choisir-site-android`, `choisir-site-commun-android`, `nouveau-site-plongee-android`, `ios-choisir-site`, `ios-nouveau-site-plongee`.
+- Tablet: `android-tablette-detail-choisir-site-paysage`, `android-tablette-site-nouveau-plongee-paysage`.
+- Desktop: `bureau-detail-choisir-site`, `bureau-site-nouveau-plongee`.
+
+Also in this push, mock-ups only (already in the app or no app change needed): the tablet screens without the floating dive toolbar (⋮ menu at the top of the detail, current detail with tabs).
