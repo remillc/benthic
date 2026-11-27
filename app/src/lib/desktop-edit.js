@@ -14,9 +14,10 @@ const G_PER_LB = 453.59237;
 
 /**
  * What the dive computer records: read-only, except on a dive logged by hand (`dive.manual`).
- * The profile, the maximum depth, the duration, the temperatures and the pressures.
+ * The profile, the maximum depth, the duration and the pressures. The air and water temperatures are edited on any dive
+ * since task 2026-11-27-422, as Subsurface desktop does (its Information tab).
  */
-export const RECORDED = /** @type {const} */ (['maxDepth', 'duration', 'waterTemp', 'airTemp', 'startPressure', 'endPressure']);
+export const RECORDED = /** @type {const} */ (['maxDepth', 'duration', 'startPressure', 'endPressure']);
 
 /**
  * The fields of the Informations, Équipement and Gaz tabs. `kind` says how the field is edited:
