@@ -9,6 +9,21 @@ import { currentDiveId } from './dive-ids.js';
 
 /** @typedef {import('benthic-core').DiveDetail} DiveDetail */
 
+/**
+ * The neighbours wait for the start: each detail holds the core's one thread for about 650 ms on a tablet, and the list's
+ * own calls queued behind them (start-up measures, 27 November 2026). Resolved once the logbook list is painted
+ * (Logbook.svelte), or after 5 s whatever happens (a start that never shows the list).
+ */
+let settle = () => {};
+const settled = new Promise((resolve) => {
+  settle = () => resolve(undefined);
+});
+setTimeout(() => settle(), 5000);
+/** The logbook list is on screen: the neighbours can be read. */
+export const startSettled = () => settle();
+/** Resolves once the start has settled. @returns {Promise<unknown>} */
+export const afterStart = () => settled;
+
 /** A few details: the one shown and its neighbours, with some margin. */
 const KEPT = 6;
 /** @type {Map<number, { dive: DiveDetail, stamp: unknown[] }>} id → detail and the logbook version it was read at, the most recent last */
@@ -94,6 +109,7 @@ function read(id) {
  * @param {number[]} ids
  */
 export async function preloadDives(ids) {
+  await settled;
   // Side by side: the swipe can go either way, so neither waits for the other.
   await Promise.all(
     ids.map(async (id) => {

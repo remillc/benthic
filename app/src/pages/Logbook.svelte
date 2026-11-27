@@ -63,6 +63,7 @@
   import { buildRows } from '../lib/logbook-cards.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { mark } from '../lib/perf.js';
+  import { startSettled } from '../lib/dive-preload.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { firstDiveOf, orderOf, rememberFirstDetail, seedStartDetail } from '../lib/detail-snapshot.js';
   import { keepDive, loadDive } from '../lib/dive-preload.js';
@@ -1145,7 +1146,10 @@
           if (data.items.length && !rowsMarked) {
             rowsMarked = true;
             mark('rowsRender');
-            requestAnimationFrame(() => requestAnimationFrame(() => mark('rowsPainted')));
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              mark('rowsPainted');
+              startSettled();
+            }));
           }
           measure();
         },

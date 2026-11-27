@@ -51,7 +51,7 @@
   import { confirmAction } from '../lib/dialogs.js';
   import { readySiteMap } from '../lib/site-image.js';
   import { currentDiveId, onDiveIdsRenumbered } from '../lib/dive-ids.js';
-  import { forgetDive, keepDive, loadDive as readDive, preloadDives, readyDive } from '../lib/dive-preload.js';
+  import { afterStart, forgetDive, keepDive, loadDive as readDive, preloadDives, readyDive } from '../lib/dive-preload.js';
   import {
     formatCylinderSize,
     formatDepth,
@@ -233,6 +233,7 @@
     clearTimeout(ghostTimer);
     if (preview || !layout.split || layout.desktop) return;
     ghostTimer = setTimeout(async () => {
+      await afterStart();
       const ids = listOrder();
       const at = ids.indexOf(Number(diveId));
       if (at < 0) return;
