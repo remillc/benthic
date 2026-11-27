@@ -30,6 +30,7 @@ import java.security.cert.X509Certificate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import org.json.JSONArray
 
 /**
  * Bluetooth permissions, asked when the diver opens the download (never at
@@ -96,6 +97,7 @@ class BenthicCorePlugin : Plugin() {
             NativeCore.init(home)
             // The messages of the cloud log's git work, while it syncs: "syncProgress" events ({message}).
             NativeCore.setSyncListener { message -> notifyListeners("syncProgress", JSObject().put("message", message)) }
+            prefetchLogbook()
             setupThread.execute {
                 val start = System.currentTimeMillis()
                 // The file of the last start is used at once: reading Android's store
@@ -217,6 +219,7 @@ class BenthicCorePlugin : Plugin() {
             return@onCoreThread
         }
         NativeCore.setPrefs(changes.toString())
+        if (startRead && prefsSinceStart.size < 50) prefsSinceStart += JSObject(changes.toString()).toString()
         call.resolve()
     }
 
@@ -256,17 +259,21 @@ class BenthicCorePlugin : Plugin() {
      */
     @PluginMethod
     fun configureCloud(call: PluginCall) = onCoreThread(call, afterSetup = false) {
-        // The user's own git repository, when one was connected: it takes the
-        // place of the cloud account. `email` is then the user name there.
+        call.resolve(configureAccount())
+    }
+
+    /**
+     * Gives the core the account of this device: the user's own git repository when one was connected (it takes the
+     * place of the cloud account; `email` is then the user name there), else the cloud account. configureCloud's
+     * answer. Core thread only.
+     */
+    private fun configureAccount(): JSObject {
         val remote = gitStore.read()
         if (remote != null) {
             try {
                 NativeCore.gitConfigure(remote.url.substringBeforeLast('['), remote.username, remote.token, remote.branch)
-                call.resolve(
-                    JSObject().put("available", true).put("email", remote.username).put("mode", "git")
-                        .put("repository", remote.url.substringBeforeLast('[').substringAfter("://")),
-                )
-                return@onCoreThread
+                return JSObject().put("available", true).put("email", remote.username).put("mode", "git")
+                    .put("repository", remote.url.substringBeforeLast('[').substringAfter("://"))
             } catch (e: IllegalStateException) {
                 Log.w(TAG, "The stored repository cannot be used: ${e.message}")
             }
@@ -277,7 +284,64 @@ class BenthicCorePlugin : Plugin() {
         // cloud is allowed only for the test account named in files/cloud-test.env.
         NativeCore.setCloudTestEmail(readTestEmail())
         // The account email is shown on the Account screen; the password never leaves the plugin.
-        call.resolve(JSObject().put("available", credentials != null).put("email", credentials?.first ?: ""))
+        return JSObject().put("available", credentials != null).put("email", credentials?.first ?: "")
+    }
+
+    /** The early read of the logbook (prefetchLogbook): the settings and account it was read with, and its answer. */
+    private class Prefetch(val prefs: List<String>, val account: String, val json: String)
+
+    /** Set on the core thread by prefetchLogbook; taken or dropped by the first listCloudDives({cached: true}). */
+    private var prefetched: Prefetch? = null
+
+    /** The settings the web layer gave the core since the start, in order, as normalized JSON (setPrefs). */
+    private val prefsSinceStart = mutableListOf<String>()
+
+    /** True until the start's logbook read is answered: setPrefs records the settings until then. */
+    private var startRead = true
+
+    /**
+     * Start-up (27 November 2026): the core reads the device's copy of the logbook as soon as Android starts the app,
+     * while the WebView and the web layer start (about 1.5 s on a tablet), instead of when the web layer asks for it.
+     * The read is the one the web layer would ask for: the settings it gave the core at the last start
+     * (`bc.startCorePrefs`, written by settings.svelte.js), the same account, then cloud_list_cached_dives. Its answer
+     * is used only when the web layer gives the core exactly those settings and the account is the same; otherwise the
+     * logbook is read again, as before. Nothing is read without a remembered account (first launch, local logbook).
+     */
+    private fun prefetchLogbook() {
+        coreThread.execute {
+            try {
+                val store = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+                if (store.getString("bc.repositoryAccount", null) == null && store.getString("bc.cloudAccount", null) == null) return@execute
+                val text = store.getString("bc.startCorePrefs", null) ?: return@execute
+                val list = JSONArray(text)
+                val prefs = (0 until list.length()).map { JSObject(list.getJSONObject(it).toString()).toString() }
+                val start = System.currentTimeMillis()
+                for (changes in prefs) NativeCore.setPrefs(changes)
+                val account = configureAccount()
+                if (!account.optBoolean("available")) return@execute
+                val json = NativeCore.cloudListCachedDives()
+                if (json.isEmpty()) return@execute
+                prefetched = Prefetch(prefs, account.toString(), json)
+                Log.i(TAG, "perf: logbook read ahead in ${System.currentTimeMillis() - start} ms, ${json.length} chars")
+            } catch (e: Exception) {
+                // Nothing kept: the web layer's own read happens as before.
+                prefetched = null
+                Log.w(TAG, "Reading the logbook ahead", e)
+            }
+        }
+    }
+
+    /**
+     * The early read, when it was made with the settings the web layer gave since the start and the account it
+     * configured; else null (and the early read is dropped). Core thread only.
+     */
+    private fun takePrefetch(): String? {
+        startRead = false
+        val early = prefetched ?: return null
+        prefetched = null
+        val same = early.prefs == prefsSinceStart && early.account == configureAccount().toString()
+        Log.i(TAG, "perf: logbook read ahead ${if (same) "used" else "dropped (settings or account changed)"}")
+        return if (same) early.json else null
     }
 
     @PluginMethod
@@ -310,7 +374,10 @@ class BenthicCorePlugin : Plugin() {
     fun listCloudDives(call: PluginCall) = onCoreThread(call, afterSetup = call.getBoolean("cached", false) != true) {
         val cached = call.getBoolean("cached", false) == true
         val start = System.currentTimeMillis()
-        val json = if (cached) {
+        val early = if (cached) takePrefetch() else null
+        val json = if (early != null) {
+            early
+        } else if (cached) {
             NativeCore.cloudListCachedDives()
         } else {
             if (gitStore.read() != null) {
