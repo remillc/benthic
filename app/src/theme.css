@@ -1983,11 +1983,18 @@ html.md {
   }
 
   /*
-   * Beside the list (tablet, 27 November 2026): the list stays; the dive pages move in their pane and pass under it (the
-   * list page is above them), so nothing is cut while the finger moves.
+   * Beside the list (tablet, 27 November 2026): a neighbour dive drawn ahead (DiveDetail.svelte, `ghosts`), laid out but
+   * hidden until a swipe shows it; it moves under the list, which stays above the dive pages.
    */
-  .view.bc-pushing.bc-pushing-split > .page.page-master {
-    transform: none;
+  .bc-dive-ghost {
+    position: absolute;
+    z-index: 1;
+    visibility: hidden;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bc-dive-ghost.bc-dive-ghost--shown {
+    visibility: visible;
   }
 }
 
