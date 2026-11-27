@@ -191,8 +191,11 @@ test('a server that is down never throws and leaves the work for the next run', 
   assert.equal(r.uploaded + r.downloaded, 0);
 });
 
-test('the Photos et vidéos section is not under the Gaz tab on a tablet or the desktop; the phone keeps it (27 November 2026)', async () => {
+test('the Photos et vidéos section is with the notes only: the Notes tab on a tablet or the desktop, the end of the Notes group on a phone (task 2026-11-27-413)', async () => {
   const { readFileSync } = await import('node:fs');
   const page = readFileSync(new URL('../../app/src/pages/DiveDetail.svelte', import.meta.url), 'utf8');
-  assert.match(page, /\{#if diveMediaEnabled\(\) && !preview && \(layout\.phone \|\| tab !== 'gas'\)\}\s*<DiveMediaSection/);
+  assert.match(page, /\{#snippet media\(\)\}\s*\{#if dive && diveMediaEnabled\(\) && !preview\}\s*<DiveMediaSection/);
+  assert.match(page, /<DesktopDiveFields \{\.\.\.fieldProps\} tab=\{key\} hint=\{false\} \/>\s*\{#if key === 'notes'\}\{@render media\(\)\}\{\/if\}/);
+  assert.match(page, /\{#if !layout\.phone && tab === 'notes'\}\{@render media\(\)\}\{\/if\}/);
+  assert.equal(page.match(/<DiveMediaSection/g)?.length, 1, 'one place draws it');
 });
