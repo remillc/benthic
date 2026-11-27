@@ -151,6 +151,7 @@
 
   /** @param {boolean} [openChoice] */
   function startEdit(openChoice = false) {
+    fingerDown = false;
     if (readonly || editing || quiet || sheetOpen || (onpick && picking)) {
       quiet = false;
       return;
@@ -171,13 +172,28 @@
     tick().then(() => {
       const input = box?.querySelector('input, textarea, select, button');
       input?.focus();
-      if (openChoice && input instanceof HTMLSelectElement) input.showPicker();
+      // Chrome refuses showPicker without a user gesture (a finger's pointerdown is none): the select stays focused, a second tap opens it.
+      if (openChoice && input instanceof HTMLSelectElement) {
+        try {
+          input.showPicker();
+        } catch {
+          // Refused: nothing to report.
+        }
+      }
     });
   }
 
+  /** A finger touched a field whose menu opens on the first tap: its focus opens the menu (never a focus by Tab). */
+  let fingerDown = false;
+
   /** @param {PointerEvent} event */
   function pointerDown(event) {
+    // A mouse opens the menu on the press; a finger on its lift (the focus that follows it), the user gesture Chrome asks for.
     if (!openChoiceOnClick || kind !== 'choice' || event.button !== 0) return;
+    if (event.pointerType !== 'mouse') {
+      fingerDown = true;
+      return;
+    }
     event.preventDefault();
     startEdit(true);
   }
@@ -313,8 +329,8 @@
       tabindex="0"
       aria-label="{label}, {restText}"
       bind:this={rest}
-      onfocus={() => startEdit()}
-      onclick={() => startEdit()}
+      onfocus={() => startEdit(fingerDown)}
+      onclick={() => startEdit(fingerDown)}
       onpointerdown={pointerDown}
       onmouseenter={() => (hovered = true)}
       onmouseleave={() => (hovered = false)}

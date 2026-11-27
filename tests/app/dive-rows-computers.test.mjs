@@ -33,3 +33,10 @@ test('Combinaison lists every suit when it opens and filters only once the text 
   assert.match(field, /oninput=\{\(\) => \(\(highlighted = -1\), \(siteTyped = true\)\)\}/);
   assert.match(read('app/src/components/DesktopDiveFields.svelte'), /name="undersuit" kind="choice" openChoiceOnClick /);
 });
+
+test('a menu that opens on the first tap waits for the finger\'s lift (Chrome\'s user gesture) and never throws', () => {
+  const field = read('app/src/components/DesktopEditField.svelte');
+  assert.match(field, /if \(event\.pointerType !== 'mouse'\) \{\s*fingerDown = true;\s*return;\s*\}/);
+  assert.match(field, /onfocus=\{\(\) => startEdit\(fingerDown\)\}/);
+  assert.match(field, /try \{\s*input\.showPicker\(\);\s*\} catch \{/);
+});
