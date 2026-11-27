@@ -7828,3 +7828,23 @@ What to build:
 Out of scope for now: the Mac App Store (Christian will decide later), the choice of the payment provider, prices.
 
 Mock-ups (desktop canvas, page « Pour commencer », row « Accès à la version Desktop »): `bureau-acces-connexion-requise`, `bureau-acces-avertissement`, `bureau-acces-lecture-seule`.
+
+## [ ] 2026-11-27-415 Admin console: new « Comptes » section (support for Benthic+ and desktop access)
+
+Christian asked for this on 27 November 2026. Work in benthic-server (`api/src/console.js`, `docs/console.md`). **Depends on task 414** (the « accès bureau » right on the server): do 414 first, or at least its entitlement model.
+
+Why: the section is for support only (who has which right, give free access, fix mistakes). It does **no billing**: prices, invoices, refunds and cancellations stay in the Google Play, App Store and payment provider consoles.
+
+Look: exactly the console's existing pages (same header, sidebar, tables, chips, buttons, type, date format `2026-11-27 14:22`). The sidebar gets a separator and a « Comptes » entry at the end, on every console page.
+
+Screens (mock-ups in `docs/mockups/admin/`):
+1. **Search** (`admin-comptes-recherche`): field « Rechercher un compte par courriel » (exact address or its beginning, case-insensitive) and « Rechercher ». Results table: Courriel (link to the account), Benthic+ (Oui / Non, with « jusqu’au … », « terminé le … » or « jamais eu »), Accès bureau (same), Créé le. A right that ends within 7 days shows a yellow chip with the days left. Empty state (`admin-comptes-recherche-vide`): « Aucun compte pour ce courriel ». Error state (`admin-comptes-recherche-erreur`): red banner « La recherche a échoué : la base des comptes ne répond pas. Aucun compte n’a été modifié. » with « Réessayer ».
+2. **Account page** (`admin-comptes-fiche`): back link « Comptes »; the address; « Créé le … · Dernière vérification par l’app de bureau : … » (or « jamais »); buttons « Revérifier » (reads the state again from the store or the payment provider, then logs it) and « Accorder un accès ». Two blocks, Benthic+ and Accès bureau, each with its status (active until, ended on, never had) and a table of its sources: Google Play, App Store, achat web du bureau, achat de l’app mobile, Benthic+ (for desktop access), accordé à la main; each with its end date. Only a source « accordé à la main » has « Retirer cet accès ». Then « Journal des droits », most recent first: achat reçu, renouvellement, fin d’abonnement, vérification by the desktop app, webhook accepté or refusé (with the reason), accès accordé or retiré (with the admin and the reason). A refused webhook row is highlighted in red.
+3. **« Accorder un accès »** dialog (`admin-comptes-accorder`): right (Benthic+, Accès bureau, Les deux), end date (required, `YYYY-MM-DD`, the access lasts through that day), reason (required: Bêta-testeur, Partenaire, Geste commercial, Autre; « Autre » shows a required text field). Button « Accorder ».
+4. **« Retirer cet accès ? »** confirmation (`admin-comptes-retirer`), for a hand-granted access only: it names the right, the dates and the reason, says it ends at once and that the store rights stay. Red button « Retirer cet accès ». Rights from a store or a purchase cannot be removed here.
+
+Privacy: the section shows the address and the rights only, never anything from the logbook (dives, sites, notes, equipment), nor the shared-map fingerprints. Nothing in it may link an account to the shared site map. Reword the sentence of `docs/console.md` « No page shows a diver's name… »: it holds for the shared-map pages; the « Comptes » section shows the address and the rights, nothing from the logbook.
+
+Every action (grant, remove, re-check) is a POST with the console's CSRF token and is written to the account's rights log with the admin's name.
+
+Tests: search (exact, prefix, none, error), grant with end date and reason required (refused without either), the right stays active through the end date and stops the day after, removal of a hand-granted access only (a store right cannot be removed), the rights log entries, CSRF refused without a token, every page and action refused without the console's sign-in.
