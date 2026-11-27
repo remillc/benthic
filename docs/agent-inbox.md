@@ -7900,3 +7900,10 @@ Christian asked for this on 27 November 2026. Work in `main`.
 - It copies the coordinates as shown (in the format chosen in Settings) to the clipboard and confirms with a short snackbar « Coordonnées copiées ». It does not open the field for editing.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
+
+## [ ] 2026-11-27-419 Tablet, dive detail, Carte tab: side margins around the map
+
+Christian asked for this on 27 November 2026. Work in `main`. Follows tasks 415 and 416.
+- Tablet, Carte tab: the map gets a 48 px margin on its left and right inside the Carte card, and keeps its 5:3 ratio (so it is narrower and less tall: about 675 × 405 px in the landscape mock-up). The Site and Coordonnées fields below keep the full card width.
+
+Mock-up: `android-tablette-detail-onglet-carte-paysage`.
