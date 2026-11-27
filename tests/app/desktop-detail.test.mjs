@@ -101,7 +101,7 @@ test('Informations: the water type menu and the stars write through the edit pat
   assert.match(fields, /<DesktopStarsRow name="rating"[^>]*onsave=\{\(v\) => save\('rating', v\)\}/);
   const editor = read('app/src/components/DesktopEditField.svelte');
   assert.match(editor, /onpointerdown=\{pointerDown\}/);
-  assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) input\.showPicker\(\)/);
+  assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) \{\s*try \{\s*input\.showPicker\(\);/);
 });
 
 test('Informations: buddy and guide editors hide the editing hint, without hiding errors', () => {
