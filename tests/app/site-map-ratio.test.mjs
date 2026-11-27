@@ -14,7 +14,8 @@ test('SiteMap sets an aspect ratio instead of a fixed height when given a ratio'
 test('site card, edit screen and desktop maps use 2.1 : 1', () => {
   assert.match(read('pages/SiteSheet.svelte'), /<SiteMap[^>]*ratio=\{2\.1\}/);
   // The form of a new site opened from a dive (task 2026-11-27-412) has a square map on a phone (nouveau-site-plongee-android: 358 x 360) and a 1128 x 400 one on a tablet.
-  assert.match(read('pages/SiteEdit.svelte'), /<SiteMap[^>]*ratio=\{mapRatio\}/);
+  // A tablet in landscape: « Nouveau site »'s map is 320 px high instead (task 2026-11-27-420).
+  assert.match(read('pages/SiteEdit.svelte'), /<SiteMap[^>]*ratio=\{flatMap \? 0 : mapRatio\} height=\{flatMap \? '320px' : undefined\}/);
   assert.match(read('pages/SiteEdit.svelte'), /forDive \? \(layout\.phone \? 1 : 2\.8\) : 2\.1/);
   const d = read('components/DesktopSitePosMap.svelte');
   assert.match(d, /aspect-ratio: 2\.1 \/ 1/);

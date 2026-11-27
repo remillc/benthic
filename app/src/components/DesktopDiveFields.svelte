@@ -103,12 +103,16 @@
   );
   // Benthic+ only (tasks 2026-11-22-332 and 333): without it the kit, the undersuit, « Ce lest était » and « Autre équipement »
   // are not in the tab at all.
+  /** Visibilité, Courant, Vagues de surface, Flux-reflux, Froid: the optional conditions (task 2026-11-27-420). */
+  const CONDITION_KEYS = ['visibility', 'current', 'wavesize', 'surge', 'chill'];
   const plus = $derived(isSubscriber());
   const undersuits = $derived(visibleGear().filter((g) => g.type === 'undersuit'));
   /** The menu's last entry: a new undersuit in the inventory (the field shows to a subscriber even with none yet). */
   const ADD_UNDERSUIT = ':add-undersuit';
   const undersuitOptions = $derived([...undersuits.map((g) => ({ value: g.id, label: g.name })), { value: ADD_UNDERSUIT, label: t('desktopDetail.addUndersuit') }]);
   // Combinaison, for a subscriber: the diver's suit pieces (every suit text of the logbook is one, task 2026-11-26-406).
+  /** The five-star conditions of the Conditions card (task 2026-11-27-420): all five with the Settings switch, else the filled ones. */
+  const starConditions = $derived(CONDITION_KEYS.filter((key) => settings.extraConditions || Number(fieldValue(dive, key, prefs)) > 0));
   const suitPieces = $derived(visibleGear().filter((g) => g.type === 'suit'));
   let suitCounts = $state(/** @type {Map<string, number>} */ (new Map()));
   $effect(() => {
@@ -851,8 +855,13 @@
   {#if hint}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
 
   {#if tab === 'info'}
-    <!-- Informations (task 2026-11-23-376): five cards, laid out like the Équipement tab's: site, people, rating, conditions, tags. -->
-    <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info">
+    <!--
+      Informations (tasks 2026-11-23-376 and 2026-11-27-420; mock-ups android-tablette-detail-onglets-paysage, detail-onglets-android):
+      a tablet in landscape has two columns as drawn, Date et heure, Site and Appréciation on the left, Personnes, Signatures and
+      Étiquettes on the right; Conditions and Plongée invalide, not drawn there, end each column. Elsewhere one column in the
+      phone's order: Date et heure, Site, Personnes, Signatures, Appréciation, Conditions, Étiquettes, Plongée invalide.
+    -->
+    {#snippet datetimeCard()}
       <DesktopEquipmentCard name="datetime" title={t('desktopDetail.card.datetime')}>
         {#snippet icon()}<Icon name="calendar" size={22} />{/snippet}
         <div class="bc-desktop-dive-fields--two-columns">
@@ -861,7 +870,8 @@
         </div>
         <p class="bc-desktop-dive-fields--kit-note">{t(layout.desktop ? 'desktopDetail.dateNoteDesktop' : 'desktopDetail.dateNote')}</p>
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet siteCard()}
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
         <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} chevron />
@@ -881,28 +891,33 @@
           <DesktopEditField stacked tall name="trip" kind="choice" label={t('desktopDetail.label.trip')} value={tripName} invitation={t('edit.tripNone')} options={tripOptions} onsave={(v) => saveTrip(String(v))} />
         {/if}
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet peopleCard()}
       <DesktopEquipmentCard name="people" title={t('desktopDetail.card.people')}>
         {#snippet icon()}<Icon name="people" size={22} />{/snippet}
         <DesktopChipsField name="guides" label={t('desktopDetail.label.guideOfDive')} value={dive.guides} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
         <DesktopChipsField name="buddies" label={t('desktopDetail.label.buddies')} value={dive.buddies} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet signaturesCard()}
       {#if !preview && benthicPlusSubscriber()}
         <DiveSignatures {dive} {onsign} />
       {/if}
-
+    {/snippet}
+    {#snippet ratingCard()}
       <DesktopEquipmentCard name="rating" title={t('desktopDetail.card.rating')}>
         {#snippet icon()}<Icon name="star" size={22} />{/snippet}
         <DesktopStarsRow name="rating" label={t('desktopDetail.label.note')} value={dive.rating} onsave={(v) => save('rating', v)} />
-        <DesktopStarsRow name="visibility" label={t('desktopDetail.label.visibility')} value={dive.visibility} onsave={(v) => save('visibility', v)} />
-        {#each ['current', ...(settings.extraConditions ? ['wavesize', 'surge', 'chill'] : [])] as key (key)}
-          <DesktopStarsRow name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
-        {/each}
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet conditionsCard()}
       <DesktopEquipmentCard name="conditions" title={t('desktopDetail.card.conditions')}>
         {#snippet icon()}<Icon name="waves" size={22} />{/snippet}
+        <!-- The five conditions (task 2026-11-27-420): every one with the Settings switch, else only those already filled in
+             (for example by Subsurface desktop). -->
+        {#each starConditions as key (key)}
+          <DesktopStarsRow name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
+        {/each}
         <div class="bc-desktop-dive-fields--two-columns">
           <DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
           {#if manual}
@@ -924,12 +939,14 @@
           {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
         </div>
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet tagsCard()}
       <DesktopEquipmentCard name="tags" title={t('desktopDetail.card.tags')}>
         {#snippet icon()}<Icon name="tag" size={22} />{/snippet}
         <DesktopChipsField name="tags" variant="tag" showLabel={false} label={t('desktopDetail.label.tags')} value={/** @type {string[]} */ (fieldValue(dive, 'tags', prefs))} known={known.tag} newLabel={t('desktopDetail.newTag')} onsave={(v) => save('tags', v)} />
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet invalidCard()}
       <!-- Ends the tab (mock-up detail-onglets-android): a switch that excludes the dive from the statistics. -->
       <DesktopEquipmentCard name="invalid" title={t('edit.invalid')} subtitle={t('edit.invalidText')}>
         {#snippet icon()}<svg class="bc-desktop-dive-fields--invalid-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M5.6 5.6l12.8 12.8" /></svg>{/snippet}
@@ -937,7 +954,34 @@
           <label class="toggle"><input type="checkbox" role="switch" aria-label={t('edit.invalid')} checked={dive.invalid} disabled={preview} onchange={(e) => saveInvalid(e.currentTarget.checked)} /><span class="toggle-icon"></span></label>
         {/snippet}
       </DesktopEquipmentCard>
-    </div>
+    {/snippet}
+    {#if layout.split && !layout.desktop && !layout.portrait}
+      <div class="bc-desktop-dive-fields--info bc-desktop-dive-fields--info-columns">
+        <div class="bc-desktop-dive-fields--info-column">
+          {@render datetimeCard()}
+          {@render siteCard()}
+          {@render ratingCard()}
+          {@render conditionsCard()}
+        </div>
+        <div class="bc-desktop-dive-fields--info-column">
+          {@render peopleCard()}
+          {@render signaturesCard()}
+          {@render tagsCard()}
+          {@render invalidCard()}
+        </div>
+      </div>
+    {:else}
+      <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info">
+        {@render datetimeCard()}
+        {@render siteCard()}
+        {@render peopleCard()}
+        {@render signaturesCard()}
+        {@render ratingCard()}
+        {@render conditionsCard()}
+        {@render tagsCard()}
+        {@render invalidCard()}
+      </div>
+    {/if}
   {:else if tab === 'equipment'}
     <!-- Équipement (task 2026-11-23-366): one card per section. -->
     <div class="bc-desktop-dive-fields--equipment">
@@ -1267,6 +1311,21 @@
       & > :global(*) {
         margin-bottom: 0;
       }
+    }
+
+    /* Informations on a tablet in landscape: two columns placed as drawn (task 2026-11-27-420), not balanced by height. */
+    .bc-desktop-dive-fields--info-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: 14px;
+      align-items: start;
+      padding-bottom: 64px;
+    }
+    .bc-desktop-dive-fields--info-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
     }
 
     /* The Informations tab uses the same cards; the people's rows and the ratings sit in the card's body. */

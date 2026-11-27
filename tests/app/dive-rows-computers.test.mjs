@@ -63,11 +63,12 @@ test('an edit\'s and an undo\'s dive carry their water type, as getDive: the « 
   assert.match(api, /async undo\(options = \{\}\) \{\s*return withWaterType\(JSON\.parse\(\(await native\.undo\(options\)\)\.json\)\);/);
 });
 
-test('a signature row sits on the card\'s white: the signature first, 96 × 48 px, then the name · role, and a 48 px × (mock-ups)', () => {
+test('each signature is a card: the picture across it in 128 px over a thin line, its × in the corner, then name · role (task 2026-11-27-420)', () => {
   const sig = read('app/src/components/DiveSignatures.svelte');
-  assert.match(sig, /data-field="signature">\s*\{#if v\.signature\}<img class="bc-dive-signatures--signature"[^>]*\/>\{\/if\}\s*<div class="bc-dive-signatures--text">/);
-  assert.match(sig, /\.bc-dive-signatures--item \{[^}]*gap: 12px;\s*\}/);
-  assert.doesNotMatch(sig, /\.bc-dive-signatures--item \{[^}]*background/);
-  assert.match(sig, /\.bc-dive-signatures--signature \{[^}]*width: 96px;\s*height: 48px;/);
+  assert.match(sig, /\.bc-dive-signatures--item \{[^}]*border: 1px solid var\(--bc-separator\);\s*border-radius: 12px;/);
+  assert.match(sig, /\.bc-dive-signatures--picture \{[^}]*height: 128px;[^}]*border-bottom: 1px solid var\(--bc-separator\);/);
+  assert.match(sig, /<div class="bc-dive-signatures--picture">\s*<img class="bc-dive-signatures--signature"[^>]*\/>\s*<button type="button" class="bc-dive-signatures--remove bc-dive-signatures--remove-corner" aria-label=\{removeLabel\}/);
+  assert.match(sig, /\.bc-dive-signatures--remove \{\s*flex: none;\s*width: 48px;\s*height: 48px;/);
   assert.match(sig, /<span class="bc-dive-signatures--role">· /);
+  assert.equal(JSON.parse(read('app/src/i18n/fr.json')).validation.removeOf, 'Retirer la signature de {name}');
 });

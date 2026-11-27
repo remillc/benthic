@@ -92,7 +92,7 @@
       <span class="bc-desktop-chips--chip" class:bc-desktop-chips--chip-tag={variant === 'tag'}>
         {#if variant === 'person'}<span class="bc-desktop-chips--initial" aria-hidden="true">{initial(item)}</span>{/if}
         <span class="bc-desktop-chips--name">{item}</span>
-        <button type="button" class="bc-desktop-chips--remove" aria-label={t('desktopDetail.removeItem', { name: item })} onclick={() => remove(i)}><Icon name="close" size={16} /></button>
+        <button type="button" class="bc-desktop-chips--remove" aria-label={t(variant === 'tag' ? 'desktopDetail.removeTag' : 'desktopDetail.removeItem', { name: item })} onclick={() => remove(i)}><Icon name="close" size={16} /></button>
       </span>
     {/each}
     {#if adding}
@@ -144,32 +144,31 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      height: 36px;
+      height: 40px;
       max-width: 100%;
       padding: 0 4px 0 4px;
-      border-radius: 18px;
-      background: var(--bc-trip-band);
+      border-radius: 20px;
+      background: var(--bc-chip-fill);
       color: var(--bc-text);
-      font-size: 14px;
+      font-size: 15px;
     }
 
-    /* A tag: an outlined chip, no initial. */
+    /* A tag: the same grey chip, no initial (task 2026-11-27-420). */
     .bc-desktop-chips--chip-tag {
+      gap: 4px;
       padding-inline-start: 14px;
-      background: none;
-      box-shadow: inset 0 0 0 1px var(--bc-chip-outline);
     }
 
     .bc-desktop-chips--initial {
       flex: none;
       display: grid;
       place-items: center;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--bc-person-initial);
       color: var(--bc-on-person-initial);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
     }
 
@@ -184,8 +183,8 @@
       flex: none;
       display: grid;
       place-items: center;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       padding: 0;
       border: 0;
       border-radius: 50%;

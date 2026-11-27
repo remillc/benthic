@@ -7908,7 +7908,7 @@ Christian asked for this on 27 November 2026. Work in `main`. Follows tasks 415 
 
 Mock-up: `android-tablette-detail-onglet-carte-paysage`.
 
-## [ ] 2026-11-27-420 « Nouveau site » map, Visibilité and Courant moved to a setting, signatures, tags
+## [x] 2026-11-27-420 « Nouveau site » map, Visibilité and Courant moved to a setting, signatures, tags
 
 Christian asked for this on 27 November 2026. Work in `main`.
 

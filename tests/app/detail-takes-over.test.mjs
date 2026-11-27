@@ -97,7 +97,8 @@ test('sources: the Lest card as rows with the amber suggestion on an Android pho
 
 test('sources: Voyage in the Site card with its cross, the invalid switch ends the Informations tab', () => {
   const fields = source('components/DesktopDiveFields.svelte');
-  const info = fields.slice(fields.indexOf("<div class=\"bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info\">"), fields.indexOf("{:else if tab === 'equipment'}"));
+  // The cards are snippets since task 2026-11-27-420 (two columns on a tablet in landscape): read from the tab's start.
+  const info = fields.slice(fields.indexOf("{#if tab === 'info'}"), fields.indexOf("{:else if tab === 'equipment'}"));
   assert.ok(info.indexOf('name="site"') < info.indexOf('data-field="trip"'), 'Voyage follows the site, in its card');
   assert.ok(info.indexOf('data-field="trip"') < info.indexOf('name="people"'), 'and sits before the next card');
   assert.match(info, /aria-label=\{t\('edit\.tripClear'\)\}/);
