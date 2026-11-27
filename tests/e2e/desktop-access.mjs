@@ -152,11 +152,11 @@ export async function desktopAccessFlows(h) {
 
   console.log('Desktop access, the grace period is over');
   tab = await open({ signedIn: true, granted: true, daysAgo: 31 });
-  await waitFor(tab, () => !!document.querySelector('.bc-access-banner--readOnly'));
-  await sleep(500);
+  await waitFor(tab, () => /30.jours/.test(document.querySelector('.bc-access-banner--readOnly')?.textContent ?? ''));
+  await sleep(300);
   expect('access: 31 days after the last check the logbook is read only', { band: true, text: true }, await tab.run(() => {
     const band = document.querySelector('.bc-access-banner--readOnly');
-    return { band: !!band, text: /plus de 30 jours/.test(band?.textContent ?? '') };
+    return { band: !!band, text: /30.jours/.test(band?.textContent ?? '') };
   }));
   if (process.env.BC_SHOTS) await shot(tab, 'access-6-delai-depasse');
   tab.ws.close();

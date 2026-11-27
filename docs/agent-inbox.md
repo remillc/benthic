@@ -7807,7 +7807,7 @@ Same rules as before otherwise (Benthic+ only, not in the free version, the demo
 
 Mock-ups: `android-tablette-detail-onglet-notes-paysage`, `bureau-carnet-onglet-notes`, `detail3-ios`, `detail3-ios-sombre`, `detail3-android`.
 
-## [ ] 2026-11-27-414 Benthic+ and the desktop app: access, offline grace period, read-only mode
+## [x] 2026-11-27-414 Benthic+ and the desktop app: access, offline grace period, read-only mode
 
 Christian decided this on 27 November 2026. Work in `main` (and in benthic-server for the server parts).
 
@@ -7849,7 +7849,7 @@ Every action (grant, remove, re-check) is a POST with the console's CSRF token a
 
 Tests: search (exact, prefix, none, error), grant with end date and reason required (refused without either), the right stays active through the end date and stops the day after, removal of a hand-granted access only (a store right cannot be removed), the rights log entries, CSRF refused without a token, every page and action refused without the console's sign-in.
 
-## [ ] 2026-11-27-416 Correction to task 414: two products, Benthic+ and Benthic Desktop
+## [x] 2026-11-27-416 Correction to task 414: two products, Benthic+ and Benthic Desktop
 
 Christian decided this on 27 November 2026. Work in `main` and in benthic-server. It replaces the business rules of task 414; the rest of 414 (grace period, read-only mode, tests) stays.
 
