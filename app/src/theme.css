@@ -1992,6 +1992,21 @@ html.md {
     /* The spring set by the swipe (lib/swipe.js, settle). */
     transition: transform var(--bc-push-ms, 180ms) var(--bc-push-ease, ease-out);
   }
+
+  /*
+   * Beside the list (tablet, 27 November 2026): a neighbour dive drawn ahead (DiveDetail.svelte, `ghosts`), laid out but
+   * hidden until a swipe shows it; it moves under the list, which stays above the dive pages.
+   */
+  .bc-dive-ghost {
+    position: absolute;
+    z-index: 1;
+    visibility: hidden;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .bc-dive-ghost.bc-dive-ghost--shown {
+    visibility: visible;
+  }
 }
 
 /* The top bar of a section continues into its band (SectionBand.svelte). Out of

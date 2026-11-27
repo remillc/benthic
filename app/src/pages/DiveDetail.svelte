@@ -8,6 +8,7 @@
   // in full. Edit and an overflow menu in the navbar. A row without a value is
   // never shown.
   import { onMount } from 'svelte';
+  import Self from './DiveDetail.svelte';
   import { Page, Navbar, Link, List, Button, Popover, f7, theme } from 'framework7-svelte';
   import { dropPreviousPage, heldBack, heldNavigate, lockRouter } from '../lib/router-guard.js';
   import { trace } from '../lib/nav-trace.js';
@@ -216,6 +217,146 @@
   }
 
   /**
+   * Beside the list (tablet, 27 November 2026): the two neighbour dives are drawn ahead, as previews just outside the pane
+   * (`ghosts`), once this dive is shown and the device is quiet. A swipe then moves this page and the neighbour's preview,
+   * already laid out, with the finger: nothing is built while it moves (building the neighbour's page took about 200 ms on
+   * a Galaxy Tab S6 Lite, the delay Christian felt before the page moved). Through, the real page replaces the preview,
+   * which already sits where it will be.
+   * @type {{ next: import('benthic-core').DiveDetail|null, previous: import('benthic-core').DiveDetail|null }}
+   */
+  let ghosts = $state({ next: null, previous: null });
+  const GHOST_SIDES = /** @type {('next'|'previous')[]} */ (['next', 'previous']);
+  /** The neighbour ids the previews are for (`next` is the older dive, reached by a swipe to the left). */
+  let ghostIds = { next: /** @type {number|undefined} */ (undefined), previous: /** @type {number|undefined} */ (undefined) };
+  let ghostTimer = /** @type {any} */ (0);
+  function prepareGhosts() {
+    clearTimeout(ghostTimer);
+    if (preview || !layout.split || layout.desktop) return;
+    ghostTimer = setTimeout(async () => {
+      const ids = listOrder();
+      const at = ids.indexOf(Number(diveId));
+      if (at < 0) return;
+      ghostIds = { next: ids[at + 1], previous: ids[at - 1] };
+      for (const side of /** @type {const} */ (['next', 'previous'])) {
+        const id = ghostIds[side];
+        if (id === undefined) {
+          ghosts[side] = null;
+          continue;
+        }
+        try {
+          ghosts[side] = readyDive(id) ?? (await readDive(id));
+        } catch {
+          ghosts[side] = null;
+        }
+      }
+    }, 350);
+  }
+  /** The url of a neighbour's page, the same kind of route as this one. @param {number} id */
+  const neighbourUrl = (id) => `${f7route.url.replace(/[^/?]+(\?.*)?$/, '')}${diveParamOf(id)}`;
+
+  /**
+   * A preview moves into the view beside this page: the page's place and size, shown one width to the side while swiped.
+   * @param {HTMLElement} node @param {'next'|'previous'} side
+   */
+  function ghostPlace(node, side) {
+    const pageEl = /** @type {HTMLElement|null} */ (node.closest('.page'));
+    const view = pageEl?.parentElement;
+    if (!pageEl || !view) return;
+    const fit = () => {
+      node.style.left = `${pageEl.offsetLeft}px`;
+      node.style.top = `${pageEl.offsetTop}px`;
+      node.style.width = `${pageEl.offsetWidth}px`;
+      node.style.height = `${pageEl.offsetHeight}px`;
+    };
+    fit();
+    node.dataset.side = side;
+    view.appendChild(node);
+    /** @type {any} */ (node).bcFit = fit;
+    return { destroy: () => node.remove() };
+  }
+
+  /**
+   * Beside the list: this page and the neighbour's preview follow the finger (`ghosts`). Without a preview on that side
+   * (the first or last dive, or not drawn yet), false: the page only gives a little.
+   * @param {HTMLElement} pageEl
+   */
+  function ghostSwipe(pageEl) {
+    /** @type {null|{ ghost: HTMLElement, dir: -1|1, width: number, id: number }} */
+    let push = null;
+    let busy = false;
+    let unlock = () => {};
+    const place = (/** @type {number} */ x) => {
+      if (!push) return;
+      pageEl.style.transform = `translate3d(${x}px, 0, 0)`;
+      push.ghost.style.transform = `translate3d(${-push.dir * push.width + x}px, 0, 0)`;
+    };
+    const clear = () => {
+      for (const el of [pageEl, push?.ghost]) {
+        if (!el) continue;
+        el.style.transition = '';
+        el.style.transform = '';
+        el.style.willChange = '';
+      }
+    };
+    return {
+      /** @param {number} dx */
+      move(dx) {
+        if (busy) return true;
+        if (!push) {
+          const side = dx < 0 ? 'next' : 'previous';
+          const id = ghostIds[side];
+          const view = pageEl.parentElement;
+          const ghost = /** @type {HTMLElement|null} */ (view?.querySelector(`:scope > .bc-dive-ghost[data-side="${side}"]`) ?? null);
+          if (id === undefined || !ghost || !ghosts[side]) return false;
+          /** @type {any} */ (ghost).bcFit?.();
+          push = { ghost, dir: dx < 0 ? -1 : 1, width: pageEl.offsetWidth, id };
+          unlock = lockRouter(f7router, 'dive-swipe');
+          trace('swipe', 'dive preview');
+          pageEl.style.willChange = 'transform';
+          ghost.style.willChange = 'transform';
+          ghost.classList.add('bc-dive-ghost--shown');
+        }
+        place(push.dir < 0 ? Math.min(dx, 0) : Math.max(dx, 0));
+        return true;
+      },
+      cancel() {
+        if (!push || busy) return false;
+        push.ghost.classList.remove('bc-dive-ghost--shown');
+        clear();
+        push = null;
+        unlock();
+        return true;
+      },
+      /** @param {number} dx @param {number} velocity */
+      end(dx, velocity) {
+        if (!push) return false;
+        const p = push;
+        const x = p.dir < 0 ? Math.min(dx, 0) : Math.max(dx, 0);
+        const through = x !== 0 && swipeGoesThrough(x, velocity, p.width);
+        const target = through ? p.dir * p.width : 0;
+        const { easing, ms } = settle(x, target, x !== 0 ? velocity : 0);
+        busy = true;
+        for (const el of [pageEl, p.ghost]) el.style.transition = `transform ${ms}ms ${easing}`;
+        place(target);
+        setTimeout(() => {
+          trace('swipe-end', through ? 'dive preview through' : 'dive preview reset');
+          unlock();
+          if (through) {
+            // The real page takes the preview's place, without animation: the preview stays on screen until it is there.
+            f7router.navigate(neighbourUrl(p.id), { reloadCurrent: true, animate: false });
+          } else {
+            p.ghost.classList.remove('bc-dive-ghost--shown');
+            clear();
+          }
+          push = null;
+          busy = false;
+        }, ms);
+        return true;
+      },
+    };
+  }
+
+  /**
    * The page follows the finger; lifted past a quarter of the width (or
    * flicked), it goes out on that side and the next dive comes in from the
    * other; otherwise it comes back. At the first or last dive it only gives
@@ -226,6 +367,7 @@
     const content = /** @type {HTMLElement|null} */ (page.el.querySelector('.page-content'));
     if (!content) return;
     const pair = sideBySide(page.el);
+    const beside = ghostSwipe(page.el);
     /** @param {number} dx */
     const hasNeighbour = (dx) => {
       const ids = listOrder();
@@ -235,20 +377,20 @@
     horizontalSwipe(content, {
       accept: (e) => !(/** @type {HTMLElement} */ (e.target).closest('.bc-dive-profile--profile')) && !document.querySelector('.modal-in:not(.toast)'),
       move(dx) {
-        if (!layout.split && pair.move(dx)) return;
+        if (layout.split ? beside.move(dx) : pair.move(dx)) return;
         const shown = hasNeighbour(dx) ? dx : dx / 3;
         content.style.transition = '';
         content.style.transform = `translateX(${shown}px)`;
         content.style.opacity = String(1 - Math.min(Math.abs(shown) / content.clientWidth, 1) / 2);
       },
       cancel() {
-        if (!layout.split && pair.cancel()) return;
+        if (layout.split ? beside.cancel() : pair.cancel()) return;
         content.style.transition = '';
         content.style.transform = '';
         content.style.opacity = '';
       },
       end(dx, velocity) {
-        if (!layout.split && pair.end(dx, velocity)) return;
+        if (layout.split ? beside.end(dx, velocity) : pair.end(dx, velocity)) return;
         const width = content.clientWidth;
         const neighbour = hasNeighbour(dx);
         const through = neighbour && swipeGoesThrough(dx, velocity, width);
@@ -441,6 +583,7 @@
     const ids = listOrder();
     const at = ids.indexOf(id);
     if (at >= 0) preloadDives([ids[at + 1], ids[at - 1]].filter((n) => n !== undefined));
+    prepareGhosts();
   }
 
   /** « Réessayer » on the error state: reads the dive again. */
@@ -968,6 +1111,16 @@
     <div class="bc-dive-detail--end" aria-hidden="true"></div>
   {/if}
 
+  {#if !preview && layout.split && !layout.desktop}
+    {#each GHOST_SIDES as side (side)}
+      {@const g = ghosts[side]}
+      {#if g}
+        <div class="bc-dive-ghost" aria-hidden="true" inert use:ghostPlace={side}>
+          <Self f7route={{ params: { id: diveParamOf(g.id) }, url: neighbourUrl(g.id) }} f7router={null} preview={g} />
+        </div>
+      {/if}
+    {/each}
+  {/if}
 </Page>
 
 {#if sharing}
