@@ -21,6 +21,8 @@
   import { t } from '../lib/i18n.js';
 
   /**
+   * `onpick`: the field opens a chooser of its own instead of being edited in place (the dive's site, task 2026-11-27-412);
+   * `picking` says the chooser is open, so that the focus returning to the field does not open it again.
    * `value`: the field's value (a text, a list of names, or a number of stars). `display`: what is
    * shown at rest when it is not the value itself. `known`: what the logbook already holds, for the
    * list and site fields. `newLabel`: « Ajouter « {name} » comme nouveau… ». `valid`: live check of
@@ -48,13 +50,15 @@
    *   onopen?: () => void,
    *   openLabel?: string,
    *   openChoiceOnClick?: boolean,
+   *   onpick?: () => void,
+   *   picking?: boolean,
    *   showHint?: boolean,
    *   manage?: { label: string, onclick: () => void }|null,
    *   leading?: import('svelte').Snippet,
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, showHint = true, manage = null, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
 
   const uid = $props.id();
   let editing = $state(false);
@@ -124,6 +128,15 @@
       saving = false;
     }
   }
+  // The chooser of `onpick` closed: the focus goes back to the field, which must not open it again.
+  let wasPicking = false;
+  $effect(() => {
+    if (wasPicking && !picking) {
+      quiet = true;
+      setTimeout(() => (quiet = false), 300);
+    }
+    wasPicking = picking;
+  });
   function sheetClosed() {
     sheetOpen = false;
     // The focus goes back to the field: that must not open the sheet again.
@@ -133,8 +146,12 @@
 
   /** @param {boolean} [openChoice] */
   function startEdit(openChoice = false) {
-    if (readonly || editing || quiet || sheetOpen) {
+    if (readonly || editing || quiet || sheetOpen || (onpick && picking)) {
       quiet = false;
+      return;
+    }
+    if (onpick) {
+      onpick();
       return;
     }
     if (sheetKind) {

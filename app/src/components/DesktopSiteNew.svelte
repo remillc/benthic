@@ -5,13 +5,20 @@
   // « Ajouter le site ». The position by a click on the map (the crosshair), by dragging, or typed;
   // country and region are filled from it (a value typed is kept) and complete as the diver types.
   // A site already within 100 m is offered instead of a duplicate.
-  import { onMount } from 'svelte';
+  // Opened from a dive (`dive`, task 2026-11-27-412; bureau-site-nouveau-plongee): the name typed in the chooser and the dive's
+  // position are the opening values, the map adds « Chercher un lieu », the legend, the diver's sites and (Benthic+) the
+  // shared map's sites around, one of which a click reuses, and the button reads « Ajouter et associer ».
+  import { onMount, untrack } from 'svelte';
   import { BenthicCore } from 'benthic-core';
   import Icon from './Icon.svelte';
   import DesktopSiteField from './DesktopSiteField.svelte';
   import DesktopSitePosMap from './DesktopSitePosMap.svelte';
   import { formatCoordinates, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { deskSites, fillPlace } from '../lib/desktop-sites.svelte.js';
+  import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
+  import { linkSite, loadLinks, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
+  import { inYourSites } from '../lib/shared-sites.js';
+  import { connection } from '../lib/online.svelte.js';
   import { completions, countValues, regionsOfCountry, worldCountries } from '../lib/desktop-sites.js';
   import { placeAt } from '../lib/place-lookup.js';
   import { showSnackbar } from '../lib/snackbar.js';
@@ -21,16 +28,19 @@
    * @type {{
    *   sites: import('benthic-core').SiteSummary[],
    *   at?: { latUdeg: number, lonUdeg: number }|null,
+   *   name?: string,
+   *   dive?: { number: number|string }|null,
    *   oncreated: (site: { uuid: number, name: string }) => void,
    *   onuse: (site: import('benthic-core').SiteSummary) => void,
    *   oncancel: () => void,
    * }}
    * at: where the site starts (the position recorded with a dive without a site).
+   * name: the name it starts with; dive: the dive the site is made for (its number is told under the form).
    * oncreated: the site was added; onuse: the diver chose the site that exists nearby.
    */
-  let { sites, at = null, oncreated, onuse, oncancel } = $props();
+  let { sites, at = null, name: given = '', dive = null, oncreated, onuse, oncancel } = $props();
 
-  let name = $state('');
+  let name = $state(untrack(() => given));
   let description = $state('');
   let notes = $state('');
   let country = $state('');
@@ -42,6 +52,40 @@
   let preview = $state(/** @type {{latUdeg: number, lonUdeg: number}|null} */ (null));
   let coordsText = $state('');
   let nearby = $state(/** @type {import('benthic-core').SiteSummary|null} */ (null));
+  /** The base site chosen on the map: the new site is linked to it when saved. */
+  let useBase = $state(/** @type {string|null} */ (null));
+  /** The shared map's sites around the position (Benthic+, online), for the map of a site made for a dive. */
+  let around = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let aroundTimer;
+  $effect(() => {
+    const p = position;
+    clearTimeout(aroundTimer);
+    if (!dive || !p || !benthicPlusAccount.signedIn || !connection.online) {
+      around = [];
+      return;
+    }
+    aroundTimer = setTimeout(async () => {
+      try {
+        if (!sharedSites.linksLoaded) await loadLinks();
+        const near = await withSession((api, token) => api.nearby(token, { lat: p.latUdeg / 1e6, lon: p.lonUdeg / 1e6, radiusM: 20000, limit: 40 }));
+        around = near.filter((b) => !inYourSites(b.id, sharedSites.links));
+      } catch {
+        around = [];
+      }
+    }, 400);
+    return () => clearTimeout(aroundTimer);
+  });
+  /** A click on a green dot: that site is reused, its name and position fill the form. @param {string} id */
+  function pickShared(id) {
+    const b = around.find((x) => x.id === id);
+    if (!b) return;
+    name = b.name;
+    useBase = b.id;
+    setPosition({ latUdeg: Math.round(b.lat * 1e6), lonUdeg: Math.round(b.lon * 1e6) });
+  }
+  /** The position still is the one the dive's computer recorded. */
+  const fromComputer = $derived(!!at && !!position && position.latUdeg === at.latUdeg && position.lonUdeg === at.lonUdeg);
   let saving = $state(false);
   let lookups = 0;
   let positionLookup = Promise.resolve(true);
@@ -115,6 +159,7 @@
       const lon = position?.lonUdeg ?? 0;
       const created = await siteChange({ action: 'create', value: name.trim(), lat, lon });
       const uuid = created.site?.uuid ?? 0;
+      if (uuid && useBase) await linkSite(uuid, useBase);
       if (description) await siteChange({ action: 'edit', uuid, field: 'description', value: description });
       if (notes) await siteChange({ action: 'edit', uuid, field: 'notes', value: notes });
       // Country and region from the position, then what the diver typed where it differs.
@@ -146,7 +191,7 @@
   <h2 class="bc-site-form--title">{t('sites.newSite')}</h2>
   <div class="bc-site-form--body">
     <div class="bc-site-form--left">
-      <DesktopSitePosMap position={preview ?? position} others={sites.filter((s) => s.hasLocation)} hint={t('desktopSites.clickToPlace')} placeOnClick onmove={setPosition} />
+      <DesktopSitePosMap position={preview ?? position} others={sites.filter((s) => s.hasLocation)} hint={dive ? t('diveSite.clickOrShared') : t('desktopSites.clickToPlace')} placeOnClick search={!!dive} legend={!!dive} shared={around} onshared={pickShared} onmove={setPosition} />
       <p class="bc-site-form--explain">{t('desktopSites.placeExplain')}</p>
     </div>
     <div class="bc-site-form--right">
@@ -155,7 +200,7 @@
         <DesktopSiteField id="bc-new-name" form bind:this={nameField} value={name} oninput={(v) => (name = v)} onkeep={(v) => (name = v)} />
 
         <label for="bc-new-coords">{t('sites.coordinates')}</label>
-        <DesktopSiteField id="bc-new-coords" form value={coordsText} note={t('desktopSites.coordinatesExample')} error={coordsError} oninput={(text) => (preview = parseCoordinates(text))} onkeep={typedCoordinates} oncancel={() => (preview = null)} />
+        <DesktopSiteField id="bc-new-coords" form value={coordsText} note={fromComputer ? t('diveSite.computerPosition') : t('desktopSites.coordinatesExample')} error={coordsError} oninput={(text) => (preview = parseCoordinates(text))} onkeep={typedCoordinates} oncancel={() => (preview = null)} />
 
         <label for="bc-new-country">{t('sites.country')}</label>
         <DesktopSiteField id="bc-new-country" form value={country} note={country && country === autoCountry ? t('sites.fromPosition') : ''} complete={completeCountry} countText={siteCount} oninput={(v) => (country = v)} onkeep={(v) => (country = v)} />
@@ -178,9 +223,11 @@
         </div>
       {/if}
 
+      {#if dive}<p class="bc-site-form--explain">{t('diveSite.newNote', { action: t('diveSite.addAndLink'), number: dive.number })}</p>{/if}
+
       <div class="bc-site-form--actions">
         <button type="button" class="bc-site-form--text" onclick={oncancel}>{t('desktopSites.cancel')}</button>
-        <button type="button" class="bc-site-form--filled" disabled={!valid || saving} onclick={add}>{t('desktopSites.addSite')}</button>
+        <button type="button" class="bc-site-form--filled" disabled={!valid || saving} onclick={add}>{t(dive ? 'diveSite.addAndLink' : 'desktopSites.addSite')}</button>
       </div>
     </div>
   </div>

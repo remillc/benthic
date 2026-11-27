@@ -7772,7 +7772,7 @@ Mock-ups:
 - Phone: `detail-onglets-gaz-android`, `ios-detail-onglets-gaz`, `detail3-android`, `detail3-ios` (and their variants).
 - Desktop: `bureau-carnet-onglet-gaz`, `-ccr`, `-pscr`.
 
-## [ ] 2026-11-27-412 Dive detail: choose the dive site, or create one; site fields
+## [x] 2026-11-27-412 Dive detail: choose the dive site, or create one; site fields
 
 Christian asked for this on 27 November 2026. Work in `main`.
 

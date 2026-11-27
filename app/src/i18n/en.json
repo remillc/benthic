@@ -2974,7 +2974,7 @@
       "Logbook: dives grouped by year, trips you can select, merge, edit together and shift the date and time of several dives, the wait before flying above the list.",
       "Planner: rebuilt, with planned dives saved in the logbook, several levels and gases, the volume per gas with the reserve, and sharing (water slate to print, PDF, image, .ssrf file, QR codes).",
       "Dive: cylinders drawn with their gas, the rebreather seen from the back with the oxygen first, a cylinder opens its edit dialog on phones (a rebreather’s two together), weights as rows with a suggestion on Android, trip and invalid dive in Information, several dive computers (choose the main one, rename), the current, waves, surge and chill ratings, any cylinder type with its own size, cylinders in the order you want, pressures editable on every dive, reading a digital gauge with the camera (Android), a map of the site behind the header.",
-      "Sites: a shared map of dive sites next to your own, and “Clean up the sites” to merge duplicates and give a site to the dives that have none; on tablets and computers, “New site” is a floating button on the map; a shared site you tap shows its coordinates to copy, “Directions”, “Add to my sites” and “Report an error”.",
+      "Sites: a shared map of dive sites next to your own, and “Clean up the sites” to merge duplicates and give a site to the dives that have none; on tablets and computers, “New site” is a floating button on the map; a shared site you tap shows its coordinates to copy, “Directions”, “Add to my sites” and “Report an error”; a dive’s site is chosen from the logbook or the shared map, or created from the dive, and coordinates are typed in decimal degrees, minutes or seconds.",
       "Statistics: each row opens its dives, and the “Where I dive most” heat map shows where your dives concentrate.",
       "Import and export: the .benthic file holds the whole logbook and your data; import of several files, Garmin watches (.fit) and the Suunto app; sending to divelogs.de.",
       "First launch: sign in, start a logbook on the device, import a logbook or try the sample logbook; a copy of the alpha’s logbook is offered.",
@@ -4876,6 +4876,27 @@
     },
     "about": "About Benthic",
     "filterFree": "Free filter…"
+  },
+  "diveSite": {
+    "title": "Dive site",
+    "inLogbook": "In your logbook",
+    "none": "Dive without a site",
+    "noneIos": "Dive without a site",
+    "touchNote": "Touching a site links it to the dive. Typing a name, a region or a country filters both lists.",
+    "clickNote": "Clicking a site links it to the dive. Typing a name, a region or a country filters both lists.",
+    "filterNote": "Typing a name, a region or a country filters the list.",
+    "commonNote": "Common sites near the dive. Choosing one adds it to your sites.",
+    "newNote": "The name comes from the search. “{action}” creates the site and links it to dive no. {number}.",
+    "addAndLink": "Add and link",
+    "computerPosition": "Dive position, recorded by the computer",
+    "mapSearchLabel": "Search for a place on the map",
+    "touchToPlace": "Touch to place the cross",
+    "clickOrShared": "Click the map to place the cross, or a common site to reuse it",
+    "legend": "Legend",
+    "legendYours": "Your sites",
+    "mapLabel": "Map: your sites and the common map's sites around the position",
+    "suggestions": "Suggestions",
+    "failed": "Site not linked. Try again."
   },
   "desktopSites": {
     "column": {

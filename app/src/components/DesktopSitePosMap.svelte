@@ -6,8 +6,11 @@
   // the crosshair or the map under it; the previous position stays as a dashed grey crosshair
   // until the change is kept. The nearby sites are 6 dp grey dots with their names. With
   // `placeOnClick` (a new site), a click on the map brings that point under the crosshair.
+  // A new site from a dive (task 2026-11-27-412, mock-up bureau-site-nouveau-plongee) adds `search` (« Chercher un lieu »),
+  // `legend`, the diver's sites as blue dots, the shared map's sites (`shared`, green dots, a click reuses one) and a red crosshair.
   import { onMount, onDestroy } from 'svelte';
   import Icon from './Icon.svelte';
+  import MapPlaceSearch from './MapPlaceSearch.svelte';
   import { t } from '../lib/i18n.js';
   import { createSiteMap, lngLatOf, positionOf } from '../lib/desktop-map.js';
 
@@ -18,13 +21,18 @@
    *   others?: { uuid: number, name: string, latUdeg: number, lonUdeg: number }[],
    *   hint?: string,
    *   placeOnClick?: boolean,
+   *   search?: boolean,
+   *   legend?: boolean,
+   *   shared?: { id: string, name: string, lat: number, lon: number }[],
+   *   onshared?: (id: string) => void,
    *   onmove: (pos: { latUdeg: number, lonUdeg: number }) => void,
    * }}
    * position: where the crosshair is (null: not placed yet; the map frames the other sites).
    * previous: the position before an uncommitted change, drawn as a dashed crosshair.
    * onmove: the diver moved the crosshair or the map (not a move made by the code).
+   * search: the place search over the map; legend: what the dots are; shared: the shared map's sites, onshared: one was clicked.
    */
-  let { position, previous = null, others = [], hint = '', placeOnClick = false, onmove } = $props();
+  let { position, previous = null, others = [], hint = '', placeOnClick = false, search = false, legend = false, shared = [], onshared, onmove } = $props();
 
   /** @type {HTMLElement|undefined} */
   let container = $state();
@@ -35,6 +43,8 @@
   let dotMarkers = [];
   /** @type {import('maplibre-gl').Marker|undefined} */
   let previousMarker;
+  /** @type {import('maplibre-gl').Marker[]} */
+  let sharedMarkers = [];
 
   const CROSS = 'M14 2v24M2 14h24';
 
@@ -49,6 +59,27 @@
       label.textContent = s.name || t('sites.noName');
       node.append(document.createElement('i'), label);
       return new /** @type {typeof import('maplibre-gl')} */ (maplibregl).Marker({ element: node, anchor: 'left' }).setLngLat(lngLatOf(s)).addTo(/** @type {import('maplibre-gl').Map} */ (map));
+    });
+  }
+
+  /** The shared map's sites: green dots with their names; a click reuses the site. */
+  function drawShared() {
+    if (!map || !maplibregl) return;
+    for (const m of sharedMarkers) m.remove();
+    sharedMarkers = shared.map((s) => {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'bc-desktop-pos-map--shared';
+      node.setAttribute('aria-label', s.name);
+      const label = document.createElement('span');
+      label.textContent = s.name;
+      node.append(document.createElement('i'), label);
+      node.addEventListener('pointerdown', (e) => e.stopPropagation());
+      node.addEventListener('click', (e) => {
+        e.stopPropagation();
+        onshared?.(s.id);
+      });
+      return new /** @type {typeof import('maplibre-gl')} */ (maplibregl).Marker({ element: node, anchor: 'left' }).setLngLat([s.lon, s.lat]).addTo(/** @type {import('maplibre-gl').Map} */ (map));
     });
   }
 
@@ -117,6 +148,7 @@
     followPosition();
     frameOthers();
     drawOthers();
+    drawShared();
     drawPrevious();
     // The map moved by the diver: the position under the crosshair, once it stops.
     m.on('moveend', (e) => {
@@ -144,15 +176,27 @@
     }
   });
   $effect(() => {
+    shared;
+    if (map) drawShared();
+  });
+  $effect(() => {
     previous;
     position;
     drawPrevious();
   });
 </script>
 
-<div class="bc-desktop-pos-map">
+<div class="bc-desktop-pos-map" class:bc-desktop-pos-map--with-legend={legend}>
   <div class="bc-desktop-pos-map--canvas" bind:this={container}></div>
-  {#if hint}<p class="bc-desktop-pos-map--hint">{hint}</p>{/if}
+  {#if search}<MapPlaceSearch onpick={(place) => onmove(place)} />{/if}
+  {#if hint}<p class="bc-desktop-pos-map--hint" class:bc-desktop-pos-map--hint-below={search}>{hint}</p>{/if}
+  {#if legend}
+    <div class="bc-desktop-pos-map--legend" role="group" aria-label={t('diveSite.legend')}>
+      <span><i class="bc-desktop-pos-map--legend-yours" aria-hidden="true"></i>{t('diveSite.legendYours')}</span>
+      {#if shared.length}<span><i class="bc-desktop-pos-map--legend-shared" aria-hidden="true"></i>{t('sharedSites.commonMapButton')}<b class="bc-desktop-pos-map--legend-plus">B+</b></span>{/if}
+      <span><svg width="14" height="14" viewBox="0 0 28 28" aria-hidden="true"><path d={CROSS} /></svg>{t('sites.newSite')}</span>
+    </div>
+  {/if}
   {#if position || placeOnClick}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="bc-desktop-pos-map--cross" onpointerdown={dragCross}>
@@ -227,6 +271,89 @@
     .bc-desktop-pos-map--stroke {
       stroke: var(--bc-secondary);
       stroke-width: 2.5;
+    }
+    /* A new site from a dive: the crosshair is red. */
+    .bc-desktop-pos-map--with-legend .bc-desktop-pos-map--stroke {
+      stroke: var(--bc-alarm);
+      stroke-width: 3;
+    }
+    .bc-desktop-pos-map--hint-below {
+      top: 64px;
+    }
+    .bc-desktop-pos-map--legend {
+      position: absolute;
+      z-index: 2;
+      left: 12px;
+      bottom: 26px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--bc-surface) 94%, transparent);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--bc-text);
+      pointer-events: none;
+      & span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      & svg path {
+        fill: none;
+        stroke: var(--bc-alarm);
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+    }
+    .bc-desktop-pos-map--legend-yours,
+    .bc-desktop-pos-map--legend-shared {
+      width: 12px;
+      height: 12px;
+      margin: 0 1px;
+      border-radius: 6px;
+    }
+    .bc-desktop-pos-map--legend-yours {
+      background: var(--bc-secondary);
+    }
+    .bc-desktop-pos-map--legend-shared {
+      background: var(--bc-shared-site);
+    }
+    .bc-desktop-pos-map--legend-plus {
+      font-family: Georgia, serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--bc-alarm);
+    }
+    :global(.bc-desktop-pos-map--shared) {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+      border: 0;
+      background: none;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    :global(.bc-desktop-pos-map--shared i) {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--bc-on-shared-site);
+      border-radius: 50%;
+      background: var(--bc-shared-site);
+      box-sizing: border-box;
+    }
+    :global(.bc-desktop-pos-map--shared span) {
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--bc-shared-site);
+      -webkit-text-stroke: 3px var(--bc-surface-2);
+      paint-order: stroke fill;
+    }
+    .bc-desktop-pos-map--with-legend :global(.bc-desktop-pos-map--other i) {
+      width: 8px;
+      height: 8px;
+      background: var(--bc-secondary);
     }
     :global(.bc-desktop-pos-map--previous path) {
       fill: none;
