@@ -49,6 +49,9 @@ class BenthicCorePlugin : Plugin() {
 
     /** Network only (probeCloud): runs while the core thread loads the log. */
     private val networkThread: ExecutorService = Executors.newSingleThreadExecutor()
+
+    /** Sends large answers to the web layer (their quoting is slow) without holding the core's thread. */
+    private val resolveThread: ExecutorService = Executors.newSingleThreadExecutor()
     private val repoDir: File by lazy { File(context.filesDir, "carnet") }
     private val repo: String by lazy { "${repoDir.absolutePath}[main]" }
     private val credentialStore: CredentialStore by lazy { CredentialStore(context) }
@@ -176,7 +179,13 @@ class BenthicCorePlugin : Plugin() {
             call.reject("Missing dive id", "BAD_ARGUMENT")
             return@onCoreThread
         }
-        call.resolve(JSObject(NativeCore.getDive(id)))
+        val t0 = System.currentTimeMillis()
+        val text = NativeCore.getDive(id)
+        val t1 = System.currentTimeMillis()
+        val obj = JSObject(text)
+        val t2 = System.currentTimeMillis()
+        call.resolve(obj)
+        Log.i(TAG, "perf: getDive $id: core ${t1 - t0} ms, ${text.length} chars, parse ${t2 - t1} ms, resolve ${System.currentTimeMillis() - t2} ms")
     }
 
     /** Planner settings as the core's preferences hold them (plan.cpp). */
@@ -320,7 +329,10 @@ class BenthicCorePlugin : Plugin() {
             }
         }
         Log.i(TAG, "listCloudDives(cached=$cached): ${json.length} chars, ${System.currentTimeMillis() - start} ms")
-        call.resolve(JSObject().put("available", true).put("json", json))
+        // Quoting the logbook (800 kB) for the bridge took about a second on a tablet: done off the core's thread, which
+        // the calls after it wait for (start-up measures, 27 November 2026).
+        val result = JSObject().put("available", true).put("json", json)
+        resolveThread.execute { call.resolve(result) }
     }
 
     /**
