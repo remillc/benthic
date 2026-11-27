@@ -9,14 +9,23 @@
   // site is set on that dive (dives without a site). A new site next to a site of the shared map (Benthic+,
   // task 2026-11-19-315, point 6; sites-edition-commun-android.dc.html) gets the teal banner « La carte commune a déjà
   // un site à 160 pi » with « Utiliser ce site »: its name and position fill the form and the saved site is linked to it.
+  // A new site opened from a dive (?dive=, task 2026-11-27-412; nouveau-site-plongee-android, ios-nouveau-site-plongee): the
+  // name typed in the chooser (?name=) and the dive's position are the opening values, the map shows the diver's sites
+  // (pins) and, for Benthic+, the shared map's sites around (dots; a tap on one reuses it), « Chercher un lieu », a legend
+  // and the new site as a red cross. Country and region suggest values while typed and keep any value.
   import { onMount } from 'svelte';
   import { Page, Navbar, Link } from 'framework7-svelte';
-  import { ios } from '../lib/layout.svelte.js';
+  import { ios, layout } from '../lib/layout.svelte.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { BenthicCore } from 'benthic-core';
   import Icon from '../components/Icon.svelte';
   import TextField from '../components/TextField.svelte';
   import SiteMap from '../components/SiteMap.svelte';
+  import SuggestField from '../components/SuggestField.svelte';
+  import MapPlaceSearch from '../components/MapPlaceSearch.svelte';
+  import { cachedSites } from '../lib/core-cache.js';
+  import { completions, countValues, regionsOfCountry, worldCountries } from '../lib/desktop-sites.js';
+  import { deskSites, loadRegions } from '../lib/desktop-sites.svelte.js';
   import { logbook, saveDiveChanges } from '../lib/logbook.svelte.js';
   import { formatCoordinates, geocodeSite, parseCoordinates, siteChange } from '../lib/sites.svelte.js';
   import { placeAt } from '../lib/place-lookup.js';
@@ -28,11 +37,12 @@
   import { benthicPlusAccount } from '../lib/benthic-plus-state.svelte.js';
   import { linkSite, loadLinks, sharedSites, withSession } from '../lib/shared-sites.svelte.js';
   import { SUGGEST_RADIUS_M, inYourSites } from '../lib/shared-sites.js';
+  import { distanceText as awayText } from '../lib/shared-sites-format.js';
   import { baseDivesText, distanceValue } from '../lib/shared-sites-format.js';
   import { connection } from '../lib/online.svelte.js';
   import { isDirty } from '../lib/leave-guard.js';
 
-  /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string, lat?: string, lon?: string, choose?: string } }, f7router: any }} */
+  /** @type {{ f7route: { params: { uuid?: string }, query: { dive?: string, name?: string, lat?: string, lon?: string, choose?: string } }, f7router: any }} */
   let { f7route, f7router } = $props();
   const editing = f7route.params.uuid ? Number(f7route.params.uuid) : 0;
   const forDive = f7route.query?.dive ? Number(f7route.query.dive) : 0;
@@ -43,7 +53,7 @@
     f7route.query?.lat && f7route.query?.lon ? { latUdeg: Number(f7route.query.lat), lonUdeg: Number(f7route.query.lon) } : null;
 
   let original = $state(/** @type {import('benthic-core').SiteDetail|null} */ (null));
-  let name = $state('');
+  let name = $state(f7route.query?.name ?? '');
   let description = $state('');
   let notes = $state('');
   let country = $state('');
@@ -62,6 +72,63 @@
   let saving = $state(false);
   let lookups = 0;
   let positionLookup = Promise.resolve(true);
+
+  // The logbook's sites: the pins of the map (a new site from a dive) and the completions of Country and Region.
+  let known = $state(/** @type {import('benthic-core').SiteSummary[]} */ ([]));
+  cachedSites().then(
+    (/** @type {import('benthic-core').SiteSummary[]} */ list) => {
+      known = list;
+      loadRegions(list, logbook.sitesVersion);
+    },
+    (/** @type {unknown} */ e) => console.error('Sites', e),
+  );
+  const worldNames = $derived(worldCountries(language));
+  const countryCounts = $derived(countValues(known.map((x) => x.country), language));
+  /** @param {string} text */
+  const completeCountry = (text) => completions(text, countryCounts, worldNames);
+  /** @param {string} text */
+  const completeRegion = (text) => completions(text, regionsOfCountry(known, deskSites.regions, country, language), []);
+  /** The map of a new site from a dive: square on a phone (358 x 360), wide on a tablet (1128 x 400); other forms 2.1 : 1. */
+  const mapRatio = $derived(forDive ? (layout.phone ? 1 : 2.8) : 2.1);
+  const pins = $derived(forDive ? known.filter((x) => x.hasLocation && x.uuid !== editing) : []);
+
+  /** The shared map's sites around the position (Benthic+, online), for the map of a new site from a dive. */
+  let around = $state.raw(/** @type {import('../lib/shared-sites.js').BaseSite[]} */ ([]));
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let aroundTimer;
+  $effect(() => {
+    const p = position;
+    clearTimeout(aroundTimer);
+    if (!forDive || !p || !benthicPlusAccount.signedIn || !connection.online) {
+      around = [];
+      return;
+    }
+    aroundTimer = setTimeout(async () => {
+      try {
+        if (!sharedSites.linksLoaded) await loadLinks();
+        const near = await withSession((api, token) => api.nearby(token, { lat: p.latUdeg / 1e6, lon: p.lonUdeg / 1e6, radiusM: 20000, limit: 40 }));
+        around = near.filter((b) => !inYourSites(b.id, sharedSites.links));
+      } catch {
+        around = [];
+      }
+    }, 400);
+    return () => clearTimeout(aroundTimer);
+  });
+  const baseLayer = $derived(
+    around.length ? { sites: around.map((b) => ({ id: b.id, name: b.name, lat: b.lat, lon: b.lon, label: `${b.name}, ${b.distanceM !== undefined ? awayText(b.distanceM, logbook.prefs) : t('sharedSites.commonMapButton')}` })), clusters: [] } : null,
+  );
+  /** A tap on a dot of the shared map: that site is reused (its name and position fill the form). @param {string} id */
+  function pickShared(id) {
+    const b = around.find((x) => x.id === id);
+    if (!b) return;
+    name = b.name;
+    useBase = b.id;
+    setPosition({ latUdeg: Math.round(b.lat * 1e6), lonUdeg: Math.round(b.lon * 1e6) });
+  }
+  /** The dive's number, for the note under the form. */
+  const diveNumber = $derived(forDive ? (logbook.dives.find((d) => d.id === forDive)?.number ?? '') : '');
+  /** The position still is the one the computer recorded. */
+  const fromComputer = $derived(!!givenPosition && !!position && position.latUdeg === givenPosition.latUdeg && position.lonUdeg === givenPosition.lonUdeg);
 
   // Leaving with changes asks first (components/LeaveGuard.svelte): the fields
   // against those at opening. A new site opens at once; one being edited, when it
@@ -309,9 +376,18 @@
 
   <!-- Full screen (SiteMap's button): the pin still moves, and the new position is kept. -->
   <div class="bc-site-edit--map-card">
-    <SiteMap pin={position} editable onmove={setPosition} ratio={2.1}>
+    <SiteMap pin={position} editable cross={!!forDive} sites={pins} hideDiveCounts names="atZoom" namesFromZoom={12} base={baseLayer} onbaseselect={pickShared} label={forDive ? t('diveSite.mapLabel') : undefined} onmove={setPosition} ratio={mapRatio}>
       {#snippet overlay(/** @type {boolean} */ full)}
-        <span class="chip bc-site-edit--chip" class:bc-site-edit--full={full}>{t('sites.movePin')}</span>
+        {#if forDive}
+          <MapPlaceSearch onpick={setPosition} />
+          <span class="chip bc-site-edit--chip bc-site-edit--chip-below" class:bc-site-edit--full={full}>{t('diveSite.touchToPlace')}</span>
+          <div class="bc-site-edit--legend" role="group" aria-label={t('diveSite.legend')}>
+            <span><svg width="12" height="16" viewBox="-11 -31 22 32" aria-hidden="true"><path d="M0 0c-7-8-11-13-11-19a11 11 0 0 1 22 0c0 6-4 11-11 19z" /></svg>{t('diveSite.legendYours')}</span>
+            {#if benthicPlusAccount.signedIn}<span><i class="bc-site-edit--legend-dot" aria-hidden="true"></i>{t('sharedSites.commonMapButton')}<b class="bc-site-edit--legend-plus">B+</b></span>{/if}
+          </div>
+        {:else}
+          <span class="chip bc-site-edit--chip" class:bc-site-edit--full={full}>{t('sites.movePin')}</span>
+        {/if}
         {#if full && coordsText}<span class="bc-site-edit--coords bc-value">{coordsText}</span>{/if}
       {/snippet}
     </SiteMap>
@@ -338,7 +414,7 @@
       onchange={typedCoordinates}
       oninput={() => { ++lookups; }}
       invalid={coordsBad}
-      supporting={coordsBad ? t('sites.coordinatesInvalid') : t('sites.coordinatesHint')}
+      supporting={coordsBad ? t('sites.coordinatesInvalid') : fromComputer ? t('diveSite.computerPosition') : t('sites.coordinatesHint')}
     >
       {#snippet trailing()}
         <button type="button" class="bc-icon-button" onclick={useDevicePosition}>
@@ -347,8 +423,8 @@
         </button>
       {/snippet}
     </TextField>
-    <TextField label={t('sites.country')} bind:value={country} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
-    <TextField label={t('sites.region')} bind:value={region} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
+    <SuggestField label={t('sites.country')} bind:value={country} suggest={completeCountry} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
+    <SuggestField label={t('sites.region')} bind:value={region} suggest={completeRegion} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
     <p class="bc-site-edit--explain">{t('sites.placeExplain')}</p>
   </div>
 
@@ -356,6 +432,10 @@
     <TextField label={t('sites.description')} bind:value={description} multiline />
     <TextField label={t('sites.notes')} bind:value={notes} multiline />
   </div>
+
+  {#if forDive && diveNumber !== ''}
+    <p class="bc-site-edit--explain">{t('diveSite.newNote', { action: t(ios ? 'dialog.ok' : 'edit.save'), number: diveNumber })}</p>
+  {/if}
 
   {#if editing}
     <div class="bc-form-surface bc-site-edit--delete">
@@ -393,6 +473,55 @@
       &.bc-site-edit--full {
         top: calc(12px + var(--bc-safe-top));
       }
+    }
+
+    .bc-site-edit--chip-below {
+      top: 64px;
+      background: color-mix(in srgb, var(--bc-surface) 92%, transparent);
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+
+      &.bc-site-edit--full {
+        top: calc(64px + var(--bc-safe-top));
+      }
+    }
+
+    .bc-site-edit--legend {
+      position: absolute;
+      left: 12px;
+      bottom: 26px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--bc-surface) 94%, transparent);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--bc-text);
+      pointer-events: none;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      svg path {
+        fill: var(--bc-secondary);
+      }
+    }
+    .bc-site-edit--legend-dot {
+      width: 10px;
+      height: 10px;
+      margin: 0 1px;
+      border-radius: 5px;
+      background: var(--bc-shared-site);
+    }
+    .bc-site-edit--legend-plus {
+      font-family: Georgia, serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--bc-alarm);
     }
 
     .bc-site-edit--coords {

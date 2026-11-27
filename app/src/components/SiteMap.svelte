@@ -56,6 +56,7 @@
    *   base?: { sites: { id: string, name: string, lat: number, lon: number, label: string }[] }|null,
    *   baseSelected?: string|null,
    *   onbaseselect?: (id: string) => void,
+   *   cross?: boolean,
    * }}
    * base: the whole shared map of dive sites (task 2026-11-19-315): its sites as teal dots, grouped on the device into
    *   numbered teal clusters at each whole zoom level while the map zooms (lib/shared-clusters.js); a tap on a cluster
@@ -86,6 +87,7 @@
    * muted: the sites as grey pins with their name, not buttons (the places around).
    * label: the map's accessible name, in place of the list of the sites.
    * onlocate: « Centrer sur ma position » in full screen (the screen has its own outside it).
+   * cross: an editable map shows a red cross on its centre in place of the pin (the new site of a dive, task 2026-11-27-412).
    * overlay: drawn over the map, in and out of full screen (gets whether it is full screen).
    */
   let {
@@ -121,6 +123,7 @@
     base = null,
     baseSelected = null,
     onbaseselect,
+    cross = false,
   } = $props();
 
   /** Full screen: the map is moved to the end of <body>, over everything. */
@@ -701,6 +704,7 @@
   class:bc-site-map--quiet={names !== 'always'}
   class:bc-site-map--desaturated={desaturated}
   class:bc-site-map--pins-hidden={pinsHidden}
+  class:bc-site-map--form={cross}
   class:bc-site-map--names-on={namesOn}
   style:height={full ? '100%' : ratio ? 'auto' : height}
   style:aspect-ratio={!full && ratio ? `${ratio} / 1` : null}
@@ -715,7 +719,12 @@
 >
   <div class="bc-site-map--canvas" bind:this={container}></div>
   {#if heat?.length}<canvas class="bc-site-map--heat" bind:this={heatCanvas} aria-hidden="true"></canvas>{/if}
-  {#if editable}
+  {#if editable && cross}
+    <svg class="bc-site-map--center-cross" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+      <path class="bc-site-map--cross-halo" d="M3 16h26M16 3v26" />
+      <path class="bc-site-map--cross-stroke" d="M3 16h26M16 3v26" />
+    </svg>
+  {:else if editable}
     <!-- The tip of the pin is the centre of the map. -->
     <svg class="bc-site-map--center-pin" width="32" height="42" viewBox="-16 -40 32 42" aria-hidden="true">
       <path d="M0 0c-9-11-14-17-14-24a14 14 0 0 1 28 0c0 7-5 13-14 24z" />
@@ -987,6 +996,25 @@
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
     }
 
+    /* The red cross of a new site: the centre of the map, 32 dp, a white halo under a 3 dp stroke. */
+    .bc-site-map--center-cross {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      fill: none;
+      stroke-linecap: round;
+    }
+    .bc-site-map--cross-halo {
+      stroke: var(--bc-surface);
+      stroke-width: 7;
+    }
+    .bc-site-map--cross-stroke {
+      stroke: var(--bc-alarm);
+      stroke-width: 3;
+    }
+
     .bc-site-map--center-pin {
       position: absolute;
       left: 50%;
@@ -1010,6 +1038,18 @@
     /* A pin per site (no grouping, even when pins overlap): ink, with the number of
        dives, white, 13 sp, bold, in its head; the name beside it, ink with a 4 dp
        white halo. */
+    /* The map of a site form (a new site from a dive): the diver's sites as smaller blue pins (nouveau-site-plongee-android). */
+    .bc-site-map--form :global(.bc-site-map--pin) {
+      transform: scale(0.72);
+      transform-origin: 50% 100%;
+    }
+    .bc-site-map--form :global(.bc-site-map--pin path) {
+      fill: var(--bc-secondary);
+    }
+    .bc-site-map--form :global(.bc-site-map--pin-name) {
+      font-size: 12px;
+    }
+
     :global(.bc-site-map--site-marker) {
       width: 32px;
       height: 42px;

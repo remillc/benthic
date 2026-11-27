@@ -30,6 +30,8 @@
   import DiveSignatures from './DiveSignatures.svelte';
   import DesktopConsumption from './DesktopConsumption.svelte';
   import SiteMap from './SiteMap.svelte';
+  import DiveSiteChooser from './DiveSiteChooser.svelte';
+  import DiveSiteNewDialog from './DiveSiteNewDialog.svelte';
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges, isSubscriber, tripChange } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
@@ -44,10 +46,11 @@
   import { applyKit, cloneEquipment, diveKeyOf, equipmentIsEmpty, removeFromEquipment, sameEquipment } from '../lib/inventory.js';
   import { BenthicCore } from 'benthic-core';
   import { openOver } from '../lib/navigation.svelte.js';
-  import { siteChange } from '../lib/sites.svelte.js';
+  import { addBaseSite } from '../lib/shared-sites.svelte.js';
+  import { currentSiteUuid, newSiteUrl, recordedPosition } from '../lib/dive-site-choice.js';
   import { showSnackbar } from '../lib/snackbar.js';
   import { offerUndo } from '../lib/undo.js';
-  import { configuredCylinderRows, cylinderChanges, fieldChanges, fieldValue, parseTyped, pressureMbarOf, siteChoice, weightChanges, weightText } from '../lib/desktop-edit.js';
+  import { configuredCylinderRows, cylinderChanges, fieldChanges, fieldValue, parseTyped, pressureMbarOf, weightChanges, weightText } from '../lib/desktop-edit.js';
   import { FEEDBACK_CHOICES, feedbackOf, withFeedback, withoutFeedbackTags } from '../lib/weight-feedback.js';
   import { cylinderKey, isMostRecent, showSuggestion, suggestWeight } from '../lib/weight-suggestion.js';
   import { scanWeightSources } from '../lib/weight-suggestion-scan.js';
@@ -359,26 +362,77 @@
     return ok;
   }
 
-  /** @param {string} name */
-  async function saveSite(name) {
-    const choice = siteChoice(name, dive.site, sites);
-    if (choice.action === 'none') return true;
-    let steps = 1;
+  // --- « Site de la plongée » (task 2026-11-27-412): the Site card opens a chooser; choosing links the dive at once. ---
+  let siteChooser = $state(false);
+  /** The desktop's « Nouveau site » dialog, opened from the chooser: the name typed in the search. */
+  let siteDialog = $state(/** @type {{ name: string }|null} */ (null));
+  /** Where the dive was recorded (see recordedPosition), read when the chooser opens. */
+  let divePosition = $state(/** @type {{ latUdeg: number, lonUdeg: number }|null} */ (null));
+  const currentSite = $derived(currentSiteUuid(sites, dive.site));
+
+  async function openSiteChooser() {
+    if (preview) return;
+    const id = dive.id;
+    divePosition = dive.siteCoordinates ?? null;
+    siteChooser = true;
     try {
-      let uuid = 0;
-      if (choice.action === 'existing') uuid = choice.uuid;
-      else if (choice.action === 'create') {
-        const created = await siteChange({ action: 'create', value: choice.name });
-        steps++;
-        uuid = created.site?.uuid ?? 0;
+      const without = dive.site ? [] : await BenthicCore.siteQuery({ kind: 'without' });
+      // Two sites can share the dive's site name: the computer's position is in the detail of the one without coordinates.
+      const same = dive.site ? sites.filter((x) => x.name === dive.site) : [];
+      let detail = null;
+      for (const s of same.filter((x) => !x.hasLocation)) {
+        const d = await BenthicCore.siteQuery({ kind: 'site', uuid: s.uuid });
+        if (recordedPosition(id, [], d, null)) {
+          detail = d;
+          break;
+        }
       }
-      const ok = await write({ site: uuid });
-      if (ok && steps > 1) offerUndo(t('edit.saved'), undefined, 6000, steps);
-      loadSites();
-      return ok;
+      const placed = same.find((x) => x.hasLocation);
+      const fallback = dive.siteCoordinates ?? (placed ? { latUdeg: placed.latUdeg, lonUdeg: placed.lonUdeg } : null);
+      if (dive.id === id) divePosition = recordedPosition(id, without, detail, fallback);
     } catch (e) {
-      failure(e);
-      return false;
+      console.error('Dive position', e);
+    }
+  }
+
+  /** Links the dive to a site of the logbook (0: no site). Throws when it could not be written, so that the chooser stays. @param {number} uuid */
+  async function linkSite(uuid) {
+    if (!(await write({ site: uuid }))) throw new Error('write');
+    logbook.sitesVersion++;
+    loadSites();
+  }
+
+  /** @param {import('benthic-core').SiteSummary} site */
+  async function chooseSite(site) {
+    if (site.uuid !== currentSite) await linkSite(site.uuid);
+  }
+
+  /** A site of the shared map: added to the diver's sites, then linked. @param {import('../lib/shared-sites.js').BaseSite} base */
+  async function chooseBase(base) {
+    let uuid = 0;
+    try {
+      uuid = await addBaseSite(base.id);
+    } catch (e) {
+      showSnackbar(t('sharedSites.card.addFailed'));
+      throw e;
+    }
+    await linkSite(uuid);
+  }
+
+  /** « Nouveau site »: the site form, full screen on a phone and a tablet, a dialog on the desktop. @param {string} name */
+  function newSiteFromDive(name) {
+    siteChooser = false;
+    if (layout.desktop) siteDialog = { name };
+    else openOver(newSiteUrl(dive.id, name, divePosition));
+  }
+
+  /** The site form's dialog saved a site (or the diver took the one nearby). @param {{ uuid: number }} site */
+  async function siteDialogDone(site) {
+    siteDialog = null;
+    try {
+      await linkSite(site.uuid);
+    } catch {
+      showSnackbar(t('diveSite.failed'));
     }
   }
 
@@ -804,7 +858,7 @@
 
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
-        <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
+        <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} />
         {#if layout.phone}
           <!-- A grey field that opens the sheet of the trips; its cross takes the dive out of its trip (mock-up detail-onglets-android). -->
           <div class="bc-desktop-dive-fields--trip" data-field="trip">
@@ -1016,7 +1070,7 @@
     {:else}
       <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
     {/if}
-    <DesktopEditField name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} known={sites.map((s) => ({ key: s.name, dives: s.dives }))} newLabel={t('desktopDetail.newSite')} onsave={(v) => saveSite(/** @type {string} */ (v))} />
+    <DesktopEditField name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
     {#if dive.siteCoordinates}
       <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
     {/if}
@@ -1089,6 +1143,14 @@
       }
     }}
   />
+{/if}
+
+{#if siteChooser}
+  <DiveSiteChooser {sites} current={currentSite} position={divePosition} onchoose={chooseSite} onchoosebase={chooseBase} onnone={() => linkSite(0)} onnew={newSiteFromDive} onclose={() => (siteChooser = false)} />
+{/if}
+
+{#if siteDialog}
+  <DiveSiteNewDialog {sites} name={siteDialog.name} at={divePosition} number={dive.number} ondone={siteDialogDone} oncancel={() => (siteDialog = null)} />
 {/if}
 
 {#if picking}

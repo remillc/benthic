@@ -2974,7 +2974,7 @@
       "Carnet : plongées groupées par année, voyages sélectionnables, fusion, modification groupée et décalage de la date et de l’heure de plusieurs plongées, délai avant de voler au-dessus de la liste.",
       "Planificateur : refait, avec des plongées planifiées enregistrées dans le carnet, plusieurs paliers et gaz, le volume par gaz avec la réserve, et le partage (ardoise à imprimer, PDF, image, fichier .ssrf, codes QR).",
       "Plongée : cylindres dessinés avec leur gaz, recycleur vu de dos avec l’oxygène en premier, une bouteille ouvre son dialogue de modification sur téléphone (les deux d’un recycleur ensemble), lest en lignes avec suggestion sur Android, voyage et plongée invalide dans Informations, ordinateurs de plongée multiples (choix du principal, renommage), courant, vagues, ressac et froid notés, tout type de bouteille avec son volume, bouteilles dans l’ordre voulu, pressions modifiables sur toutes les plongées, lecture d’un manomètre numérique par l’appareil photo (Android), plan de site derrière l’en-tête.",
-      "Sites : carte partagée des sites de plongée à côté des vôtres, « Nettoyer les sites » pour fusionner les doublons et rattacher les plongées sans site ; sur tablette et ordinateur, « Nouveau site » est un bouton flottant sur la carte ; un site de la carte commune touché montre ses coordonnées à copier, « Itinéraire », « Ajouter à mes sites » et « Signaler une erreur ».",
+      "Sites : carte partagée des sites de plongée à côté des vôtres, « Nettoyer les sites » pour fusionner les doublons et rattacher les plongées sans site ; sur tablette et ordinateur, « Nouveau site » est un bouton flottant sur la carte ; un site de la carte commune touché montre ses coordonnées à copier, « Itinéraire », « Ajouter à mes sites » et « Signaler une erreur » ; le site d’une plongée se choisit dans le carnet ou la carte commune, ou se crée depuis la plongée, et les coordonnées se saisissent en degrés décimaux, minutes ou secondes.",
       "Statistiques : chaque ligne ouvre ses plongées, et la carte de chaleur « Où je plonge le plus » montre où se concentrent vos plongées.",
       "Importer et exporter : le fichier .benthic contient tout le carnet et vos données ; import de plusieurs fichiers, des montres Garmin (.fit) et de l’application Suunto ; envoi vers divelogs.de.",
       "Premier lancement : se connecter, créer un carnet sur l’appareil, importer un carnet ou essayer le carnet d’exemple ; une copie du carnet de l’alpha est proposée.",
@@ -4876,6 +4876,27 @@
     },
     "about": "À propos de Benthic",
     "filterFree": "Filtre libre…"
+  },
+  "diveSite": {
+    "title": "Site de la plongée",
+    "inLogbook": "Dans votre carnet",
+    "none": "Plongée sans site",
+    "noneIos": "Plongée sans site",
+    "touchNote": "Toucher un site l’associe à la plongée. Taper un nom, une région ou un pays filtre les deux listes.",
+    "clickNote": "Cliquer sur un site l’associe à la plongée. Taper un nom, une région ou un pays filtre les deux listes.",
+    "filterNote": "Taper un nom, une région ou un pays filtre la liste.",
+    "commonNote": "Les sites communs proches de la plongée. En choisir un l’ajoute à vos sites.",
+    "newNote": "Le nom vient de la recherche. « {action} » crée le site et l’associe à la plongée N° {number}.",
+    "addAndLink": "Ajouter et associer",
+    "computerPosition": "Position de la plongée, relevée par l’ordinateur",
+    "mapSearchLabel": "Chercher un lieu sur la carte",
+    "touchToPlace": "Touchez pour placer la croix",
+    "clickOrShared": "Cliquez sur la carte pour placer la croix, ou sur un site commun pour le reprendre",
+    "legend": "Légende",
+    "legendYours": "Vos sites",
+    "mapLabel": "Carte : vos sites et les sites de la carte commune autour de la position",
+    "suggestions": "Suggestions",
+    "failed": "Site non associé. Réessayez."
   },
   "desktopSites": {
     "column": {
