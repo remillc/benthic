@@ -907,7 +907,7 @@
     {#snippet ratingCard()}
       <DesktopEquipmentCard name="rating" title={t('desktopDetail.card.rating')}>
         {#snippet icon()}<Icon name="star" size={22} />{/snippet}
-        <DesktopStarsRow name="rating" label={t('desktopDetail.label.note')} value={dive.rating} onsave={(v) => save('rating', v)} />
+        <DesktopStarsRow inline={!layout.desktop} name="rating" label={t('desktopDetail.label.note')} value={dive.rating} onsave={(v) => save('rating', v)} />
       </DesktopEquipmentCard>
     {/snippet}
     {#snippet conditionsCard()}
@@ -916,7 +916,7 @@
         <!-- The five conditions (task 2026-11-27-420): every one with the Settings switch, else only those already filled in
              (for example by Subsurface desktop). -->
         {#each starConditions as key (key)}
-          <DesktopStarsRow name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
+          <DesktopStarsRow inline={!layout.desktop} name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
         {/each}
         <div class="bc-desktop-dive-fields--two-columns">
           <DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
@@ -1330,6 +1330,10 @@
 
     /* The Informations tab uses the same cards; the people's rows and the ratings sit in the card's body. */
     .bc-desktop-dive-fields--info {
+      /* « Vagues de surface » is the longest of the conditions' names. */
+      & :global([data-card='conditions']) {
+        --bc-stars-label-width: 140px;
+      }
       & :global([data-card='rating'] .bc-desktop-equipment-card--body) {
         flex-direction: row;
         flex-wrap: wrap;

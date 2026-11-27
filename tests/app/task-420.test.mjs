@@ -53,3 +53,11 @@ test('tags are grey chips like the people\'s: 40 px, 15 px text, a 32 px × name
   assert.match(theme, /--bc-chip-fill: #ECEAE4;/);
   assert.match(theme, /--bc-chip-fill: #2A2B2E;/);
 });
+
+test('the detail\'s star rows read « Note ★★★★☆ 4 sur 5 » on one line on a phone and a tablet (76 px label, 44 px targets)', () => {
+  const row = read('app/src/components/DesktopStarsRow.svelte');
+  assert.match(row, /class:bc-desktop-stars-row--inline=\{inline\}/);
+  assert.match(row, /width: var\(--bc-stars-label-width, 76px\);\s*font-size: 15px;/);
+  assert.match(row, /& \.bc-desktop-stars-row--star \{\s*width: 44px;\s*height: 44px;/);
+  assert.equal(fields.match(/<DesktopStarsRow inline=\{!layout\.desktop\}/g)?.length, 2);
+});

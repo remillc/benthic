@@ -11,10 +11,13 @@
    *   value: number,
    *   name?: string,
    *   text?: string,
+   *   inline?: boolean,
    *   onsave: (value: number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, value, name = '', text = '', onsave } = $props();
+  // `inline`: the label at the left of the stars, 44 px targets and 28 px stars (the detail on a phone or a tablet, mock-ups
+  // android-tablette-detail-onglets-paysage, detail-onglets-android: « Note ★★★★☆ 4 sur 5 »).
+  let { label, value, name = '', text = '', inline = false, onsave } = $props();
 
   const uid = $props.id();
   const current = $derived(Math.min(Math.max(Number(value) || 0, 0), 5));
@@ -36,7 +39,7 @@
   }
 </script>
 
-<div class="bc-desktop-stars-row" data-field={name || undefined}>
+<div class="bc-desktop-stars-row" class:bc-desktop-stars-row--inline={inline} data-field={name || undefined}>
   <span class="bc-desktop-stars-row--label" id="bc-stars-{uid}">{label}</span>
   <div class="bc-desktop-stars-row--line">
     <span class="bc-desktop-stars-row--stars" role="radiogroup" aria-labelledby="bc-stars-{uid}">
@@ -53,7 +56,7 @@
           onclick={() => choose(star)}
           onkeydown={(e) => keydown(e, star)}
         >
-          <svg width="26" height="26" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true" focusable="false"><path d={star <= current ? FILLED : OUTLINE} /></svg>
+          <svg width={inline ? 28 : 26} height={inline ? 28 : 26} viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true" focusable="false"><path d={star <= current ? FILLED : OUTLINE} /></svg>
         </button>
       {/each}
     </span>
@@ -103,6 +106,24 @@
 
     .bc-desktop-stars-row--on {
       color: var(--bc-star-on);
+    }
+
+    /* The label at the left: 76 px (the Conditions card widens it for its longer names), 15 px text, 48 px rows. */
+    .bc-desktop-stars-row--inline {
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+      min-height: 48px;
+      & .bc-desktop-stars-row--label {
+        flex: none;
+        width: var(--bc-stars-label-width, 76px);
+        font-size: 15px;
+        color: var(--bc-text);
+      }
+      & .bc-desktop-stars-row--star {
+        width: 44px;
+        height: 44px;
+      }
     }
 
     .bc-desktop-stars-row--value {

@@ -99,8 +99,8 @@ test('Informations: the water type menu and the stars write through the edit pat
   // The stars are the Appréciation card's rows (task 2026-11-23-376): the same save path.
   // The conditions' star rows (visibility among them) are one loop since task 2026-11-27-420: the same save path.
   assert.match(fields, /const CONDITION_KEYS = \['visibility', 'current', 'wavesize', 'surge', 'chill'\];/);
-  assert.match(fields, /<DesktopStarsRow name=\{key\}[^>]*onsave=\{\(v\) => save\(key, v\)\}/);
-  assert.match(fields, /<DesktopStarsRow name="rating"[^>]*onsave=\{\(v\) => save\('rating', v\)\}/);
+  assert.match(fields, /<DesktopStarsRow [^>]*name=\{key\}[^>]*onsave=\{\(v\) => save\(key, v\)\}/);
+  assert.match(fields, /<DesktopStarsRow [^>]*name="rating"[^>]*onsave=\{\(v\) => save\('rating', v\)\}/);
   const editor = read('app/src/components/DesktopEditField.svelte');
   assert.match(editor, /onpointerdown=\{pointerDown\}/);
   assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) \{\s*try \{\s*input\.showPicker\(\);/);
