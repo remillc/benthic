@@ -92,3 +92,7 @@ test('task 422: the tall text fields of Conditions have no arrow (they are no me
   assert.match(read('app/src/components/DesktopEditField.svelte'), /\{:else if tall && kind === 'text'\}<!-- [^>]*-->\{:else if tall\}<span class="bc-desktop-edit-field--chevron"/);
   for (const key of ['airTemp', 'waterTemp', 'surfacePressure']) assert.equal(fr.desktopDetail.invitation[key], 'Ajouter', key);
 });
+
+test('task 424: 12 px between wrapped chip rows, 8 px between chips', () => {
+  assert.match(read('app/src/components/DesktopChipsField.svelte'), /\.bc-desktop-chips--row \{[^}]*gap: 12px 8px;/);
+});

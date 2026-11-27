@@ -135,7 +135,8 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      /* 12 px between wrapped rows, 8 px between chips (task 2026-11-27-424). */
+      gap: 12px 8px;
       min-width: 0;
     }
 
