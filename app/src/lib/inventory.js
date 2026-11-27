@@ -18,6 +18,7 @@ import { isShortId, newId } from './short-id.js';
 import { migrateDiveIdsInStore } from './dive-id-migration.js';
 import { CYLINDER_TYPES_FOLDER, isTypeFile, pathOfType } from './cylinder-type-files.js';
 import { DISMISSED_SUITS_FOLDER, dismissedSuitPath, newDismissedSuit, dismissedKeys, suitPieceId, suitNorm } from './suit-pieces.js';
+import { DISMISSED_COMPUTERS_FOLDER, dismissedComputerKeys, dismissedComputerPath, newDismissedComputer } from './computer-pieces.js';
 import { WEIGHT_TYPES_FOLDER, isWeightTypeFile, pathOfWeightType } from './weight-type-files.js';
 
 import { ruleProblems } from './maintenance.js';
@@ -497,6 +498,29 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       return dismissedKeys(await store.readAll(DISMISSED_SUITS_FOLDER));
     },
 
+    /** The keys of the logbook computers the diver deleted (lib/computer-pieces.js). @returns {Promise<Set<string>>} */
+    async dismissedComputers() {
+      return dismissedComputerKeys(await store.readAll(DISMISSED_COMPUTERS_FOLDER));
+    },
+
+    /**
+     * Makes the pieces of lib/computer-pieces.js `planComputerPieces` for the logbook's computers. Idempotent: the ids come
+     * from the model and the serial number, a piece that exists is left. @param {{ id: string, name: string, computerModel: string, computerSerial: string }[]} plan
+     * @returns {Promise<number>} the files written
+     */
+    async applyComputerPlan(plan) {
+      const known = new Set((await store.readAll('gear/')).map((g) => g.id));
+      /** @type {[string, unknown][]} */
+      const writes = plan
+        .filter((c) => !known.has(c.id))
+        .map((c) => [
+          `gear/${c.id}.json`,
+          { format: 1, createdAt: stamp(), retired: false, id: c.id, name: c.name, model: c.computerModel, type: 'computer', computerModel: c.computerModel, computerSerial: c.computerSerial, ...(c.computerSerial ? { serial: c.computerSerial } : {}), updatedAt: stamp() },
+        ]);
+      if (writes.length) await commit(writes);
+      return writes.length;
+    },
+
     /**
      * Applies a plan of lib/suit-pieces.js: new suit pieces for the logbook's suit texts, and spellings added to the pieces that
      * have them. Idempotent: the ids come from the text, a piece that exists is extended, never made twice. @param {{ create: { id: string, name: string, suitNames: string[] }[], extend: { id: string, suitNames: string[] }[] }} plan
@@ -604,6 +628,8 @@ export function createInventory(store, { now = () => new Date(), id = newId } = 
       if (piece?.photoId) removes.push(`gear-photos/${piece.photoId}.json`);
       // The texts of a deleted suit are not made into a piece again (task 2026-11-26-406).
       for (const name of new Map((piece?.suitNames ?? []).map((/** @type {string} */ n) => [suitNorm(n), n])).values()) writes.push([dismissedSuitPath(name), newDismissedSuit(name, stamp())]);
+      // Nor is the logbook computer of a deleted computer piece (27 November 2026).
+      if (piece?.type === 'computer' && piece.computerModel) writes.push([dismissedComputerPath(piece.computerModel, piece.computerSerial ?? ''), newDismissedComputer(piece.computerModel, piece.computerSerial ?? '', stamp())]);
       for (const m of await store.readAll('maintenance/')) {
         if (m.gearId !== gearId) continue;
         removes.push(`maintenance/${m.id}.json`);
