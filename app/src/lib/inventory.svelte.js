@@ -11,6 +11,7 @@ import { deviceStore } from './device-store.js';
 import { createInventory, diveKeyOf, recordKey, startKeyOf, readOnlyInfo, pieceFigures, emptyEquipment, cloneEquipment } from './inventory.js';
 import { logbook, isSubscriber } from './logbook.svelte.js';
 import { planSuitPieces, planIsEmpty } from './suit-pieces.js';
+import { planComputerPieces } from './computer-pieces.js';
 import { evaluateAll, todayIso, notificationPlan, applyNotificationPlan, sections, overdueCount } from './maintenance.js';
 import { settings } from './settings.svelte.js';
 import { readSnoozed } from './maintenance-snooze.js';
@@ -105,6 +106,35 @@ export async function loadInventory() {
   scheduleNotifications();
   if (pieces.some((g) => g.suitNames?.length || (g.type === 'computer' && g.computerModel))) refreshLinkedDives().then(scheduleNotifications);
   syncSuitPieces().catch((e) => console.error('Making the logbook suits into pieces', e));
+  syncComputerPieces().catch((e) => console.error('Making the logbook computers into pieces', e));
+}
+
+let computerSyncRunning = false;
+/**
+ * Every computer of the logbook (« Ordinateurs du carnet ») is a piece, as the suits are (lib/computer-pieces.js); Benthic+
+ * only, never while read-only. A computer deleted as a piece is not made again.
+ */
+export async function syncComputerPieces() {
+  if (computerSyncRunning || !gear.ready || gear.readOnly || !isSubscriber()) return;
+  computerSyncRunning = true;
+  try {
+    /** @type {import('benthic-core').LogbookComputer[]} */
+    let computers;
+    try {
+      computers = await BenthicCore.diveComputers();
+    } catch {
+      return;
+    }
+    const inv = open();
+    const plan = planComputerPieces(computers, await inv.listGear(), await inv.dismissedComputers());
+    if (!plan.length) return;
+    if (await inv.applyComputerPlan(plan)) {
+      await loadInventory();
+      signalAccountData('edit');
+    }
+  } finally {
+    computerSyncRunning = false;
+  }
 }
 
 let suitSyncRunning = false;
