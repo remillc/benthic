@@ -32,7 +32,7 @@
       const cs = getComputedStyle(drawn);
       // The gradient's own size and offset when the element states them in px, else its box.
       const sized = cs.backgroundSize.split(',')[1]?.trim().split(/\s+/) ?? [];
-      const height = /px$/.test(sized[1] ?? '') ? parseFloat(sized[1]) : box.height;
+      const height = /^[\d.]+px$/.test(sized[1] ?? '') ? parseFloat(sized[1]) : box.height;
       const y = parseFloat(cs.backgroundPositionY.split(',')[1] ?? '0') || 0;
       scroller.style.setProperty('--bc-gutter-band-top', `${box.top - scroller.getBoundingClientRect().top + y}px`);
       scroller.style.setProperty('--bc-gutter-band-size', `${box.width}px ${height}px`);
