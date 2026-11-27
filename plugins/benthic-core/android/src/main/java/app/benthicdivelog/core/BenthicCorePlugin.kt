@@ -2139,7 +2139,9 @@ class BenthicCorePlugin : Plugin() {
      * regions, and does not wait for the certificates (start of the logbook).
      */
     private fun onCoreThread(call: PluginCall, afterSetup: Boolean = true, block: () -> Unit) {
+        val queued = System.currentTimeMillis()
         coreThread.execute {
+            val started = System.currentTimeMillis()
             try {
                 if (afterSetup) setupDone.await()
                 block()
@@ -2147,6 +2149,9 @@ class BenthicCorePlugin : Plugin() {
                 Log.e(TAG, "Core error", e)
                 call.reject(e.message, "CORE_ERROR", e)
             }
+            // The core has one thread: a slow call holds every call after it (start-up measures, 27 November 2026).
+            val ran = System.currentTimeMillis() - started
+            if (ran >= 100 || started - queued >= 100) Log.i(TAG, "perf: core ${call.methodName} waited ${started - queued} ms, ran $ran ms")
         }
     }
 
