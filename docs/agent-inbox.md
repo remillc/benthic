@@ -8074,3 +8074,13 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 
 1. **Case line under the title**: remove the country and region. It reads « 140 m l’un de l’autre · noms trop différents pour fusionner seuls » (the `[c.a.country, c.a.region]` part of the `bc-lede` goes).
 2. **« Région et pays » in each site's card does not match the mock-up.** Now it is a `bc-compare--place` block with a small note label and the value in bold. In the mock-up it is an ordinary row of the card, like « Plongées » or « Carnets »: the label on the left in #4B4A47, the value on the right in regular weight (« Lighthouse Reef, Belize »), a 1 px #E3E1DC line above, 8 px padding top and bottom, 15 px text. It is the first row under the site's name. The text button « Recalculer la région et le pays » sits right under that row, aligned with the card's text (its icon at the left edge), before the « Plongées » row.
+
+## [ ] 2026-11-28-437 Admin console, « Journal des décisions »: search, sortable columns, pagination, rows open where the decision was made
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `assets/console.css`). Mock-up: `docs/mockups/admin/admin-journal.dc.html`.
+
+1. **No intro sentence**: remove « Toutes les modifications de la base, les vôtres et les automatiques. Annuler remet le site comme avant. »; the title stands alone.
+2. **Search** under the title, above the filter chips: a rounded box « Site, décision ou détail » (the same look as on « Sites de la base »), the journal's existing `q`.
+3. **Every column sorts**, « Action » included (Quand, Par, Décision, Site et détail, Action), the same headers as on « Sites de la base » (button, blue with an arrow for the sorting column, grey up-down arrow for the others, `aria-sort`). Default: Quand, most recent first. « Action » groups the decisions that can still be undone and those already undone.
+4. **Pagination** inside the list's card, under the last row (a thin line above): « 1 à 25 sur 1 248 » on the left; « Par page » (25, 50, 100, 200, remembered) and the previous / next arrow buttons on the right. Same component as on « Sites de la base ».
+5. **A row opens the page where the decision was made**, with that site or case selected: a position corrected, a report rejected or a site closed from reports → « Signalements »; a merge made by an administrator → « Fusions à décider » (or « Sites de la base » on the resulting site when the case no longer exists); an automatic decision → « Sites de la base » on the site. The whole row is clickable (hover tints it and underlines the decision); the decision is a real link for the keyboard. « Annuler » stays a separate button that undoes without leaving the page.
