@@ -9,6 +9,7 @@ import { createServerApi } from './server-api.js';
 import { serverTransport } from './server-transport.js';
 import { serverUrl } from './server-url.js';
 import { isRelease } from './edition.js';
+import { reportDevice } from './device-session.js';
 import { desktopApp, sideWindow } from './layout.svelte.js';
 import { connection } from './online.svelte.js';
 import { KEYS, accessState, checkResult, purchaseUrl, remembered, rightFromOverview, trustedNow } from './desktop-access.js';
@@ -118,6 +119,8 @@ export async function checkDesktopAccess() {
     if (!right) return 'failed';
     const now = trustedNow(Date.now(), remembered(deviceStore).seenAt);
     for (const [key, value] of Object.entries(checkResult(right, now))) deviceStore.setItem(key, value);
+    // The check tells the server what this computer is (task 2026-11-28-431).
+    void reportDevice({ force: true });
     return 'ok';
   } catch {
     return 'failed';

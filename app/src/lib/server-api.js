@@ -142,7 +142,10 @@ export function createServerApi({ baseUrl, transport }) {
     }
     // A deletion answers with an empty body (204) as well as with a JSON one.
     if (response.status >= 200 && response.status < 300 && (json || method === 'DELETE' || response.status === 204)) return json ?? {};
-    throw errorFromResponse(response.status, json);
+    const failure = errorFromResponse(response.status, json);
+    // The HTTP status, for the one caller that tells a session the server ended (401) from a server that does not answer (reportDevice).
+    /** @type {any} */ (failure).status = response.status;
+    throw failure;
   }
 
   return {
@@ -159,21 +162,22 @@ export function createServerApi({ baseUrl, transport }) {
     /**
      * Checks the code; the account is created when the address is new.
      * @param {string} email @param {string} code
+     * @param {import('./device-report.js').DeviceReport|null} [device] what this device tells the server about itself (lib/device-report.js)
      * @returns {Promise<ServerSession>}
      */
-    async verifyCode(email, code) {
-      const r = await call('POST', '/v1/auth/verify', { email: email.trim(), code });
+    async verifyCode(email, code, device) {
+      const r = await call('POST', '/v1/auth/verify', { email: email.trim(), code, ...(device ? { device } : {}) });
       if (typeof r.sessionToken !== 'string' || !r.repository?.url || !r.git?.token) throw new ServerError('UNREACHABLE');
       return r;
     },
 
     /**
      * Signs in with an Apple account (the answer of signInWithApple); the account is created when it is new.
-     * @param {{ idToken: string, nonce: string, authorizationCode?: string, name?: string }} apple
+     * @param {{ idToken: string, nonce: string, authorizationCode?: string, name?: string, device?: import('./device-report.js').DeviceReport|null }} apple
      * @returns {Promise<ServerSession>}
      */
-    async signInApple({ idToken, nonce, authorizationCode, name }) {
-      const r = await call('POST', '/v1/auth/apple', { identityToken: idToken, nonce, ...(authorizationCode ? { authorizationCode } : {}), ...(name ? { name } : {}) });
+    async signInApple({ idToken, nonce, authorizationCode, name, device }) {
+      const r = await call('POST', '/v1/auth/apple', { identityToken: idToken, nonce, ...(authorizationCode ? { authorizationCode } : {}), ...(name ? { name } : {}), ...(device ? { device } : {}) });
       if (typeof r.sessionToken !== 'string' || !r.repository?.url || !r.git?.token) throw new ServerError('UNREACHABLE');
       return r;
     },
@@ -296,6 +300,21 @@ export function createServerApi({ baseUrl, transport }) {
      */
     async signOut(sessionToken) {
       await call('POST', '/v1/auth/sign-out', undefined, { Authorization: `Bearer ${sessionToken}` });
+    },
+
+    /**
+     * Tells the server what this device is (task 2026-11-28-431): `PUT /v1/session/device`, at each sync and each desktop access check. 'ended'
+     * when the server says the session is gone (the device was signed out from the console); 'failed' for anything else.
+     * @param {string} sessionToken @param {import('./device-report.js').DeviceReport} device
+     * @returns {Promise<'ok'|'ended'|'failed'>}
+     */
+    async reportDevice(sessionToken, device) {
+      try {
+        await call('PUT', '/v1/session/device', device, { Authorization: `Bearer ${sessionToken}` });
+        return 'ok';
+      } catch (e) {
+        return /** @type {any} */ (e)?.status === 401 ? 'ended' : 'failed';
+      }
     },
 
     /** @returns {Promise<boolean>} whether the server answers */

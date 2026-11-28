@@ -28,6 +28,7 @@
   import { createServerApi } from '../lib/server-api.js';
   import { serverTransport } from '../lib/server-transport.js';
   import { serverUrl } from '../lib/server-url.js';
+  import { currentDevice } from '../lib/device-session.js';
   import { deviceKind, deviceKey } from '../lib/first-launch-phone.js';
   import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
   import { t } from '../lib/i18n.js';
@@ -106,7 +107,7 @@
       else if (answer.status === 'failed') showSnackbar(t('benthicPlus.providerFailed', { provider: name }));
       if (answer.status !== 'signedIn' || provider !== 'apple') return;
       const session = await createServerApi({ baseUrl: serverUrl(), transport: serverTransport }).signInApple({
-        idToken: answer.idToken, nonce: answer.nonce ?? '', authorizationCode: answer.authorizationCode, name: answer.name,
+        idToken: answer.idToken, nonce: answer.nonce ?? '', authorizationCode: answer.authorizationCode, name: answer.name, device: await currentDevice(),
       });
       flow.plus.email = session.user.email;
       // As the e-mail sign-in: an account without a subscription goes to the offer, and nothing of it is kept on this device.
