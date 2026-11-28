@@ -36,6 +36,7 @@ import { signOutPush } from './push-notifications.svelte.js';
 import { assignMissingIds, idsLookIncomplete, noteIdsList, useDives } from './dive-id.js';
 import { newId } from './short-id.js';
 import { desktopReadOnly } from './desktop-access.svelte.js';
+import { onSessionEnded, reportDevice } from './device-session.js';
 
 /** @typedef {import('benthic-core').Dive} Dive */
 /** @typedef {import('benthic-core').Prefs} Prefs */
@@ -920,6 +921,8 @@ async function syncEdits() {
     logbook.sync = 'offline';
   }
   await countPending();
+  // The device tells the server what it is with each sync (task 2026-11-28-431); quiet, once a minute at most.
+  void reportDevice();
   // The diver's equipment, profile and the rest follow the dives (lib/account-sync.svelte.js).
   signalAccountData('dives');
   return outcome;
@@ -1406,6 +1409,10 @@ let retryTimer;
 let retries = 0;
 
 /** @param {boolean} refused the server answered and refused the credentials */
+// The server ended this device's session (« Déconnecter cet appareil » of the console): the sync is refused, the logbook and its pending
+// changes stay on the device, and the diver is asked to sign in again (the same sheet as a refused sync).
+onSessionEnded(() => noteFailure(true));
+
 function noteFailure(refused) {
   logbook.syncFailure = failureCause({ online: navigator.onLine, gitMode: logbook.mode === 'git', refused });
   clearTimeout(retryTimer);

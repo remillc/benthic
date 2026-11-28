@@ -18,6 +18,7 @@
   import { ServerError, createServerApi, plausibleEmail } from '../lib/server-api.js';
   import { serverTransport } from '../lib/server-transport.js';
   import { serverUrl } from '../lib/server-url.js';
+  import { currentDevice } from '../lib/device-session.js';
   import { ServerLogbookError, openServerLogbook } from '../lib/server-logbook.js';
   import { nextProgress } from '../lib/sync-progress.js';
   import { transferCount } from '../lib/first-launch.js';
@@ -124,7 +125,7 @@
     if (busy || view.primaryDisabled || view.primary !== 'signIn') return;
     busy = true;
     try {
-      const session = await api.verifyCode(s.email, s.code);
+      const session = await api.verifyCode(s.email, s.code, await currentDevice());
       // An account without a subscription goes to the offer, and nothing of it is kept on this device (task 2026-11-17-265).
       if (afterSignIn(session.user, desktopApp) === 'offer') {
         s.code = '';
