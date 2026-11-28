@@ -8012,3 +8012,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, the map script of the console). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows task 426.
 
 On the case's map, draw a dashed line (#1F2124, 2 px, dashes 6/4) between the two sites' positions, under the two markers. At its middle, a white rounded label with a thin #1F2124 outline shows the distance (12 px, 600), in the unit chosen in Réglages (« 140 m » or « 459 pi »; the same `dist()` helper as the rest of the console). The map fits both sites and the label.
+
+## [ ] 2026-11-28-428 Admin console, account page: back arrow instead of the chevron
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-comptes-fiche.dc.html`. The « Comptes » link at the top of an account page shows a back arrow (←, a shaft with its head) instead of the chevron (‹). Same on any other back link of the console.
