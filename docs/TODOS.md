@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 205
+Next number: 207
 
 ## List
 
@@ -55,4 +55,4 @@ Next number: 205
 - #203 [design] en desktop, ajouter l’en-tête bleu avec bordure inférieure ondulée.
 - #204 [design] renommer partout « Carte commune » par « Carte mondiale ».
 - #205 [code] Recruter les testeurs pour le test fermé Google Play (compte personnel créé après le 13 nov. 2023 : au moins 12 testeurs inscrits sans interruption pendant 14 jours avant de pouvoir demander l’accès à la production ; seul le test fermé compte, pas le test interne ni ouvert). Viser une vingtaine de testeurs. Sources : compagnons de plongée, club, boutique ; liste de diffusion et forum de Subsurface, utilisateurs Android du cloud Subsurface ; groupes de plongée en ligne (Québec, Canada, plongée sous glace, technique et recycleur ; Reddit r/scuba et r/diving) ; en dernier recours, communautés d’échange de testeurs (r/AndroidClosedTesting), au faible engagement. Gérer les inscriptions avec un groupe Google. Donner une raison de rester (importer son carnet, télécharger ses plongées, essayer Benthic+), relancer pendant les 14 jours, recueillir les retours avec un formulaire : Google demande de résumer les retours, l’engagement et les changements faits. Fournir un compte de test qui fonctionne si une connexion est requise. Éviter les services payants de testeurs.
-- #204 [code] Concernant la console d'administration, analyser les mesures de sécurité en place, leurs forces et faiblesses et les manquements. Comme nous allons y stocker des informations liées au compte de personnes, il faudrait que ces informations soient encryptées dans la base de données. Est-ce possible tout en gardant les fonctionnalités du site?
+- #206 [code] Concernant la console d'administration, analyser les mesures de sécurité en place, leurs forces et faiblesses et les manquements. Comme nous allons y stocker des informations liées au compte de personnes, il faudrait que ces informations soient encryptées dans la base de données. Est-ce possible tout en gardant les fonctionnalités du site?
