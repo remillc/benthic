@@ -8006,3 +8006,9 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
    - A pencil icon button at the right of the site's name (« Modifier le nom de … »): the name becomes an editable field in place, with « Enregistrer » and « Annuler »; saving renames that site of the base (POST with the CSRF token) and is written to the decisions journal, like an edit on « Sites de la base ».
    - A row « Région et pays » (« Lighthouse Reef, Belize ») under the name, then a text button « Recalculer la région et le pays » (target icon): it recalculates the two from that site's position, as on « Sites de la base », saves them and writes the change to the journal.
 4. The board is a little taller (1080 px): nothing to do in the code, the page just grows.
+
+## [ ] 2026-11-28-427 Admin console, « Fusions à décider »: line and distance between the two sites on the map
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, the map script of the console). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows task 426.
+
+On the case's map, draw a dashed line (#1F2124, 2 px, dashes 6/4) between the two sites' positions, under the two markers. At its middle, a white rounded label with a thin #1F2124 outline shows the distance (12 px, 600), in the unit chosen in Réglages (« 140 m » or « 459 pi »; the same `dist()` helper as the rest of the console). The map fits both sites and the label.
