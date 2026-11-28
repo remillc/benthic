@@ -13,3 +13,4 @@ export const BenthicCore = new Proxy(
 );
 
 export function setCoreErrorHook() {}
+export function setCoreReadOnly() {}

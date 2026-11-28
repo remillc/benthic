@@ -66,7 +66,12 @@ export function errorFromResponse(status, body) {
  *   signInMethod?: 'google'|'apple'|'email',
  *   subscription?: { subscribed?: boolean, store?: 'google'|'apple', price?: string, renewsOn?: string },
  *   storage?: { usedBytes?: number, limitBytes?: number },
+ *   benthicPlus?: { active: boolean, endsOn?: string, endedOn?: string },
+ *   benthicDesktop?: { purchased: boolean, purchasedOn?: string },
+ *   desktopAccess?: { granted: boolean, source?: 'benthic_plus'|'benthic_desktop' },
  * }} AccountOverview
+ * Tasks 2026-11-27-414 and 416: `benthicPlus` is the annual subscription (`endsOn`: the end of the period paid, `endedOn`: the day the last
+ * one ended), `benthicDesktop` the one-time web purchase (no end date), `desktopAccess` what the desktop app computes from them.
  */
 
 /**
@@ -86,6 +91,24 @@ export function overviewOf(r) {
     if (sub.store === 'google' || sub.store === 'apple') out.subscription.store = sub.store;
     if (typeof sub.price === 'string' && sub.price) out.subscription.price = sub.price;
     if (typeof sub.renewsOn === 'string' && /^\d{4}-\d{2}-\d{2}/.test(sub.renewsOn)) out.subscription.renewsOn = sub.renewsOn.slice(0, 10);
+  }
+  // The two rights apart and the desktop access computed from them (tasks 2026-11-27-414 and 416).
+  const day = (/** @type {unknown} */ v) => (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(0, 10) : undefined);
+  const plus = r?.benthicPlus;
+  if (plus && typeof plus === 'object' && typeof plus.active === 'boolean') {
+    out.benthicPlus = { active: plus.active };
+    if (day(plus.endsOn)) out.benthicPlus.endsOn = day(plus.endsOn);
+    if (day(plus.endedOn)) out.benthicPlus.endedOn = day(plus.endedOn);
+  }
+  const desktop = r?.benthicDesktop;
+  if (desktop && typeof desktop === 'object' && typeof desktop.purchased === 'boolean') {
+    out.benthicDesktop = { purchased: desktop.purchased };
+    if (day(desktop.purchasedOn)) out.benthicDesktop.purchasedOn = day(desktop.purchasedOn);
+  }
+  const da = r?.desktopAccess;
+  if (da && typeof da === 'object' && typeof da.granted === 'boolean') {
+    out.desktopAccess = { granted: da.granted };
+    if (da.source === 'benthic_plus' || da.source === 'benthic_desktop') out.desktopAccess.source = da.source;
   }
   const st = r?.storage;
   if (st && typeof st === 'object' && typeof st.usedBytes === 'number' && st.usedBytes >= 0) {

@@ -101,5 +101,6 @@ test('white is for the cards: the tablet\'s detail keeps the page colour; no « 
   const page = read('app/src/pages/DiveDetail.svelte');
   assert.match(page, /:global\(\.view-master-detail \.page-master-detail\.bc-dive-detail\) \{\s*background: var\(--bc-background\);/);
   assert.doesNotMatch(page, /desktopDetail\.fieldsHint/);
-  assert.match(fields, /\{#if hint && layout\.desktop\}<p class="bc-desktop-dive-fields--hint">/);
+  // The desktop keeps it, except in read-only mode (task 414).
+  assert.match(fields, /\{#if hint && layout\.desktop[^}]*\}<p class="bc-desktop-dive-fields--hint">/);
 });

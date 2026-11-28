@@ -23,6 +23,7 @@
   import { ACTIVATED, BENEFITS, afterSignIn, includedGroups, providerOrder, summaryRows } from '../lib/benthic-plus.js';
   import { purchaseSubscription, restorePurchases, signInWithApple, signInWithGoogle } from '../lib/benthic-plus-billing.js';
   import { showSnackbar } from '../lib/snackbar.js';
+  import { browseReadOnly, desktopPurchaseUrl } from '../lib/desktop-access.svelte.js';
   import { BenthicCore } from 'benthic-core';
   import { createServerApi } from '../lib/server-api.js';
   import { serverTransport } from '../lib/server-transport.js';
@@ -109,7 +110,7 @@
       });
       flow.plus.email = session.user.email;
       // As the e-mail sign-in: an account without a subscription goes to the offer, and nothing of it is kept on this device.
-      if (afterSignIn(session.user) === 'offer') {
+      if (afterSignIn(session.user, desktopApp) === 'offer') {
         goOffer();
         return;
       }
@@ -145,7 +146,7 @@
       const dev = await import('../lib/dev-accounts.js');
       const session = await dev.createDevApi().signIn(email, name);
       devOpen = false;
-      if (afterSignIn(session.user) === 'offer') {
+      if (afterSignIn(session.user, desktopApp) === 'offer') {
         dev.rememberPending(session);
         flow.plus.email = session.user.email;
         goOffer();
@@ -255,9 +256,15 @@
 {/if}
 
 {#if step === 'benthicPlusConnect'}
-  <h2 class="bc-plus--title">{t('benthicPlus.connect.title')}</h2>
-  <p class="bc-plus--lead">{t('benthicPlus.connect.lead')}</p>
-  <div class="bc-plus--buttons">
+  {#if flow.desktopAccess}
+    <!-- The desktop app without the right to it (task 2026-11-27-414; bureau-acces-connexion-requise.dc.html). -->
+    <h2 class="bc-plus--title bc-plus--title-access">{t('desktopAccess.required.title')}</h2>
+    <p class="bc-plus--lead bc-plus--lead-access">{t('desktopAccess.required.lead')}</p>
+  {:else}
+    <h2 class="bc-plus--title">{t('benthicPlus.connect.title')}</h2>
+    <p class="bc-plus--lead">{t('benthicPlus.connect.lead')}</p>
+  {/if}
+  <div class="bc-plus--buttons" class:bc-plus--buttons-access={flow.desktopAccess}>
     <!-- The official logos and rules of each provider (assets/brands/README.md): the logos are never altered. -->
     <!-- « Continuer avec Apple » first on iOS (task 2026-11-19-289, ios-odplus-connexion.dc.html). -->
     {#each providerOrder(ios) as which (which)}
@@ -276,8 +283,15 @@
       {/if}
     {/each}
   </div>
-  <p class="bc-plus--note">{t('benthicPlus.connect.note')}</p>
-  <button type="button" class="bc-plus--text bc-plus--text-link" onclick={onwithout}>{t('benthicPlus.connect.without')}</button>
+  {#if flow.desktopAccess}
+    <p class="bc-plus--note">
+      {t('desktopAccess.required.noAccount')} <a class="bc-plus--buy" href={desktopPurchaseUrl} target="_blank" rel="noopener noreferrer">{t('desktopAccess.required.buy')}</a> {t('desktopAccess.required.noAccountAfter')}
+    </p>
+    <button type="button" class="bc-plus--text bc-plus--text-link" onclick={browseReadOnly}>{t('desktopAccess.required.readOnly')}</button>
+  {:else}
+    <p class="bc-plus--note">{t('benthicPlus.connect.note')}</p>
+    <button type="button" class="bc-plus--text bc-plus--text-link" onclick={onwithout}>{t('benthicPlus.connect.without')}</button>
+  {/if}
 {:else if step === 'benthicPlusOffer'}
   <div class="bc-plus--screen bc-plus--screen-offer" class:bc-plus--screen-ios={ios}>
     <!-- A tablet's blue panel (pages/WelcomeStartRelease.svelte) carries the chip, the title and the lead: the hero is the phone's. -->
@@ -485,6 +499,13 @@
 
     /* Google: white (light) or #131314 (dark) with a thin stroke. The supplied "G" is a 24 x 24 picture with a 1 px margin,
        shown at 22 x 22: the letter itself is about 20 px, the size the guidelines fix (custom button). */
+    /* The desktop sign-in screen draws the e-mail choice outlined like the two others (bureau-acces-connexion-requise.dc.html). */
+    .bc-plus--buttons-access .bc-plus--provider-main {
+      border: 1px solid var(--bc-brand-google-border);
+      background: var(--bc-brand-google-bg);
+      color: var(--bc-brand-google-ink);
+    }
+
     .bc-plus--provider-google {
       gap: 10px;
       padding: 0 16px 0 12px;

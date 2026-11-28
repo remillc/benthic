@@ -58,7 +58,7 @@ test('a subscribed account goes to its logbook, any other one to the offer', () 
 
 test('an account without a subscription keeps nothing on the device', () => {
   const source = read('components/FirstLaunchServer.svelte');
-  const offer = source.indexOf("afterSignIn(session.user) === 'offer'");
+  const offer = source.indexOf("afterSignIn(session.user, desktopApp) === 'offer'");
   const save = source.indexOf('serverSessionSave');
   assert.ok(offer > 0 && save > offer, 'the offer is chosen before the session is saved');
   assert.match(source.slice(offer, save), /goOffer\(\);\s*return;/);
@@ -163,7 +163,7 @@ test('« Continuer avec Apple »: a fresh nonce, its SHA-256 to Apple, the token
   const screen = read('components/FirstLaunchBenthicPlus.svelte');
   assert.match(screen, /signInWithApple\(ios \? \(o\) => BenthicCore\.appleSignIn\(o\) : undefined\)/);
   const call = screen.indexOf('.signInApple(');
-  const offer = screen.indexOf("afterSignIn(session.user) === 'offer'", call);
+  const offer = screen.indexOf("afterSignIn(session.user, desktopApp) === 'offer'", call);
   const save = screen.indexOf('serverSessionSave', call);
   assert.ok(call > 0 && offer > call && save > offer, 'the offer is chosen before the session is saved');
   for (const lang of ['fr', 'en']) assert.ok(langs[lang].benthicPlus.providerFailed, `${lang}: providerFailed`);

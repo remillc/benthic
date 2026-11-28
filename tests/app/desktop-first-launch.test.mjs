@@ -37,7 +37,7 @@ function memoryStorage() {
 
 test('the release edition shows « Pour commencer » in the window without a logbook; the beta keeps its start screen', () => {
   const app = read('App.svelte');
-  assert.match(app, /\{#if desktopApp && noLogbook\}\{#if isRelease\}<DesktopFirstLaunch \/>\{:else\}<DesktopLogbookStart \/>\{\/if\}\{\/if\}/);
+  assert.match(app, /\{#if desktopApp && \(noLogbook \|\| accessScreenShown\(false\)\)\}\{#if isRelease\}<DesktopFirstLaunch \/>\{:else\}<DesktopLogbookStart \/>\{\/if\}\{\/if\}/);
   // The beta's screen is the one it always was: its own file, still the start screen of task 2026-11-15-173.
   const start = read('components/DesktopLogbookStart.svelte');
   assert.match(start, /desktopLogbooks\.start\.empty/);

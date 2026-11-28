@@ -98,7 +98,7 @@ test('the window picks its screen from the list, and the profile is still on the
   assert.match(window, /startMode\(logbooks\.recentLoaded \? logbooks\.recent : null\)/);
   assert.match(window, /refreshRecent\(\)\.then\(checkRecent\)/);
   assert.match(window, /<ReleaseProfile still=\{mode === 'recents'\} \/>/);
-  assert.match(window, /\{#if mode\}<FirstLaunchSteps f7router=\{router\} recents=\{mode === 'recents'\} \/>\{\/if\}/);
+  assert.match(window, /\{#if mode \|\| accessMode\}<FirstLaunchSteps f7router=\{router\} recents=\{mode === 'recents'\} \/>\{\/if\}/);
   assert.match(read('components/ReleaseProfile.svelte'), /bc-release-profile--still/);
 });
 

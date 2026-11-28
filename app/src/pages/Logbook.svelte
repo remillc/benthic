@@ -23,6 +23,7 @@
   import FloatingToolbar from '../components/FloatingToolbar.svelte';
   import MenuItem from '../components/MenuItem.svelte';
   import { enterFromMenu } from '../lib/first-launch.svelte.js';
+  import { desktopReadOnly } from '../lib/desktop-access.svelte.js';
   import MenuButton from '../components/MenuButton.svelte';
   import AccountAvatar from '../components/AccountAvatar.svelte';
   import SectionBand from '../components/SectionBand.svelte';
@@ -1819,7 +1820,7 @@
         />
       {/if}
     {/if}
-    {#if !theme.ios && logbook.dives.length && !selecting}
+    {#if !theme.ios && logbook.dives.length && !selecting && !desktopReadOnly()}
       <!-- Hidden while the download pane shows: it is the task the + opened, and it covered "Retry". -->
       {#if !navigation.downloadPanes}
         <FabMenu choices={addChoices} onchoose={choose} />

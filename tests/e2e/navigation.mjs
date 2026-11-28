@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Navigation e2e in a real browser (Chromium headless, driven through the DevTools protocol, no dependency).
 //
-//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-dates-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--multi-dive-only|--dive-tabs-only|--detail-only|--no-monkey|--cylinder-types-only] [--keep]
+//   node tests/e2e/navigation.mjs [--delete-only|--tablet-only|--phone-only|--gestures-only|--regressions-only|--monkey-only|--export-only|--divelogs-only|--desktop-only|--computer-photo-only|--units-only|--profile-section-only|--profile-insets-only|--gear-add-only|--gear-type-dialog-only|--gear-dates-only|--gear-delete-only|--maintenance-entry-only|--profile-info-widths-only|--profile-layers-only|--sync-line-only|--dive-renumber-only|--dive-media-only|--download-only|--certs-fab-only|--cert-agencies-only|--settings-computers-only|--long-press-only|--equipment-only|--benthic-import-only|--list-header-only|--multi-dive-only|--dive-tabs-only|--access-only|--detail-only|--no-monkey|--cylinder-types-only] [--keep]
 //
 // It starts the app's development server (app/vite.e2e.config.js, port BC_E2E_PORT, default 5541) and opens the
 // app at 390x844 (phone, Material look) and at 1280x800 (tablet), with the sample logbook of the core. After each
@@ -39,6 +39,7 @@ import { benthicImportFlows } from './benthic-import-flow.mjs';
 import { desktopListHeaderFlows } from './desktop-list-header.mjs';
 import { cylinderTypeFlows } from './cylinder-types.mjs';
 import { desktopDetailFlows } from './desktop-detail.mjs';
+import { desktopAccessFlows } from './desktop-access.mjs';
 import { multiDiveFlows, desktopSkeletonFlows } from './multi-dive.mjs';
 import { diveDetailTabsFlows } from './dive-detail-tabs.mjs';
 
@@ -170,7 +171,7 @@ children.push({ kill: () => divelogs.close() });
 // The app's development server.
 const vite = spawn(process.execPath, [path.join(root, 'app/node_modules/vite/bin/vite.js'), '--config', 'vite.e2e.config.js'], {
   cwd: path.join(root, 'app'),
-  env: { ...process.env, BC_E2E_PORT: String(PORT), VITE_DIVELOGS_URL: divelogs.url },
+  env: { ...process.env, BC_E2E_PORT: String(PORT), VITE_DIVELOGS_URL: divelogs.url, VITE_SERVER_URL: 'http://127.0.0.1:9' },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 children.push(vite);
@@ -331,7 +332,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
     tab.run((t, r) => window.__bcAnswer(t, r), token, reply).catch(() => {});
   };
   await tab.send('Page.addScriptToEvaluateOnNewDocument', {
-    source: `(${function (home, temp, stage, welcome, mediaPort, plus) {
+    source: `(${function (home, temp, stage, welcome, mediaPort, plus, access) {
       // The very first start (no value) shows the first launch; otherwise the logbook.
       if (welcome) {
         localStorage.removeItem('CapacitorStorage.bc.welcomeBeta');
@@ -349,6 +350,16 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         localStorage.setItem('__bcTestCredential.server', JSON.stringify({ email: 'diver@benthic.test', repositoryUrl: '', branch: '' }));
         localStorage.setItem('CapacitorStorage.bc.benthicPlusSubscribed', '1');
       }
+      // The right to the desktop app (opts.access, task 2026-11-27-414): what the device remembers of its last check, and its session.
+      if (access) {
+        const keep = (name, value) => (value === undefined ? undefined : localStorage.setItem(`CapacitorStorage.bc.${name}`, String(value)));
+        for (const k of ['desktopAccessCheckedAt', 'desktopAccessGranted', 'desktopAccessEndedOn', 'desktopAccessSeenAt']) localStorage.removeItem(`CapacitorStorage.bc.${k}`);
+        if (access.signedIn) localStorage.setItem('__bcTestCredential.server', JSON.stringify({ email: 'diver@benthic.test', repositoryUrl: '', branch: '' }));
+        else localStorage.removeItem('__bcTestCredential.server');
+        if (access.granted !== undefined) keep('desktopAccessGranted', access.granted ? '1' : '0');
+        if (access.daysAgo !== undefined) keep('desktopAccessCheckedAt', Date.now() - access.daysAgo * 86400000);
+        keep('desktopAccessEndedOn', access.endedOn);
+      }
       const answers = new Map();
       let n = 0;
       window.__bcAnswer = (token, reply) => answers.get(token)?.(reply);
@@ -359,7 +370,7 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
       });
       window.benthicDesktop = {
         platform: 'win32',
-        logbook: { id: 'main', kind: 'main', name: '', location: '' },
+        logbook: access && access.noLogbook ? null : { id: 'main', kind: 'main', name: '', location: '' },
         paths: { userData: home, temp, resourcesDir: stage, xsltDir: `${stage}/xslt`, caFile: `${temp}/ca.pem` },
         core: (m, a) => call('core', m, a),
         onCoreEvent: () => () => {},
@@ -380,9 +391,9 @@ async function openTab(width, height, mobile, welcome = false, desktop = false, 
         media: { call: (op, o) => call('media', op, o) },
         mediaUrl: (hash, mime) => `http://127.0.0.1:${mediaPort}/${hash}?type=${encodeURIComponent(mime || '')}`,
       };
-    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)}, ${PORT + 2000}, ${JSON.stringify(!!opts.plus)})`,
+    }})(${JSON.stringify(home)}, ${JSON.stringify(temp)}, ${JSON.stringify(stage || path.dirname(sample))}, ${JSON.stringify(welcome)}, ${PORT + 2000}, ${JSON.stringify(!!opts.plus)}, ${JSON.stringify(opts.access ?? null)})`,
   });
-  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.BC_THEME || 'md'}${desktop ? '&desktop=1' : ''}` });
+  await tab.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/?theme=${opts.theme || process.env.BC_THEME || 'md'}${desktop ? '&desktop=1' : ''}${opts.access ? '&access=1' : ''}` });
   for (let i = 0; i < 100; i++) {
     await sleep(200);
     if (await tab.run((w) => !!document.querySelector(w ? '.bc-welcome.modal-in .bc-first-launch, .bc-welcome.modal-in' : 'a[href^="/dives/"]'), welcome).catch(() => false)) break;
@@ -3047,7 +3058,7 @@ async function accountBackFlows(expect) {
 const blocks = [];
 
 try {
-  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-dates-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only', '--multi-dive-only', '--dive-tabs-only'];
+  const ONLY = ['--delete-only', '--monkey-only', '--gestures-only', '--regressions-only', '--export-only', '--divelogs-only', '--desktop-only', '--computer-photo-only', '--units-only', '--profile-section-only', '--cold-profile-only', '--account-back-only', '--profile-insets-only', '--gear-add-only', '--gear-type-dialog-only', '--gear-dates-only', '--gear-delete-only', '--maintenance-entry-only', '--profile-info-widths-only', '--profile-layers-only', '--sync-line-only', '--sync-state-only', '--dive-renumber-only', '--dive-media-only', '--download-only', '--certs-fab-only', '--cert-agencies-only', '--settings-computers-only', '--long-press-only', '--equipment-only', '--benthic-import-only', '--list-header-only', '--cylinder-types-only', '--detail-only', '--multi-dive-only', '--dive-tabs-only', '--access-only'];
   const fixed = !ONLY.some((flag) => args.has(flag));
   const [phoneOnly, tabletOnly, welcomeOnly] = ['--phone-only', '--tablet-only', '--welcome-only'].map((flag) => args.has(flag));
   /** One check: every key of `want` has that value in `got`. */
@@ -3131,6 +3142,8 @@ try {
     }],
     // The dive detail's tabs and in-place editing on the desktop, a tablet and a phone (tests/e2e/dive-detail-tabs.mjs).
     ['dive detail tabs', '--dive-tabs-only', 60, !phoneOnly && !tabletOnly && !welcomeOnly, () => diveDetailTabsFlows({ ...harness, shot })],
+    // The right to the desktop app: the sign-in screen, the band from day 25, the read-only logbook (tests/e2e/desktop-access.mjs).
+    ['desktop access', '--access-only', 40, !phoneOnly && !tabletOnly && !welcomeOnly, () => desktopAccessFlows({ ...harness, shot })],
     ['phone', '', 160, !tabletOnly && !welcomeOnly, () => phoneFlows()],
     ['first launch', '', 10, !tabletOnly, () => welcomeFlows()],
     ['tablet', '', 8, !phoneOnly, () => tabletFlows()],

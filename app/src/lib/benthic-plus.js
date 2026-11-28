@@ -6,7 +6,8 @@
 /**
  * Where a signed-in account goes: a subscribed one to its logbook, any other one to the offer. A session is kept on
  * the device only for the first.
- * @param {{ subscribed?: boolean }|undefined} user the `user` of the server's sign-in answer
+ * @param {{ subscribed?: boolean, desktopAccess?: boolean }|undefined} user the `user` of the server's sign-in answer
+ * @param {boolean} [desktop] the desktop app: the right to it counts as well
  * @returns {'download'|'offer'}
  */
 /**
@@ -19,7 +20,10 @@ export function providerOrder(ios) {
   return ios ? ['apple', 'google', 'email'] : ['google', 'apple', 'email'];
 }
 
-export function afterSignIn(user) {
+export function afterSignIn(user, desktop = false) {
+  // The desktop app (task 2026-11-27-414): an account that holds the right to it without being a subscriber (a desktop purchase
+  // on the web) keeps its session too.
+  if (desktop && user?.desktopAccess === true) return 'download';
   return user?.subscribed === true ? 'download' : 'offer';
 }
 

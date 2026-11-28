@@ -158,6 +158,11 @@
     --bc-first-row-line: #F0EEE9;
     --bc-first-tile: #E6EEF7;
     --bc-first-tile-warn: #FBEFD9;
+    /* The band about the right to the desktop app (task 2026-11-27-414; bureau-acces-*.dc.html): yellow warning, grey read only. */
+    --bc-access-warning: #FFF4D6;
+    --bc-access-warning-icon: #8A5A00;
+    --bc-access-read-only: #EBEAE5;
+    --bc-access-action: #1F5C99;
     --bc-first-done: #1E6B3A;
     --bc-on-first-done: #FFFFFF;
     --bc-first-pending-ring: #C9CCD0;
@@ -653,6 +658,10 @@
     --bc-first-row-line: #2A2C2F;
     --bc-first-tile: #1E3552;
     --bc-first-tile-warn: #4A3216;
+    --bc-access-warning: #3A2E12;
+    --bc-access-warning-icon: #E5B04A;
+    --bc-access-read-only: #2A2C2F;
+    --bc-access-action: #9CC3EE;
     --bc-first-done: #4FA874;
     --bc-on-first-done: #0B2418;
     --bc-first-pending-ring: #4A4D52;
@@ -2300,4 +2309,16 @@ html.md.bc-bottom-nav .navbar .left:not(:has(a, button)) + .title {
   line-height: 20px;
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+/* The band about the right to the desktop app (components/DesktopAccessBanner.svelte) is fixed at the top of the window: the app starts under it. */
+@layer bc.components {
+  html.bc-has-access-banner .framework7-root {
+    height: calc(100% - var(--bc-access-banner-h, 0px));
+    margin-top: var(--bc-access-banner-h, 0px);
+  }
+
+  html.bc-has-access-banner .bc-nav-rail {
+    top: var(--bc-access-banner-h, 0px);
+  }
 }

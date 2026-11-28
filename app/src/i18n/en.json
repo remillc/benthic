@@ -2951,7 +2951,7 @@
       "Backup and restore: get back a deleted dive, a version of a dive or the whole logbook at a date, on a timeline.",
       "Photos and videos (Benthic+): each dive has its gallery, in shooting order with the profile depth, sent to the account (10 GB) and available on every device.",
       "Profile and equipment (Benthic+): diver profile, certifications drawn like the cards, scanned documents, an emergency sheet, 20 types of equipment with kits, and maintenance reminders by time or by number of dives. A dive’s Equipment tab fills the gear with a kit or the previous dive’s, and lists the other gear. A piece can be paired with the computers already in the logbook, and suits written in several ways merge into one piece. Every suit written in your dives and every dive computer of the logbook is a piece, and a dive’s Suit field picks from the suits. “Get the dive signed” asks a buddy or an instructor to sign. Settings › Weight types (on the desktop too): your weight types and their weight; a weight chosen starts from the previous dive’s.",
-      "Computer (Windows, macOS, Linux): Benthic in three panes, with a logbook table that stays fast with thousands of dives, a dive in tabs, right-click menus and windows for several logbooks.",
+      "Computer (Windows, macOS, Linux): Benthic in three panes, with a logbook table that stays fast with thousands of dives, a dive in tabs, right-click menus, a read-only logbook without Benthic+ or Benthic Desktop and windows for several logbooks.",
       "iPhone and iPad: Benthic follows the iOS look, with the tab bar, dive computer download over Bluetooth, “Continue with Apple” and the import of an Apple Watch Ultra’s dives from Health.",
       "Android: bottom navigation (Logbook, Sites, Statistics, Tools), account avatar and Material 3 Expressive components.",
       "Logbook: dives grouped by year, trips you can select, merge, edit together and shift the date and time of several dives, the wait before flying above the list.",
@@ -5380,6 +5380,39 @@
       "s5": "Tap [kbd]Create repository[/kbd].",
       "s5Desktop": "Click [kbd]Create repository[/kbd].",
       "s6": "Choose [kbd]HTTPS[/kbd] above the repository address, then copy it, for example [code]https://codeberg.org/you/carnet-plongee.git[/code]."
+    }
+  },
+  "desktopAccess": {
+    "required": {
+      "title": "Benthic on a computer needs Benthic+ or Benthic Desktop",
+      "lead": "Sign in with the account of your Benthic+ subscription or your Benthic Desktop purchase. Benthic+ also opens the app on phone and tablet.",
+      "noAccount": "No account yet?",
+      "buy": "Buy Benthic Desktop",
+      "noAccountAfter": "(a Benthic account is created when you buy, with no end date)",
+      "readOnly": "Open a logbook read only",
+      "browseEmpty": "There is no logbook on this computer. Sign in to create one.",
+      "back": "Sign in"
+    },
+    "warning": {
+      "text": "Benthic has not been able to check your account for {days} days.",
+      "action": {
+        "one": "Connect to the Internet within {n} day to keep your access.",
+        "other": "Connect to the Internet within {n} days to keep your access."
+      },
+      "retry": "Try again",
+      "stillOffline": "Benthic could not reach the server. Check the Internet connection."
+    },
+    "readOnly": {
+      "title": "Read only.",
+      "ended": "Your Benthic+ subscription ended on {date}.",
+      "never": "No Benthic account is signed in.",
+      "none": "This account has neither Benthic+ nor Benthic Desktop.",
+      "graceOver": "Benthic has not been able to check your access for more than 30 days.",
+      "tail": "You can view and export the logbook; nothing is added, changed or synced.",
+      "export": "Export the logbook",
+      "signIn": "Sign in",
+      "renew": "Renew",
+      "snackbar": "Read only: sign in with a Benthic+ account to change the logbook."
     }
   },
   "benthicPlus": {

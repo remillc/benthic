@@ -35,6 +35,7 @@ import { signalAccountData } from './account-sync-signal.js';
 import { signOutPush } from './push-notifications.svelte.js';
 import { assignMissingIds, idsLookIncomplete, noteIdsList, useDives } from './dive-id.js';
 import { newId } from './short-id.js';
+import { desktopReadOnly } from './desktop-access.svelte.js';
 
 /** @typedef {import('benthic-core').Dive} Dive */
 /** @typedef {import('benthic-core').Prefs} Prefs */
@@ -874,7 +875,8 @@ function undoCleared() {
  * (« Seulement sur Wi-Fi ou câble », lib/sync-network.svelte.js) and no older version is being browsed.
  */
 export function autoSyncing() {
-  return syncAllowedOnThisNetwork() && !logbook.browsing;
+  // The desktop app without the right to it (task 2026-11-27-414): the logbook is read only, nothing is sent.
+  return syncAllowedOnThisNetwork() && !logbook.browsing && !desktopReadOnly();
 }
 
 /**
