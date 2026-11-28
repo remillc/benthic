@@ -8016,3 +8016,7 @@ On the case's map, draw a dashed line (#1F2124, 2 px, dashes 6/4) between the tw
 ## [ ] 2026-11-28-428 Admin console, account page: back arrow instead of the chevron
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-comptes-fiche.dc.html`. The « Comptes » link at the top of an account page shows a back arrow (←, a shaft with its head) instead of the chevron (‹). Same on any other back link of the console.
+
+## [ ] 2026-11-28-429 Admin console, account page: the line under « Revérifier » follows the mock-up
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`). The line under the account's buttons does not match the mock-up (`docs/mockups/admin/admin-comptes-fiche.dc.html`). Replace « Revérifier relit les droits que le serveur détient pour ce compte et l’inscrit au journal. Les magasins et le fournisseur de paiement ne sont pas encore interrogés. » with the mock-up's text: « Revérifier relit l’état de l’abonnement auprès de Google Play, de l’App Store et du fournisseur de paiement. » The button's behaviour stays as it is until the stores and the payment provider are wired.
