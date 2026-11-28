@@ -8098,13 +8098,13 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html`. Follows task 438: the chips À traiter / Traités / Rejetés sit on the same line as the search box, to its right (the box up to 420 px wide, 12 px between them; they wrap under it on a narrow window), as on « Sites de la base ».
 
-## [ ] 2026-11-28-440 Admin console, « Signalements »: buttons of the selected report
+## [x] 2026-11-28-440 Admin console, « Signalements »: buttons of the selected report
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html`. Same layout as the site panel of « Sites de la base » (task 425).
 
 - **Bottom row** (what answers the report): the main action filled on the left (« Déplacer à la position proposée » for a wrong position; the main answer of the other reasons likewise), its alternative outlined beside it (« Placer moi-même »), and « Rejeter » as a red text button on the right.
 - **Top right, beside the site's name**: « Fusionner avec… » (merge icon) and « Marquer fermé » (closed icon) as blue text buttons, one under the other. They are the other decisions on the site, apart from the report itself. They move out of the bottom row.
 
-## [ ] 2026-11-28-441 Correction to task 440: « Fusionner avec… » and « Marquer fermé » in a ⋮ menu
+## [x] 2026-11-28-441 Correction to task 440: « Fusionner avec… » and « Marquer fermé » in a ⋮ menu
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html` (shown open). Instead of the two text buttons at the top right of the selected report (task 440), one ⋮ icon button (40 px, « Autres décisions ») at the top right, beside the site's name. It opens a menu under it (white, 12 px corners, shadow, 220 px wide) with two items, each with its icon: « Fusionner avec… » and « Marquer fermé ». `aria-haspopup="menu"`, `aria-expanded`, `role="menu"` and `menuitem`; closes with Escape or a click outside; arrows move between the items. The bottom row of task 440 is unchanged.
