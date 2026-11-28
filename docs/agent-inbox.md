@@ -8039,3 +8039,16 @@ Christian asked for this on 28 November 2026. Work in `main` (the app) and in be
 ## [ ] 2026-11-28-432 Admin console, « Comptes »: no hint beside the search button
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`). Remove the text « Courriel exact ou son début » beside « Rechercher » on the « Comptes » search, everywhere it appears (results, no result, search error). The search itself is unchanged (exact address or its beginning). Mock-ups: `docs/mockups/admin/admin-comptes-recherche*.dc.html`.
+
+## [ ] 2026-11-28-433 Admin console: account menu at the top right, « Mon compte » page
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `api/src/console-admins.js`, `assets/console.css`, `docs/console.md`). Mock-ups: `docs/mockups/admin/admin-menu-compte.dc.html`, `admin-mon-compte.dc.html`, and the header of every page. This replaces two points of task 425: « Réglages » leaves the sidebar, and « Se déconnecter » is no longer a button in the header.
+
+1. **Header, every page**: at the right, only a round avatar (36 px, the first letter of the administrator's name, #D4E2F2 on #114477) in a 48 px button (« Compte : <name> »). The name and the « Se déconnecter » button go.
+2. **Account menu** (opens under the avatar; closes with ✕, Escape or a click outside): a rounded card (28 px corners, #ECEAE4, shadow, 360 px wide). At the top, centred, « Administrateur », with ✕ at the right. Then a large avatar (80 px) and « Bonjour, <name> », then an outlined button « Gérer votre compte » (to `/account`). At the bottom, a white rounded block with two items: « Réglages » (gear, to `/settings`) and « Se déconnecter » (exit icon; a POST with the CSRF token, as now). `role="menu"` and `menuitem`, keyboard arrows between the items.
+3. **Sidebar**: remove « Réglages » (it is in the menu now). The groups are otherwise unchanged.
+4. **« Mon compte »** (`/account`, new): two white cards.
+   - « Profil »: Nom, Courriel, « Enregistrer ». The name is the one the header and the logs show.
+   - « Mot de passe »: « Mot de passe actuel », « Nouveau mot de passe » (« Au moins 12 caractères. »), « Confirmer le nouveau mot de passe », « Changer le mot de passe ». The current password is checked; the new one must be 12 characters or more and match the confirmation. After a change, every other console session of this administrator is ended; this one stays. Errors under their field (« Mot de passe actuel incorrect. », « Les deux mots de passe ne sont pas pareils. »).
+   - Both forms are POSTs with the CSRF token. Changes go to the administrators' log, never the password.
+5. Tests: the menu's links, the profile save, the password change (wrong current password, too short, not matching, success ends the other sessions), CSRF refused, the page refused without the console's sign-in.
