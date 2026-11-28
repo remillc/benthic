@@ -8094,6 +8094,6 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 3. Every column sorts (Site, Raison, Signalements, Dernier); default: Dernier, most recent first.
 4. Pagination inside the list's card, under the last row: « 1 à 25 sur N » (N = groups) on the left; « Par page » (25, 50, 100, 200, remembered) and the arrow buttons on the right.
 
-## [ ] 2026-11-28-439 Admin console, « Signalements »: filter chips beside the search box
+## [x] 2026-11-28-439 Admin console, « Signalements »: filter chips beside the search box
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html`. Follows task 438: the chips À traiter / Traités / Rejetés sit on the same line as the search box, to its right (the box up to 420 px wide, 12 px between them; they wrap under it on a narrow window), as on « Sites de la base ».
