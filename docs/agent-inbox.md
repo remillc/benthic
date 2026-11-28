@@ -8024,3 +8024,14 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 ## [ ] 2026-11-28-430 Admin console, « Accorder un accès »: calendar icon in the end date field
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`, `assets/console.css`). In the « Accorder un accès » dialog, the « Date de fin » field has no icon; the mock-up (`docs/mockups/admin/admin-comptes-accorder.dc.html`) shows a calendar icon at the right end of the field (20 px, #4B4A47), inside its outline. Clicking the icon opens the date picker; the value stays written `YYYY-MM-DD`.
+
+## [ ] 2026-11-28-431 Devices of an account: the app reports them, the console lists them and can sign one out
+
+Christian asked for this on 28 November 2026. Work in `main` (the app) and in benthic-server (sessions, `api/src/console-accounts.js`, `docs/console.md`). Mock-up: `docs/mockups/admin/admin-comptes-fiche.dc.html`, section « Appareils ».
+
+1. **App**: at sign-in and at each sync, the app sends with its session: the device type (`phone`, `tablet`, `desktop`), the system and its version (« Android 15 », « iOS 18.1 », « Windows 11 »), the model (« Pixel 8 », « iPad Air »; on desktop none, shown as « Ordinateur Windows / Mac / Linux »), the app version and edition. Nothing else: no name of the device given by its owner, no identifier of the hardware, nothing from the logbook. A device in local mode (no account) sends nothing.
+2. **Server**: keep these fields on the session, with the time of its last activity (last sync or desktop check). A session signed out or expired leaves the list.
+3. **Console, account page**: a section « Appareils » between the rights and « Rôle »: one row per signed-in device, most recent activity first: an icon by type (phone, tablet, computer), the model in bold with « Téléphone · Android 15 » under it, « Version de l’app » (« 0.3.0 beta »), « Dernière activité » (`2026-11-28 06:40`), and a red text button « Déconnecter cet appareil ». Under the table: « Déconnecter oblige l’appareil à se reconnecter. Son carnet reste sur l’appareil. » No devices: « Aucun appareil connecté. »
+4. **« Déconnecter cet appareil »**: a POST with the CSRF token that ends that session at once (its token stops working, its push stream is closed); the app then asks to sign in again and keeps the logbook on the device, with its pending changes. Written to the account's rights log (« Appareil déconnecté », the model, who did it).
+5. **Privacy**: add the device data to the privacy policy (`site/`), in both languages: what is kept, why (support), and that it goes when the device signs out.
+6. Tests: the fields stored at sign-in and updated at sync, the list in the console, signing out a device (its token refused afterwards, the log line), CSRF refused without a token.
