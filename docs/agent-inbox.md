@@ -8108,3 +8108,9 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 ## [x] 2026-11-28-441 Correction to task 440: « Fusionner avec… » and « Marquer fermé » in a ⋮ menu
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html` (shown open). Instead of the two text buttons at the top right of the selected report (task 440), one ⋮ icon button (40 px, « Autres décisions ») at the top right, beside the site's name. It opens a menu under it (white, 12 px corners, shadow, 220 px wide) with two items, each with its icon: « Fusionner avec… » and « Marquer fermé ». `aria-haspopup="menu"`, `aria-expanded`, `role="menu"` and `menuitem`; closes with Escape or a click outside; arrows move between the items. The bottom row of task 440 is unchanged.
+
+## [ ] 2026-11-28-442 Admin console, « Fusions à décider »: « À décider » and « Remis à plus tard » filters
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows task 426.
+
+Under the search box of the cases column, two chips (same look as on « Signalements »): « À décider · N » (chosen by default) and « Remis à plus tard · N ». A case put off with « Décider plus tard » leaves « À décider » and shows only under « Remis à plus tard », where the same three actions are offered; so the « · à revoir » mention in the list goes. The chosen chip is in the address (`?state=later`), and the search filters within it. The scrolling list keeps the height of the window, minus the search and the chips.
