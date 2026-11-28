@@ -8053,7 +8053,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
    - Both forms are POSTs with the CSRF token. Changes go to the administrators' log, never the password.
 5. Tests: the menu's links, the profile save, the password change (wrong current password, too short, not matching, success ends the other sessions), CSRF refused, the page refused without the console's sign-in.
 
-## [ ] 2026-11-28-434 Admin console, « Fusions à décider »: sources of each site, water type menu
+## [x] 2026-11-28-434 Admin console, « Fusions à décider »: sources of each site, water type menu
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows tasks 426 and 427.
 
