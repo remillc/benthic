@@ -8075,7 +8075,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 1. **Case line under the title**: remove the country and region. It reads « 140 m l’un de l’autre · noms trop différents pour fusionner seuls » (the `[c.a.country, c.a.region]` part of the `bc-lede` goes).
 2. **« Région et pays » in each site's card does not match the mock-up.** Now it is a `bc-compare--place` block with a small note label and the value in bold. In the mock-up it is an ordinary row of the card, like « Plongées » or « Carnets »: the label on the left in #4B4A47, the value on the right in regular weight (« Lighthouse Reef, Belize »), a 1 px #E3E1DC line above, 8 px padding top and bottom, 15 px text. It is the first row under the site's name. The text button « Recalculer la région et le pays » sits right under that row, aligned with the card's text (its icon at the left edge), before the « Plongées » row.
 
-## [ ] 2026-11-28-437 Admin console, « Journal des décisions »: search, sortable columns, pagination, rows open where the decision was made
+## [x] 2026-11-28-437 Admin console, « Journal des décisions »: search, sortable columns, pagination, rows open where the decision was made
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `assets/console.css`). Mock-up: `docs/mockups/admin/admin-journal.dc.html`.
 
