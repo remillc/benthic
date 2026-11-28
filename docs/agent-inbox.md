@@ -8052,3 +8052,12 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
    - « Mot de passe »: « Mot de passe actuel », « Nouveau mot de passe » (« Au moins 12 caractères. »), « Confirmer le nouveau mot de passe », « Changer le mot de passe ». The current password is checked; the new one must be 12 characters or more and match the confirmation. After a change, every other console session of this administrator is ended; this one stays. Errors under their field (« Mot de passe actuel incorrect. », « Les deux mots de passe ne sont pas pareils. »).
    - Both forms are POSTs with the CSRF token. Changes go to the administrators' log, never the password.
 5. Tests: the menu's links, the profile save, the password change (wrong current password, too short, not matching, success ends the other sessions), CSRF refused, the page refused without the console's sign-in.
+
+## [ ] 2026-11-28-434 Admin console, « Fusions à décider »: sources of each site, water type menu
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows tasks 426 and 427.
+
+1. **Sources** in each site's card, under the figures (the same data as `admin.siteSources(id)` on the map page): a small heading « Sources », then one line per source: its name in bold, and under it « N carnets · M plongées · à X m » for a logbook site, or « <origin> · importé le <date> · à X m » for an imported source (Wikimedia Commons, the BC, Queensland or Michigan imports…), with a grey chip « Import » after its name.
+2. **Where the name comes from**: the source that gives the site its name has a blue asterisk (« * ») before its name and is always **first** in the list; the other sources follow by number of dives, most first. One legend under the two cards (not inside them): « * Source du nom du site ».
+3. **Type d’eau** becomes a menu in each card (Eau de mer, Eau douce, Eau saumâtre): no outline, the value and a chevron only. Changing it saves the site at once and goes to the decisions journal.
+4. The board is taller (1240 px): nothing to do, the page grows.
