@@ -8020,3 +8020,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 ## [ ] 2026-11-28-429 Admin console, account page: the line under « Revérifier » follows the mock-up
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`). The line under the account's buttons does not match the mock-up (`docs/mockups/admin/admin-comptes-fiche.dc.html`). Replace « Revérifier relit les droits que le serveur détient pour ce compte et l’inscrit au journal. Les magasins et le fournisseur de paiement ne sont pas encore interrogés. » with the mock-up's text: « Revérifier relit l’état de l’abonnement auprès de Google Play, de l’App Store et du fournisseur de paiement. » The button's behaviour stays as it is until the stores and the payment provider are wired.
+
+## [ ] 2026-11-28-430 Admin console, « Accorder un accès »: calendar icon in the end date field
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`, `assets/console.css`). In the « Accorder un accès » dialog, the « Date de fin » field has no icon; the mock-up (`docs/mockups/admin/admin-comptes-accorder.dc.html`) shows a calendar icon at the right end of the field (20 px, #4B4A47), inside its outline. Clicking the icon opens the date picker; the value stays written `YYYY-MM-DD`.
