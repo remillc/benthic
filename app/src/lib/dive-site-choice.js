@@ -4,12 +4,13 @@
 import { matchesSiteText } from './desktop-sites.js';
 
 /**
- * @typedef {{ uuid: number, name: string, country?: string, dives?: number, hasLocation?: boolean, latUdeg?: number, lonUdeg?: number }} ChoiceSite
+ * @typedef {{ uuid: number, name: string, country?: string, dives?: number, lastDate?: string, hasLocation?: boolean, latUdeg?: number, lonUdeg?: number }} ChoiceSite
  */
 
 /**
  * The sites of « Dans votre carnet »: the logbook's own sites only, matching the typed text on the name, the region or
- * the country, in alphabetical order (accents and case ignored, numbers in order). A site with neither a name nor a
+ * the country, in the order of the logbook: the site of the most recent dive first (Christian, 27 November 2026), then
+ * the sites without a dive in alphabetical order (accents and case ignored, numbers in order). A site with neither a name nor a
  * dive is left out, as the choice screens always did. The shared map's sites are never in this list.
  * @template {ChoiceSite} S
  * @param {S[]} sites
@@ -25,7 +26,9 @@ export function logbookChoice(sites, regions, query, locale) {
     .sort((a, b) => {
       // A site without a name goes last.
       if (!a.name !== !b.name) return a.name ? -1 : 1;
-      return collator.compare(a.name, b.name) || a.uuid - b.uuid;
+      // The latest dive first; a site without a dive (no date) after every site with one.
+      const byDate = (b.lastDate ?? '').localeCompare(a.lastDate ?? '');
+      return byDate || collator.compare(a.name, b.name) || a.uuid - b.uuid;
     });
 }
 

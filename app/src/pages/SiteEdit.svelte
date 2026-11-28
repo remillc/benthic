@@ -90,6 +90,8 @@
   const completeRegion = (text) => completions(text, regionsOfCountry(known, deskSites.regions, country, language), []);
   /** The map of a new site from a dive: square on a phone (358 x 360), wide on a tablet (1128 x 400); other forms 2.1 : 1. */
   const mapRatio = $derived(forDive ? (layout.phone ? 1 : 2.8) : 2.1);
+  /** A tablet in landscape: « Nouveau site »'s map is 320 px high, the width of the fields (task 2026-11-27-420). */
+  const flatMap = $derived(!editing && !layout.phone && !layout.portrait);
   const pins = $derived(forDive ? known.filter((x) => x.hasLocation && x.uuid !== editing) : []);
 
   /** The shared map's sites around the position (Benthic+, online), for the map of a new site from a dive. */
@@ -376,16 +378,16 @@
 
   <!-- Full screen (SiteMap's button): the pin still moves, and the new position is kept. -->
   <div class="bc-site-edit--map-card">
-    <SiteMap pin={position} editable cross={!!forDive} sites={pins} hideDiveCounts names="atZoom" namesFromZoom={12} base={baseLayer} onbaseselect={pickShared} label={forDive ? t('diveSite.mapLabel') : undefined} onmove={setPosition} ratio={mapRatio}>
+    <SiteMap pin={position} editable cross={!!forDive} sites={pins} hideDiveCounts names="atZoom" namesFromZoom={12} base={baseLayer} onbaseselect={pickShared} label={forDive ? t('diveSite.mapLabel') : undefined} onmove={setPosition} ratio={flatMap ? 0 : mapRatio} height={flatMap ? '320px' : undefined}>
       {#snippet overlay(/** @type {boolean} */ full)}
         {#if forDive}
-          <MapPlaceSearch onpick={setPosition} />
-          <span class="chip bc-site-edit--chip bc-site-edit--chip-below" class:bc-site-edit--full={full}>{t('diveSite.touchToPlace')}</span>
+          <!-- No instruction over the map (task 2026-11-27-420). -->
+          <MapPlaceSearch onpick={setPosition} wide={!layout.phone} />
           <div class="bc-site-edit--legend" role="group" aria-label={t('diveSite.legend')}>
             <span><svg width="12" height="16" viewBox="-11 -31 22 32" aria-hidden="true"><path d="M0 0c-7-8-11-13-11-19a11 11 0 0 1 22 0c0 6-4 11-11 19z" /></svg>{t('diveSite.legendYours')}</span>
             {#if benthicPlusAccount.signedIn}<span><i class="bc-site-edit--legend-dot" aria-hidden="true"></i>{t('sharedSites.commonMapButton')}<b class="bc-site-edit--legend-plus">B+</b></span>{/if}
           </div>
-        {:else}
+        {:else if editing}
           <span class="chip bc-site-edit--chip" class:bc-site-edit--full={full}>{t('sites.movePin')}</span>
         {/if}
         {#if full && coordsText}<span class="bc-site-edit--coords bc-value">{coordsText}</span>{/if}
@@ -414,7 +416,7 @@
       onchange={typedCoordinates}
       oninput={() => { ++lookups; }}
       invalid={coordsBad}
-      supporting={coordsBad ? t('sites.coordinatesInvalid') : fromComputer ? t('diveSite.computerPosition') : t('sites.coordinatesHint')}
+      supporting={coordsBad ? t('sites.coordinatesInvalid') : editing ? t('sites.coordinatesHint') : ''}
     >
       {#snippet trailing()}
         <button type="button" class="bc-icon-button" onclick={useDevicePosition}>
@@ -423,9 +425,10 @@
         </button>
       {/snippet}
     </TextField>
-    <SuggestField label={t('sites.country')} bind:value={country} suggest={completeCountry} supporting={country && country === autoCountry ? t('sites.fromPosition') : ''} />
-    <SuggestField label={t('sites.region')} bind:value={region} suggest={completeRegion} supporting={region && region === autoRegion ? t('sites.fromPosition') : ''} />
-    <p class="bc-site-edit--explain">{t('sites.placeExplain')}</p>
+    <SuggestField label={t('sites.country')} bind:value={country} suggest={completeCountry} supporting={editing && country && country === autoCountry ? t('sites.fromPosition') : ''} />
+    <SuggestField label={t('sites.region')} bind:value={region} suggest={completeRegion} supporting={editing && region && region === autoRegion ? t('sites.fromPosition') : ''} />
+    <!-- « Nouveau site » has no supporting text under its fields (task 2026-11-27-420); editing a site keeps them. -->
+    {#if editing}<p class="bc-site-edit--explain">{t('sites.placeExplain')}</p>{/if}
   </div>
 
   <div class="bc-form-surface">
@@ -472,18 +475,6 @@
 
       &.bc-site-edit--full {
         top: calc(12px + var(--bc-safe-top));
-      }
-    }
-
-    .bc-site-edit--chip-below {
-      top: 64px;
-      background: color-mix(in srgb, var(--bc-surface) 92%, transparent);
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 12px;
-
-      &.bc-site-edit--full {
-        top: calc(64px + var(--bc-safe-top));
       }
     }
 

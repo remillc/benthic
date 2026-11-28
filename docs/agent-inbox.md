@@ -7869,7 +7869,7 @@ Christian decided this on 27 November 2026. Work in benthic-server. Depends on t
 - « Retirer cet accès ? »: names the product; says the other rights stay (for example « L’abonnement Benthic+ par Google Play reste, et avec lui l’app sur ordinateur. »).
 - Rights log wording: « Benthic Desktop jusqu’au … », « Achat web de Benthic Desktop ».
 
-## [ ] 2026-11-27-415 Dive detail, Carte: full-screen button; 5:4 map on tablet
+## [x] 2026-11-27-415 Dive detail, Carte: full-screen button; 5:4 map on tablet
 
 Christian asked for this on 27 November 2026. Work in `main`.
 - The map of the dive (Carte tab on tablet and desktop, Carte group on the phone) gets a full-screen button at its top right: a round white 44 px button with the « expand » icon (four corners), the same as on the « Nouveau site » map. It opens the map full screen; the system back or Échap closes it.
@@ -7877,10 +7877,97 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` (and their dark and menu variants).
 
-## [ ] 2026-11-27-416 Correction to 415: tablet map in 5:3, and « Ouvrir dans Maps » as drawn
+## [x] 2026-11-27-416 Correction to 415: tablet map in 5:3, and « Ouvrir dans Maps » as drawn
 
 Christian asked for this on 27 November 2026. Work in `main`. Corrects task 2026-11-27-415.
 - Tablet, dive detail, Carte tab: the map keeps a **5:3** ratio (width:height), not 5:4. With it, the whole tab (map, Site, Coordonnées, « Ouvrir dans Maps ») fits in a landscape tablet screen.
 - Check that « Ouvrir dans Maps » matches the mock-up on every device: a text link with the « open externally » icon (square with an arrow), below the Site and Coordonnées fields, in the accent blue; it opens the device's maps app (or the browser on desktop) at the dive's coordinates. Fix any difference.
 
 Mock-ups: `android-tablette-detail-onglet-carte-paysage`, and the Carte part of `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`.
+
+## [x] 2026-11-27-417 Dive detail, Carte: the Site field shows a chevron and opens « Site de la plongée »
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- In the map part of the dive detail (Carte tab on tablet and desktop, Carte group on the phone), the Site field gets a right chevron, like the Site card of the Informations tab.
+- Tapping or clicking it opens « Site de la plongée » (task 2026-11-27-412): search, « Nouveau site », the logbook's sites, the shared map's sites (Benthic+), « Plongée sans site ». Same behaviour as from the Informations tab.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage` (with an orange note on the canvas), `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
+
+## [x] 2026-11-27-418 Dive detail, Carte: a button to copy the coordinates
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- In the map part of the dive detail (Carte tab on tablet and desktop, Carte group on the phone), the Coordonnées field gets a copy button at its right end: a 40 px icon button (two overlapping squares), accessible name and tooltip « Copier les coordonnées ».
+- It copies the coordinates as shown (in the format chosen in Settings) to the clipboard and confirms with a short snackbar « Coordonnées copiées ». It does not open the field for editing.
+
+Mock-ups: `android-tablette-detail-onglet-carte-paysage`, `bureau-carnet-onglet-carte`, `detail-onglets-android`, `ios-detail-onglets`, `detail3-android`, `detail3-ios` and their variants.
+
+## [x] 2026-11-27-419 Tablet, dive detail, Carte tab: side margins around the map
+
+Christian asked for this on 27 November 2026. Work in `main`. Follows tasks 415 and 416.
+- Tablet, Carte tab: the map gets a 48 px margin on its left and right inside the Carte card, and keeps its 5:3 ratio (so it is narrower and less tall: about 675 × 405 px in the landscape mock-up). The Site and Coordonnées fields below keep the full card width.
+
+Mock-up: `android-tablette-detail-onglet-carte-paysage`.
+
+## [x] 2026-11-27-420 « Nouveau site » map, Visibilité and Courant moved to a setting, signatures, tags
+
+Christian asked for this on 27 November 2026. Work in `main`.
+
+**« Nouveau site » (from a dive and from Sites), every device**
+- The instruction over the map (« Touchez la carte pour placer la croix… », « Cliquez sur la carte… ») is removed.
+- No supporting text under the fields: remove « Position de la plongée, relevée par l’ordinateur », « Rempli d’après la position » (Pays, Région) and the paragraph about Pays and Région being updated. The behaviour itself does not change.
+- Tablet: the map takes the full width of the content, like the fields below it, with the same rounded corners on all four sides; it is 320 px high in landscape instead of 400. The search box over the map is narrower: about 420 px instead of the whole width.
+
+**Visibilité and Courant become optional conditions**
+- Dive detail, Informations tab: the « Appréciation » card keeps only « Note ». Visibilité moves out of it (phone, tablet), and the Visibilité row is removed from the Informations tab on desktop.
+- Settings › Carnet: the switch « Vagues de surface, flux-reflux et froid » becomes **« Visibilité, courant, vagues de surface, flux-reflux et froid »**, supporting text « Ajoute ces cinq conditions à l’onglet Informations ». Still off by default (`extraEnvironmentalDefault`). When on, the five conditions show as five-star rows in the Informations tab.
+- As today, a condition already filled in (for example by Subsurface desktop) still shows in the detail whatever the switch.
+- Update `docs/ui-specification.md` (Conditions, and the Settings table) and `fr.json` to match.
+
+**Signatures (phone, tablet)**
+- Each signature is a card with a 1 px border and 12 px corners. On top, the signature image takes the full width of the card in a 128 px high area, with a thin line; the « Retirer la signature de … » button (✕, 48 px target) sits in the image's top-right corner. Below a divider: the name and role (« Taylor · guide de palanquée »), then « Signée au doigt · date ».
+
+**Étiquettes (phone, tablet)**
+- Tags in the detail look like the people chips in « Personnes »: grey filled (`#ECEAE4`, dark `#2A2B2E`), no border, 40 px high, fully rounded corners, 15 px text, and a ✕ button at the end (32 px, accessible name « Retirer l’étiquette … ») that removes the tag. « + Ajouter » keeps its dashed outline.
+
+Mock-ups: `android-tablette-site-nouveau-plongee-paysage`, `nouveau-site-plongee-android`, `ios-nouveau-site-plongee`, `bureau-site-nouveau-plongee`, `bureau-sites-nouveau`; `detail3-android`, `detail3-ios`, `detail-onglets-android`, `ios-detail-onglets`, `android-tablette-detail-onglets-paysage` and their variants (dark, menu, portrait); `bureau-carnet-edition-sur-place`; `android-tablette-reglages-paysage`, `android-reglages`, `reglages-carnet-android`, `bureau-reglages-carnet`.
+
+## [x] 2026-11-27-421 Dive detail, Informations: « Voyage » field under Site on every device
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- The Site card of the Informations tab gets a « Voyage » field right under the site, on tablet and iPhone too (the Android phone already has it): label « Voyage », grey field with the trip name, a ✕ « Retirer du voyage » and a down arrow that opens the trip choice. Same behaviour as on the Android phone.
+- Desktop, Informations tab: a « Voyage » row right after « Site »; when the dive is in no trip it shows « Ajouter à un voyage » in grey. Clicking it opens the same trip choice.
+
+Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-ios`, `detail3-ios-sombre`, `ios-detail-onglets`, `detail2-ios-menu`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
+
+## [x] 2026-11-27-422 Dive detail, Informations: « Conditions » card and « Plongée invalide »
+
+Christian asked for this on 27 November 2026. Work in `main`.
+
+**Conditions (phone, tablet)**
+- A new card « Conditions » (wave icon) in the Informations tab, with six fields on two columns: « Type d’eau » (dropdown) | « Pression en surface »; « Air » | « Eau » (temperatures); « CNS » | « OTU ».
+- Type d’eau, Pression en surface, Air and Eau are editable grey fields, like the other fields of the detail. CNS and OTU are computed: shown read-only, with a thin outline (no grey fill).
+- Order: phone, after « Étiquettes »; tablet, right column, under « Signatures » (left column: Date et heure, Site, Appréciation, Étiquettes, Plongée invalide).
+- When the setting « Visibilité, courant, vagues de surface, flux-reflux et froid » is on (task 420), the five-star conditions go in this card, under CNS and OTU.
+
+**Conditions (desktop)**
+- In the Informations list, after « Type d’eau »: « Pression en surface », « Air », « Eau » (editable), then « CNS » and « OTU » (read-only, outlined).
+
+**Plongée invalide (every device)**
+- Phone and iPhone: the « Plongée invalide » card (switch, « Exclue des statistiques et masquée selon le réglage ») is the last card of the Informations tab, after Conditions, as on Android today.
+- Tablet: same card, left column, under « Étiquettes ».
+- Desktop: a last row « Plongée invalide » with a switch and the same supporting text.
+
+Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-android`, `detail3-ios` and their variants, `detail-onglets-android`, `ios-detail-onglets`, `bureau-carnet-edition-sur-place`, `bureau-detail-choisir-site`.
+
+## [x] 2026-11-27-423 Dive detail, Équipement: empty undersuit field reads « Choisir… »
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- In the Équipement tab of the dive detail, the empty undersuit field shows « Choisir… » instead of « Choisir un sous-vêtement »: change `invitation.undersuit` in `app/src/i18n/fr.json` (and « Choose… » in the English file).
+
+## [x] 2026-11-27-424 Dive detail: 12 px between chip rows
+
+Christian asked for this on 27 November 2026. Work in `main`.
+- In « Personnes » (Guide de palanquée, Compagnons) and « Étiquettes », when the chips wrap, the vertical gap between rows is 12 px; the horizontal gap stays 8 px (`gap: 12px 8px`). Phone and tablet.
+- The mock-ups now show a second companion, « Andrew », next to Michael, to show the wrapping; « + Ajouter » goes to the next row.
+
+Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-android`, `detail3-ios` and their variants, `detail-onglets-android`, `ios-detail-onglets`.

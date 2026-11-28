@@ -374,7 +374,8 @@ public class BenthicCorePlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         onCoreThread(call) { [self] in
-            resolveObject(call, try BenthicNative.getDive(id))
+            // The text as the core wrote it, parsed in JavaScript (parsing it here was most of the call: start-up measures, 27 November 2026).
+            call.resolve(["json": try BenthicNative.getDive(id)])
         }
     }
 

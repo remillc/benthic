@@ -97,11 +97,13 @@ test('Informations: the water type menu and the stars write through the edit pat
   assert.match(fields, /WATER_TYPES\.map/);
   assert.match(fields, /<DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick[^>]*options=\{waterOptions\}[^>]*onsave=/);
   // The stars are the Appréciation card's rows (task 2026-11-23-376): the same save path.
-  assert.match(fields, /<DesktopStarsRow name="visibility"[^>]*onsave=\{\(v\) => save\('visibility', v\)\}/);
-  assert.match(fields, /<DesktopStarsRow name="rating"[^>]*onsave=\{\(v\) => save\('rating', v\)\}/);
+  // The conditions' star rows (visibility among them) are one loop since task 2026-11-27-420: the same save path.
+  assert.match(fields, /const CONDITION_KEYS = \['visibility', 'current', 'wavesize', 'surge', 'chill'\];/);
+  assert.match(fields, /<DesktopStarsRow [^>]*name=\{key\}[^>]*onsave=\{\(v\) => save\(key, v\)\}/);
+  assert.match(fields, /<DesktopStarsRow [^>]*name="rating"[^>]*onsave=\{\(v\) => save\('rating', v\)\}/);
   const editor = read('app/src/components/DesktopEditField.svelte');
   assert.match(editor, /onpointerdown=\{pointerDown\}/);
-  assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) input\.showPicker\(\)/);
+  assert.match(editor, /if \(openChoice && input instanceof HTMLSelectElement\) \{\s*try \{\s*input\.showPicker\(\);/);
 });
 
 test('Informations: buddy and guide editors hide the editing hint, without hiding errors', () => {
@@ -203,7 +205,7 @@ test('Autre équipement: a seam of two props, no storage of its own, absent with
   assert.match(fields, /<DesktopOtherGear items=\{otherItems\} onremove=\{removeGear\} \/>/); // the release edition
 });
 
-test('the Carte tab keeps its height and the tab content replaces the old map block', () => {
+test('the Carte tab keeps its desktop height (a phone and a tablet have their own, task 2026-11-27-416) and the tab content replaces the old map block', () => {
   const fields = read('app/src/components/DesktopDiveFields.svelte');
   assert.match(fields, /\.bc-desktop-dive-fields--map \{\s*flex: none;\s*height: 300px;/);
   assert.doesNotMatch(read('app/src/pages/DiveDetail.svelte'), /desk-map/);
@@ -212,7 +214,7 @@ test('the Carte tab keeps its height and the tab content replaces the old map bl
 test('the texts of the five tabs exist in French and English', () => {
   for (const lang of ['fr', 'en']) {
     const d = JSON.parse(read(`app/src/i18n/${lang}.json`)).desktopDetail;
-    for (const key of ['notRated', 'weightTotal', 'consumption', 'legendStart', 'legendEnd', 'otherGearAdd', 'openSiteLink', 'addCylinder']) assert.ok(d[key], `${lang} ${key}`);
+    for (const key of ['notRated', 'weightTotal', 'consumption', 'legendStart', 'legendEnd', 'otherGearAdd', 'addCylinder']) assert.ok(d[key], `${lang} ${key}`);
     for (const key of ['weights', 'mix', 'pressure', 'coordinates']) assert.ok(d.label[key], `${lang} label.${key}`);
   }
   assert.equal(JSON.parse(read('app/src/i18n/fr.json')).desktopDetail.notRated, 'Non notée');
@@ -236,7 +238,8 @@ test('Benthic+: the undersuit field shows even with no undersuit in the inventor
 
 test('the Informations tab edits the four conditions ratings, the Équipement tab the main computer and the names', () => {
   const fields = read('app/src/components/DesktopDiveFields.svelte');
-  assert.match(fields, /\['current', \.\.\.\(settings\.extraConditions \? \['wavesize', 'surge', 'chill'\] : \[\]\)\]/);
+  // Task 2026-11-27-420: the five conditions with the Settings switch, else the ones already filled in (was: current always).
+  assert.match(fields, /CONDITION_KEYS\.filter\(\(key\) => settings\.extraConditions \|\| Number\(fieldValue\(dive, key, prefs\)\) > 0\)/);
   assert.match(fields, /<ComputersSheet/);
   assert.match(fields, /mainComputer: index/);
   assert.match(fields, /<RenameComputerDialog/);

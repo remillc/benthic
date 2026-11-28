@@ -64,6 +64,7 @@
   import { buildRows } from '../lib/logbook-cards.js';
   import { logbookSummary } from '../lib/logbook-summary.js';
   import { mark } from '../lib/perf.js';
+  import { startSettled } from '../lib/dive-preload.js';
   import { buildSnapshot, saveSnapshot } from '../lib/snapshot.js';
   import { firstDiveOf, orderOf, rememberFirstDetail, seedStartDetail } from '../lib/detail-snapshot.js';
   import { keepDive, loadDive } from '../lib/dive-preload.js';
@@ -126,7 +127,7 @@
     const list = all;
     const prefs = logbook.prefs;
     const timer = setTimeout(() => {
-      saveSnapshot(list.length ? buildSnapshot(list, $state.snapshot(prefs)) : null);
+      saveSnapshot(list.length ? buildSnapshot(list, $state.snapshot(prefs), logbookSummary(list)) : null);
       // Beside the list, the pane shows the first dive: its detail is kept too (lib/detail-snapshot.js).
       const first = layout.split ? firstDiveOf(list) : null;
       if (first && navigation.dive === String(first.id)) rememberFirstDetail(first, orderOf(false), loadDive).catch((e) => console.warn('Keeping the detail', e));
@@ -1017,8 +1018,19 @@
     return `${name} · ${where}\n${t('welcomeSteps.bandNoDives')}`;
   });
 
+  /**
+   * While the logbook loads, the band keeps the place of its line (Christian, 27 November 2026): the line of the last start
+   * (the snapshot), else one of a usual length, drawn as grey blocks and replaced by the real line, so nothing below moves.
+   */
+  const summaryLoading = $derived(logbook.loading && !logbook.error && logbook.dives.length === 0 && !releaseEmpty);
   /** "9 plongées · 4 sites · dernière plongée il y a 9 mois" (the band). */
-  const bandSummary = $derived(releaseEmpty ? emptyBand : logbookSummary(logbook.dives));
+  const bandSummary = $derived(
+    releaseEmpty
+      ? emptyBand
+      : summaryLoading
+        ? logbook.preview?.summary || [t('band.dives', { n: 1000 }), t('band.sites', { n: 100 })].join(' · ')
+        : logbookSummary(logbook.dives),
+  );
 
   /** Number of dives shown: follows the search (the filter row counts the filter). */
   const count = $derived(
@@ -1146,7 +1158,10 @@
           if (data.items.length && !rowsMarked) {
             rowsMarked = true;
             mark('rowsRender');
-            requestAnimationFrame(() => requestAnimationFrame(() => mark('rowsPainted')));
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              mark('rowsPainted');
+              startSettled();
+            }));
           }
           measure();
         },
@@ -1406,7 +1421,7 @@
   </Navbar>
 
   {#if !theme.ios}<BandBackdrop pill={showPill} group={stickyGroup} syncLine />{/if}
-  <SectionBand tall pill={showPill} bare={!theme.ios} syncLine={theme.ios} summary={bandSummary}>
+  <SectionBand tall pill={showPill} bare={!theme.ios} syncLine={theme.ios} summary={bandSummary} placeholder={summaryLoading}>
     {#if showPill}
       {#if conflictWaits}
         <SyncPill icon="sync" text={stoppedText} onclick={reopenConflict} />
@@ -1724,7 +1739,6 @@
               inTrip={row.kind === 'inTrip'}
               index={row.index}
               top={visible.topPosition}
-              pending={row.dive.number ? (logbook.pendingByDive[row.dive.number] ?? []) : []}
               {selecting}
               checked={!!checked[row.dive.id]}
               appear={row.kind === 'inTrip' && row.dive.trip?.id === appearing}
@@ -1824,6 +1838,29 @@
   :global(.md .bc-logbook) {
     --f7-navbar-large-title-height: 64px;
     --f7-subnavbar-height: 76px;
+  }
+
+  /*
+   * Tablet (mock-ups android-tablette-detail-onglets-paysage and the other detail boards; Christian, 27 November 2026):
+   * 16 px above the title's 64 px row, 16 px between the summary and the search field, 52 px of blue under it. The band's
+   * backdrop follows the navbar height and the band's own height, so it grows with them.
+   */
+  :global(.md .bc-tablet .bc-logbook) {
+    --f7-navbar-height: 80px;
+  }
+  :global(.md .bc-tablet .bc-logbook > .navbar .navbar-inner) {
+    padding-top: calc(var(--f7-safe-area-top) + 16px);
+  }
+  /* The band's backdrop (BandBackdrop) paints the whole band, the bar included: the bar's own gradient, sized for the
+     phone, showed a seam at its bottom once the bar was taller. */
+  :global(.md .bc-tablet .bc-logbook > .navbar .navbar-bg) {
+    background-image: none;
+  }
+  :global(.md .bc-tablet .bc-logbook .searchbar.bc-band-search) {
+    margin-top: 16px;
+  }
+  :global(.md .bc-tablet .bc-logbook .bc-section-band--band.bc-section-band--tall:has(.bc-band-search, .bc-folding-search--slot)) {
+    padding-bottom: 52px;
   }
 
   /* The title and the search box at the top of their bands: the room is under the search box. */

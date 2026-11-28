@@ -7,6 +7,7 @@
 //
 // The app's own settings (language, theme, date and time formats, GPS
 // coordinates, Bluetooth filter) live here only.
+import { mark } from './perf.js';
 import { deviceStore } from './device-store.js';
 import { BenthicCore } from 'benthic-core';
 import { invalidateCoreCache } from './core-cache.js';
@@ -131,6 +132,8 @@ function writeJson(key, value) {
 }
 
 /** The core values changed on this device: {key: value}. @type {Partial<CorePrefValues>} */
+/** The settings the core was given at the last start, read by Android before the web layer starts (BenthicCorePlugin.kt). */
+const START_PREFS_KEY = 'bc.startCorePrefs';
 const storedCore = readJson(CORE_KEY) ?? {};
 // "Always hours and minutes" is no longer offered: back to automatic.
 if (storedCore.duration === 'hours') delete storedCore.duration;
@@ -158,7 +161,7 @@ export const settings = $state({
   ...storedApp,
   ...reserve,
   /**
-   * "Surface waves, surge and chill" (spec, section 4, "Conditions"), the
+   * "Visibility, current, surface waves, surge and chill" (spec, section 4, "Conditions"), the
    * core's extraEnvironmentalDefault: off by default. On, editing adds these
    * three conditions; the detail shows filled-in conditions either way.
    */
@@ -197,14 +200,25 @@ export function applyDeviceSettings() {
   storedCore.includeUnusedTanks ??= true;
   delete storedCore.threeMGrid;
   // A value refused by this core (an older version kept something else): the others are kept.
-  send('Restoring the settings of this device', () => BenthicCore.setPrefs({ changes: { ...storedCore, displayDefaultTankInfos: false } }));
+  /** What the core is given now, in order: kept for the next start (bc.startCorePrefs, below). */
+  const startChanges = [{ ...storedCore, displayDefaultTankInfos: false }];
+  send('Restoring the settings of this device', () => BenthicCore.setPrefs({ changes: startChanges[0] }));
   const computers = readJson(COMPUTERS_KEY);
   if (Array.isArray(computers)) {
+    startChanges.push({ diveComputerList: computers });
     send('Restoring the dive computers of this device', () => BenthicCore.setPrefs({ changes: { diveComputerList: computers } }));
   }
+  // Android reads the logbook as soon as the app starts, with the settings given at the last start
+  // (BenthicCorePlugin.prefetchLogbook): its read is used only when these are the same, so a change is always right.
+  deviceStore.setItem(START_PREFS_KEY, JSON.stringify(startChanges));
   // The cylinder types the diver added are files of the account data: migrated from the old device library once, then
-  // given to the core (lib/cylinder-type-library.svelte.js).
-  send('Restoring the cylinder types of this device', () => import('./cylinder-type-library.svelte.js').then((m) => m.startCylinderTypes()));
+  // given to the core (lib/cylinder-type-library.svelte.js). Not awaited: the core's table of types is in memory only and
+  // reading the logbook does not use it, and its call would queue behind the logbook read on the core's one thread (about
+  // a second at start on a tablet with 1,358 dives). The inventory gives the core the list again after each load.
+  import('./cylinder-type-library.svelte.js')
+    .then((m) => m.startCylinderTypes())
+    .then(() => mark('cylinderTypes'))
+    .catch((/** @type {unknown} */ e) => console.error('Restoring the cylinder types of this device', e));
   return Promise.all(calls).then(() => {});
 }
 

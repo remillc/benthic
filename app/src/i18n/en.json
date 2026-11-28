@@ -469,24 +469,7 @@
     "spokenNumber": "Dive {number}",
     "screenReader": "{site}, {date}, duration {duration}, max. depth {depth}",
     "screenReaderNoDepth": "{site}, {date}, duration {duration}",
-    "thumbnail": "Profile, {depth} max. depth",
-    "pending": "{what}, waiting to be sent",
-    "pendingSeveral": "Edited, waiting to be sent",
-    "pendingFields": {
-      "notes": "Notes edited",
-      "suit": "Suit edited",
-      "rating": "Rating edited",
-      "visibility": "Visibility edited",
-      "wavesize": "Surface waves edited",
-      "current": "Current edited",
-      "surge": "Surge edited",
-      "chill": "Chill edited",
-      "buddies": "Buddies edited",
-      "diveguide": "Dive guide edited",
-      "tags": "Tags edited",
-      "site": "Site edited",
-      "dive": "Dive edited"
-    }
+    "thumbnail": "Profile, {depth} max. depth"
   },
   "trip": {
     "startingOn": "Trip starting {date}",
@@ -973,8 +956,8 @@
       "text": "For example pool dives marked invalid"
     },
     "extraConditions": {
-      "label": "Surface waves, surge and chill",
-      "text": "Adds these three conditions to Edit the dive"
+      "label": "Visibility, current, surface waves, surge and chill",
+      "text": "Adds these five conditions to the Information tab"
     },
     "salinity": {
       "label": "Choose the water type in the editor",
@@ -2973,7 +2956,7 @@
       "Android: bottom navigation (Logbook, Sites, Statistics, Tools), account avatar and Material 3 Expressive components.",
       "Logbook: dives grouped by year, trips you can select, merge, edit together and shift the date and time of several dives, the wait before flying above the list.",
       "Planner: rebuilt, with planned dives saved in the logbook, several levels and gases, the volume per gas with the reserve, and sharing (water slate to print, PDF, image, .ssrf file, QR codes).",
-      "Dive: cylinders drawn with their gas, the rebreather seen from the back with the oxygen first, a cylinder opens its edit dialog on phones (a rebreather’s two together), weights as rows with a suggestion on Android, trip and invalid dive in Information, several dive computers (choose the main one, rename), the current, waves, surge and chill ratings, any cylinder type with its own size, cylinders in the order you want, pressures editable on every dive, reading a digital gauge with the camera (Android), a map of the site behind the header.",
+      "Dive: cylinders drawn with their gas, the rebreather seen from the back with the oxygen first, a cylinder opens its edit dialog on phones (a rebreather’s two together), weights as rows with a suggestion on Android, trip and invalid dive in Information, several dive computers (choose the main one, rename), visibility, current, waves, surge and chill ratings on request (Settings › Logbook), signatures as cards, any cylinder type with its own size, cylinders in the order you want, pressures editable on every dive, reading a digital gauge with the camera (Android), a map of the site behind the header.",
       "Sites: a shared map of dive sites next to your own, and “Clean up the sites” to merge duplicates and give a site to the dives that have none; on tablets and computers, “New site” is a floating button on the map; a shared site you tap shows its coordinates to copy, “Directions”, “Add to my sites” and “Report an error”; a dive’s site is chosen from the logbook or the shared map, or created from the dive, and coordinates are typed in decimal degrees, minutes or seconds.",
       "Statistics: each row opens its dives, and the “Where I dive most” heat map shows where your dives concentrate.",
       "Import and export: the .benthic file holds the whole logbook and your data; import of several files, Garmin watches (.fit) and the Suunto app; sending to divelogs.de.",
@@ -4617,6 +4600,11 @@
     }
   },
   "desktopDetail": {
+    "openInMaps": "Open in Maps",
+    "addToTripShort": "Add to a trip",
+    "copyCoordinates": "Copy the coordinates",
+    "coordinatesCopied": "Coordinates copied",
+    "copyFailed": "Coordinates not copied.",
     "diveType": {
       "title": "Dive type",
       "long": { "OC": "Open circuit", "CCR": "CCR rebreather", "PSCR": "pSCR rebreather", "Freedive": "Freediving" },
@@ -4657,6 +4645,7 @@
     "readOnly": "This value comes from the dive computer.",
     "starsLabel": "{label}: {n} of 5",
     "removeItem": "Remove {name}",
+    "removeTag": "Remove the tag {name}",
     "diveCount": {
       "one": "{n} dive",
       "other": "{n} dives"
@@ -4742,7 +4731,7 @@
     },
     "invitation": {
       "kit": "Apply a kit",
-      "undersuit": "Choose an undersuit",
+      "undersuit": "Choose…",
       "site": "Site not set",
       "buddies": "Add buddies",
       "guides": "Add a guide",
@@ -4751,11 +4740,11 @@
       "visibility": "Add the visibility",
       "rating": "Add a rating",
       "suit": "Add the suit",
-      "surfacePressure": "Add the surface pressure",
+      "surfacePressure": "Add",
       "maxDepth": "Add the depth",
       "duration": "Add the duration",
-      "waterTemp": "Add the water temperature",
-      "airTemp": "Add the air temperature",
+      "waterTemp": "Add",
+      "airTemp": "Add",
       "notes": "Add notes",
       "weight": "Add the weight",
       "cylinderType": "Choose a type",
@@ -4767,6 +4756,7 @@
     "notRated": "Not rated",
     "starsOf": "{n} of 5",
     "card": {
+      "map": "Map",
       "datetime": "Date and time",
       "site": "Site",
       "people": "People",
@@ -4780,12 +4770,9 @@
     "weightType": "Type",
     "weightRowsNote": "A chosen type starts from the previous dive’s weight, otherwise from its weight in Settings › Weight types.",
     "weightSuggestionClose": "Close the suggestion",
-    "openSite": "Open the site",
-    "openSiteLink": "See the site in Sites",
     "serial": "no. {serial}",
     "addComputer": "Add a computer",
     "kitFilled": "Filled the fields below; each can still be changed.",
-    "manageComputers": "Main computer and names",
     "addSecondComputer": "+ Add a second computer",
     "addFirstComputer": "+ Add a computer",
     "removeWeightNamed": "Remove {name}",
@@ -6677,6 +6664,7 @@
     },
     "modified": "Changed after the validation",
     "remove": "Remove the validation",
+    "removeOf": "Remove the signature of {name}",
     "removeTitle": "Remove this validation?",
     "removeText": "{name} will no longer appear on this dive.",
     "removePendingText": "It will no longer be able to arrive.",

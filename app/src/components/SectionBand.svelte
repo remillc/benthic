@@ -7,12 +7,12 @@
   // the band: the wave cuts the band, so the map shows under the curve.
   // The page title is not here: it sits on the ☰ row of the top bar (task 2026-11-14-117).
 
-  /** @type {{ summary?: string, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, syncLine?: boolean, children?: import('svelte').Snippet }} */
+  /** @type {{ summary?: string, placeholder?: boolean, tall?: boolean, overMap?: boolean, pill?: boolean, chip?: boolean, bare?: boolean, summaryKey?: unknown, syncLine?: boolean, children?: import('svelte').Snippet }} */
   import { ios } from '../lib/layout.svelte.js';
   import { BAND_PROFILE } from '../lib/band-profile.js';
   import { overlayScrollbar } from '../lib/overlay-scrollbar.js';
   import SyncProfileLine from './SyncProfileLine.svelte';
-  let { summary = '', tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, syncLine = false, children } = $props();
+  let { summary = '', placeholder = false, tall = false, overMap = false, pill = false, chip = false, bare = false, summaryKey = undefined, syncLine = false, children } = $props();
 
   /** @type {HTMLElement|undefined} */
   let band = $state();
@@ -33,7 +33,7 @@
        (the search field). -->
   <div class="bc-section-band bc-section-band--ios">
     {#key summaryKey}
-      {#if summary}<p class="bc-section-band--summary bc-value">{summary}</p>{/if}
+      {#if summary}<p class="bc-section-band--summary bc-value" aria-hidden={placeholder || undefined}><span class:bc-section-band--placeholder={placeholder}>{summary}</span></p>{/if}
     {/key}
     {@render children?.()}
     <!-- No band here: the faint profile and the sync progress line go under the header (task 2026-11-23-340). -->
@@ -52,7 +52,7 @@
   {/if}
   <!-- A new summaryKey cross-fades to the new summary (Sites: the search count). -->
   {#key summaryKey}
-    {#if summary}<p class="bc-section-band--summary bc-value">{summary}</p>{/if}
+    {#if summary}<p class="bc-section-band--summary bc-value" aria-hidden={placeholder || undefined}><span class:bc-section-band--placeholder={placeholder}>{summary}</span></p>{/if}
   {/key}
   {@render children?.()}
 </div>
@@ -157,6 +157,15 @@
         line-height: 18px;
         margin-bottom: 10px;
       }
+    }
+
+    /* The line's place while the logbook loads: its text drawn as blocks (Framework7's skeleton text), in the band's colour. */
+    .bc-section-band--placeholder {
+      color: transparent;
+      background: color-mix(in srgb, var(--bc-on-band-2) 28%, transparent);
+      border-radius: 4px;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
     }
 
     .bc-section-band--summary {

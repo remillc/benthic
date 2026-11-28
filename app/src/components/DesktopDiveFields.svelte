@@ -35,7 +35,8 @@
   import Icon from './Icon.svelte';
   import { logbook, saveDiveChanges, isSubscriber, tripChange } from '../lib/logbook.svelte.js';
   import { settings } from '../lib/settings.svelte.js';
-  import { ios, layout } from '../lib/layout.svelte.js';
+  import { desktopApp, ios, layout } from '../lib/layout.svelte.js';
+  import { webMapUrl } from '../lib/maps-link.js';
   import CylinderEditDialog from './CylinderEditDialog.svelte';
   import CylinderDeleteDialog from './CylinderDeleteDialog.svelte';
   import { blankCylinder, cylinderDraft, draftPatch, newPartDraft, pressureText as draftPressureText, sizeMlOf, sizeText } from '../lib/cylinder-dialog.js';
@@ -65,9 +66,7 @@
   import { copyEquipment } from '../lib/inventory.js';
   import { formatDiveDay, formatTimeOfDay } from '../lib/format.js';
   import { benthicPlusSubscriber } from '../lib/benthic-plus-state.svelte.js';
-  import { formatCoordinates } from '../lib/sites.svelte.js';
-  import { focusSite } from '../lib/site-focus.svelte.js';
-  import { goToSection } from '../lib/navigation.svelte.js';
+  import { formatCoordinates, mapsLink, openInMapsApp } from '../lib/sites.svelte.js';
   import { cylinderTypeLabel } from '../lib/cylinder-types.js';
   import { desktopReadOnly } from '../lib/desktop-access.svelte.js';
 
@@ -105,12 +104,16 @@
   );
   // Benthic+ only (tasks 2026-11-22-332 and 333): without it the kit, the undersuit, « Ce lest était » and « Autre équipement »
   // are not in the tab at all.
+  /** Visibilité, Courant, Vagues de surface, Flux-reflux, Froid: the optional conditions (task 2026-11-27-420). */
+  const CONDITION_KEYS = ['visibility', 'current', 'wavesize', 'surge', 'chill'];
   const plus = $derived(isSubscriber());
   const undersuits = $derived(visibleGear().filter((g) => g.type === 'undersuit'));
   /** The menu's last entry: a new undersuit in the inventory (the field shows to a subscriber even with none yet). */
   const ADD_UNDERSUIT = ':add-undersuit';
   const undersuitOptions = $derived([...undersuits.map((g) => ({ value: g.id, label: g.name })), { value: ADD_UNDERSUIT, label: t('desktopDetail.addUndersuit') }]);
   // Combinaison, for a subscriber: the diver's suit pieces (every suit text of the logbook is one, task 2026-11-26-406).
+  /** The five-star conditions of the Conditions card (task 2026-11-27-420): all five with the Settings switch, else the filled ones. */
+  const starConditions = $derived(CONDITION_KEYS.filter((key) => settings.extraConditions || Number(fieldValue(dive, key, prefs)) > 0));
   const suitPieces = $derived(visibleGear().filter((g) => g.type === 'suit'));
   let suitCounts = $state(/** @type {Map<string, number>} */ (new Map()));
   $effect(() => {
@@ -371,6 +374,18 @@
   let divePosition = $state(/** @type {{ latUdeg: number, lonUdeg: number }|null} */ (null));
   const currentSite = $derived(currentSiteUuid(sites, dive.site));
 
+  /** Copies the dive's coordinates as shown (task 2026-11-27-418). */
+  async function copyCoordinates() {
+    const c = dive.siteCoordinates;
+    if (!c) return;
+    try {
+      await navigator.clipboard.writeText(formatCoordinates(c.latUdeg, c.lonUdeg));
+      showSnackbar(t('desktopDetail.coordinatesCopied'));
+    } catch {
+      showSnackbar(t('desktopDetail.copyFailed'));
+    }
+  }
+
   async function openSiteChooser() {
     if (preview) return;
     const id = dive.id;
@@ -469,6 +484,8 @@
   // and detail3-android); the other devices keep the chips their mock-ups draw. The suggestion is the weight of the latest dive of
   // the logbook with the same suit, cylinders and water, as the old editor offered it, and only on the logbook's most recent dive.
   const rowsLayout = $derived(layout.phone && !ios);
+  /** The dive's map keeps a 5:3 ratio on a tablet (task 2026-11-27-416). */
+  const tabletMap = $derived(!layout.phone && !desktopApp);
   /** @type {Map<number, import('../lib/weight-suggestion.js').WeightSource>} */
   const sourceCache = new Map();
   let sources = $state(/** @type {import('../lib/weight-suggestion.js').WeightSource[]} */ ([]));
@@ -826,13 +843,6 @@
       .filter(Boolean)
       .join(' · '),
   );
-  /** Opens the Sites section on this dive's site. */
-  function openSite() {
-    if (!siteRow) return;
-    focusSite(siteRow.uuid);
-    goToSection('sites');
-  }
-
   /** Ctrl/⌘+E: the first editable field of the tab takes the focus (and starts its edit). */
   let root = $state(/** @type {HTMLElement|undefined} */ (undefined));
   $effect(() => {
@@ -843,11 +853,17 @@
 </script>
 
 <div class="bc-desktop-dive-fields" bind:clientWidth={paneWidth} class:bc-desktop-dive-fields--compact={!layout.desktop} class:bc-desktop-dive-fields--cols={layout.split && !layout.desktop && !layout.portrait} bind:this={root}>
-  {#if hint && !desktopReadOnly()}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
+  <!-- « Les champs gris se modifient… »: on the desktop only, and not in read-only mode (tasks 414; Christian, 27 November 2026). -->
+  {#if hint && layout.desktop && !desktopReadOnly()}<p class="bc-desktop-dive-fields--hint">{t('desktopDetail.fieldsHint')}</p>{/if}
 
   {#if tab === 'info'}
-    <!-- Informations (task 2026-11-23-376): five cards, laid out like the Équipement tab's: site, people, rating, conditions, tags. -->
-    <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info">
+    <!--
+      Informations (tasks 2026-11-23-376 and 2026-11-27-420; mock-ups android-tablette-detail-onglets-paysage, detail-onglets-android):
+      a tablet in landscape has two columns as drawn (task 2026-11-27-422), Date et heure, Site, Appréciation, Étiquettes and
+      Plongée invalide on the left, Personnes, Signatures and Conditions on the right. Elsewhere one column in the phone's order:
+      Date et heure, Site, Personnes, Signatures, Appréciation, Étiquettes, Conditions, Plongée invalide.
+    -->
+    {#snippet datetimeCard()}
       <DesktopEquipmentCard name="datetime" title={t('desktopDetail.card.datetime')}>
         {#snippet icon()}<Icon name="calendar" size={22} />{/snippet}
         <div class="bc-desktop-dive-fields--two-columns">
@@ -856,75 +872,77 @@
         </div>
         <p class="bc-desktop-dive-fields--kit-note">{t(layout.desktop ? 'desktopDetail.dateNoteDesktop' : 'desktopDetail.dateNote')}</p>
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet siteCard()}
       <DesktopEquipmentCard name="site" title={t('desktopDetail.card.site')}>
         {#snippet icon()}<Icon name="place" size={22} />{/snippet}
-        <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} onopen={siteRow ? openSite : undefined} openLabel={t('desktopDetail.openSite')} />
-        {#if layout.phone}
-          <!-- A grey field that opens the sheet of the trips; its cross takes the dive out of its trip (mock-up detail-onglets-android). -->
-          <div class="bc-desktop-dive-fields--trip" data-field="trip">
-            <span class="bc-desktop-dive-fields--trip-label">{t('desktopDetail.label.trip')}</span>
-            <div class="bc-desktop-dive-fields--trip-row">
-              <button type="button" class="bc-desktop-dive-fields--trip-field" aria-haspopup="dialog" aria-label="{t('desktopDetail.label.trip')} : {tripName || t('edit.tripNone')}" disabled={preview} onclick={() => (tripSheet = true)}>
-                <span class="bc-desktop-dive-fields--trip-name" class:bc-desktop-dive-fields--trip-empty={!tripName} class:bc-desktop-dive-fields--trip-has={!!tripName}>{tripName || t('edit.tripNone')}</span>
-                <Icon name="expand" size={24} />
-              </button>
-              {#if tripName}<button type="button" class="bc-desktop-dive-fields--trip-clear" aria-label={t('edit.tripClear')} onclick={() => saveTrip('')}><Icon name="close" size={20} /></button>{/if}
-            </div>
+        <DesktopEditField card noLead name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={siteNote} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} chevron />
+        <!-- « Voyage » under the site on every device (tasks 2026-11-27-421; mock-ups detail-onglets-android,
+             android-tablette-detail-onglets-paysage, ios-detail-onglets, bureau-carnet-edition-sur-place): a grey field that opens
+             the trips' choice, its × taking the dive out of its trip. Empty, it reads « Aucun », on the desktop « Ajouter à un voyage ». -->
+        {@const tripEmpty = t(layout.desktop ? 'desktopDetail.addToTripShort' : 'edit.tripNone')}
+        <div class="bc-desktop-dive-fields--trip" data-field="trip">
+          <span class="bc-desktop-dive-fields--trip-label">{t('desktopDetail.label.trip')}</span>
+          <div class="bc-desktop-dive-fields--trip-row">
+            <button type="button" class="bc-desktop-dive-fields--trip-field" aria-haspopup="dialog" aria-label="{t('desktopDetail.label.trip')} : {tripName || tripEmpty}" disabled={preview} onclick={() => (tripSheet = true)}>
+              <span class="bc-desktop-dive-fields--trip-name" class:bc-desktop-dive-fields--trip-empty={!tripName} class:bc-desktop-dive-fields--trip-has={!!tripName}>{tripName || tripEmpty}</span>
+              <Icon name="expand" size={24} />
+            </button>
+            {#if tripName}<button type="button" class="bc-desktop-dive-fields--trip-clear" aria-label={t('edit.tripClear')} onclick={() => saveTrip('')}><Icon name="close" size={20} /></button>{/if}
           </div>
-        {:else}
-          <DesktopEditField stacked tall name="trip" kind="choice" label={t('desktopDetail.label.trip')} value={tripName} invitation={t('edit.tripNone')} options={tripOptions} onsave={(v) => saveTrip(String(v))} />
-        {/if}
+        </div>
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet peopleCard()}
       <DesktopEquipmentCard name="people" title={t('desktopDetail.card.people')}>
         {#snippet icon()}<Icon name="people" size={22} />{/snippet}
         <DesktopChipsField name="guides" label={t('desktopDetail.label.guideOfDive')} value={dive.guides} known={known.guide} newLabel={t('desktopDetail.newGuide')} onsave={(v) => save('guides', v)} />
         <DesktopChipsField name="buddies" label={t('desktopDetail.label.buddies')} value={dive.buddies} known={known.buddy} newLabel={t('desktopDetail.newBuddy')} onsave={(v) => save('buddies', v)} />
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet signaturesCard()}
       {#if !preview && benthicPlusSubscriber()}
         <DiveSignatures {dive} {onsign} />
       {/if}
-
+    {/snippet}
+    {#snippet ratingCard()}
       <DesktopEquipmentCard name="rating" title={t('desktopDetail.card.rating')}>
         {#snippet icon()}<Icon name="star" size={22} />{/snippet}
-        <DesktopStarsRow name="rating" label={t('desktopDetail.label.note')} value={dive.rating} onsave={(v) => save('rating', v)} />
-        <DesktopStarsRow name="visibility" label={t('desktopDetail.label.visibility')} value={dive.visibility} onsave={(v) => save('visibility', v)} />
-        {#each ['current', ...(settings.extraConditions ? ['wavesize', 'surge', 'chill'] : [])] as key (key)}
-          <DesktopStarsRow name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
-        {/each}
+        <DesktopStarsRow inline={!layout.desktop} name="rating" label={t('desktopDetail.label.note')} value={dive.rating} onsave={(v) => save('rating', v)} />
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet conditionsCard()}
+      <!-- Conditions (task 2026-11-27-422): Type d'eau | Pression en surface, Air | Eau, all four edited in place; CNS | OTU,
+           computed, read-only in an outline. A dive logged by hand also edits its depth and duration here. The five-star
+           conditions follow (task 2026-11-27-420). -->
       <DesktopEquipmentCard name="conditions" title={t('desktopDetail.card.conditions')}>
         {#snippet icon()}<Icon name="waves" size={22} />{/snippet}
         <div class="bc-desktop-dive-fields--two-columns">
           <DesktopEditField stacked tall name="waterType" kind="choice" openChoiceOnClick label={t('desktopDetail.label.waterType')} value={waterValue} invitation={t('edit.notSet')} options={waterOptions} onsave={(v) => save('waterType', String(v))} />
+          <DesktopEditField stacked tall name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
+          <DesktopEditField stacked tall name="airTemp" kind="text" label={t('desktopDetail.label.airTemp')} value={fieldValue(dive, 'airTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.airTemp')} valid={checker('airTemp')} onsave={(v) => save('airTemp', v)} />
+          <DesktopEditField stacked tall name="waterTemp" kind="text" label={t('desktopDetail.label.waterTemp')} value={fieldValue(dive, 'waterTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.waterTemp')} valid={checker('waterTemp')} onsave={(v) => save('waterTemp', v)} />
           {#if manual}
-            <DesktopEditField stacked name="airTemp" kind="text" label={t('desktopDetail.label.airTemp')} value={fieldValue(dive, 'airTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.airTemp')} valid={checker('airTemp')} onsave={(v) => save('airTemp', v)} />
-          {:else}
-            <!-- What the dive computer recorded: plain text, no field (a dash when it recorded none). -->
-            <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.airTemp')} value={dive.airTempMk ? formatTemperature(dive.airTempMk, prefs) : '—'} />
+            <DesktopEditField stacked tall name="maxDepth" kind="text" label={t('desktopDetail.label.maxDepth')} value={fieldValue(dive, 'maxDepth', prefs)} unit={depthUnitText} invitation={t('desktopDetail.invitation.maxDepth')} valid={checker('maxDepth')} onsave={(v) => save('maxDepth', v)} />
+            <DesktopEditField stacked tall name="duration" kind="text" label={t('desktopDetail.label.duration')} value={fieldValue(dive, 'duration', prefs)} unit={t('units.minutes')} invitation={t('desktopDetail.invitation.duration')} valid={checker('duration')} onsave={(v) => save('duration', v)} />
           {/if}
-          <DesktopEditField stacked name="surfacePressure" kind="text" label={t('desktopDetail.label.surfacePressure')} value={fieldValue(dive, 'surfacePressure', prefs)} unit="mbar" invitation={t('desktopDetail.invitation.surfacePressure')} valid={checker('surfacePressure')} onsave={(v) => save('surfacePressure', v)} />
-          {#if manual}
-            <!-- A dive logged by hand has no recorded values: they are edited like the others. -->
-            <DesktopEditField stacked name="maxDepth" kind="text" label={t('desktopDetail.label.maxDepth')} value={fieldValue(dive, 'maxDepth', prefs)} unit={depthUnitText} invitation={t('desktopDetail.invitation.maxDepth')} valid={checker('maxDepth')} onsave={(v) => save('maxDepth', v)} />
-            <DesktopEditField stacked name="duration" kind="text" label={t('desktopDetail.label.duration')} value={fieldValue(dive, 'duration', prefs)} unit={t('units.minutes')} invitation={t('desktopDetail.invitation.duration')} valid={checker('duration')} onsave={(v) => save('duration', v)} />
-            <DesktopEditField stacked name="waterTemp" kind="text" label={t('desktopDetail.label.waterTemp')} value={fieldValue(dive, 'waterTemp', prefs)} unit={temperatureUnitText} invitation={t('desktopDetail.invitation.waterTemp')} valid={checker('waterTemp')} onsave={(v) => save('waterTemp', v)} />
-          {:else if dive.waterTempMk}
-            <DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.waterTemp')} value={formatTemperature(dive.waterTempMk, prefs)} />
-          {/if}
-          {#if dive.cns > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.cns')} value={`${formatNumber(dive.cns, 0)} %`} />{/if}
-          {#if dive.otu > 0}<DesktopEditField stacked kind="text" readonly label={t('desktopDetail.label.otu')} value={formatNumber(dive.otu, 0)} />{/if}
+          <DesktopEditField stacked boxed outlined kind="text" readonly label={t('desktopDetail.label.cns')} value={dive.cns > 0 ? `${formatNumber(dive.cns, 0)} %` : '—'} />
+          <DesktopEditField stacked boxed outlined kind="text" readonly label={t('desktopDetail.label.otu')} value={dive.otu > 0 ? formatNumber(dive.otu, 0) : '—'} />
         </div>
+        <!-- The five conditions (task 2026-11-27-420): every one with the Settings switch, else only those already filled in
+             (for example by Subsurface desktop); under CNS and OTU (task 2026-11-27-422). -->
+        {#each starConditions as key (key)}
+          <DesktopStarsRow inline={!layout.desktop} name={key} label={t(`detail.conditionNames.${key}`)} value={fieldValue(dive, key, prefs)} onsave={(v) => save(key, v)} />
+        {/each}
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet tagsCard()}
       <DesktopEquipmentCard name="tags" title={t('desktopDetail.card.tags')}>
         {#snippet icon()}<Icon name="tag" size={22} />{/snippet}
         <DesktopChipsField name="tags" variant="tag" showLabel={false} label={t('desktopDetail.label.tags')} value={/** @type {string[]} */ (fieldValue(dive, 'tags', prefs))} known={known.tag} newLabel={t('desktopDetail.newTag')} onsave={(v) => save('tags', v)} />
       </DesktopEquipmentCard>
-
+    {/snippet}
+    {#snippet invalidCard()}
       <!-- Ends the tab (mock-up detail-onglets-android): a switch that excludes the dive from the statistics. -->
       <DesktopEquipmentCard name="invalid" title={t('edit.invalid')} subtitle={t('edit.invalidText')}>
         {#snippet icon()}<svg class="bc-desktop-dive-fields--invalid-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M5.6 5.6l12.8 12.8" /></svg>{/snippet}
@@ -932,7 +950,34 @@
           <label class="toggle"><input type="checkbox" role="switch" aria-label={t('edit.invalid')} checked={dive.invalid} disabled={preview} onchange={(e) => saveInvalid(e.currentTarget.checked)} /><span class="toggle-icon"></span></label>
         {/snippet}
       </DesktopEquipmentCard>
-    </div>
+    {/snippet}
+    {#if layout.split && !layout.desktop && !layout.portrait}
+      <div class="bc-desktop-dive-fields--info bc-desktop-dive-fields--info-columns">
+        <div class="bc-desktop-dive-fields--info-column">
+          {@render datetimeCard()}
+          {@render siteCard()}
+          {@render ratingCard()}
+          {@render tagsCard()}
+          {@render invalidCard()}
+        </div>
+        <div class="bc-desktop-dive-fields--info-column">
+          {@render peopleCard()}
+          {@render signaturesCard()}
+          {@render conditionsCard()}
+        </div>
+      </div>
+    {:else}
+      <div class="bc-desktop-dive-fields--equipment bc-desktop-dive-fields--info">
+        {@render datetimeCard()}
+        {@render siteCard()}
+        {@render peopleCard()}
+        {@render signaturesCard()}
+        {@render ratingCard()}
+        {@render tagsCard()}
+        {@render conditionsCard()}
+        {@render invalidCard()}
+      </div>
+    {/if}
   {:else if tab === 'equipment'}
     <!-- Équipement (task 2026-11-23-366): one card per section. -->
     <div class="bc-desktop-dive-fields--equipment">
@@ -957,19 +1002,17 @@
         {#snippet icon()}<Icon name="diveComputer" size={22} />{/snippet}
         {#snippet noComputerPhoto()}{/snippet}
         {#each dive.diveComputers ?? [] as dc, i (i)}
-          <div class="bc-desktop-dive-fields--computer" data-field="computer">
+          <!-- A tap opens « Ordinateurs de cette plongée »: the main computer and the names (Christian, 27 November 2026). -->
+          <button type="button" class="bc-desktop-dive-fields--computer" data-field="computer" aria-haspopup="dialog" disabled={preview} onclick={() => (computersSheet = true)}>
             <span class="bc-desktop-dive-fields--computer-tile" aria-hidden="true">{#if dc.model}<DcTile model={dc.model} size={48} radius={10} photo={ownComputerPhoto(dc.model, dc.serial)} fallback={dive.diveComputers?.length === 1 ? noComputerPhoto : undefined} />{/if}</span>
             <span class="bc-desktop-dive-fields--computer-text">
               <span class="bc-desktop-dive-fields--computer-name">{dc.nickname || dc.model}</span>
               <span class="bc-desktop-dive-fields--computer-role">{[computerRole(i), dc.serial ? t('desktopDetail.serial', { serial: dc.serial }) : ''].filter(Boolean).join(' · ')}</span>
             </span>
-          </div>
+            <span class="bc-desktop-dive-fields--computer-chevron" aria-hidden="true"><Icon name="chevron" size={22} /></span>
+          </button>
         {/each}
         <!-- Computers join a dive when it is downloaded: nothing to type here. -->
-        {#if computers.length}
-          <!-- The main computer of a dive that has several, and the computers' names (the sheet of the phone's detail). -->
-          <button type="button" class="bc-desktop-dive-fields--text-button bc-desktop-dive-fields--add-computer" data-field="computer-manage" disabled={preview} onclick={() => (computersSheet = true)}>{t('desktopDetail.manageComputers')}</button>
-        {/if}
         <button type="button" class="bc-desktop-dive-fields--text-button bc-desktop-dive-fields--add-computer" data-field="computer-add" disabled title={t('desktopDetail.addComputer')}>{t(computers.length ? 'desktopDetail.addSecondComputer' : 'desktopDetail.addFirstComputer')}</button>
       </DesktopEquipmentCard>
 
@@ -982,7 +1025,7 @@
             <DesktopEditField stacked tall name="suit" kind="text" label={t('desktopDetail.label.suit')} value={dive.suit ?? ''} invitation={t('desktopDetail.invitation.suit')} onsave={(v) => save('suit', v)} />
           {/if}
           {#if plus && equipment}
-            <DesktopEditField stacked tall name="undersuit" kind="choice" label={t('desktopDetail.label.undersuit')} value={equipment.undersuitGearId} options={undersuitOptions} invitation={t('desktopDetail.invitation.undersuit')} showHint={false} onsave={(v) => saveUndersuit(v)} />
+            <DesktopEditField stacked tall name="undersuit" kind="choice" openChoiceOnClick label={t('desktopDetail.label.undersuit')} value={equipment.undersuitGearId} options={undersuitOptions} invitation={t('desktopDetail.invitation.undersuit')} showHint={false} onsave={(v) => saveUndersuit(v)} />
           {/if}
         </div>
       </DesktopEquipmentCard>
@@ -1065,17 +1108,60 @@
     <!-- Notes (task 2026-11-23-376): the notes; the rating and the tags are in the Informations tab's cards. -->
     <DesktopEditField name="notes" kind="multiline" label={t('desktopDetail.label.notes')} value={dive.notes} invitation={t('desktopDetail.invitation.notes')} onsave={(v) => save('notes', v)} />
   {:else if tab === 'map'}
-    <!-- Carte (mock-up bureau-carnet-onglet-carte): the map keeps its height, then the site and its position. -->
-    {#if dive.siteCoordinates}
-      <div class="bc-desktop-dive-fields--map"><SiteMap pin={dive.siteCoordinates} height="300px" /></div>
+    <!-- Carte (mock-ups bureau-carnet-onglet-carte, android-tablette-detail-onglet-carte-paysage, detail-onglets-android; tasks 2026-11-27-415
+         and 416). Phone and tablet: one white card with its « Carte » header, the map (220 px on a phone, 5:3 on a tablet), Site and
+         Coordonnées side by side with their labels above, then « Ouvrir dans Maps ». Desktop: the map 300 px high, then the fields in rows. -->
+    <!-- « Copier les coordonnées » (task 2026-11-27-418): copies them as shown, in the Settings' format; never opens the field. -->
+    {#snippet copyButton()}
+      <button type="button" class="bc-desktop-dive-fields--copy" aria-label={t('desktopDetail.copyCoordinates')} title={t('desktopDetail.copyCoordinates')} onclick={copyCoordinates}><Icon name="copy" size={20} /></button>
+    {/snippet}
+    {#snippet mapLink()}
+      {#if dive.siteCoordinates}
+        {@const { latUdeg, lonUdeg } = dive.siteCoordinates}
+        <!-- « Ouvrir dans Maps »: the device's maps app on a phone or tablet, the browser on the desktop. -->
+        <a
+          class="bc-desktop-dive-fields--maps-link external"
+          href={desktopApp ? webMapUrl(latUdeg, lonUdeg) : mapsLink(latUdeg, lonUdeg, dive.site ?? '')}
+          target={desktopApp ? '_blank' : undefined}
+          rel={desktopApp ? 'noopener' : undefined}
+          onclick={ios && !desktopApp ? (e) => (e.preventDefault(), openInMapsApp(latUdeg, lonUdeg, dive.site ?? '')) : undefined}
+        >
+          <Icon name="openInNew" size={18} />{t(ios ? 'sites.openInPlans' : 'desktopDetail.openInMaps')}<span class="bc-sr-only">, {t('sites.opensElsewhere')}</span>
+        </a>
+      {/if}
+    {/snippet}
+    {#if desktopApp}
+      {#if dive.siteCoordinates}
+        <div class="bc-desktop-dive-fields--map">
+          <SiteMap pin={dive.siteCoordinates} height="300px" roundButton />
+        </div>
+      {:else}
+        <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
+      {/if}
+      <DesktopEditField chevron name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
+      {#if dive.siteCoordinates}
+        <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} trailing={copyButton} />
+      {/if}
+      {@render mapLink()}
     {:else}
-      <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
+      <DesktopEquipmentCard name="map" title={t('desktopDetail.card.map')}>
+        {#snippet icon()}<Icon name="map" size={22} />{/snippet}
+        {#if dive.siteCoordinates}
+          <div class="bc-desktop-dive-fields--map bc-desktop-dive-fields--map-card" class:bc-desktop-dive-fields--map-phone={layout.phone} class:bc-desktop-dive-fields--map-tablet={tabletMap}>
+            <SiteMap pin={dive.siteCoordinates} height={layout.phone ? '220px' : '300px'} ratio={tabletMap ? 5 / 3 : 0} roundButton />
+          </div>
+        {:else}
+          <p class="bc-desktop-dive-fields--no-map">{t('desktop.noMap')}</p>
+        {/if}
+        <div class="bc-desktop-dive-fields--map-fields">
+          <DesktopEditField stacked tall chevron name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
+          {#if dive.siteCoordinates}
+            <DesktopEditField stacked boxed kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} trailing={copyButton} />
+          {/if}
+        </div>
+        {@render mapLink()}
+      </DesktopEquipmentCard>
     {/if}
-    <DesktopEditField name="site" kind="site" label={t('desktopDetail.label.site')} value={dive.site} invitation={t('desktopDetail.invitation.site')} note={country} onpick={openSiteChooser} picking={siteChooser || !!siteDialog} />
-    {#if dive.siteCoordinates}
-      <DesktopEditField kind="text" readonly label={t('desktopDetail.label.coordinates')} value={formatCoordinates(dive.siteCoordinates.latUdeg, dive.siteCoordinates.lonUdeg)} />
-    {/if}
-    {#if siteRow}<button type="button" class="bc-desktop-dive-fields--link" onclick={openSite}>{t('desktopDetail.openSiteLink')}</button>{/if}
   {/if}
 </div>
 
@@ -1223,8 +1309,27 @@
       }
     }
 
+    /* Informations on a tablet in landscape: two columns placed as drawn (task 2026-11-27-420), not balanced by height. */
+    .bc-desktop-dive-fields--info-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: 14px;
+      align-items: start;
+      padding-bottom: 64px;
+    }
+    .bc-desktop-dive-fields--info-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+
     /* The Informations tab uses the same cards; the people's rows and the ratings sit in the card's body. */
     .bc-desktop-dive-fields--info {
+      /* « Vagues de surface » is the longest of the conditions' names. */
+      & :global([data-card='conditions']) {
+        --bc-stars-label-width: 140px;
+      }
       & :global([data-card='rating'] .bc-desktop-equipment-card--body) {
         flex-direction: row;
         flex-wrap: wrap;
@@ -1272,13 +1377,29 @@
     /* A dive computer: 64 px grey row, its photo on a 48 px white tile, its name and its role. */
     .bc-desktop-dive-fields--computer {
       box-sizing: border-box;
+      width: 100%;
       height: 64px;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 0 8px;
+      border: 0;
       border-radius: 12px;
       background: var(--bc-field-rest);
+      color: inherit;
+      font: inherit;
+      text-align: start;
+      cursor: pointer;
+      &:disabled {
+        cursor: default;
+      }
+    }
+
+    .bc-desktop-dive-fields--computer-chevron {
+      flex: none;
+      display: grid;
+      margin-inline-start: auto;
+      color: var(--bc-text-2);
     }
 
     .bc-desktop-dive-fields--computer-tile {
@@ -1456,6 +1577,63 @@
       color: var(--bc-text-2);
     }
 
+    /* The map keeps its height: it never shrinks in the pane. A phone's is 220 px; a tablet's keeps 5:3 (task 2026-11-27-416). */
+    .bc-desktop-dive-fields--map.bc-desktop-dive-fields--map-phone {
+      height: 220px;
+    }
+
+    .bc-desktop-dive-fields--map.bc-desktop-dive-fields--map-tablet {
+      height: auto;
+      margin-inline: 48px;
+    }
+
+    /* 40 px round icon button at the end of Coordonnées (mock-ups of task 2026-11-27-418). */
+    .bc-desktop-dive-fields--copy {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      margin: -4px -8px -4px 0;
+      padding: 0;
+      border: 0;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--bc-text-2);
+      cursor: pointer;
+      &:hover {
+        background: var(--bc-surface-container-highest);
+      }
+    }
+
+    .bc-desktop-dive-fields--maps-link {
+      align-self: flex-start;
+      min-height: 40px;
+      padding: 0 12px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--bc-code-active);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* In the phone and tablet card: 16 px corners, no border (mock-ups detail-onglets-android, android-tablette-detail-onglet-carte-paysage). */
+    .bc-desktop-dive-fields--map.bc-desktop-dive-fields--map-card {
+      margin-bottom: 0;
+      border: 0;
+      border-radius: 16px;
+    }
+
+    /* Site and Coordonnées side by side, their labels above. */
+    .bc-desktop-dive-fields--map-fields {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
     /* The map keeps its height: it never shrinks in the pane. */
     .bc-desktop-dive-fields--map {
       flex: none;
@@ -1469,21 +1647,6 @@
     .bc-desktop-dive-fields--no-map {
       margin: 8px 0 12px;
       color: var(--bc-text-2);
-    }
-
-    .bc-desktop-dive-fields--link {
-      align-self: flex-start;
-      width: auto;
-      min-height: 40px;
-      padding: 0;
-      border: 0;
-      background: none;
-      color: var(--bc-code-active);
-      font: inherit;
-      font-size: 14px;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      cursor: pointer;
     }
 
   }

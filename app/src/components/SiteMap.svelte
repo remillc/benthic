@@ -51,6 +51,7 @@
    *   credits?: boolean,
    *   desaturated?: boolean,
    *   fullscreenLabel?: string,
+   *   roundButton?: boolean,
    *   closerInFullScreen?: boolean,
    *   pinsFromZoom?: number,
    *   base?: { sites: { id: string, name: string, lat: number, lon: number, label: string }[] }|null,
@@ -70,6 +71,7 @@
    * frame: the points the map opens on (lon, lat), in place of the sites.
    * credits: the OpenStreetMap line (not on the heat map: it is in About).
    * desaturated: the base map at about 25 % saturation.
+   * roundButton: the full-screen button is a round 44 px button (the dive's Carte, task 2026-11-27-416).
    * fullscreenLabel: the full-screen button's name, when not « Afficher la carte en plein écran ».
    * closerInFullScreen: full screen opens on the same area, slightly closer.
    * names: « fewInFullScreen » (Sites, task 2026-11-14-150): the names show only in full
@@ -118,6 +120,7 @@
     credits = true,
     desaturated = false,
     fullscreenLabel = '',
+    roundButton = false,
     closerInFullScreen = false,
     pinsFromZoom = 0,
     base = null,
@@ -547,8 +550,30 @@
     pinsHidden = z < pinsFromZoom;
   }
 
+  /**
+   * Resolves once the element has a size: a map in a hidden pane (the tablet's Sites and Statistics tabs, built at start)
+   * waits until it is shown. Building the two hidden maps took about half a second of the start on a tablet (start-up
+   * profile, 27 November 2026).
+   * @param {HTMLElement} el
+   * @returns {Promise<void>}
+   */
+  function whenSized(el) {
+    if (el.offsetWidth > 0 && el.offsetHeight > 0) return Promise.resolve();
+    return new Promise((resolve) => {
+      const watch = new ResizeObserver(() => {
+        if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+          watch.disconnect();
+          resolve();
+        }
+      });
+      watch.observe(el);
+    });
+  }
+
   onMount(async () => {
     if (!container) return;
+    await whenSized(container);
+    if (!container.isConnected) return;
     const module = await loadMapLibre();
     maplibregl = /** @type {any} */ (module).default ?? module;
     const { style } = await buildMapStyle(maplibregl);
@@ -703,6 +728,7 @@
   class:bc-map-fullscreen={full}
   class:bc-site-map--quiet={names !== 'always'}
   class:bc-site-map--desaturated={desaturated}
+  class:bc-site-map--round-button={roundButton}
   class:bc-site-map--pins-hidden={pinsHidden}
   class:bc-site-map--form={cross}
   class:bc-site-map--names-on={namesOn}
@@ -765,6 +791,13 @@
       position: fixed;
       inset: 0;
       z-index: 12000;
+    }
+
+    /* roundButton: the dive's map button, round and 44 px (mock-up android-tablette-detail-onglet-carte-paysage). */
+    .bc-site-map--round-button .bc-map-fullscreen-button:not(.bc-map-fullscreen--locate) {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
     }
 
     /* The full-screen button (bc-map-fullscreen-button): a white square, 40 dp (44 pt on

@@ -4,8 +4,8 @@
   // android-tablette-detail-choisir-site-paysage, bureau-detail-choisir-site): what the dive detail's Site card opens.
   // A full screen on a phone (Android: the search bar with ←; iPhone: « Annuler », the title, the search field), a dialog on
   // a tablet and on the desktop with « Dans votre carnet » and « Dans la carte commune » side by side.
-  // The search filters both lists (name, region, country). « Dans votre carnet » is the logbook's sites in alphabetical
-  // order, the dive's site checked. « Dans la carte commune » (Benthic+, online, a position for the dive) lists the shared
+  // The search filters both lists (name, region, country). « Dans votre carnet » is the logbook's sites, the site of the most
+  // recent dive first, the dive's site checked. « Dans la carte commune » (Benthic+, online, a position for the dive) lists the shared
   // map's sites near the dive; choosing one adds it to the diver's sites (the caller does it and links it).
   // Choosing links at once: the caller writes the dive and this component is closed. « Plongée sans site » unlinks it.
   import { onMount } from 'svelte';
@@ -280,7 +280,8 @@
       position: relative;
       box-sizing: border-box;
       width: min(880px, calc(100% - 48px));
-      max-height: calc(100% - 48px);
+      /* Not the whole screen: a margin above and below, the lists scroll inside with a visible bar (27 November 2026). */
+      max-height: min(720px, calc(100% - 96px));
       display: flex;
       flex-direction: column;
       padding: 24px;
@@ -336,6 +337,14 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 24px;
       overflow: auto;
+      scrollbar-gutter: stable;
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: color-mix(in srgb, var(--bc-text) 35%, transparent);
+      }
       &.bc-dive-site-chooser--one {
         grid-template-columns: minmax(0, 1fr);
       }

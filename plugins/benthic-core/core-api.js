@@ -12,6 +12,18 @@ export { setCoreReadOnly } from './read-only.js';
 export { waterTypeOf };
 
 /**
+ * An edit's or an undo's answer with its dive's water type named, as getDive does: the detail shows that dive at once,
+ * and without it the « Eau » fact under the profile went away after any edit, moving the page (27 November 2026).
+ * @template {{ dive?: any }} R
+ * @param {R} result
+ * @returns {R}
+ */
+export function withWaterType(result) {
+  if (result?.dive) result.dive = { ...result.dive, waterType: waterTypeOf(result.dive.salinity) };
+  return result;
+}
+
+/**
  * The column mapping of a CSV import (import_csv in core/libbenthic/benthic.h): `format` is `samples` (a
  * profile per file), `dives` (a dive per line), `seabear` or `poseidon`; `template` the stylesheet of `samples`
  * (`csv`, `SensusCSV`); the other keys are the stylesheets' own: a column index (`timeField`, `depthField`, ...,
@@ -1151,7 +1163,7 @@ export const BenthicCore = {
     return JSON.parse(json);
   },
   async editDive(options) {
-    return JSON.parse((await native.editDive(options)).json);
+    return withWaterType(JSON.parse((await native.editDive(options)).json));
   },
   async siteQuery(options) {
     return JSON.parse((await native.siteQuery(options)).json);
@@ -1216,7 +1228,7 @@ export const BenthicCore = {
     return JSON.parse((await native.tripAction(options)).json);
   },
   async undo(options = {}) {
-    return JSON.parse((await native.undo(options)).json);
+    return withWaterType(JSON.parse((await native.undo(options)).json));
   },
   saveLocal: () => native.saveLocal(),
   writeShareFile: (options) => native.writeShareFile(options),
@@ -1235,7 +1247,10 @@ export const BenthicCore = {
   },
   /** One dive in full; its water type is named here from the core's salinity. */
   async getDive(options) {
-    const dive = await native.getDive(options);
+    // The native side sends the core's text (`json`), parsed here: parsing it in Kotlin took 430 to 680 ms of the core's
+    // thread at start on a tablet, against a few ms for the core itself (27 November 2026). An object is still taken.
+    const answer = await native.getDive(options);
+    const dive = typeof answer?.json === 'string' ? JSON.parse(answer.json) : answer;
     return { ...dive, waterType: waterTypeOf(dive.salinity) };
   },
   async getPrefs() {

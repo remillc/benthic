@@ -42,6 +42,10 @@
    *   unit?: string,
    *   name?: string,
    *   stacked?: boolean,
+   *   boxed?: boolean,
+   *   outlined?: boolean,
+   *   chevron?: boolean,
+   *   trailing?: import('svelte').Snippet,
    *   note?: string,
    *   disabled?: boolean,
    *   card?: boolean,
@@ -59,7 +63,7 @@
    *   onsave?: (value: string|string[]|number) => Promise<boolean|void>|boolean|void,
    * }}
    */
-  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
+  let { label, kind, value, invitation = '', display = '', readonly = false, options = [], known = [], newLabel = '', valid = () => true, unit = '', name = '', stacked = false, boxed = false, outlined = false, chevron = false, trailing, note = '', disabled = false, card = false, noLead = false, tall = false, emptyText = '', onopen, openLabel = '', openChoiceOnClick = false, onpick, picking = false, showHint = true, manage = null, leading, onsave } = $props();
 
   const uid = $props.id();
   // No right to the desktop app (task 2026-11-27-414): every field is plain text, an empty one shows « — ».
@@ -71,6 +75,8 @@
   let draft = $state('');
   /** The text typed in the chips or site input. */
   let typed = $state('');
+  /** A site-kind field filters its list only once the text was changed: opened, it lists every known value (Christian, 27 November 2026). */
+  let siteTyped = $state(false);
   let hovered = $state(false);
   let highlighted = $state(-1);
   /** @type {HTMLElement|undefined} */
@@ -86,7 +92,7 @@
   const invalid = $derived((kind === 'text' || kind === 'multiline') && editing && !valid(text));
   const suggestions = $derived(
     kind === 'list' || kind === 'site'
-      ? listSuggestions(knownOnce, Array.isArray(draft) ? draft : [], typed || (kind === 'site' && typeof draft === 'string' && editing ? draft : ''))
+      ? listSuggestions(knownOnce, Array.isArray(draft) ? draft : [], typed || (kind === 'site' && typeof draft === 'string' && editing && siteTyped ? draft : ''))
       : { matches: [], addNew: null },
   );
   /** The rows of the list under the field: the known values, then « Ajouter … ». */
@@ -150,6 +156,7 @@
 
   /** @param {boolean} [openChoice] */
   function startEdit(openChoice = false) {
+    fingerDown = false;
     if (ro || editing || quiet || sheetOpen || (onpick && picking)) {
       quiet = false;
       return;
@@ -164,18 +171,34 @@
     }
     draft = Array.isArray(value) ? [...value] : value;
     typed = '';
+    siteTyped = false;
     highlighted = -1;
     editing = true;
     tick().then(() => {
       const input = box?.querySelector('input, textarea, select, button');
       input?.focus();
-      if (openChoice && input instanceof HTMLSelectElement) input.showPicker();
+      // Chrome refuses showPicker without a user gesture (a finger's pointerdown is none): the select stays focused, a second tap opens it.
+      if (openChoice && input instanceof HTMLSelectElement) {
+        try {
+          input.showPicker();
+        } catch {
+          // Refused: nothing to report.
+        }
+      }
     });
   }
 
+  /** A finger touched a field whose menu opens on the first tap: its focus opens the menu (never a focus by Tab). */
+  let fingerDown = false;
+
   /** @param {PointerEvent} event */
   function pointerDown(event) {
+    // A mouse opens the menu on the press; a finger on its lift (the focus that follows it), the user gesture Chrome asks for.
     if (!openChoiceOnClick || kind !== 'choice' || event.button !== 0) return;
+    if (event.pointerType !== 'mouse') {
+      fingerDown = true;
+      return;
+    }
     event.preventDefault();
     startEdit(true);
   }
@@ -294,7 +317,7 @@
   <span class="bc-desktop-edit-field--label" class:bc-sr-only={card} id="bc-df-{uid}">{label}</span>
 
   {#if ro}
-    <span class="bc-desktop-edit-field--value bc-value" aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}{shownText || (Array.isArray(value) ? value.join(', ') : '') || (locked ? '—' : '')}</span>
+    <span class="bc-desktop-edit-field--value bc-value" class:bc-desktop-edit-field--boxed={boxed} class:bc-desktop-edit-field--outlined={outlined} aria-labelledby="bc-df-{uid}">{#if leading}{@render leading()}{/if}<span class="bc-desktop-edit-field--value-text">{shownText || (Array.isArray(value) ? value.join(', ') : '') || (locked ? '—' : '')}</span>{#if trailing}{@render trailing()}{/if}</span>
   {:else if disabled}
     <!-- Not wired to any storage yet: grey and dimmed, nothing to edit. -->
     <div class="bc-desktop-edit-field--rest bc-desktop-edit-field--disabled" role="group" aria-disabled="true" aria-label="{label}, {restText}" title={invitation}>
@@ -311,8 +334,8 @@
       tabindex="0"
       aria-label="{label}, {restText}"
       bind:this={rest}
-      onfocus={() => startEdit()}
-      onclick={() => startEdit()}
+      onfocus={() => startEdit(fingerDown)}
+      onclick={() => startEdit(fingerDown)}
       onpointerdown={pointerDown}
       onmouseenter={() => (hovered = true)}
       onmouseleave={() => (hovered = false)}
@@ -340,7 +363,7 @@
         {/if}
       </span>
       {#if note && !card && kind !== 'stars'}<span class="bc-desktop-edit-field--note">{note}</span>{/if}
-      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else if tall}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="expand" size={24} /></span>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
+      {#if onopen}<button type="button" class="bc-desktop-edit-field--open" aria-label={openLabel} title={openLabel} onfocus={(e) => e.stopPropagation()} onclick={(e) => { e.stopPropagation(); onopen(); }}><Icon name="chevron" size={22} /></button>{:else if chevron}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="chevron" size={22} /></span>{:else if tall && kind === 'text'}<!-- A tall text field (Conditions, task 2026-11-27-422): no arrow, it is no menu. -->{:else if tall}<span class="bc-desktop-edit-field--chevron" aria-hidden="true"><Icon name="expand" size={24} /></span>{:else}<span class="bc-desktop-edit-field--pencil" aria-hidden="true"><Icon name="edit" size={18} /></span>{/if}
     </div>
   {:else}
     <div class="bc-desktop-edit-field--edit-wrap">
@@ -352,7 +375,7 @@
           {/each}
           <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={typed} oninput={() => (highlighted = -1)} />
         {:else if kind === 'site'}
-          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={draft} oninput={() => (highlighted = -1)} />
+          <input class="bc-desktop-edit-field--input" type="text" aria-labelledby="bc-df-{uid}" bind:value={draft} oninput={() => ((highlighted = -1), (siteTyped = true))} />
         {:else if kind === 'choice'}
           <select class="bc-desktop-edit-field--input" aria-labelledby="bc-df-{uid}" value={draft} onchange={(e) => chooseOption(/** @type {HTMLSelectElement} */ (e.currentTarget).value)}>
             <option value="">{invitation}</option>
@@ -488,6 +511,32 @@
     }
 
     /* A 48 px field with a chevron at its end (the Équipement cards, task 2026-11-23-366). */
+    /* A read-only value drawn in the grey field box (Carte tab's Coordonnées on a phone or tablet): nothing opens on a tap. */
+    .bc-desktop-edit-field--value.bc-desktop-edit-field--boxed {
+      box-sizing: border-box;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 10px;
+      background: var(--bc-field-rest);
+      color: var(--bc-text);
+      font-size: 15px;
+      & .bc-desktop-edit-field--value-text {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    /* A computed value (CNS, OTU, task 2026-11-27-422): the box's size, a thin outline, no fill. */
+    .bc-desktop-edit-field--value.bc-desktop-edit-field--boxed.bc-desktop-edit-field--outlined {
+      background: none;
+      box-shadow: inset 0 0 0 1px var(--bc-chip-outline);
+    }
+
     .bc-desktop-edit-field--tall {
       & .bc-desktop-edit-field--rest,
       & .bc-desktop-edit-field--editing {
