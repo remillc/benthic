@@ -11,7 +11,7 @@ Rules (agreed between the design agent and the code agent, see `docs/agent-inbox
 - **Ideas:** features not decided yet live in `docs/IDEAS.md` (split on 14 November 2026). Ideas and to-dos share one numbering: a new idea also takes "Next number" below, and an idea keeps its number when it moves here because Christian decides to do it.
 - No other content in this file: no history, no checked boxes, no notes from agents.
 
-Next number: 209
+Next number: 210
 
 ## List
 
@@ -58,3 +58,4 @@ Next number: 209
 - #206 [code] Concernant la console d'administration, analyser les mesures de sécurité en place, leurs forces et faiblesses et les manquements. Comme nous allons y stocker des informations liées au compte de personnes, il faudrait que ces informations soient encryptées dans la base de données. Est-ce possible tout en gardant les fonctionnalités du site?
 - #207 [design] rendre la console d'admin compatible avec tablettes et téléphones
 - #208 [code] ajouter un noindex au site de la console d'admin
+- #209 [code] ajouter un favicon (console d'admin)
