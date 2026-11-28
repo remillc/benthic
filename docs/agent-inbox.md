@@ -7995,3 +7995,14 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 6. **Comptes, admin role** (`admin-comptes-fiche`, `admin-comptes-admin`): a « Rôle » section on the account page, between the rights and the rights log: « Plongeur · N’a pas accès à cette console. » with an outlined button « Nommer administrateur ». It opens a confirmation (« Nommer administrateur ? »: the account will be able to sign in to the console, decide reports and merges, edit sites, grant and remove access and name other administrators; its address must also be added to Cloudflare Access, or the console stays closed to it) with « Annuler » and « Nommer administrateur ». An administrator's page shows « Administrateur » with « Retirer le rôle administrateur » (same confirmation pattern; an administrator cannot remove their own role, so there is always one left). Both are POSTs with the CSRF token, written to the account's rights log with who did it. Replace the single `ADMIN_NAME` with the administrators' accounts: the header shows the signed-in administrator's name. Tests: naming, removing, the last administrator cannot be removed, a non-administrator cannot sign in to the console even past Cloudflare Access.
 
 Update `docs/console.md` for all of the above.
+
+## [ ] 2026-11-28-426 Admin console, « Fusions à décider »: search, scrolling list, rename and recalculate each site
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `assets/console.css`). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows task 425.
+
+1. **Search** above the list of cases: a rounded field « Nom de site ou pays » (same look as on « Sites de la base »); it filters the cases by either site's name or by country, as you type (server side with `?q=`, the page keeps working without JavaScript).
+2. **The list scrolls on its own**: the column keeps the height of the window (`max-height` down to the bottom of the window), with a visible scrollbar; the case panel on the right stays in place. The selected case stays highlighted and is scrolled into view on load.
+3. **Each site's card** in the right panel:
+   - A pencil icon button at the right of the site's name (« Modifier le nom de … »): the name becomes an editable field in place, with « Enregistrer » and « Annuler »; saving renames that site of the base (POST with the CSRF token) and is written to the decisions journal, like an edit on « Sites de la base ».
+   - A row « Région et pays » (« Lighthouse Reef, Belize ») under the name, then a text button « Recalculer la région et le pays » (target icon): it recalculates the two from that site's position, as on « Sites de la base », saves them and writes the change to the journal.
+4. The board is a little taller (1080 px): nothing to do in the code, the page just grows.
