@@ -8084,3 +8084,12 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 3. **Every column sorts**, « Action » included (Quand, Par, Décision, Site et détail, Action), the same headers as on « Sites de la base » (button, blue with an arrow for the sorting column, grey up-down arrow for the others, `aria-sort`). Default: Quand, most recent first. « Action » groups the decisions that can still be undone and those already undone.
 4. **Pagination** inside the list's card, under the last row (a thin line above): « 1 à 25 sur 1 248 » on the left; « Par page » (25, 50, 100, 200, remembered) and the previous / next arrow buttons on the right. Same component as on « Sites de la base ».
 5. **A row opens the page where the decision was made**, with that site or case selected: a position corrected, a report rejected or a site closed from reports → « Signalements »; a merge made by an administrator → « Fusions à décider » (or « Sites de la base » on the resulting site when the case no longer exists); an automatic decision → « Sites de la base » on the site. The whole row is clickable (hover tints it and underlines the decision); the decision is a real link for the keyboard. « Annuler » stays a separate button that undoes without leaving the page.
+
+## [ ] 2026-11-28-438 Admin console, « Signalements »: search, sortable columns, pagination
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html`. Same components as tasks 425 and 437 (« Sites de la base », « Journal des décisions »).
+
+1. Remove the sentence under the title (« Les signalements d’un même site et d’une même raison sont regroupés. »).
+2. A search box « Site, pays ou raison » under the title, above the chips À traiter / Traités / Rejetés; it filters the groups by site name, country or reason, within the chosen chip.
+3. Every column sorts (Site, Raison, Signalements, Dernier); default: Dernier, most recent first.
+4. Pagination inside the list's card, under the last row: « 1 à 25 sur N » (N = groups) on the left; « Par page » (25, 50, 100, 200, remembered) and the arrow buttons on the right.
