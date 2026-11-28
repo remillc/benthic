@@ -8085,7 +8085,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 4. **Pagination** inside the list's card, under the last row (a thin line above): « 1 à 25 sur 1 248 » on the left; « Par page » (25, 50, 100, 200, remembered) and the previous / next arrow buttons on the right. Same component as on « Sites de la base ».
 5. **A row opens the page where the decision was made**, with that site or case selected: a position corrected, a report rejected or a site closed from reports → « Signalements »; a merge made by an administrator → « Fusions à décider » (or « Sites de la base » on the resulting site when the case no longer exists); an automatic decision → « Sites de la base » on the site. The whole row is clickable (hover tints it and underlines the decision); the decision is a real link for the keyboard. « Annuler » stays a separate button that undoes without leaving the page.
 
-## [ ] 2026-11-28-438 Admin console, « Signalements »: search, sortable columns, pagination
+## [x] 2026-11-28-438 Admin console, « Signalements »: search, sortable columns, pagination
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html`. Same components as tasks 425 and 437 (« Sites de la base », « Journal des décisions »).
 
