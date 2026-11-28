@@ -8035,3 +8035,7 @@ Christian asked for this on 28 November 2026. Work in `main` (the app) and in be
 4. **« Déconnecter cet appareil »**: a POST with the CSRF token that ends that session at once (its token stops working, its push stream is closed); the app then asks to sign in again and keeps the logbook on the device, with its pending changes. Written to the account's rights log (« Appareil déconnecté », the model, who did it).
 5. **Privacy**: add the device data to the privacy policy (`site/`), in both languages: what is kept, why (support), and that it goes when the device signs out.
 6. Tests: the fields stored at sign-in and updated at sync, the list in the console, signing out a device (its token refused afterwards, the log line), CSRF refused without a token.
+
+## [ ] 2026-11-28-432 Admin console, « Comptes »: no hint beside the search button
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`). Remove the text « Courriel exact ou son début » beside « Rechercher » on the « Comptes » search, everywhere it appears (results, no result, search error). The search itself is unchanged (exact address or its beginning). Mock-ups: `docs/mockups/admin/admin-comptes-recherche*.dc.html`.
