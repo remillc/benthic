@@ -8062,7 +8062,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 3. **Type d’eau** becomes a menu in each card (Eau de mer, Eau douce, Eau saumâtre): no outline, the value and a chevron only. Changing it saves the site at once and goes to the decisions journal.
 4. The board is taller (1240 px): nothing to do, the page grows.
 
-## [ ] 2026-11-28-435 Admin console: filled text fields everywhere (search boxes excepted)
+## [x] 2026-11-28-435 Admin console: filled text fields everywhere (search boxes excepted)
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`assets/console.css`, the forms in `api/src/console.js`, `console-accounts.js`, `console-admins.js`). Mock-ups: `docs/mockups/admin/admin-fusions.dc.html` (« Nom du site fusionné »), `admin-sites.dc.html`, `admin-mon-compte.dc.html`, `admin-comptes-accorder.dc.html`.
 
