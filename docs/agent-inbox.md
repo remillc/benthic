@@ -8068,7 +8068,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`assets/co
 
 Every text field of the console (text, e-mail, password, date, the « Autre » reason) takes the filled style: background #ECEAE4, no outline, a 1 px #4B4A47 line at the bottom (2 px #114477 on focus), top corners rounded 4 px, 52 px high. The label sits inside the field, at the top left (12 px, #4B4A47), the value under it (16 px). A field without a visible label (the « Autre » reason) is 48 px with its value centred. Help texts and errors under a field are inset 14 px, in line with its text. The date field keeps its calendar icon at the right, inside. One CSS class for all of them (`bc-field--filled` or the like), so every form uses it. Search boxes keep their rounded outlined look.
 
-## [ ] 2026-11-28-436 Admin console, « Fusions à décider »: no country in the case line; « Région et pays » row as in the mock-up
+## [x] 2026-11-28-436 Admin console, « Fusions à décider »: no country in the case line; « Région et pays » row as in the mock-up
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `assets/console.css`). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`.
 
