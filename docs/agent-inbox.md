@@ -7829,7 +7829,7 @@ Out of scope for now: the Mac App Store (Christian will decide later), the choic
 
 Mock-ups (desktop canvas, page « Pour commencer », row « Accès à la version Desktop »): `bureau-acces-connexion-requise`, `bureau-acces-avertissement`, `bureau-acces-lecture-seule`.
 
-## [ ] 2026-11-27-415 Admin console: new « Comptes » section (support for Benthic+ and desktop access)
+## [x] 2026-11-27-415 Admin console: new « Comptes » section (support for Benthic+ and desktop access)
 
 Christian asked for this on 27 November 2026. Work in benthic-server (`api/src/console.js`, `docs/console.md`). **Depends on task 414** (the « accès bureau » right on the server): do 414 first, or at least its entitlement model.
 
@@ -7860,7 +7860,7 @@ Christian decided this on 27 November 2026. Work in `main` and in benthic-server
 - Texts in the desktop app: « Benthic sur ordinateur demande Benthic+ ou Benthic Desktop »; the buy button reads « Acheter Benthic Desktop ». In read-only mode, the grey banner names what ended (« Votre abonnement Benthic+ a pris fin le … »); a Benthic Desktop purchase never ends, so it never leads to read-only mode (only the offline grace period can).
 - Tests: Benthic+ only, Benthic Desktop only, both, neither, Benthic+ ended with Benthic Desktop still bought.
 
-## [ ] 2026-11-27-417 Correction to task 415: the « Comptes » section shows Benthic+ and Benthic Desktop
+## [x] 2026-11-27-417 Correction to task 415: the « Comptes » section shows Benthic+ and Benthic Desktop
 
 Christian decided this on 27 November 2026. Work in benthic-server. Depends on task 416. Replace « Accès bureau » with the two products everywhere in the section (mock-ups updated in `docs/mockups/admin/admin-comptes-*`):
 - Search results: columns Benthic+ (« jusqu’au … », « terminé le … », « jamais eu ») and Benthic Desktop (« acheté le … », « jamais acheté », or « accordé jusqu’au … »).
