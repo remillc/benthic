@@ -8097,3 +8097,10 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 ## [x] 2026-11-28-439 Admin console, « Signalements »: filter chips beside the search box
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html`. Follows task 438: the chips À traiter / Traités / Rejetés sit on the same line as the search box, to its right (the box up to 420 px wide, 12 px between them; they wrap under it on a narrow window), as on « Sites de la base ».
+
+## [ ] 2026-11-28-440 Admin console, « Signalements »: buttons of the selected report
+
+Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html`. Same layout as the site panel of « Sites de la base » (task 425).
+
+- **Bottom row** (what answers the report): the main action filled on the left (« Déplacer à la position proposée » for a wrong position; the main answer of the other reasons likewise), its alternative outlined beside it (« Placer moi-même »), and « Rejeter » as a red text button on the right.
+- **Top right, beside the site's name**: « Fusionner avec… » (merge icon) and « Marquer fermé » (closed icon) as blue text buttons, one under the other. They are the other decisions on the site, apart from the report itself. They move out of the bottom row.
