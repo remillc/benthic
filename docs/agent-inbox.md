@@ -8013,19 +8013,19 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 
 On the case's map, draw a dashed line (#1F2124, 2 px, dashes 6/4) between the two sites' positions, under the two markers. At its middle, a white rounded label with a thin #1F2124 outline shows the distance (12 px, 600), in the unit chosen in Réglages (« 140 m » or « 459 pi »; the same `dist()` helper as the rest of the console). The map fits both sites and the label.
 
-## [ ] 2026-11-28-428 Admin console, account page: back arrow instead of the chevron
+## [x] 2026-11-28-428 Admin console, account page: back arrow instead of the chevron
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-comptes-fiche.dc.html`. The « Comptes » link at the top of an account page shows a back arrow (←, a shaft with its head) instead of the chevron (‹). Same on any other back link of the console.
 
-## [ ] 2026-11-28-429 Admin console, account page: the line under « Revérifier » follows the mock-up
+## [x] 2026-11-28-429 Admin console, account page: the line under « Revérifier » follows the mock-up
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`). The line under the account's buttons does not match the mock-up (`docs/mockups/admin/admin-comptes-fiche.dc.html`). Replace « Revérifier relit les droits que le serveur détient pour ce compte et l’inscrit au journal. Les magasins et le fournisseur de paiement ne sont pas encore interrogés. » with the mock-up's text: « Revérifier relit l’état de l’abonnement auprès de Google Play, de l’App Store et du fournisseur de paiement. » The button's behaviour stays as it is until the stores and the payment provider are wired.
 
-## [ ] 2026-11-28-430 Admin console, « Accorder un accès »: calendar icon in the end date field
+## [x] 2026-11-28-430 Admin console, « Accorder un accès »: calendar icon in the end date field
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`, `assets/console.css`). In the « Accorder un accès » dialog, the « Date de fin » field has no icon; the mock-up (`docs/mockups/admin/admin-comptes-accorder.dc.html`) shows a calendar icon at the right end of the field (20 px, #4B4A47), inside its outline. Clicking the icon opens the date picker; the value stays written `YYYY-MM-DD`.
 
-## [ ] 2026-11-28-431 Devices of an account: the app reports them, the console lists them and can sign one out
+## [x] 2026-11-28-431 Devices of an account: the app reports them, the console lists them and can sign one out
 
 Christian asked for this on 28 November 2026. Work in `main` (the app) and in benthic-server (sessions, `api/src/console-accounts.js`, `docs/console.md`). Mock-up: `docs/mockups/admin/admin-comptes-fiche.dc.html`, section « Appareils ».
 
@@ -8036,11 +8036,11 @@ Christian asked for this on 28 November 2026. Work in `main` (the app) and in be
 5. **Privacy**: add the device data to the privacy policy (`site/`), in both languages: what is kept, why (support), and that it goes when the device signs out.
 6. Tests: the fields stored at sign-in and updated at sync, the list in the console, signing out a device (its token refused afterwards, the log line), CSRF refused without a token.
 
-## [ ] 2026-11-28-432 Admin console, « Comptes »: no hint beside the search button
+## [x] 2026-11-28-432 Admin console, « Comptes »: no hint beside the search button
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console-accounts.js`). Remove the text « Courriel exact ou son début » beside « Rechercher » on the « Comptes » search, everywhere it appears (results, no result, search error). The search itself is unchanged (exact address or its beginning). Mock-ups: `docs/mockups/admin/admin-comptes-recherche*.dc.html`.
 
-## [ ] 2026-11-28-433 Admin console: account menu at the top right, « Mon compte » page
+## [x] 2026-11-28-433 Admin console: account menu at the top right, « Mon compte » page
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `api/src/console-admins.js`, `assets/console.css`, `docs/console.md`). Mock-ups: `docs/mockups/admin/admin-menu-compte.dc.html`, `admin-mon-compte.dc.html`, and the header of every page. This replaces two points of task 425: « Réglages » leaves the sidebar, and « Se déconnecter » is no longer a button in the header.
 
