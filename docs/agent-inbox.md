@@ -7972,7 +7972,7 @@ Christian asked for this on 27 November 2026. Work in `main`.
 
 Mock-ups: `android-tablette-detail-onglets-paysage` (and the other tablet boards with the detail), `detail3-android`, `detail3-ios` and their variants, `detail-onglets-android`, `ios-detail-onglets`.
 
-## [ ] 2026-11-28-425 Admin console: sites page, error reports, settings, admin role
+## [x] 2026-11-28-425 Admin console: sites page, error reports, settings, admin role
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `assets/console.css`, `docs/console.md`). Mock-ups: canvas « Benthic — Site web · Administration », copied in `docs/mockups/admin/` (`admin-signalements` is the canvas's `Main`). Each point says what changes from the console as it is now.
 
@@ -7996,7 +7996,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 
 Update `docs/console.md` for all of the above.
 
-## [ ] 2026-11-28-426 Admin console, « Fusions à décider »: search, scrolling list, rename and recalculate each site
+## [x] 2026-11-28-426 Admin console, « Fusions à décider »: search, scrolling list, rename and recalculate each site
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, `assets/console.css`). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows task 425.
 
@@ -8007,7 +8007,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
    - A row « Région et pays » (« Lighthouse Reef, Belize ») under the name, then a text button « Recalculer la région et le pays » (target icon): it recalculates the two from that site's position, as on « Sites de la base », saves them and writes the change to the journal.
 4. The board is a little taller (1080 px): nothing to do in the code, the page just grows.
 
-## [ ] 2026-11-28-427 Admin console, « Fusions à décider »: line and distance between the two sites on the map
+## [x] 2026-11-28-427 Admin console, « Fusions à décider »: line and distance between the two sites on the map
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`, the map script of the console). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows task 426.
 
