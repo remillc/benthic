@@ -8109,7 +8109,7 @@ Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/c
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-signalements.dc.html` (shown open). Instead of the two text buttons at the top right of the selected report (task 440), one ⋮ icon button (40 px, « Autres décisions ») at the top right, beside the site's name. It opens a menu under it (white, 12 px corners, shadow, 220 px wide) with two items, each with its icon: « Fusionner avec… » and « Marquer fermé ». `aria-haspopup="menu"`, `aria-expanded`, `role="menu"` and `menuitem`; closes with Escape or a click outside; arrows move between the items. The bottom row of task 440 is unchanged.
 
-## [ ] 2026-11-28-442 Admin console, « Fusions à décider »: « À décider » and « Remis à plus tard » filters
+## [x] 2026-11-28-442 Admin console, « Fusions à décider »: « À décider » and « Remis à plus tard » filters
 
 Christian asked for this on 28 November 2026. Work in benthic-server (`api/src/console.js`). Mock-up: `docs/mockups/admin/admin-fusions.dc.html`. Follows task 426.
 
